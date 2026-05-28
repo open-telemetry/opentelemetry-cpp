@@ -1,0 +1,308 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::sdk::trace::Tracer</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1trace_1_1Tracer" prot="public" virt="non-virtual">opentelemetry::trace::Tracer</basecompoundref>
+    <basecompoundref prot="public" virt="non-virtual">std::enable_shared_from_this&lt; Tracer &gt;</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a802ac7e0d21753a3879b0a6361c1c6e0" prot="private" static="no" mutable="no">
+        <type>std::shared_ptr&lt; InstrumentationScope &gt;</type>
+        <definition>std::shared_ptr&lt;InstrumentationScope&gt; opentelemetry::sdk::trace::Tracer::instrumentation_scope_</definition>
+        <argsstring></argsstring>
+        <name>instrumentation_scope_</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::instrumentation_scope_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="108" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" bodystart="108" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a3c596d825bcd7dc3b82adea611f938fb" prot="private" static="no" mutable="no">
+        <type>std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref> &gt;</type>
+        <definition>std::shared_ptr&lt;TracerContext&gt; opentelemetry::sdk::trace::Tracer::context_</definition>
+        <argsstring></argsstring>
+        <name>context_</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::context_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="109" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" bodystart="109" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1aacb984ac87bfc8e6e52ce8b044b759bd" prot="private" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref></type>
+        <definition>TracerConfig opentelemetry::sdk::trace::Tracer::tracer_config_</definition>
+        <argsstring></argsstring>
+        <name>tracer_config_</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::tracer_config_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="110" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" bodystart="110" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a8cdc77284c514f95d87dc17d48efcc8c" prot="private" static="yes" mutable="no">
+        <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1NoopTracer" kindref="compound">opentelemetry::trace::NoopTracer</ref> &gt;</type>
+        <definition>const std::shared_ptr&lt;opentelemetry::trace::NoopTracer&gt; opentelemetry::sdk::trace::Tracer::kNoopTracer</definition>
+        <argsstring></argsstring>
+        <name>kNoopTracer</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::kNoopTracer</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="111" column="32" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" bodystart="111" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a7e145c2f1b22955670566c7aa5821ae2" prot="public" static="no" const="no" explicit="yes" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::Tracer::Tracer</definition>
+        <argsstring>(std::shared_ptr&lt; TracerContext &gt; context, std::unique_ptr&lt; InstrumentationScope &gt; instrumentation_scope=InstrumentationScope::Create(&quot;&quot;)) noexcept</argsstring>
+        <name>Tracer</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::Tracer</qualifiedname>
+        <param>
+          <type>std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref> &gt;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; InstrumentationScope &gt;</type>
+          <declname>instrumentation_scope</declname>
+          <defval>InstrumentationScope::Create(&quot;&quot;)</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Construct a new Tracer with the given context pipeline. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="38" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a576d4ce11a7f81c0cb96051323357082" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">opentelemetry::trace::Span</ref> &gt;</type>
+        <definition>nostd::shared_ptr&lt; opentelemetry::trace::Span &gt; opentelemetry::sdk::trace::Tracer::StartSpan</definition>
+        <argsstring>(nostd::string_view name, const opentelemetry::common::KeyValueIterable &amp;attributes, const opentelemetry::trace::SpanContextKeyValueIterable &amp;links, const opentelemetry::trace::StartSpanOptions &amp;options={}) noexcept override</argsstring>
+        <name>StartSpan</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::StartSpan</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" kindref="compound">opentelemetry::trace::SpanContextKeyValueIterable</ref> &amp;</type>
+          <declname>links</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1trace_1_1StartSpanOptions" kindref="compound">opentelemetry::trace::StartSpanOptions</ref> &amp;</type>
+          <declname>options</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="42" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a052cd3c0cb25efe359db01aa73414bf7" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::Tracer::ForceFlushWithMicroseconds</definition>
+        <argsstring>(uint64_t timeout) noexcept override</argsstring>
+        <name>ForceFlushWithMicroseconds</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::ForceFlushWithMicroseconds</qualifiedname>
+        <param>
+          <type>uint64_t</type>
+          <declname>timeout</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="76" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a87da4aa765bcf89a484c5e3451c3550a" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::Tracer::CloseWithMicroseconds</definition>
+        <argsstring>(uint64_t timeout) noexcept override</argsstring>
+        <name>CloseWithMicroseconds</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::CloseWithMicroseconds</qualifiedname>
+        <param>
+          <type>uint64_t</type>
+          <declname>timeout</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="78" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a22e823539eaf1d07941cae9f4022a6b9" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &amp;</type>
+        <definition>SpanProcessor &amp; opentelemetry::sdk::trace::Tracer::GetProcessor</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetProcessor</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::GetProcessor</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the configured span processor. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="82" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" bodystart="82" bodyend="82"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a21b47452623bd6e6436c673bfc464ecc" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator" kindref="compound">IdGenerator</ref> &amp;</type>
+        <definition>IdGenerator &amp; opentelemetry::sdk::trace::Tracer::GetIdGenerator</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetIdGenerator</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::GetIdGenerator</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the configured Id generator </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="85" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" bodystart="85" bodyend="85"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a80c4c9a13673f3571fdc9d63ad2c85ed" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>const InstrumentationScope &amp;</type>
+        <definition>const InstrumentationScope &amp; opentelemetry::sdk::trace::Tracer::GetInstrumentationScope</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetInstrumentationScope</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::GetInstrumentationScope</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the associated instrumentation scope </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="88" column="30" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" bodystart="88" bodyend="91"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a494ccf7e6782c46681e5275b1ccd0ce0" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>const InstrumentationScope &amp;</type>
+        <definition>const InstrumentationScope &amp; opentelemetry::sdk::trace::Tracer::GetInstrumentationLibrary</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetInstrumentationLibrary</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::GetInstrumentationLibrary</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="94" column="30" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" bodystart="94" bodyend="97"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a875adc1b1899ff0e3f323261e567bf84" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+        <definition>const opentelemetry::sdk::resource::Resource &amp; opentelemetry::sdk::trace::Tracer::GetResource</definition>
+        <argsstring>()</argsstring>
+        <name>GetResource</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::GetResource</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the currently configured resource </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="100" column="48" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" bodystart="100" bodyend="100"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a6c6c734a0c587910c5a4c4514ec72185" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &amp;</type>
+        <definition>Sampler &amp; opentelemetry::sdk::trace::Tracer::GetSampler</definition>
+        <argsstring>()</argsstring>
+        <name>GetSampler</name>
+        <qualifiedname>opentelemetry::sdk::trace::Tracer::GetSampler</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="103" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" bodystart="103" bodyend="103"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::Tracer</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::trace::Tracer</label>
+        <link refid="classopentelemetry_1_1trace_1_1Tracer"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::Tracer</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::trace::Tracer</label>
+        <link refid="classopentelemetry_1_1trace_1_1Tracer"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" line="33" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h" bodystart="35" bodyend="112"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a87da4aa765bcf89a484c5e3451c3550a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>CloseWithMicroseconds</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a3c596d825bcd7dc3b82adea611f938fb" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>context_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a052cd3c0cb25efe359db01aa73414bf7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>ForceFlushWithMicroseconds</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1a87f53c2d8062066229be5179da07db21" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>GetCurrentSpan</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a21b47452623bd6e6436c673bfc464ecc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>GetIdGenerator</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a494ccf7e6782c46681e5275b1ccd0ce0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>GetInstrumentationLibrary</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a80c4c9a13673f3571fdc9d63ad2c85ed" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>GetInstrumentationScope</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a22e823539eaf1d07941cae9f4022a6b9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>GetProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a875adc1b1899ff0e3f323261e567bf84" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>GetResource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a6c6c734a0c587910c5a4c4514ec72185" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>GetSampler</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a802ac7e0d21753a3879b0a6361c1c6e0" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>instrumentation_scope_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a8cdc77284c514f95d87dc17d48efcc8c" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>kNoopTracer</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1a02bccf43493dcc0ffdde791a1e3920af" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1a66162917723787831ac05e291770ef02" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a576d4ce11a7f81c0cb96051323357082" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>StartSpan</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1af002e899afb59bcd3cdb514ed6b8960f" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Tracer::"><scope>opentelemetry::sdk::trace::Tracer</scope><name>StartSpan</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1aaefa284ffe78628a3e0b499578b5f29a" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Tracer::"><scope>opentelemetry::sdk::trace::Tracer</scope><name>StartSpan</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1acb008037a559edffcb98a180ba353284" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Tracer::"><scope>opentelemetry::sdk::trace::Tracer</scope><name>StartSpan</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1af539d1d6bba4a96376e9e23541b22c28" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Tracer::"><scope>opentelemetry::sdk::trace::Tracer</scope><name>StartSpan</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1a7120a59d66e7186eeda27519adbbce80" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Tracer::"><scope>opentelemetry::sdk::trace::Tracer</scope><name>StartSpan</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1abf5388532de8228755f0850aca8e6ee0" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Tracer::"><scope>opentelemetry::sdk::trace::Tracer</scope><name>StartSpan</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1a03ce2b8b4db5369c9443949f64bcc4c7" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Tracer::"><scope>opentelemetry::sdk::trace::Tracer</scope><name>StartSpan</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1afc4c9e7da6888eae83f9f619e52730a7" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Tracer::"><scope>opentelemetry::sdk::trace::Tracer</scope><name>StartSpan</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1a7e145c2f1b22955670566c7aa5821ae2" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>Tracer</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1aad79b3cc59e64c17bfb8dca35a4495a9" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Tracer::"><scope>opentelemetry::sdk::trace::Tracer</scope><name>Tracer</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1ac16b45a4b893a2c2da4a264d94981475" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Tracer::"><scope>opentelemetry::sdk::trace::Tracer</scope><name>Tracer</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1a2f6350ee5ceb51c4e45d9f53138a7d34" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Tracer::"><scope>opentelemetry::sdk::trace::Tracer</scope><name>Tracer</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer_1aacb984ac87bfc8e6e52ce8b044b759bd" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>tracer_config_</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1a5967fea27fc7f04f1ece1bf9bbdc809f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>WithActiveSpan</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Tracer_1aa4f845c6fc37e7f6bbaf893e60159c29" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::Tracer</scope><name>~Tracer</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="api_2include_2opentelemetry_2logs_2logger__provider_8h" kind="file" language="C++">
+    <compoundname>logger_provider.h</compoundname>
+    <includes refid="key__value__iterable_8h" local="yes">opentelemetry/common/key_value_iterable.h</includes>
+    <includes local="yes">opentelemetry/common/key_value_iterable_view.h</includes>
+    <includes local="yes">opentelemetry/nostd/shared_ptr.h</includes>
+    <includes local="yes">opentelemetry/nostd/span.h</includes>
+    <includes local="yes">opentelemetry/nostd/string_view.h</includes>
+    <includes local="yes">opentelemetry/nostd/type_traits.h</includes>
+    <includes local="yes">opentelemetry/version.h</includes>
+    <includedby refid="logs_2noop_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h</includedby>
+    <includedby refid="sdk_2include_2opentelemetry_2sdk_2logs_2logger__provider_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider.h</includedby>
+    <incdepgraph>
+      <node id="3">
+        <label>opentelemetry/common/attribute_value.h</label>
+        <link refid="attribute__value_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry/common/key_value_iterable.h</label>
+        <link refid="key__value__iterable_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_provider.h</label>
+        <link refid="api_2include_2opentelemetry_2logs_2logger__provider_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>cstdint</label>
+      </node>
+      <node id="10">
+        <label>opentelemetry/common/key_value_iterable_view.h</label>
+      </node>
+      <node id="9">
+        <label>opentelemetry/nostd/function_ref.h</label>
+      </node>
+      <node id="11">
+        <label>opentelemetry/nostd/shared_ptr.h</label>
+      </node>
+      <node id="5">
+        <label>opentelemetry/nostd/span.h</label>
+      </node>
+      <node id="6">
+        <label>opentelemetry/nostd/string_view.h</label>
+      </node>
+      <node id="12">
+        <label>opentelemetry/nostd/type_traits.h</label>
+      </node>
+      <node id="7">
+        <label>opentelemetry/nostd/variant.h</label>
+      </node>
+      <node id="8">
+        <label>opentelemetry/version.h</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_provider.h</label>
+        <link refid="api_2include_2opentelemetry_2logs_2logger__provider_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h</label>
+        <link refid="logs_2noop_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h</label>
+        <link refid="api_2include_2opentelemetry_2logs_2provider_8h_source"/>
+      </node>
+      <node id="4">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2logs_2logger_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2logs_2logger__provider_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider_factory.h</label>
+        <link refid="logger__provider__factory_8h_source"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classopentelemetry_1_1logs_1_1LoggerProvider" prot="public">opentelemetry::logs::LoggerProvider</innerclass>
+    <innernamespace refid="namespaceopentelemetry">opentelemetry</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1logs">opentelemetry::logs</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>The<sp/>OpenTelemetry<sp/>Authors</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/common/key_value_iterable.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/common/key_value_iterable_view.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/nostd/shared_ptr.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/nostd/span.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/nostd/string_view.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/nostd/type_traits.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/version.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal">OPENTELEMETRY_BEGIN_NAMESPACE</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">logs</highlight></codeline>
+<codeline lineno="16"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Logger;</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight></codeline>
+<codeline lineno="23" refid="classopentelemetry_1_1logs_1_1LoggerProvider" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">OPENTELEMETRY_EXPORT<sp/><ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref></highlight></codeline>
+<codeline lineno="24"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref>()<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref><sp/>&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref>(<ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref><sp/>&amp;&amp;)<sp/></highlight><highlight class="keyword">noexcept</highlight><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref><sp/>&amp;operator=(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref><sp/>&amp;)<sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref><sp/>&amp;operator=(<ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref><sp/>&amp;&amp;)<sp/></highlight><highlight class="keyword">noexcept</highlight><highlight class="normal"><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">~LoggerProvider</ref>()<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight></codeline>
+<codeline lineno="44" refid="classopentelemetry_1_1logs_1_1LoggerProvider_1a1d36dc8b6abec8183d37b291cf202273" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/>nostd::shared_ptr&lt;Logger&gt;<sp/><ref refid="classopentelemetry_1_1logs_1_1LoggerProvider_1a1d36dc8b6abec8183d37b291cf202273" kindref="member">GetLogger</ref>(</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>nostd::string_view<sp/>logger_name,</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>nostd::string_view<sp/>name<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="stringliteral">&quot;&quot;</highlight><highlight class="normal">,</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>nostd::string_view<sp/>version<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="stringliteral">&quot;&quot;</highlight><highlight class="normal">,</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>nostd::string_view<sp/>schema_url<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="stringliteral">&quot;&quot;</highlight><highlight class="normal">,</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">common::KeyValueIterable</ref><sp/>&amp;attributes<sp/>=<sp/><ref refid="classopentelemetry_1_1common_1_1NoopKeyValueIterable" kindref="compound">common::NoopKeyValueIterable</ref>())<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/>nostd::shared_ptr&lt;Logger&gt;<sp/>GetLogger(</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>nostd::string_view<sp/>logger_name,</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>nostd::string_view<sp/>name,</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>nostd::string_view<sp/>version,</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>nostd::string_view<sp/>schema_url,</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::initializer_list&lt;std::pair&lt;nostd::string_view,<sp/>common::AttributeValue&gt;&gt;<sp/>attributes)</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/>{</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>GetLogger(logger_name,<sp/>name,<sp/>version,<sp/>schema_url,</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>nostd::span&lt;</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::pair&lt;nostd::string_view,<sp/>common::AttributeValue&gt;&gt;{</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>attributes.begin(),<sp/>attributes.end()});</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="62"><highlight class="normal"></highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">T,</highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>nostd::enable_if_t&lt;common::detail::is_key_value_iterable&lt;T&gt;::value&gt;<sp/>*<sp/>=<sp/></highlight><highlight class="keyword">nullptr</highlight><highlight class="normal">&gt;</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/>nostd::shared_ptr&lt;Logger&gt;<sp/>GetLogger(nostd::string_view<sp/>logger_name,</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>nostd::string_view<sp/>name,</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>nostd::string_view<sp/>version,</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>nostd::string_view<sp/>schema_url,</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>T<sp/>&amp;attributes)</highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/>{</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>GetLogger(logger_name,<sp/>name,<sp/>version,<sp/>schema_url,</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>common::KeyValueIterableView&lt;T&gt;(attributes));</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="74"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="75"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>logs</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="76"><highlight class="normal">OPENTELEMETRY_END_NAMESPACE</highlight></codeline>
+    </programlisting>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_provider.h"/>
+  </compounddef>
+</doxygen>

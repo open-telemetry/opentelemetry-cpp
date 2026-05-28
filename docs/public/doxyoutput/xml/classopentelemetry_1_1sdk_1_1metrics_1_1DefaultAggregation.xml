@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAggregation" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::DefaultAggregation</compoundname>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAggregation_1aebc2caf6bba37c165b82d6c226e19e31" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::unique_ptr&lt; Aggregation &gt;</type>
+        <definition>static std::unique_ptr&lt; Aggregation &gt; opentelemetry::sdk::metrics::DefaultAggregation::CreateAggregation</definition>
+        <argsstring>(const opentelemetry::sdk::metrics::InstrumentDescriptor &amp;instrument_descriptor, const AggregationConfig *aggregation_config)</argsstring>
+        <name>CreateAggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DefaultAggregation::CreateAggregation</qualifiedname>
+        <param>
+          <type>const opentelemetry::sdk::metrics::InstrumentDescriptor &amp;</type>
+          <declname>instrument_descriptor</declname>
+        </param>
+        <param>
+          <type>const AggregationConfig *</type>
+          <declname>aggregation_config</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/default_aggregation.h" line="28" column="26" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/default_aggregation.h" bodystart="28" bodyend="62"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAggregation_1ae384500306b9df582ac627e9e8d70adf" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::unique_ptr&lt; Aggregation &gt;</type>
+        <definition>static std::unique_ptr&lt; Aggregation &gt; opentelemetry::sdk::metrics::DefaultAggregation::CreateAggregation</definition>
+        <argsstring>(AggregationType aggregation_type, const InstrumentDescriptor &amp;instrument_descriptor, const AggregationConfig *aggregation_config=nullptr)</argsstring>
+        <name>CreateAggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DefaultAggregation::CreateAggregation</qualifiedname>
+        <param>
+          <type>AggregationType</type>
+          <declname>aggregation_type</declname>
+        </param>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>instrument_descriptor</declname>
+        </param>
+        <param>
+          <type>const AggregationConfig *</type>
+          <declname>aggregation_config</declname>
+          <defval>nullptr</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/default_aggregation.h" line="64" column="26" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/default_aggregation.h" bodystart="64" bodyend="119"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAggregation_1a4a5187ae7106ff298c53189fa8d28da0" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::unique_ptr&lt; Aggregation &gt;</type>
+        <definition>static std::unique_ptr&lt; Aggregation &gt; opentelemetry::sdk::metrics::DefaultAggregation::CloneAggregation</definition>
+        <argsstring>(AggregationType aggregation_type, const InstrumentDescriptor &amp;instrument_descriptor, const Aggregation &amp;to_copy)</argsstring>
+        <name>CloneAggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DefaultAggregation::CloneAggregation</qualifiedname>
+        <param>
+          <type>AggregationType</type>
+          <declname>aggregation_type</declname>
+        </param>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>instrument_descriptor</declname>
+        </param>
+        <param>
+          <type>const Aggregation &amp;</type>
+          <declname>to_copy</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/default_aggregation.h" line="121" column="26" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/default_aggregation.h" bodystart="121" bodyend="175"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAggregation_1a8792fd0990f5c254347ea4ca03c9e803" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>AggregationType</type>
+        <definition>static AggregationType opentelemetry::sdk::metrics::DefaultAggregation::GetDefaultAggregationType</definition>
+        <argsstring>(InstrumentType instrument_type, bool &amp;is_monotonic)</argsstring>
+        <name>GetDefaultAggregationType</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DefaultAggregation::GetDefaultAggregationType</qualifiedname>
+        <param>
+          <type>InstrumentType</type>
+          <declname>instrument_type</declname>
+        </param>
+        <param>
+          <type>bool &amp;</type>
+          <declname>is_monotonic</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/default_aggregation.h" line="177" column="26" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/default_aggregation.h" bodystart="177" bodyend="198"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/default_aggregation.h" line="25" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/default_aggregation.h" bodystart="26" bodyend="199"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAggregation_1a4a5187ae7106ff298c53189fa8d28da0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DefaultAggregation</scope><name>CloneAggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAggregation_1aebc2caf6bba37c165b82d6c226e19e31" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DefaultAggregation</scope><name>CreateAggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAggregation_1ae384500306b9df582ac627e9e8d70adf" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DefaultAggregation</scope><name>CreateAggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAggregation_1a8792fd0990f5c254347ea4ca03c9e803" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DefaultAggregation</scope><name>GetDefaultAggregationType</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

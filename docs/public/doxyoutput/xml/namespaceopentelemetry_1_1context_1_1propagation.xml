@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1context_1_1propagation" kind="namespace" language="C++">
+    <compoundname>opentelemetry::context::propagation</compoundname>
+    <innerclass refid="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator" prot="public">opentelemetry::context::propagation::CompositePropagator</innerclass>
+    <innerclass refid="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier" prot="public">opentelemetry::context::propagation::EnvironmentCarrier</innerclass>
+    <innerclass refid="classopentelemetry_1_1context_1_1propagation_1_1GlobalTextMapPropagator" prot="public">opentelemetry::context::propagation::GlobalTextMapPropagator</innerclass>
+    <innerclass refid="classopentelemetry_1_1context_1_1propagation_1_1NoOpPropagator" prot="public">opentelemetry::context::propagation::NoOpPropagator</innerclass>
+    <innerclass refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapCarrier" prot="public">opentelemetry::context::propagation::TextMapCarrier</innerclass>
+    <innerclass refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator" prot="public">opentelemetry::context::propagation::TextMapPropagator</innerclass>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" line="15" column="1"/>
+  </compounddef>
+</doxygen>

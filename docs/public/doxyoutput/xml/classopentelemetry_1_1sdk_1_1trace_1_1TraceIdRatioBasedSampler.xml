@@ -1,0 +1,175 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" prot="public" virt="non-virtual">opentelemetry::sdk::trace::Sampler</basecompoundref>
+    <includes refid="trace__id__ratio_8h" local="no">trace_id_ratio.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler_1a73146dd72f7f9efadd08656a616882f2" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::trace::TraceIdRatioBasedSampler::description_</definition>
+        <argsstring></argsstring>
+        <name>description_</name>
+        <qualifiedname>opentelemetry::sdk::trace::TraceIdRatioBasedSampler::description_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio.h" line="55" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio.h" bodystart="55" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler_1af40957a531abd76de3744522e24b3ae6" prot="private" static="no" mutable="no">
+        <type>const uint64_t</type>
+        <definition>const uint64_t opentelemetry::sdk::trace::TraceIdRatioBasedSampler::threshold_</definition>
+        <argsstring></argsstring>
+        <name>threshold_</name>
+        <qualifiedname>opentelemetry::sdk::trace::TraceIdRatioBasedSampler::threshold_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio.h" line="56" column="18" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio.h" bodystart="56" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler_1a9a979adb669d7bd88a942ac2599afd3e" prot="public" static="no" const="no" explicit="yes" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::TraceIdRatioBasedSampler::TraceIdRatioBasedSampler</definition>
+        <argsstring>(double ratio)</argsstring>
+        <name>TraceIdRatioBasedSampler</name>
+        <qualifiedname>opentelemetry::sdk::trace::TraceIdRatioBasedSampler::TraceIdRatioBasedSampler</qualifiedname>
+        <param>
+          <type>double</type>
+          <declname>ratio</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>ratio</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a required value, 1.0 &gt;= ratio &gt;= 0.0. If the given trace_id falls into a given ratio of all possible trace_id values, ShouldSample will return RECORD_AND_SAMPLE. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="exception"><parameteritem>
+<parameternamelist>
+<parametername>invalid_argument</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>if ratio is out of bounds [0.0, 1.0] </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio.h" line="33" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler_1ace7df57457acc5ca69f5dfe1bb3e16e5" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type><ref refid="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult" kindref="compound">SamplingResult</ref></type>
+        <definition>SamplingResult opentelemetry::sdk::trace::TraceIdRatioBasedSampler::ShouldSample</definition>
+        <argsstring>(const opentelemetry::trace::SpanContext &amp;, opentelemetry::trace::TraceId trace_id, nostd::string_view, opentelemetry::trace::SpanKind, const opentelemetry::common::KeyValueIterable &amp;, const opentelemetry::trace::SpanContextKeyValueIterable &amp;) noexcept override</argsstring>
+        <name>ShouldSample</name>
+        <qualifiedname>opentelemetry::sdk::trace::TraceIdRatioBasedSampler::ShouldSample</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a9b242dce90cf9794dc0d1a444c6a65a4">ShouldSample</reimplements>
+        <param>
+          <type>const opentelemetry::trace::SpanContext &amp;</type>
+        </param>
+        <param>
+          <type>opentelemetry::trace::TraceId</type>
+          <declname>trace_id</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <param>
+          <type>opentelemetry::trace::SpanKind</type>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" kindref="compound">opentelemetry::trace::SpanContextKeyValueIterable</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Returns either RECORD_AND_SAMPLE or DROP based on current sampler configuration and provided trace_id and ratio. trace_id is used as a pseudorandom value in conjunction with the predefined ratio to determine whether this trace should be sampled </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio.h" line="41" column="18"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler_1aaff56efb06d701d022536bd9eeb740e7" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>nostd::string_view</type>
+        <definition>nostd::string_view opentelemetry::sdk::trace::TraceIdRatioBasedSampler::GetDescription</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetDescription</name>
+        <qualifiedname>opentelemetry::sdk::trace::TraceIdRatioBasedSampler::GetDescription</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a3005a357efac28b16b0728b644d70b23">GetDescription</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Description MUST be <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler" kindref="compound">TraceIdRatioBasedSampler</ref>{0.000100} </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio.h" line="52" column="22"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>The TraceIdRatioBased sampler computes and returns a decision based on the provided trace_id and the configured ratio. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::Sampler</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::Sampler</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio.h" line="24" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio.h" bodystart="25" bodyend="57"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler_1a73146dd72f7f9efadd08656a616882f2" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</scope><name>description_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler_1aaff56efb06d701d022536bd9eeb740e7" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</scope><name>GetDescription</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a2b02c0ea090d1ffb444633586c5fc7b7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a39498e03f5c855401636c846bf5c7470" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1aa42ac55b013a48f0824ddeae448a8b9c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</scope><name>Sampler</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a9cc64fe1400ccec2b9dd59969e709e6f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</scope><name>Sampler</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a4e7c4c3bc6495cd80dc70b383583a785" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</scope><name>Sampler</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler_1ace7df57457acc5ca69f5dfe1bb3e16e5" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</scope><name>ShouldSample</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler_1af40957a531abd76de3744522e24b3ae6" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</scope><name>threshold_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler_1a9a979adb669d7bd88a942ac2599afd3e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</scope><name>TraceIdRatioBasedSampler</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1ab87388d70cd8b6c8d71f44592e487817" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::TraceIdRatioBasedSampler</scope><name>~Sampler</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

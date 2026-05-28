@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_b89c0757dfc56f57ba82f694d8e78bd5" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation</compoundname>
+    <innerdir refid="dir_0895f3e6c745b0ffec4661f91a212d79">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/detail</innerdir>
+    <innerfile refid="b3__propagator_8h">b3_propagator.h</innerfile>
+    <innerfile refid="http__trace__context_8h">http_trace_context.h</innerfile>
+    <innerfile refid="jaeger_8h">jaeger.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/"/>
+  </compounddef>
+</doxygen>

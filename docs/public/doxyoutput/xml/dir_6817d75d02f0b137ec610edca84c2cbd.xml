@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_6817d75d02f0b137ec610edca84c2cbd" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics</compoundname>
+    <innerdir refid="dir_a7414691051213a5c3d56b3236afb1ce">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation</innerdir>
+    <innerdir refid="dir_39cb28a1a63206bd525021799cf0ed71">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data</innerdir>
+    <innerdir refid="dir_85f8b9db71648cd4677aa03e5606da7f">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/exemplar</innerdir>
+    <innerdir refid="dir_c62aacbd96ca3feb778ece95e81f5342">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export</innerdir>
+    <innerdir refid="dir_f2c4dfd5f13efa79d59d9a341d371132">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state</innerdir>
+    <innerdir refid="dir_4e919c6afd76df5c2117daab1dc3fbdb">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view</innerdir>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2metrics_2async__instruments_8h">async_instruments.h</innerfile>
+    <innerfile refid="instrument__metadata__validator_8h">instrument_metadata_validator.h</innerfile>
+    <innerfile refid="instruments_8h">instruments.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter_8h">meter.h</innerfile>
+    <innerfile refid="meter__config_8h">meter_config.h</innerfile>
+    <innerfile refid="meter__context_8h">meter_context.h</innerfile>
+    <innerfile refid="meter__context__factory_8h">meter_context_factory.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter__provider_8h">meter_provider.h</innerfile>
+    <innerfile refid="meter__provider__factory_8h">meter_provider_factory.h</innerfile>
+    <innerfile refid="metric__reader_8h">metric_reader.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2metrics_2multi__observer__result_8h">multi_observer_result.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2metrics_2observer__result_8h">observer_result.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2metrics_2provider_8h">provider.h</innerfile>
+    <innerfile refid="push__metric__exporter_8h">push_metric_exporter.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2metrics_2sync__instruments_8h">sync_instruments.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/"/>
+  </compounddef>
+</doxygen>

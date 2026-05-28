@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::MeterConfig</compoundname>
+    <includes refid="meter__config_8h" local="no">meter_config.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1a3cfede37c24ed1256b88823174e12826" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::MeterConfig::enabled_</definition>
+        <argsstring></argsstring>
+        <name>enabled_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterConfig::enabled_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_config.h" line="53" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_config.h" bodystart="53" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1ab840911c20cadaacb9cd63f7449b25ed" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::MeterConfig::operator==</definition>
+        <argsstring>(const MeterConfig &amp;other) const noexcept</argsstring>
+        <name>operator==</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterConfig::operator==</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_config.h" line="22" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1afb20dd6306b6729a4593987f7ad3a875" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::MeterConfig::IsEnabled</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>IsEnabled</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterConfig::IsEnabled</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns if the Meter is enabled or disabled. Meters are enabled by default. <simplesect kind="return"><para>a boolean indicating if the Meter is enabled. Defaults to true. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_config.h" line="28" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1a2d0b4b092311043a5ad68619283ca3aa" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref></type>
+        <definition>static MeterConfig opentelemetry::sdk::metrics::MeterConfig::Disabled</definition>
+        <argsstring>()</argsstring>
+        <name>Disabled</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterConfig::Disabled</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> that represents a disabled Meter. A disabled meter behaves like a no-op meter. <simplesect kind="return"><para>a static constant <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> that represents a disabled meter. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_config.h" line="35" column="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1ad7f2332c5493f186844ed9f1bda928cc" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref></type>
+        <definition>static MeterConfig opentelemetry::sdk::metrics::MeterConfig::Enabled</definition>
+        <argsstring>()</argsstring>
+        <name>Enabled</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterConfig::Enabled</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> that represents an enabled Meter. <simplesect kind="return"><para>a static constant <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> that represents an enabled meter. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_config.h" line="41" column="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1a7f75cf87af050b37e190b24391ced907" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref></type>
+        <definition>static MeterConfig opentelemetry::sdk::metrics::MeterConfig::Default</definition>
+        <argsstring>()</argsstring>
+        <name>Default</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterConfig::Default</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> that represents a Meter configured with the default behavior. The default behavior is guided by the OpenTelemetry specification. <simplesect kind="return"><para>a static constant <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> that represents a meter configured with default behavior. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_config.h" line="49" column="22"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1ae4e64f630a27dd529bec7a226af25a9f" prot="private" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MeterConfig::MeterConfig</definition>
+        <argsstring>(const bool enabled=true)</argsstring>
+        <name>MeterConfig</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterConfig::MeterConfig</qualifiedname>
+        <param>
+          <type>const bool</type>
+          <declname>enabled</declname>
+          <defval>true</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_config.h" line="52" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_config.h" bodystart="52" bodyend="52"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> defines various configurable aspects of a Meter&apos;s behavior. This class should not be used directly to configure a Meter&apos;s behavior, instead a ScopeConfigurator should be used to compute the desired <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> which can then be used to configure a Meter. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_config.h" line="19" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_config.h" bodystart="20" bodyend="54"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1a7f75cf87af050b37e190b24391ced907" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterConfig</scope><name>Default</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1a2d0b4b092311043a5ad68619283ca3aa" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterConfig</scope><name>Disabled</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1ad7f2332c5493f186844ed9f1bda928cc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterConfig</scope><name>Enabled</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1a3cfede37c24ed1256b88823174e12826" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterConfig</scope><name>enabled_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1afb20dd6306b6729a4593987f7ad3a875" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterConfig</scope><name>IsEnabled</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1ae4e64f630a27dd529bec7a226af25a9f" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterConfig</scope><name>MeterConfig</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1ab840911c20cadaacb9cd63f7449b25ed" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterConfig</scope><name>operator==</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

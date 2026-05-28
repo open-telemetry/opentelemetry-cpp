@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::LongCounter</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::sdk::metrics::Synchronous</basecompoundref>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::metrics::Counter&lt; uint64_t &gt;</basecompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter_1a10f8817ad6208bccb9f684d3df499e3d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::LongCounter::LongCounter</definition>
+        <argsstring>(const InstrumentDescriptor &amp;instrument_descriptor, std::unique_ptr&lt; SyncWritableMetricStorage &gt; storage)</argsstring>
+        <name>LongCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongCounter::LongCounter</qualifiedname>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>instrument_descriptor</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; SyncWritableMetricStorage &gt;</type>
+          <declname>storage</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="39" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter_1a480d0583b3904896f67c0ec71c6e50f3" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::LongCounter::Add</definition>
+        <argsstring>(uint64_t value, const opentelemetry::common::KeyValueIterable &amp;attributes) noexcept override</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongCounter::Add</qualifiedname>
+        <param>
+          <type>uint64_t</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="42" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter_1a943295842b5ceffd404d18218a88308c" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::LongCounter::Add</definition>
+        <argsstring>(uint64_t value, const opentelemetry::common::KeyValueIterable &amp;attributes, const opentelemetry::context::Context &amp;context) noexcept override</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongCounter::Add</qualifiedname>
+        <param>
+          <type>uint64_t</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="45" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter_1a5149edaa3cc5de4b7fd6331c8d5b6226" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::LongCounter::Add</definition>
+        <argsstring>(uint64_t value) noexcept override</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongCounter::Add</qualifiedname>
+        <param>
+          <type>uint64_t</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="49" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter_1a6a31eeaca11f55cae4849902e12f7d6a" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::LongCounter::Add</definition>
+        <argsstring>(uint64_t value, const opentelemetry::context::Context &amp;context) noexcept override</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongCounter::Add</qualifiedname>
+        <param>
+          <type>uint64_t</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="51" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="36" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" bodystart="37" bodyend="52"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter_1a480d0583b3904896f67c0ec71c6e50f3" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter_1a943295842b5ceffd404d18218a88308c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter_1a5149edaa3cc5de4b7fd6331c8d5b6226" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter_1a6a31eeaca11f55cae4849902e12f7d6a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1ad9124e77b7c6e53b5f05f21b2a9171b3" prot="public" virt="pure-virtual" ambiguityscope="opentelemetry::metrics::Counter::"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1ab26a446b6b1604c7030e2ddb7f502471" prot="public" virt="pure-virtual" ambiguityscope="opentelemetry::metrics::Counter::"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1ad48e45008b85c89f36342c278a323868" prot="public" virt="pure-virtual" ambiguityscope="opentelemetry::metrics::Counter::"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1af34937b2f16b46c58a17502ef7895511" prot="public" virt="pure-virtual" ambiguityscope="opentelemetry::metrics::Counter::"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1ae33094a907ad70552e671423213acf43" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::Counter::"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1a5e083edd1885f90f167f10310e1d317d" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::Counter::"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1a08bfb1a3cf017850a676d9ff3c1a8cf0" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::Counter::"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1a4ec120cc692e56bb5d6a452e70e4331d" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::Counter::"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous_1afbc8adc2f1abe1e43f8d9545590f6fcf" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>instrument_descriptor_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter_1a10f8817ad6208bccb9f684d3df499e3d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>LongCounter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a3a119c3d01bcbeb27f003798f709dbb9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a96a92a09ac869edb8c85adbf2f22aefe" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous_1a19bc4d3a4c503ae3b1d89508b6ee2cb9" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>storage_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous_1a14f16a02f71aa80c5dc87c60a1ff4715" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>Synchronous</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a958cd63a32c41bd53ddb57c74a4af161" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1ad1da5a4adfa52aac49ae6bc98ac39294" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a163d350c750a10cb2c68ad9c88d9ef2b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a2cb1a911901a8e09c73dfaf2c3113dae" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::LongCounter</scope><name>~SynchronousInstrument</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,161 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1metrics_1_1NoopUpDownCounter" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::metrics::NoopUpDownCounter</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" prot="public" virt="non-virtual">opentelemetry::metrics::UpDownCounter&lt; T &gt;</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1NoopUpDownCounter_1a4e2de70e716604248ea80e5c17eb50b0" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::metrics::NoopUpDownCounter&lt; T &gt;::NoopUpDownCounter</definition>
+        <argsstring>(nostd::string_view, nostd::string_view, nostd::string_view) noexcept</argsstring>
+        <name>NoopUpDownCounter</name>
+        <qualifiedname>opentelemetry::metrics::NoopUpDownCounter::NoopUpDownCounter</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" line="60" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" bodystart="60" bodyend="63"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1NoopUpDownCounter_1ae9734dd407e1d14ecb706657c77452e4" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::metrics::NoopUpDownCounter&lt; T &gt;::Add</definition>
+        <argsstring>(T) noexcept override</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::metrics::NoopUpDownCounter::Add</qualifiedname>
+        <param>
+          <type>T</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" line="64" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" bodystart="64" bodyend="64"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1NoopUpDownCounter_1aef85b85500818ef2652bf603faa574db" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::metrics::NoopUpDownCounter&lt; T &gt;::Add</definition>
+        <argsstring>(T, const context::Context &amp;) noexcept override</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::metrics::NoopUpDownCounter::Add</qualifiedname>
+        <param>
+          <type>T</type>
+        </param>
+        <param>
+          <type>const context::Context &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" line="65" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" bodystart="65" bodyend="65"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1NoopUpDownCounter_1a53edef52cba4a9b2555b78350724109e" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::metrics::NoopUpDownCounter&lt; T &gt;::Add</definition>
+        <argsstring>(T, const common::KeyValueIterable &amp;) noexcept override</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::metrics::NoopUpDownCounter::Add</qualifiedname>
+        <param>
+          <type>T</type>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">common::KeyValueIterable</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" line="66" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" bodystart="66" bodyend="66"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1NoopUpDownCounter_1aa86fd2bc5f45ab1c09ea7e7312ab4f27" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::metrics::NoopUpDownCounter&lt; T &gt;::Add</definition>
+        <argsstring>(T, const common::KeyValueIterable &amp;, const context::Context &amp;) noexcept override</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::metrics::NoopUpDownCounter::Add</qualifiedname>
+        <param>
+          <type>T</type>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">common::KeyValueIterable</ref> &amp;</type>
+        </param>
+        <param>
+          <type>const context::Context &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" line="67" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" bodystart="67" bodyend="70"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::metrics::NoopUpDownCounter&lt; T &gt;</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::metrics::UpDownCounter&lt; T &gt;</label>
+        <link refid="classopentelemetry_1_1metrics_1_1UpDownCounter"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>opentelemetry::metrics::NoopUpDownCounter&lt; T &gt;</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::metrics::UpDownCounter&lt; T &gt;</label>
+        <link refid="classopentelemetry_1_1metrics_1_1UpDownCounter"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" line="57" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" bodystart="58" bodyend="71"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1metrics_1_1NoopUpDownCounter_1ae9734dd407e1d14ecb706657c77452e4" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1NoopUpDownCounter_1aef85b85500818ef2652bf603faa574db" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1NoopUpDownCounter_1a53edef52cba4a9b2555b78350724109e" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1NoopUpDownCounter_1aa86fd2bc5f45ab1c09ea7e7312ab4f27" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1UpDownCounter_1a3e26086edd11a5bea98de00cceafdc0b" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::UpDownCounter::"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1UpDownCounter_1aa4fb21c8da36734f0fb44c52c860f394" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::UpDownCounter::"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1UpDownCounter_1a757428488f42825c147e9b52557adbad" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::UpDownCounter::"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1UpDownCounter_1ae89ad09422ccbe4b3bdc91584621609c" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::UpDownCounter::"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1NoopUpDownCounter_1a4e2de70e716604248ea80e5c17eb50b0" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>NoopUpDownCounter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a3a119c3d01bcbeb27f003798f709dbb9" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a96a92a09ac869edb8c85adbf2f22aefe" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a958cd63a32c41bd53ddb57c74a4af161" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1ad1da5a4adfa52aac49ae6bc98ac39294" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a163d350c750a10cb2c68ad9c88d9ef2b" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a2cb1a911901a8e09c73dfaf2c3113dae" prot="public" virt="virtual"><scope>opentelemetry::metrics::NoopUpDownCounter</scope><name>~SynchronousInstrument</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

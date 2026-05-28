@@ -1,0 +1,380 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="batch__log__record__processor_8h" kind="file" language="C++">
+    <compoundname>batch_log_record_processor.h</compoundname>
+    <includes local="no">stddef.h</includes>
+    <includes local="no">atomic</includes>
+    <includes local="no">chrono</includes>
+    <includes local="no">condition_variable</includes>
+    <includes local="no">cstdint</includes>
+    <includes local="no">memory</includes>
+    <includes local="no">mutex</includes>
+    <includes local="no">thread</includes>
+    <includes local="yes">opentelemetry/sdk/common/circular_buffer.h</includes>
+    <includes refid="batch__log__record__processor__options_8h" local="yes">opentelemetry/sdk/logs/batch_log_record_processor_options.h</includes>
+    <includes refid="batch__log__record__processor__runtime__options_8h" local="yes">opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h</includes>
+    <includes refid="logs_2exporter_8h" local="yes">opentelemetry/sdk/logs/exporter.h</includes>
+    <includes refid="logs_2processor_8h" local="yes">opentelemetry/sdk/logs/processor.h</includes>
+    <includes refid="logs_2recordable_8h" local="yes">opentelemetry/sdk/logs/recordable.h</includes>
+    <includes local="yes">opentelemetry/version.h</includes>
+    <incdepgraph>
+      <node id="21">
+        <label>opentelemetry/common/attribute_value.h</label>
+        <link refid="attribute__value_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>opentelemetry/common/timestamp.h</label>
+        <link refid="timestamp_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>opentelemetry/context/context.h</label>
+        <link refid="context_2context_8h_source"/>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>opentelemetry/context/context_value.h</label>
+        <link refid="context__value_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="20">
+        <label>opentelemetry/logs/log_record.h</label>
+        <link refid="log__record_8h_source"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>opentelemetry/logs/severity.h</label>
+        <link refid="severity_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h</label>
+        <link refid="batch__log__record__processor_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>opentelemetry/sdk/logs/batch_log_record_processor_options.h</label>
+        <link refid="batch__log__record__processor__options_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h</label>
+        <link refid="batch__log__record__processor__runtime__options_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>opentelemetry/sdk/logs/exporter.h</label>
+        <link refid="logs_2exporter_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>opentelemetry/sdk/logs/processor.h</label>
+        <link refid="logs_2processor_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>opentelemetry/sdk/logs/recordable.h</label>
+        <link refid="logs_2recordable_8h_source"/>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>atomic</label>
+      </node>
+      <node id="4">
+        <label>chrono</label>
+      </node>
+      <node id="5">
+        <label>condition_variable</label>
+      </node>
+      <node id="12">
+        <label>cstddef</label>
+      </node>
+      <node id="6">
+        <label>cstdint</label>
+      </node>
+      <node id="27">
+        <label>cstring</label>
+      </node>
+      <node id="7">
+        <label>memory</label>
+      </node>
+      <node id="8">
+        <label>mutex</label>
+      </node>
+      <node id="30">
+        <label>opentelemetry/nostd/shared_ptr.h</label>
+      </node>
+      <node id="17">
+        <label>opentelemetry/nostd/span.h</label>
+      </node>
+      <node id="22">
+        <label>opentelemetry/nostd/string_view.h</label>
+      </node>
+      <node id="23">
+        <label>opentelemetry/nostd/variant.h</label>
+      </node>
+      <node id="10">
+        <label>opentelemetry/sdk/common/circular_buffer.h</label>
+      </node>
+      <node id="18">
+        <label>opentelemetry/sdk/common/exporter_utils.h</label>
+      </node>
+      <node id="15">
+        <label>opentelemetry/sdk/common/thread_instrumentation.h</label>
+      </node>
+      <node id="13">
+        <label>opentelemetry/version.h</label>
+      </node>
+      <node id="2">
+        <label>stddef.h</label>
+      </node>
+      <node id="9">
+        <label>thread</label>
+      </node>
+      <node id="28">
+        <label>utility</label>
+      </node>
+    </incdepgraph>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" prot="public">opentelemetry::sdk::logs::BatchLogRecordProcessor</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData" prot="protected">opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</innerclass>
+    <innernamespace refid="namespaceopentelemetry">opentelemetry</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk">opentelemetry::sdk</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1logs">opentelemetry::sdk::logs</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>The<sp/>OpenTelemetry<sp/>Authors</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stddef.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;atomic&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;chrono&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;condition_variable&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;cstdint&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;memory&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;mutex&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;thread&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/common/circular_buffer.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/logs/batch_log_record_processor_options.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/logs/batch_log_record_processor_runtime_options.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/logs/exporter.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/logs/processor.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/logs/recordable.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/version.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal">OPENTELEMETRY_BEGIN_NAMESPACE</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">sdk</highlight></codeline>
+<codeline lineno="25"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">logs</highlight></codeline>
+<codeline lineno="28"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="34" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref><sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref></highlight></codeline>
+<codeline lineno="35"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="48" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a376f8f770b1debaa15f8055454da36a4" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">explicit</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a376f8f770b1debaa15f8055454da36a4" kindref="member">BatchLogRecordProcessor</ref>(</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::unique_ptr&lt;LogRecordExporter&gt;<sp/>&amp;&amp;exporter,</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>max_queue_size<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>2048,</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::chrono::milliseconds<sp/>scheduled_delay_millis<sp/>=<sp/>std::chrono::milliseconds(5000),</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>max_export_batch_size<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>512);</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"></highlight></codeline>
+<codeline lineno="61" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a4cce24c3db5260478d4cb0ac5d53876a" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">explicit</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a4cce24c3db5260478d4cb0ac5d53876a" kindref="member">BatchLogRecordProcessor</ref>(std::unique_ptr&lt;LogRecordExporter&gt;<sp/>&amp;&amp;exporter,</highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions" kindref="compound">BatchLogRecordProcessorOptions</ref><sp/>&amp;options);</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight></codeline>
+<codeline lineno="72" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a36ea8b283e821d476927725db63234cf" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">explicit</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a36ea8b283e821d476927725db63234cf" kindref="member">BatchLogRecordProcessor</ref>(std::unique_ptr&lt;LogRecordExporter&gt;<sp/>&amp;&amp;exporter,</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions" kindref="compound">BatchLogRecordProcessorOptions</ref><sp/>&amp;options,</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorRuntimeOptions" kindref="compound">BatchLogRecordProcessorRuntimeOptions</ref><sp/>&amp;runtime_options);</highlight></codeline>
+<codeline lineno="75"><highlight class="normal"></highlight></codeline>
+<codeline lineno="76"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref><sp/>&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref>(<ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref><sp/>&amp;&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref><sp/>&amp;operator=(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref><sp/>&amp;)<sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref><sp/>&amp;operator=(<ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref><sp/>&amp;&amp;)<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"></highlight></codeline>
+<codeline lineno="82" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a0e9503d8c9580ffd6aa0ceafefea8d4b" refkind="member"><highlight class="normal"><sp/><sp/>std::unique_ptr&lt;Recordable&gt;<sp/><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a0e9503d8c9580ffd6aa0ceafefea8d4b" kindref="member">MakeRecordable</ref>()<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"></highlight></codeline>
+<codeline lineno="89" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1aa93cfbe74c1165c5fcddf174d023fa9c" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>OnEmit(std::unique_ptr&lt;<ref refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable" kindref="compound">Recordable</ref>&gt;<sp/>&amp;&amp;record)<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="90"><highlight class="normal"></highlight></codeline>
+<codeline lineno="96" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1aedf393dab13b54ae30d74fce73f02457" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>ForceFlush(</highlight></codeline>
+<codeline lineno="97"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::chrono::microseconds<sp/>timeout<sp/>=<sp/>(std::chrono::microseconds::max)())<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="98"><highlight class="normal"></highlight></codeline>
+<codeline lineno="107" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1ad5b4c037d3f6d2e91bb099d6a1c38f0a" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Shutdown(</highlight></codeline>
+<codeline lineno="108"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::chrono::microseconds<sp/>timeout<sp/>=<sp/>(std::chrono::microseconds::max)())<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="109"><highlight class="normal"></highlight></codeline>
+<codeline lineno="113" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a7bcc57fef0354c6261dcfa3fbcb07e58" refkind="member"><highlight class="normal"><sp/><sp/>~<ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref>()<sp/>override;</highlight></codeline>
+<codeline lineno="114"><highlight class="normal"></highlight></codeline>
+<codeline lineno="115"><highlight class="normal">protected:</highlight></codeline>
+<codeline lineno="120" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1ad234823cc2d0e1091c551a9304bafbdc" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>InternalShutdown(</highlight></codeline>
+<codeline lineno="121"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::chrono::microseconds<sp/>timeout<sp/>=<sp/>(std::chrono::microseconds::max)())<sp/>noexcept;</highlight></codeline>
+<codeline lineno="122"><highlight class="normal"></highlight></codeline>
+<codeline lineno="126" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a2b9ec9f1869bbd3932ef34363a621a14" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>DoBackgroundWork();</highlight></codeline>
+<codeline lineno="127"><highlight class="normal"></highlight></codeline>
+<codeline lineno="132" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a5a0a7df80de2d80e13494844a93dff4b" refkind="member"><highlight class="normal"><sp/><sp/>virtual<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>Export();</highlight></codeline>
+<codeline lineno="133"><highlight class="normal"></highlight></codeline>
+<codeline lineno="138" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1abe1e20fe12a065cd9ce12bfa0232154e" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>DrainQueue();</highlight></codeline>
+<codeline lineno="139"><highlight class="normal"></highlight></codeline>
+<codeline lineno="140"><highlight class="normal"><sp/><sp/>struct<sp/>SynchronizationData</highlight></codeline>
+<codeline lineno="141"><highlight class="normal"><sp/><sp/>{</highlight></codeline>
+<codeline lineno="142"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Synchronization<sp/>primitives<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="143"><highlight class="normal"><sp/><sp/><sp/><sp/>std::condition_variable<sp/>cv,<sp/>force_flush_cv;</highlight></codeline>
+<codeline lineno="144"><highlight class="normal"><sp/><sp/><sp/><sp/>std::mutex<sp/>cv_m,<sp/>force_flush_cv_m,<sp/>shutdown_m;</highlight></codeline>
+<codeline lineno="145"><highlight class="normal"></highlight></codeline>
+<codeline lineno="146"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Important<sp/>boolean<sp/>flags<sp/>to<sp/>handle<sp/>the<sp/>workflow<sp/>of<sp/>the<sp/>processor<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="147"><highlight class="normal"><sp/><sp/><sp/><sp/>std::atomic&lt;bool&gt;<sp/>is_force_wakeup_background_worker{</highlight><highlight class="keyword">false</highlight><highlight class="normal">};</highlight></codeline>
+<codeline lineno="148"><highlight class="normal"><sp/><sp/><sp/><sp/>std::atomic&lt;bool&gt;<sp/>is_shutdown{</highlight><highlight class="keyword">false</highlight><highlight class="normal">};</highlight></codeline>
+<codeline lineno="149"><highlight class="normal"><sp/><sp/><sp/><sp/>std::atomic&lt;uint64_t&gt;<sp/>force_flush_pending_sequence{0};</highlight></codeline>
+<codeline lineno="150"><highlight class="normal"><sp/><sp/><sp/><sp/>std::atomic&lt;uint64_t&gt;<sp/>force_flush_notified_sequence{0};</highlight></codeline>
+<codeline lineno="151"><highlight class="normal"><sp/><sp/><sp/><sp/>std::atomic&lt;std::chrono::microseconds::rep&gt;<sp/>force_flush_timeout_us{0};</highlight></codeline>
+<codeline lineno="152"><highlight class="normal"></highlight></codeline>
+<codeline lineno="153"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Do<sp/>not<sp/>use<sp/>SynchronizationData()<sp/>=<sp/>default;<sp/>here,<sp/>some<sp/>versions<sp/>of<sp/>GCC&amp;Clang<sp/>have<sp/>BUGs</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="154"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>and<sp/>may<sp/>not<sp/>initialize<sp/>the<sp/>member<sp/>correctly.<sp/>See<sp/>also</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="155"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="156"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/>SynchronizationData()<sp/>{}</highlight></codeline>
+<codeline lineno="157"><highlight class="normal"><sp/><sp/>};</highlight></codeline>
+<codeline lineno="158"><highlight class="normal"></highlight></codeline>
+<codeline lineno="167" refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a773bd771f6cc56e999f1e748329afebe" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1a773bd771f6cc56e999f1e748329afebe" kindref="member">NotifyCompletion</ref>(uint64_t<sp/>notify_force_flush,</highlight></codeline>
+<codeline lineno="168"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::unique_ptr&lt;LogRecordExporter&gt;<sp/>&amp;exporter,</highlight></codeline>
+<codeline lineno="169"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::shared_ptr&lt;SynchronizationData&gt;<sp/>&amp;synchronization_data);</highlight></codeline>
+<codeline lineno="170"><highlight class="normal"></highlight></codeline>
+<codeline lineno="171"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>GetWaitAdjustedTime(std::chrono::microseconds<sp/>&amp;timeout,</highlight></codeline>
+<codeline lineno="172"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::chrono::time_point&lt;std::chrono::system_clock&gt;<sp/>&amp;start_time);</highlight></codeline>
+<codeline lineno="173"><highlight class="normal"></highlight></codeline>
+<codeline lineno="174"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">/*<sp/>The<sp/>configured<sp/>backend<sp/>log<sp/>exporter<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="175"><highlight class="normal"><sp/><sp/>std::unique_ptr&lt;LogRecordExporter&gt;<sp/>exporter_;</highlight></codeline>
+<codeline lineno="176"><highlight class="normal"></highlight></codeline>
+<codeline lineno="177"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">/*<sp/>Configurable<sp/>parameters<sp/>as<sp/>per<sp/>the<sp/>official<sp/>*trace*<sp/>specs<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="178"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>max_queue_size_;</highlight></codeline>
+<codeline lineno="179"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::chrono::milliseconds<sp/>scheduled_delay_millis_;</highlight></codeline>
+<codeline lineno="180"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>max_export_batch_size_;</highlight></codeline>
+<codeline lineno="181"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">/*<sp/>The<sp/>buffer/queue<sp/>to<sp/>which<sp/>the<sp/>ended<sp/>logs<sp/>are<sp/>added<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="182"><highlight class="normal"><sp/><sp/>opentelemetry::sdk::common::CircularBuffer&lt;Recordable&gt;<sp/>buffer_;</highlight></codeline>
+<codeline lineno="183"><highlight class="normal"></highlight></codeline>
+<codeline lineno="184"><highlight class="normal"><sp/><sp/>std::shared_ptr&lt;SynchronizationData&gt;<sp/>synchronization_data_;</highlight></codeline>
+<codeline lineno="185"><highlight class="normal"></highlight></codeline>
+<codeline lineno="186"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">/*<sp/>The<sp/>background<sp/>worker<sp/>thread<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="187"><highlight class="normal"><sp/><sp/>std::shared_ptr&lt;sdk::common::ThreadInstrumentation&gt;<sp/>worker_thread_instrumentation_;</highlight></codeline>
+<codeline lineno="188"><highlight class="normal"><sp/><sp/>std::thread<sp/>worker_thread_;</highlight></codeline>
+<codeline lineno="189"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="190"><highlight class="normal"></highlight></codeline>
+<codeline lineno="191"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>logs</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="192"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>sdk</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="193"><highlight class="normal">OPENTELEMETRY_END_NAMESPACE</highlight></codeline>
+    </programlisting>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h"/>
+  </compounddef>
+</doxygen>

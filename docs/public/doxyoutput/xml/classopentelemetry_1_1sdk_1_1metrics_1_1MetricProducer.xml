@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::metrics::MetricProducer</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricCollector" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::MetricCollector</derivedcompoundref>
+    <includes refid="metric__producer_8h" local="no">metric_producer.h</includes>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1_1Result" prot="public">opentelemetry::sdk::metrics::MetricProducer::Result</innerclass>
+    <sectiondef kind="public-type">
+      <memberdef kind="enum" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a352fd6b7efe2bf73a98aac7bbd172239" prot="public" static="no" strong="yes">
+        <type>std::uint8_t</type>
+        <name>Status</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricProducer::Status</qualifiedname>
+        <enumvalue id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a352fd6b7efe2bf73a98aac7bbd172239a8c632159fa131f09d04f94e3cbcd8782" prot="public">
+          <name>kSuccess</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a352fd6b7efe2bf73a98aac7bbd172239a45d5f642bcbee805302334d856c54259" prot="public">
+          <name>kFailure</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a352fd6b7efe2bf73a98aac7bbd172239a7f27861ff1d3f550c6aa77150d7edabd" prot="public">
+          <name>kTimeout</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="98" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" bodystart="99" bodyend="103"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1aa41c00bd797afe558e27ae58e0c4ceac" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MetricProducer::MetricProducer</definition>
+        <argsstring>()=default</argsstring>
+        <name>MetricProducer</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricProducer::MetricProducer</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="90" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a08b4b33a0562b5a7281c3c17b842eb96" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::metrics::MetricProducer::~MetricProducer</definition>
+        <argsstring>()=default</argsstring>
+        <name>~MetricProducer</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricProducer::~MetricProducer</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="91" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1acc41bbf3cd90ad70441ab772a9ff217a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MetricProducer::MetricProducer</definition>
+        <argsstring>(const MetricProducer &amp;)=delete</argsstring>
+        <name>MetricProducer</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricProducer::MetricProducer</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="93" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1addfb04dd6a4d99d4d777d720548fc94f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MetricProducer::MetricProducer</definition>
+        <argsstring>(MetricProducer &amp;&amp;)=delete</argsstring>
+        <name>MetricProducer</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricProducer::MetricProducer</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="94" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a8bb814026a9c1ce35acbf79cb016e166" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> &amp;</type>
+        <definition>MetricProducer &amp; opentelemetry::sdk::metrics::MetricProducer::operator=</definition>
+        <argsstring>(const MetricProducer &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricProducer::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="95" column="18"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1ade96a50227c6d272620ccde9fd524d7c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> &amp;</type>
+        <definition>MetricProducer &amp; opentelemetry::sdk::metrics::MetricProducer::operator=</definition>
+        <argsstring>(MetricProducer &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricProducer::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="96" column="18"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a78c9383c135b1fc11975008877b4e282" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>Result</type>
+        <definition>virtual Result opentelemetry::sdk::metrics::MetricProducer::Produce</definition>
+        <argsstring>() noexcept=0</argsstring>
+        <name>Produce</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricProducer::Produce</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricCollector_1a1618e79eb12686557d8f45721ca0ee4c">Produce</reimplementedby>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Produce returns a batch of Metric Points, with a single instrumentation scope that identifies the <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref>. Implementations may return successfully collected points even if there is a partial failure. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="116" column="18"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> defines the interface which bridges to third-party metric sources MUST implement, so they can be plugged into an OpenTelemetry <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> as a source of aggregated metric data.</para>
+<para>Implementations must be thread-safe, and should accept configuration for the AggregationTemporality of produced metrics. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::sdk::metrics::MetricCollector</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricCollector"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::MetricProducer</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer"/>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="87" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" bodystart="88" bodyend="117"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1aa41c00bd797afe558e27ae58e0c4ceac" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricProducer</scope><name>MetricProducer</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1acc41bbf3cd90ad70441ab772a9ff217a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricProducer</scope><name>MetricProducer</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1addfb04dd6a4d99d4d777d720548fc94f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricProducer</scope><name>MetricProducer</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a8bb814026a9c1ce35acbf79cb016e166" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricProducer</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1ade96a50227c6d272620ccde9fd524d7c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricProducer</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a78c9383c135b1fc11975008877b4e282" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::MetricProducer</scope><name>Produce</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a352fd6b7efe2bf73a98aac7bbd172239" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricProducer</scope><name>Status</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a08b4b33a0562b5a7281c3c17b842eb96" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::MetricProducer</scope><name>~MetricProducer</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

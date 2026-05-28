@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1baggage_1_1propagation" kind="namespace" language="C++">
+    <compoundname>opentelemetry::baggage::propagation</compoundname>
+    <innerclass refid="classopentelemetry_1_1baggage_1_1propagation_1_1BaggagePropagator" prot="public">opentelemetry::baggage::propagation::BaggagePropagator</innerclass>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/propagation/baggage_propagator.h" line="20" column="1"/>
+  </compounddef>
+</doxygen>

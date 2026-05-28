@@ -1,0 +1,185 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::DoubleLastValueAggregation</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::sdk::metrics::Aggregation</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a47a92dc778dd3d0e0fd8b24f245d20dc" prot="private" static="no" mutable="yes">
+        <type>opentelemetry::common::SpinLockMutex</type>
+        <definition>opentelemetry::common::SpinLockMutex opentelemetry::sdk::metrics::DoubleLastValueAggregation::lock_</definition>
+        <argsstring></argsstring>
+        <name>lock_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DoubleLastValueAggregation::lock_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" line="58" column="48" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" bodystart="58" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1af4f5dc193de8bf298ed853bbf8011407" prot="private" static="no" mutable="yes">
+        <type>LastValuePointData</type>
+        <definition>LastValuePointData opentelemetry::sdk::metrics::DoubleLastValueAggregation::point_data_</definition>
+        <argsstring></argsstring>
+        <name>point_data_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DoubleLastValueAggregation::point_data_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" line="59" column="30" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" bodystart="59" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a0e85c7b39cad2daadaa56ec71f4cf20e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::DoubleLastValueAggregation::DoubleLastValueAggregation</definition>
+        <argsstring>()</argsstring>
+        <name>DoubleLastValueAggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DoubleLastValueAggregation::DoubleLastValueAggregation</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" line="44" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1aaf55c17bb8afd25d66267447d806dabb" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::DoubleLastValueAggregation::DoubleLastValueAggregation</definition>
+        <argsstring>(const LastValuePointData &amp;)</argsstring>
+        <name>DoubleLastValueAggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DoubleLastValueAggregation::DoubleLastValueAggregation</qualifiedname>
+        <param>
+          <type>const LastValuePointData &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" line="45" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a51790e8fbfb6e2ffe4f6bb30a8d22372" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::DoubleLastValueAggregation::Aggregate</definition>
+        <argsstring>(int64_t, const PointAttributes &amp;) noexcept override</argsstring>
+        <name>Aggregate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DoubleLastValueAggregation::Aggregate</qualifiedname>
+        <param>
+          <type>int64_t</type>
+        </param>
+        <param>
+          <type>const PointAttributes &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" line="47" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" bodystart="47" bodyend="47"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a89be6623fc2e73139f505dc2442c980b" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::DoubleLastValueAggregation::Aggregate</definition>
+        <argsstring>(double value, const PointAttributes &amp;attributes={}) noexcept override</argsstring>
+        <name>Aggregate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DoubleLastValueAggregation::Aggregate</qualifiedname>
+        <param>
+          <type>double</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const PointAttributes &amp;</type>
+          <declname>attributes</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" line="49" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a1355064ff9dd488ed159762eab0b525d" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>std::unique_ptr&lt; Aggregation &gt;</type>
+        <definition>std::unique_ptr&lt; Aggregation &gt; opentelemetry::sdk::metrics::DoubleLastValueAggregation::Merge</definition>
+        <argsstring>(const Aggregation &amp;delta) const noexcept override</argsstring>
+        <name>Merge</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DoubleLastValueAggregation::Merge</qualifiedname>
+        <param>
+          <type>const Aggregation &amp;</type>
+          <declname>delta</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" line="51" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a52790cf5bb698d98ecb18c96def2c798" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>std::unique_ptr&lt; Aggregation &gt;</type>
+        <definition>std::unique_ptr&lt; Aggregation &gt; opentelemetry::sdk::metrics::DoubleLastValueAggregation::Diff</definition>
+        <argsstring>(const Aggregation &amp;next) const noexcept override</argsstring>
+        <name>Diff</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DoubleLastValueAggregation::Diff</qualifiedname>
+        <param>
+          <type>const Aggregation &amp;</type>
+          <declname>next</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" line="53" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a4eb506a9bb1f2ea4e0f34864766f1a8b" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>PointType</type>
+        <definition>PointType opentelemetry::sdk::metrics::DoubleLastValueAggregation::ToPoint</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>ToPoint</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DoubleLastValueAggregation::ToPoint</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" line="55" column="13"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" line="41" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h" bodystart="42" bodyend="60"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a51790e8fbfb6e2ffe4f6bb30a8d22372" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>Aggregate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a89be6623fc2e73139f505dc2442c980b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>Aggregate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1af6a4b0195c2b59d6592864a944bebd96" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>Aggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a29cfcd740ec1da70be6a3523d06e5eba" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>Aggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a6da32b25e5f17a10ff72fc46f6142239" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>Aggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a52790cf5bb698d98ecb18c96def2c798" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>Diff</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a0e85c7b39cad2daadaa56ec71f4cf20e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>DoubleLastValueAggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1aaf55c17bb8afd25d66267447d806dabb" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>DoubleLastValueAggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a47a92dc778dd3d0e0fd8b24f245d20dc" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>lock_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a1355064ff9dd488ed159762eab0b525d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>Merge</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a8bebc1d6cc3ea50af4726b95a6717e9b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a4f0021ce4ded2fabb2d92acd132d5288" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1af4f5dc193de8bf298ed853bbf8011407" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>point_data_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation_1a4eb506a9bb1f2ea4e0f34864766f1a8b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>ToPoint</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a3b49d27663b7598b277bacfe282447ce" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::DoubleLastValueAggregation</scope><name>~Aggregation</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

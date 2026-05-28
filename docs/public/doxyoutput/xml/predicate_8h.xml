@@ -1,0 +1,238 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="predicate_8h" kind="file" language="C++">
+    <compoundname>predicate.h</compoundname>
+    <includes local="no">vector</includes>
+    <includes refid="macros_8h" local="yes">opentelemetry/common/macros.h</includes>
+    <includes local="yes">opentelemetry/nostd/string_view.h</includes>
+    <includes local="yes">opentelemetry/sdk/common/global_log_handler.h</includes>
+    <includedby refid="predicate__factory_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate_factory.h</includedby>
+    <incdepgraph>
+      <node id="3">
+        <label>opentelemetry/common/macros.h</label>
+        <link refid="macros_8h_source"/>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h</label>
+        <link refid="predicate_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>opentelemetry/nostd/string_view.h</label>
+      </node>
+      <node id="5">
+        <label>opentelemetry/sdk/common/global_log_handler.h</label>
+      </node>
+      <node id="2">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="5">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h</label>
+        <link refid="meter__context_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context_factory.h</label>
+        <link refid="meter__context__factory_8h_source"/>
+      </node>
+      <node id="6">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter__provider_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider_factory.h</label>
+        <link refid="meter__provider__factory_8h_source"/>
+      </node>
+      <node id="3">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h</label>
+        <link refid="instrument__selector_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector_factory.h</label>
+        <link refid="instrument__selector__factory_8h_source"/>
+      </node>
+      <node id="12">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h</label>
+        <link refid="meter__selector_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector_factory.h</label>
+        <link refid="meter__selector__factory_8h_source"/>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h</label>
+        <link refid="predicate_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate_factory.h</label>
+        <link refid="predicate__factory_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view_registry.h</label>
+        <link refid="view__registry_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view_registry_factory.h</label>
+        <link refid="view__registry__factory_8h_source"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate" prot="public">opentelemetry::sdk::metrics::Predicate</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1PatternPredicate" prot="public">opentelemetry::sdk::metrics::PatternPredicate</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExactPredicate" prot="public">opentelemetry::sdk::metrics::ExactPredicate</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MatchEverythingPattern" prot="public">opentelemetry::sdk::metrics::MatchEverythingPattern</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MatchNothingPattern" prot="public">opentelemetry::sdk::metrics::MatchNothingPattern</innerclass>
+    <innernamespace refid="namespaceopentelemetry">opentelemetry</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk">opentelemetry::sdk</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1metrics">opentelemetry::sdk::metrics</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>The<sp/>OpenTelemetry<sp/>Authors</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;vector&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/common/macros.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/nostd/string_view.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/common/global_log_handler.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>OPENTELEMETRY_HAVE_WORKING_REGEX</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#<sp/><sp/>include<sp/>&lt;regex&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal">OPENTELEMETRY_BEGIN_NAMESPACE</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">sdk</highlight></codeline>
+<codeline lineno="17"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">metrics</highlight></codeline>
+<codeline lineno="19"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Predicate</highlight></codeline>
+<codeline lineno="21"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/>Predicate()<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/>Predicate(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>Predicate<sp/>&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/>Predicate(Predicate<sp/>&amp;&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/>Predicate<sp/>&amp;operator=(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>Predicate<sp/>&amp;)<sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/>Predicate<sp/>&amp;operator=(Predicate<sp/>&amp;&amp;)<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/>~Predicate()<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Match(opentelemetry::nostd::string_view<sp/></highlight><highlight class="keywordtype">string</highlight><highlight class="normal">)<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">noexcept</highlight><highlight class="normal"><sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="33"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">PatternPredicate<sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/>Predicate</highlight></codeline>
+<codeline lineno="36"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/>PatternPredicate(opentelemetry::nostd::string_view<sp/>pattern)<sp/>:<sp/>reg_key_{pattern.data()}<sp/>{}</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Match(opentelemetry::nostd::string_view<sp/>str)<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">noexcept</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">override</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><sp/><sp/>{</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>OPENTELEMETRY_HAVE_WORKING_REGEX</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>std::regex_match(str.data(),<sp/>reg_key_);</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight><highlight class="preprocessor">#else</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>TBD<sp/>-<sp/>Support<sp/>regex<sp/>match<sp/>for<sp/>GCC4.8</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/>OTEL_INTERNAL_LOG_ERROR(</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;PatternPredicate::Match<sp/>-<sp/>failed.<sp/>std::regex<sp/>not<sp/>fully<sp/>supported<sp/>for<sp/>this<sp/>compiler.&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;<sp/><sp/></highlight><highlight class="comment">//<sp/>not<sp/>supported</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight></codeline>
+<codeline lineno="51"><highlight class="normal"></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>OPENTELEMETRY_HAVE_WORKING_REGEX</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/>std::regex<sp/>reg_key_;</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"></highlight><highlight class="preprocessor">#else</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/>std::string<sp/>reg_key_;</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="57"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"></highlight></codeline>
+<codeline lineno="59"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">ExactPredicate<sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/>Predicate</highlight></codeline>
+<codeline lineno="60"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/>ExactPredicate(opentelemetry::nostd::string_view<sp/>pattern)<sp/>:<sp/>pattern_{pattern}<sp/>{}</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Match(opentelemetry::nostd::string_view<sp/>str)<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">noexcept</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">override</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/>{</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(pattern_<sp/>==<sp/>str)</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"></highlight></codeline>
+<codeline lineno="72"><highlight class="normal"></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/>std::string<sp/>pattern_;</highlight></codeline>
+<codeline lineno="74"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="75"><highlight class="normal"></highlight></codeline>
+<codeline lineno="76"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">MatchEverythingPattern<sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/>Predicate</highlight></codeline>
+<codeline lineno="77"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Match(opentelemetry::nostd::string_view<sp/></highlight><highlight class="comment">/*<sp/>str<sp/>*/</highlight><highlight class="normal">)<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">noexcept</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">override</highlight><highlight class="normal"><sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;<sp/>}</highlight></codeline>
+<codeline lineno="79"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"></highlight></codeline>
+<codeline lineno="81"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">MatchNothingPattern<sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/>Predicate</highlight></codeline>
+<codeline lineno="82"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Match(opentelemetry::nostd::string_view<sp/></highlight><highlight class="comment">/*<sp/>str<sp/>*/</highlight><highlight class="normal">)<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">noexcept</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">override</highlight><highlight class="normal"><sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;<sp/>}</highlight></codeline>
+<codeline lineno="84"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="85"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>metrics</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="86"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>sdk</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="87"><highlight class="normal">OPENTELEMETRY_END_NAMESPACE</highlight></codeline>
+    </programlisting>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h"/>
+  </compounddef>
+</doxygen>

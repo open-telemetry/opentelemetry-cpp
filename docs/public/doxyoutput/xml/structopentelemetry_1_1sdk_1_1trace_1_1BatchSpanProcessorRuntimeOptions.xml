@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorRuntimeOptions" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::BatchSpanProcessorRuntimeOptions</compoundname>
+    <includes refid="batch__span__processor__runtime__options_8h" local="no">batch_span_processor_runtime_options.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorRuntimeOptions_1ace2b3378de65bb2489e4051a338ba81c" prot="public" static="no" mutable="no">
+        <type>std::shared_ptr&lt; sdk::common::ThreadInstrumentation &gt;</type>
+        <definition>std::shared_ptr&lt;sdk::common::ThreadInstrumentation&gt; opentelemetry::sdk::trace::BatchSpanProcessorRuntimeOptions::thread_instrumentation</definition>
+        <argsstring></argsstring>
+        <name>thread_instrumentation</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessorRuntimeOptions::thread_instrumentation</qualifiedname>
+        <initializer>=
+      std::shared_ptr&lt;sdk::common::ThreadInstrumentation&gt;(nullptr)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor_runtime_options.h" line="23" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor_runtime_options.h" bodystart="23" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Struct to hold batch <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> runtime options. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor_runtime_options.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor_runtime_options.h" bodystart="22" bodyend="25"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorRuntimeOptions_1ace2b3378de65bb2489e4051a338ba81c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessorRuntimeOptions</scope><name>thread_instrumentation</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,7 @@
+<map id="opentelemetry::trace::StartSpanOptions" name="opentelemetry::trace::StartSpanOptions">
+<area shape="rect" id="Node000001" title=" " alt="" coords="120,108,279,148"/>
+<area shape="rect" id="Node000002" href="$classopentelemetry_1_1common_1_1SystemTimestamp.html" title="A timepoint relative to the system clock epoch." alt="" coords="5,5,188,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,54,149,82,177,106,173,110,145,86,119,58"/>
+<area shape="rect" id="Node000003" href="$classopentelemetry_1_1common_1_1SteadyTimestamp.html" title="A timepoint relative to the monotonic clock epoch." alt="" coords="212,5,395,45"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="294,60,276,86,243,110,240,106,272,82,289,57"/>
+</map>

@@ -1,0 +1,299 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a3c81d573742e4774afd09b0779ed9cf1" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::sum_</definition>
+        <argsstring></argsstring>
+        <name>sum_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::sum_</qualifiedname>
+        <initializer>= {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="147" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="147" bodyend="147"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1ab60cd006e1327e69448d4d0e5b1f608e" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::min_</definition>
+        <argsstring></argsstring>
+        <name>min_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::min_</qualifiedname>
+        <initializer>= {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="148" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="148" bodyend="148"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a27e334e62183a5e4400e4a7bd98e3938" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::max_</definition>
+        <argsstring></argsstring>
+        <name>max_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::max_</qualifiedname>
+        <initializer>= {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="149" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="149" bodyend="149"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1ae0ad8bf007774e6226e4afc1a2601edb" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::zero_threshold_</definition>
+        <argsstring></argsstring>
+        <name>zero_threshold_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::zero_threshold_</qualifiedname>
+        <initializer>= {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="150" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="150" bodyend="150"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a513699da1634c6550d33092708259f1b" prot="public" static="no" mutable="no">
+        <type>uint64_t</type>
+        <definition>uint64_t opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::count_</definition>
+        <argsstring></argsstring>
+        <name>count_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::count_</qualifiedname>
+        <initializer>= {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="151" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="151" bodyend="151"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a60879e76be93dac26ef4781bcaec43be" prot="public" static="no" mutable="no">
+        <type>uint64_t</type>
+        <definition>uint64_t opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::zero_count_</definition>
+        <argsstring></argsstring>
+        <name>zero_count_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::zero_count_</qualifiedname>
+        <initializer>= {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="152" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="152" bodyend="152"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a4cba1d68df005e16ca2325f2febbc4e1" prot="public" static="no" mutable="no">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" kindref="compound">AdaptingCircularBufferCounter</ref> &gt;</type>
+        <definition>std::unique_ptr&lt;AdaptingCircularBufferCounter&gt; opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::positive_buckets_</definition>
+        <argsstring></argsstring>
+        <name>positive_buckets_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::positive_buckets_</qualifiedname>
+        <initializer>=
+      std::make_unique&lt;<ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" kindref="compound">AdaptingCircularBufferCounter</ref>&gt;(0)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="153" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="153" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a1e8f3bc3f576efb7a5b6c691e399730e" prot="public" static="no" mutable="no">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" kindref="compound">AdaptingCircularBufferCounter</ref> &gt;</type>
+        <definition>std::unique_ptr&lt;AdaptingCircularBufferCounter&gt; opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::negative_buckets_</definition>
+        <argsstring></argsstring>
+        <name>negative_buckets_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::negative_buckets_</qualifiedname>
+        <initializer>=
+      std::make_unique&lt;<ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" kindref="compound">AdaptingCircularBufferCounter</ref>&gt;(0)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="155" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="155" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a10326573712accbba8998d026f840246" prot="public" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::max_buckets_</definition>
+        <argsstring></argsstring>
+        <name>max_buckets_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::max_buckets_</qualifiedname>
+        <initializer>= {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="157" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="157" bodyend="157"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a72e7203a65f029095f352763f281b1b1" prot="public" static="no" mutable="no">
+        <type>int32_t</type>
+        <definition>int32_t opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::scale_</definition>
+        <argsstring></argsstring>
+        <name>scale_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::scale_</qualifiedname>
+        <initializer>= {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="158" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="158" bodyend="158"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a698264aa6e4618586255f81bdc08f7d1" prot="public" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::record_min_max_</definition>
+        <argsstring></argsstring>
+        <name>record_min_max_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::record_min_max_</qualifiedname>
+        <initializer>= true</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="159" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="159" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a3d95cc4970c10d94cff80ab07880c565" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::Base2ExponentialHistogramPointData</definition>
+        <argsstring>(Base2ExponentialHistogramPointData &amp;&amp;) noexcept=default</argsstring>
+        <name>Base2ExponentialHistogramPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::Base2ExponentialHistogramPointData</qualifiedname>
+        <param>
+          <type>Base2ExponentialHistogramPointData &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="79" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1ae092695989558d70ee2e96a753d422b3" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>Base2ExponentialHistogramPointData &amp;</type>
+        <definition>Base2ExponentialHistogramPointData &amp; opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::operator=</definition>
+        <argsstring>(Base2ExponentialHistogramPointData &amp;&amp;) noexcept=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::operator=</qualifiedname>
+        <param>
+          <type>Base2ExponentialHistogramPointData &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="80" column="38"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a42f74b5789618d1e2b944faf6c142a61" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::Base2ExponentialHistogramPointData</definition>
+        <argsstring>(const Base2ExponentialHistogramPointData &amp;other)</argsstring>
+        <name>Base2ExponentialHistogramPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::Base2ExponentialHistogramPointData</qualifiedname>
+        <param>
+          <type>const Base2ExponentialHistogramPointData &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="83" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="83" bodyend="102"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a6616b8e0c8552e331ed3f26a6e1b8b87" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>Base2ExponentialHistogramPointData &amp;</type>
+        <definition>Base2ExponentialHistogramPointData &amp; opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::operator=</definition>
+        <argsstring>(const Base2ExponentialHistogramPointData &amp;other)</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::operator=</qualifiedname>
+        <param>
+          <type>const Base2ExponentialHistogramPointData &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="104" column="38" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="104" bodyend="139"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1aae6256c2606418b173354a0e71e0e30a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::Base2ExponentialHistogramPointData</definition>
+        <argsstring>()=default</argsstring>
+        <name>Base2ExponentialHistogramPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::Base2ExponentialHistogramPointData</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="142" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a8f5b5f5ed41e6abd68f1041bf00afee7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::~Base2ExponentialHistogramPointData</definition>
+        <argsstring>()=default</argsstring>
+        <name>~Base2ExponentialHistogramPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData::~Base2ExponentialHistogramPointData</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="144" column="3"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="76" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="77" bodyend="160"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a3d95cc4970c10d94cff80ab07880c565" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>Base2ExponentialHistogramPointData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a42f74b5789618d1e2b944faf6c142a61" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>Base2ExponentialHistogramPointData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1aae6256c2606418b173354a0e71e0e30a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>Base2ExponentialHistogramPointData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a513699da1634c6550d33092708259f1b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>count_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a27e334e62183a5e4400e4a7bd98e3938" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>max_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a10326573712accbba8998d026f840246" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>max_buckets_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1ab60cd006e1327e69448d4d0e5b1f608e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>min_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a1e8f3bc3f576efb7a5b6c691e399730e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>negative_buckets_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1ae092695989558d70ee2e96a753d422b3" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a6616b8e0c8552e331ed3f26a6e1b8b87" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a4cba1d68df005e16ca2325f2febbc4e1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>positive_buckets_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a698264aa6e4618586255f81bdc08f7d1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>record_min_max_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a72e7203a65f029095f352763f281b1b1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>scale_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a3c81d573742e4774afd09b0779ed9cf1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>sum_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a60879e76be93dac26ef4781bcaec43be" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>zero_count_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1ae0ad8bf007774e6226e4afc1a2601edb" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>zero_threshold_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData_1a8f5b5f5ed41e6abd68f1041bf00afee7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</scope><name>~Base2ExponentialHistogramPointData</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

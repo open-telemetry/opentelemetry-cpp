@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::DropPointData</compoundname>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData_1a5172eb471b77de1b54ce42eea7ab1da1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::DropPointData::DropPointData</definition>
+        <argsstring>(DropPointData &amp;&amp;)=default</argsstring>
+        <name>DropPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DropPointData::DropPointData</qualifiedname>
+        <param>
+          <type>DropPointData &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="166" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData_1a7cf29cefb58bb4b3cb6411bf54bf5763" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::DropPointData::DropPointData</definition>
+        <argsstring>(const DropPointData &amp;)=default</argsstring>
+        <name>DropPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DropPointData::DropPointData</qualifiedname>
+        <param>
+          <type>const DropPointData &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="167" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData_1ae66e5f9af8a29c7f0193e3e8372f2771" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::DropPointData::DropPointData</definition>
+        <argsstring>()=default</argsstring>
+        <name>DropPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DropPointData::DropPointData</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="168" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData_1a092c18ec8ff6b892eaeabb967dab2b83" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>DropPointData &amp;</type>
+        <definition>DropPointData &amp; opentelemetry::sdk::metrics::DropPointData::operator=</definition>
+        <argsstring>(const DropPointData &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DropPointData::operator=</qualifiedname>
+        <param>
+          <type>const DropPointData &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="169" column="17"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData_1acae59728d041c63ec046d05a9e62d921" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>DropPointData &amp;</type>
+        <definition>DropPointData &amp; opentelemetry::sdk::metrics::DropPointData::operator=</definition>
+        <argsstring>(DropPointData &amp;&amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DropPointData::operator=</qualifiedname>
+        <param>
+          <type>DropPointData &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="170" column="17"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData_1a74ac711e058125daabea59e958007747" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::DropPointData::~DropPointData</definition>
+        <argsstring>()=default</argsstring>
+        <name>~DropPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::DropPointData::~DropPointData</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="171" column="3"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="162" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="163" bodyend="172"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData_1a5172eb471b77de1b54ce42eea7ab1da1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DropPointData</scope><name>DropPointData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData_1a7cf29cefb58bb4b3cb6411bf54bf5763" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DropPointData</scope><name>DropPointData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData_1ae66e5f9af8a29c7f0193e3e8372f2771" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DropPointData</scope><name>DropPointData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData_1a092c18ec8ff6b892eaeabb967dab2b83" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DropPointData</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData_1acae59728d041c63ec046d05a9e62d921" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DropPointData</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData_1a74ac711e058125daabea59e958007747" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::DropPointData</scope><name>~DropPointData</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

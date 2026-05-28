@@ -1,0 +1,736 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::sdk::metrics::Meter</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1metrics_1_1Meter" prot="public" virt="non-virtual">opentelemetry::metrics::Meter</basecompoundref>
+    <sectiondef kind="private-type">
+      <memberdef kind="typedef" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a042e028d43a5a461ac4b7b1b63ee1888" prot="private" static="no">
+        <type>std::unordered_map&lt; InstrumentDescriptor, std::shared_ptr&lt; MetricStorage &gt;, InstrumentDescriptorHash, InstrumentEqualNameCaseInsensitive &gt;</type>
+        <definition>using opentelemetry::sdk::metrics::Meter::MetricStorageMap =  std::unordered_map&lt;InstrumentDescriptor, std::shared_ptr&lt;MetricStorage&gt;, InstrumentDescriptorHash, InstrumentEqualNameCaseInsensitive&gt;</definition>
+        <argsstring></argsstring>
+        <name>MetricStorageMap</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::MetricStorageMap</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="148" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" bodystart="151" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1ae450769c6a60e7a3902b27dcb773fa1b" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; sdk::instrumentationscope::InstrumentationScope &gt;</type>
+        <definition>std::unique_ptr&lt;sdk::instrumentationscope::InstrumentationScope&gt; opentelemetry::sdk::metrics::Meter::scope_</definition>
+        <argsstring></argsstring>
+        <name>scope_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::scope_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="145" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" bodystart="145" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a7a066667da0624197d27a66af1b75d1f" prot="private" static="no" mutable="no">
+        <type>std::weak_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">sdk::metrics::MeterContext</ref> &gt;</type>
+        <definition>std::weak_ptr&lt;sdk::metrics::MeterContext&gt; opentelemetry::sdk::metrics::Meter::meter_context_</definition>
+        <argsstring></argsstring>
+        <name>meter_context_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::meter_context_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="146" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" bodystart="146" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a0c9f8f74772b21bf5d8808722c99beea" prot="private" static="no" mutable="no">
+        <type>MetricStorageMap</type>
+        <definition>MetricStorageMap opentelemetry::sdk::metrics::Meter::storage_registry_</definition>
+        <argsstring></argsstring>
+        <name>storage_registry_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::storage_registry_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="152" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" bodystart="152" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a654ed6473030cc716f30a512f059da7c" prot="private" static="no" mutable="no">
+        <type>std::shared_ptr&lt; ObservableRegistry &gt;</type>
+        <definition>std::shared_ptr&lt;ObservableRegistry&gt; opentelemetry::sdk::metrics::Meter::observable_registry_</definition>
+        <argsstring></argsstring>
+        <name>observable_registry_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::observable_registry_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="153" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" bodystart="153" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1af90a7962175a5e4521454a18f73ccb81" prot="private" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref></type>
+        <definition>MeterConfig opentelemetry::sdk::metrics::Meter::meter_config_</definition>
+        <argsstring></argsstring>
+        <name>meter_config_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::meter_config_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="154" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" bodystart="154" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a00e45059499830891e46c7ee236b3489" prot="private" static="no" mutable="no">
+        <type>opentelemetry::common::SpinLockMutex</type>
+        <definition>opentelemetry::common::SpinLockMutex opentelemetry::sdk::metrics::Meter::storage_lock_</definition>
+        <argsstring></argsstring>
+        <name>storage_lock_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::storage_lock_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="159" column="40" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" bodystart="159" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a3d6fd7f887184217c44fc35dadd0ce4d" prot="private" static="yes" mutable="no">
+        <type><ref refid="classopentelemetry_1_1metrics_1_1NoopMeter" kindref="compound">opentelemetry::metrics::NoopMeter</ref></type>
+        <definition>opentelemetry::metrics::NoopMeter opentelemetry::sdk::metrics::Meter::kNoopMeter</definition>
+        <argsstring></argsstring>
+        <name>kNoopMeter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::kNoopMeter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="161" column="44" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" bodystart="161" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a01c3a8e6a995d38cca72507c7cee34f5" prot="public" static="no" const="no" explicit="yes" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Meter::Meter</definition>
+        <argsstring>(std::weak_ptr&lt; sdk::metrics::MeterContext &gt; meter_context, std::unique_ptr&lt; opentelemetry::sdk::instrumentationscope::InstrumentationScope &gt; scope=opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(&quot;&quot;)) noexcept</argsstring>
+        <name>Meter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::Meter</qualifiedname>
+        <param>
+          <type>std::weak_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">sdk::metrics::MeterContext</ref> &gt;</type>
+          <declname>meter_context</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; opentelemetry::sdk::instrumentationscope::InstrumentationScope &gt;</type>
+          <declname>scope</declname>
+          <defval>opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(&quot;&quot;)</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Construct a new Meter with the given pipeline. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="44" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a7ea6e5ec7b168e3fb0cecb9a79860581" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::unique_ptr&lt; opentelemetry::metrics::Counter&lt; uint64_t &gt; &gt;</type>
+        <definition>nostd::unique_ptr&lt; opentelemetry::metrics::Counter&lt; uint64_t &gt; &gt; opentelemetry::sdk::metrics::Meter::CreateUInt64Counter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept override</argsstring>
+        <name>CreateUInt64Counter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::CreateUInt64Counter</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="49" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1ab69037c961fa61d6b303d16aa2f3a62e" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::unique_ptr&lt; opentelemetry::metrics::Counter&lt; double &gt; &gt;</type>
+        <definition>nostd::unique_ptr&lt; opentelemetry::metrics::Counter&lt; double &gt; &gt; opentelemetry::sdk::metrics::Meter::CreateDoubleCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept override</argsstring>
+        <name>CreateDoubleCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::CreateDoubleCounter</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="54" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1ad40e38bf013690644e818682dda21953" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt;</type>
+        <definition>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt; opentelemetry::sdk::metrics::Meter::CreateInt64ObservableCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept override</argsstring>
+        <name>CreateInt64ObservableCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::CreateInt64ObservableCounter</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="59" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1afc814108d2fba4bbd3e22d5036662a87" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt;</type>
+        <definition>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt; opentelemetry::sdk::metrics::Meter::CreateDoubleObservableCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept override</argsstring>
+        <name>CreateDoubleObservableCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::CreateDoubleObservableCounter</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="64" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1aaaa51a63575164e8f3483dec09097911" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1Histogram" kindref="compound">opentelemetry::metrics::Histogram</ref>&lt; uint64_t &gt; &gt;</type>
+        <definition>nostd::unique_ptr&lt; opentelemetry::metrics::Histogram&lt; uint64_t &gt; &gt; opentelemetry::sdk::metrics::Meter::CreateUInt64Histogram</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept override</argsstring>
+        <name>CreateUInt64Histogram</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::CreateUInt64Histogram</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="69" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a502c282c52c21821e66adbeac061850e" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1Histogram" kindref="compound">opentelemetry::metrics::Histogram</ref>&lt; double &gt; &gt;</type>
+        <definition>nostd::unique_ptr&lt; opentelemetry::metrics::Histogram&lt; double &gt; &gt; opentelemetry::sdk::metrics::Meter::CreateDoubleHistogram</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept override</argsstring>
+        <name>CreateDoubleHistogram</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::CreateDoubleHistogram</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="74" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a8bf305502370c9c8d4fd962d71f4d0e9" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt;</type>
+        <definition>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt; opentelemetry::sdk::metrics::Meter::CreateInt64ObservableGauge</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept override</argsstring>
+        <name>CreateInt64ObservableGauge</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::CreateInt64ObservableGauge</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="91" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a4319654e7766dd9603b8d8e63bec8032" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt;</type>
+        <definition>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt; opentelemetry::sdk::metrics::Meter::CreateDoubleObservableGauge</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept override</argsstring>
+        <name>CreateDoubleObservableGauge</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::CreateDoubleObservableGauge</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="96" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1ace5f25f18468994ef1d5a4e1ee700ca9" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">opentelemetry::metrics::UpDownCounter</ref>&lt; int64_t &gt; &gt;</type>
+        <definition>nostd::unique_ptr&lt; opentelemetry::metrics::UpDownCounter&lt; int64_t &gt; &gt; opentelemetry::sdk::metrics::Meter::CreateInt64UpDownCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept override</argsstring>
+        <name>CreateInt64UpDownCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::CreateInt64UpDownCounter</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="101" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a704a84abdd60ba90ef658fbf93539d66" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">opentelemetry::metrics::UpDownCounter</ref>&lt; double &gt; &gt;</type>
+        <definition>nostd::unique_ptr&lt; opentelemetry::metrics::UpDownCounter&lt; double &gt; &gt; opentelemetry::sdk::metrics::Meter::CreateDoubleUpDownCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept override</argsstring>
+        <name>CreateDoubleUpDownCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::CreateDoubleUpDownCounter</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="106" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1abab180abe71965631d63c6a653a6b513" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt;</type>
+        <definition>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt; opentelemetry::sdk::metrics::Meter::CreateInt64ObservableUpDownCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept override</argsstring>
+        <name>CreateInt64ObservableUpDownCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::CreateInt64ObservableUpDownCounter</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="112" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a359a5ead2d21a20ad6bde5284e56fb18" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt;</type>
+        <definition>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt; opentelemetry::sdk::metrics::Meter::CreateDoubleObservableUpDownCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept override</argsstring>
+        <name>CreateDoubleObservableUpDownCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::CreateDoubleObservableUpDownCounter</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="117" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a641e0c6501da95c92cee677e609949cd" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>const sdk::instrumentationscope::InstrumentationScope *</type>
+        <definition>const sdk::instrumentationscope::InstrumentationScope * opentelemetry::sdk::metrics::Meter::GetInstrumentationScope</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetInstrumentationScope</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::GetInstrumentationScope</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the associated instrumentation scope </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="122" column="57"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a11e308dc55ab0c7d0df2114f20247a7d" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>const sdk::instrumentationscope::InstrumentationScope *</type>
+        <definition>const sdk::instrumentationscope::InstrumentationScope * opentelemetry::sdk::metrics::Meter::GetInstrumentationLibrary</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetInstrumentationLibrary</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::GetInstrumentationLibrary</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="125" column="57" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" bodystart="125" bodyend="128"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1af8b7062307bc81c637f35a4213ba1d3e" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>std::vector&lt; MetricData &gt;</type>
+        <definition>std::vector&lt; MetricData &gt; opentelemetry::sdk::metrics::Meter::Collect</definition>
+        <argsstring>(CollectorHandle *collector, opentelemetry::common::SystemTimestamp collect_ts) noexcept</argsstring>
+        <name>Collect</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::Collect</qualifiedname>
+        <param>
+          <type>CollectorHandle *</type>
+          <declname>collector</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>collect_ts</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>collect metrics across all the instruments configured for the meter </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="131" column="15"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a3e54d0bca762f916bb7ec0558e707a6f" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; SyncWritableMetricStorage &gt;</type>
+        <definition>std::unique_ptr&lt; SyncWritableMetricStorage &gt; opentelemetry::sdk::metrics::Meter::RegisterSyncMetricStorage</definition>
+        <argsstring>(InstrumentDescriptor &amp;instrument_descriptor)</argsstring>
+        <name>RegisterSyncMetricStorage</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::RegisterSyncMetricStorage</qualifiedname>
+        <param>
+          <type>InstrumentDescriptor &amp;</type>
+          <declname>instrument_descriptor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="155" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1af61602bcafbc31f97f7ff410a9623513" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; AsyncWritableMetricStorage &gt;</type>
+        <definition>std::unique_ptr&lt; AsyncWritableMetricStorage &gt; opentelemetry::sdk::metrics::Meter::RegisterAsyncMetricStorage</definition>
+        <argsstring>(InstrumentDescriptor &amp;instrument_descriptor)</argsstring>
+        <name>RegisterAsyncMetricStorage</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::RegisterAsyncMetricStorage</qualifiedname>
+        <param>
+          <type>InstrumentDescriptor &amp;</type>
+          <declname>instrument_descriptor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="157" column="19"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1ab7ff281237a9655d618940902d4e98b4" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt;</type>
+        <definition>static nostd::shared_ptr&lt; opentelemetry::metrics::ObservableInstrument &gt; opentelemetry::sdk::metrics::Meter::GetNoopObservableInsrument</definition>
+        <argsstring>()</argsstring>
+        <name>GetNoopObservableInsrument</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::GetNoopObservableInsrument</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="164" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" bodystart="164" bodyend="169"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1aa53638b61027287a139cbfc9431bdb74" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>static bool opentelemetry::sdk::metrics::Meter::ValidateInstrument</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description, nostd::string_view unit)</argsstring>
+        <name>ValidateInstrument</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::ValidateInstrument</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="171" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" bodystart="171" bodyend="178"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1ac1df1e69b1d4b67cae00d6d769ca8550" prot="private" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>static void opentelemetry::sdk::metrics::Meter::WarnOnDuplicateInstrument</definition>
+        <argsstring>(const sdk::instrumentationscope::InstrumentationScope *scope, const MetricStorageMap &amp;storage_registry, const InstrumentDescriptor &amp;new_instrument)</argsstring>
+        <name>WarnOnDuplicateInstrument</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::WarnOnDuplicateInstrument</qualifiedname>
+        <param>
+          <type>const sdk::instrumentationscope::InstrumentationScope *</type>
+          <declname>scope</declname>
+        </param>
+        <param>
+          <type>const MetricStorageMap &amp;</type>
+          <declname>storage_registry</declname>
+        </param>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>new_instrument</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="182" column="15"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a976716d9aa39c26358ce30761b85177c" prot="private" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>static void opentelemetry::sdk::metrics::Meter::WarnOnNameCaseConflict</definition>
+        <argsstring>(const sdk::instrumentationscope::InstrumentationScope *scope, const InstrumentDescriptor &amp;existing_instrument, const InstrumentDescriptor &amp;new_instrument)</argsstring>
+        <name>WarnOnNameCaseConflict</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Meter::WarnOnNameCaseConflict</qualifiedname>
+        <param>
+          <type>const sdk::instrumentationscope::InstrumentationScope *</type>
+          <declname>scope</declname>
+        </param>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>existing_instrument</declname>
+        </param>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>new_instrument</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="189" column="15"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::metrics::Meter</label>
+        <link refid="classopentelemetry_1_1metrics_1_1Meter"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::Meter</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::metrics::Meter</label>
+        <link refid="classopentelemetry_1_1metrics_1_1Meter"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::Meter</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" line="40" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h" bodystart="41" bodyend="192"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1af8b7062307bc81c637f35a4213ba1d3e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>Collect</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1ab69037c961fa61d6b303d16aa2f3a62e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>CreateDoubleCounter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a502c282c52c21821e66adbeac061850e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>CreateDoubleHistogram</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1afc814108d2fba4bbd3e22d5036662a87" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>CreateDoubleObservableCounter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a4319654e7766dd9603b8d8e63bec8032" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>CreateDoubleObservableGauge</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a359a5ead2d21a20ad6bde5284e56fb18" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>CreateDoubleObservableUpDownCounter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a704a84abdd60ba90ef658fbf93539d66" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>CreateDoubleUpDownCounter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1ad40e38bf013690644e818682dda21953" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>CreateInt64ObservableCounter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a8bf305502370c9c8d4fd962d71f4d0e9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>CreateInt64ObservableGauge</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1abab180abe71965631d63c6a653a6b513" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>CreateInt64ObservableUpDownCounter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1ace5f25f18468994ef1d5a4e1ee700ca9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>CreateInt64UpDownCounter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a7ea6e5ec7b168e3fb0cecb9a79860581" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>CreateUInt64Counter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1aaaa51a63575164e8f3483dec09097911" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>CreateUInt64Histogram</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a11e308dc55ab0c7d0df2114f20247a7d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>GetInstrumentationLibrary</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a641e0c6501da95c92cee677e609949cd" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>GetInstrumentationScope</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1ab7ff281237a9655d618940902d4e98b4" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>GetNoopObservableInsrument</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a3d6fd7f887184217c44fc35dadd0ce4d" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>kNoopMeter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a01c3a8e6a995d38cca72507c7cee34f5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>Meter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1acf0063e9ed6fd844d338f6b048fdff0c" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::Meter::"><scope>opentelemetry::sdk::metrics::Meter</scope><name>Meter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a9563e74279ca3f7f9ad15e62f29eab20" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::Meter::"><scope>opentelemetry::sdk::metrics::Meter</scope><name>Meter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a16c5314f6a526135a8c3a10873e15b3a" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::Meter::"><scope>opentelemetry::sdk::metrics::Meter</scope><name>Meter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1af90a7962175a5e4521454a18f73ccb81" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>meter_config_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a7a066667da0624197d27a66af1b75d1f" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>meter_context_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a042e028d43a5a461ac4b7b1b63ee1888" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>MetricStorageMap</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a654ed6473030cc716f30a512f059da7c" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>observable_registry_</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1aee4c6c9917d4d0d666c6344e4e9fb5d1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1ac3b3b654d2b370582987de13bef3d7a6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1af61602bcafbc31f97f7ff410a9623513" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>RegisterAsyncMetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a3e54d0bca762f916bb7ec0558e707a6f" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>RegisterSyncMetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1ae450769c6a60e7a3902b27dcb773fa1b" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>scope_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a00e45059499830891e46c7ee236b3489" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>storage_lock_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a0c9f8f74772b21bf5d8808722c99beea" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>storage_registry_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1aa53638b61027287a139cbfc9431bdb74" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>ValidateInstrument</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1ac1df1e69b1d4b67cae00d6d769ca8550" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>WarnOnDuplicateInstrument</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter_1a976716d9aa39c26358ce30761b85177c" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>WarnOnNameCaseConflict</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a3b23539c8ee14eb382a80fbae7859eee" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::Meter</scope><name>~Meter</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

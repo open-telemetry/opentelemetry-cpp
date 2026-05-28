@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory</compoundname>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderFactory_1adb619c07198c832d8e997c5fc7684a78" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; MetricReader &gt; opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; PushMetricExporter &gt; exporter, const PeriodicExportingMetricReaderOptions &amp;options)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kindref="compound">PushMetricExporter</ref> &gt;</type>
+          <declname>exporter</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderOptions" kindref="compound">PeriodicExportingMetricReaderOptions</ref> &amp;</type>
+          <declname>options</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h" line="23" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderFactory_1a64789e92749dee8fbd36fba038c3c1cb" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; MetricReader &gt; opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; PushMetricExporter &gt; exporter, const PeriodicExportingMetricReaderOptions &amp;options, const PeriodicExportingMetricReaderRuntimeOptions &amp;runtime_options)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kindref="compound">PushMetricExporter</ref> &gt;</type>
+          <declname>exporter</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderOptions" kindref="compound">PeriodicExportingMetricReaderOptions</ref> &amp;</type>
+          <declname>options</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderRuntimeOptions" kindref="compound">PeriodicExportingMetricReaderRuntimeOptions</ref> &amp;</type>
+          <declname>runtime_options</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h" line="26" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h" bodystart="21" bodyend="30"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderFactory_1adb619c07198c832d8e997c5fc7684a78" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderFactory_1a64789e92749dee8fbd36fba038c3c1cb" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::sdk::metrics::Aggregation</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1ae115274a494ec34d76265e62263bba7a" prot="private" static="no" mutable="yes">
+        <type>opentelemetry::common::SpinLockMutex</type>
+        <definition>opentelemetry::common::SpinLockMutex opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::lock_</definition>
+        <argsstring></argsstring>
+        <name>lock_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::lock_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="52" column="48" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" bodystart="52" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a04a7c38ae37dede4cee2da8798fd6d35" prot="private" static="no" mutable="no">
+        <type>Base2ExponentialHistogramPointData</type>
+        <definition>Base2ExponentialHistogramPointData opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::point_data_</definition>
+        <argsstring></argsstring>
+        <name>point_data_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::point_data_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="53" column="38" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" bodystart="53" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1afc3c64e35abe44d9fe8888d901ba4eb3" prot="private" static="no" mutable="no">
+        <type>Base2ExponentialHistogramIndexer</type>
+        <definition>Base2ExponentialHistogramIndexer opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::indexer_</definition>
+        <argsstring></argsstring>
+        <name>indexer_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::indexer_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="54" column="36" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" bodystart="54" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a162ee11a274b35f0b495314e7e9896a9" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::record_min_max_</definition>
+        <argsstring></argsstring>
+        <name>record_min_max_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::record_min_max_</qualifiedname>
+        <initializer>= true</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="55" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" bodystart="55" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a0eaad44bf6da0d489bbf8290131868dc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation</definition>
+        <argsstring>(const AggregationConfig *aggregation_config=nullptr)</argsstring>
+        <name>Base2ExponentialHistogramAggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation</qualifiedname>
+        <param>
+          <type>const AggregationConfig *</type>
+          <declname>aggregation_config</declname>
+          <defval>nullptr</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="27" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a86f12f59cf74cae39944cdc8e0e86039" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation</definition>
+        <argsstring>(const Base2ExponentialHistogramPointData &amp;point_data)</argsstring>
+        <name>Base2ExponentialHistogramAggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation</qualifiedname>
+        <param>
+          <type>const Base2ExponentialHistogramPointData &amp;</type>
+          <declname>point_data</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="28" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a326de6150221e94d5e07ab2e7e42ad68" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation</definition>
+        <argsstring>(Base2ExponentialHistogramPointData &amp;&amp;point_data)</argsstring>
+        <name>Base2ExponentialHistogramAggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation</qualifiedname>
+        <param>
+          <type>Base2ExponentialHistogramPointData &amp;&amp;</type>
+          <declname>point_data</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="29" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a36ad624c0c5070aa29c4e0dcef1d58a7" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Aggregate</definition>
+        <argsstring>(int64_t value, const PointAttributes &amp;attributes={}) noexcept override</argsstring>
+        <name>Aggregate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Aggregate</qualifiedname>
+        <param>
+          <type>int64_t</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const PointAttributes &amp;</type>
+          <declname>attributes</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="31" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a9979eaba4ec6678183d946736bbd648d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Aggregate</definition>
+        <argsstring>(double value, const PointAttributes &amp;attributes={}) noexcept override</argsstring>
+        <name>Aggregate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Aggregate</qualifiedname>
+        <param>
+          <type>double</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const PointAttributes &amp;</type>
+          <declname>attributes</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="32" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a54b09ca8719140df9327feb33bf70804" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>std::unique_ptr&lt; Aggregation &gt;</type>
+        <definition>std::unique_ptr&lt; Aggregation &gt; opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Merge</definition>
+        <argsstring>(const Aggregation &amp;delta) const noexcept override</argsstring>
+        <name>Merge</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Merge</qualifiedname>
+        <param>
+          <type>const Aggregation &amp;</type>
+          <declname>delta</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="36" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a4e46d7cc0da391fbd5b517bf9b4a81be" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>std::unique_ptr&lt; Aggregation &gt;</type>
+        <definition>std::unique_ptr&lt; Aggregation &gt; opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Diff</definition>
+        <argsstring>(const Aggregation &amp;next) const noexcept override</argsstring>
+        <name>Diff</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Diff</qualifiedname>
+        <param>
+          <type>const Aggregation &amp;</type>
+          <declname>next</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="43" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a2f3f708f3df4958db50b3a2217173edc" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>PointType</type>
+        <definition>PointType opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::ToPoint</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>ToPoint</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::ToPoint</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="45" column="13"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a15d8daf46c8212d678a1abb6aeb46acb" prot="private" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::AggregateIntoBuckets</definition>
+        <argsstring>(std::unique_ptr&lt; AdaptingCircularBufferCounter &gt; &amp;buckets, double value) noexcept</argsstring>
+        <name>AggregateIntoBuckets</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::AggregateIntoBuckets</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" kindref="compound">AdaptingCircularBufferCounter</ref> &gt; &amp;</type>
+          <declname>buckets</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="48" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a94bb3ab27cc2b0d474952b928d09f4d9" prot="private" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Downscale</definition>
+        <argsstring>(uint32_t by) noexcept</argsstring>
+        <name>Downscale</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation::Downscale</qualifiedname>
+        <param>
+          <type>uint32_t</type>
+          <declname>by</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="50" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" line="24" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h" bodystart="25" bodyend="56"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a36ad624c0c5070aa29c4e0dcef1d58a7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>Aggregate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a9979eaba4ec6678183d946736bbd648d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>Aggregate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a15d8daf46c8212d678a1abb6aeb46acb" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>AggregateIntoBuckets</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1af6a4b0195c2b59d6592864a944bebd96" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>Aggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a29cfcd740ec1da70be6a3523d06e5eba" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>Aggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a6da32b25e5f17a10ff72fc46f6142239" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>Aggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a0eaad44bf6da0d489bbf8290131868dc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>Base2ExponentialHistogramAggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a86f12f59cf74cae39944cdc8e0e86039" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>Base2ExponentialHistogramAggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a326de6150221e94d5e07ab2e7e42ad68" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>Base2ExponentialHistogramAggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a4e46d7cc0da391fbd5b517bf9b4a81be" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>Diff</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a94bb3ab27cc2b0d474952b928d09f4d9" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>Downscale</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1afc3c64e35abe44d9fe8888d901ba4eb3" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>indexer_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1ae115274a494ec34d76265e62263bba7a" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>lock_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a54b09ca8719140df9327feb33bf70804" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>Merge</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a8bebc1d6cc3ea50af4726b95a6717e9b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a4f0021ce4ded2fabb2d92acd132d5288" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a04a7c38ae37dede4cee2da8798fd6d35" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>point_data_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a162ee11a274b35f0b495314e7e9896a9" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>record_min_max_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation_1a2f3f708f3df4958db50b3a2217173edc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>ToPoint</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a3b49d27663b7598b277bacfe282447ce" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</scope><name>~Aggregation</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

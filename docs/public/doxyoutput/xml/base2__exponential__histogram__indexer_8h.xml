@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="base2__exponential__histogram__indexer_8h" kind="file" language="C++">
+    <compoundname>base2_exponential_histogram_indexer.h</compoundname>
+    <includes local="no">stdint.h</includes>
+    <includes local="yes">opentelemetry/version.h</includes>
+    <includedby refid="base2__exponential__histogram__aggregation_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h</includedby>
+    <incdepgraph>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h</label>
+        <link refid="base2__exponential__histogram__indexer_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>opentelemetry/version.h</label>
+      </node>
+      <node id="2">
+        <label>stdint.h</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="2">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h</label>
+        <link refid="base2__exponential__histogram__aggregation_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h</label>
+        <link refid="base2__exponential__histogram__indexer_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/default_aggregation.h</label>
+        <link refid="default__aggregation_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter__provider_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider_factory.h</label>
+        <link refid="meter__provider__factory_8h_source"/>
+      </node>
+      <node id="4">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/async_metric_storage.h</label>
+        <link refid="async__metric__storage_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/sync_metric_storage.h</label>
+        <link refid="sync__metric__storage_8h_source"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer" prot="public">opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer</innerclass>
+    <innernamespace refid="namespaceopentelemetry">opentelemetry</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk">opentelemetry::sdk</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1metrics">opentelemetry::sdk::metrics</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>The<sp/>OpenTelemetry<sp/>Authors</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stdint.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/version.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal">OPENTELEMETRY_BEGIN_NAMESPACE</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">sdk</highlight></codeline>
+<codeline lineno="12"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">metrics</highlight></codeline>
+<codeline lineno="14"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="comment">/*</highlight></codeline>
+<codeline lineno="17"><highlight class="comment"><sp/>*<sp/>An<sp/>indexer<sp/>for<sp/>base2<sp/>exponential<sp/>histograms.<sp/>It<sp/>is<sp/>used<sp/>to<sp/>calculate<sp/>index<sp/>for<sp/>a<sp/>given<sp/>value<sp/>and</highlight></codeline>
+<codeline lineno="18"><highlight class="comment"><sp/>*<sp/>scale.</highlight></codeline>
+<codeline lineno="19"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Base2ExponentialHistogramIndexer</highlight></codeline>
+<codeline lineno="21"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">/*</highlight></codeline>
+<codeline lineno="24"><highlight class="comment"><sp/><sp/><sp/>*<sp/>Construct<sp/>a<sp/>new<sp/>indexer<sp/>for<sp/>a<sp/>given<sp/>scale.</highlight></codeline>
+<codeline lineno="25"><highlight class="comment"><sp/><sp/><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">explicit</highlight><highlight class="normal"><sp/>Base2ExponentialHistogramIndexer(int32_t<sp/>scale<sp/>=<sp/>0);</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/>Base2ExponentialHistogramIndexer(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>Base2ExponentialHistogramIndexer<sp/>&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/>Base2ExponentialHistogramIndexer(Base2ExponentialHistogramIndexer<sp/>&amp;&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/>Base2ExponentialHistogramIndexer<sp/>&amp;operator=(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>Base2ExponentialHistogramIndexer<sp/>&amp;)<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/>Base2ExponentialHistogramIndexer<sp/>&amp;operator=(Base2ExponentialHistogramIndexer<sp/>&amp;&amp;)<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/>~Base2ExponentialHistogramIndexer()<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><sp/><sp/>int32_t<sp/>ComputeIndex(</highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>value)<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal"></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/>int32_t<sp/>scale_;</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>scale_factor_;</highlight></codeline>
+<codeline lineno="45"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"></highlight></codeline>
+<codeline lineno="47"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>metrics</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="48"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>sdk</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="49"><highlight class="normal">OPENTELEMETRY_END_NAMESPACE</highlight></codeline>
+    </programlisting>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h"/>
+  </compounddef>
+</doxygen>

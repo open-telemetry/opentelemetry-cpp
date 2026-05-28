@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1common_1_1NoopKeyValueIterable" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::common::NoopKeyValueIterable</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1common_1_1KeyValueIterable" prot="public" virt="non-virtual">opentelemetry::common::KeyValueIterable</basecompoundref>
+    <includes refid="key__value__iterable_8h" local="no">key_value_iterable.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1NoopKeyValueIterable_1a20f22d2fec1e9b3b3589e5cfda240fe9" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::common::NoopKeyValueIterable::ForEachKeyValue</definition>
+        <argsstring>(nostd::function_ref&lt; bool(nostd::string_view, common::AttributeValue)&gt;) const noexcept override</argsstring>
+        <name>ForEachKeyValue</name>
+        <qualifiedname>opentelemetry::common::NoopKeyValueIterable::ForEachKeyValue</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1common_1_1KeyValueIterable_1a96fa50fcdf0dff279f97f725c0e33318">ForEachKeyValue</reimplements>
+        <param>
+          <type>nostd::function_ref&lt; bool(nostd::string_view, common::AttributeValue)&gt;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>No-op implementation: does not invoke the callback, even if key-value pairs are present. <simplesect kind="return"><para>true without iterating or invoking the callback </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/key_value_iterable.h" line="52" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/key_value_iterable.h" bodystart="52" bodyend="57"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1NoopKeyValueIterable_1af1e5ade3b6f54426c3404b13179274bb" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::common::NoopKeyValueIterable::size</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>size</name>
+        <qualifiedname>opentelemetry::common::NoopKeyValueIterable::size</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1common_1_1KeyValueIterable_1ab34d95f41c48b32e579c7923415b4922">size</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>the number of key-value pairs </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/key_value_iterable.h" line="62" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/key_value_iterable.h" bodystart="62" bodyend="62"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Supports internal iteration over a collection of key-value pairs. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::common::KeyValueIterable</label>
+        <link refid="classopentelemetry_1_1common_1_1KeyValueIterable"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::common::NoopKeyValueIterable</label>
+        <link refid="classopentelemetry_1_1common_1_1NoopKeyValueIterable"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::common::KeyValueIterable</label>
+        <link refid="classopentelemetry_1_1common_1_1KeyValueIterable"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::common::NoopKeyValueIterable</label>
+        <link refid="classopentelemetry_1_1common_1_1NoopKeyValueIterable"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/key_value_iterable.h" line="45" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/key_value_iterable.h" bodystart="46" bodyend="63"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1common_1_1NoopKeyValueIterable_1a20f22d2fec1e9b3b3589e5cfda240fe9" prot="public" virt="virtual"><scope>opentelemetry::common::NoopKeyValueIterable</scope><name>ForEachKeyValue</name></member>
+      <member refid="classopentelemetry_1_1common_1_1KeyValueIterable_1a4f83438626a325e6e4fbd2ce70504cc8" prot="public" virt="non-virtual"><scope>opentelemetry::common::NoopKeyValueIterable</scope><name>KeyValueIterable</name></member>
+      <member refid="classopentelemetry_1_1common_1_1KeyValueIterable_1a5ff04644dfe1accd0940e6f7a50ee11f" prot="public" virt="non-virtual"><scope>opentelemetry::common::NoopKeyValueIterable</scope><name>KeyValueIterable</name></member>
+      <member refid="classopentelemetry_1_1common_1_1KeyValueIterable_1a5d08068caa06fc7955678cd1709d2902" prot="public" virt="non-virtual"><scope>opentelemetry::common::NoopKeyValueIterable</scope><name>KeyValueIterable</name></member>
+      <member refid="classopentelemetry_1_1common_1_1KeyValueIterable_1a6ee7adfbfc6c802db3a6688c67aa60cb" prot="public" virt="non-virtual"><scope>opentelemetry::common::NoopKeyValueIterable</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1common_1_1KeyValueIterable_1a569fb14e6fe278fae6e23e9f0a6ff9a2" prot="public" virt="non-virtual"><scope>opentelemetry::common::NoopKeyValueIterable</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1common_1_1NoopKeyValueIterable_1af1e5ade3b6f54426c3404b13179274bb" prot="public" virt="virtual"><scope>opentelemetry::common::NoopKeyValueIterable</scope><name>size</name></member>
+      <member refid="classopentelemetry_1_1common_1_1KeyValueIterable_1adf79a852b8e60c32e655dbaba52f3374" prot="public" virt="virtual"><scope>opentelemetry::common::NoopKeyValueIterable</scope><name>~KeyValueIterable</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

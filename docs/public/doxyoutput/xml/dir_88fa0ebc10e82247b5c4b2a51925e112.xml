@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_88fa0ebc10e82247b5c4b2a51925e112" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common</compoundname>
+    <innerfile refid="attribute__value_8h">attribute_value.h</innerfile>
+    <innerfile refid="key__value__iterable_8h">key_value_iterable.h</innerfile>
+    <innerfile refid="macros_8h">macros.h</innerfile>
+    <innerfile refid="timestamp_8h">timestamp.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/"/>
+  </compounddef>
+</doxygen>

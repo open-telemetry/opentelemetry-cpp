@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1trace_1_1MultiSpanProcessor_1_1ProcessorNode" kind="struct" language="C++" prot="private">
+    <compoundname>opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1MultiSpanProcessor_1_1ProcessorNode_1a9c71ae7e1f7dadb89b8c752572d39f34" prot="public" static="no" mutable="no">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt;</type>
+        <definition>std::unique_ptr&lt;SpanProcessor&gt; opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode::value_</definition>
+        <argsstring></argsstring>
+        <name>value_</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode::value_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h" line="158" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h" bodystart="158" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1MultiSpanProcessor_1_1ProcessorNode_1a56bbb6cf02626948c39747424b2d6ca5" prot="public" static="no" mutable="no">
+        <type>ProcessorNode *</type>
+        <definition>ProcessorNode* opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode::next_</definition>
+        <argsstring></argsstring>
+        <name>next_</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode::next_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h" line="159" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h" bodystart="159" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1MultiSpanProcessor_1_1ProcessorNode_1ab6b45362bf1edc4af30f8a6e10793c6a" prot="public" static="no" mutable="no">
+        <type>ProcessorNode *</type>
+        <definition>ProcessorNode * opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode::prev_</definition>
+        <argsstring></argsstring>
+        <name>prev_</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode::prev_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h" line="159" column="25" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h" bodystart="159" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1trace_1_1MultiSpanProcessor_1_1ProcessorNode_1a8574f9709f158d37f1b5d1255b82fc2d" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode::ProcessorNode</definition>
+        <argsstring>(std::unique_ptr&lt; SpanProcessor &gt; &amp;&amp;value, ProcessorNode *prev=nullptr, ProcessorNode *next=nullptr)</argsstring>
+        <name>ProcessorNode</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode::ProcessorNode</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt; &amp;&amp;</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>ProcessorNode *</type>
+          <declname>prev</declname>
+          <defval>nullptr</defval>
+        </param>
+        <param>
+          <type>ProcessorNode *</type>
+          <declname>next</declname>
+          <defval>nullptr</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h" line="160" column="5" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h" bodystart="160" bodyend="164"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h" line="156" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h" bodystart="157" bodyend="165"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1MultiSpanProcessor_1_1ProcessorNode_1a56bbb6cf02626948c39747424b2d6ca5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode</scope><name>next_</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1MultiSpanProcessor_1_1ProcessorNode_1ab6b45362bf1edc4af30f8a6e10793c6a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode</scope><name>prev_</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1MultiSpanProcessor_1_1ProcessorNode_1a8574f9709f158d37f1b5d1255b82fc2d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode</scope><name>ProcessorNode</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1MultiSpanProcessor_1_1ProcessorNode_1a9c71ae7e1f7dadb89b8c752572d39f34" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiSpanProcessor::ProcessorNode</scope><name>value_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

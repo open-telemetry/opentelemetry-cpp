@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::metrics::MetricStorage</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AsyncMetricStorage" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::AsyncMetricStorage</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1NoopMetricStorage" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::NoopMetricStorage</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMetricStorage" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::SyncMetricStorage</derivedcompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1ad5cac0743cb4afebe6b807fb1d63eb6d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MetricStorage::MetricStorage</definition>
+        <argsstring>()=default</argsstring>
+        <name>MetricStorage</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricStorage::MetricStorage</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="35" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a5613c45082dda98dd49421e06a00cb85" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MetricStorage::MetricStorage</definition>
+        <argsstring>(const MetricStorage &amp;)=delete</argsstring>
+        <name>MetricStorage</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricStorage::MetricStorage</qualifiedname>
+        <param>
+          <type>const MetricStorage &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="37" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a4bf6c5840e65ab8e164941a23b216e6d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MetricStorage::MetricStorage</definition>
+        <argsstring>(MetricStorage &amp;&amp;)=delete</argsstring>
+        <name>MetricStorage</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricStorage::MetricStorage</qualifiedname>
+        <param>
+          <type>MetricStorage &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="38" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a3f1254022e433a9e3e972053b6387849" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>MetricStorage &amp;</type>
+        <definition>MetricStorage &amp; opentelemetry::sdk::metrics::MetricStorage::operator=</definition>
+        <argsstring>(const MetricStorage &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricStorage::operator=</qualifiedname>
+        <param>
+          <type>const MetricStorage &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="39" column="17"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a336a4d6914279ad55dc1f7267ecbe19d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>MetricStorage &amp;</type>
+        <definition>MetricStorage &amp; opentelemetry::sdk::metrics::MetricStorage::operator=</definition>
+        <argsstring>(MetricStorage &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricStorage::operator=</qualifiedname>
+        <param>
+          <type>MetricStorage &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="40" column="17"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1aaedfbda3546ec0a15f552814e880ecac" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::metrics::MetricStorage::~MetricStorage</definition>
+        <argsstring>()=default</argsstring>
+        <name>~MetricStorage</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricStorage::~MetricStorage</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="42" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a9d5a38a724b4053c88790af55644b602" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::sdk::metrics::MetricStorage::Collect</definition>
+        <argsstring>(CollectorHandle *collector, nostd::span&lt; std::shared_ptr&lt; CollectorHandle &gt; &gt; collectors, opentelemetry::common::SystemTimestamp sdk_start_ts, opentelemetry::common::SystemTimestamp collection_ts, nostd::function_ref&lt; bool(MetricData)&gt; callback) noexcept=0</argsstring>
+        <name>Collect</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricStorage::Collect</qualifiedname>
+        <param>
+          <type>CollectorHandle *</type>
+          <declname>collector</declname>
+        </param>
+        <param>
+          <type>nostd::span&lt; std::shared_ptr&lt; CollectorHandle &gt; &gt;</type>
+          <declname>collectors</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>sdk_start_ts</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>collection_ts</declname>
+        </param>
+        <param>
+          <type>nostd::function_ref&lt; bool(MetricData)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="45" column="16"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="32" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" bodystart="33" bodyend="50"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a9d5a38a724b4053c88790af55644b602" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::MetricStorage</scope><name>Collect</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1ad5cac0743cb4afebe6b807fb1d63eb6d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricStorage</scope><name>MetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a5613c45082dda98dd49421e06a00cb85" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricStorage</scope><name>MetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a4bf6c5840e65ab8e164941a23b216e6d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricStorage</scope><name>MetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a3f1254022e433a9e3e972053b6387849" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricStorage</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a336a4d6914279ad55dc1f7267ecbe19d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricStorage</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1aaedfbda3546ec0a15f552814e880ecac" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::MetricStorage</scope><name>~MetricStorage</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

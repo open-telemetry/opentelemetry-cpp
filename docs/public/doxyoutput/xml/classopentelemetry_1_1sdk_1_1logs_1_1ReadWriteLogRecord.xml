@@ -1,0 +1,918 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::sdk::logs::ReadWriteLogRecord</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord" prot="public" virt="non-virtual">opentelemetry::sdk::logs::ReadableLogRecord</basecompoundref>
+    <includes refid="read__write__log__record_8h" local="no">read_write_log_record.h</includes>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1_1TraceState" prot="private">opentelemetry::sdk::logs::ReadWriteLogRecord::TraceState</innerclass>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a3ccf26079fd231841735030d29709fd5" prot="private" static="no" mutable="no">
+        <type>opentelemetry::logs::Severity</type>
+        <definition>opentelemetry::logs::Severity opentelemetry::sdk::logs::ReadWriteLogRecord::severity_</definition>
+        <argsstring></argsstring>
+        <name>severity_</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::severity_</qualifiedname>
+        <initializer>{opentelemetry::logs::Severity::kInvalid}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="190" column="33" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="190" bodyend="190"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a60dfc8b993825b899434b0bb10fefc07" prot="private" static="no" mutable="no">
+        <type>const opentelemetry::sdk::resource::Resource *</type>
+        <definition>const opentelemetry::sdk::resource::Resource* opentelemetry::sdk::logs::ReadWriteLogRecord::resource_</definition>
+        <argsstring></argsstring>
+        <name>resource_</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::resource_</qualifiedname>
+        <initializer>{nullptr}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="191" column="48" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="191" bodyend="191"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1adc4c2fafd92b78245177414982b70ea5" prot="private" static="no" mutable="no">
+        <type>const opentelemetry::sdk::instrumentationscope::InstrumentationScope *</type>
+        <definition>const opentelemetry::sdk::instrumentationscope::InstrumentationScope* opentelemetry::sdk::logs::ReadWriteLogRecord::instrumentation_scope_</definition>
+        <argsstring></argsstring>
+        <name>instrumentation_scope_</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::instrumentation_scope_</qualifiedname>
+        <initializer>{
+      nullptr}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="192" column="72" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="192" bodyend="193"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1adab98dcdce268d1f4913a3dce5aef154" prot="private" static="no" mutable="no">
+        <type>std::unordered_map&lt; std::string, opentelemetry::sdk::common::OwnedAttributeValue &gt;</type>
+        <definition>std::unordered_map&lt;std::string, opentelemetry::sdk::common::OwnedAttributeValue&gt; opentelemetry::sdk::logs::ReadWriteLogRecord::attributes_map_</definition>
+        <argsstring></argsstring>
+        <name>attributes_map_</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::attributes_map_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="195" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="195" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a99984eb834cf7f6f482dcc6c762e6f3a" prot="private" static="no" mutable="no">
+        <type>opentelemetry::sdk::common::OwnedAttributeValue</type>
+        <definition>opentelemetry::sdk::common::OwnedAttributeValue opentelemetry::sdk::logs::ReadWriteLogRecord::body_</definition>
+        <argsstring></argsstring>
+        <name>body_</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::body_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="196" column="51" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="196" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1ae376cdbd6524e76525e321da30197a63" prot="private" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::logs::ReadWriteLogRecord::timestamp_</definition>
+        <argsstring></argsstring>
+        <name>timestamp_</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::timestamp_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="197" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="197" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1ac522095bf6e9167ba1f798af1750812b" prot="private" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::logs::ReadWriteLogRecord::observed_timestamp_</definition>
+        <argsstring></argsstring>
+        <name>observed_timestamp_</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::observed_timestamp_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="198" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="198" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a5703740f8dc0489b50dc822f5feeb19e" prot="private" static="no" mutable="no">
+        <type>int64_t</type>
+        <definition>int64_t opentelemetry::sdk::logs::ReadWriteLogRecord::event_id_</definition>
+        <argsstring></argsstring>
+        <name>event_id_</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::event_id_</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="200" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="200" bodyend="200"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a96f473214a76dac5a0b4619414a29290" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::logs::ReadWriteLogRecord::event_name_</definition>
+        <argsstring></argsstring>
+        <name>event_name_</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::event_name_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="201" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="201" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a12ff20def15a1fdcf96818fc27be14d6" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; TraceState &gt;</type>
+        <definition>std::unique_ptr&lt;TraceState&gt; opentelemetry::sdk::logs::ReadWriteLogRecord::trace_state_</definition>
+        <argsstring></argsstring>
+        <name>trace_state_</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::trace_state_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="210" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="210" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1aa69b87a88eedf4c795fb672e9821b2ec" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::ReadWriteLogRecord::ReadWriteLogRecord</definition>
+        <argsstring>()</argsstring>
+        <name>ReadWriteLogRecord</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::ReadWriteLogRecord</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="36" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a3be56649485bbefc36df08f43f34f4da" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::ReadWriteLogRecord::ReadWriteLogRecord</definition>
+        <argsstring>(const ReadWriteLogRecord &amp;)=delete</argsstring>
+        <name>ReadWriteLogRecord</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::ReadWriteLogRecord</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord" kindref="compound">ReadWriteLogRecord</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="38" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1ae72f332e6a203572797e9962a1d0187f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::ReadWriteLogRecord::ReadWriteLogRecord</definition>
+        <argsstring>(ReadWriteLogRecord &amp;&amp;)=delete</argsstring>
+        <name>ReadWriteLogRecord</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::ReadWriteLogRecord</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord" kindref="compound">ReadWriteLogRecord</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="39" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a91a2cbd63126ce4c66814a29b82e49c4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord" kindref="compound">ReadWriteLogRecord</ref> &amp;</type>
+        <definition>ReadWriteLogRecord &amp; opentelemetry::sdk::logs::ReadWriteLogRecord::operator=</definition>
+        <argsstring>(const ReadWriteLogRecord &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord" kindref="compound">ReadWriteLogRecord</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="40" column="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1ab107a45d48c46581375be81a02679494" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord" kindref="compound">ReadWriteLogRecord</ref> &amp;</type>
+        <definition>ReadWriteLogRecord &amp; opentelemetry::sdk::logs::ReadWriteLogRecord::operator=</definition>
+        <argsstring>(ReadWriteLogRecord &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord" kindref="compound">ReadWriteLogRecord</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="41" column="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a99b343c086902f96f552f0c33d2ac384" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::ReadWriteLogRecord::~ReadWriteLogRecord</definition>
+        <argsstring>() override</argsstring>
+        <name>~ReadWriteLogRecord</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::~ReadWriteLogRecord</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="43" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a2384d0d211a46fcf4cbe9269df057077" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::ReadWriteLogRecord::SetTimestamp</definition>
+        <argsstring>(opentelemetry::common::SystemTimestamp timestamp) noexcept override</argsstring>
+        <name>SetTimestamp</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::SetTimestamp</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1LogRecord_1aa7f956bb9e85881049fcddaa2f6c6021">SetTimestamp</reimplements>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>timestamp</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the timestamp for this log. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timestamp</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the timestamp to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="49" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a36df24405969709f4d12fe9545fc40e4" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::logs::ReadWriteLogRecord::GetTimestamp</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetTimestamp</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::GetTimestamp</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1a483c48cd8889866ae974ab9ea98ca809">GetTimestamp</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the timestamp of this log. <simplesect kind="return"><para>the timestamp of this log </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="55" column="42"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1ab9ac975851a7cf8494c92033134e3790" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::ReadWriteLogRecord::SetObservedTimestamp</definition>
+        <argsstring>(opentelemetry::common::SystemTimestamp timestamp) noexcept override</argsstring>
+        <name>SetObservedTimestamp</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::SetObservedTimestamp</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1LogRecord_1a9e37e10ae9db0860cc3bbaaf7574fbd9">SetObservedTimestamp</reimplements>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>timestamp</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the observed timestamp for this log. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timestamp</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the timestamp to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="61" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a99b32ad9b9407709ff678b9a8bc6a6b6" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::logs::ReadWriteLogRecord::GetObservedTimestamp</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetObservedTimestamp</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::GetObservedTimestamp</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1a32ec920fd511548a260a0f3cae845831">GetObservedTimestamp</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the observed timestamp of this log. <simplesect kind="return"><para>the observed timestamp of this log </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="67" column="42"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a93750b5aef91393571017eb6e5c93486" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::ReadWriteLogRecord::SetSeverity</definition>
+        <argsstring>(opentelemetry::logs::Severity severity) noexcept override</argsstring>
+        <name>SetSeverity</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::SetSeverity</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1LogRecord_1a264185f7c7772e0c2f3b6f723fa8638d">SetSeverity</reimplements>
+        <param>
+          <type>opentelemetry::logs::Severity</type>
+          <declname>severity</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the severity for this log. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>severity</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the severity of the event </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="73" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1ae5d36ad7137a899fd86a8a61872c00ca" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>opentelemetry::logs::Severity</type>
+        <definition>opentelemetry::logs::Severity opentelemetry::sdk::logs::ReadWriteLogRecord::GetSeverity</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetSeverity</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::GetSeverity</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1a690c701844d6a82c2cec73e257944ae2">GetSeverity</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the severity of this log. <simplesect kind="return"><para>the severity of this log </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="79" column="33"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a903255f0700e2e5563865b4c951f8e4e" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::ReadWriteLogRecord::SetBody</definition>
+        <argsstring>(const opentelemetry::common::AttributeValue &amp;message) noexcept override</argsstring>
+        <name>SetBody</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::SetBody</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1LogRecord_1acdb2834aa663aba2b557fcb5897c0b5b">SetBody</reimplements>
+        <param>
+          <type>const opentelemetry::common::AttributeValue &amp;</type>
+          <declname>message</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set body field for this log. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>message</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the body to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="85" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a6639236c82d9e253ec965dccb3e684b4" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>const opentelemetry::sdk::common::OwnedAttributeValue &amp;</type>
+        <definition>const opentelemetry::sdk::common::OwnedAttributeValue &amp; opentelemetry::sdk::logs::ReadWriteLogRecord::GetBody</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetBody</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::GetBody</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1a34fb58d2f232aba55b87e9e9b88db778">GetBody</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get body field of this log. <simplesect kind="return"><para>the body field for this log. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="91" column="57"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a7b9452713980e2ec389e678f94a349e1" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::ReadWriteLogRecord::SetEventId</definition>
+        <argsstring>(int64_t id, nostd::string_view name) noexcept override</argsstring>
+        <name>SetEventId</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::SetEventId</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1LogRecord_1a3d4148b3ba65373283ea998da86f719c">SetEventId</reimplements>
+        <param>
+          <type>int64_t</type>
+          <declname>id</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the Event Id object <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the event Id to set </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the event name to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="98" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a791bbb159925b29b54a77cd1c708c1cf" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>int64_t</type>
+        <definition>int64_t opentelemetry::sdk::logs::ReadWriteLogRecord::GetEventId</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetEventId</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::GetEventId</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1a9a0dc16b6dc529930a6ce1ecfb23f485">GetEventId</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get event Id of this log. <simplesect kind="return"><para>the event Id of this log. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="104" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a4270a886a1989021544b811cb60dcdfa" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>nostd::string_view</type>
+        <definition>nostd::string_view opentelemetry::sdk::logs::ReadWriteLogRecord::GetEventName</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetEventName</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::GetEventName</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1ab9183844f1beb4f98501f94916efa8e0">GetEventName</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get event name of this log. <simplesect kind="return"><para>the event name of this log. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="110" column="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a8b2e3fe846cb6d228dd62ffe466b9555" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::ReadWriteLogRecord::SetTraceId</definition>
+        <argsstring>(const opentelemetry::trace::TraceId &amp;trace_id) noexcept override</argsstring>
+        <name>SetTraceId</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::SetTraceId</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1LogRecord_1abe990638818f67bd11bbdd55c4b95bd4">SetTraceId</reimplements>
+        <param>
+          <type>const opentelemetry::trace::TraceId &amp;</type>
+          <declname>trace_id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the trace id for this log. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>trace_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the trace id to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="116" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1af3e994b647db1ba4bbe9967134d55d99" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>const opentelemetry::trace::TraceId &amp;</type>
+        <definition>const opentelemetry::trace::TraceId &amp; opentelemetry::sdk::logs::ReadWriteLogRecord::GetTraceId</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetTraceId</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::GetTraceId</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1ae72a493746e09115e1d8b26a17814350">GetTraceId</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the trace id of this log. <simplesect kind="return"><para>the trace id of this log </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="122" column="39"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1aa3d52346f68e9f98cfb498993b3bd37a" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::ReadWriteLogRecord::SetSpanId</definition>
+        <argsstring>(const opentelemetry::trace::SpanId &amp;span_id) noexcept override</argsstring>
+        <name>SetSpanId</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::SetSpanId</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1LogRecord_1a5c67a07ae1564a14f97ad2ec81c596a1">SetSpanId</reimplements>
+        <param>
+          <type>const opentelemetry::trace::SpanId &amp;</type>
+          <declname>span_id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the span id for this log. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>span_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the span id to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="128" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a2641af5239c20a6a54aaab3113a8cef2" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>const opentelemetry::trace::SpanId &amp;</type>
+        <definition>const opentelemetry::trace::SpanId &amp; opentelemetry::sdk::logs::ReadWriteLogRecord::GetSpanId</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetSpanId</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::GetSpanId</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1aa8714ab8f50e0d60607dd75557901d16">GetSpanId</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the span id of this log. <simplesect kind="return"><para>the span id of this log </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="134" column="38"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a509ca17c19c31d03331b6bf328af38d9" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::ReadWriteLogRecord::SetTraceFlags</definition>
+        <argsstring>(const opentelemetry::trace::TraceFlags &amp;trace_flags) noexcept override</argsstring>
+        <name>SetTraceFlags</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::SetTraceFlags</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1LogRecord_1a00a2039945541466f88b6373fe57b2d3">SetTraceFlags</reimplements>
+        <param>
+          <type>const opentelemetry::trace::TraceFlags &amp;</type>
+          <declname>trace_flags</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Inject trace_flags for this log. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>trace_flags</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the trace flags to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="140" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a9dc043f7c5dd147bea0a696b5f54c2fb" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>const opentelemetry::trace::TraceFlags &amp;</type>
+        <definition>const opentelemetry::trace::TraceFlags &amp; opentelemetry::sdk::logs::ReadWriteLogRecord::GetTraceFlags</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetTraceFlags</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::GetTraceFlags</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1aac6fb81091000eb4a5753cbd261cbe15">GetTraceFlags</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Inject trace_flags of this log. <simplesect kind="return"><para>trace_flags of this log </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="146" column="42"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a36f8c6113e7ee1f7e64247fcbec57e95" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::ReadWriteLogRecord::SetAttribute</definition>
+        <argsstring>(nostd::string_view key, const opentelemetry::common::AttributeValue &amp;value) noexcept override</argsstring>
+        <name>SetAttribute</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::SetAttribute</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1LogRecord_1ad5e8d7872301717e194b5b4090f73cb5">SetAttribute</reimplements>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::common::AttributeValue &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set an attribute of a log. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>key</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name of the attribute </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the attribute value </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="153" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a701fc2f8e49f6ab02d6cb740a69fdab2" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>const std::unordered_map&lt; std::string, opentelemetry::sdk::common::OwnedAttributeValue &gt; &amp;</type>
+        <definition>const std::unordered_map&lt; std::string, opentelemetry::sdk::common::OwnedAttributeValue &gt; &amp; opentelemetry::sdk::logs::ReadWriteLogRecord::GetAttributes</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetAttributes</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::GetAttributes</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1abf0d053853fed9980155b015a94fe04f">GetAttributes</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get attributes of this log. <simplesect kind="return"><para>the body field of this log </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="161" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1aebda9607d84bca9d4f333ecccf85a68d" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+        <definition>const opentelemetry::sdk::resource::Resource &amp; opentelemetry::sdk::logs::ReadWriteLogRecord::GetResource</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetResource</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::GetResource</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1af638dd4da40b41321192b482cb84d1ce">GetResource</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get resource of this log <simplesect kind="return"><para>the resource of this log </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="167" column="48"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a357d890484ef08d6801ac3cc573ade63" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::ReadWriteLogRecord::SetResource</definition>
+        <argsstring>(const opentelemetry::sdk::resource::Resource &amp;resource) noexcept override</argsstring>
+        <name>SetResource</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::SetResource</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable_1ad615f379dd3ea6063ee237501741c6e9">SetResource</reimplements>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set Resource of this log <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>resource</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the resource to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="173" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a14f5c6abbc40cef1b4afe08abd04ab43" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;</type>
+        <definition>const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp; opentelemetry::sdk::logs::ReadWriteLogRecord::GetInstrumentationScope</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetInstrumentationScope</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::GetInstrumentationScope</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1ac3adacaf5725d977f00b2688604774cf">GetInstrumentationScope</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get instrumentation_scope of this log. <simplesect kind="return"><para>the instrumentation_scope of this log </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="179" column="72"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a9f9f5f916bf4c8a3a90ae7ce519c42b5" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::ReadWriteLogRecord::SetInstrumentationScope</definition>
+        <argsstring>(const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;instrumentation_scope) noexcept override</argsstring>
+        <name>SetInstrumentationScope</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::SetInstrumentationScope</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable_1a1385ac5d0c3fd3924edb9f0ba4cbb6b5">SetInstrumentationScope</reimplements>
+        <param>
+          <type>const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;</type>
+          <declname>instrumentation_scope</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set instrumentation_scope for this log. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>instrumentation_scope</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the instrumentation scope to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="186" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Maintains a representation of a log in a format that can be processed by a recorder.</para>
+<para>This class is thread-compatible. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="4">
+        <label>opentelemetry::logs::LogRecord</label>
+        <link refid="classopentelemetry_1_1logs_1_1LogRecord"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::logs::ReadWriteLogRecord</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::logs::ReadableLogRecord</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord"/>
+        <childnode refid="3" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>opentelemetry::sdk::logs::Recordable</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable"/>
+        <childnode refid="4" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="4">
+        <label>opentelemetry::logs::LogRecord</label>
+        <link refid="classopentelemetry_1_1logs_1_1LogRecord"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::logs::ReadWriteLogRecord</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::logs::ReadableLogRecord</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord"/>
+        <childnode refid="3" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>opentelemetry::sdk::logs::Recordable</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable"/>
+        <childnode refid="4" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="33" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="34" bodyend="211"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1adab98dcdce268d1f4913a3dce5aef154" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>attributes_map_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a99984eb834cf7f6f482dcc6c762e6f3a" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>body_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a5703740f8dc0489b50dc822f5feeb19e" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>event_id_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a96f473214a76dac5a0b4619414a29290" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>event_name_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a701fc2f8e49f6ab02d6cb740a69fdab2" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetAttributes</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a6639236c82d9e253ec965dccb3e684b4" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetBody</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1a4fdfdd5488760acda93a2b74b4d0fffe" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetDefaultInstrumentationScope</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1a3f2d6c80d08ce3e3e95e4334f0c42dde" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetDefaultResource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a791bbb159925b29b54a77cd1c708c1cf" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetEventId</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a4270a886a1989021544b811cb60dcdfa" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetEventName</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a14f5c6abbc40cef1b4afe08abd04ab43" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetInstrumentationScope</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a99b32ad9b9407709ff678b9a8bc6a6b6" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetObservedTimestamp</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1aebda9607d84bca9d4f333ecccf85a68d" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetResource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1ae5d36ad7137a899fd86a8a61872c00ca" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetSeverity</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord_1a113baef8adcf0d5153a7b6d8b14d84ca" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetSeverityText</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a2641af5239c20a6a54aaab3113a8cef2" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetSpanId</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a36df24405969709f4d12fe9545fc40e4" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetTimestamp</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a9dc043f7c5dd147bea0a696b5f54c2fb" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetTraceFlags</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1af3e994b647db1ba4bbe9967134d55d99" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>GetTraceId</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1adc4c2fafd92b78245177414982b70ea5" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>instrumentation_scope_</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1abe66675b44bad2280904bde5c823aaf9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>LogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1abef51ee0d83791eeb2f2964df14d48ac" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>LogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1aca9c888fac59ec29f5ca379d10da0c86" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>LogRecord</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1ac522095bf6e9167ba1f798af1750812b" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>observed_timestamp_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a91a2cbd63126ce4c66814a29b82e49c4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1ab107a45d48c46581375be81a02679494" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a84bfdebe71f551bfcf2ce6f62b85482c" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::logs::ReadableLogRecord::"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a4df43247ea78b8f295f4d97a8a2c33eb" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::logs::ReadableLogRecord::"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1aa69b87a88eedf4c795fb672e9821b2ec" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>ReadWriteLogRecord</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a3be56649485bbefc36df08f43f34f4da" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>ReadWriteLogRecord</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1ae72f332e6a203572797e9962a1d0187f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>ReadWriteLogRecord</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a60dfc8b993825b899434b0bb10fefc07" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>resource_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a36f8c6113e7ee1f7e64247fcbec57e95" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>SetAttribute</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a903255f0700e2e5563865b4c951f8e4e" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>SetBody</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a7b9452713980e2ec389e678f94a349e1" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>SetEventId</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a9f9f5f916bf4c8a3a90ae7ce519c42b5" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>SetInstrumentationScope</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1ab9ac975851a7cf8494c92033134e3790" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>SetObservedTimestamp</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a357d890484ef08d6801ac3cc573ade63" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>SetResource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a93750b5aef91393571017eb6e5c93486" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>SetSeverity</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1aa3d52346f68e9f98cfb498993b3bd37a" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>SetSpanId</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a2384d0d211a46fcf4cbe9269df057077" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>SetTimestamp</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a509ca17c19c31d03331b6bf328af38d9" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>SetTraceFlags</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a8b2e3fe846cb6d228dd62ffe466b9555" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>SetTraceId</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a3ccf26079fd231841735030d29709fd5" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>severity_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1ae376cdbd6524e76525e321da30197a63" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>timestamp_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a12ff20def15a1fdcf96818fc27be14d6" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>trace_state_</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a4ff305825b55bfeebfd6060431039e19" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>~LogRecord</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a99b343c086902f96f552f0c33d2ac384" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord</scope><name>~ReadWriteLogRecord</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

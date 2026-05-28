@@ -1,0 +1,249 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::ParentBasedSampler</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" prot="public" virt="non-virtual">opentelemetry::sdk::trace::Sampler</basecompoundref>
+    <includes refid="parent_8h" local="no">parent.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a91f444da99cfd36a609768792d04326e" prot="private" static="no" mutable="no">
+        <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+        <definition>const std::shared_ptr&lt;Sampler&gt; opentelemetry::sdk::trace::ParentBasedSampler::root_sampler_</definition>
+        <argsstring></argsstring>
+        <name>root_sampler_</name>
+        <qualifiedname>opentelemetry::sdk::trace::ParentBasedSampler::root_sampler_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" line="71" column="25" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" bodystart="71" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a8a05283cbe905f1782efa7a591924370" prot="private" static="no" mutable="no">
+        <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+        <definition>const std::shared_ptr&lt;Sampler&gt; opentelemetry::sdk::trace::ParentBasedSampler::remote_parent_sampled_sampler_</definition>
+        <argsstring></argsstring>
+        <name>remote_parent_sampled_sampler_</name>
+        <qualifiedname>opentelemetry::sdk::trace::ParentBasedSampler::remote_parent_sampled_sampler_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" line="72" column="25" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" bodystart="72" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a527efb1575d88eeb3d850640a64eac26" prot="private" static="no" mutable="no">
+        <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+        <definition>const std::shared_ptr&lt;Sampler&gt; opentelemetry::sdk::trace::ParentBasedSampler::remote_parent_nonsampled_sampler_</definition>
+        <argsstring></argsstring>
+        <name>remote_parent_nonsampled_sampler_</name>
+        <qualifiedname>opentelemetry::sdk::trace::ParentBasedSampler::remote_parent_nonsampled_sampler_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" line="73" column="25" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" bodystart="73" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1acc40233dad8ed690e200c3f5c1d76b0a" prot="private" static="no" mutable="no">
+        <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+        <definition>const std::shared_ptr&lt;Sampler&gt; opentelemetry::sdk::trace::ParentBasedSampler::local_parent_sampled_sampler_</definition>
+        <argsstring></argsstring>
+        <name>local_parent_sampled_sampler_</name>
+        <qualifiedname>opentelemetry::sdk::trace::ParentBasedSampler::local_parent_sampled_sampler_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" line="74" column="25" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" bodystart="74" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a93c4fbb95e82824f5b2dce151d431afc" prot="private" static="no" mutable="no">
+        <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+        <definition>const std::shared_ptr&lt;Sampler&gt; opentelemetry::sdk::trace::ParentBasedSampler::local_parent_nonsampled_sampler_</definition>
+        <argsstring></argsstring>
+        <name>local_parent_nonsampled_sampler_</name>
+        <qualifiedname>opentelemetry::sdk::trace::ParentBasedSampler::local_parent_nonsampled_sampler_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" line="75" column="25" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" bodystart="75" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a2748b19741a972a95ad566746479ffba" prot="private" static="no" mutable="no">
+        <type>const std::string</type>
+        <definition>const std::string opentelemetry::sdk::trace::ParentBasedSampler::description_</definition>
+        <argsstring></argsstring>
+        <name>description_</name>
+        <qualifiedname>opentelemetry::sdk::trace::ParentBasedSampler::description_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" line="76" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" bodystart="76" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a0d24bcc3f667fae0583d7e4b1eeeb484" prot="public" static="no" const="no" explicit="yes" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::ParentBasedSampler::ParentBasedSampler</definition>
+        <argsstring>(const std::shared_ptr&lt; Sampler &gt; &amp;root_sampler, const std::shared_ptr&lt; Sampler &gt; &amp;remote_parent_sampled_sampler=std::make_shared&lt; AlwaysOnSampler &gt;(), const std::shared_ptr&lt; Sampler &gt; &amp;remote_parent_nonsampled_sampler=std::make_shared&lt; AlwaysOffSampler &gt;(), const std::shared_ptr&lt; Sampler &gt; &amp;local_parent_sampled_sampler=std::make_shared&lt; AlwaysOnSampler &gt;(), const std::shared_ptr&lt; Sampler &gt; &amp;local_parent_nonsampled_sampler=std::make_shared&lt; AlwaysOffSampler &gt;()) noexcept</argsstring>
+        <name>ParentBasedSampler</name>
+        <qualifiedname>opentelemetry::sdk::trace::ParentBasedSampler::ParentBasedSampler</qualifiedname>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt; &amp;</type>
+          <declname>root_sampler</declname>
+        </param>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt; &amp;</type>
+          <declname>remote_parent_sampled_sampler</declname>
+          <defval>std::make_shared&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOnSampler" kindref="compound">AlwaysOnSampler</ref> &gt;()</defval>
+        </param>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt; &amp;</type>
+          <declname>remote_parent_nonsampled_sampler</declname>
+          <defval>std::make_shared&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler" kindref="compound">AlwaysOffSampler</ref> &gt;()</defval>
+        </param>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt; &amp;</type>
+          <declname>local_parent_sampled_sampler</declname>
+          <defval>std::make_shared&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOnSampler" kindref="compound">AlwaysOnSampler</ref> &gt;()</defval>
+        </param>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt; &amp;</type>
+          <declname>local_parent_nonsampled_sampler</declname>
+          <defval>std::make_shared&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler" kindref="compound">AlwaysOffSampler</ref> &gt;()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" line="43" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a957a190e3f4ae1ee7a1ee7a10e520f6e" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type><ref refid="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult" kindref="compound">SamplingResult</ref></type>
+        <definition>SamplingResult opentelemetry::sdk::trace::ParentBasedSampler::ShouldSample</definition>
+        <argsstring>(const opentelemetry::trace::SpanContext &amp;parent_context, opentelemetry::trace::TraceId trace_id, nostd::string_view name, opentelemetry::trace::SpanKind span_kind, const opentelemetry::common::KeyValueIterable &amp;attributes, const opentelemetry::trace::SpanContextKeyValueIterable &amp;links) noexcept override</argsstring>
+        <name>ShouldSample</name>
+        <qualifiedname>opentelemetry::sdk::trace::ParentBasedSampler::ShouldSample</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a9b242dce90cf9794dc0d1a444c6a65a4">ShouldSample</reimplements>
+        <param>
+          <type>const opentelemetry::trace::SpanContext &amp;</type>
+          <declname>parent_context</declname>
+        </param>
+        <param>
+          <type>opentelemetry::trace::TraceId</type>
+          <declname>trace_id</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>opentelemetry::trace::SpanKind</type>
+          <declname>span_kind</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" kindref="compound">opentelemetry::trace::SpanContextKeyValueIterable</ref> &amp;</type>
+          <declname>links</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Implements the decision logic by checking the parent context and delegating to the appropriate configured sampler <simplesect kind="return"><para>The <ref refid="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult" kindref="compound">SamplingResult</ref> from the delegated sampler </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" line="57" column="18"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1ac2171452af24e21776fd1f67549fc82c" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>nostd::string_view</type>
+        <definition>nostd::string_view opentelemetry::sdk::trace::ParentBasedSampler::GetDescription</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetDescription</name>
+        <qualifiedname>opentelemetry::sdk::trace::ParentBasedSampler::GetDescription</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a3005a357efac28b16b0728b644d70b23">GetDescription</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Description MUST be ParentBased{delegate_sampler_.getDescription()} </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" line="68" column="22"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>The ParentBased sampler is a composite sampler that delegates sampling decisions based on the parent span&apos;s context.</para>
+<para>The decision is delegated to one of five configurable samplers:<itemizedlist>
+<listitem><para>No parent exists (root span): delegates to <computeroutput>root sampler</computeroutput>.</para>
+</listitem><listitem><para>A remote parent exists and was sampled: delegates to <computeroutput>remote_parent_sampled_sampler</computeroutput> (default to <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOnSampler" kindref="compound">AlwaysOnSampler</ref>).</para>
+</listitem><listitem><para>A remote parent exists and was not sampled: delegates to <computeroutput>remote_parent_nonsampled_sampler</computeroutput> (default to <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler" kindref="compound">AlwaysOffSampler</ref>).</para>
+</listitem><listitem><para>A local parent exists and was sampled: delegates to <computeroutput>local_parent_sampled_sampler</computeroutput> (default to <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOnSampler" kindref="compound">AlwaysOnSampler</ref>).</para>
+</listitem><listitem><para>A local parent exists and was not sampled: delegates to <computeroutput>local_parent_nonsampled_sampler</computeroutput> (default to <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler" kindref="compound">AlwaysOffSampler</ref>). </para>
+</listitem></itemizedlist>
+</para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::ParentBasedSampler</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::Sampler</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::ParentBasedSampler</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::Sampler</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" line="40" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h" bodystart="41" bodyend="77"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a2748b19741a972a95ad566746479ffba" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>description_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1ac2171452af24e21776fd1f67549fc82c" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>GetDescription</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a93c4fbb95e82824f5b2dce151d431afc" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>local_parent_nonsampled_sampler_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1acc40233dad8ed690e200c3f5c1d76b0a" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>local_parent_sampled_sampler_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a2b02c0ea090d1ffb444633586c5fc7b7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a39498e03f5c855401636c846bf5c7470" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a0d24bcc3f667fae0583d7e4b1eeeb484" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>ParentBasedSampler</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a527efb1575d88eeb3d850640a64eac26" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>remote_parent_nonsampled_sampler_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a8a05283cbe905f1782efa7a591924370" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>remote_parent_sampled_sampler_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a91f444da99cfd36a609768792d04326e" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>root_sampler_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1aa42ac55b013a48f0824ddeae448a8b9c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>Sampler</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a9cc64fe1400ccec2b9dd59969e709e6f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>Sampler</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a4e7c4c3bc6495cd80dc70b383583a785" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>Sampler</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler_1a957a190e3f4ae1ee7a1ee7a10e520f6e" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>ShouldSample</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1ab87388d70cd8b6c8d71f44592e487817" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::ParentBasedSampler</scope><name>~Sampler</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

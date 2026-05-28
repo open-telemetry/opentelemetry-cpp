@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_f326b02a259940e063304ce4339b49f5" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs</compoundname>
+    <innerfile refid="event__id_8h">event_id.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2logs_2event__logger_8h">event_logger.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2logs_2event__logger__provider_8h">event_logger_provider.h</innerfile>
+    <innerfile refid="log__record_8h">log_record.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2logs_2logger_8h">logger.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2logs_2logger__provider_8h">logger_provider.h</innerfile>
+    <innerfile refid="logger__type__traits_8h">logger_type_traits.h</innerfile>
+    <innerfile refid="logs_2noop_8h">noop.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2logs_2provider_8h">provider.h</innerfile>
+    <innerfile refid="severity_8h">severity.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/"/>
+  </compounddef>
+</doxygen>

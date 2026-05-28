@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_f2c4dfd5f13efa79d59d9a341d371132" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state</compoundname>
+    <innerfile refid="async__metric__storage_8h">async_metric_storage.h</innerfile>
+    <innerfile refid="attributes__hashmap_8h">attributes_hashmap.h</innerfile>
+    <innerfile refid="filtered__ordered__attribute__map_8h">filtered_ordered_attribute_map.h</innerfile>
+    <innerfile refid="metric__collector_8h">metric_collector.h</innerfile>
+    <innerfile refid="metric__storage_8h">metric_storage.h</innerfile>
+    <innerfile refid="multi__metric__storage_8h">multi_metric_storage.h</innerfile>
+    <innerfile refid="observable__registry_8h">observable_registry.h</innerfile>
+    <innerfile refid="sync__metric__storage_8h">sync_metric_storage.h</innerfile>
+    <innerfile refid="temporal__metric__storage_8h">temporal_metric_storage.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/"/>
+  </compounddef>
+</doxygen>

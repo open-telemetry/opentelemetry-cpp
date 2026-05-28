@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1sdk_1_1instrumentationlibrary" kind="namespace" language="C++">
+    <compoundname>opentelemetry::sdk::instrumentationlibrary</compoundname>
+    <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="instrumentation__library_8h_1af91b145671ccbc68ecde84819dd9ac24" prot="public" static="no">
+        <type>instrumentationscope::InstrumentationScope</type>
+        <definition>using opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary = typedef instrumentationscope::InstrumentationScope</definition>
+        <argsstring></argsstring>
+        <name>InstrumentationLibrary</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationlibrary::InstrumentationLibrary</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h" line="16" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h" bodystart="16" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h" line="13" column="1"/>
+  </compounddef>
+</doxygen>

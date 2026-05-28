@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1metrics_1_1LastReportedMetrics" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::LastReportedMetrics</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1LastReportedMetrics_1ae41be960ef5e7ecf580e29e3cdb0a152" prot="public" static="no" mutable="no">
+        <type>std::unique_ptr&lt; AttributesHashMap &gt;</type>
+        <definition>std::unique_ptr&lt;AttributesHashMap&gt; opentelemetry::sdk::metrics::LastReportedMetrics::attributes_map</definition>
+        <argsstring></argsstring>
+        <name>attributes_map</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LastReportedMetrics::attributes_map</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="28" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" bodystart="28" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1LastReportedMetrics_1a8bfcdf6603d1840c706ab7366452d6f7" prot="public" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::metrics::LastReportedMetrics::collection_ts</definition>
+        <argsstring></argsstring>
+        <name>collection_ts</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LastReportedMetrics::collection_ts</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="29" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" bodystart="29" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::common::SystemTimestamp</label>
+        <link refid="classopentelemetry_1_1common_1_1SystemTimestamp"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::LastReportedMetrics</label>
+        <childnode refid="2" relation="usage">
+          <edgelabel>collection_ts</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="26" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" bodystart="27" bodyend="30"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1LastReportedMetrics_1ae41be960ef5e7ecf580e29e3cdb0a152" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LastReportedMetrics</scope><name>attributes_map</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1LastReportedMetrics_1a8bfcdf6603d1840c706ab7366452d6f7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LastReportedMetrics</scope><name>collection_ts</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

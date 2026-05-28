@@ -1,0 +1,509 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="span__data_8h" kind="file" language="C++">
+    <compoundname>span_data.h</compoundname>
+    <includes local="no">chrono</includes>
+    <includes local="no">map</includes>
+    <includes local="no">memory</includes>
+    <includes local="no">string</includes>
+    <includes local="no">unordered_map</includes>
+    <includes local="no">utility</includes>
+    <includes local="no">vector</includes>
+    <includes refid="attribute__value_8h" local="yes">opentelemetry/common/attribute_value.h</includes>
+    <includes refid="key__value__iterable_8h" local="yes">opentelemetry/common/key_value_iterable.h</includes>
+    <includes local="yes">opentelemetry/common/key_value_iterable_view.h</includes>
+    <includes refid="timestamp_8h" local="yes">opentelemetry/common/timestamp.h</includes>
+    <includes local="yes">opentelemetry/nostd/string_view.h</includes>
+    <includes local="yes">opentelemetry/sdk/common/attribute_utils.h</includes>
+    <includes refid="instrumentation__scope_8h" local="yes">opentelemetry/sdk/instrumentationscope/instrumentation_scope.h</includes>
+    <includes refid="resource_8h" local="yes">opentelemetry/sdk/resource/resource.h</includes>
+    <includes refid="trace_2recordable_8h" local="yes">opentelemetry/sdk/trace/recordable.h</includes>
+    <includes refid="span__context_8h" local="yes">opentelemetry/trace/span_context.h</includes>
+    <includes refid="span__id_8h" local="yes">opentelemetry/trace/span_id.h</includes>
+    <includes refid="span__metadata_8h" local="yes">opentelemetry/trace/span_metadata.h</includes>
+    <includes refid="trace__flags_8h" local="yes">opentelemetry/trace/trace_flags.h</includes>
+    <includes refid="trace__id_8h" local="yes">opentelemetry/trace/trace_id.h</includes>
+    <includes local="yes">opentelemetry/version.h</includes>
+    <incdepgraph>
+      <node id="9">
+        <label>opentelemetry/common/attribute_value.h</label>
+        <link refid="attribute__value_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>opentelemetry/common/key_value_iterable.h</label>
+        <link refid="key__value__iterable_8h_source"/>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>opentelemetry/common/timestamp.h</label>
+        <link refid="timestamp_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>opentelemetry/trace/span_context.h</label>
+        <link refid="span__context_8h_source"/>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>opentelemetry/trace/span_id.h</label>
+        <link refid="span__id_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="38">
+        <label>opentelemetry/trace/span_metadata.h</label>
+        <link refid="span__metadata_8h_source"/>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>opentelemetry/trace/trace_flags.h</label>
+        <link refid="trace__flags_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>opentelemetry/trace/trace_id.h</label>
+        <link refid="trace__id_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>opentelemetry/trace/trace_state.h</label>
+        <link refid="trace__state_8h_source"/>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="20">
+        <label>opentelemetry/sdk/instrumentationscope/instrumentation_scope.h</label>
+        <link refid="instrumentation__scope_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>opentelemetry/sdk/resource/resource.h</label>
+        <link refid="resource_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>opentelemetry/sdk/trace/recordable.h</label>
+        <link refid="trace_2recordable_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h</label>
+        <link refid="span__data_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>chrono</label>
+      </node>
+      <node id="36">
+        <label>cstddef</label>
+      </node>
+      <node id="10">
+        <label>cstdint</label>
+      </node>
+      <node id="31">
+        <label>cstring</label>
+      </node>
+      <node id="35">
+        <label>ctype.h</label>
+      </node>
+      <node id="3">
+        <label>map</label>
+      </node>
+      <node id="4">
+        <label>memory</label>
+      </node>
+      <node id="17">
+        <label>opentelemetry/common/key_value_iterable_view.h</label>
+      </node>
+      <node id="37">
+        <label>opentelemetry/common/kv_properties.h</label>
+      </node>
+      <node id="16">
+        <label>opentelemetry/nostd/function_ref.h</label>
+      </node>
+      <node id="29">
+        <label>opentelemetry/nostd/shared_ptr.h</label>
+      </node>
+      <node id="11">
+        <label>opentelemetry/nostd/span.h</label>
+      </node>
+      <node id="12">
+        <label>opentelemetry/nostd/string_view.h</label>
+      </node>
+      <node id="22">
+        <label>opentelemetry/nostd/type_traits.h</label>
+      </node>
+      <node id="23">
+        <label>opentelemetry/nostd/unique_ptr.h</label>
+      </node>
+      <node id="13">
+        <label>opentelemetry/nostd/variant.h</label>
+      </node>
+      <node id="19">
+        <label>opentelemetry/sdk/common/attribute_utils.h</label>
+      </node>
+      <node id="26">
+        <label>opentelemetry/sdk/common/empty_attributes.h</label>
+      </node>
+      <node id="14">
+        <label>opentelemetry/version.h</label>
+      </node>
+      <node id="28">
+        <label>stdint.h</label>
+      </node>
+      <node id="5">
+        <label>string</label>
+      </node>
+      <node id="21">
+        <label>type_traits</label>
+      </node>
+      <node id="6">
+        <label>unordered_map</label>
+      </node>
+      <node id="7">
+        <label>utility</label>
+      </node>
+      <node id="8">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent" prot="public">opentelemetry::sdk::trace::SpanDataEvent</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataLink" prot="public">opentelemetry::sdk::trace::SpanDataLink</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData" prot="public">opentelemetry::sdk::trace::SpanData</innerclass>
+    <innernamespace refid="namespaceopentelemetry">opentelemetry</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk">opentelemetry::sdk</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1trace">opentelemetry::sdk::trace</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>The<sp/>OpenTelemetry<sp/>Authors</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;chrono&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;map&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;memory&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;string&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;unordered_map&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;utility&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;vector&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/common/attribute_value.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/common/key_value_iterable.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/common/key_value_iterable_view.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/common/timestamp.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/nostd/string_view.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/common/attribute_utils.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/instrumentationscope/instrumentation_scope.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/resource/resource.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/trace/recordable.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/trace/span_context.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/trace/span_id.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/trace/span_metadata.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/trace/trace_flags.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/trace/trace_id.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/version.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal">OPENTELEMETRY_BEGIN_NAMESPACE</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">sdk</highlight></codeline>
+<codeline lineno="32"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">trace</highlight></codeline>
+<codeline lineno="34"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="38" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent" kindref="compound">SpanDataEvent</ref></highlight></codeline>
+<codeline lineno="39"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent" kindref="compound">SpanDataEvent</ref>(std::string<sp/>name,</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref><sp/>timestamp,</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref><sp/>&amp;attributes);</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"></highlight></codeline>
+<codeline lineno="49" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1ab734172815b82acdff0f984eaed83452" refkind="member"><highlight class="normal"><sp/><sp/>std::string<sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1ab734172815b82acdff0f984eaed83452" kindref="member">GetName</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>name_;<sp/>}</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight></codeline>
+<codeline lineno="55" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1a5d66721ecec4699a74c4ecaed18087b9" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1a5d66721ecec4699a74c4ecaed18087b9" kindref="member">GetTimestamp</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>timestamp_;<sp/>}</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::unordered_map&lt;std::string,<sp/>opentelemetry::sdk::common::OwnedAttributeValue&gt;<sp/>&amp;</highlight></codeline>
+<codeline lineno="62" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1aba3ba9f56debfbd908c59f39ffed1bfe" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1aba3ba9f56debfbd908c59f39ffed1bfe" kindref="member">GetAttributes</ref>()<sp/>const<sp/>noexcept;</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight></codeline>
+<codeline lineno="64"><highlight class="normal">private:</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/>std::</highlight><highlight class="keywordtype">string</highlight><highlight class="normal"><sp/>name_;</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/>opentelemetry::common::SystemTimestamp<sp/>timestamp_;</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/>opentelemetry::sdk::common::AttributeMap<sp/>attribute_map_;</highlight></codeline>
+<codeline lineno="68"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"></highlight></codeline>
+<codeline lineno="73" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataLink" refkind="compound"><highlight class="normal">class<sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataLink" kindref="compound">SpanDataLink</ref></highlight></codeline>
+<codeline lineno="74"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="75"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataLink" kindref="compound">SpanDataLink</ref>(opentelemetry::trace::SpanContext<sp/>span_context,</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref><sp/>&amp;attributes);</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"></highlight></codeline>
+<codeline lineno="83"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::unordered_map&lt;std::string,<sp/>opentelemetry::sdk::common::OwnedAttributeValue&gt;<sp/>&amp;</highlight></codeline>
+<codeline lineno="84" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataLink_1ae0ba01669a63a3db5887a465a2161f4a" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataLink_1ae0ba01669a63a3db5887a465a2161f4a" kindref="member">GetAttributes</ref>()<sp/>const<sp/>noexcept;</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"></highlight></codeline>
+<codeline lineno="90" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataLink_1a81fdd9c140afaac8275f1d378ec45121" refkind="member"><highlight class="normal"><sp/><sp/>const<sp/>opentelemetry::trace::SpanContext<sp/>&amp;GetSpanContext()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>span_context_;<sp/>}</highlight></codeline>
+<codeline lineno="91"><highlight class="normal"></highlight></codeline>
+<codeline lineno="92"><highlight class="normal"></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="93"><highlight class="normal"><sp/><sp/>opentelemetry::trace::SpanContext<sp/>span_context_;</highlight></codeline>
+<codeline lineno="94"><highlight class="normal"><sp/><sp/>opentelemetry::sdk::common::AttributeMap<sp/>attribute_map_;</highlight></codeline>
+<codeline lineno="95"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="96"><highlight class="normal"></highlight></codeline>
+<codeline lineno="100" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData" kindref="compound">SpanData</ref><sp/>final<sp/>:<sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref></highlight></codeline>
+<codeline lineno="101"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="102"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData" kindref="compound">SpanData</ref>()<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="108" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1af81e5aab3e7128168797b3cc4d6f4765" refkind="member"><highlight class="normal"><sp/><sp/>opentelemetry::trace::TraceId<sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1af81e5aab3e7128168797b3cc4d6f4765" kindref="member">GetTraceId</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>span_context_.trace_id();<sp/>}</highlight></codeline>
+<codeline lineno="109"><highlight class="normal"></highlight></codeline>
+<codeline lineno="114" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1ac4a5d6d275cb860a0b7a65fc44305606" refkind="member"><highlight class="normal"><sp/><sp/>opentelemetry::trace::SpanId<sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1ac4a5d6d275cb860a0b7a65fc44305606" kindref="member">GetSpanId</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>span_context_.span_id();<sp/>}</highlight></codeline>
+<codeline lineno="115"><highlight class="normal"></highlight></codeline>
+<codeline lineno="120" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a8e636464f884715d3a444345d7ffa0b0" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>opentelemetry::trace::SpanContext<sp/>&amp;<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a8e636464f884715d3a444345d7ffa0b0" kindref="member">GetSpanContext</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>span_context_;<sp/>}</highlight></codeline>
+<codeline lineno="121"><highlight class="normal"></highlight></codeline>
+<codeline lineno="126" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a83dd3e6f8ca1a7812ba3355d157ead31" refkind="member"><highlight class="normal"><sp/><sp/>opentelemetry::trace::SpanId<sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a83dd3e6f8ca1a7812ba3355d157ead31" kindref="member">GetParentSpanId</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>parent_span_id_;<sp/>}</highlight></codeline>
+<codeline lineno="127"><highlight class="normal"></highlight></codeline>
+<codeline lineno="132" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1af392c35760676fe78f888912185fa1cf" refkind="member"><highlight class="normal"><sp/><sp/>opentelemetry::nostd::string_view<sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1af392c35760676fe78f888912185fa1cf" kindref="member">GetName</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>name_;<sp/>}</highlight></codeline>
+<codeline lineno="133"><highlight class="normal"></highlight></codeline>
+<codeline lineno="138" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a3df864241c86b4d5fc7beec6601e8714" refkind="member"><highlight class="normal"><sp/><sp/>opentelemetry::trace::TraceFlags<sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a3df864241c86b4d5fc7beec6601e8714" kindref="member">GetFlags</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>flags_;<sp/>}</highlight></codeline>
+<codeline lineno="139"><highlight class="normal"></highlight></codeline>
+<codeline lineno="144" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a629f0910300703eb83bc9023a69ff462" refkind="member"><highlight class="normal"><sp/><sp/>opentelemetry::trace::SpanKind<sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a629f0910300703eb83bc9023a69ff462" kindref="member">GetSpanKind</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>span_kind_;<sp/>}</highlight></codeline>
+<codeline lineno="145"><highlight class="normal"></highlight></codeline>
+<codeline lineno="150" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a9f327e32e9dfc2e0a8a4880127583595" refkind="member"><highlight class="normal"><sp/><sp/>opentelemetry::trace::StatusCode<sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a9f327e32e9dfc2e0a8a4880127583595" kindref="member">GetStatus</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>status_code_;<sp/>}</highlight></codeline>
+<codeline lineno="151"><highlight class="normal"></highlight></codeline>
+<codeline lineno="156" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a803527bde97733ade212eb6c467577b0" refkind="member"><highlight class="normal"><sp/><sp/>opentelemetry::nostd::string_view<sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a803527bde97733ade212eb6c467577b0" kindref="member">GetDescription</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>status_desc_;<sp/>}</highlight></codeline>
+<codeline lineno="157"><highlight class="normal"></highlight></codeline>
+<codeline lineno="162" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1af9bad293215f399ec52b1ab78e425044" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>opentelemetry::sdk::resource::Resource<sp/>&amp;<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1af9bad293215f399ec52b1ab78e425044" kindref="member">GetResource</ref>()<sp/>const<sp/>noexcept;</highlight></codeline>
+<codeline lineno="163"><highlight class="normal"></highlight></codeline>
+<codeline lineno="168" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a64464dd6a90aaa4e40c48f1e3837f750" refkind="member"><highlight class="normal"><sp/><sp/>const<sp/>opentelemetry::sdk::trace::InstrumentationScope<sp/>&amp;GetInstrumentationScope()<sp/>const<sp/>noexcept;</highlight></codeline>
+<codeline lineno="169"><highlight class="normal"></highlight></codeline>
+<codeline lineno="170"><highlight class="normal"><sp/><sp/>OPENTELEMETRY_DEPRECATED_MESSAGE(&quot;Please<sp/>use<sp/>GetInstrumentationScope<sp/>instead&quot;)</highlight></codeline>
+<codeline lineno="171"><highlight class="normal"><sp/><sp/>const<sp/>opentelemetry::sdk::trace::InstrumentationScope<sp/>&amp;GetInstrumentationLibrary()<sp/>const<sp/>noexcept</highlight></codeline>
+<codeline lineno="172"><highlight class="normal"><sp/><sp/>{</highlight></codeline>
+<codeline lineno="173"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>GetInstrumentationScope();</highlight></codeline>
+<codeline lineno="174"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="175"><highlight class="normal"></highlight></codeline>
+<codeline lineno="180" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a8920a9b688255e3831ee430fcb438f7a" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a8920a9b688255e3831ee430fcb438f7a" kindref="member">GetStartTime</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>start_time_;<sp/>}</highlight></codeline>
+<codeline lineno="181"><highlight class="normal"></highlight></codeline>
+<codeline lineno="186" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1ab481a7c7b44cf1836111b405cc8e08d8" refkind="member"><highlight class="normal"><sp/><sp/>std::chrono::nanoseconds<sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1ab481a7c7b44cf1836111b405cc8e08d8" kindref="member">GetDuration</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>duration_;<sp/>}</highlight></codeline>
+<codeline lineno="187"><highlight class="normal"></highlight></codeline>
+<codeline lineno="192"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::unordered_map&lt;std::string,<sp/>opentelemetry::sdk::common::OwnedAttributeValue&gt;<sp/>&amp;</highlight></codeline>
+<codeline lineno="193" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1aaceb71caf7ab23f1b54bc3c0eb0d7382" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1aaceb71caf7ab23f1b54bc3c0eb0d7382" kindref="member">GetAttributes</ref>()<sp/>const<sp/>noexcept;</highlight></codeline>
+<codeline lineno="194"><highlight class="normal"></highlight></codeline>
+<codeline lineno="199" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1afcb9d21802c002e994a71db855853b47" refkind="member"><highlight class="normal"><sp/><sp/>const<sp/>std::vector&lt;<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent" kindref="compound">SpanDataEvent</ref>&gt;<sp/>&amp;GetEvents()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>events_;<sp/>}</highlight></codeline>
+<codeline lineno="200"><highlight class="normal"></highlight></codeline>
+<codeline lineno="205" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1aa8d83c33392690342121c6083b128b43" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::vector&lt;SpanDataLink&gt;<sp/>&amp;<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1aa8d83c33392690342121c6083b128b43" kindref="member">GetLinks</ref>()<sp/>const<sp/>noexcept<sp/>{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>links_;<sp/>}</highlight></codeline>
+<codeline lineno="206"><highlight class="normal"></highlight></codeline>
+<codeline lineno="207" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1af251ff2190b2b7d1774f874ba47c39bb" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1af251ff2190b2b7d1774f874ba47c39bb" kindref="member">SetIdentity</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>opentelemetry::trace::SpanContext<sp/>&amp;span_context,</highlight></codeline>
+<codeline lineno="208"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>opentelemetry::trace::SpanId<sp/>parent_span_id)<sp/></highlight><highlight class="keyword">noexcept</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">override</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="209"><highlight class="normal"></highlight></codeline>
+<codeline lineno="210" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1ad8ab379d24fa67efea94698ced98402a" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1ad8ab379d24fa67efea94698ced98402a" kindref="member">SetAttribute</ref>(nostd::string_view<sp/>key,</highlight></codeline>
+<codeline lineno="211"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>opentelemetry::common::AttributeValue<sp/>&amp;value)<sp/></highlight><highlight class="keyword">noexcept</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">override</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="212"><highlight class="normal"></highlight></codeline>
+<codeline lineno="213" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1aae41f976d81215c67f734a11a2971e63" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1aae41f976d81215c67f734a11a2971e63" kindref="member">AddEvent</ref>(nostd::string_view<sp/>name,</highlight></codeline>
+<codeline lineno="214"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref><sp/>timestamp<sp/>=</highlight></codeline>
+<codeline lineno="215"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref>(std::chrono::system_clock::now()),</highlight></codeline>
+<codeline lineno="216"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref><sp/>&amp;attributes<sp/>=</highlight></codeline>
+<codeline lineno="217"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>opentelemetry::common::KeyValueIterableView&lt;std::map&lt;std::string,<sp/>int32_t&gt;&gt;(</highlight></codeline>
+<codeline lineno="218"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{}))<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="219"><highlight class="normal"></highlight></codeline>
+<codeline lineno="220" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1aef76de6b3a57f249ba2d4580d8ba7073" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>AddLink(const<sp/>opentelemetry::trace::SpanContext<sp/>&amp;span_context,</highlight></codeline>
+<codeline lineno="221"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>const<sp/>opentelemetry::common::KeyValueIterable<sp/>&amp;attributes)<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="222"><highlight class="normal"></highlight></codeline>
+<codeline lineno="223" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a2d43a2cf5d80925bf8606038fd0e80b4" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SetStatus(opentelemetry::trace::StatusCode<sp/>code,</highlight></codeline>
+<codeline lineno="224"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>nostd::string_view<sp/>description)<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="225"><highlight class="normal"></highlight></codeline>
+<codeline lineno="226" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a24c071dcf439cbbe7be4d71c833dc721" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SetName(nostd::string_view<sp/>name)<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="227"><highlight class="normal"></highlight></codeline>
+<codeline lineno="228" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1aaaa4df970c0b8d623b939058cc484f0a" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SetTraceFlags(opentelemetry::trace::TraceFlags<sp/>flags)<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="229"><highlight class="normal"></highlight></codeline>
+<codeline lineno="230" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a2111bf3de2d31bc4d39a04e222222819" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SetSpanKind(opentelemetry::trace::SpanKind<sp/>span_kind)<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="231"><highlight class="normal"></highlight></codeline>
+<codeline lineno="232" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1af81f44e6d4b4be3d982ef46340cc7eb4" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SetResource(const<sp/>opentelemetry::sdk::resource::Resource<sp/>&amp;resource)<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="233"><highlight class="normal"></highlight></codeline>
+<codeline lineno="234" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a74d329fbaec721f28e1209a91c6ccfc7" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SetStartTime(opentelemetry::common::SystemTimestamp<sp/>start_time)<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="235"><highlight class="normal"></highlight></codeline>
+<codeline lineno="236" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a571fbfe6811bbb671bd338886948a1e5" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SetDuration(std::chrono::nanoseconds<sp/>duration)<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="237"><highlight class="normal"></highlight></codeline>
+<codeline lineno="238" refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1afd8c6534bb5f4978939e83da05fe6e65" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SetInstrumentationScope(const<sp/>InstrumentationScope<sp/>&amp;instrumentation_scope)<sp/>noexcept<sp/>override;</highlight></codeline>
+<codeline lineno="239"><highlight class="normal"></highlight></codeline>
+<codeline lineno="240"><highlight class="normal">private:</highlight></codeline>
+<codeline lineno="241"><highlight class="normal"><sp/><sp/>opentelemetry::trace::SpanContext<sp/>span_context_{</highlight><highlight class="keyword">false</highlight><highlight class="normal">,<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">};</highlight></codeline>
+<codeline lineno="242"><highlight class="normal"><sp/><sp/>opentelemetry::trace::SpanId<sp/>parent_span_id_;</highlight></codeline>
+<codeline lineno="243"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref><sp/>start_time_;</highlight></codeline>
+<codeline lineno="244"><highlight class="normal"><sp/><sp/>std::chrono::nanoseconds<sp/>duration_{0};</highlight></codeline>
+<codeline lineno="245"><highlight class="normal"><sp/><sp/>std::string<sp/>name_;</highlight></codeline>
+<codeline lineno="246"><highlight class="normal"><sp/><sp/>opentelemetry::trace::StatusCode<sp/>status_code_{opentelemetry::trace::StatusCode::kUnset};</highlight></codeline>
+<codeline lineno="247"><highlight class="normal"><sp/><sp/>std::string<sp/>status_desc_;</highlight></codeline>
+<codeline lineno="248"><highlight class="normal"><sp/><sp/>opentelemetry::sdk::common::AttributeMap<sp/>attribute_map_;</highlight></codeline>
+<codeline lineno="249"><highlight class="normal"><sp/><sp/>std::vector&lt;SpanDataEvent&gt;<sp/>events_;</highlight></codeline>
+<codeline lineno="250"><highlight class="normal"><sp/><sp/>std::vector&lt;SpanDataLink&gt;<sp/>links_;</highlight></codeline>
+<codeline lineno="251"><highlight class="normal"><sp/><sp/>opentelemetry::trace::TraceFlags<sp/>flags_;</highlight></codeline>
+<codeline lineno="252"><highlight class="normal"><sp/><sp/>opentelemetry::trace::SpanKind<sp/>span_kind_{opentelemetry::trace::SpanKind::kInternal};</highlight></codeline>
+<codeline lineno="253"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>opentelemetry::sdk::resource::Resource<sp/>*resource_{</highlight><highlight class="keyword">nullptr</highlight><highlight class="normal">};</highlight></codeline>
+<codeline lineno="254"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>InstrumentationScope<sp/>*instrumentation_scope_{</highlight><highlight class="keyword">nullptr</highlight><highlight class="normal">};</highlight></codeline>
+<codeline lineno="255"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="256"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>trace</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="257"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>sdk</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="258"><highlight class="normal">OPENTELEMETRY_END_NAMESPACE</highlight></codeline>
+    </programlisting>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,26 @@
+var classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord =
+[
+    [ "GetAttributes", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a701fc2f8e49f6ab02d6cb740a69fdab2", null ],
+    [ "GetBody", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a6639236c82d9e253ec965dccb3e684b4", null ],
+    [ "GetEventId", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a791bbb159925b29b54a77cd1c708c1cf", null ],
+    [ "GetEventName", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a4270a886a1989021544b811cb60dcdfa", null ],
+    [ "GetInstrumentationScope", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a14f5c6abbc40cef1b4afe08abd04ab43", null ],
+    [ "GetObservedTimestamp", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a99b32ad9b9407709ff678b9a8bc6a6b6", null ],
+    [ "GetResource", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#aebda9607d84bca9d4f333ecccf85a68d", null ],
+    [ "GetSeverity", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#ae5d36ad7137a899fd86a8a61872c00ca", null ],
+    [ "GetSpanId", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a2641af5239c20a6a54aaab3113a8cef2", null ],
+    [ "GetTimestamp", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a36df24405969709f4d12fe9545fc40e4", null ],
+    [ "GetTraceFlags", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a9dc043f7c5dd147bea0a696b5f54c2fb", null ],
+    [ "GetTraceId", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#af3e994b647db1ba4bbe9967134d55d99", null ],
+    [ "SetAttribute", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a36f8c6113e7ee1f7e64247fcbec57e95", null ],
+    [ "SetBody", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a903255f0700e2e5563865b4c951f8e4e", null ],
+    [ "SetEventId", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a7b9452713980e2ec389e678f94a349e1", null ],
+    [ "SetInstrumentationScope", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a9f9f5f916bf4c8a3a90ae7ce519c42b5", null ],
+    [ "SetObservedTimestamp", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#ab9ac975851a7cf8494c92033134e3790", null ],
+    [ "SetResource", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a357d890484ef08d6801ac3cc573ade63", null ],
+    [ "SetSeverity", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a93750b5aef91393571017eb6e5c93486", null ],
+    [ "SetSpanId", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#aa3d52346f68e9f98cfb498993b3bd37a", null ],
+    [ "SetTimestamp", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a2384d0d211a46fcf4cbe9269df057077", null ],
+    [ "SetTraceFlags", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a509ca17c19c31d03331b6bf328af38d9", null ],
+    [ "SetTraceId", "classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord.html#a8b2e3fe846cb6d228dd62ffe466b9555", null ]
+];

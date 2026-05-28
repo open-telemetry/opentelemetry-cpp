@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::logs::BatchLogRecordProcessorOptions</compoundname>
+    <includes refid="batch__log__record__processor__options_8h" local="no">batch_log_record_processor_options.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions_1aa4158d7b626c92cc58dbd6416c1f38de" prot="public" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::logs::BatchLogRecordProcessorOptions::max_queue_size</definition>
+        <argsstring></argsstring>
+        <name>max_queue_size</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessorOptions::max_queue_size</qualifiedname>
+        <initializer>= batch_log_record_processor_options_env::GetMaxQueueSizeFromEnv()</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>The maximum buffer/queue size. After the size is reached, log records are dropped. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" line="63" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" bodystart="63" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions_1a32ab3bee07d8b58df016c228926d1312" prot="public" static="no" mutable="no">
+        <type>std::chrono::milliseconds</type>
+        <definition>std::chrono::milliseconds opentelemetry::sdk::logs::BatchLogRecordProcessorOptions::schedule_delay_millis</definition>
+        <argsstring></argsstring>
+        <name>schedule_delay_millis</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessorOptions::schedule_delay_millis</qualifiedname>
+        <initializer>=
+      batch_log_record_processor_options_env::GetScheduleDelayFromEnv()</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" line="66" column="29" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" bodystart="66" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions_1ac1d7c347e8468dc59e3d813e381588dd" prot="public" static="no" mutable="no">
+        <type>std::chrono::milliseconds</type>
+        <definition>std::chrono::milliseconds opentelemetry::sdk::logs::BatchLogRecordProcessorOptions::export_timeout_millis</definition>
+        <argsstring></argsstring>
+        <name>export_timeout_millis</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessorOptions::export_timeout_millis</qualifiedname>
+        <initializer>=
+      batch_log_record_processor_options_env::GetExportTimeoutFromEnv()</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>The maximum time allowed to export data. It is not currently used by the SDK and the parameter is ignored. TODO: Implement the parameter in <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref> </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" line="74" column="29" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" bodystart="74" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions_1a633b3d87a127b71f65f8f7c55b00d631" prot="public" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::logs::BatchLogRecordProcessorOptions::max_export_batch_size</definition>
+        <argsstring></argsstring>
+        <name>max_export_batch_size</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessorOptions::max_export_batch_size</qualifiedname>
+        <initializer>=
+      batch_log_record_processor_options_env::GetMaxExportBatchSizeFromEnv()</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>The maximum batch size of every export. It must be smaller or equal to max_queue_size. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" line="81" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" bodystart="81" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Struct to hold batch <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> options.</para>
+<para>This is an aggregate type that supports C++20 designated initializers. Default values are read from environment variables when an instance is created:<itemizedlist>
+<listitem><para>OTEL_BLRP_MAX_QUEUE_SIZE (default: 2048)</para>
+</listitem><listitem><para>OTEL_BLRP_SCHEDULE_DELAY (default: 1000ms)</para>
+</listitem><listitem><para>OTEL_BLRP_EXPORT_TIMEOUT (default: 30000ms)</para>
+</listitem><listitem><para>OTEL_BLRP_MAX_EXPORT_BATCH_SIZE (default: 512)</para>
+</listitem></itemizedlist>
+</para>
+<para>Usage notes:<itemizedlist>
+<listitem><para>If you use default initialization (e.g., <computeroutput><ref refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions" kindref="compound">BatchLogRecordProcessorOptions</ref> opts{}</computeroutput>), all fields are set by reading the environment variables (or hardcoded defaults if unset).</para>
+</listitem><listitem><para>If you use aggregate initialization with explicit values (positional or designated), those values override the environment variable defaults for the specified fields.</para>
+</listitem><listitem><para>With C++20 designated initializers, you can override only specific fields; unspecified fields will use environment variables or hardcoded defaults. </para>
+</listitem></itemizedlist>
+</para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" line="57" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" bodystart="58" bodyend="83"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions_1ac1d7c347e8468dc59e3d813e381588dd" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessorOptions</scope><name>export_timeout_millis</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions_1a633b3d87a127b71f65f8f7c55b00d631" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessorOptions</scope><name>max_export_batch_size</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions_1aa4158d7b626c92cc58dbd6416c1f38de" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessorOptions</scope><name>max_queue_size</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions_1a32ab3bee07d8b58df016c228926d1312" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessorOptions</scope><name>schedule_delay_millis</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

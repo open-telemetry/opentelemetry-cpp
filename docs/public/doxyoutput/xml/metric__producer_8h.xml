@@ -1,0 +1,496 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="metric__producer_8h" kind="file" language="C++">
+    <compoundname>metric_producer.h</compoundname>
+    <includes local="no">cstdint</includes>
+    <includes local="no">memory</includes>
+    <includes local="no">utility</includes>
+    <includes local="no">vector</includes>
+    <includes local="yes">opentelemetry/nostd/function_ref.h</includes>
+    <includes local="yes">opentelemetry/nostd/variant.h</includes>
+    <includes refid="metric__data_8h" local="yes">opentelemetry/sdk/metrics/data/metric_data.h</includes>
+    <includes refid="metric__filter_8h" local="yes">opentelemetry/sdk/metrics/export/metric_filter.h</includes>
+    <includes local="yes">opentelemetry/version.h</includes>
+    <includedby refid="metric__reader_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h</includedby>
+    <includedby refid="metric__collector_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_collector.h</includedby>
+    <incdepgraph>
+      <node id="25">
+        <label>opentelemetry/common/attribute_value.h</label>
+        <link refid="attribute__value_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>opentelemetry/common/key_value_iterable.h</label>
+        <link refid="key__value__iterable_8h_source"/>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>opentelemetry/common/timestamp.h</label>
+        <link refid="timestamp_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>opentelemetry/sdk/instrumentationscope/instrumentation_scope.h</label>
+        <link refid="instrumentation__scope_8h_source"/>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="14">
+        <label>opentelemetry/sdk/metrics/data/circular_buffer.h</label>
+        <link refid="circular__buffer_8h_source"/>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>opentelemetry/sdk/metrics/data/metric_data.h</label>
+        <link refid="metric__data_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>opentelemetry/sdk/metrics/data/point_data.h</label>
+        <link refid="point__data_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>opentelemetry/sdk/metrics/export/metric_filter.h</label>
+        <link refid="metric__filter_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h</label>
+        <link refid="metric__producer_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>opentelemetry/sdk/metrics/instruments.h</label>
+        <link refid="instruments_8h_source"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="21">
+        <label>opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h</label>
+        <link refid="filtered__ordered__attribute__map_8h_source"/>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>algorithm</label>
+      </node>
+      <node id="18">
+        <label>cctype</label>
+      </node>
+      <node id="12">
+        <label>chrono</label>
+      </node>
+      <node id="2">
+        <label>cstdint</label>
+      </node>
+      <node id="19">
+        <label>functional</label>
+      </node>
+      <node id="23">
+        <label>initializer_list</label>
+      </node>
+      <node id="15">
+        <label>limits</label>
+      </node>
+      <node id="24">
+        <label>map</label>
+      </node>
+      <node id="3">
+        <label>memory</label>
+      </node>
+      <node id="33">
+        <label>opentelemetry/common/key_value_iterable_view.h</label>
+      </node>
+      <node id="6">
+        <label>opentelemetry/nostd/function_ref.h</label>
+      </node>
+      <node id="26">
+        <label>opentelemetry/nostd/span.h</label>
+      </node>
+      <node id="27">
+        <label>opentelemetry/nostd/string_view.h</label>
+      </node>
+      <node id="34">
+        <label>opentelemetry/nostd/type_traits.h</label>
+      </node>
+      <node id="35">
+        <label>opentelemetry/nostd/unique_ptr.h</label>
+      </node>
+      <node id="7">
+        <label>opentelemetry/nostd/variant.h</label>
+      </node>
+      <node id="9">
+        <label>opentelemetry/sdk/common/attribute_utils.h</label>
+      </node>
+      <node id="29">
+        <label>opentelemetry/sdk/common/attributemap_hash.h</label>
+      </node>
+      <node id="13">
+        <label>opentelemetry/version.h</label>
+      </node>
+      <node id="22">
+        <label>stddef.h</label>
+      </node>
+      <node id="20">
+        <label>string</label>
+      </node>
+      <node id="32">
+        <label>type_traits</label>
+      </node>
+      <node id="4">
+        <label>utility</label>
+      </node>
+      <node id="5">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h</label>
+        <link refid="metric__producer_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h</label>
+        <link refid="periodic__exporting__metric__reader_8h_source"/>
+      </node>
+      <node id="4">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h</label>
+        <link refid="periodic__exporting__metric__reader__factory_8h_source"/>
+      </node>
+      <node id="6">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h</label>
+        <link refid="meter__context_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context_factory.h</label>
+        <link refid="meter__context__factory_8h_source"/>
+      </node>
+      <node id="7">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter__provider_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider_factory.h</label>
+        <link refid="meter__provider__factory_8h_source"/>
+      </node>
+      <node id="2">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h</label>
+        <link refid="metric__reader_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/async_metric_storage.h</label>
+        <link refid="async__metric__storage_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_collector.h</label>
+        <link refid="metric__collector_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/sync_metric_storage.h</label>
+        <link refid="sync__metric__storage_8h_source"/>
+      </node>
+      <node id="13">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h</label>
+        <link refid="temporal__metric__storage_8h_source"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" prot="public">opentelemetry::sdk::metrics::ScopeMetrics</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1ResourceMetrics" prot="public">opentelemetry::sdk::metrics::ResourceMetrics</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" prot="public">opentelemetry::sdk::metrics::MetricProducer</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1_1Result" prot="public">opentelemetry::sdk::metrics::MetricProducer::Result</innerclass>
+    <innernamespace refid="namespaceopentelemetry">opentelemetry</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk">opentelemetry::sdk</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1resource">opentelemetry::sdk::resource</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1instrumentationscope">opentelemetry::sdk::instrumentationscope</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1metrics">opentelemetry::sdk::metrics</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>The<sp/>OpenTelemetry<sp/>Authors</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;cstdint&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;memory&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;utility&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;vector&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/nostd/function_ref.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/nostd/variant.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/metrics/data/metric_data.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/metrics/export/metric_filter.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/version.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal">OPENTELEMETRY_BEGIN_NAMESPACE</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">sdk</highlight></codeline>
+<codeline lineno="19"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">resource</highlight></codeline>
+<codeline lineno="21"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">Resource;</highlight></codeline>
+<codeline lineno="23"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>resource</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">instrumentationscope</highlight></codeline>
+<codeline lineno="26"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">InstrumentationScope;</highlight></codeline>
+<codeline lineno="28"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>instrumentationscope</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">metrics</highlight></codeline>
+<codeline lineno="31"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight></codeline>
+<codeline lineno="37" refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref></highlight></codeline>
+<codeline lineno="38"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>opentelemetry::sdk::instrumentationscope::InstrumentationScope<sp/>*scope_<sp/>=<sp/></highlight><highlight class="keyword">nullptr</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><sp/><sp/>std::vector&lt;MetricData&gt;<sp/>metric_data_;</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>ScopePtr,<sp/></highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>MetricDataType&gt;</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref>(ScopePtr<sp/>&amp;&amp;scope,<sp/>MetricDataType<sp/>&amp;&amp;metric)</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/>scope_{std::forward&lt;ScopePtr&gt;(scope)},<sp/>metric_data_{std::forward&lt;MetricDataType&gt;(metric)}</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/>{}</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"></highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref>()<sp/>{}</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref><sp/>&amp;)<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref>(<ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref><sp/>&amp;&amp;)<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref><sp/>&amp;operator=(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref><sp/>&amp;)<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"></highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref><sp/>&amp;operator=(<ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref><sp/>&amp;&amp;)<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"></highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">~ScopeMetrics</ref>()<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="56"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"></highlight></codeline>
+<codeline lineno="58"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal">ResourceMetrics</highlight></codeline>
+<codeline lineno="59"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>opentelemetry::sdk::resource::Resource<sp/>*resource_<sp/>=<sp/></highlight><highlight class="keyword">nullptr</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/>std::vector&lt;ScopeMetrics&gt;<sp/>scope_metric_data_;</highlight></codeline>
+<codeline lineno="62"><highlight class="normal"></highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>ResourcePtr,<sp/></highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>ScopeMetricsType&gt;</highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/>ResourceMetrics(ResourcePtr<sp/>&amp;&amp;resource,<sp/>ScopeMetricsType<sp/>&amp;&amp;scope_metric_data)</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/>resource_{std::forward&lt;ResourcePtr&gt;(resource)},</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>scope_metric_data_{std::forward&lt;ScopeMetricsType&gt;(scope_metric_data)}</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/>{}</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"></highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/>ResourceMetrics()<sp/>{}</highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/>ResourceMetrics(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>ResourceMetrics<sp/>&amp;)<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/>ResourceMetrics(ResourceMetrics<sp/>&amp;&amp;)<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"></highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/>ResourceMetrics<sp/>&amp;operator=(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>ResourceMetrics<sp/>&amp;)<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"></highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">inline</highlight><highlight class="normal"><sp/>ResourceMetrics<sp/>&amp;operator=(ResourceMetrics<sp/>&amp;&amp;)<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"></highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/>~ResourceMetrics()<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="78"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"></highlight></codeline>
+<codeline lineno="87" refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref></highlight></codeline>
+<codeline lineno="88"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="89"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="90"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref>()<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="91"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">~MetricProducer</ref>()<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="92"><highlight class="normal"></highlight></codeline>
+<codeline lineno="93"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref><sp/>&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="94"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref>(<ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref><sp/>&amp;&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="95"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref><sp/>&amp;operator=(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref><sp/>&amp;)<sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="96"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref><sp/>&amp;operator=(<ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref><sp/>&amp;&amp;)<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="97"><highlight class="normal"></highlight></codeline>
+<codeline lineno="98"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">enum<sp/>class</highlight><highlight class="normal"><sp/>Status<sp/>:<sp/>std::uint8_t</highlight></codeline>
+<codeline lineno="99"><highlight class="normal"><sp/><sp/>{</highlight></codeline>
+<codeline lineno="100"><highlight class="normal"><sp/><sp/><sp/><sp/>kSuccess,</highlight></codeline>
+<codeline lineno="101"><highlight class="normal"><sp/><sp/><sp/><sp/>kFailure,</highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><sp/><sp/>kTimeout,</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"><sp/><sp/>};</highlight></codeline>
+<codeline lineno="104"><highlight class="normal"></highlight></codeline>
+<codeline lineno="105"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal">Result</highlight></codeline>
+<codeline lineno="106"><highlight class="normal"><sp/><sp/>{</highlight></codeline>
+<codeline lineno="107"><highlight class="normal"><sp/><sp/><sp/><sp/>ResourceMetrics<sp/>points_;</highlight></codeline>
+<codeline lineno="108"><highlight class="normal"><sp/><sp/><sp/><sp/>Status<sp/>status_;</highlight></codeline>
+<codeline lineno="109"><highlight class="normal"><sp/><sp/>};</highlight></codeline>
+<codeline lineno="110"><highlight class="normal"></highlight></codeline>
+<codeline lineno="116" refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a78c9383c135b1fc11975008877b4e282" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/>Result<sp/><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1a78c9383c135b1fc11975008877b4e282" kindref="member">Produce</ref>()<sp/>noexcept<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="117"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="118"><highlight class="normal"></highlight></codeline>
+<codeline lineno="119"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>metrics</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="120"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>sdk</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="121"><highlight class="normal">OPENTELEMETRY_END_NAMESPACE</highlight></codeline>
+    </programlisting>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h"/>
+  </compounddef>
+</doxygen>

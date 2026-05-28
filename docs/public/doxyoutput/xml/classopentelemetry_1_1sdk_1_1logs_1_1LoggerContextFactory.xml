@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContextFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::logs::LoggerContextFactory</compoundname>
+    <includes refid="logger__context__factory_8h" local="no">logger_context_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContextFactory_1a7af2237dd697fc1221822905197fcb54" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; LoggerContext &gt; opentelemetry::sdk::logs::LoggerContextFactory::Create</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; LogRecordProcessor &gt; &gt; &amp;&amp;processors)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContextFactory::Create</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> with specified LogRecordProcessors. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>processors</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A vector of log processors that can parse the logs. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A unique pointer to the created <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> object. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context_factory.h" line="31" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContextFactory_1a8ef27c24d7b525640f807f27fca1de4a" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; LoggerContext &gt; opentelemetry::sdk::logs::LoggerContextFactory::Create</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; LogRecordProcessor &gt; &gt; &amp;&amp;processors, const opentelemetry::sdk::resource::Resource &amp;resource)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContextFactory::Create</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> with specified LogRecordProcessors and OpenTelemetry resource. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>processors</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A vector of log processors that can parse the logs. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>resource</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The OpenTelemetry resource responsible for generating the logs. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A unique pointer to the created <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> object. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context_factory.h" line="40" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContextFactory_1a66aefa5a85ba23d83117ec6d86583022" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; LoggerContext &gt; opentelemetry::sdk::logs::LoggerContextFactory::Create</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; LogRecordProcessor &gt; &gt; &amp;&amp;processors, const opentelemetry::sdk::resource::Resource &amp;resource, std::unique_ptr&lt; instrumentationscope::ScopeConfigurator&lt; LoggerConfig &gt; &gt; logger_configurator)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContextFactory::Create</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> &gt; &gt;</type>
+          <declname>logger_configurator</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> with specified LogRecordProcessors, OpenTelemetry resource and a logger ScopeConfigurator. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>processors</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A vector of log processors that can parse the logs. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>resource</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The OpenTelemetry resource responsible for generating the logs. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>logger_configurator</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A ScopeConfigurator that can be used compute the <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> for a given InstrumentationScope. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A unique pointer to the created <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> object. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context_factory.h" line="53" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context_factory.h" line="23" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context_factory.h" bodystart="24" bodyend="57"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContextFactory_1a7af2237dd697fc1221822905197fcb54" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContextFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContextFactory_1a8ef27c24d7b525640f807f27fca1de4a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContextFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContextFactory_1a66aefa5a85ba23d83117ec6d86583022" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContextFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

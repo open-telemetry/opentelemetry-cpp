@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_2a3a8271d047108710ae7f12f5e664d0" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs</compoundname>
+    <innerfile refid="batch__log__record__processor_8h">batch_log_record_processor.h</innerfile>
+    <innerfile refid="batch__log__record__processor__factory_8h">batch_log_record_processor_factory.h</innerfile>
+    <innerfile refid="batch__log__record__processor__options_8h">batch_log_record_processor_options.h</innerfile>
+    <innerfile refid="batch__log__record__processor__runtime__options_8h">batch_log_record_processor_runtime_options.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2logs_2event__logger_8h">event_logger.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2logs_2event__logger__provider_8h">event_logger_provider.h</innerfile>
+    <innerfile refid="event__logger__provider__factory_8h">event_logger_provider_factory.h</innerfile>
+    <innerfile refid="logs_2exporter_8h">exporter.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2logs_2logger_8h">logger.h</innerfile>
+    <innerfile refid="logger__config_8h">logger_config.h</innerfile>
+    <innerfile refid="logger__context_8h">logger_context.h</innerfile>
+    <innerfile refid="logger__context__factory_8h">logger_context_factory.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2logs_2logger__provider_8h">logger_provider.h</innerfile>
+    <innerfile refid="logger__provider__factory_8h">logger_provider_factory.h</innerfile>
+    <innerfile refid="multi__log__record__processor_8h">multi_log_record_processor.h</innerfile>
+    <innerfile refid="multi__log__record__processor__factory_8h">multi_log_record_processor_factory.h</innerfile>
+    <innerfile refid="logs_2multi__recordable_8h">multi_recordable.h</innerfile>
+    <innerfile refid="logs_2processor_8h">processor.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2logs_2provider_8h">provider.h</innerfile>
+    <innerfile refid="read__write__log__record_8h">read_write_log_record.h</innerfile>
+    <innerfile refid="readable__log__record_8h">readable_log_record.h</innerfile>
+    <innerfile refid="logs_2recordable_8h">recordable.h</innerfile>
+    <innerfile refid="simple__log__record__processor_8h">simple_log_record_processor.h</innerfile>
+    <innerfile refid="simple__log__record__processor__factory_8h">simple_log_record_processor_factory.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/"/>
+  </compounddef>
+</doxygen>

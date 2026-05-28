@@ -1,0 +1,646 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1sdk_1_1metrics" kind="namespace" language="C++">
+    <compoundname>opentelemetry::sdk::metrics</compoundname>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" prot="public">opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray" prot="public">opentelemetry::sdk::metrics::AdaptingIntegerArray</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation" prot="public">opentelemetry::sdk::metrics::Aggregation</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1AggregationConfig" prot="public">opentelemetry::sdk::metrics::AggregationConfig</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1AsyncMetricStorage" prot="public">opentelemetry::sdk::metrics::AsyncMetricStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1AsyncMultiMetricStorage" prot="public">opentelemetry::sdk::metrics::AsyncMultiMetricStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1AsyncWritableMetricStorage" prot="public">opentelemetry::sdk::metrics::AsyncWritableMetricStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributeHashGenerator" prot="public">opentelemetry::sdk::metrics::AttributeHashGenerator</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash" prot="public">opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" prot="public">opentelemetry::sdk::metrics::AttributesProcessor</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation" prot="public">opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregationConfig" prot="public">opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer" prot="public">opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramPointData" prot="public">opentelemetry::sdk::metrics::Base2ExponentialHistogramPointData</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle" prot="public">opentelemetry::sdk::metrics::CollectorHandle</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAggregation" prot="public">opentelemetry::sdk::metrics::DefaultAggregation</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAttributesProcessor" prot="public">opentelemetry::sdk::metrics::DefaultAttributesProcessor</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleCounter" prot="public">opentelemetry::sdk::metrics::DoubleCounter</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleHistogram" prot="public">opentelemetry::sdk::metrics::DoubleHistogram</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleHistogramAggregation" prot="public">opentelemetry::sdk::metrics::DoubleHistogramAggregation</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation" prot="public">opentelemetry::sdk::metrics::DoubleLastValueAggregation</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleSumAggregation" prot="public">opentelemetry::sdk::metrics::DoubleSumAggregation</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleUpDownCounter" prot="public">opentelemetry::sdk::metrics::DoubleUpDownCounter</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1DropAggregation" prot="public">opentelemetry::sdk::metrics::DropAggregation</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1DropPointData" prot="public">opentelemetry::sdk::metrics::DropPointData</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExactPredicate" prot="public">opentelemetry::sdk::metrics::ExactPredicate</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData" prot="public">opentelemetry::sdk::metrics::ExemplarData</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap" prot="public">opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMapHash" prot="public">opentelemetry::sdk::metrics::FilteredOrderedAttributeMapHash</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringAttributesProcessor" prot="public">opentelemetry::sdk::metrics::FilteringAttributesProcessor</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor" prot="public">opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1HistogramAggregationConfig" prot="public">opentelemetry::sdk::metrics::HistogramAggregationConfig</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1HistogramPointData" prot="public">opentelemetry::sdk::metrics::HistogramPointData</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptor" prot="public">opentelemetry::sdk::metrics::InstrumentDescriptor</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorHash" prot="public">opentelemetry::sdk::metrics::InstrumentDescriptorHash</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorUtil" prot="public">opentelemetry::sdk::metrics::InstrumentDescriptorUtil</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentEqualNameCaseInsensitive" prot="public">opentelemetry::sdk::metrics::InstrumentEqualNameCaseInsensitive</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentMetaDataValidator" prot="public">opentelemetry::sdk::metrics::InstrumentMetaDataValidator</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector" prot="public">opentelemetry::sdk::metrics::InstrumentSelector</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelectorFactory" prot="public">opentelemetry::sdk::metrics::InstrumentSelectorFactory</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1LastReportedMetrics" prot="public">opentelemetry::sdk::metrics::LastReportedMetrics</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1LastValuePointData" prot="public">opentelemetry::sdk::metrics::LastValuePointData</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter" prot="public">opentelemetry::sdk::metrics::LongCounter</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogram" prot="public">opentelemetry::sdk::metrics::LongHistogram</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation" prot="public">opentelemetry::sdk::metrics::LongHistogramAggregation</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongLastValueAggregation" prot="public">opentelemetry::sdk::metrics::LongLastValueAggregation</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongSumAggregation" prot="public">opentelemetry::sdk::metrics::LongSumAggregation</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter" prot="public">opentelemetry::sdk::metrics::LongUpDownCounter</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MatchEverythingPattern" prot="public">opentelemetry::sdk::metrics::MatchEverythingPattern</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MatchNothingPattern" prot="public">opentelemetry::sdk::metrics::MatchNothingPattern</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter" prot="public">opentelemetry::sdk::metrics::Meter</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" prot="public">opentelemetry::sdk::metrics::MeterConfig</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" prot="public">opentelemetry::sdk::metrics::MeterContext</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContextFactory" prot="public">opentelemetry::sdk::metrics::MeterContextFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProvider" prot="public">opentelemetry::sdk::metrics::MeterProvider</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProviderFactory" prot="public">opentelemetry::sdk::metrics::MeterProviderFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector" prot="public">opentelemetry::sdk::metrics::MeterSelector</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelectorFactory" prot="public">opentelemetry::sdk::metrics::MeterSelectorFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricCollector" prot="public">opentelemetry::sdk::metrics::MetricCollector</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricData" prot="public">opentelemetry::sdk::metrics::MetricData</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter" prot="public">opentelemetry::sdk::metrics::MetricFilter</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" prot="public">opentelemetry::sdk::metrics::MetricProducer</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" prot="public">opentelemetry::sdk::metrics::MetricReader</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage" prot="public">opentelemetry::sdk::metrics::MetricStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult" prot="public">opentelemetry::sdk::metrics::MultiObserverResult</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1NoopAsyncWritableMetricStorage" prot="public">opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1NoopMetricStorage" prot="public">opentelemetry::sdk::metrics::NoopMetricStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1NoopWritableMetricStorage" prot="public">opentelemetry::sdk::metrics::NoopWritableMetricStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument" prot="public">opentelemetry::sdk::metrics::ObservableInstrument</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry" prot="public">opentelemetry::sdk::metrics::ObservableRegistry</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT" prot="public">opentelemetry::sdk::metrics::ObserverResultT</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1PatternPredicate" prot="public">opentelemetry::sdk::metrics::PatternPredicate</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader" prot="public">opentelemetry::sdk::metrics::PeriodicExportingMetricReader</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderFactory" prot="public">opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderOptions" prot="public">opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderRuntimeOptions" prot="public">opentelemetry::sdk::metrics::PeriodicExportingMetricReaderRuntimeOptions</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1PointDataAttributes" prot="public">opentelemetry::sdk::metrics::PointDataAttributes</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate" prot="public">opentelemetry::sdk::metrics::Predicate</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1PredicateFactory" prot="public">opentelemetry::sdk::metrics::PredicateFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1Provider" prot="public">opentelemetry::sdk::metrics::Provider</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" prot="public">opentelemetry::sdk::metrics::PushMetricExporter</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1RegisteredView" prot="public">opentelemetry::sdk::metrics::RegisteredView</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1ResourceMetrics" prot="public">opentelemetry::sdk::metrics::ResourceMetrics</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" prot="public">opentelemetry::sdk::metrics::ScopeMetrics</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData" prot="public">opentelemetry::sdk::metrics::SumPointData</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous" prot="public">opentelemetry::sdk::metrics::Synchronous</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMetricStorage" prot="public">opentelemetry::sdk::metrics::SyncMetricStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage" prot="public">opentelemetry::sdk::metrics::SyncMultiMetricStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncWritableMetricStorage" prot="public">opentelemetry::sdk::metrics::SyncWritableMetricStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage" prot="public">opentelemetry::sdk::metrics::TemporalMetricStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1View" prot="public">opentelemetry::sdk::metrics::View</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1ViewFactory" prot="public">opentelemetry::sdk::metrics::ViewFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1ViewRegistry" prot="public">opentelemetry::sdk::metrics::ViewRegistry</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1ViewRegistryFactory" prot="public">opentelemetry::sdk::metrics::ViewRegistryFactory</innerclass>
+    <sectiondef kind="enum">
+      <memberdef kind="enum" id="instruments_8h_1a747526d0e14540552d9581df01ea7a89" prot="public" static="no" strong="yes">
+        <type>std::uint8_t</type>
+        <name>InstrumentType</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentType</qualifiedname>
+        <enumvalue id="instruments_8h_1a747526d0e14540552d9581df01ea7a89a8034f0c60302e5e78833a25b86a05e0c" prot="public">
+          <name>kCounter</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1a747526d0e14540552d9581df01ea7a89a94751e5dfe556cc7d29c100e7227e974" prot="public">
+          <name>kHistogram</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1a747526d0e14540552d9581df01ea7a89ab55b825bcf42b23a23e9016f1bedc9e8" prot="public">
+          <name>kUpDownCounter</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1a747526d0e14540552d9581df01ea7a89abf10c85d882879e03addec8329cefc1b" prot="public">
+          <name>kObservableCounter</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1a747526d0e14540552d9581df01ea7a89a5a7d6e57d61d803d0c2642191898e488" prot="public">
+          <name>kObservableGauge</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1a747526d0e14540552d9581df01ea7a89a7db8debd2a745769f640faea46d002a4" prot="public">
+          <name>kObservableUpDownCounter</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1a747526d0e14540552d9581df01ea7a89a1cbd575b2e473e10f2bbcc1fb3d71834" prot="public">
+          <name>kGauge</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="21" bodyend="29"/>
+      </memberdef>
+      <memberdef kind="enum" id="instruments_8h_1ad1346687edf19dbed504b216d0948879" prot="public" static="no" strong="yes">
+        <type>std::uint8_t</type>
+        <name>InstrumentClass</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentClass</qualifiedname>
+        <enumvalue id="instruments_8h_1ad1346687edf19dbed504b216d0948879ae3bade32f12a5139b27ef40b3689b77c" prot="public">
+          <name>kSync</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1ad1346687edf19dbed504b216d0948879a9f2b960005d2a3a5f35ac32809d84db7" prot="public">
+          <name>kAsync</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="31" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="32" bodyend="35"/>
+      </memberdef>
+      <memberdef kind="enum" id="instruments_8h_1a15d9f17532f213d9b068fa4bd8dbb63a" prot="public" static="no" strong="yes">
+        <type>std::uint8_t</type>
+        <name>InstrumentValueType</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentValueType</qualifiedname>
+        <enumvalue id="instruments_8h_1a15d9f17532f213d9b068fa4bd8dbb63aa355088fbd6ac81f051e0bd6ede5ab8e0" prot="public">
+          <name>kInt</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1a15d9f17532f213d9b068fa4bd8dbb63aa6a285ab26ec7ec4c22536626eeaaf52e" prot="public">
+          <name>kLong</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1a15d9f17532f213d9b068fa4bd8dbb63aa8425cd882e78bc9251db970b8a1da20e" prot="public">
+          <name>kFloat</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1a15d9f17532f213d9b068fa4bd8dbb63aa7fb3efa35444cd88d5a31dc125ca9c28" prot="public">
+          <name>kDouble</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="37" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="38" bodyend="43"/>
+      </memberdef>
+      <memberdef kind="enum" id="instruments_8h_1ae47987bb9a7bb7d455ab0e4ee07e0d1f" prot="public" static="no" strong="yes">
+        <type>std::uint8_t</type>
+        <name>AggregationType</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AggregationType</qualifiedname>
+        <enumvalue id="instruments_8h_1ae47987bb9a7bb7d455ab0e4ee07e0d1fabbb0cc7bb38684a413a6c6bde2db64aa" prot="public">
+          <name>kDrop</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1ae47987bb9a7bb7d455ab0e4ee07e0d1fa94751e5dfe556cc7d29c100e7227e974" prot="public">
+          <name>kHistogram</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1ae47987bb9a7bb7d455ab0e4ee07e0d1fa0d1310b4ac2805ecb1a041ee3dd6d1d0" prot="public">
+          <name>kLastValue</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1ae47987bb9a7bb7d455ab0e4ee07e0d1faa1dc5fbfa16754d1e628d66381725617" prot="public">
+          <name>kSum</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1ae47987bb9a7bb7d455ab0e4ee07e0d1fa6867faeaa475fda467e48267db2bb8a8" prot="public">
+          <name>kDefault</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1ae47987bb9a7bb7d455ab0e4ee07e0d1facaf9fb3960ba4e190ad00fe9fbce7863" prot="public">
+          <name>kBase2ExponentialHistogram</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="45" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="46" bodyend="53"/>
+      </memberdef>
+      <memberdef kind="enum" id="instruments_8h_1a0d222e7424144e9efb0da7468ce64829" prot="public" static="no" strong="yes">
+        <type>std::uint8_t</type>
+        <name>AggregationTemporality</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AggregationTemporality</qualifiedname>
+        <enumvalue id="instruments_8h_1a0d222e7424144e9efb0da7468ce64829a8536661e94a42d4d95dcb9058b9936b5" prot="public">
+          <name>kUnspecified</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1a0d222e7424144e9efb0da7468ce64829ac65e995e8c320e4c9a7df020723a6821" prot="public">
+          <name>kDelta</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="instruments_8h_1a0d222e7424144e9efb0da7468ce64829aecc0090f6c50bdd8d4445535e3c8555b" prot="public">
+          <name>kCumulative</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="55" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="56" bodyend="60"/>
+      </memberdef>
+      <memberdef kind="enum" id="predicate__factory_8h_1a598c24d78db0bd81f3cf8fd33560fef4" prot="public" static="no" strong="yes">
+        <type>uint8_t</type>
+        <name>PredicateType</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PredicateType</qualifiedname>
+        <enumvalue id="predicate__factory_8h_1a598c24d78db0bd81f3cf8fd33560fef4af885d687ac9e8b32468314b8b815ab02" prot="public">
+          <name>kPattern</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="predicate__factory_8h_1a598c24d78db0bd81f3cf8fd33560fef4aef332f2db7f7515c1705d2498d4dd0de" prot="public">
+          <name>kExact</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate_factory.h" line="18" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate_factory.h" bodystart="19" bodyend="22"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="exemplar__data_8h_1ae5763e4d9fcec047afcf141613e32a19" prot="public" static="no">
+        <type>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</type>
+        <definition>typedef opentelemetry::sdk::metrics::FilteredOrderedAttributeMap opentelemetry::sdk::metrics::MetricAttributes</definition>
+        <argsstring></argsstring>
+        <name>MetricAttributes</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricAttributes</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="19" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="19" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="metric__data_8h_1a5a1c960114c74eba0fdf4943cd6e1eba" prot="public" static="no">
+        <type>opentelemetry::sdk::common::OrderedAttributeMap</type>
+        <definition>using opentelemetry::sdk::metrics::PointAttributes = typedef opentelemetry::sdk::common::OrderedAttributeMap</definition>
+        <argsstring></argsstring>
+        <name>PointAttributes</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PointAttributes</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" bodystart="20" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="metric__data_8h_1a1b0d11ef7cbe4cf96aa3cb10f8d292c7" prot="public" static="no">
+        <type>opentelemetry::nostd::variant&lt; SumPointData, HistogramPointData, Base2ExponentialHistogramPointData, LastValuePointData, DropPointData &gt;</type>
+        <definition>using opentelemetry::sdk::metrics::PointType = typedef opentelemetry::nostd::variant&lt;SumPointData, HistogramPointData, Base2ExponentialHistogramPointData, LastValuePointData, DropPointData&gt;</definition>
+        <argsstring></argsstring>
+        <name>PointType</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PointType</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" bodystart="25" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="point__data_8h_1ad6ce54879fab6b6e12d0e28ec82b4274" prot="public" static="no">
+        <type>nostd::variant&lt; int64_t, double &gt;</type>
+        <definition>using opentelemetry::sdk::metrics::ValueType = typedef nostd::variant&lt;int64_t, double&gt;</definition>
+        <argsstring></argsstring>
+        <name>ValueType</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ValueType</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="19" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="19" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="instruments_8h_1ad821cde67d4e4d1665f737416ef11653" prot="public" static="no">
+        <type>opentelemetry::sdk::metrics::FilteredOrderedAttributeMapHash</type>
+        <definition>using opentelemetry::sdk::metrics::MetricAttributesHash = typedef opentelemetry::sdk::metrics::FilteredOrderedAttributeMapHash</definition>
+        <argsstring></argsstring>
+        <name>MetricAttributesHash</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricAttributesHash</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="218" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="218" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="instruments_8h_1acf3a716cc5a6c32ff0b9e4f71f360157" prot="public" static="no">
+        <type>std::function&lt; AggregationTemporality(InstrumentType)&gt;</type>
+        <definition>using opentelemetry::sdk::metrics::AggregationTemporalitySelector = typedef std::function&lt;AggregationTemporality(InstrumentType)&gt;</definition>
+        <argsstring></argsstring>
+        <name>AggregationTemporalitySelector</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AggregationTemporalitySelector</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="219" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="219" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="attributes__hashmap_8h_1ad0e29330dcd13910f40d317818256676" prot="public" static="no">
+        <type>AttributesHashMapWithCustomHash&lt;&gt;</type>
+        <definition>using opentelemetry::sdk::metrics::AttributesHashMap = typedef AttributesHashMapWithCustomHash&lt;&gt;</definition>
+        <argsstring></argsstring>
+        <name>AttributesHashMap</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMap</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="227" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="227" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="attributes__processor_8h_1ab49b175ca95c801c26f028de12c48bf5" prot="public" static="no">
+        <type>std::unordered_map&lt; std::string, bool, opentelemetry::sdk::common::StringViewHash, opentelemetry::sdk::common::StringViewEqual &gt;</type>
+        <definition>typedef std::unordered_map&lt;std::string, bool, opentelemetry::sdk::common::StringViewHash, opentelemetry::sdk::common::StringViewEqual&gt; opentelemetry::sdk::metrics::FilterAttributeMap</definition>
+        <argsstring></argsstring>
+        <name>FilterAttributeMap</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilterAttributeMap</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="30" column="5" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" bodystart="30" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="var">
+      <memberdef kind="variable" id="periodic__exporting__metric__reader__options_8h_1ab198a7644f189d5fc7f8762997c75b97" prot="public" static="no" constexpr="yes" mutable="no">
+        <type>constexpr std::chrono::milliseconds</type>
+        <definition>constexpr std::chrono::milliseconds opentelemetry::sdk::metrics::kExportIntervalMillis</definition>
+        <argsstring></argsstring>
+        <name>kExportIntervalMillis</name>
+        <qualifiedname>opentelemetry::sdk::metrics::kExportIntervalMillis</qualifiedname>
+        <initializer>= std::chrono::milliseconds(60000)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h" line="16" column="37" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h" bodystart="16" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="periodic__exporting__metric__reader__options_8h_1a2e3a3e4b2b0ed1374d173c1fdf9a413d" prot="public" static="no" constexpr="yes" mutable="no">
+        <type>constexpr std::chrono::milliseconds</type>
+        <definition>constexpr std::chrono::milliseconds opentelemetry::sdk::metrics::kExportTimeOutMillis</definition>
+        <argsstring></argsstring>
+        <name>kExportTimeOutMillis</name>
+        <qualifiedname>opentelemetry::sdk::metrics::kExportTimeOutMillis</qualifiedname>
+        <initializer>= std::chrono::milliseconds(30000)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h" line="17" column="37" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h" bodystart="17" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="attributes__hashmap_8h_1ad67fb62bff427f78245b6bb0ed8ebbaa" prot="public" static="no" constexpr="yes" mutable="no">
+        <type>constexpr size_t</type>
+        <definition>constexpr size_t opentelemetry::sdk::metrics::kAggregationCardinalityLimit</definition>
+        <argsstring></argsstring>
+        <name>kAggregationCardinalityLimit</name>
+        <qualifiedname>opentelemetry::sdk::metrics::kAggregationCardinalityLimit</qualifiedname>
+        <initializer>= 2000</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="28" column="18" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="28" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="attributes__hashmap_8h_1aabaea036f581b37850708432a27e5bec" prot="public" static="no" mutable="no">
+        <type>const std::string</type>
+        <definition>const std::string opentelemetry::sdk::metrics::kAttributesLimitOverflowKey</definition>
+        <argsstring></argsstring>
+        <name>kAttributesLimitOverflowKey</name>
+        <qualifiedname>opentelemetry::sdk::metrics::kAttributesLimitOverflowKey</qualifiedname>
+        <initializer>= &quot;otel.metric.overflow&quot;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="29" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="29" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="attributes__hashmap_8h_1a0325f2849f8622b2d2ba429fe6028191" prot="public" static="no" mutable="no">
+        <type>const bool</type>
+        <definition>const bool opentelemetry::sdk::metrics::kAttributesLimitOverflowValue</definition>
+        <argsstring></argsstring>
+        <name>kAttributesLimitOverflowValue</name>
+        <qualifiedname>opentelemetry::sdk::metrics::kAttributesLimitOverflowValue</qualifiedname>
+        <initializer>= true</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="30" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="30" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="attributes__hashmap_8h_1a975379c7e9385d64de0d5e09ea0a5f9d" prot="public" static="no" mutable="no">
+        <type>const MetricAttributes</type>
+        <definition>const MetricAttributes opentelemetry::sdk::metrics::kOverflowAttributes</definition>
+        <argsstring></argsstring>
+        <name>kOverflowAttributes</name>
+        <qualifiedname>opentelemetry::sdk::metrics::kOverflowAttributes</qualifiedname>
+        <initializer>= {
+    {kAttributesLimitOverflowKey,
+        kAttributesLimitOverflowValue}}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="31" column="24" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="31" bodyend="33"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="histogram__aggregation_8h_1a3d95cd4ee3a24f424e88b4a3efa7b3f0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::HistogramMerge</definition>
+        <argsstring>(HistogramPointData &amp;current, HistogramPointData &amp;delta, HistogramPointData &amp;merge)</argsstring>
+        <name>HistogramMerge</name>
+        <qualifiedname>opentelemetry::sdk::metrics::HistogramMerge</qualifiedname>
+        <param>
+          <type>HistogramPointData &amp;</type>
+          <declname>current</declname>
+        </param>
+        <param>
+          <type>HistogramPointData &amp;</type>
+          <declname>delta</declname>
+        </param>
+        <param>
+          <type>HistogramPointData &amp;</type>
+          <declname>merge</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="88" column="6" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" bodystart="88" bodyend="105"/>
+      </memberdef>
+      <memberdef kind="function" id="histogram__aggregation_8h_1a63c19021c59100bd0b69902b8e1a20fe" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::HistogramDiff</definition>
+        <argsstring>(HistogramPointData &amp;current, HistogramPointData &amp;next, HistogramPointData &amp;diff)</argsstring>
+        <name>HistogramDiff</name>
+        <qualifiedname>opentelemetry::sdk::metrics::HistogramDiff</qualifiedname>
+        <param>
+          <type>HistogramPointData &amp;</type>
+          <declname>current</declname>
+        </param>
+        <param>
+          <type>HistogramPointData &amp;</type>
+          <declname>next</declname>
+        </param>
+        <param>
+          <type>HistogramPointData &amp;</type>
+          <declname>diff</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="108" column="6" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" bodystart="108" bodyend="117"/>
+      </memberdef>
+      <memberdef kind="function" id="histogram__aggregation_8h_1a1daec008997d3a4bdc7d732d373bc701" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::BucketBinarySearch</definition>
+        <argsstring>(T value, const std::vector&lt; double &gt; &amp;boundaries)</argsstring>
+        <name>BucketBinarySearch</name>
+        <qualifiedname>opentelemetry::sdk::metrics::BucketBinarySearch</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const std::vector&lt; double &gt; &amp;</type>
+          <declname>boundaries</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="120" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" bodystart="120" bodyend="124"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="14" column="1"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="meter__selector_8h" kind="file" language="C++">
+    <compoundname>meter_selector.h</compoundname>
+    <includes local="no">memory</includes>
+    <includes local="no">string</includes>
+    <includes refid="predicate__factory_8h" local="yes">opentelemetry/sdk/metrics/view/predicate_factory.h</includes>
+    <includes local="yes">opentelemetry/version.h</includes>
+    <includedby refid="meter__context_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h</includedby>
+    <includedby refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter__provider_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider.h</includedby>
+    <includedby refid="meter__selector__factory_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector_factory.h</includedby>
+    <includedby refid="view__registry_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view_registry.h</includedby>
+    <incdepgraph>
+      <node id="8">
+        <label>opentelemetry/common/macros.h</label>
+        <link refid="macros_8h_source"/>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h</label>
+        <link refid="meter__selector_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>opentelemetry/sdk/metrics/view/predicate.h</label>
+        <link refid="predicate_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>opentelemetry/sdk/metrics/view/predicate_factory.h</label>
+        <link refid="predicate__factory_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>memory</label>
+      </node>
+      <node id="5">
+        <label>opentelemetry/nostd/string_view.h</label>
+      </node>
+      <node id="9">
+        <label>opentelemetry/sdk/common/global_log_handler.h</label>
+      </node>
+      <node id="10">
+        <label>opentelemetry/version.h</label>
+      </node>
+      <node id="3">
+        <label>string</label>
+      </node>
+      <node id="7">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="3">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h</label>
+        <link refid="meter__context_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context_factory.h</label>
+        <link refid="meter__context__factory_8h_source"/>
+      </node>
+      <node id="4">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter__provider_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider_factory.h</label>
+        <link refid="meter__provider__factory_8h_source"/>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h</label>
+        <link refid="meter__selector_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector_factory.h</label>
+        <link refid="meter__selector__factory_8h_source"/>
+      </node>
+      <node id="8">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view_registry.h</label>
+        <link refid="view__registry_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view_registry_factory.h</label>
+        <link refid="view__registry__factory_8h_source"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector" prot="public">opentelemetry::sdk::metrics::MeterSelector</innerclass>
+    <innernamespace refid="namespaceopentelemetry">opentelemetry</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk">opentelemetry::sdk</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1metrics">opentelemetry::sdk::metrics</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>The<sp/>OpenTelemetry<sp/>Authors</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;memory&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;string&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/metrics/view/predicate_factory.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/version.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal">OPENTELEMETRY_BEGIN_NAMESPACE</highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">sdk</highlight></codeline>
+<codeline lineno="14"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">metrics</highlight></codeline>
+<codeline lineno="16"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">MeterSelector</highlight></codeline>
+<codeline lineno="18"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/>MeterSelector(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string<sp/>&amp;name,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string<sp/>&amp;version,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>std::string<sp/>&amp;schema)</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>:<sp/>name_filter_{PredicateFactory::GetPredicate(name,<sp/>PredicateType::kExact)},</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>version_filter_{PredicateFactory::GetPredicate(version,<sp/>PredicateType::kExact)},</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>schema_filter_{PredicateFactory::GetPredicate(schema,<sp/>PredicateType::kExact)}</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/>{}</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Returns<sp/>name<sp/>filter<sp/>predicate.<sp/>This<sp/>shouldn&apos;t<sp/>be<sp/>deleted</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>opentelemetry::sdk::metrics::Predicate<sp/>*GetNameFilter()</highlight><highlight class="keyword"><sp/>const<sp/></highlight><highlight class="normal">{<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>name_filter_.get();<sp/>}</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Returns<sp/>version<sp/>filter<sp/>predicate.<sp/>This<sp/>shouldn&apos;t<sp/>be<sp/>deleted</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>opentelemetry::sdk::metrics::Predicate<sp/>*GetVersionFilter()</highlight><highlight class="keyword"><sp/>const</highlight></codeline>
+<codeline lineno="31"><highlight class="keyword"><sp/><sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>version_filter_.get();</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Returns<sp/>schema<sp/>filter<sp/>predicate.<sp/>This<sp/>shouldn&apos;t<sp/>be<sp/>deleted</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>opentelemetry::sdk::metrics::Predicate<sp/>*GetSchemaFilter()</highlight><highlight class="keyword"><sp/>const</highlight></codeline>
+<codeline lineno="37"><highlight class="keyword"><sp/><sp/></highlight><highlight class="normal">{</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>schema_filter_.get();</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/>std::unique_ptr&lt;opentelemetry::sdk::metrics::Predicate&gt;<sp/>name_filter_;</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/>std::unique_ptr&lt;opentelemetry::sdk::metrics::Predicate&gt;<sp/>version_filter_;</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/>std::unique_ptr&lt;opentelemetry::sdk::metrics::Predicate&gt;<sp/>schema_filter_;</highlight></codeline>
+<codeline lineno="45"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="46"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>metrics</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="47"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>sdk</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="48"><highlight class="normal">OPENTELEMETRY_END_NAMESPACE</highlight></codeline>
+    </programlisting>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h"/>
+  </compounddef>
+</doxygen>

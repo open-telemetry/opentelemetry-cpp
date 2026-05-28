@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1SimpleSpanProcessorFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::SimpleSpanProcessorFactory</compoundname>
+    <includes refid="simple__processor__factory_8h" local="no">simple_processor_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SimpleSpanProcessorFactory_1a301f2e10f72577dec163a58e75ca99fa" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; SpanProcessor &gt; opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; SpanExporter &gt; &amp;&amp;exporter)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &gt; &amp;&amp;</type>
+          <declname>exporter</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SimpleSpanProcessor" kindref="compound">SimpleSpanProcessor</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/simple_processor_factory.h" line="27" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SimpleSpanProcessor" kindref="compound">SimpleSpanProcessor</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/simple_processor_factory.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/simple_processor_factory.h" bodystart="22" bodyend="28"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SimpleSpanProcessorFactory_1a301f2e10f72577dec163a58e75ca99fa" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SimpleSpanProcessorFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

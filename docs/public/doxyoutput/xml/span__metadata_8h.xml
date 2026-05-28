@@ -1,0 +1,387 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="span__metadata_8h" kind="file" language="C++">
+    <compoundname>span_metadata.h</compoundname>
+    <includes refid="timestamp_8h" local="yes">opentelemetry/common/timestamp.h</includes>
+    <includes local="yes">opentelemetry/version.h</includes>
+    <includedby refid="trace_2noop_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h</includedby>
+    <includedby refid="scope_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/scope.h</includedby>
+    <includedby refid="span_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h</includedby>
+    <includedby refid="span__startoptions_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_startoptions.h</includedby>
+    <includedby refid="trace_2recordable_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h</includedby>
+    <includedby refid="sampler_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h</includedby>
+    <includedby refid="always__off_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_off.h</includedby>
+    <includedby refid="always__on_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_on.h</includedby>
+    <includedby refid="parent_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h</includedby>
+    <includedby refid="trace__id__ratio_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio.h</includedby>
+    <includedby refid="span__data_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h</includedby>
+    <incdepgraph>
+      <node id="2">
+        <label>opentelemetry/common/timestamp.h</label>
+        <link refid="timestamp_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h</label>
+        <link refid="span__metadata_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>chrono</label>
+      </node>
+      <node id="4">
+        <label>cstdint</label>
+      </node>
+      <node id="5">
+        <label>opentelemetry/version.h</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="11">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/context.h</label>
+        <link refid="trace_2context_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/default_span.h</label>
+        <link refid="default__span_8h_source"/>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h</label>
+        <link refid="trace_2noop_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h</label>
+        <link refid="b3__propagator_8h_source"/>
+      </node>
+      <node id="13">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h</label>
+        <link refid="http__trace__context_8h_source"/>
+      </node>
+      <node id="14">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/jaeger.h</label>
+        <link refid="jaeger_8h_source"/>
+      </node>
+      <node id="3">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/provider.h</label>
+        <link refid="api_2include_2opentelemetry_2trace_2provider_8h_source"/>
+      </node>
+      <node id="7">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/scope.h</label>
+        <link refid="scope_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h</label>
+        <link refid="span_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h</label>
+        <link refid="span__metadata_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_startoptions.h</label>
+        <link refid="span__startoptions_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/tracer.h</label>
+        <link refid="api_2include_2opentelemetry_2trace_2tracer_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h</label>
+        <link refid="batch__span__processor_8h_source"/>
+      </node>
+      <node id="19">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor_factory.h</label>
+        <link refid="batch__span__processor__factory_8h_source"/>
+      </node>
+      <node id="18">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h</label>
+        <link refid="trace_2exporter_8h_source"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h</label>
+        <link refid="trace_2multi__recordable_8h_source"/>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h</label>
+        <link refid="multi__span__processor_8h_source"/>
+      </node>
+      <node id="16">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h</label>
+        <link refid="trace_2recordable_8h_source"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h</label>
+        <link refid="sampler_8h_source"/>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_off.h</label>
+        <link refid="always__off_8h_source"/>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_off_factory.h</label>
+        <link refid="always__off__factory_8h_source"/>
+      </node>
+      <node id="29">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_on.h</label>
+        <link refid="always__on_8h_source"/>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_on_factory.h</label>
+        <link refid="always__on__factory_8h_source"/>
+      </node>
+      <node id="27">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent.h</label>
+        <link refid="parent_8h_source"/>
+      </node>
+      <node id="33">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent_factory.h</label>
+        <link refid="parent__factory_8h_source"/>
+      </node>
+      <node id="34">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio.h</label>
+        <link refid="trace__id__ratio_8h_source"/>
+      </node>
+      <node id="35">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h</label>
+        <link refid="trace__id__ratio__factory_8h_source"/>
+      </node>
+      <node id="20">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/simple_processor.h</label>
+        <link refid="simple__processor_8h_source"/>
+      </node>
+      <node id="21">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/simple_processor_factory.h</label>
+        <link refid="simple__processor__factory_8h_source"/>
+      </node>
+      <node id="24">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h</label>
+        <link refid="span__data_8h_source"/>
+      </node>
+      <node id="4">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2trace_2tracer_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_context.h</label>
+        <link refid="tracer__context_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_context_factory.h</label>
+        <link refid="tracer__context__factory_8h_source"/>
+      </node>
+      <node id="5">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2trace_2tracer__provider_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h</label>
+        <link refid="tracer__provider__factory_8h_source"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="structopentelemetry_1_1trace_1_1EndSpanOptions" prot="public">opentelemetry::trace::EndSpanOptions</innerclass>
+    <innernamespace refid="namespaceopentelemetry">opentelemetry</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1trace">opentelemetry::trace</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>The<sp/>OpenTelemetry<sp/>Authors</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/common/timestamp.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/version.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>OPENTELEMETRY_ABI_VERSION_NO<sp/>&gt;=<sp/>2</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#<sp/><sp/>include<sp/>&lt;cstdint&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal">OPENTELEMETRY_BEGIN_NAMESPACE</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">trace</highlight></codeline>
+<codeline lineno="15"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>OPENTELEMETRY_ABI_VERSION_NO<sp/>&gt;=<sp/>2</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="keyword">enum<sp/>class</highlight><highlight class="normal"><sp/>SpanKind<sp/>:<sp/>std::uint8_t</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight><highlight class="preprocessor">#else</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="keyword">enum<sp/>class</highlight><highlight class="normal"><sp/>SpanKind<sp/><sp/></highlight><highlight class="comment">//<sp/>NOLINT(performance-enum-size)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/>kInternal,</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/>kServer,</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/>kClient,</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/>kProducer,</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/>kConsumer,</highlight></codeline>
+<codeline lineno="28"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight><highlight class="comment">//<sp/>The<sp/>key<sp/>identifies<sp/>the<sp/>active<sp/>span<sp/>in<sp/>the<sp/>current<sp/>context.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight><highlight class="keyword">constexpr</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>kSpanKey[]<sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="stringliteral">&quot;active_span&quot;</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight><highlight class="keyword">constexpr</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>kIsRootSpanKey[]<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;is_root_span&quot;</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight><highlight class="comment">//<sp/>StatusCode<sp/>-<sp/>Represents<sp/>the<sp/>canonical<sp/>set<sp/>of<sp/>status<sp/>codes<sp/>of<sp/>a<sp/>finished<sp/>Span.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>OPENTELEMETRY_ABI_VERSION_NO<sp/>&gt;=<sp/>2</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight><highlight class="keyword">enum<sp/>class</highlight><highlight class="normal"><sp/>StatusCode<sp/>:<sp/>std::uint8_t</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight><highlight class="preprocessor">#else</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight><highlight class="keyword">enum<sp/>class</highlight><highlight class="normal"><sp/>StatusCode<sp/><sp/></highlight><highlight class="comment">//<sp/>NOLINT(performance-enum-size)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/>kUnset,<sp/><sp/></highlight><highlight class="comment">//<sp/>default<sp/>status</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/>kOk,<sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Operation<sp/>has<sp/>completed<sp/>successfully.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/>kError<sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>The<sp/>operation<sp/>contains<sp/>an<sp/>error</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight></codeline>
+<codeline lineno="50" refid="structopentelemetry_1_1trace_1_1EndSpanOptions" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal"><ref refid="structopentelemetry_1_1trace_1_1EndSpanOptions" kindref="compound">EndSpanOptions</ref></highlight></codeline>
+<codeline lineno="51"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Optionally<sp/>sets<sp/>the<sp/>end<sp/>time<sp/>of<sp/>a<sp/>Span.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1common_1_1SteadyTimestamp" kindref="compound">common::SteadyTimestamp</ref><sp/>end_steady_time;</highlight></codeline>
+<codeline lineno="54"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"></highlight></codeline>
+<codeline lineno="56"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>trace</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="57"><highlight class="normal">OPENTELEMETRY_END_NAMESPACE</highlight></codeline>
+    </programlisting>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h"/>
+  </compounddef>
+</doxygen>

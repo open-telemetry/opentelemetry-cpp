@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="api_2include_2opentelemetry_2metrics_2async__instruments_8h" kind="file" language="C++">
+    <compoundname>async_instruments.h</compoundname>
+    <includes refid="api_2include_2opentelemetry_2metrics_2observer__result_8h" local="yes">opentelemetry/metrics/observer_result.h</includes>
+    <includes local="yes">opentelemetry/version.h</includes>
+    <includedby refid="api_2include_2opentelemetry_2metrics_2multi__observer__result_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/multi_observer_result.h</includedby>
+    <includedby refid="metrics_2noop_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h</includedby>
+    <includedby refid="sdk_2include_2opentelemetry_2sdk_2metrics_2async__instruments_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h</includedby>
+    <includedby refid="sdk_2include_2opentelemetry_2sdk_2metrics_2multi__observer__result_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h</includedby>
+    <includedby refid="observable__registry_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h</includedby>
+    <incdepgraph>
+      <node id="3">
+        <label>opentelemetry/common/attribute_value.h</label>
+        <link refid="attribute__value_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/async_instruments.h</label>
+        <link refid="api_2include_2opentelemetry_2metrics_2async__instruments_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry/metrics/observer_result.h</label>
+        <link refid="api_2include_2opentelemetry_2metrics_2observer__result_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>cstdint</label>
+      </node>
+      <node id="9">
+        <label>opentelemetry/common/key_value_iterable_view.h</label>
+      </node>
+      <node id="10">
+        <label>opentelemetry/nostd/shared_ptr.h</label>
+      </node>
+      <node id="5">
+        <label>opentelemetry/nostd/span.h</label>
+      </node>
+      <node id="6">
+        <label>opentelemetry/nostd/string_view.h</label>
+      </node>
+      <node id="11">
+        <label>opentelemetry/nostd/type_traits.h</label>
+      </node>
+      <node id="7">
+        <label>opentelemetry/nostd/variant.h</label>
+      </node>
+      <node id="8">
+        <label>opentelemetry/version.h</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/async_instruments.h</label>
+        <link refid="api_2include_2opentelemetry_2metrics_2async__instruments_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/multi_observer_result.h</label>
+        <link refid="api_2include_2opentelemetry_2metrics_2multi__observer__result_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h</label>
+        <link refid="metrics_2noop_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/provider.h</label>
+        <link refid="api_2include_2opentelemetry_2metrics_2provider_8h_source"/>
+      </node>
+      <node id="5">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2metrics_2async__instruments_8h_source"/>
+      </node>
+      <node id="8">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter_8h_source"/>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2metrics_2meter__provider_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider_factory.h</label>
+        <link refid="meter__provider__factory_8h_source"/>
+      </node>
+      <node id="3">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2metrics_2multi__observer__result_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h</label>
+        <link refid="observable__registry_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classopentelemetry_1_1metrics_1_1ObservableInstrument" prot="public">opentelemetry::metrics::ObservableInstrument</innerclass>
+    <innernamespace refid="namespaceopentelemetry">opentelemetry</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1metrics">opentelemetry::metrics</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>The<sp/>OpenTelemetry<sp/>Authors</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/metrics/observer_result.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/version.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal">OPENTELEMETRY_BEGIN_NAMESPACE</highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">metrics</highlight></codeline>
+<codeline lineno="11"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="keyword">using<sp/></highlight><highlight class="normal">ObservableCallbackPtr<sp/>=<sp/>void<sp/>(*)(ObserverResult,<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*);</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">ObservableInstrument</highlight></codeline>
+<codeline lineno="16"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/>ObservableInstrument()<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"><sp/><sp/>ObservableInstrument(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>ObservableInstrument<sp/>&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/>ObservableInstrument(ObservableInstrument<sp/>&amp;&amp;)<sp/>noexcept<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>default;</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/>ObservableInstrument<sp/>&amp;operator=(const<sp/>ObservableInstrument<sp/>&amp;)<sp/><sp/><sp/><sp/><sp/>=<sp/>default;</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/>ObservableInstrument<sp/>&amp;operator=(ObservableInstrument<sp/>&amp;&amp;)<sp/>noexcept<sp/>=<sp/>default;</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/>virtual<sp/>~ObservableInstrument()<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>default;</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/>virtual<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>AddCallback(ObservableCallbackPtr,<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*state)<sp/>noexcept<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/>virtual<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>RemoveCallback(ObservableCallbackPtr,<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*state)<sp/>noexcept<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="34"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight></codeline>
+<codeline lineno="36"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>metrics</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal">OPENTELEMETRY_END_NAMESPACE</highlight></codeline>
+    </programlisting>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/async_instruments.h"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,344 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1trace_1_1NoopSpan" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::trace::NoopSpan</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1trace_1_1Span" prot="public" virt="non-virtual">opentelemetry::trace::Span</basecompoundref>
+    <includes refid="trace_2noop_8h" local="no">noop.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1trace_1_1NoopSpan_1a8a7971f447ac8c583bea7aad5c709f3b" prot="private" static="no" mutable="no">
+        <type>std::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1Tracer" kindref="compound">Tracer</ref> &gt;</type>
+        <definition>std::shared_ptr&lt;Tracer&gt; opentelemetry::trace::NoopSpan::tracer_</definition>
+        <argsstring></argsstring>
+        <name>tracer_</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::tracer_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="87" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="87" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1trace_1_1NoopSpan_1a024f05b7f463452bf0cf6e8c4bb97d82" prot="private" static="no" mutable="no">
+        <type>nostd::unique_ptr&lt; SpanContext &gt;</type>
+        <definition>nostd::unique_ptr&lt;SpanContext&gt; opentelemetry::trace::NoopSpan::span_context_</definition>
+        <argsstring></argsstring>
+        <name>span_context_</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::span_context_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="88" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="88" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopSpan_1a1bb1e49dc81bed62bb26ef72afc27292" prot="public" static="no" const="no" explicit="yes" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::NoopSpan::NoopSpan</definition>
+        <argsstring>(const std::shared_ptr&lt; Tracer &gt; &amp;tracer) noexcept</argsstring>
+        <name>NoopSpan</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::NoopSpan</qualifiedname>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1Tracer" kindref="compound">Tracer</ref> &gt; &amp;</type>
+          <declname>tracer</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="40" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="40" bodyend="42"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopSpan_1af740de2304f1387ec8769ef4a216143e" prot="public" static="no" const="no" explicit="yes" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::NoopSpan::NoopSpan</definition>
+        <argsstring>(const std::shared_ptr&lt; Tracer &gt; &amp;tracer, nostd::unique_ptr&lt; SpanContext &gt; span_context) noexcept</argsstring>
+        <name>NoopSpan</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::NoopSpan</qualifiedname>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1Tracer" kindref="compound">Tracer</ref> &gt; &amp;</type>
+          <declname>tracer</declname>
+        </param>
+        <param>
+          <type>nostd::unique_ptr&lt; SpanContext &gt;</type>
+          <declname>span_context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="44" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="44" bodyend="47"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopSpan_1a837a863fe7935958ef32ce98065e6676" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::NoopSpan::SetAttribute</definition>
+        <argsstring>(nostd::string_view, const common::AttributeValue &amp;) noexcept override</argsstring>
+        <name>SetAttribute</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::SetAttribute</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1Span_1a25d3f4649b011b89fc7e01898e47ca27">SetAttribute</reimplements>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>const common::AttributeValue &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Sets an attribute on the <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> (ABI).</para>
+<para>If the <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> previously contained a mapping for the key, the old value is replaced.</para>
+<para>See comments about sampling in <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">opentelemetry::trace::Span</ref> </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="49" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="49" bodyend="51"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopSpan_1a300d5fa0e66bc081629af29e160d222d" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::NoopSpan::AddEvent</definition>
+        <argsstring>(nostd::string_view) noexcept override</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::AddEvent</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1Span_1a791a064b4e8b2f3f679a65c1fc4485ad">AddEvent</reimplements>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="53" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="53" bodyend="53"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopSpan_1a793000fea7fff2cdf5e41a18b4c8e301" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::NoopSpan::AddEvent</definition>
+        <argsstring>(nostd::string_view, common::SystemTimestamp) noexcept override</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::AddEvent</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1Span_1a81980dfa2a4de30b74954e6e54b86fb7">AddEvent</reimplements>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">common::SystemTimestamp</ref></type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="55" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="55" bodyend="57"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopSpan_1af7bc86f27b0263be625104d517b5ddf3" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::NoopSpan::AddEvent</definition>
+        <argsstring>(nostd::string_view, const common::KeyValueIterable &amp;) noexcept override</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::AddEvent</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1Span_1a1b04b7d55f4c6dc1419513af543e0e99">AddEvent</reimplements>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">common::KeyValueIterable</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="59" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="59" bodyend="61"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopSpan_1a96a1951369ab8da69b3264bde72b0c76" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::NoopSpan::AddEvent</definition>
+        <argsstring>(nostd::string_view, common::SystemTimestamp, const common::KeyValueIterable &amp;) noexcept override</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::AddEvent</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1Span_1a3fe5d810d6b6882f13dcdf3bfa77f74a">AddEvent</reimplements>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">common::SystemTimestamp</ref></type>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">common::KeyValueIterable</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="63" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="63" bodyend="66"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopSpan_1a421715f10341ad426ff76bcb0329d8d6" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::NoopSpan::SetStatus</definition>
+        <argsstring>(StatusCode, nostd::string_view) noexcept override</argsstring>
+        <name>SetStatus</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::SetStatus</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1Span_1a9042b08cdb0497a0876c41c7e843c284">SetStatus</reimplements>
+        <param>
+          <type>StatusCode</type>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="76" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="76" bodyend="76"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopSpan_1aba15a60b9d482055485c58f370869459" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::NoopSpan::UpdateName</definition>
+        <argsstring>(nostd::string_view) noexcept override</argsstring>
+        <name>UpdateName</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::UpdateName</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1Span_1ae5c66d0e6891ce392ab655b9c0959417">UpdateName</reimplements>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="78" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="78" bodyend="78"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopSpan_1a5d2668be96fe08bf4aea10cc81ea8bfd" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::NoopSpan::End</definition>
+        <argsstring>(const EndSpanOptions &amp;) noexcept override</argsstring>
+        <name>End</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::End</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1Span_1a92e58537aa0426ebb9b47769386d6060">End</reimplements>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1trace_1_1EndSpanOptions" kindref="compound">EndSpanOptions</ref> &amp;</type>
+          <declname>options</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Mark the end of the <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref>. Only the timing of the first End call for a given <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> will be recorded, and implementations are free to ignore all further calls. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>options</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>can be used to manually define span properties like the end timestamp </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="80" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="80" bodyend="80"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopSpan_1a110a1a3ce38976a8966b8b50c7471c8c" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::trace::NoopSpan::IsRecording</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>IsRecording</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::IsRecording</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1Span_1aa1822a1e0ad1258096df5d0c07ea98c8">IsRecording</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="82" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="82" bodyend="82"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopSpan_1a827abd396c02bab98aa06cfae76eee18" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>SpanContext</type>
+        <definition>SpanContext opentelemetry::trace::NoopSpan::GetContext</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetContext</name>
+        <qualifiedname>opentelemetry::trace::NoopSpan::GetContext</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1Span_1a00150ed93601ff2f8ab9d5841587b4e0">GetContext</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="84" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="84" bodyend="84"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>No-op implementation of <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref>. This class should not be used directly. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::trace::NoopSpan</label>
+        <link refid="classopentelemetry_1_1trace_1_1NoopSpan"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::trace::Span</label>
+        <link refid="classopentelemetry_1_1trace_1_1Span"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>opentelemetry::trace::NoopSpan</label>
+        <link refid="classopentelemetry_1_1trace_1_1NoopSpan"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::trace::Span</label>
+        <link refid="classopentelemetry_1_1trace_1_1Span"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="37" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="38" bodyend="89"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1a300d5fa0e66bc081629af29e160d222d" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1a793000fea7fff2cdf5e41a18b4c8e301" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1af7bc86f27b0263be625104d517b5ddf3" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1a96a1951369ab8da69b3264bde72b0c76" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a91e91416372ce05fde81049b7763e245" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Span::"><scope>opentelemetry::trace::NoopSpan</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a1ef18d22c3d7947148785f8d373e63e1" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Span::"><scope>opentelemetry::trace::NoopSpan</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1af048b9dd37b435fb6cce56171ef11270" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Span::"><scope>opentelemetry::trace::NoopSpan</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1ae8cc49641777f7900060ffde0cb04424" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::trace::Span::"><scope>opentelemetry::trace::NoopSpan</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1a5d2668be96fe08bf4aea10cc81ea8bfd" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>End</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1a827abd396c02bab98aa06cfae76eee18" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>GetContext</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1a110a1a3ce38976a8966b8b50c7471c8c" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>IsRecording</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1a1bb1e49dc81bed62bb26ef72afc27292" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>NoopSpan</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1af740de2304f1387ec8769ef4a216143e" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>NoopSpan</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1ad728c1520b3d2eaa8ec0ff51c27bb2f2" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1af1b685c07fedc6d12844aba23739a646" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1a837a863fe7935958ef32ce98065e6676" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>SetAttribute</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1a421715f10341ad426ff76bcb0329d8d6" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>SetStatus</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1af324cf9243681c6614742f24f76aa42e" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>Span</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a7290c2386fea54f8f190429c6347e2ec" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>Span</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1af11a4a194c7d37b973a0d5f01dac4337" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>Span</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1a024f05b7f463452bf0cf6e8c4bb97d82" prot="private" virt="non-virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>span_context_</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1a8a7971f447ac8c583bea7aad5c709f3b" prot="private" virt="non-virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>tracer_</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopSpan_1aba15a60b9d482055485c58f370869459" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>UpdateName</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a776318c04b10803d94d665358cd74caa" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopSpan</scope><name>~Span</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

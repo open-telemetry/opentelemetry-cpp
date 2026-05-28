@@ -1,0 +1,5 @@
+<map id="opentelemetry::sdk::trace::AlwaysOffSampler" name="opentelemetry::sdk::trace::AlwaysOffSampler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,93,196,133"/>
+<area shape="rect" id="Node000002" href="$classopentelemetry_1_1sdk_1_1trace_1_1Sampler.html" title=" " alt="" coords="27,5,175,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,59,103,93,98,93,98,59"/>
+</map>

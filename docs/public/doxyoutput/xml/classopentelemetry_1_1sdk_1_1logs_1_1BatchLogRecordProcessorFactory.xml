@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::logs::BatchLogRecordProcessorFactory</compoundname>
+    <includes refid="batch__log__record__processor__factory_8h" local="no">batch_log_record_processor_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorFactory_1a620fe535b8aca3150b2d1db4df9d73cf" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; LogRecordProcessor &gt; opentelemetry::sdk::logs::BatchLogRecordProcessorFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; LogRecordExporter &gt; &amp;&amp;exporter, const BatchLogRecordProcessorOptions &amp;options)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessorFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> &gt; &amp;&amp;</type>
+          <declname>exporter</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions" kindref="compound">BatchLogRecordProcessorOptions</ref> &amp;</type>
+          <declname>options</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_factory.h" line="30" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorFactory_1ac59bc9c0300fe8a0ec4a07bab240bf61" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; LogRecordProcessor &gt; opentelemetry::sdk::logs::BatchLogRecordProcessorFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; LogRecordExporter &gt; &amp;&amp;exporter, const BatchLogRecordProcessorOptions &amp;options, const BatchLogRecordProcessorRuntimeOptions &amp;runtime_options)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessorFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> &gt; &amp;&amp;</type>
+          <declname>exporter</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions" kindref="compound">BatchLogRecordProcessorOptions</ref> &amp;</type>
+          <declname>options</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorRuntimeOptions" kindref="compound">BatchLogRecordProcessorRuntimeOptions</ref> &amp;</type>
+          <declname>runtime_options</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_factory.h" line="36" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" kindref="compound">BatchLogRecordProcessor</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_factory.h" line="24" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_factory.h" bodystart="25" bodyend="40"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorFactory_1a620fe535b8aca3150b2d1db4df9d73cf" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessorFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorFactory_1ac59bc9c0300fe8a0ec4a07bab240bf61" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessorFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

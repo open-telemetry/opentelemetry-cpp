@@ -1,0 +1,424 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1baggage_1_1Baggage" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::baggage::Baggage</compoundname>
+    <sectiondef kind="public-static-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1baggage_1_1Baggage_1a255796e654244ffbae090fb8df9ebf60" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr size_t</type>
+        <definition>constexpr size_t opentelemetry::baggage::Baggage::kMaxKeyValuePairs</definition>
+        <argsstring></argsstring>
+        <name>kMaxKeyValuePairs</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::kMaxKeyValuePairs</qualifiedname>
+        <initializer>= 180</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="22" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="22" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1baggage_1_1Baggage_1a7c39fa6540eaf5a5bbfcce8a2c792fee" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr size_t</type>
+        <definition>constexpr size_t opentelemetry::baggage::Baggage::kMaxKeyValueSize</definition>
+        <argsstring></argsstring>
+        <name>kMaxKeyValueSize</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::kMaxKeyValueSize</qualifiedname>
+        <initializer>= 4096</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="23" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="23" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1baggage_1_1Baggage_1a65551779e7cba2c2556ac85c76be925d" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr size_t</type>
+        <definition>constexpr size_t opentelemetry::baggage::Baggage::kMaxSize</definition>
+        <argsstring></argsstring>
+        <name>kMaxSize</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::kMaxSize</qualifiedname>
+        <initializer>= 8192</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="24" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="24" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1baggage_1_1Baggage_1a4901c0d3c71fc4ac9e0805a85a668860" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr char</type>
+        <definition>constexpr char opentelemetry::baggage::Baggage::kKeyValueSeparator</definition>
+        <argsstring></argsstring>
+        <name>kKeyValueSeparator</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::kKeyValueSeparator</qualifiedname>
+        <initializer>= &apos;=&apos;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="25" column="25" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="25" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1baggage_1_1Baggage_1a8b6604da4ec12b22f4d1ca75b554eab8" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr char</type>
+        <definition>constexpr char opentelemetry::baggage::Baggage::kMembersSeparator</definition>
+        <argsstring></argsstring>
+        <name>kMembersSeparator</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::kMembersSeparator</qualifiedname>
+        <initializer>= &apos;,&apos;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="26" column="25" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="26" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1baggage_1_1Baggage_1a29dfa3b89b8d7d0732fcae78ee0cc356" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr char</type>
+        <definition>constexpr char opentelemetry::baggage::Baggage::kMetadataSeparator</definition>
+        <argsstring></argsstring>
+        <name>kMetadataSeparator</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::kMetadataSeparator</qualifiedname>
+        <initializer>= &apos;;&apos;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="27" column="25" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="27" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1baggage_1_1Baggage_1a7ac98e716aa4e1be6348220abda98f8f" prot="private" static="no" mutable="no">
+        <type>nostd::unique_ptr&lt; common::KeyValueProperties &gt;</type>
+        <definition>nostd::unique_ptr&lt;common::KeyValueProperties&gt; opentelemetry::baggage::Baggage::kv_properties_</definition>
+        <argsstring></argsstring>
+        <name>kv_properties_</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::kv_properties_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="299" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="299" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1abc384928bc826d453e5993da5dcf6024" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::baggage::Baggage::Baggage</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>Baggage</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::Baggage</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="29" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="29" bodyend="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1a270ddac47a372c8648991dcbe733b251" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::baggage::Baggage::Baggage</definition>
+        <argsstring>(size_t size) noexcept</argsstring>
+        <name>Baggage</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::Baggage</qualifiedname>
+        <param>
+          <type>size_t</type>
+          <declname>size</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="30" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="30" bodyend="30"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1af95faf5ae727f65deb8d4e9633aceeb6" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type></type>
+        <definition>opentelemetry::baggage::Baggage::Baggage</definition>
+        <argsstring>(const T &amp;keys_and_values) noexcept</argsstring>
+        <name>Baggage</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::Baggage</qualifiedname>
+        <param>
+          <type>const T &amp;</type>
+          <declname>keys_and_values</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="33" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="33" bodyend="35"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1a8b684af7bc00e10b3e49722ee7070293" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::baggage::Baggage::GetValue</definition>
+        <argsstring>(nostd::string_view key, std::string &amp;value) const noexcept</argsstring>
+        <name>GetValue</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::GetValue</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>std::string &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="46" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="46" bodyend="49"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1a7ef0d78d0663869971b8ccfc919f3ca2" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; Baggage &gt;</type>
+        <definition>nostd::shared_ptr&lt; Baggage &gt; opentelemetry::baggage::Baggage::Set</definition>
+        <argsstring>(const nostd::string_view &amp;key, const nostd::string_view &amp;value) noexcept</argsstring>
+        <name>Set</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::Set</qualifiedname>
+        <param>
+          <type>const nostd::string_view &amp;</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>const nostd::string_view &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="54" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="54" bodyend="80"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1a5c3f04d50d5eb4fa3c0af8f2998cc4ba" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::baggage::Baggage::GetAllEntries</definition>
+        <argsstring>(nostd::function_ref&lt; bool(nostd::string_view, nostd::string_view)&gt; callback) const noexcept</argsstring>
+        <name>GetAllEntries</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::GetAllEntries</qualifiedname>
+        <param>
+          <type>nostd::function_ref&lt; bool(nostd::string_view, nostd::string_view)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="84" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="84" bodyend="88"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1a99594a0693e221117bd0242bddd38c4f" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; Baggage &gt;</type>
+        <definition>nostd::shared_ptr&lt; Baggage &gt; opentelemetry::baggage::Baggage::Delete</definition>
+        <argsstring>(nostd::string_view key) noexcept</argsstring>
+        <name>Delete</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::Delete</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="94" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="94" bodyend="105"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1ab29bb2b402522ff1555845657120c98a" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::baggage::Baggage::ToHeader</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>ToHeader</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::ToHeader</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="163" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="163" bodyend="194"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1a318c35723bbe2eeecba1482bf6d67143" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>OPENTELEMETRY_API_SINGLETON nostd::shared_ptr&lt; Baggage &gt;</type>
+        <definition>static OPENTELEMETRY_API_SINGLETON nostd::shared_ptr&lt; Baggage &gt; opentelemetry::baggage::Baggage::GetDefault</definition>
+        <argsstring>()</argsstring>
+        <name>GetDefault</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::GetDefault</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="37" column="56" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="37" bodyend="41"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1a5ed9c70f5817809e982a24c11f61f069" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; Baggage &gt;</type>
+        <definition>static nostd::shared_ptr&lt; Baggage &gt; opentelemetry::baggage::Baggage::FromHeader</definition>
+        <argsstring>(nostd::string_view header) noexcept</argsstring>
+        <name>FromHeader</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::FromHeader</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>header</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="108" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="108" bodyend="160"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1affdf0aff982013e45943a989b6ec6777" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>static bool opentelemetry::baggage::Baggage::IsPrintableString</definition>
+        <argsstring>(nostd::string_view str)</argsstring>
+        <name>IsPrintableString</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::IsPrintableString</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>str</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="197" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="197" bodyend="208"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1a3e99e51b219ab24f2d2ca9d0af95f8d6" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>static bool opentelemetry::baggage::Baggage::IsValidKey</definition>
+        <argsstring>(nostd::string_view key)</argsstring>
+        <name>IsValidKey</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::IsValidKey</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="210" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="210" bodyend="210"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1afefd67a0cb19fe5e0365f71ffba00087" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>static bool opentelemetry::baggage::Baggage::IsValidValue</definition>
+        <argsstring>(nostd::string_view value)</argsstring>
+        <name>IsValidValue</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::IsValidValue</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="212" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="212" bodyend="212"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1ac607e70964df78892437a32c6f62c9e0" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::string</type>
+        <definition>static std::string opentelemetry::baggage::Baggage::UrlEncode</definition>
+        <argsstring>(nostd::string_view str)</argsstring>
+        <name>UrlEncode</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::UrlEncode</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>str</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="216" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="216" bodyend="244"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1baggage_1_1Baggage_1aac16dc317764464a99d99ababccd5e07" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::string</type>
+        <definition>static std::string opentelemetry::baggage::Baggage::UrlDecode</definition>
+        <argsstring>(nostd::string_view str, bool &amp;err)</argsstring>
+        <name>UrlDecode</name>
+        <qualifiedname>opentelemetry::baggage::Baggage::UrlDecode</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>str</declname>
+        </param>
+        <param>
+          <type>bool &amp;</type>
+          <declname>err</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="247" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="247" bodyend="295"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="19" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" bodystart="20" bodyend="300"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1abc384928bc826d453e5993da5dcf6024" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>Baggage</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a270ddac47a372c8648991dcbe733b251" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>Baggage</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1af95faf5ae727f65deb8d4e9633aceeb6" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>Baggage</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a99594a0693e221117bd0242bddd38c4f" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>Delete</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a5ed9c70f5817809e982a24c11f61f069" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>FromHeader</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a5c3f04d50d5eb4fa3c0af8f2998cc4ba" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>GetAllEntries</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a318c35723bbe2eeecba1482bf6d67143" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>GetDefault</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a8b684af7bc00e10b3e49722ee7070293" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>GetValue</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1affdf0aff982013e45943a989b6ec6777" prot="private" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>IsPrintableString</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a3e99e51b219ab24f2d2ca9d0af95f8d6" prot="private" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>IsValidKey</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1afefd67a0cb19fe5e0365f71ffba00087" prot="private" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>IsValidValue</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a4901c0d3c71fc4ac9e0805a85a668860" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>kKeyValueSeparator</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a255796e654244ffbae090fb8df9ebf60" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>kMaxKeyValuePairs</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a7c39fa6540eaf5a5bbfcce8a2c792fee" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>kMaxKeyValueSize</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a65551779e7cba2c2556ac85c76be925d" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>kMaxSize</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a8b6604da4ec12b22f4d1ca75b554eab8" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>kMembersSeparator</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a29dfa3b89b8d7d0732fcae78ee0cc356" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>kMetadataSeparator</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a7ac98e716aa4e1be6348220abda98f8f" prot="private" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>kv_properties_</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1a7ef0d78d0663869971b8ccfc919f3ca2" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>Set</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1ab29bb2b402522ff1555845657120c98a" prot="public" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>ToHeader</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1aac16dc317764464a99d99ababccd5e07" prot="private" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>UrlDecode</name></member>
+      <member refid="classopentelemetry_1_1baggage_1_1Baggage_1ac607e70964df78892437a32c6f62c9e0" prot="private" virt="non-virtual"><scope>opentelemetry::baggage::Baggage</scope><name>UrlEncode</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

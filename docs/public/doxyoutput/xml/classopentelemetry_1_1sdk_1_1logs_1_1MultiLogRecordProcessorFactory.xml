@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessorFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::logs::MultiLogRecordProcessorFactory</compoundname>
+    <includes refid="multi__log__record__processor__factory_8h" local="no">multi_log_record_processor_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessorFactory_1a7ccedeb7156e7d5cbb7b91cf1a8c7c2a" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; LogRecordProcessor &gt; opentelemetry::sdk::logs::MultiLogRecordProcessorFactory::Create</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; LogRecordProcessor &gt; &gt; &amp;&amp;processors)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessorFactory::Create</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor_factory.h" line="24" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor" kindref="compound">MultiLogRecordProcessor</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor_factory.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor_factory.h" bodystart="22" bodyend="26"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessorFactory_1a7ccedeb7156e7d5cbb7b91cf1a8c7c2a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessorFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::MeterSelector</compoundname>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1a8bb3faeb7054e69ce58a746080994a88" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::metrics::Predicate &gt;</type>
+        <definition>std::unique_ptr&lt;opentelemetry::sdk::metrics::Predicate&gt; opentelemetry::sdk::metrics::MeterSelector::name_filter_</definition>
+        <argsstring></argsstring>
+        <name>name_filter_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterSelector::name_filter_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" line="42" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" bodystart="42" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1aaee5ded1fd753e867f4bf67642f722b7" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::metrics::Predicate &gt;</type>
+        <definition>std::unique_ptr&lt;opentelemetry::sdk::metrics::Predicate&gt; opentelemetry::sdk::metrics::MeterSelector::version_filter_</definition>
+        <argsstring></argsstring>
+        <name>version_filter_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterSelector::version_filter_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" line="43" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" bodystart="43" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1a31c74ca954afd6377ea6327166740bba" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::metrics::Predicate &gt;</type>
+        <definition>std::unique_ptr&lt;opentelemetry::sdk::metrics::Predicate&gt; opentelemetry::sdk::metrics::MeterSelector::schema_filter_</definition>
+        <argsstring></argsstring>
+        <name>schema_filter_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterSelector::schema_filter_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" line="44" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" bodystart="44" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1a2d863ea9988c6d995d0bbf406c7263ca" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MeterSelector::MeterSelector</definition>
+        <argsstring>(const std::string &amp;name, const std::string &amp;version, const std::string &amp;schema)</argsstring>
+        <name>MeterSelector</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterSelector::MeterSelector</qualifiedname>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>version</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>schema</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" line="20" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" bodystart="20" bodyend="24"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1a86f61dd28652da44120b85551e7a9fab" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const opentelemetry::sdk::metrics::Predicate *</type>
+        <definition>const opentelemetry::sdk::metrics::Predicate * opentelemetry::sdk::metrics::MeterSelector::GetNameFilter</definition>
+        <argsstring>() const</argsstring>
+        <name>GetNameFilter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterSelector::GetNameFilter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" line="27" column="48" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" bodystart="27" bodyend="27"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1a15b927e6a9469efaa8798546255151f7" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const opentelemetry::sdk::metrics::Predicate *</type>
+        <definition>const opentelemetry::sdk::metrics::Predicate * opentelemetry::sdk::metrics::MeterSelector::GetVersionFilter</definition>
+        <argsstring>() const</argsstring>
+        <name>GetVersionFilter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterSelector::GetVersionFilter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" line="30" column="48" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" bodystart="30" bodyend="33"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1a7ac4864604796031534f6fff871d6c2b" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const opentelemetry::sdk::metrics::Predicate *</type>
+        <definition>const opentelemetry::sdk::metrics::Predicate * opentelemetry::sdk::metrics::MeterSelector::GetSchemaFilter</definition>
+        <argsstring>() const</argsstring>
+        <name>GetSchemaFilter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterSelector::GetSchemaFilter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" line="36" column="48" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" bodystart="36" bodyend="39"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" line="17" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector.h" bodystart="18" bodyend="45"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1a86f61dd28652da44120b85551e7a9fab" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterSelector</scope><name>GetNameFilter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1a7ac4864604796031534f6fff871d6c2b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterSelector</scope><name>GetSchemaFilter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1a15b927e6a9469efaa8798546255151f7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterSelector</scope><name>GetVersionFilter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1a2d863ea9988c6d995d0bbf406c7263ca" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterSelector</scope><name>MeterSelector</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1a8bb3faeb7054e69ce58a746080994a88" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterSelector</scope><name>name_filter_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1a31c74ca954afd6377ea6327166740bba" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterSelector</scope><name>schema_filter_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelector_1aaee5ded1fd753e867f4bf67642f722b7" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterSelector</scope><name>version_filter_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

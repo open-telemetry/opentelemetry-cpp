@@ -1,0 +1,475 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::MetricReader</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1af9177d5967c509af4ec398714d33c351" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kindref="compound">PushMetricExporter</ref> &gt;</type>
+        <definition>std::unique_ptr&lt;PushMetricExporter&gt; opentelemetry::sdk::metrics::PeriodicExportingMetricReader::exporter_</definition>
+        <argsstring></argsstring>
+        <name>exporter_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::exporter_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="56" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="56" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a8d529383400bc58688b28f157356133b" prot="private" static="no" mutable="no">
+        <type>std::chrono::milliseconds</type>
+        <definition>std::chrono::milliseconds opentelemetry::sdk::metrics::PeriodicExportingMetricReader::export_interval_millis_</definition>
+        <argsstring></argsstring>
+        <name>export_interval_millis_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::export_interval_millis_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="57" column="29" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="57" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1aae2fd001dbaf874059a831f6777d55c9" prot="private" static="no" mutable="no">
+        <type>std::chrono::milliseconds</type>
+        <definition>std::chrono::milliseconds opentelemetry::sdk::metrics::PeriodicExportingMetricReader::export_timeout_millis_</definition>
+        <argsstring></argsstring>
+        <name>export_timeout_millis_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::export_timeout_millis_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="58" column="29" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="58" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a4c645a63cb6088a69376c0a61a32278c" prot="private" static="no" mutable="no">
+        <type>std::atomic&lt; bool &gt;</type>
+        <definition>std::atomic&lt;bool&gt; opentelemetry::sdk::metrics::PeriodicExportingMetricReader::is_force_wakeup_background_worker_</definition>
+        <argsstring></argsstring>
+        <name>is_force_wakeup_background_worker_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::is_force_wakeup_background_worker_</qualifiedname>
+        <initializer>{false}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="64" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="64" bodyend="64"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1abbe35533df7d2673aa3d3d41c2e52c09" prot="private" static="no" mutable="no">
+        <type>std::atomic&lt; uint64_t &gt;</type>
+        <definition>std::atomic&lt;uint64_t&gt; opentelemetry::sdk::metrics::PeriodicExportingMetricReader::force_flush_pending_sequence_</definition>
+        <argsstring></argsstring>
+        <name>force_flush_pending_sequence_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::force_flush_pending_sequence_</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="65" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="65" bodyend="65"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a1861c3bb658302b551ccc92eb0383bf3" prot="private" static="no" mutable="no">
+        <type>std::atomic&lt; uint64_t &gt;</type>
+        <definition>std::atomic&lt;uint64_t&gt; opentelemetry::sdk::metrics::PeriodicExportingMetricReader::force_flush_notified_sequence_</definition>
+        <argsstring></argsstring>
+        <name>force_flush_notified_sequence_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::force_flush_notified_sequence_</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="66" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="66" bodyend="66"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a77306a68a61f97605d409d7e7836d058" prot="private" static="no" mutable="no">
+        <type>std::condition_variable</type>
+        <definition>std::condition_variable opentelemetry::sdk::metrics::PeriodicExportingMetricReader::cv_</definition>
+        <argsstring></argsstring>
+        <name>cv_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::cv_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="67" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="67" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a264e2929ccd87db7fc184a2cfaa00e6c" prot="private" static="no" mutable="no">
+        <type>std::condition_variable</type>
+        <definition>std::condition_variable opentelemetry::sdk::metrics::PeriodicExportingMetricReader::force_flush_cv_</definition>
+        <argsstring></argsstring>
+        <name>force_flush_cv_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::force_flush_cv_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="67" column="31" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="67" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a31c80f808934b1735670835b47854995" prot="private" static="no" mutable="no">
+        <type>std::mutex</type>
+        <definition>std::mutex opentelemetry::sdk::metrics::PeriodicExportingMetricReader::cv_m_</definition>
+        <argsstring></argsstring>
+        <name>cv_m_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::cv_m_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="68" column="14" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="68" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a941c281f3cf7e1772224aa89d09367af" prot="private" static="no" mutable="no">
+        <type>std::mutex</type>
+        <definition>std::mutex opentelemetry::sdk::metrics::PeriodicExportingMetricReader::force_flush_m_</definition>
+        <argsstring></argsstring>
+        <name>force_flush_m_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::force_flush_m_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="68" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="68" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1ae5eeed03db4b7d3a9b84703c72234a18" prot="private" static="no" mutable="no">
+        <type>std::shared_ptr&lt; sdk::common::ThreadInstrumentation &gt;</type>
+        <definition>std::shared_ptr&lt;sdk::common::ThreadInstrumentation&gt; opentelemetry::sdk::metrics::PeriodicExportingMetricReader::worker_thread_instrumentation_</definition>
+        <argsstring></argsstring>
+        <name>worker_thread_instrumentation_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::worker_thread_instrumentation_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="71" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="71" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a26f6e3dcca3a59eeb7d50544bd44c904" prot="private" static="no" mutable="no">
+        <type>std::thread</type>
+        <definition>std::thread opentelemetry::sdk::metrics::PeriodicExportingMetricReader::worker_thread_</definition>
+        <argsstring></argsstring>
+        <name>worker_thread_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::worker_thread_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="72" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="72" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1adaf57f4a86b5bc23ba6b5beb50cf2943" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::PeriodicExportingMetricReader</definition>
+        <argsstring>(std::unique_ptr&lt; PushMetricExporter &gt; exporter, const PeriodicExportingMetricReaderOptions &amp;options)</argsstring>
+        <name>PeriodicExportingMetricReader</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::PeriodicExportingMetricReader</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kindref="compound">PushMetricExporter</ref> &gt;</type>
+          <declname>exporter</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderOptions" kindref="compound">PeriodicExportingMetricReaderOptions</ref> &amp;</type>
+          <declname>options</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="32" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a4c560d62cc7cb6e5a620ac7094cb1bca" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::PeriodicExportingMetricReader</definition>
+        <argsstring>(std::unique_ptr&lt; PushMetricExporter &gt; exporter, const PeriodicExportingMetricReaderOptions &amp;options, const PeriodicExportingMetricReaderRuntimeOptions &amp;runtime_options)</argsstring>
+        <name>PeriodicExportingMetricReader</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::PeriodicExportingMetricReader</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kindref="compound">PushMetricExporter</ref> &gt;</type>
+          <declname>exporter</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderOptions" kindref="compound">PeriodicExportingMetricReaderOptions</ref> &amp;</type>
+          <declname>options</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderRuntimeOptions" kindref="compound">PeriodicExportingMetricReaderRuntimeOptions</ref> &amp;</type>
+          <declname>runtime_options</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="35" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1abb32513fa645067629a80a8604d29eb5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::~PeriodicExportingMetricReader</definition>
+        <argsstring>() override</argsstring>
+        <name>~PeriodicExportingMetricReader</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::~PeriodicExportingMetricReader</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="39" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a58585fb5ef8142dd24d12113908e4ae7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::PeriodicExportingMetricReader</definition>
+        <argsstring>(const PeriodicExportingMetricReader &amp;)=delete</argsstring>
+        <name>PeriodicExportingMetricReader</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::PeriodicExportingMetricReader</qualifiedname>
+        <param>
+          <type>const PeriodicExportingMetricReader &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="41" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a6ba0ea93466271e2d2003a3695d0fe0a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>PeriodicExportingMetricReader &amp;</type>
+        <definition>PeriodicExportingMetricReader &amp; opentelemetry::sdk::metrics::PeriodicExportingMetricReader::operator=</definition>
+        <argsstring>(const PeriodicExportingMetricReader &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::operator=</qualifiedname>
+        <param>
+          <type>const PeriodicExportingMetricReader &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="42" column="33"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1aa64d3c62439ac14458652cfd1887de11" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::PeriodicExportingMetricReader</definition>
+        <argsstring>(PeriodicExportingMetricReader &amp;&amp;)=delete</argsstring>
+        <name>PeriodicExportingMetricReader</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::PeriodicExportingMetricReader</qualifiedname>
+        <param>
+          <type>PeriodicExportingMetricReader &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="43" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a852c3dce192535c94f6559995c65d3f4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>PeriodicExportingMetricReader &amp;</type>
+        <definition>PeriodicExportingMetricReader &amp; opentelemetry::sdk::metrics::PeriodicExportingMetricReader::operator=</definition>
+        <argsstring>(PeriodicExportingMetricReader &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::operator=</qualifiedname>
+        <param>
+          <type>PeriodicExportingMetricReader &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="44" column="33"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1ac69259aae3e1e9d9dd1705536ff5cf16" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>AggregationTemporality</type>
+        <definition>AggregationTemporality opentelemetry::sdk::metrics::PeriodicExportingMetricReader::GetAggregationTemporality</definition>
+        <argsstring>(InstrumentType instrument_type) const noexcept override</argsstring>
+        <name>GetAggregationTemporality</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::GetAggregationTemporality</qualifiedname>
+        <param>
+          <type>InstrumentType</type>
+          <declname>instrument_type</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="46" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a017a9dfdab4372645abb61221f070a59" prot="private" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::PeriodicExportingMetricReader::OnForceFlush</definition>
+        <argsstring>(std::chrono::microseconds timeout) noexcept override</argsstring>
+        <name>OnForceFlush</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::OnForceFlush</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="50" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1acac6e1afdf8b3a99bbb5fae1666276fe" prot="private" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::PeriodicExportingMetricReader::OnShutDown</definition>
+        <argsstring>(std::chrono::microseconds timeout) noexcept override</argsstring>
+        <name>OnShutDown</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::OnShutDown</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="52" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1aba6b3ea874d385389da704065f502471" prot="private" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::PeriodicExportingMetricReader::OnInitialized</definition>
+        <argsstring>() noexcept override</argsstring>
+        <name>OnInitialized</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::OnInitialized</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="54" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a592e18d3638f056723cdb7cd5f279528" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::PeriodicExportingMetricReader::DoBackgroundWork</definition>
+        <argsstring>()</argsstring>
+        <name>DoBackgroundWork</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::DoBackgroundWork</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="60" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a6cb62b6e01648a571786b87e20dca4f3" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::PeriodicExportingMetricReader::CollectAndExportOnce</definition>
+        <argsstring>()</argsstring>
+        <name>CollectAndExportOnce</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReader::CollectAndExportOnce</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="61" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::sdk::metrics::MetricReader</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::sdk::metrics::MetricReader</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" line="28" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h" bodystart="29" bodyend="73"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1ac66b811f9a14ff773041f40a46233f3a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>Collect</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a6cb62b6e01648a571786b87e20dca4f3" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>CollectAndExportOnce</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a77306a68a61f97605d409d7e7836d058" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>cv_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a31c80f808934b1735670835b47854995" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>cv_m_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a592e18d3638f056723cdb7cd5f279528" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>DoBackgroundWork</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a8d529383400bc58688b28f157356133b" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>export_interval_millis_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1aae2fd001dbaf874059a831f6777d55c9" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>export_timeout_millis_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1af9177d5967c509af4ec398714d33c351" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>exporter_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a264e2929ccd87db7fc184a2cfaa00e6c" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>force_flush_cv_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a941c281f3cf7e1772224aa89d09367af" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>force_flush_m_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a1861c3bb658302b551ccc92eb0383bf3" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>force_flush_notified_sequence_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1abbe35533df7d2673aa3d3d41c2e52c09" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>force_flush_pending_sequence_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a2cb9d92ef82fc1f7996b7f23eb431ebc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>ForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1ac69259aae3e1e9d9dd1705536ff5cf16" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>GetAggregationTemporality</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a4c645a63cb6088a69376c0a61a32278c" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>is_force_wakeup_background_worker_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1af998e10d2dc26947e94297e064f05801" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>IsShutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a0985198d8444fa6797434a7610b436ac" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>MetricReader</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1aae6780957c372d84739a27311e990fa5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>MetricReader</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a548aa7fa897e6c791a1172941192ff75" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>MetricReader</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a017a9dfdab4372645abb61221f070a59" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>OnForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1aba6b3ea874d385389da704065f502471" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>OnInitialized</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1acac6e1afdf8b3a99bbb5fae1666276fe" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>OnShutDown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a6ba0ea93466271e2d2003a3695d0fe0a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a852c3dce192535c94f6559995c65d3f4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a59025ed628180c4039e5f57e295ac075" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::metrics::MetricReader::"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1adc3493e55373b25da84fda122999c27f" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::metrics::MetricReader::"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1adaf57f4a86b5bc23ba6b5beb50cf2943" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>PeriodicExportingMetricReader</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a4c560d62cc7cb6e5a620ac7094cb1bca" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>PeriodicExportingMetricReader</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a58585fb5ef8142dd24d12113908e4ae7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>PeriodicExportingMetricReader</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1aa64d3c62439ac14458652cfd1887de11" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>PeriodicExportingMetricReader</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1ac61640ae321fcaf8cce700b9db7e7b14" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>SetMetricProducer</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a0955a89e21ec0b535a2a5d98c1da5fc0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>Shutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1a26f6e3dcca3a59eeb7d50544bd44c904" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>worker_thread_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1ae5eeed03db4b7d3a9b84703c72234a18" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>worker_thread_instrumentation_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a6142bde6259181630f714a5381174efb" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>~MetricReader</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader_1abb32513fa645067629a80a8604d29eb5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReader</scope><name>~PeriodicExportingMetricReader</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::logs::LoggerProviderFactory</compoundname>
+    <includes refid="logger__provider__factory_8h" local="no">logger_provider_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1ab2f9eb5a50ffdd329133bd161b02731a" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt; opentelemetry::sdk::logs::LoggerProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; LogRecordProcessor &gt; &amp;&amp;processor)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &amp;&amp;</type>
+          <declname>processor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a LoggerProvider. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider_factory.h" line="30" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1a6ed8d4b678ac41e738f918c38df1803b" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt; opentelemetry::sdk::logs::LoggerProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; LogRecordProcessor &gt; &amp;&amp;processor, const opentelemetry::sdk::resource::Resource &amp;resource)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &amp;&amp;</type>
+          <declname>processor</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a LoggerProvider. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider_factory.h" line="36" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1a0546b91d882029b474a7b6adaf68ce27" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt; opentelemetry::sdk::logs::LoggerProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; LogRecordProcessor &gt; &amp;&amp;processor, const opentelemetry::sdk::resource::Resource &amp;resource, std::unique_ptr&lt; instrumentationscope::ScopeConfigurator&lt; LoggerConfig &gt; &gt; logger_configurator)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &amp;&amp;</type>
+          <declname>processor</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> &gt; &gt;</type>
+          <declname>logger_configurator</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a LoggerProvider. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider_factory.h" line="43" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1a160b645ef6abfeefa8d1f5708f0e59fa" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt; opentelemetry::sdk::logs::LoggerProviderFactory::Create</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; LogRecordProcessor &gt; &gt; &amp;&amp;processors)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a LoggerProvider. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider_factory.h" line="51" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1a3557ec60178f09749bbba34e2e5841a0" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt; opentelemetry::sdk::logs::LoggerProviderFactory::Create</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; LogRecordProcessor &gt; &gt; &amp;&amp;processors, const opentelemetry::sdk::resource::Resource &amp;resource)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a LoggerProvider. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider_factory.h" line="57" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1a22472cc0638212ad21e11ab6bc37c8d9" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt; opentelemetry::sdk::logs::LoggerProviderFactory::Create</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; LogRecordProcessor &gt; &gt; &amp;&amp;processors, const opentelemetry::sdk::resource::Resource &amp;resource, std::unique_ptr&lt; instrumentationscope::ScopeConfigurator&lt; LoggerConfig &gt; &gt; logger_configurator)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> &gt; &gt;</type>
+          <declname>logger_configurator</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a LoggerProvider. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider_factory.h" line="64" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1a9a53f095ee72b5311dcaf9b3af553b15" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::logs::LoggerProvider &gt; opentelemetry::sdk::logs::LoggerProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; LoggerContext &gt; context)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> &gt;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a LoggerProvider. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider_factory.h" line="72" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for LoggerProvider. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider_factory.h" line="24" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider_factory.h" bodystart="25" bodyend="74"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1ab2f9eb5a50ffdd329133bd161b02731a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1a6ed8d4b678ac41e738f918c38df1803b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1a0546b91d882029b474a7b6adaf68ce27" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1a160b645ef6abfeefa8d1f5708f0e59fa" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1a3557ec60178f09749bbba34e2e5841a0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1a22472cc0638212ad21e11ab6bc37c8d9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory_1a9a53f095ee72b5311dcaf9b3af553b15" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerProviderFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

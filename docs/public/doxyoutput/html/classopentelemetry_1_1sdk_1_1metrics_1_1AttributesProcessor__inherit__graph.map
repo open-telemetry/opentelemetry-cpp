@@ -1,0 +1,9 @@
+<map id="opentelemetry::sdk::metrics::AttributesProcessor" name="opentelemetry::sdk::metrics::AttributesProcessor">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,91,220,131"/>
+<area shape="rect" id="Node000002" href="$classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAttributesProcessor.html" title=" " alt="" coords="271,5,469,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,85,279,58,281,63,193,90"/>
+<area shape="rect" id="Node000003" href="$classopentelemetry_1_1sdk_1_1metrics_1_1FilteringAttributesProcessor.html" title=" " alt="" coords="268,84,472,139"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,109,268,109,268,114,234,114"/>
+<area shape="rect" id="Node000004" href="$classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor.html" title=" " alt="" coords="275,163,465,217"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="193,133,281,160,279,165,191,138"/>
+</map>

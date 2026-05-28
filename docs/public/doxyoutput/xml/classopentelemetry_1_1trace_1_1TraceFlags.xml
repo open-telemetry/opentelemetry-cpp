@@ -1,0 +1,255 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1trace_1_1TraceFlags" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::trace::TraceFlags</compoundname>
+    <sectiondef kind="public-static-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1trace_1_1TraceFlags_1a6b74a4d8086dbeee071bdb97be5759a6" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr uint8_t</type>
+        <definition>constexpr uint8_t opentelemetry::trace::TraceFlags::kIsSampled</definition>
+        <argsstring></argsstring>
+        <name>kIsSampled</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::kIsSampled</qualifiedname>
+        <initializer>= 1</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="21" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="21" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1trace_1_1TraceFlags_1a8708a31f854fe171c645aa0e8a207be6" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr uint8_t</type>
+        <definition>constexpr uint8_t opentelemetry::trace::TraceFlags::kIsRandom</definition>
+        <argsstring></argsstring>
+        <name>kIsRandom</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::kIsRandom</qualifiedname>
+        <initializer>= 2</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="22" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="22" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1trace_1_1TraceFlags_1a4631f428eff351aec0039d46375a211b" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr uint8_t</type>
+        <definition>constexpr uint8_t opentelemetry::trace::TraceFlags::kAllW3CTraceContext1Flags</definition>
+        <argsstring></argsstring>
+        <name>kAllW3CTraceContext1Flags</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::kAllW3CTraceContext1Flags</qualifiedname>
+        <initializer>= kIsSampled</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Valid flags in W3C Trace Context version 1. See <ulink url="https://www.w3.org/TR/trace-context-1/#trace-flags">https://www.w3.org/TR/trace-context-1/#trace-flags</ulink> </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="28" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="28" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1trace_1_1TraceFlags_1a0c33326168c67b3833869d7052878306" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr uint8_t</type>
+        <definition>constexpr uint8_t opentelemetry::trace::TraceFlags::kAllW3CTraceContext2Flags</definition>
+        <argsstring></argsstring>
+        <name>kAllW3CTraceContext2Flags</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::kAllW3CTraceContext2Flags</qualifiedname>
+        <initializer>= kIsSampled | kIsRandom</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Valid flags in W3C Trace Context version 2. See <ulink url="https://www.w3.org/TR/trace-context-2/#trace-flags">https://www.w3.org/TR/trace-context-2/#trace-flags</ulink> </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="34" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="34" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1trace_1_1TraceFlags_1abc6b0e7972b063e408257f1f3246d6fb" prot="private" static="no" mutable="no">
+        <type>uint8_t</type>
+        <definition>uint8_t opentelemetry::trace::TraceFlags::rep_</definition>
+        <argsstring></argsstring>
+        <name>rep_</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::rep_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="62" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="62" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceFlags_1a98005a56eb7edaa8b18949049ccf7bfa" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::TraceFlags::TraceFlags</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>TraceFlags</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::TraceFlags</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="36" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="36" bodyend="36"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceFlags_1ac30df83fa2173e0be4bd13777d790b8b" prot="public" static="no" const="no" explicit="yes" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::TraceFlags::TraceFlags</definition>
+        <argsstring>(uint8_t flags) noexcept</argsstring>
+        <name>TraceFlags</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::TraceFlags</qualifiedname>
+        <param>
+          <type>uint8_t</type>
+          <declname>flags</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="38" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="38" bodyend="38"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceFlags_1a67486859980025c37dae5b625ee4bb8a" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::trace::TraceFlags::IsSampled</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>IsSampled</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::IsSampled</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="40" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="40" bodyend="40"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceFlags_1abb8fe814922a1346844ebb6a16696618" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::trace::TraceFlags::IsRandom</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>IsRandom</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::IsRandom</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="42" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="42" bodyend="42"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceFlags_1a411cd6458dc1ff0732439ca74875b42d" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::TraceFlags::ToLowerBase16</definition>
+        <argsstring>(nostd::span&lt; char, 2 &gt; buffer) const noexcept</argsstring>
+        <name>ToLowerBase16</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::ToLowerBase16</qualifiedname>
+        <param>
+          <type>nostd::span&lt; char, 2 &gt;</type>
+          <declname>buffer</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="45" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="45" bodyend="50"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceFlags_1a1585fb021e16798522afa06eb23b8d09" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>uint8_t</type>
+        <definition>uint8_t opentelemetry::trace::TraceFlags::flags</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>flags</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::flags</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="52" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="52" bodyend="52"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceFlags_1aa26f4792665167d5c00057053105218b" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::trace::TraceFlags::operator==</definition>
+        <argsstring>(const TraceFlags &amp;that) const noexcept</argsstring>
+        <name>operator==</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::operator==</qualifiedname>
+        <param>
+          <type>const TraceFlags &amp;</type>
+          <declname>that</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="54" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="54" bodyend="54"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceFlags_1a7ecda8293594724518dcc4a792deacee" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::trace::TraceFlags::operator!=</definition>
+        <argsstring>(const TraceFlags &amp;that) const noexcept</argsstring>
+        <name>operator!=</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::operator!=</qualifiedname>
+        <param>
+          <type>const TraceFlags &amp;</type>
+          <declname>that</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="56" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="56" bodyend="56"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceFlags_1a3bda284865b87a266390820ba707267b" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::TraceFlags::CopyBytesTo</definition>
+        <argsstring>(nostd::span&lt; uint8_t, 1 &gt; dest) const noexcept</argsstring>
+        <name>CopyBytesTo</name>
+        <qualifiedname>opentelemetry::trace::TraceFlags::CopyBytesTo</qualifiedname>
+        <param>
+          <type>nostd::span&lt; uint8_t, 1 &gt;</type>
+          <declname>dest</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="59" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="59" bodyend="59"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" line="18" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_flags.h" bodystart="19" bodyend="63"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1a3bda284865b87a266390820ba707267b" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>CopyBytesTo</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1a1585fb021e16798522afa06eb23b8d09" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>flags</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1abb8fe814922a1346844ebb6a16696618" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>IsRandom</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1a67486859980025c37dae5b625ee4bb8a" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>IsSampled</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1a4631f428eff351aec0039d46375a211b" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>kAllW3CTraceContext1Flags</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1a0c33326168c67b3833869d7052878306" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>kAllW3CTraceContext2Flags</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1a8708a31f854fe171c645aa0e8a207be6" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>kIsRandom</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1a6b74a4d8086dbeee071bdb97be5759a6" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>kIsSampled</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1a7ecda8293594724518dcc4a792deacee" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>operator!=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1aa26f4792665167d5c00057053105218b" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>operator==</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1abc6b0e7972b063e408257f1f3246d6fb" prot="private" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>rep_</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1a411cd6458dc1ff0732439ca74875b42d" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>ToLowerBase16</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1a98005a56eb7edaa8b18949049ccf7bfa" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>TraceFlags</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceFlags_1ac30df83fa2173e0be4bd13777d790b8b" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceFlags</scope><name>TraceFlags</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

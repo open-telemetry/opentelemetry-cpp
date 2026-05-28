@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentEqualNameCaseInsensitive" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::InstrumentEqualNameCaseInsensitive</compoundname>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentEqualNameCaseInsensitive_1a996b48172ba9148e0afe2522788941a9" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::InstrumentEqualNameCaseInsensitive::operator()</definition>
+        <argsstring>(const InstrumentDescriptor &amp;lhs, const InstrumentDescriptor &amp;rhs) const noexcept</argsstring>
+        <name>operator()</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentEqualNameCaseInsensitive::operator()</qualifiedname>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>lhs</declname>
+        </param>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>rhs</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="162" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="162" bodyend="190"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="160" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="161" bodyend="191"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentEqualNameCaseInsensitive_1a996b48172ba9148e0afe2522788941a9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentEqualNameCaseInsensitive</scope><name>operator()</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

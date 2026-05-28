@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1sdk_1_1instrumentationscope" kind="namespace" language="C++">
+    <compoundname>opentelemetry::sdk::instrumentationscope</compoundname>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope" prot="public">opentelemetry::sdk::instrumentationscope::InstrumentationScope</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" prot="public">opentelemetry::sdk::instrumentationscope::ScopeConfigurator</innerclass>
+    <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="instrumentation__scope_8h_1ad7d55f6801278dfd4ef154ea08a86c23" prot="public" static="no">
+        <type>opentelemetry::sdk::common::AttributeMap</type>
+        <definition>using opentelemetry::sdk::instrumentationscope::InstrumentationScopeAttributes = typedef opentelemetry::sdk::common::AttributeMap</definition>
+        <argsstring></argsstring>
+        <name>InstrumentationScopeAttributes</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScopeAttributes</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="24" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="24" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="21" column="1"/>
+  </compounddef>
+</doxygen>

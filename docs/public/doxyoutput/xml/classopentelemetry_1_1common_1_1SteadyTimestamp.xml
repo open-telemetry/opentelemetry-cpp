@@ -1,0 +1,203 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1common_1_1SteadyTimestamp" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::common::SteadyTimestamp</compoundname>
+    <includes refid="timestamp_8h" local="no">timestamp.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1common_1_1SteadyTimestamp_1abe8773b484be23680fd95b8c626761d5" prot="private" static="no" mutable="no">
+        <type>int64_t</type>
+        <definition>int64_t opentelemetry::common::SteadyTimestamp::nanos_since_epoch_</definition>
+        <argsstring></argsstring>
+        <name>nanos_since_epoch_</name>
+        <qualifiedname>opentelemetry::common::SteadyTimestamp::nanos_since_epoch_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="169" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="169" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SteadyTimestamp_1ae6fb3705eed4881327108fda1265bdb4" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::common::SteadyTimestamp::SteadyTimestamp</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>SteadyTimestamp</name>
+        <qualifiedname>opentelemetry::common::SteadyTimestamp::SteadyTimestamp</qualifiedname>
+        <briefdescription>
+<para>Initializes a monotonic timestamp pointing to the start of the epoch. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="104" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="104" bodyend="104"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SteadyTimestamp_1acef1396f504a13043040d134383420fc" prot="public" static="no" const="no" explicit="yes" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Rep</type>
+          </param>
+          <param>
+            <type>class Period</type>
+          </param>
+        </templateparamlist>
+        <type></type>
+        <definition>opentelemetry::common::SteadyTimestamp::SteadyTimestamp</definition>
+        <argsstring>(const std::chrono::duration&lt; Rep, Period &gt; &amp;time_since_epoch) noexcept</argsstring>
+        <name>SteadyTimestamp</name>
+        <qualifiedname>opentelemetry::common::SteadyTimestamp::SteadyTimestamp</qualifiedname>
+        <param>
+          <type>const std::chrono::duration&lt; Rep, Period &gt; &amp;</type>
+          <declname>time_since_epoch</declname>
+        </param>
+        <briefdescription>
+<para>Initializes a monotonic timestamp from a duration. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>time_since_epoch</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time elapsed since the beginning of the epoch. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="112" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="112" bodyend="115"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SteadyTimestamp_1ae5d3935aa3728783ccd84ebe2842e2e8" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::common::SteadyTimestamp::SteadyTimestamp</definition>
+        <argsstring>(const std::chrono::steady_clock::time_point &amp;time_point) noexcept</argsstring>
+        <name>SteadyTimestamp</name>
+        <qualifiedname>opentelemetry::common::SteadyTimestamp::SteadyTimestamp</qualifiedname>
+        <param>
+          <type>const std::chrono::steady_clock::time_point &amp;</type>
+          <declname>time_point</declname>
+        </param>
+        <briefdescription>
+<para>Initializes a monotonic timestamp based on a point in time. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>time_point</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A point in time. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="122" column="4" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="122" bodyend="124"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SteadyTimestamp_1a28ce65fe8396b3034ce95a1743ee2b12" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::common::SteadyTimestamp::operator std::chrono::steady_clock::time_point</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>operator std::chrono::steady_clock::time_point</name>
+        <qualifiedname>opentelemetry::common::SteadyTimestamp::time_point</qualifiedname>
+        <briefdescription>
+<para>Returns a time point for the time stamp. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>A time point corresponding to the time stamp. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="131" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="131" bodyend="136"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SteadyTimestamp_1a7ee1531b91d7ad17309f29badf278fb8" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>std::chrono::nanoseconds</type>
+        <definition>std::chrono::nanoseconds opentelemetry::common::SteadyTimestamp::time_since_epoch</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>time_since_epoch</name>
+        <qualifiedname>opentelemetry::common::SteadyTimestamp::time_since_epoch</qualifiedname>
+        <briefdescription>
+<para>Returns the nanoseconds since the beginning of the epoch. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Elapsed nanoseconds since the beginning of the epoch for this timestamp. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="143" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="143" bodyend="146"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SteadyTimestamp_1a30b98a662ac63ee76a69129c968bf5a9" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::common::SteadyTimestamp::operator==</definition>
+        <argsstring>(const SteadyTimestamp &amp;other) const noexcept</argsstring>
+        <name>operator==</name>
+        <qualifiedname>opentelemetry::common::SteadyTimestamp::operator==</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1SteadyTimestamp" kindref="compound">SteadyTimestamp</ref> &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+<para>Compare two steady time stamps. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>true if the two time stamps are equal. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="153" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="153" bodyend="156"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SteadyTimestamp_1a6cba92201ee2ca5fc679f968f6e78e72" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::common::SteadyTimestamp::operator!=</definition>
+        <argsstring>(const SteadyTimestamp &amp;other) const noexcept</argsstring>
+        <name>operator!=</name>
+        <qualifiedname>opentelemetry::common::SteadyTimestamp::operator!=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1SteadyTimestamp" kindref="compound">SteadyTimestamp</ref> &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+<para>Compare two steady time stamps for inequality. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>true if the two time stamps are not equal. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="163" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="163" bodyend="166"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+<para>A timepoint relative to the monotonic clock epoch. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>This is used for calculating the duration of an operation. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="98" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="99" bodyend="170"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1common_1_1SteadyTimestamp_1abe8773b484be23680fd95b8c626761d5" prot="private" virt="non-virtual"><scope>opentelemetry::common::SteadyTimestamp</scope><name>nanos_since_epoch_</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SteadyTimestamp_1a28ce65fe8396b3034ce95a1743ee2b12" prot="public" virt="non-virtual"><scope>opentelemetry::common::SteadyTimestamp</scope><name>operator std::chrono::steady_clock::time_point</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SteadyTimestamp_1a6cba92201ee2ca5fc679f968f6e78e72" prot="public" virt="non-virtual"><scope>opentelemetry::common::SteadyTimestamp</scope><name>operator!=</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SteadyTimestamp_1a30b98a662ac63ee76a69129c968bf5a9" prot="public" virt="non-virtual"><scope>opentelemetry::common::SteadyTimestamp</scope><name>operator==</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SteadyTimestamp_1ae6fb3705eed4881327108fda1265bdb4" prot="public" virt="non-virtual"><scope>opentelemetry::common::SteadyTimestamp</scope><name>SteadyTimestamp</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SteadyTimestamp_1acef1396f504a13043040d134383420fc" prot="public" virt="non-virtual"><scope>opentelemetry::common::SteadyTimestamp</scope><name>SteadyTimestamp</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SteadyTimestamp_1ae5d3935aa3728783ccd84ebe2842e2e8" prot="public" virt="non-virtual"><scope>opentelemetry::common::SteadyTimestamp</scope><name>SteadyTimestamp</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SteadyTimestamp_1a7ee1531b91d7ad17309f29badf278fb8" prot="public" virt="non-virtual"><scope>opentelemetry::common::SteadyTimestamp</scope><name>time_since_epoch</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

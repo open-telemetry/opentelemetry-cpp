@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::SamplingResult</compoundname>
+    <includes refid="sampler_8h" local="no">sampler.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult_1a0afbe74f3043e3bb9d14eab667138b0f" prot="public" static="no" mutable="no">
+        <type>Decision</type>
+        <definition>Decision opentelemetry::sdk::trace::SamplingResult::decision</definition>
+        <argsstring></argsstring>
+        <name>decision</name>
+        <qualifiedname>opentelemetry::sdk::trace::SamplingResult::decision</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" line="55" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" bodystart="55" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult_1a632d2aa661b86879c1395f92e00cad42" prot="public" static="no" mutable="no">
+        <type>std::unique_ptr&lt; const std::map&lt; std::string, opentelemetry::common::AttributeValue &gt; &gt;</type>
+        <definition>std::unique_ptr&lt;const std::map&lt;std::string, opentelemetry::common::AttributeValue&gt; &gt; opentelemetry::sdk::trace::SamplingResult::attributes</definition>
+        <argsstring></argsstring>
+        <name>attributes</name>
+        <qualifiedname>opentelemetry::sdk::trace::SamplingResult::attributes</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" line="57" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" bodystart="57" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult_1a070da9ee54a428d71d565894191891c9" prot="public" static="no" mutable="no">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1TraceState" kindref="compound">opentelemetry::trace::TraceState</ref> &gt;</type>
+        <definition>nostd::shared_ptr&lt;opentelemetry::trace::TraceState&gt; opentelemetry::sdk::trace::SamplingResult::trace_state</definition>
+        <argsstring></argsstring>
+        <name>trace_state</name>
+        <qualifiedname>opentelemetry::sdk::trace::SamplingResult::trace_state</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" line="59" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" bodystart="59" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult_1a56d45cbed942d6854b70a2b55d1cf5a5" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::trace::SamplingResult::IsRecording</definition>
+        <argsstring>()</argsstring>
+        <name>IsRecording</name>
+        <qualifiedname>opentelemetry::sdk::trace::SamplingResult::IsRecording</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" line="61" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" bodystart="61" bodyend="64"/>
+      </memberdef>
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult_1a3c354b73ba519824318617bd431fcd4d" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::trace::SamplingResult::IsSampled</definition>
+        <argsstring>()</argsstring>
+        <name>IsSampled</name>
+        <qualifiedname>opentelemetry::sdk::trace::SamplingResult::IsSampled</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" line="65" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" bodystart="65" bodyend="65"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>The output of ShouldSample. It contains a sampling Decision and a set of Span Attributes. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" line="53" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" bodystart="54" bodyend="66"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult_1a632d2aa661b86879c1395f92e00cad42" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SamplingResult</scope><name>attributes</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult_1a0afbe74f3043e3bb9d14eab667138b0f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SamplingResult</scope><name>decision</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult_1a56d45cbed942d6854b70a2b55d1cf5a5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SamplingResult</scope><name>IsRecording</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult_1a3c354b73ba519824318617bd431fcd4d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SamplingResult</scope><name>IsSampled</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult_1a070da9ee54a428d71d565894191891c9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SamplingResult</scope><name>trace_state</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

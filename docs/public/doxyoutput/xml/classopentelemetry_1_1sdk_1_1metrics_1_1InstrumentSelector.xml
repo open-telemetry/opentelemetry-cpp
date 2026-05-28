@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::InstrumentSelector</compoundname>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1a50ba54561d0588f82f2ef40c8ddb7ddb" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::metrics::Predicate &gt;</type>
+        <definition>std::unique_ptr&lt;opentelemetry::sdk::metrics::Predicate&gt; opentelemetry::sdk::metrics::InstrumentSelector::name_filter_</definition>
+        <argsstring></argsstring>
+        <name>name_filter_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentSelector::name_filter_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" line="37" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" bodystart="37" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1a206eb3c6c3e0bc72fea82efa61c1636d" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::metrics::Predicate &gt;</type>
+        <definition>std::unique_ptr&lt;opentelemetry::sdk::metrics::Predicate&gt; opentelemetry::sdk::metrics::InstrumentSelector::unit_filter_</definition>
+        <argsstring></argsstring>
+        <name>unit_filter_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentSelector::unit_filter_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" line="38" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" bodystart="38" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1a6c0a288b2433c8751b07cadb44778397" prot="private" static="no" mutable="no">
+        <type>opentelemetry::sdk::metrics::InstrumentType</type>
+        <definition>opentelemetry::sdk::metrics::InstrumentType opentelemetry::sdk::metrics::InstrumentSelector::instrument_type_</definition>
+        <argsstring></argsstring>
+        <name>instrument_type_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentSelector::instrument_type_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" line="39" column="47" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" bodystart="39" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1a86add07bcd5bfa67bb24c5adf3326308" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::InstrumentSelector::InstrumentSelector</definition>
+        <argsstring>(opentelemetry::sdk::metrics::InstrumentType instrument_type, const std::string &amp;name, const std::string &amp;units)</argsstring>
+        <name>InstrumentSelector</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentSelector::InstrumentSelector</qualifiedname>
+        <param>
+          <type>opentelemetry::sdk::metrics::InstrumentType</type>
+          <declname>instrument_type</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>units</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" line="21" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" bodystart="21" bodyend="27"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1a30828f9ba82bb0dca02b1ba470182136" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const opentelemetry::sdk::metrics::Predicate *</type>
+        <definition>const opentelemetry::sdk::metrics::Predicate * opentelemetry::sdk::metrics::InstrumentSelector::GetNameFilter</definition>
+        <argsstring>() const</argsstring>
+        <name>GetNameFilter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentSelector::GetNameFilter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" line="30" column="48" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" bodystart="30" bodyend="30"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1a48f6a091d2ee24069573c51b3c6c4f4a" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>const opentelemetry::sdk::metrics::Predicate *</type>
+        <definition>const opentelemetry::sdk::metrics::Predicate * opentelemetry::sdk::metrics::InstrumentSelector::GetUnitFilter</definition>
+        <argsstring>() const</argsstring>
+        <name>GetUnitFilter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentSelector::GetUnitFilter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" line="32" column="48" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" bodystart="32" bodyend="32"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1ac1c860e3eaf1c17757e47122305438c8" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>InstrumentType</type>
+        <definition>InstrumentType opentelemetry::sdk::metrics::InstrumentSelector::GetInstrumentType</definition>
+        <argsstring>()</argsstring>
+        <name>GetInstrumentType</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentSelector::GetInstrumentType</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" line="34" column="18" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" bodystart="34" bodyend="34"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" line="18" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector.h" bodystart="19" bodyend="40"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1ac1c860e3eaf1c17757e47122305438c8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentSelector</scope><name>GetInstrumentType</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1a30828f9ba82bb0dca02b1ba470182136" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentSelector</scope><name>GetNameFilter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1a48f6a091d2ee24069573c51b3c6c4f4a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentSelector</scope><name>GetUnitFilter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1a6c0a288b2433c8751b07cadb44778397" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentSelector</scope><name>instrument_type_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1a86add07bcd5bfa67bb24c5adf3326308" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentSelector</scope><name>InstrumentSelector</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1a50ba54561d0588f82f2ef40c8ddb7ddb" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentSelector</scope><name>name_filter_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelector_1a206eb3c6c3e0bc72fea82efa61c1636d" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentSelector</scope><name>unit_filter_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

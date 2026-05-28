@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentMetaDataValidator" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::InstrumentMetaDataValidator</compoundname>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentMetaDataValidator_1affbfe23851e46ee2e53c1080c08ef249" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::InstrumentMetaDataValidator::InstrumentMetaDataValidator</definition>
+        <argsstring>()</argsstring>
+        <name>InstrumentMetaDataValidator</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentMetaDataValidator::InstrumentMetaDataValidator</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instrument_metadata_validator.h" line="21" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentMetaDataValidator_1aa66f86ebcef7a59a766895db533b0eb8" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::InstrumentMetaDataValidator::ValidateName</definition>
+        <argsstring>(nostd::string_view name) const</argsstring>
+        <name>ValidateName</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentMetaDataValidator::ValidateName</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instrument_metadata_validator.h" line="22" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentMetaDataValidator_1a615ce3dcfc1f8d599e20fc1631a246c6" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::InstrumentMetaDataValidator::ValidateUnit</definition>
+        <argsstring>(nostd::string_view unit) const</argsstring>
+        <name>ValidateUnit</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentMetaDataValidator::ValidateUnit</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instrument_metadata_validator.h" line="23" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentMetaDataValidator_1a507b3d8084045e2064b2414778e65ad3" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::InstrumentMetaDataValidator::ValidateDescription</definition>
+        <argsstring>(nostd::string_view description) const</argsstring>
+        <name>ValidateDescription</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentMetaDataValidator::ValidateDescription</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instrument_metadata_validator.h" line="24" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instrument_metadata_validator.h" line="18" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instrument_metadata_validator.h" bodystart="19" bodyend="31"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentMetaDataValidator_1affbfe23851e46ee2e53c1080c08ef249" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentMetaDataValidator</scope><name>InstrumentMetaDataValidator</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentMetaDataValidator_1a507b3d8084045e2064b2414778e65ad3" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentMetaDataValidator</scope><name>ValidateDescription</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentMetaDataValidator_1aa66f86ebcef7a59a766895db533b0eb8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentMetaDataValidator</scope><name>ValidateName</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentMetaDataValidator_1a615ce3dcfc1f8d599e20fc1631a246c6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentMetaDataValidator</scope><name>ValidateUnit</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

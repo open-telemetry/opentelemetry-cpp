@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1logs_1_1EventId" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::logs::EventId</compoundname>
+    <includes refid="event__id_8h" local="no">event_id.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1logs_1_1EventId_1a88e9dc907aa9fdf1ded67ac8b9904d77" prot="public" static="no" mutable="no">
+        <type>int64_t</type>
+        <definition>int64_t opentelemetry::logs::EventId::id_</definition>
+        <argsstring></argsstring>
+        <name>id_</name>
+        <qualifiedname>opentelemetry::logs::EventId::id_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/event_id.h" line="32" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/event_id.h" bodystart="32" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1logs_1_1EventId_1a5107e5e0fc86e2d71ed2296e38dea0a8" prot="public" static="no" mutable="no">
+        <type>nostd::unique_ptr&lt; char[]&gt;</type>
+        <definition>nostd::unique_ptr&lt;char[]&gt; opentelemetry::logs::EventId::name_</definition>
+        <argsstring></argsstring>
+        <name>name_</name>
+        <qualifiedname>opentelemetry::logs::EventId::name_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/event_id.h" line="33" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/event_id.h" bodystart="33" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1EventId_1abeb96bb1d24bf62d9383ce0ca2c51212" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::logs::EventId::EventId</definition>
+        <argsstring>(int64_t id, nostd::string_view name) noexcept</argsstring>
+        <name>EventId</name>
+        <qualifiedname>opentelemetry::logs::EventId::EventId</qualifiedname>
+        <param>
+          <type>int64_t</type>
+          <declname>id</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/event_id.h" line="22" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/event_id.h" bodystart="22" bodyend="27"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1EventId_1acb4c82d3296344492197f852bf767220" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::logs::EventId::EventId</definition>
+        <argsstring>(int64_t id) noexcept</argsstring>
+        <name>EventId</name>
+        <qualifiedname>opentelemetry::logs::EventId::EventId</qualifiedname>
+        <param>
+          <type>int64_t</type>
+          <declname>id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/event_id.h" line="29" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/event_id.h" bodystart="29" bodyend="29"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classopentelemetry_1_1logs_1_1EventId" kindref="compound">EventId</ref> class which acts the Id of the event with an optional name. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/event_id.h" line="19" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/event_id.h" bodystart="20" bodyend="34"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1logs_1_1EventId_1abeb96bb1d24bf62d9383ce0ca2c51212" prot="public" virt="non-virtual"><scope>opentelemetry::logs::EventId</scope><name>EventId</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1EventId_1acb4c82d3296344492197f852bf767220" prot="public" virt="non-virtual"><scope>opentelemetry::logs::EventId</scope><name>EventId</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1EventId_1a88e9dc907aa9fdf1ded67ac8b9904d77" prot="public" virt="non-virtual"><scope>opentelemetry::logs::EventId</scope><name>id_</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1EventId_1a5107e5e0fc86e2d71ed2296e38dea0a8" prot="public" virt="non-virtual"><scope>opentelemetry::logs::EventId</scope><name>name_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

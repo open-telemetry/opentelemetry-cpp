@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_f9f23a095dc66ede01080ec64cebeb98" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics</compoundname>
+    <innerfile refid="api_2include_2opentelemetry_2metrics_2async__instruments_8h">async_instruments.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2metrics_2meter_8h">meter.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2metrics_2meter__provider_8h">meter_provider.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2metrics_2multi__observer__result_8h">multi_observer_result.h</innerfile>
+    <innerfile refid="metrics_2noop_8h">noop.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2metrics_2observer__result_8h">observer_result.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2metrics_2provider_8h">provider.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2metrics_2sync__instruments_8h">sync_instruments.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/"/>
+  </compounddef>
+</doxygen>

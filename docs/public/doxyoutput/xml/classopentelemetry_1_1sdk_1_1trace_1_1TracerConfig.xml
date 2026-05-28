@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::TracerConfig</compoundname>
+    <includes refid="tracer__config_8h" local="no">tracer_config.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1a6d2c611aa2bf5936a5bd7deba1a8bd73" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::trace::TracerConfig::enabled_</definition>
+        <argsstring></argsstring>
+        <name>enabled_</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerConfig::enabled_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_config.h" line="53" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_config.h" bodystart="53" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1a0430d4b6f7d8ad436133d242929c22fb" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::trace::TracerConfig::operator==</definition>
+        <argsstring>(const TracerConfig &amp;other) const noexcept</argsstring>
+        <name>operator==</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerConfig::operator==</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref> &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_config.h" line="22" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1a76ca9c1553e4ef8fc2ae8723dccfef20" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::trace::TracerConfig::IsEnabled</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>IsEnabled</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerConfig::IsEnabled</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns if the Tracer is enabled or disabled. Tracers are enabled by default. <simplesect kind="return"><para>a boolean indicating if the Tracer is enabled. Defaults to true. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_config.h" line="28" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1a10bc64efb43db7b82fcee780a80d994f" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref></type>
+        <definition>static TracerConfig opentelemetry::sdk::trace::TracerConfig::Disabled</definition>
+        <argsstring>()</argsstring>
+        <name>Disabled</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerConfig::Disabled</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref> that represents a disabled Tracer. A disabled tracer behaves like a no-op tracer. <simplesect kind="return"><para>a static constant <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref> that represents a disabled tracer. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_config.h" line="35" column="23"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1ae760006ff55fcff8a5fffd62672f617c" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref></type>
+        <definition>static TracerConfig opentelemetry::sdk::trace::TracerConfig::Enabled</definition>
+        <argsstring>()</argsstring>
+        <name>Enabled</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerConfig::Enabled</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref> that represents an enabled Tracer. <simplesect kind="return"><para>a static constant <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref> that represents an enabled tracer. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_config.h" line="41" column="23"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1a97dd2af91f4742f27a7091e6cfb403be" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref></type>
+        <definition>static TracerConfig opentelemetry::sdk::trace::TracerConfig::Default</definition>
+        <argsstring>()</argsstring>
+        <name>Default</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerConfig::Default</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref> that represents a Tracer configured with the default behavior. The default behavior is guided by the OpenTelemetry specification. <simplesect kind="return"><para>a static constant <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref> that represents a tracer configured with default behavior. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_config.h" line="49" column="23"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1af169b85b318c7f4a76542484a6683649" prot="private" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::TracerConfig::TracerConfig</definition>
+        <argsstring>(const bool enabled=true)</argsstring>
+        <name>TracerConfig</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerConfig::TracerConfig</qualifiedname>
+        <param>
+          <type>const bool</type>
+          <declname>enabled</declname>
+          <defval>true</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_config.h" line="52" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_config.h" bodystart="52" bodyend="52"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref> defines various configurable aspects of a Tracer&apos;s behavior. This class should not be used directly to configure a Tracer&apos;s behavior, instead a ScopeConfigurator should be used to compute the desired <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref> which can then be used to configure a Tracer. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_config.h" line="19" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_config.h" bodystart="20" bodyend="54"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1a97dd2af91f4742f27a7091e6cfb403be" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerConfig</scope><name>Default</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1a10bc64efb43db7b82fcee780a80d994f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerConfig</scope><name>Disabled</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1ae760006ff55fcff8a5fffd62672f617c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerConfig</scope><name>Enabled</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1a6d2c611aa2bf5936a5bd7deba1a8bd73" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerConfig</scope><name>enabled_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1a76ca9c1553e4ef8fc2ae8723dccfef20" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerConfig</scope><name>IsEnabled</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1a0430d4b6f7d8ad436133d242929c22fb" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerConfig</scope><name>operator==</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig_1af169b85b318c7f4a76542484a6683649" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerConfig</scope><name>TracerConfig</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

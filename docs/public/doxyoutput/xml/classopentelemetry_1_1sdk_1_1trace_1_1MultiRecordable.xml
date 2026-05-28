@@ -1,0 +1,401 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::MultiRecordable</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" prot="public" virt="non-virtual">opentelemetry::sdk::trace::Recordable</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1ac3a0a0385dcf25ac29ad0d3ac69f4d14" prot="private" static="no" mutable="no">
+        <type>std::map&lt; std::size_t, std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &gt; &gt;</type>
+        <definition>std::map&lt;std::size_t, std::unique_ptr&lt;Recordable&gt; &gt; opentelemetry::sdk::trace::MultiRecordable::recordables_</definition>
+        <argsstring></argsstring>
+        <name>recordables_</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::recordables_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="64" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" bodystart="64" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1af24a6d08c1205a1ff51f8799356654da" prot="private" static="yes" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>std::size_t</type>
+        <definition>static std::size_t opentelemetry::sdk::trace::MultiRecordable::MakeKey</definition>
+        <argsstring>(const SpanProcessor &amp;processor) noexcept</argsstring>
+        <name>MakeKey</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::MakeKey</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &amp;</type>
+          <declname>processor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="23" column="22"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a3eba493b14be0d21d5804c64ef96d749" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::AddRecordable</definition>
+        <argsstring>(const SpanProcessor &amp;processor, std::unique_ptr&lt; Recordable &gt; recordable) noexcept</argsstring>
+        <name>AddRecordable</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::AddRecordable</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &amp;</type>
+          <declname>processor</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &gt;</type>
+          <declname>recordable</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="26" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a131305ac0aa166a474d63103b025e7a4" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>const std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &gt; &amp;</type>
+        <definition>const std::unique_ptr&lt; Recordable &gt; &amp; opentelemetry::sdk::trace::MultiRecordable::GetRecordable</definition>
+        <argsstring>(const SpanProcessor &amp;processor) const noexcept</argsstring>
+        <name>GetRecordable</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::GetRecordable</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &amp;</type>
+          <declname>processor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="29" column="25"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1ac35bd1bdbd0f220f65ed53c559f4e398" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &gt;</type>
+        <definition>std::unique_ptr&lt; Recordable &gt; opentelemetry::sdk::trace::MultiRecordable::ReleaseRecordable</definition>
+        <argsstring>(const SpanProcessor &amp;processor) noexcept</argsstring>
+        <name>ReleaseRecordable</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::ReleaseRecordable</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &amp;</type>
+          <declname>processor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="31" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a1985c9d9be8d7ae7d428b9fcc6a14143" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::SetIdentity</definition>
+        <argsstring>(const opentelemetry::trace::SpanContext &amp;span_context, opentelemetry::trace::SpanId parent_span_id) noexcept override</argsstring>
+        <name>SetIdentity</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::SetIdentity</qualifiedname>
+        <param>
+          <type>const opentelemetry::trace::SpanContext &amp;</type>
+          <declname>span_context</declname>
+        </param>
+        <param>
+          <type>opentelemetry::trace::SpanId</type>
+          <declname>parent_span_id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="33" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a44e2e1a8cad19368c152f763381c723c" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::SetAttribute</definition>
+        <argsstring>(nostd::string_view key, const opentelemetry::common::AttributeValue &amp;value) noexcept override</argsstring>
+        <name>SetAttribute</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::SetAttribute</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::common::AttributeValue &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="36" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1ab60e08171800a59513094ac212c6917e" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::AddEvent</definition>
+        <argsstring>(nostd::string_view name, opentelemetry::common::SystemTimestamp timestamp, const opentelemetry::common::KeyValueIterable &amp;attributes) noexcept override</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::AddEvent</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>timestamp</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="39" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a29f8af4c1469b4aab58e19f486b7dbb6" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::AddLink</definition>
+        <argsstring>(const opentelemetry::trace::SpanContext &amp;span_context, const opentelemetry::common::KeyValueIterable &amp;attributes) noexcept override</argsstring>
+        <name>AddLink</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::AddLink</qualifiedname>
+        <param>
+          <type>const opentelemetry::trace::SpanContext &amp;</type>
+          <declname>span_context</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="43" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a76dc43b4f3a76efe088c76768998b42d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::SetStatus</definition>
+        <argsstring>(opentelemetry::trace::StatusCode code, nostd::string_view description) noexcept override</argsstring>
+        <name>SetStatus</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::SetStatus</qualifiedname>
+        <param>
+          <type>opentelemetry::trace::StatusCode</type>
+          <declname>code</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="46" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1ac7fe011b04867382c2324073626ffb1d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::SetName</definition>
+        <argsstring>(nostd::string_view name) noexcept override</argsstring>
+        <name>SetName</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::SetName</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="49" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a59622a339d1141e69b8bb969bf87ef0d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::SetTraceFlags</definition>
+        <argsstring>(opentelemetry::trace::TraceFlags flags) noexcept override</argsstring>
+        <name>SetTraceFlags</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::SetTraceFlags</qualifiedname>
+        <param>
+          <type>opentelemetry::trace::TraceFlags</type>
+          <declname>flags</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="51" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a5a3702a225466a96fcc3898884674291" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::SetSpanKind</definition>
+        <argsstring>(opentelemetry::trace::SpanKind span_kind) noexcept override</argsstring>
+        <name>SetSpanKind</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::SetSpanKind</qualifiedname>
+        <param>
+          <type>opentelemetry::trace::SpanKind</type>
+          <declname>span_kind</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="53" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a78556a148dde01fcebc14a59f07d129f" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::SetResource</definition>
+        <argsstring>(const opentelemetry::sdk::resource::Resource &amp;resource) noexcept override</argsstring>
+        <name>SetResource</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::SetResource</qualifiedname>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="55" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a7475e1a1d6959ab4c0a445cd6f549bb0" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::SetStartTime</definition>
+        <argsstring>(opentelemetry::common::SystemTimestamp start_time) noexcept override</argsstring>
+        <name>SetStartTime</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::SetStartTime</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>start_time</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="57" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a5bd6fa82491c841816a0cec67f198bf6" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::SetDuration</definition>
+        <argsstring>(std::chrono::nanoseconds duration) noexcept override</argsstring>
+        <name>SetDuration</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::SetDuration</qualifiedname>
+        <param>
+          <type>std::chrono::nanoseconds</type>
+          <declname>duration</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="59" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a607df333996603c9d0dd452fffee700a" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::MultiRecordable::SetInstrumentationScope</definition>
+        <argsstring>(const InstrumentationScope &amp;instrumentation_scope) noexcept override</argsstring>
+        <name>SetInstrumentationScope</name>
+        <qualifiedname>opentelemetry::sdk::trace::MultiRecordable::SetInstrumentationScope</qualifiedname>
+        <param>
+          <type>const InstrumentationScope &amp;</type>
+          <declname>instrumentation_scope</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="61" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::MultiRecordable</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::Recordable</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::MultiRecordable</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::Recordable</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_recordable.h" bodystart="22" bodyend="65"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1ab60e08171800a59513094ac212c6917e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ae8da3008b9f7a7a455dbb184060c3408" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::trace::Recordable::"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ae270986d5dab09b199275f3f77d442af" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::trace::Recordable::"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a2dfcde84d24a896e1d903a77f257e7ae" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::trace::Recordable::"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a29f8af4c1469b4aab58e19f486b7dbb6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>AddLink</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1aa70ce55618751e46bad04114bf375ec4" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::trace::Recordable::"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>AddLink</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a3eba493b14be0d21d5804c64ef96d749" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>AddRecordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a131305ac0aa166a474d63103b025e7a4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>GetRecordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1af24a6d08c1205a1ff51f8799356654da" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>MakeKey</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ab7b76fe73cdcdcb3af1a961c6b643a57" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>operator SpanData *</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a1ba6855d07d1fda235b192d41f178a9d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a6e8d0062a9dbe80dc34a3a8e64f76125" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ab2d9d7d398e67eb92c0dbffbf05ffae5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>Recordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1aa75e478152aeb4fcffcfb84bea7f09d1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>Recordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a1c5766960f385cbe62c078ca96249ed7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>Recordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1ac3a0a0385dcf25ac29ad0d3ac69f4d14" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>recordables_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1ac35bd1bdbd0f220f65ed53c559f4e398" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>ReleaseRecordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a44e2e1a8cad19368c152f763381c723c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>SetAttribute</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a5bd6fa82491c841816a0cec67f198bf6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>SetDuration</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a1985c9d9be8d7ae7d428b9fcc6a14143" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>SetIdentity</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1acd38d088ff100fe4c884c72da7f69642" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>SetInstrumentationLibrary</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a607df333996603c9d0dd452fffee700a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>SetInstrumentationScope</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1ac7fe011b04867382c2324073626ffb1d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>SetName</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a78556a148dde01fcebc14a59f07d129f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>SetResource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a5a3702a225466a96fcc3898884674291" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>SetSpanKind</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a7475e1a1d6959ab4c0a445cd6f549bb0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>SetStartTime</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a76dc43b4f3a76efe088c76768998b42d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>SetStatus</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable_1a59622a339d1141e69b8bb969bf87ef0d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>SetTraceFlags</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1acd25970d099f9692a6d7b803d73c1d97" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::MultiRecordable</scope><name>~Recordable</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

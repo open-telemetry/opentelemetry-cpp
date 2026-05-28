@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry" kind="namespace" language="C++">
+    <compoundname>opentelemetry</compoundname>
+    <innernamespace refid="namespaceopentelemetry_1_1baggage">opentelemetry::baggage</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1common">opentelemetry::common</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1context">opentelemetry::context</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1logs">opentelemetry::logs</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1metrics">opentelemetry::metrics</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk">opentelemetry::sdk</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1trace">opentelemetry::trace</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="14" column="1"/>
+  </compounddef>
+</doxygen>

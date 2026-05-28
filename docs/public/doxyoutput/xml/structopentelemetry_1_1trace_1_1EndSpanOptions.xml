@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1trace_1_1EndSpanOptions" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::trace::EndSpanOptions</compoundname>
+    <includes refid="span__metadata_8h" local="no">span_metadata.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1trace_1_1EndSpanOptions_1a2a514d896725138254c0a965ec0ce3f7" prot="public" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1common_1_1SteadyTimestamp" kindref="compound">common::SteadyTimestamp</ref></type>
+        <definition>common::SteadyTimestamp opentelemetry::trace::EndSpanOptions::end_steady_time</definition>
+        <argsstring></argsstring>
+        <name>end_steady_time</name>
+        <qualifiedname>opentelemetry::trace::EndSpanOptions::end_steady_time</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h" line="53" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h" bodystart="53" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="structopentelemetry_1_1trace_1_1EndSpanOptions" kindref="compound">EndSpanOptions</ref> provides options to set properties of a <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> when it is ended. </para>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::common::SteadyTimestamp</label>
+        <link refid="classopentelemetry_1_1common_1_1SteadyTimestamp"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::trace::EndSpanOptions</label>
+        <link refid="structopentelemetry_1_1trace_1_1EndSpanOptions"/>
+        <childnode refid="2" relation="usage">
+          <edgelabel>end_steady_time</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h" line="50" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h" bodystart="51" bodyend="54"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1trace_1_1EndSpanOptions_1a2a514d896725138254c0a965ec0ce3f7" prot="public" virt="non-virtual"><scope>opentelemetry::trace::EndSpanOptions</scope><name>end_steady_time</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

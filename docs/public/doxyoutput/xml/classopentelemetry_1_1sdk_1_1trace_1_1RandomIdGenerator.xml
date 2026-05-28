@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1RandomIdGenerator" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::RandomIdGenerator</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator" prot="public" virt="non-virtual">opentelemetry::sdk::trace::IdGenerator</basecompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1RandomIdGenerator_1a274bead8ba6a45cfe139cf173187ad97" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::RandomIdGenerator::RandomIdGenerator</definition>
+        <argsstring>()</argsstring>
+        <name>RandomIdGenerator</name>
+        <qualifiedname>opentelemetry::sdk::trace::RandomIdGenerator::RandomIdGenerator</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/random_id_generator.h" line="20" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/random_id_generator.h" bodystart="20" bodyend="20"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1RandomIdGenerator_1a0a3cce8e9e159fc9e38734242351436c" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>opentelemetry::trace::SpanId</type>
+        <definition>opentelemetry::trace::SpanId opentelemetry::sdk::trace::RandomIdGenerator::GenerateSpanId</definition>
+        <argsstring>() noexcept override</argsstring>
+        <name>GenerateSpanId</name>
+        <qualifiedname>opentelemetry::sdk::trace::RandomIdGenerator::GenerateSpanId</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/random_id_generator.h" line="22" column="32"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1RandomIdGenerator_1ad13ed43860d5b553fa5cbfa17a1a698a" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>opentelemetry::trace::TraceId</type>
+        <definition>opentelemetry::trace::TraceId opentelemetry::sdk::trace::RandomIdGenerator::GenerateTraceId</definition>
+        <argsstring>() noexcept override</argsstring>
+        <name>GenerateTraceId</name>
+        <qualifiedname>opentelemetry::sdk::trace::RandomIdGenerator::GenerateTraceId</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/random_id_generator.h" line="24" column="33"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::IdGenerator</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::RandomIdGenerator</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::IdGenerator</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::RandomIdGenerator</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/random_id_generator.h" line="17" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/random_id_generator.h" bodystart="18" bodyend="25"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1RandomIdGenerator_1a0a3cce8e9e159fc9e38734242351436c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::RandomIdGenerator</scope><name>GenerateSpanId</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1RandomIdGenerator_1ad13ed43860d5b553fa5cbfa17a1a698a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::RandomIdGenerator</scope><name>GenerateTraceId</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator_1a25a357e96a55d6844a9fc44736856ab4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::RandomIdGenerator</scope><name>IdGenerator</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator_1a5aaee47543a34d66f18dc67f95831c68" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::RandomIdGenerator</scope><name>IdGenerator</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator_1a33f3f85b96d8c2643d811460b01cb54b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::RandomIdGenerator</scope><name>IdGenerator</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator_1aa411262af817ea89219bd5649ac99c8a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::RandomIdGenerator</scope><name>IsRandom</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator_1a7411a156822cc4ec8a2ad03c1bd14d14" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::RandomIdGenerator</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator_1a69ca698e40217f114a4dd292477d725b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::RandomIdGenerator</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1RandomIdGenerator_1a274bead8ba6a45cfe139cf173187ad97" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::RandomIdGenerator</scope><name>RandomIdGenerator</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator_1a65365d0cac41ed10301071a6754dc0a7" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::RandomIdGenerator</scope><name>~IdGenerator</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

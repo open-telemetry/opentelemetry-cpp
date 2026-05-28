@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1ExactPredicate" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::ExactPredicate</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::sdk::metrics::Predicate</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExactPredicate_1a16254dd5dcc850d79d2d4bd20fedba6d" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::metrics::ExactPredicate::pattern_</definition>
+        <argsstring></argsstring>
+        <name>pattern_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExactPredicate::pattern_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="73" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" bodystart="73" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExactPredicate_1a99ddd3abd66de8333d789f6820c160be" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ExactPredicate::ExactPredicate</definition>
+        <argsstring>(opentelemetry::nostd::string_view pattern)</argsstring>
+        <name>ExactPredicate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExactPredicate::ExactPredicate</qualifiedname>
+        <param>
+          <type>opentelemetry::nostd::string_view</type>
+          <declname>pattern</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="62" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" bodystart="62" bodyend="62"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExactPredicate_1ae47db1d8dc73105c56d427cda00575de" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::ExactPredicate::Match</definition>
+        <argsstring>(opentelemetry::nostd::string_view str) const noexcept override</argsstring>
+        <name>Match</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExactPredicate::Match</qualifiedname>
+        <param>
+          <type>opentelemetry::nostd::string_view</type>
+          <declname>str</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="63" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" bodystart="63" bodyend="70"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="59" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" bodystart="60" bodyend="74"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExactPredicate_1a99ddd3abd66de8333d789f6820c160be" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExactPredicate</scope><name>ExactPredicate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExactPredicate_1ae47db1d8dc73105c56d427cda00575de" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExactPredicate</scope><name>Match</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a887426a85c647f5527af2ba35628cc37" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExactPredicate</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a78a4ec7a90b2b5e4a76551eded3d8262" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExactPredicate</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExactPredicate_1a16254dd5dcc850d79d2d4bd20fedba6d" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExactPredicate</scope><name>pattern_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a0851e32f18671b7a3045066b4a6b0b42" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExactPredicate</scope><name>Predicate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a2cc8c7abe32f21f60b5576a1a35a2f52" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExactPredicate</scope><name>Predicate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1abd232148c19aeedbb5bc67fa1c68df1b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExactPredicate</scope><name>Predicate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a34af40c8bec73a5bd25aa3c30ddbbf20" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::ExactPredicate</scope><name>~Predicate</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

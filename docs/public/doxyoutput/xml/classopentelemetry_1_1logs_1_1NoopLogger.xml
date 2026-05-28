@@ -1,0 +1,273 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1logs_1_1NoopLogger" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::logs::NoopLogger</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1logs_1_1Logger" prot="public" virt="non-virtual">opentelemetry::logs::Logger</basecompoundref>
+    <includes refid="logs_2noop_8h" local="no">noop.h</includes>
+    <innerclass refid="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord" prot="private">opentelemetry::logs::NoopLogger::NoopLogRecord</innerclass>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1a834653414bfcd9d7a47258428a1e1d21" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>const nostd::string_view</type>
+        <definition>const nostd::string_view opentelemetry::logs::NoopLogger::GetName</definition>
+        <argsstring>() noexcept override</argsstring>
+        <name>GetName</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::GetName</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1Logger_1a9693d64325c93b225a2efc96f7df61d8">GetName</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="35" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="35" bodyend="35"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1a9af56fb2e67047e3f82315a56ab296b9" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1LogRecord" kindref="compound">LogRecord</ref> &gt;</type>
+        <definition>nostd::unique_ptr&lt; LogRecord &gt; opentelemetry::logs::NoopLogger::CreateLogRecord</definition>
+        <argsstring>() noexcept override</argsstring>
+        <name>CreateLogRecord</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::CreateLogRecord</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1Logger_1ae6bca9f29444adfc287636c637f8939f">CreateLogRecord</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a Log Record object</para>
+<para><simplesect kind="return"><para>nostd::unique_ptr&lt;LogRecord&gt; </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="37" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="37" bodyend="45"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1a540271e41d31bd79925edda404a9f571" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::logs::NoopLogger::EmitLogRecord</definition>
+        <argsstring>(nostd::unique_ptr&lt; LogRecord &gt; &amp;&amp;log_record) noexcept override</argsstring>
+        <name>EmitLogRecord</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::EmitLogRecord</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1Logger_1af67afe1be9a4b187ab0e331cfc3e7cd4">EmitLogRecord</reimplements>
+        <param>
+          <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1LogRecord" kindref="compound">LogRecord</ref> &gt; &amp;&amp;</type>
+          <declname>log_record</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Emit a Log Record object</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>log_record</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Log record </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="49" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="49" bodyend="53"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1af67afe1be9a4b187ab0e331cfc3e7cd4" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::logs::Logger::EmitLogRecord</definition>
+        <argsstring>(nostd::unique_ptr&lt; LogRecord &gt; &amp;&amp;log_record) noexcept=0</argsstring>
+        <name>EmitLogRecord</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::EmitLogRecord</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1Logger_1af67afe1be9a4b187ab0e331cfc3e7cd4">EmitLogRecord</reimplements>
+        <param>
+          <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1LogRecord" kindref="compound">LogRecord</ref> &gt; &amp;&amp;</type>
+          <declname>log_record</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Emit a Log Record object</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>log_record</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Log record </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="47" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1aac46b634e048cbbd8ffb9e81340a6f86" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class...</type>
+            <declname>ArgumentType</declname>
+            <defname>ArgumentType</defname>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void opentelemetry::logs::Logger::EmitLogRecord</definition>
+        <argsstring>(nostd::unique_ptr&lt; LogRecord &gt; &amp;&amp;log_record, ArgumentType &amp;&amp;...args)</argsstring>
+        <name>EmitLogRecord</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::EmitLogRecord</qualifiedname>
+        <param>
+          <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1LogRecord" kindref="compound">LogRecord</ref> &gt; &amp;&amp;</type>
+          <declname>log_record</declname>
+        </param>
+        <param>
+          <type>ArgumentType &amp;&amp;...</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Emit a Log Record object with arguments</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>log_record</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Log record </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>args</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Arguments which can be used to set data of log record by type. Severity -&gt; severity, severity_text string_view -&gt; body AttributeValue -&gt; body SpanContext -&gt; span_id,trace_id and trace_flags SpanId -&gt; span_id TraceId -&gt; trace_id TraceFlags -&gt; trace_flags SystemTimestamp -&gt; timestamp system_clock::time_point -&gt; timestamp KeyValueIterable -&gt; attributes Key value iterable container -&gt; attributes span&lt;pair&lt;string_view, AttributeValue&gt;&gt; -&gt; attributes(return type of MakeAttributes) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="47" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger.h" bodystart="79" bodyend="105"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1aab0f909b701a8a5fe1d8f1165d228f6b" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class...</type>
+            <declname>ArgumentType</declname>
+            <defname>ArgumentType</defname>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void opentelemetry::logs::Logger::EmitLogRecord</definition>
+        <argsstring>(ArgumentType &amp;&amp;...args)</argsstring>
+        <name>EmitLogRecord</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::EmitLogRecord</qualifiedname>
+        <param>
+          <type>ArgumentType &amp;&amp;...</type>
+          <declname>args</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Emit a Log Record object with arguments</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>args</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Arguments which can be used to set data of log record by type. Severity -&gt; severity, severity_text string_view -&gt; body AttributeValue -&gt; body SpanContext -&gt; span_id,trace_id and trace_flags SpanId -&gt; span_id TraceId -&gt; trace_id TraceFlags -&gt; trace_flags SystemTimestamp -&gt; timestamp system_clock::time_point -&gt; timestamp KeyValueIterable -&gt; attributes Key value iterable container -&gt; attributes span&lt;pair&lt;string_view, AttributeValue&gt;&gt; -&gt; attributes(return type of MakeAttributes) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="47" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger.h" bodystart="125" bodyend="130"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>No-op implementation of <ref refid="classopentelemetry_1_1logs_1_1Logger" kindref="compound">Logger</ref>. This class should not be used directly. It should only be instantiated using a <ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref>&apos;s GetLogger() call. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::logs::Logger</label>
+        <link refid="classopentelemetry_1_1logs_1_1Logger"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::logs::NoopLogger</label>
+        <link refid="classopentelemetry_1_1logs_1_1NoopLogger"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::logs::Logger</label>
+        <link refid="classopentelemetry_1_1logs_1_1Logger"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::logs::NoopLogger</label>
+        <link refid="classopentelemetry_1_1logs_1_1NoopLogger"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="32" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="33" bodyend="71"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1a9af56fb2e67047e3f82315a56ab296b9" prot="public" virt="virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>CreateLogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a662d7f7448baf3a8cf1647a0fe09f434" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Debug</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a946b8b8cfbd2b387d682b7f58585f391" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Debug</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1aed68931625e7da86ca13425ef324f514" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Debug</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a3e84c030d24d91c1dc17fb75929e4db5" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Debug</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1af68637ee922e284773df64e25b084ac8" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Debug</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1a540271e41d31bd79925edda404a9f571" prot="public" virt="virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>EmitLogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1af67afe1be9a4b187ab0e331cfc3e7cd4" prot="public" virt="virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>EmitLogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1aac46b634e048cbbd8ffb9e81340a6f86" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>EmitLogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1aab0f909b701a8a5fe1d8f1165d228f6b" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>EmitLogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1aa5abf0bcdf7bb7f14bdb6812247ce54b" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Enabled</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a8e728ca5d4879953b3ea163d40965c64" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Enabled</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ac429d287bb2152f9fd93e5ae1149c0f4" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Enabled</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ad8c4c1dd19dfa7967844acdd121aa300" prot="protected" virt="virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>EnabledImplementation</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a532ace56e9ccb57b07974305e730a94a" prot="protected" virt="virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>EnabledImplementation</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ae8e088b2cd9fc1e04fcdab4598d146f4" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Error</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1af2320d2b7ef200d6f3ab41afbeecf848" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Error</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a3b5e070bb6e8561994268b08e6672978" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Error</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a5c7db814af1905e6d75bf6e58db5c8e0" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Error</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ab018f29af1ada301dceda2f4e49e4bea" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Error</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a87bfa2db3523333c9259897837994b39" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Fatal</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a3d7143a054dfdfa263d8101d90ca58e9" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Fatal</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a7a25ec83b21a121ba4a885d43c68a621" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Fatal</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a9216f7e58a458e9fa7d1f0daa194e804" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Fatal</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ae1a053ae3e168b23ec5b7c86bbdd3a2f" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Fatal</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1a834653414bfcd9d7a47258428a1e1d21" prot="public" virt="virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>GetName</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ab97295acd6925afc06435e6dc32e10dc" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Info</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a41a91426f132bc3eb060343525fdf520" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Info</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a2cd854b19e474f5e43e9472f84bade6e" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Info</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a654f236423f9def6cf9c448bed76139d" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Info</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ae5edf5456546c59f34a7993298a5563f" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Info</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a9ebfc008fb193c7eec494a3eefecbe21" prot="public" virt="virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Log</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a183704d4f6d87fc03e804cc78e5c0162" prot="public" virt="virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Log</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a1c134b198d9bb55edad603b9a4b496fb" prot="public" virt="virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Log</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1aea97ceaf12ec14cf681513f8481f6805" prot="public" virt="virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Log</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a67471e5d5592da4d0a49385e8d6fb6ef" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Logger</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a8d52dbed8eb70f141ee18d4af283b1a2" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Logger</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a48e4730ec26685f0498927c09be1bd01" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Logger</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a1db870558fcc7f4ac34b8a3f3763c25d" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1aa442b5510983020d507ebfc0e6585a7b" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1acb6424fa78ca8d0ff71de6f74c247914" prot="protected" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>SetMinimumSeverity</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a5e9438c63f239bf36407c403a81b6a43" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Trace</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1aecac6a08860cff862d59a70773e31dfa" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Trace</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a1118374fd446d6b73e66d1d10fb44ca4" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Trace</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a9bf1f8fd504b306dd10899026f66d858" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Trace</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a6f9e4db4dd7ae34ba41c170b2692592b" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Trace</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a0669700cd35cac8ec83e92df0fb18c3e" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Warn</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1af240d1289807b1a718e0b07e64fcfedb" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Warn</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1abcc8de1ec177ea49535194000c4f34c9" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Warn</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a1693fab147d05538b795fb754a3b8f83" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Warn</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ace0c385d77532ca84406ae60d51d0898" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>Warn</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a81f083c110081f9fd350f1b77033853c" prot="public" virt="virtual"><scope>opentelemetry::logs::NoopLogger</scope><name>~Logger</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,295 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1View" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::View</compoundname>
+    <includes refid="view_8h" local="no">view.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a5fa61cfbc4340a8edd0352cf54237250" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::metrics::View::name_</definition>
+        <argsstring></argsstring>
+        <name>name_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::name_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="66" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" bodystart="66" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a84ba83bf1e854f8c10e9e0bac9ce9fe8" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::metrics::View::description_</definition>
+        <argsstring></argsstring>
+        <name>description_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::description_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="67" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" bodystart="67" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a6da39791e421eee897dd79d0a358483d" prot="private" static="no" mutable="no">
+        <type>AggregationType</type>
+        <definition>AggregationType opentelemetry::sdk::metrics::View::aggregation_type_</definition>
+        <argsstring></argsstring>
+        <name>aggregation_type_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::aggregation_type_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="68" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" bodystart="68" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1ae16923f28908e3acaae1490d508cdb22" prot="private" static="no" mutable="no">
+        <type>std::shared_ptr&lt; AggregationConfig &gt;</type>
+        <definition>std::shared_ptr&lt;AggregationConfig&gt; opentelemetry::sdk::metrics::View::aggregation_config_</definition>
+        <argsstring></argsstring>
+        <name>aggregation_config_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::aggregation_config_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="69" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" bodystart="69" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a3f2f0dc04c1313031b283d902ecf3b15" prot="private" static="no" mutable="no">
+        <type>std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">AttributesProcessor</ref> &gt;</type>
+        <definition>std::shared_ptr&lt;AttributesProcessor&gt; opentelemetry::sdk::metrics::View::attributes_processor_</definition>
+        <argsstring></argsstring>
+        <name>attributes_processor_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::attributes_processor_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="70" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" bodystart="70" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a16b21f1b4477a6ece4e49f31ea95f7be" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::View::View</definition>
+        <argsstring>(const std::string &amp;name, const std::string &amp;description=&quot;&quot;, AggregationType aggregation_type=AggregationType::kDefault, const std::shared_ptr&lt; AggregationConfig &gt; &amp;aggregation_config=nullptr, std::unique_ptr&lt; opentelemetry::sdk::metrics::AttributesProcessor &gt; attributes_processor=std::unique_ptr&lt; opentelemetry::sdk::metrics::AttributesProcessor &gt;(new opentelemetry::sdk::metrics::DefaultAttributesProcessor()))</argsstring>
+        <name>View</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::View</qualifiedname>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>AggregationType</type>
+          <declname>aggregation_type</declname>
+          <defval>AggregationType::kDefault</defval>
+        </param>
+        <param>
+          <type>const std::shared_ptr&lt; AggregationConfig &gt; &amp;</type>
+          <declname>aggregation_config</declname>
+          <defval>nullptr</defval>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">opentelemetry::sdk::metrics::AttributesProcessor</ref> &gt;</type>
+          <declname>attributes_processor</declname>
+          <defval>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">opentelemetry::sdk::metrics::AttributesProcessor</ref> &gt;(new <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAttributesProcessor" kindref="compound">opentelemetry::sdk::metrics::DefaultAttributesProcessor</ref>())</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="27" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" bodystart="27" bodyend="39"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a0851168484730dfe287404cbbcc3ac9b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::View::View</definition>
+        <argsstring>(const View &amp;)=delete</argsstring>
+        <name>View</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::View</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1View" kindref="compound">View</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="41" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a0e041d3a6631be53aad4b032dfb1fa6a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::View::View</definition>
+        <argsstring>(View &amp;&amp;)=delete</argsstring>
+        <name>View</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::View</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1View" kindref="compound">View</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="42" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a7fe8585788740c4889f873a6b242b47b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1View" kindref="compound">View</ref> &amp;</type>
+        <definition>View &amp; opentelemetry::sdk::metrics::View::operator=</definition>
+        <argsstring>(const View &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1View" kindref="compound">View</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="43" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1ada121cfbfda17cd970cec84a8b932b93" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1View" kindref="compound">View</ref> &amp;</type>
+        <definition>View &amp; opentelemetry::sdk::metrics::View::operator=</definition>
+        <argsstring>(View &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1View" kindref="compound">View</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="44" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1ad42846b8b26f76055a8e5c9cea456eca" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::metrics::View::~View</definition>
+        <argsstring>()=default</argsstring>
+        <name>~View</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::~View</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="46" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1aa442633a41eeb9a8ac0e67fce43f7a20" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>std::string</type>
+        <definition>virtual std::string opentelemetry::sdk::metrics::View::GetName</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetName</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::GetName</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="48" column="23" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" bodystart="48" bodyend="48"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a63208ad7a8a95a37cbf922f03b5c282a" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>std::string</type>
+        <definition>virtual std::string opentelemetry::sdk::metrics::View::GetDescription</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetDescription</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::GetDescription</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="50" column="23" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" bodystart="50" bodyend="50"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a26212e25d5504638ea1f4fd5143eb5de" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>AggregationType</type>
+        <definition>virtual AggregationType opentelemetry::sdk::metrics::View::GetAggregationType</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetAggregationType</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::GetAggregationType</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="52" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" bodystart="52" bodyend="52"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1adbd739d1e503afb9ec5f811ff2de0d94" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>AggregationConfig *</type>
+        <definition>virtual AggregationConfig * opentelemetry::sdk::metrics::View::GetAggregationConfig</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetAggregationConfig</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::GetAggregationConfig</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="54" column="29" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" bodystart="54" bodyend="57"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a1d717f1cab54ed8854a1e605c8d9b11a" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>std::shared_ptr&lt; const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">opentelemetry::sdk::metrics::AttributesProcessor</ref> &gt;</type>
+        <definition>virtual std::shared_ptr&lt; const opentelemetry::sdk::metrics::AttributesProcessor &gt; opentelemetry::sdk::metrics::View::GetAttributesProcessor</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetAttributesProcessor</name>
+        <qualifiedname>opentelemetry::sdk::metrics::View::GetAttributesProcessor</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="60" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" bodystart="60" bodyend="63"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1View" kindref="compound">View</ref> defines the interface to allow SDK user to customize the metrics before exported. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" line="24" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/view.h" bodystart="25" bodyend="71"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1ae16923f28908e3acaae1490d508cdb22" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>aggregation_config_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a6da39791e421eee897dd79d0a358483d" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>aggregation_type_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a3f2f0dc04c1313031b283d902ecf3b15" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>attributes_processor_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a84ba83bf1e854f8c10e9e0bac9ce9fe8" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>description_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1adbd739d1e503afb9ec5f811ff2de0d94" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>GetAggregationConfig</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a26212e25d5504638ea1f4fd5143eb5de" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>GetAggregationType</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a1d717f1cab54ed8854a1e605c8d9b11a" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>GetAttributesProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a63208ad7a8a95a37cbf922f03b5c282a" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>GetDescription</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1aa442633a41eeb9a8ac0e67fce43f7a20" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>GetName</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a5fa61cfbc4340a8edd0352cf54237250" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>name_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a7fe8585788740c4889f873a6b242b47b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1ada121cfbfda17cd970cec84a8b932b93" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a16b21f1b4477a6ece4e49f31ea95f7be" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>View</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a0851168484730dfe287404cbbcc3ac9b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>View</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1a0e041d3a6631be53aad4b032dfb1fa6a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>View</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1View_1ad42846b8b26f76055a8e5c9cea456eca" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::View</scope><name>~View</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

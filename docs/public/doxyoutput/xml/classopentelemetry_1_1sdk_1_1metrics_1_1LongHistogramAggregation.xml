@@ -1,0 +1,224 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::LongHistogramAggregation</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::sdk::metrics::Aggregation</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1ab47eea8d8d334cfe83ae3f59e7c40fd7" prot="private" static="no" mutable="yes">
+        <type>opentelemetry::common::SpinLockMutex</type>
+        <definition>opentelemetry::common::SpinLockMutex opentelemetry::sdk::metrics::LongHistogramAggregation::lock_</definition>
+        <argsstring></argsstring>
+        <name>lock_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongHistogramAggregation::lock_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="52" column="48" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" bodystart="52" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1a272c0dd93f97549e6c1562afb0755155" prot="private" static="no" mutable="no">
+        <type>HistogramPointData</type>
+        <definition>HistogramPointData opentelemetry::sdk::metrics::LongHistogramAggregation::point_data_</definition>
+        <argsstring></argsstring>
+        <name>point_data_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongHistogramAggregation::point_data_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="53" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" bodystart="53" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1a541ab6b086103f42c7e0f6e919235b67" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::LongHistogramAggregation::record_min_max_</definition>
+        <argsstring></argsstring>
+        <name>record_min_max_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongHistogramAggregation::record_min_max_</qualifiedname>
+        <initializer>= true</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="54" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" bodystart="54" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1ad176e3d5d62cf5157269213f00d9ec19" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::LongHistogramAggregation::LongHistogramAggregation</definition>
+        <argsstring>(const AggregationConfig *aggregation_config=nullptr)</argsstring>
+        <name>LongHistogramAggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongHistogramAggregation::LongHistogramAggregation</qualifiedname>
+        <param>
+          <type>const AggregationConfig *</type>
+          <declname>aggregation_config</declname>
+          <defval>nullptr</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="30" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1aa6a4d5b4c3236c1440803e5fed86985b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::LongHistogramAggregation::LongHistogramAggregation</definition>
+        <argsstring>(HistogramPointData &amp;&amp;)</argsstring>
+        <name>LongHistogramAggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongHistogramAggregation::LongHistogramAggregation</qualifiedname>
+        <param>
+          <type>HistogramPointData &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="31" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1aa0c361a9da91873979356443eac1eb38" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::LongHistogramAggregation::LongHistogramAggregation</definition>
+        <argsstring>(const HistogramPointData &amp;)</argsstring>
+        <name>LongHistogramAggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongHistogramAggregation::LongHistogramAggregation</qualifiedname>
+        <param>
+          <type>const HistogramPointData &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="32" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1a216b800aa9ad3ed3af043f33b730b17d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::LongHistogramAggregation::Aggregate</definition>
+        <argsstring>(int64_t value, const PointAttributes &amp;attributes={}) noexcept override</argsstring>
+        <name>Aggregate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongHistogramAggregation::Aggregate</qualifiedname>
+        <param>
+          <type>int64_t</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const PointAttributes &amp;</type>
+          <declname>attributes</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="34" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1a95667d3fa7983b5c15528f8d4bd80736" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::LongHistogramAggregation::Aggregate</definition>
+        <argsstring>(double, const PointAttributes &amp;) noexcept override</argsstring>
+        <name>Aggregate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongHistogramAggregation::Aggregate</qualifiedname>
+        <param>
+          <type>double</type>
+        </param>
+        <param>
+          <type>const PointAttributes &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="36" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" bodystart="36" bodyend="36"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1a6a498a595a563678439c8e487b768179" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>std::unique_ptr&lt; Aggregation &gt;</type>
+        <definition>std::unique_ptr&lt; Aggregation &gt; opentelemetry::sdk::metrics::LongHistogramAggregation::Merge</definition>
+        <argsstring>(const Aggregation &amp;delta) const noexcept override</argsstring>
+        <name>Merge</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongHistogramAggregation::Merge</qualifiedname>
+        <param>
+          <type>const Aggregation &amp;</type>
+          <declname>delta</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="40" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1aadb5bb3ed63034a8ffa4f40bc319ff34" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>std::unique_ptr&lt; Aggregation &gt;</type>
+        <definition>std::unique_ptr&lt; Aggregation &gt; opentelemetry::sdk::metrics::LongHistogramAggregation::Diff</definition>
+        <argsstring>(const Aggregation &amp;next) const noexcept override</argsstring>
+        <name>Diff</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongHistogramAggregation::Diff</qualifiedname>
+        <param>
+          <type>const Aggregation &amp;</type>
+          <declname>next</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="47" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1a0a4b4ff58cf876c4b32cb103caebbac3" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>PointType</type>
+        <definition>PointType opentelemetry::sdk::metrics::LongHistogramAggregation::ToPoint</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>ToPoint</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongHistogramAggregation::ToPoint</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="49" column="13"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" line="27" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h" bodystart="28" bodyend="55"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1a216b800aa9ad3ed3af043f33b730b17d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>Aggregate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1a95667d3fa7983b5c15528f8d4bd80736" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>Aggregate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1af6a4b0195c2b59d6592864a944bebd96" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>Aggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a29cfcd740ec1da70be6a3523d06e5eba" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>Aggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a6da32b25e5f17a10ff72fc46f6142239" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>Aggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1aadb5bb3ed63034a8ffa4f40bc319ff34" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>Diff</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1ab47eea8d8d334cfe83ae3f59e7c40fd7" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>lock_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1ad176e3d5d62cf5157269213f00d9ec19" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>LongHistogramAggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1aa6a4d5b4c3236c1440803e5fed86985b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>LongHistogramAggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1aa0c361a9da91873979356443eac1eb38" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>LongHistogramAggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1a6a498a595a563678439c8e487b768179" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>Merge</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a8bebc1d6cc3ea50af4726b95a6717e9b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a4f0021ce4ded2fabb2d92acd132d5288" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1a272c0dd93f97549e6c1562afb0755155" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>point_data_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1a541ab6b086103f42c7e0f6e919235b67" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>record_min_max_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation_1a0a4b4ff58cf876c4b32cb103caebbac3" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>ToPoint</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a3b49d27663b7598b277bacfe282447ce" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::LongHistogramAggregation</scope><name>~Aggregation</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

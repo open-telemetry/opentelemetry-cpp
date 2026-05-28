@@ -1,0 +1,9 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor.html" title=" " alt="" coords="5,69,201,109"/>
+<area shape="rect" id="Node000001" href="$classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor.html" title=" " alt="" coords="253,5,487,45"/>
+<area shape="poly" id="edge13_Node000000_Node000001" title=" " alt="" coords="200,63,286,43,287,48,201,69"/>
+<area shape="rect" id="Node000002" href="$classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor.html" title=" " alt="" coords="255,69,485,109"/>
+<area shape="poly" id="edge14_Node000000_Node000002" title=" " alt="" coords="215,87,255,87,255,92,215,92"/>
+<area shape="rect" id="Node000003" href="$classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor.html" title=" " alt="" coords="249,133,491,173"/>
+<area shape="poly" id="edge15_Node000000_Node000003" title=" " alt="" coords="201,110,287,131,286,136,200,115"/>
+</map>

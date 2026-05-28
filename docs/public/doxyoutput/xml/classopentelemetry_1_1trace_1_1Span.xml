@@ -1,0 +1,513 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1trace_1_1Span" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::trace::Span</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1trace_1_1DefaultSpan" prot="public" virt="non-virtual">opentelemetry::trace::DefaultSpan</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1trace_1_1NoopSpan" prot="public" virt="non-virtual">opentelemetry::trace::NoopSpan</derivedcompoundref>
+    <includes refid="span_8h" local="no">span.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1af324cf9243681c6614742f24f76aa42e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::Span::Span</definition>
+        <argsstring>()=default</argsstring>
+        <name>Span</name>
+        <qualifiedname>opentelemetry::trace::Span::Span</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="59" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1a776318c04b10803d94d665358cd74caa" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::trace::Span::~Span</definition>
+        <argsstring>()=default</argsstring>
+        <name>~Span</name>
+        <qualifiedname>opentelemetry::trace::Span::~Span</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="62" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1a7290c2386fea54f8f190429c6347e2ec" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::Span::Span</definition>
+        <argsstring>(const Span &amp;)=delete</argsstring>
+        <name>Span</name>
+        <qualifiedname>opentelemetry::trace::Span::Span</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="65" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1af11a4a194c7d37b973a0d5f01dac4337" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::Span::Span</definition>
+        <argsstring>(Span &amp;&amp;)=delete</argsstring>
+        <name>Span</name>
+        <qualifiedname>opentelemetry::trace::Span::Span</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="66" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1ad728c1520b3d2eaa8ec0ff51c27bb2f2" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> &amp;</type>
+        <definition>Span &amp; opentelemetry::trace::Span::operator=</definition>
+        <argsstring>(const Span &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::trace::Span::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="67" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1af1b685c07fedc6d12844aba23739a646" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> &amp;</type>
+        <definition>Span &amp; opentelemetry::trace::Span::operator=</definition>
+        <argsstring>(Span &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::trace::Span::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="68" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1a25d3f4649b011b89fc7e01898e47ca27" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::trace::Span::SetAttribute</definition>
+        <argsstring>(nostd::string_view key, const common::AttributeValue &amp;value) noexcept=0</argsstring>
+        <name>SetAttribute</name>
+        <qualifiedname>opentelemetry::trace::Span::SetAttribute</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1DefaultSpan_1a96492d62052d41eeba34faf8a639b819">SetAttribute</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NoopSpan_1a837a863fe7935958ef32ce98065e6676">SetAttribute</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>const common::AttributeValue &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Sets an attribute on the <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> (ABI).</para>
+<para>If the <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> previously contained a mapping for the key, the old value is replaced.</para>
+<para>See comments about sampling in <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">opentelemetry::trace::Span</ref> </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="78" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1a791a064b4e8b2f3f679a65c1fc4485ad" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::trace::Span::AddEvent</definition>
+        <argsstring>(nostd::string_view name) noexcept=0</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::trace::Span::AddEvent</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1DefaultSpan_1ace26a86fe965760db4d737c47fe9b036">AddEvent</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NoopSpan_1a300d5fa0e66bc081629af29e160d222d">AddEvent</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="82" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1a81980dfa2a4de30b74954e6e54b86fb7" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::trace::Span::AddEvent</definition>
+        <argsstring>(nostd::string_view name, common::SystemTimestamp timestamp) noexcept=0</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::trace::Span::AddEvent</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1DefaultSpan_1a4bfc80729db6b4e5865bd5dbdb5ba8fa">AddEvent</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NoopSpan_1a793000fea7fff2cdf5e41a18b4c8e301">AddEvent</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">common::SystemTimestamp</ref></type>
+          <declname>timestamp</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="85" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1a3fe5d810d6b6882f13dcdf3bfa77f74a" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::trace::Span::AddEvent</definition>
+        <argsstring>(nostd::string_view name, common::SystemTimestamp timestamp, const common::KeyValueIterable &amp;attributes) noexcept=0</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::trace::Span::AddEvent</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1DefaultSpan_1ad94ab3885c257dfb91963bc02f909ec2">AddEvent</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NoopSpan_1a96a1951369ab8da69b3264bde72b0c76">AddEvent</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">common::SystemTimestamp</ref></type>
+          <declname>timestamp</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="88" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1a1b04b7d55f4c6dc1419513af543e0e99" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::trace::Span::AddEvent</definition>
+        <argsstring>(nostd::string_view name, const common::KeyValueIterable &amp;attributes) noexcept</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::trace::Span::AddEvent</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1DefaultSpan_1af84632ed56473387e0ab32728dcb72f3">AddEvent</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NoopSpan_1af7bc86f27b0263be625104d517b5ddf3">AddEvent</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="92" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" bodystart="92" bodyend="96"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1a91e91416372ce05fde81049b7763e245" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+          <param>
+            <type>nostd::enable_if_t&lt; common::detail::is_key_value_iterable&lt; T &gt;::value &gt; *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void opentelemetry::trace::Span::AddEvent</definition>
+        <argsstring>(nostd::string_view name, common::SystemTimestamp timestamp, const T &amp;attributes) noexcept</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::trace::Span::AddEvent</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">common::SystemTimestamp</ref></type>
+          <declname>timestamp</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="100" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" bodystart="100" bodyend="105"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1a1ef18d22c3d7947148785f8d373e63e1" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+          <param>
+            <type>nostd::enable_if_t&lt; common::detail::is_key_value_iterable&lt; T &gt;::value &gt; *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void opentelemetry::trace::Span::AddEvent</definition>
+        <argsstring>(nostd::string_view name, const T &amp;attributes) noexcept</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::trace::Span::AddEvent</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="109" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" bodystart="109" bodyend="112"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1af048b9dd37b435fb6cce56171ef11270" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::Span::AddEvent</definition>
+        <argsstring>(nostd::string_view name, common::SystemTimestamp timestamp, std::initializer_list&lt; std::pair&lt; nostd::string_view, common::AttributeValue &gt; &gt; attributes) noexcept</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::trace::Span::AddEvent</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">common::SystemTimestamp</ref></type>
+          <declname>timestamp</declname>
+        </param>
+        <param>
+          <type>std::initializer_list&lt; std::pair&lt; nostd::string_view, common::AttributeValue &gt; &gt;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="114" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" bodystart="114" bodyend="122"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1ae8cc49641777f7900060ffde0cb04424" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::Span::AddEvent</definition>
+        <argsstring>(nostd::string_view name, std::initializer_list&lt; std::pair&lt; nostd::string_view, common::AttributeValue &gt; &gt; attributes) noexcept</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::trace::Span::AddEvent</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>std::initializer_list&lt; std::pair&lt; nostd::string_view, common::AttributeValue &gt; &gt;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="124" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" bodystart="124" bodyend="131"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1a9042b08cdb0497a0876c41c7e843c284" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::trace::Span::SetStatus</definition>
+        <argsstring>(StatusCode code, nostd::string_view description=&quot;&quot;) noexcept=0</argsstring>
+        <name>SetStatus</name>
+        <qualifiedname>opentelemetry::trace::Span::SetStatus</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1DefaultSpan_1abe814ba7173355b693d10e4179577bd9">SetStatus</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NoopSpan_1a421715f10341ad426ff76bcb0329d8d6">SetStatus</reimplementedby>
+        <param>
+          <type>StatusCode</type>
+          <declname>code</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="236" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1ae5c66d0e6891ce392ab655b9c0959417" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::trace::Span::UpdateName</definition>
+        <argsstring>(nostd::string_view name) noexcept=0</argsstring>
+        <name>UpdateName</name>
+        <qualifiedname>opentelemetry::trace::Span::UpdateName</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1DefaultSpan_1a74ee1ee6cf96c56c78852409e74acdd9">UpdateName</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NoopSpan_1aba15a60b9d482055485c58f370869459">UpdateName</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="240" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1a92e58537aa0426ebb9b47769386d6060" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::trace::Span::End</definition>
+        <argsstring>(const trace::EndSpanOptions &amp;options={}) noexcept=0</argsstring>
+        <name>End</name>
+        <qualifiedname>opentelemetry::trace::Span::End</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1DefaultSpan_1af29e80e97d0e6364ef10fbc435cf51fa">End</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NoopSpan_1a5d2668be96fe08bf4aea10cc81ea8bfd">End</reimplementedby>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1trace_1_1EndSpanOptions" kindref="compound">trace::EndSpanOptions</ref> &amp;</type>
+          <declname>options</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Mark the end of the <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref>. Only the timing of the first End call for a given <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> will be recorded, and implementations are free to ignore all further calls. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>options</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>can be used to manually define span properties like the end timestamp </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="249" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1a00150ed93601ff2f8ab9d5841587b4e0" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>trace::SpanContext</type>
+        <definition>virtual trace::SpanContext opentelemetry::trace::Span::GetContext</definition>
+        <argsstring>() const noexcept=0</argsstring>
+        <name>GetContext</name>
+        <qualifiedname>opentelemetry::trace::Span::GetContext</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1DefaultSpan_1a28f703f65666f5a733a98042eec4925a">GetContext</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NoopSpan_1a827abd396c02bab98aa06cfae76eee18">GetContext</reimplementedby>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="251" column="30"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Span_1aa1822a1e0ad1258096df5d0c07ea98c8" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::trace::Span::IsRecording</definition>
+        <argsstring>() const noexcept=0</argsstring>
+        <name>IsRecording</name>
+        <qualifiedname>opentelemetry::trace::Span::IsRecording</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1DefaultSpan_1aa65afe2b3c00efdbc8523ae4a09c042c">IsRecording</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NoopSpan_1a110a1a3ce38976a8966b8b50c7471c8c">IsRecording</reimplementedby>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="255" column="16"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>A <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> represents a single operation within a Trace.</para>
+<para><ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> attributes can be provided:<itemizedlist>
+<listitem><para>at span creation time, using <ref refid="classopentelemetry_1_1trace_1_1Tracer_1a677b7139d9750d2389d1403ba4cbb9d3" kindref="member">Tracer::StartSpan()</ref>,</para>
+</listitem><listitem><para>during the span lifetime, using <ref refid="classopentelemetry_1_1trace_1_1Span_1a25d3f4649b011b89fc7e01898e47ca27" kindref="member">Span::SetAttribute()</ref></para>
+</listitem></itemizedlist>
+</para>
+<para>Please note that head samplers, in the SDK (<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">opentelemetry::sdk::trace::Sampler</ref>), can only make sampling decisions based on data known at span creation time.</para>
+<para>When attributes are known early, adding attributes with <ref refid="classopentelemetry_1_1trace_1_1Tracer_1a677b7139d9750d2389d1403ba4cbb9d3" kindref="member">opentelemetry::trace::Tracer::StartSpan()</ref> is preferable.</para>
+<para>Attributes added or changed with <ref refid="classopentelemetry_1_1trace_1_1Span_1a25d3f4649b011b89fc7e01898e47ca27" kindref="member">Span::SetAttribute()</ref> can not change a sampler decision.</para>
+<para>Likewise, links can be provided:<itemizedlist>
+<listitem><para>at span creation time, using <ref refid="classopentelemetry_1_1trace_1_1Tracer_1a677b7139d9750d2389d1403ba4cbb9d3" kindref="member">Tracer::StartSpan()</ref>,</para>
+</listitem><listitem><para>during the span lifetime, using Span::AddLink() or Span::AddLinks().</para>
+</listitem></itemizedlist>
+</para>
+<para>When links are known early, adding links with <ref refid="classopentelemetry_1_1trace_1_1Tracer_1a677b7139d9750d2389d1403ba4cbb9d3" kindref="member">opentelemetry::trace::Tracer::StartSpan()</ref> is preferable.</para>
+<para>Links added with Span::AddLink() or Span::AddLinks() can not change a sampler decision. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::trace::DefaultSpan</label>
+        <link refid="classopentelemetry_1_1trace_1_1DefaultSpan"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>opentelemetry::trace::NoopSpan</label>
+        <link refid="classopentelemetry_1_1trace_1_1NoopSpan"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>opentelemetry::trace::Span</label>
+        <link refid="classopentelemetry_1_1trace_1_1Span"/>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" line="54" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span.h" bodystart="55" bodyend="256"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a791a064b4e8b2f3f679a65c1fc4485ad" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::Span</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a81980dfa2a4de30b74954e6e54b86fb7" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::Span</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a3fe5d810d6b6882f13dcdf3bfa77f74a" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::Span</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a1b04b7d55f4c6dc1419513af543e0e99" prot="public" virt="virtual"><scope>opentelemetry::trace::Span</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a91e91416372ce05fde81049b7763e245" prot="public" virt="non-virtual"><scope>opentelemetry::trace::Span</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a1ef18d22c3d7947148785f8d373e63e1" prot="public" virt="non-virtual"><scope>opentelemetry::trace::Span</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1af048b9dd37b435fb6cce56171ef11270" prot="public" virt="non-virtual"><scope>opentelemetry::trace::Span</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1ae8cc49641777f7900060ffde0cb04424" prot="public" virt="non-virtual"><scope>opentelemetry::trace::Span</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a92e58537aa0426ebb9b47769386d6060" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::Span</scope><name>End</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a00150ed93601ff2f8ab9d5841587b4e0" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::Span</scope><name>GetContext</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1aa1822a1e0ad1258096df5d0c07ea98c8" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::Span</scope><name>IsRecording</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1ad728c1520b3d2eaa8ec0ff51c27bb2f2" prot="public" virt="non-virtual"><scope>opentelemetry::trace::Span</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1af1b685c07fedc6d12844aba23739a646" prot="public" virt="non-virtual"><scope>opentelemetry::trace::Span</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a25d3f4649b011b89fc7e01898e47ca27" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::Span</scope><name>SetAttribute</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a9042b08cdb0497a0876c41c7e843c284" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::Span</scope><name>SetStatus</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1af324cf9243681c6614742f24f76aa42e" prot="public" virt="non-virtual"><scope>opentelemetry::trace::Span</scope><name>Span</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a7290c2386fea54f8f190429c6347e2ec" prot="public" virt="non-virtual"><scope>opentelemetry::trace::Span</scope><name>Span</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1af11a4a194c7d37b973a0d5f01dac4337" prot="public" virt="non-virtual"><scope>opentelemetry::trace::Span</scope><name>Span</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1ae5c66d0e6891ce392ab655b9c0959417" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::Span</scope><name>UpdateName</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Span_1a776318c04b10803d94d665358cd74caa" prot="public" virt="virtual"><scope>opentelemetry::trace::Span</scope><name>~Span</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

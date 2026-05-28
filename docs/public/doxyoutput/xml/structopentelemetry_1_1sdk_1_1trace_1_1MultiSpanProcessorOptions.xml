@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1trace_1_1MultiSpanProcessorOptions" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::MultiSpanProcessorOptions</compoundname>
+    <includes refid="multi__span__processor_8h" local="no">multi_span_processor.h</includes>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Instantiation options. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h" line="22" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/multi_span_processor.h" bodystart="23" bodyend="23"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

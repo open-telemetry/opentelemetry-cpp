@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1baggage" kind="namespace" language="C++">
+    <compoundname>opentelemetry::baggage</compoundname>
+    <innerclass refid="classopentelemetry_1_1baggage_1_1Baggage" prot="public">opentelemetry::baggage::Baggage</innerclass>
+    <innernamespace refid="namespaceopentelemetry_1_1baggage_1_1propagation">opentelemetry::baggage::propagation</innernamespace>
+    <sectiondef kind="var">
+      <memberdef kind="variable" id="baggage__context_8h_1af10485d870fc46757a91eebd9e076c49" prot="public" static="yes" mutable="no">
+        <type>const std::string</type>
+        <definition>const std::string opentelemetry::baggage::kBaggageHeader</definition>
+        <argsstring></argsstring>
+        <name>kBaggageHeader</name>
+        <qualifiedname>opentelemetry::baggage::kBaggageHeader</qualifiedname>
+        <initializer>= &quot;baggage&quot;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage_context.h" line="16" column="26" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage_context.h" bodystart="16" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="baggage__context_8h_1afded2ec071897d1322d19324844ef325" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; Baggage &gt;</type>
+        <definition>nostd::shared_ptr&lt; Baggage &gt; opentelemetry::baggage::GetBaggage</definition>
+        <argsstring>(const context::Context &amp;context) noexcept</argsstring>
+        <name>GetBaggage</name>
+        <qualifiedname>opentelemetry::baggage::GetBaggage</qualifiedname>
+        <param>
+          <type>const context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage_context.h" line="18" column="26" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage_context.h" bodystart="18" bodyend="29"/>
+      </memberdef>
+      <memberdef kind="function" id="baggage__context_8h_1a99e58276b8285a6669aea88f38fef9a9" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>context::Context</type>
+        <definition>context::Context opentelemetry::baggage::SetBaggage</definition>
+        <argsstring>(context::Context &amp;context, const nostd::shared_ptr&lt; Baggage &gt; &amp;baggage) noexcept</argsstring>
+        <name>SetBaggage</name>
+        <qualifiedname>opentelemetry::baggage::SetBaggage</qualifiedname>
+        <param>
+          <type>context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type>const nostd::shared_ptr&lt; Baggage &gt; &amp;</type>
+          <declname>baggage</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage_context.h" line="31" column="25" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage_context.h" bodystart="31" bodyend="35"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/baggage.h" line="16" column="1"/>
+  </compounddef>
+</doxygen>

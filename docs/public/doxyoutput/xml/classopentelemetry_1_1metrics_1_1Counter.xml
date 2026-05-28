@@ -1,0 +1,316 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1metrics_1_1Counter" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::metrics::Counter</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::metrics::SynchronousInstrument</basecompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1metrics_1_1NoopCounter" prot="public" virt="non-virtual">opentelemetry::metrics::NoopCounter&lt; T &gt;</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleCounter" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::DoubleCounter</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::LongCounter</derivedcompoundref>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Counter_1ad9124e77b7c6e53b5f05f21b2a9171b3" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::metrics::Counter&lt; T &gt;::Add</definition>
+        <argsstring>(T value) noexcept=0</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::metrics::Counter::Add</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Record a value</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The increment amount. MUST be non-negative. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="40" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Counter_1ab26a446b6b1604c7030e2ddb7f502471" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::metrics::Counter&lt; T &gt;::Add</definition>
+        <argsstring>(T value, const context::Context &amp;context) noexcept=0</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::metrics::Counter::Add</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Record a value</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The increment amount. MUST be non-negative. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The explicit context to associate with this measurement. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="48" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Counter_1ad48e45008b85c89f36342c278a323868" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::metrics::Counter&lt; T &gt;::Add</definition>
+        <argsstring>(T value, const common::KeyValueIterable &amp;attributes) noexcept=0</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::metrics::Counter::Add</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Record a value with a set of attributes.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The increment amount. MUST be non-negative. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>attributes</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A set of attributes to associate with the value. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="57" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Counter_1af34937b2f16b46c58a17502ef7895511" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::metrics::Counter&lt; T &gt;::Add</definition>
+        <argsstring>(T value, const common::KeyValueIterable &amp;attributes, const context::Context &amp;context) noexcept=0</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::metrics::Counter::Add</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Record a value with a set of attributes.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The increment amount. MUST be non-negative. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>attributes</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A set of attributes to associate with the value. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The explicit context to associate with this measurement. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="66" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Counter_1ae33094a907ad70552e671423213acf43" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class U</type>
+          </param>
+          <param>
+            <type>nostd::enable_if_t&lt; common::detail::is_key_value_iterable&lt; U &gt;::value &gt; *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void opentelemetry::metrics::Counter&lt; T &gt;::Add</definition>
+        <argsstring>(T value, const U &amp;attributes) noexcept</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::metrics::Counter::Add</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const U &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="72" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" bodystart="72" bodyend="75"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Counter_1a5e083edd1885f90f167f10310e1d317d" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class U</type>
+          </param>
+          <param>
+            <type>nostd::enable_if_t&lt; common::detail::is_key_value_iterable&lt; U &gt;::value &gt; *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void opentelemetry::metrics::Counter&lt; T &gt;::Add</definition>
+        <argsstring>(T value, const U &amp;attributes, const context::Context &amp;context) noexcept</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::metrics::Counter::Add</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const U &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="79" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" bodystart="79" bodyend="82"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Counter_1a08bfb1a3cf017850a676d9ff3c1a8cf0" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::metrics::Counter&lt; T &gt;::Add</definition>
+        <argsstring>(T value, std::initializer_list&lt; std::pair&lt; nostd::string_view, common::AttributeValue &gt; &gt; attributes) noexcept</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::metrics::Counter::Add</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>std::initializer_list&lt; std::pair&lt; nostd::string_view, common::AttributeValue &gt; &gt;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="84" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" bodystart="84" bodyend="90"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Counter_1a4ec120cc692e56bb5d6a452e70e4331d" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::metrics::Counter&lt; T &gt;::Add</definition>
+        <argsstring>(T value, std::initializer_list&lt; std::pair&lt; nostd::string_view, common::AttributeValue &gt; &gt; attributes, const context::Context &amp;context) noexcept</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::metrics::Counter::Add</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>std::initializer_list&lt; std::pair&lt; nostd::string_view, common::AttributeValue &gt; &gt;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="92" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" bodystart="92" bodyend="100"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="31" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" bodystart="32" bodyend="101"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1ad9124e77b7c6e53b5f05f21b2a9171b3" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Counter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1ab26a446b6b1604c7030e2ddb7f502471" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Counter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1ad48e45008b85c89f36342c278a323868" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Counter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1af34937b2f16b46c58a17502ef7895511" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Counter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1ae33094a907ad70552e671423213acf43" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Counter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1a5e083edd1885f90f167f10310e1d317d" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Counter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1a08bfb1a3cf017850a676d9ff3c1a8cf0" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Counter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Counter_1a4ec120cc692e56bb5d6a452e70e4331d" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Counter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a3a119c3d01bcbeb27f003798f709dbb9" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Counter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a96a92a09ac869edb8c85adbf2f22aefe" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Counter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a958cd63a32c41bd53ddb57c74a4af161" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Counter</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1ad1da5a4adfa52aac49ae6bc98ac39294" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Counter</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a163d350c750a10cb2c68ad9c88d9ef2b" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Counter</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a2cb1a911901a8e09c73dfaf2c3113dae" prot="public" virt="virtual"><scope>opentelemetry::metrics::Counter</scope><name>~SynchronousInstrument</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

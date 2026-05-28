@@ -1,0 +1,478 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="tracer__context_8h" kind="file" language="C++">
+    <compoundname>tracer_context.h</compoundname>
+    <includes local="no">chrono</includes>
+    <includes local="no">memory</includes>
+    <includes local="no">vector</includes>
+    <includes refid="scope__configurator_8h" local="yes">opentelemetry/sdk/instrumentationscope/scope_configurator.h</includes>
+    <includes refid="resource_8h" local="yes">opentelemetry/sdk/resource/resource.h</includes>
+    <includes refid="id__generator_8h" local="yes">opentelemetry/sdk/trace/id_generator.h</includes>
+    <includes refid="trace_2processor_8h" local="yes">opentelemetry/sdk/trace/processor.h</includes>
+    <includes refid="random__id__generator_8h" local="yes">opentelemetry/sdk/trace/random_id_generator.h</includes>
+    <includes refid="sampler_8h" local="yes">opentelemetry/sdk/trace/sampler.h</includes>
+    <includes refid="always__on_8h" local="yes">opentelemetry/sdk/trace/samplers/always_on.h</includes>
+    <includes refid="tracer__config_8h" local="yes">opentelemetry/sdk/trace/tracer_config.h</includes>
+    <includes local="yes">opentelemetry/version.h</includes>
+    <includedby refid="sdk_2include_2opentelemetry_2sdk_2trace_2tracer_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h</includedby>
+    <includedby refid="tracer__context__factory_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_context_factory.h</includedby>
+    <includedby refid="sdk_2include_2opentelemetry_2sdk_2trace_2tracer__provider_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider.h</includedby>
+    <includedby refid="tracer__provider__factory_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h</includedby>
+    <incdepgraph>
+      <node id="29">
+        <label>opentelemetry/common/attribute_value.h</label>
+        <link refid="attribute__value_8h_source"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>opentelemetry/common/timestamp.h</label>
+        <link refid="timestamp_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>opentelemetry/trace/span_context.h</label>
+        <link refid="span__context_8h_source"/>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="20">
+        <label>opentelemetry/trace/span_id.h</label>
+        <link refid="span__id_8h_source"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>opentelemetry/trace/span_metadata.h</label>
+        <link refid="span__metadata_8h_source"/>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="36">
+        <label>opentelemetry/trace/trace_flags.h</label>
+        <link refid="trace__flags_8h_source"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>opentelemetry/trace/trace_id.h</label>
+        <link refid="trace__id_8h_source"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="37">
+        <label>opentelemetry/trace/trace_state.h</label>
+        <link refid="trace__state_8h_source"/>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>opentelemetry/sdk/instrumentationscope/instrumentation_scope.h</label>
+        <link refid="instrumentation__scope_8h_source"/>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>opentelemetry/sdk/instrumentationscope/scope_configurator.h</label>
+        <link refid="scope__configurator_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>opentelemetry/sdk/resource/resource.h</label>
+        <link refid="resource_8h_source"/>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>opentelemetry/sdk/trace/id_generator.h</label>
+        <link refid="id__generator_8h_source"/>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>opentelemetry/sdk/trace/processor.h</label>
+        <link refid="trace_2processor_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>opentelemetry/sdk/trace/random_id_generator.h</label>
+        <link refid="random__id__generator_8h_source"/>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>opentelemetry/sdk/trace/sampler.h</label>
+        <link refid="sampler_8h_source"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>opentelemetry/sdk/trace/samplers/always_on.h</label>
+        <link refid="always__on_8h_source"/>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>opentelemetry/sdk/trace/tracer_config.h</label>
+        <link refid="tracer__config_8h_source"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_context.h</label>
+        <link refid="tracer__context_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>chrono</label>
+      </node>
+      <node id="39">
+        <label>cstddef</label>
+      </node>
+      <node id="21">
+        <label>cstdint</label>
+      </node>
+      <node id="22">
+        <label>cstring</label>
+      </node>
+      <node id="38">
+        <label>ctype.h</label>
+      </node>
+      <node id="6">
+        <label>functional</label>
+      </node>
+      <node id="28">
+        <label>map</label>
+      </node>
+      <node id="3">
+        <label>memory</label>
+      </node>
+      <node id="11">
+        <label>opentelemetry/common/key_value_iterable_view.h</label>
+      </node>
+      <node id="40">
+        <label>opentelemetry/common/kv_properties.h</label>
+      </node>
+      <node id="41">
+        <label>opentelemetry/nostd/function_ref.h</label>
+      </node>
+      <node id="30">
+        <label>opentelemetry/nostd/shared_ptr.h</label>
+      </node>
+      <node id="23">
+        <label>opentelemetry/nostd/span.h</label>
+      </node>
+      <node id="12">
+        <label>opentelemetry/nostd/string_view.h</label>
+      </node>
+      <node id="13">
+        <label>opentelemetry/nostd/type_traits.h</label>
+      </node>
+      <node id="14">
+        <label>opentelemetry/nostd/unique_ptr.h</label>
+      </node>
+      <node id="15">
+        <label>opentelemetry/nostd/variant.h</label>
+      </node>
+      <node id="16">
+        <label>opentelemetry/sdk/common/attribute_utils.h</label>
+      </node>
+      <node id="17">
+        <label>opentelemetry/version.h</label>
+      </node>
+      <node id="35">
+        <label>stdint.h</label>
+      </node>
+      <node id="9">
+        <label>string</label>
+      </node>
+      <node id="10">
+        <label>type_traits</label>
+      </node>
+      <node id="7">
+        <label>utility</label>
+      </node>
+      <node id="4">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="2">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2trace_2tracer_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_context.h</label>
+        <link refid="tracer__context_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_context_factory.h</label>
+        <link refid="tracer__context__factory_8h_source"/>
+      </node>
+      <node id="3">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2trace_2tracer__provider_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h</label>
+        <link refid="tracer__provider__factory_8h_source"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" prot="public">opentelemetry::sdk::trace::TracerContext</innerclass>
+    <innernamespace refid="namespaceopentelemetry">opentelemetry</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk">opentelemetry::sdk</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1trace">opentelemetry::sdk::trace</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>The<sp/>OpenTelemetry<sp/>Authors</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;chrono&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;memory&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;vector&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/instrumentationscope/scope_configurator.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/resource/resource.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/trace/id_generator.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/trace/processor.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/trace/random_id_generator.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/trace/sampler.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/trace/samplers/always_on.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/sdk/trace/tracer_config.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/version.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal">OPENTELEMETRY_BEGIN_NAMESPACE</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">sdk</highlight></codeline>
+<codeline lineno="22"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">trace</highlight></codeline>
+<codeline lineno="24"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight></codeline>
+<codeline lineno="39" refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref></highlight></codeline>
+<codeline lineno="40"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">explicit</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref>(</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::vector&lt;std::unique_ptr&lt;SpanProcessor&gt;&gt;<sp/>&amp;&amp;processor,</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>opentelemetry::sdk::resource::Resource<sp/>&amp;resource<sp/>=</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>opentelemetry::sdk::resource::Resource::Create({}),</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::unique_ptr&lt;Sampler&gt;<sp/>sampler<sp/>=<sp/>std::unique_ptr&lt;AlwaysOnSampler&gt;(</highlight><highlight class="keyword">new</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOnSampler" kindref="compound">AlwaysOnSampler</ref>),</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::unique_ptr&lt;IdGenerator&gt;<sp/>id_generator<sp/>=</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::unique_ptr&lt;IdGenerator&gt;(</highlight><highlight class="keyword">new</highlight><highlight class="normal"><sp/>RandomIdGenerator()),</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>std::unique_ptr&lt;<ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator&lt;TracerConfig&gt;</ref>&gt;<sp/>tracer_configurator<sp/>=</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>std::make_unique&lt;<ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator&lt;TracerConfig&gt;</ref>&gt;(</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder" kindref="compound">instrumentationscope::ScopeConfigurator&lt;TracerConfig&gt;::Builder</ref>(</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>TracerConfig::Default())</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>.Build()))<sp/></highlight><highlight class="keyword">noexcept</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"></highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref><sp/>&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref>(<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref><sp/>&amp;&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref><sp/>&amp;operator=(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref><sp/>&amp;)<sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref><sp/>&amp;operator=(<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref><sp/>&amp;&amp;)<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keyword">delete</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"></highlight></codeline>
+<codeline lineno="60"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">~TracerContext</ref>()<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight></codeline>
+<codeline lineno="70" refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext_1a4f1576318ff459d617ea1fb3e812bedf" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext_1a4f1576318ff459d617ea1fb3e812bedf" kindref="member">AddProcessor</ref>(std::unique_ptr&lt;SpanProcessor&gt;<sp/>processor)<sp/></highlight><highlight class="keyword">noexcept</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"></highlight></codeline>
+<codeline lineno="76" refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext_1a751d07a3246e44615c7d6b820aaaa761" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref><sp/>&amp;<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext_1a751d07a3246e44615c7d6b820aaaa761" kindref="member">GetSampler</ref>()<sp/>const<sp/>noexcept;</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"></highlight></codeline>
+<codeline lineno="84" refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext_1a8b3d500469e6c4f1b94abfc0fb757f51" refkind="member"><highlight class="normal"><sp/><sp/><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref><sp/>&amp;GetProcessor()<sp/>const<sp/>noexcept;</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"></highlight></codeline>
+<codeline lineno="90" refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext_1ae61b078161954304dcbae33d564d75f9" refkind="member"><highlight class="normal"><sp/><sp/>const<sp/>opentelemetry::sdk::resource::Resource<sp/>&amp;GetResource()<sp/>const<sp/>noexcept;</highlight></codeline>
+<codeline lineno="91"><highlight class="normal"></highlight></codeline>
+<codeline lineno="96" refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext_1a53c6d856a29b1d0bf48330950abb7eae" refkind="member"><highlight class="normal"><sp/><sp/>const<sp/>instrumentationscope::<ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">ScopeConfigurator</ref>&lt;<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref>&gt;<sp/>&amp;GetTracerConfigurator()</highlight></codeline>
+<codeline lineno="97"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/>const<sp/>noexcept;</highlight></codeline>
+<codeline lineno="98"><highlight class="normal"></highlight></codeline>
+<codeline lineno="103" refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext_1a102d249408174b45be8d7b7fabf581d1" refkind="member"><highlight class="normal"><sp/><sp/>opentelemetry::sdk::trace::<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator" kindref="compound">IdGenerator</ref><sp/>&amp;GetIdGenerator()<sp/>const<sp/>noexcept;</highlight></codeline>
+<codeline lineno="104"><highlight class="normal"></highlight></codeline>
+<codeline lineno="109" refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext_1a1e4f99074a732e3ac7e4801f02d12546" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>ForceFlush(std::chrono::microseconds<sp/>timeout<sp/>=<sp/>(std::chrono::microseconds::max)())<sp/>noexcept;</highlight></codeline>
+<codeline lineno="110"><highlight class="normal"></highlight></codeline>
+<codeline lineno="114" refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext_1a9dd99af9d6d49cb734cd3cfb3027f19b" refkind="member"><highlight class="normal"><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Shutdown(std::chrono::microseconds<sp/>timeout<sp/>=<sp/>(std::chrono::microseconds::max)())<sp/>noexcept;</highlight></codeline>
+<codeline lineno="115"><highlight class="normal"></highlight></codeline>
+<codeline lineno="116"><highlight class="normal">private:</highlight></codeline>
+<codeline lineno="117"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/><sp/>order<sp/>of<sp/>declaration<sp/>is<sp/>important<sp/>here<sp/>-<sp/>resource<sp/>object<sp/>should<sp/>be<sp/>destroyed<sp/>after<sp/>processor.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="118"><highlight class="normal"><sp/><sp/>opentelemetry::sdk::resource::Resource<sp/>resource_;</highlight></codeline>
+<codeline lineno="119"><highlight class="normal"><sp/><sp/>std::unique_ptr&lt;<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref>&gt;<sp/>sampler_;</highlight></codeline>
+<codeline lineno="120"><highlight class="normal"><sp/><sp/>std::unique_ptr&lt;<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator" kindref="compound">IdGenerator</ref>&gt;<sp/>id_generator_;</highlight></codeline>
+<codeline lineno="121"><highlight class="normal"><sp/><sp/>std::unique_ptr&lt;<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref>&gt;<sp/>processor_;</highlight></codeline>
+<codeline lineno="122"><highlight class="normal"><sp/><sp/>std::unique_ptr&lt;instrumentationscope::<ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">ScopeConfigurator</ref>&lt;<ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref>&gt;&gt;<sp/>tracer_configurator_;</highlight></codeline>
+<codeline lineno="123"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="124"><highlight class="normal"></highlight></codeline>
+<codeline lineno="125"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>trace</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="126"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>sdk</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="127"><highlight class="normal">OPENTELEMETRY_END_NAMESPACE</highlight></codeline>
+    </programlisting>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_context.h"/>
+  </compounddef>
+</doxygen>

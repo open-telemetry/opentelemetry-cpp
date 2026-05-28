@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1context_1_1propagation_1_1GlobalTextMapPropagator" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::context::propagation::GlobalTextMapPropagator</compoundname>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1GlobalTextMapPropagator_1ad740e93f5e421ad4c72fa09fae94866b" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; TextMapPropagator &gt;</type>
+        <definition>static nostd::shared_ptr&lt; TextMapPropagator &gt; opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetGlobalPropagator</name>
+        <qualifiedname>opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/global_propagator.h" line="29" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/global_propagator.h" bodystart="29" bodyend="33"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1GlobalTextMapPropagator_1a18d5d9bfb252bcea8f5cbfaccc63707d" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>static void opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator</definition>
+        <argsstring>(const nostd::shared_ptr&lt; TextMapPropagator &gt; &amp;prop) noexcept</argsstring>
+        <name>SetGlobalPropagator</name>
+        <qualifiedname>opentelemetry::context::propagation::GlobalTextMapPropagator::SetGlobalPropagator</qualifiedname>
+        <param>
+          <type>const nostd::shared_ptr&lt; TextMapPropagator &gt; &amp;</type>
+          <declname>prop</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/global_propagator.h" line="35" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/global_propagator.h" bodystart="35" bodyend="39"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1GlobalTextMapPropagator_1abe8374f13bb3cb826da15d20acac4cab" prot="private" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>OPENTELEMETRY_API_SINGLETON nostd::shared_ptr&lt; TextMapPropagator &gt; &amp;</type>
+        <definition>static OPENTELEMETRY_API_SINGLETON nostd::shared_ptr&lt; TextMapPropagator &gt; &amp; opentelemetry::context::propagation::GlobalTextMapPropagator::GetPropagator</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetPropagator</name>
+        <qualifiedname>opentelemetry::context::propagation::GlobalTextMapPropagator::GetPropagator</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/global_propagator.h" line="42" column="56" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/global_propagator.h" bodystart="42" bodyend="46"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1GlobalTextMapPropagator_1afcfb9eccc7612d7edfa144001901d74f" prot="private" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>OPENTELEMETRY_API_SINGLETON common::SpinLockMutex &amp;</type>
+        <definition>static OPENTELEMETRY_API_SINGLETON common::SpinLockMutex &amp; opentelemetry::context::propagation::GlobalTextMapPropagator::GetLock</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetLock</name>
+        <qualifiedname>opentelemetry::context::propagation::GlobalTextMapPropagator::GetLock</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/global_propagator.h" line="48" column="60" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/global_propagator.h" bodystart="48" bodyend="52"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/global_propagator.h" line="26" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/global_propagator.h" bodystart="27" bodyend="53"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1GlobalTextMapPropagator_1ad740e93f5e421ad4c72fa09fae94866b" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::GlobalTextMapPropagator</scope><name>GetGlobalPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1GlobalTextMapPropagator_1afcfb9eccc7612d7edfa144001901d74f" prot="private" virt="non-virtual"><scope>opentelemetry::context::propagation::GlobalTextMapPropagator</scope><name>GetLock</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1GlobalTextMapPropagator_1abe8374f13bb3cb826da15d20acac4cab" prot="private" virt="non-virtual"><scope>opentelemetry::context::propagation::GlobalTextMapPropagator</scope><name>GetPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1GlobalTextMapPropagator_1a18d5d9bfb252bcea8f5cbfaccc63707d" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::GlobalTextMapPropagator</scope><name>SetGlobalPropagator</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

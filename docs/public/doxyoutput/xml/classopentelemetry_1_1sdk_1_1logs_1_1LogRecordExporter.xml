@@ -1,0 +1,221 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::logs::LogRecordExporter</compoundname>
+    <includes refid="logs_2exporter_8h" local="no">exporter.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a1d25cbb54c23c74b857403aa45c8f577" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::LogRecordExporter::LogRecordExporter</definition>
+        <argsstring>()</argsstring>
+        <name>LogRecordExporter</name>
+        <qualifiedname>opentelemetry::sdk::logs::LogRecordExporter::LogRecordExporter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/exporter.h" line="25" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a0122fad4f5d1ff0a3c8749222c4f3b56" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::LogRecordExporter::LogRecordExporter</definition>
+        <argsstring>(const LogRecordExporter &amp;)=delete</argsstring>
+        <name>LogRecordExporter</name>
+        <qualifiedname>opentelemetry::sdk::logs::LogRecordExporter::LogRecordExporter</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/exporter.h" line="27" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a43a191cf25da626ccfb2472295f91541" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::LogRecordExporter::LogRecordExporter</definition>
+        <argsstring>(LogRecordExporter &amp;&amp;)=delete</argsstring>
+        <name>LogRecordExporter</name>
+        <qualifiedname>opentelemetry::sdk::logs::LogRecordExporter::LogRecordExporter</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/exporter.h" line="28" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1aec33bcb559c33277c047cb2fa8102c7c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> &amp;</type>
+        <definition>LogRecordExporter &amp; opentelemetry::sdk::logs::LogRecordExporter::operator=</definition>
+        <argsstring>(const LogRecordExporter &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::logs::LogRecordExporter::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/exporter.h" line="29" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1af9f62ea3d3ed53b35d1fd27987969b0e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> &amp;</type>
+        <definition>LogRecordExporter &amp; opentelemetry::sdk::logs::LogRecordExporter::operator=</definition>
+        <argsstring>(LogRecordExporter &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::logs::LogRecordExporter::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/exporter.h" line="30" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a59147404062b03690568eee2fd8f0065" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::logs::LogRecordExporter::~LogRecordExporter</definition>
+        <argsstring>()</argsstring>
+        <name>~LogRecordExporter</name>
+        <qualifiedname>opentelemetry::sdk::logs::LogRecordExporter::~LogRecordExporter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/exporter.h" line="32" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a6c437ce94572a19960b71d0dbb50bc51" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable" kindref="compound">Recordable</ref> &gt;</type>
+        <definition>virtual std::unique_ptr&lt; Recordable &gt; opentelemetry::sdk::logs::LogRecordExporter::MakeRecordable</definition>
+        <argsstring>() noexcept=0</argsstring>
+        <name>MakeRecordable</name>
+        <qualifiedname>opentelemetry::sdk::logs::LogRecordExporter::MakeRecordable</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a log recordable. This object will be used to record log data and will subsequently be passed to <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a81cdf8eba99c8bc90fa970f23e4c91e3" kindref="member">LogRecordExporter::Export</ref>. Vendors can implement custom recordables or use the default <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord" kindref="compound">ReadWriteLogRecord</ref> recordable provided by the SDK. <simplesect kind="return"><para>a newly initialized <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable" kindref="compound">Recordable</ref> object</para>
+</simplesect>
+Note: This method must be callable from multiple threads. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/exporter.h" line="43" column="27"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a81cdf8eba99c8bc90fa970f23e4c91e3" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>sdk::common::ExportResult</type>
+        <definition>virtual sdk::common::ExportResult opentelemetry::sdk::logs::LogRecordExporter::Export</definition>
+        <argsstring>(const nostd::span&lt; std::unique_ptr&lt; Recordable &gt; &gt; &amp;records) noexcept=0</argsstring>
+        <name>Export</name>
+        <qualifiedname>opentelemetry::sdk::logs::LogRecordExporter::Export</qualifiedname>
+        <param>
+          <type>const nostd::span&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable" kindref="compound">Recordable</ref> &gt; &gt; &amp;</type>
+          <declname>records</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Exports the batch of log records to their export destination. This method must not be called concurrently for the same exporter instance. The exporter may attempt to retry sending the batch, but should drop and return kFailure after a certain timeout. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>records</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a span of unique pointers to log records </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>an ExportResult code (whether export was success or failure) </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/exporter.h" line="53" column="37"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a5890afb929185c3b1d21e826d7293f9f" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::sdk::logs::LogRecordExporter::ForceFlush</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept=0</argsstring>
+        <name>ForceFlush</name>
+        <qualifiedname>opentelemetry::sdk::logs::LogRecordExporter::ForceFlush</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Force flush the log records pushed into this log exporter. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/exporter.h" line="59" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1ade91637f3797c97eb874a90be7669510" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::sdk::logs::LogRecordExporter::Shutdown</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept=0</argsstring>
+        <name>Shutdown</name>
+        <qualifiedname>opentelemetry::sdk::logs::LogRecordExporter::Shutdown</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Marks the exporter as ShutDown and cleans up any resources as required. Shutdown should be called only once for each Exporter instance. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timeout</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>minimum amount of microseconds to wait for shutdown before giving up and returning failure. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if the exporter shutdown succeeded, false otherwise </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/exporter.h" line="69" column="16"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> defines the interface that log exporters must implement. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/exporter.h" line="22" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/exporter.h" bodystart="23" bodyend="71"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a81cdf8eba99c8bc90fa970f23e4c91e3" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::LogRecordExporter</scope><name>Export</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a5890afb929185c3b1d21e826d7293f9f" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::LogRecordExporter</scope><name>ForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a1d25cbb54c23c74b857403aa45c8f577" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LogRecordExporter</scope><name>LogRecordExporter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a0122fad4f5d1ff0a3c8749222c4f3b56" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LogRecordExporter</scope><name>LogRecordExporter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a43a191cf25da626ccfb2472295f91541" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LogRecordExporter</scope><name>LogRecordExporter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a6c437ce94572a19960b71d0dbb50bc51" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::LogRecordExporter</scope><name>MakeRecordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1aec33bcb559c33277c047cb2fa8102c7c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LogRecordExporter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1af9f62ea3d3ed53b35d1fd27987969b0e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LogRecordExporter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1ade91637f3797c97eb874a90be7669510" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::LogRecordExporter</scope><name>Shutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter_1a59147404062b03690568eee2fd8f0065" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::LogRecordExporter</scope><name>~LogRecordExporter</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

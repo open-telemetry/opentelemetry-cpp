@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::metrics::Predicate</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExactPredicate" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::ExactPredicate</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MatchEverythingPattern" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::MatchEverythingPattern</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MatchNothingPattern" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::MatchNothingPattern</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PatternPredicate" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::PatternPredicate</derivedcompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a0851e32f18671b7a3045066b4a6b0b42" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Predicate::Predicate</definition>
+        <argsstring>()=default</argsstring>
+        <name>Predicate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Predicate::Predicate</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="23" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a2cc8c7abe32f21f60b5576a1a35a2f52" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Predicate::Predicate</definition>
+        <argsstring>(const Predicate &amp;)=delete</argsstring>
+        <name>Predicate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Predicate::Predicate</qualifiedname>
+        <param>
+          <type>const Predicate &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="25" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1abd232148c19aeedbb5bc67fa1c68df1b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Predicate::Predicate</definition>
+        <argsstring>(Predicate &amp;&amp;)=delete</argsstring>
+        <name>Predicate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Predicate::Predicate</qualifiedname>
+        <param>
+          <type>Predicate &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="26" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a887426a85c647f5527af2ba35628cc37" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Predicate &amp;</type>
+        <definition>Predicate &amp; opentelemetry::sdk::metrics::Predicate::operator=</definition>
+        <argsstring>(const Predicate &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Predicate::operator=</qualifiedname>
+        <param>
+          <type>const Predicate &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="27" column="13"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a78a4ec7a90b2b5e4a76551eded3d8262" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Predicate &amp;</type>
+        <definition>Predicate &amp; opentelemetry::sdk::metrics::Predicate::operator=</definition>
+        <argsstring>(Predicate &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Predicate::operator=</qualifiedname>
+        <param>
+          <type>Predicate &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="28" column="13"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a34af40c8bec73a5bd25aa3c30ddbbf20" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::metrics::Predicate::~Predicate</definition>
+        <argsstring>()=default</argsstring>
+        <name>~Predicate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Predicate::~Predicate</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="30" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a28aeb0326427233fb2731ac48f11c12c" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::sdk::metrics::Predicate::Match</definition>
+        <argsstring>(opentelemetry::nostd::string_view string) const noexcept=0</argsstring>
+        <name>Match</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Predicate::Match</qualifiedname>
+        <param>
+          <type>opentelemetry::nostd::string_view</type>
+          <declname>string</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="32" column="16"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" bodystart="21" bodyend="33"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a28aeb0326427233fb2731ac48f11c12c" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::Predicate</scope><name>Match</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a887426a85c647f5527af2ba35628cc37" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Predicate</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a78a4ec7a90b2b5e4a76551eded3d8262" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Predicate</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a0851e32f18671b7a3045066b4a6b0b42" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Predicate</scope><name>Predicate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a2cc8c7abe32f21f60b5576a1a35a2f52" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Predicate</scope><name>Predicate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1abd232148c19aeedbb5bc67fa1c68df1b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Predicate</scope><name>Predicate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a34af40c8bec73a5bd25aa3c30ddbbf20" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::Predicate</scope><name>~Predicate</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

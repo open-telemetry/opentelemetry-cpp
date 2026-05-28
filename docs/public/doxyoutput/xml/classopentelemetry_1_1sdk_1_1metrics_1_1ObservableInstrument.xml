@@ -1,0 +1,258 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::ObservableInstrument</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::metrics::ObservableInstrument</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a8297b22e1428e27c4e7398e5fa2039e6" prot="private" static="no" mutable="no">
+        <type>InstrumentDescriptor</type>
+        <definition>InstrumentDescriptor opentelemetry::sdk::metrics::ObservableInstrument::instrument_descriptor_</definition>
+        <argsstring></argsstring>
+        <name>instrument_descriptor_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::instrument_descriptor_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="45" column="24" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" bodystart="45" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a39638b7abec74697547280fde3fd6454" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; AsyncWritableMetricStorage &gt;</type>
+        <definition>std::unique_ptr&lt;AsyncWritableMetricStorage&gt; opentelemetry::sdk::metrics::ObservableInstrument::storage_</definition>
+        <argsstring></argsstring>
+        <name>storage_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::storage_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="46" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" bodystart="46" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1ada9bf0b107ec4d44cc40470ceb704204" prot="private" static="no" mutable="no">
+        <type>std::shared_ptr&lt; ObservableRegistry &gt;</type>
+        <definition>std::shared_ptr&lt;ObservableRegistry&gt; opentelemetry::sdk::metrics::ObservableInstrument::observable_registry_</definition>
+        <argsstring></argsstring>
+        <name>observable_registry_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::observable_registry_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="47" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" bodystart="47" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1ab11a136d8bd38663efeb6a573b373e27" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ObservableInstrument::ObservableInstrument</definition>
+        <argsstring>(InstrumentDescriptor instrument_descriptor, std::unique_ptr&lt; AsyncWritableMetricStorage &gt; storage, std::shared_ptr&lt; ObservableRegistry &gt; observable_registry)</argsstring>
+        <name>ObservableInstrument</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::ObservableInstrument</qualifiedname>
+        <param>
+          <type>InstrumentDescriptor</type>
+          <declname>instrument_descriptor</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; AsyncWritableMetricStorage &gt;</type>
+          <declname>storage</declname>
+        </param>
+        <param>
+          <type>std::shared_ptr&lt; ObservableRegistry &gt;</type>
+          <declname>observable_registry</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="23" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a2d36e1559b1b60b6d1eedf0507d96cc5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ObservableInstrument::ObservableInstrument</definition>
+        <argsstring>(const ObservableInstrument &amp;)=delete</argsstring>
+        <name>ObservableInstrument</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::ObservableInstrument</qualifiedname>
+        <param>
+          <type>const ObservableInstrument &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="27" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a489487039cd3784be897894344b436cc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ObservableInstrument::ObservableInstrument</definition>
+        <argsstring>(ObservableInstrument &amp;&amp;)=delete</argsstring>
+        <name>ObservableInstrument</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::ObservableInstrument</qualifiedname>
+        <param>
+          <type>ObservableInstrument &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="28" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a8b1930f146e38b81b3851c14b6ef8ef1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>ObservableInstrument &amp;</type>
+        <definition>ObservableInstrument &amp; opentelemetry::sdk::metrics::ObservableInstrument::operator=</definition>
+        <argsstring>(const ObservableInstrument &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::operator=</qualifiedname>
+        <param>
+          <type>const ObservableInstrument &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="29" column="24"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a43846c9e7c08a07d52fbc16b14f11f2c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>ObservableInstrument &amp;</type>
+        <definition>ObservableInstrument &amp; opentelemetry::sdk::metrics::ObservableInstrument::operator=</definition>
+        <argsstring>(ObservableInstrument &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::operator=</qualifiedname>
+        <param>
+          <type>ObservableInstrument &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="30" column="24"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1ac6b9f50324965b60c3efb5b3fa641055" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ObservableInstrument::~ObservableInstrument</definition>
+        <argsstring>() override</argsstring>
+        <name>~ObservableInstrument</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::~ObservableInstrument</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="32" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a8e7619ac714cb0a2857e73cef485e07d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::ObservableInstrument::AddCallback</definition>
+        <argsstring>(opentelemetry::metrics::ObservableCallbackPtr callback, void *state) noexcept override</argsstring>
+        <name>AddCallback</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::AddCallback</qualifiedname>
+        <param>
+          <type>opentelemetry::metrics::ObservableCallbackPtr</type>
+          <declname>callback</declname>
+        </param>
+        <param>
+          <type>void *</type>
+          <declname>state</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="34" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1abb3381b7c796a10e0c1c90df1985f0ea" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::ObservableInstrument::RemoveCallback</definition>
+        <argsstring>(opentelemetry::metrics::ObservableCallbackPtr callback, void *state) noexcept override</argsstring>
+        <name>RemoveCallback</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::RemoveCallback</qualifiedname>
+        <param>
+          <type>opentelemetry::metrics::ObservableCallbackPtr</type>
+          <declname>callback</declname>
+        </param>
+        <param>
+          <type>void *</type>
+          <declname>state</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="37" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a9599626574fe8213135fb0240f27aa8e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>const InstrumentDescriptor &amp;</type>
+        <definition>const InstrumentDescriptor &amp; opentelemetry::sdk::metrics::ObservableInstrument::GetInstrumentDescriptor</definition>
+        <argsstring>()</argsstring>
+        <name>GetInstrumentDescriptor</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::GetInstrumentDescriptor</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="40" column="30"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1aa33e3aef8545ce331551a11d718b9426" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>AsyncWritableMetricStorage *</type>
+        <definition>AsyncWritableMetricStorage * opentelemetry::sdk::metrics::ObservableInstrument::GetMetricStorage</definition>
+        <argsstring>()</argsstring>
+        <name>GetMetricStorage</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableInstrument::GetMetricStorage</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="42" column="30"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/async_instruments.h" bodystart="21" bodyend="48"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a8e7619ac714cb0a2857e73cef485e07d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>AddCallback</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a9599626574fe8213135fb0240f27aa8e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>GetInstrumentDescriptor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1aa33e3aef8545ce331551a11d718b9426" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>GetMetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a8297b22e1428e27c4e7398e5fa2039e6" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>instrument_descriptor_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1ada9bf0b107ec4d44cc40470ceb704204" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>observable_registry_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1ab11a136d8bd38663efeb6a573b373e27" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>ObservableInstrument</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a2d36e1559b1b60b6d1eedf0507d96cc5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>ObservableInstrument</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a489487039cd3784be897894344b436cc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>ObservableInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1ObservableInstrument_1a3d53793dda6aadf8419acb00c7c23faf" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::ObservableInstrument::"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>ObservableInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1ObservableInstrument_1a01fd4431e09a2da192ef75fae66f851f" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::ObservableInstrument::"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>ObservableInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1ObservableInstrument_1a4ada1c773b2c4f8daffdd6ffb4bdc1a6" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::ObservableInstrument::"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>ObservableInstrument</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a8b1930f146e38b81b3851c14b6ef8ef1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a43846c9e7c08a07d52fbc16b14f11f2c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1ObservableInstrument_1a46068cb7e15834b6f4a885caea5f698c" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::ObservableInstrument::"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1ObservableInstrument_1a5818834ffc5158bc1e9a9860e43d3230" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::ObservableInstrument::"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1abb3381b7c796a10e0c1c90df1985f0ea" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>RemoveCallback</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1a39638b7abec74697547280fde3fd6454" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>storage_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableInstrument_1ac6b9f50324965b60c3efb5b3fa641055" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableInstrument</scope><name>~ObservableInstrument</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

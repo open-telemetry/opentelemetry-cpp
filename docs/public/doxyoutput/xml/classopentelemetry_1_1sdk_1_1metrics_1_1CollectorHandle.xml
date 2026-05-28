@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::metrics::CollectorHandle</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricCollector" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::MetricCollector</derivedcompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1aebaf5cda9278d8c02cc43303b98365c8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::CollectorHandle::CollectorHandle</definition>
+        <argsstring>()=default</argsstring>
+        <name>CollectorHandle</name>
+        <qualifiedname>opentelemetry::sdk::metrics::CollectorHandle::CollectorHandle</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_collector.h" line="28" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1add673a1a3d025a801633edbefda3bba1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::CollectorHandle::CollectorHandle</definition>
+        <argsstring>(const CollectorHandle &amp;)=delete</argsstring>
+        <name>CollectorHandle</name>
+        <qualifiedname>opentelemetry::sdk::metrics::CollectorHandle::CollectorHandle</qualifiedname>
+        <param>
+          <type>const CollectorHandle &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_collector.h" line="30" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1a494945915cb2026125e82a684cea7606" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::CollectorHandle::CollectorHandle</definition>
+        <argsstring>(CollectorHandle &amp;&amp;)=delete</argsstring>
+        <name>CollectorHandle</name>
+        <qualifiedname>opentelemetry::sdk::metrics::CollectorHandle::CollectorHandle</qualifiedname>
+        <param>
+          <type>CollectorHandle &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_collector.h" line="31" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1a75e0f65e16c88a5013a8df1e6c2c7ba4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>CollectorHandle &amp;</type>
+        <definition>CollectorHandle &amp; opentelemetry::sdk::metrics::CollectorHandle::operator=</definition>
+        <argsstring>(const CollectorHandle &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::CollectorHandle::operator=</qualifiedname>
+        <param>
+          <type>const CollectorHandle &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_collector.h" line="32" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1ab8f9c7323203376c755192095f79cc62" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>CollectorHandle &amp;</type>
+        <definition>CollectorHandle &amp; opentelemetry::sdk::metrics::CollectorHandle::operator=</definition>
+        <argsstring>(CollectorHandle &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::CollectorHandle::operator=</qualifiedname>
+        <param>
+          <type>CollectorHandle &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_collector.h" line="33" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1a28f7d3c365b4e5f55a8d7b6511b0bc03" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::metrics::CollectorHandle::~CollectorHandle</definition>
+        <argsstring>()=default</argsstring>
+        <name>~CollectorHandle</name>
+        <qualifiedname>opentelemetry::sdk::metrics::CollectorHandle::~CollectorHandle</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_collector.h" line="35" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1a29f189b6c51aab38db854812424fe0e9" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>AggregationTemporality</type>
+        <definition>virtual AggregationTemporality opentelemetry::sdk::metrics::CollectorHandle::GetAggregationTemporality</definition>
+        <argsstring>(InstrumentType instrument_type) noexcept=0</argsstring>
+        <name>GetAggregationTemporality</name>
+        <qualifiedname>opentelemetry::sdk::metrics::CollectorHandle::GetAggregationTemporality</qualifiedname>
+        <param>
+          <type>InstrumentType</type>
+          <declname>instrument_type</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_collector.h" line="37" column="34"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::CollectorHandle</label>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::metrics::MetricCollector</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricCollector"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_collector.h" line="25" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_collector.h" bodystart="26" bodyend="39"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1aebaf5cda9278d8c02cc43303b98365c8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::CollectorHandle</scope><name>CollectorHandle</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1add673a1a3d025a801633edbefda3bba1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::CollectorHandle</scope><name>CollectorHandle</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1a494945915cb2026125e82a684cea7606" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::CollectorHandle</scope><name>CollectorHandle</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1a29f189b6c51aab38db854812424fe0e9" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::CollectorHandle</scope><name>GetAggregationTemporality</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1a75e0f65e16c88a5013a8df1e6c2c7ba4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::CollectorHandle</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1ab8f9c7323203376c755192095f79cc62" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::CollectorHandle</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1CollectorHandle_1a28f7d3c365b4e5f55a8d7b6511b0bc03" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::CollectorHandle</scope><name>~CollectorHandle</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

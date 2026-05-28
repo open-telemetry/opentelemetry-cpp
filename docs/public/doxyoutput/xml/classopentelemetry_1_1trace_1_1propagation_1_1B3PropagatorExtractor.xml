@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::trace::propagation::B3PropagatorExtractor</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::context::propagation::TextMapPropagator</basecompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1trace_1_1propagation_1_1B3Propagator" prot="public" virt="non-virtual">opentelemetry::trace::propagation::B3Propagator</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorMultiHeader" prot="public" virt="non-virtual">opentelemetry::trace::propagation::B3PropagatorMultiHeader</derivedcompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor_1af83c1b69a3ff17521556003143f37a59" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>context::Context</type>
+        <definition>context::Context opentelemetry::trace::propagation::B3PropagatorExtractor::Extract</definition>
+        <argsstring>(const context::propagation::TextMapCarrier &amp;carrier, context::Context &amp;context) noexcept override</argsstring>
+        <name>Extract</name>
+        <qualifiedname>opentelemetry::trace::propagation::B3PropagatorExtractor::Extract</qualifiedname>
+        <param>
+          <type>const context::propagation::TextMapCarrier &amp;</type>
+          <declname>carrier</declname>
+        </param>
+        <param>
+          <type>context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="49" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" bodystart="49" bodyend="62"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor_1a858e693d53dce7791c74c2806fa40b26" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>TraceId</type>
+        <definition>static TraceId opentelemetry::trace::propagation::B3PropagatorExtractor::TraceIdFromHex</definition>
+        <argsstring>(nostd::string_view trace_id)</argsstring>
+        <name>TraceIdFromHex</name>
+        <qualifiedname>opentelemetry::trace::propagation::B3PropagatorExtractor::TraceIdFromHex</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>trace_id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="64" column="18" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" bodystart="64" bodyend="69"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor_1a22698049bd414e4806b89cd1d755c766" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>SpanId</type>
+        <definition>static SpanId opentelemetry::trace::propagation::B3PropagatorExtractor::SpanIdFromHex</definition>
+        <argsstring>(nostd::string_view span_id)</argsstring>
+        <name>SpanIdFromHex</name>
+        <qualifiedname>opentelemetry::trace::propagation::B3PropagatorExtractor::SpanIdFromHex</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>span_id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="71" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" bodystart="71" bodyend="76"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor_1ac8a5023842664dab217e55973c9de5d8" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>TraceFlags</type>
+        <definition>static TraceFlags opentelemetry::trace::propagation::B3PropagatorExtractor::TraceFlagsFromHex</definition>
+        <argsstring>(nostd::string_view trace_flags)</argsstring>
+        <name>TraceFlagsFromHex</name>
+        <qualifiedname>opentelemetry::trace::propagation::B3PropagatorExtractor::TraceFlagsFromHex</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>trace_flags</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="78" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" bodystart="78" bodyend="85"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor_1a45caece1ad8797eb06be29f62ce49a61" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>SpanContext</type>
+        <definition>static SpanContext opentelemetry::trace::propagation::B3PropagatorExtractor::ExtractImpl</definition>
+        <argsstring>(const context::propagation::TextMapCarrier &amp;carrier)</argsstring>
+        <name>ExtractImpl</name>
+        <qualifiedname>opentelemetry::trace::propagation::B3PropagatorExtractor::ExtractImpl</qualifiedname>
+        <param>
+          <type>const context::propagation::TextMapCarrier &amp;</type>
+          <declname>carrier</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="88" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" bodystart="88" bodyend="130"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="45" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" bodystart="46" bodyend="131"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor_1af83c1b69a3ff17521556003143f37a59" prot="public" virt="non-virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>Extract</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor_1a45caece1ad8797eb06be29f62ce49a61" prot="private" virt="non-virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>ExtractImpl</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a7d9f7198f5d9c477a4143e325d22cd1f" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>Fields</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a9941d1d770a06527ee1b04f8c2cdac03" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>Inject</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1aa14ca5a5b60a8b1d444397f04cc6ce2f" prot="public" virt="non-virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1af1e661fbae8179b4a4b944a00a30d7fe" prot="public" virt="non-virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor_1a22698049bd414e4806b89cd1d755c766" prot="public" virt="non-virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>SpanIdFromHex</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a95708796cfcbdade8ad81ea6402749c3" prot="public" virt="non-virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>TextMapPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a9eca02e8ef37c0f8e029175bc0cb9fec" prot="public" virt="non-virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>TextMapPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a81a7bb782548036a458c497105b1bcc0" prot="public" virt="non-virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>TextMapPropagator</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor_1ac8a5023842664dab217e55973c9de5d8" prot="public" virt="non-virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>TraceFlagsFromHex</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor_1a858e693d53dce7791c74c2806fa40b26" prot="public" virt="non-virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>TraceIdFromHex</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a0a5f832aea596281984396b45ad09573" prot="public" virt="virtual"><scope>opentelemetry::trace::propagation::B3PropagatorExtractor</scope><name>~TextMapPropagator</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

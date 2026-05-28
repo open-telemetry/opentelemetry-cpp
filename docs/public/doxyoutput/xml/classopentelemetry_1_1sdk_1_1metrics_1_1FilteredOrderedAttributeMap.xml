@@ -1,0 +1,273 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::sdk::common::OrderedAttributeMap</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a3573b894b4bc12c8d19b2b9c2e07017c" prot="private" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::hash_</definition>
+        <argsstring></argsstring>
+        <name>hash_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::hash_</qualifiedname>
+        <initializer>= (std::numeric_limits&lt;size_t&gt;::max)()</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="79" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" bodystart="79" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a3ac220a38c5d20771d1270714aaf38a6" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</definition>
+        <argsstring>()</argsstring>
+        <name>FilteredOrderedAttributeMap</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="31" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" bodystart="31" bodyend="31"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a9ca870c6f1e051ae75e327aef367f387" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</definition>
+        <argsstring>(std::initializer_list&lt; std::pair&lt; nostd::string_view, opentelemetry::common::AttributeValue &gt; &gt; attributes)</argsstring>
+        <name>FilteredOrderedAttributeMap</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</qualifiedname>
+        <param>
+          <type>std::initializer_list&lt; std::pair&lt; nostd::string_view, opentelemetry::common::AttributeValue &gt; &gt;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="33" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" bodystart="33" bodyend="39"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a04368fc784f51cfbdb18728edce0fb4f" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</definition>
+        <argsstring>(const opentelemetry::common::KeyValueIterable &amp;attributes)</argsstring>
+        <name>FilteredOrderedAttributeMap</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="41" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" bodystart="41" bodyend="45"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a8e9483f188982531b557d6b1ca739c47" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</definition>
+        <argsstring>(const opentelemetry::common::KeyValueIterable &amp;attributes, const opentelemetry::sdk::metrics::AttributesProcessor *processor)</argsstring>
+        <name>FilteredOrderedAttributeMap</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">opentelemetry::sdk::metrics::AttributesProcessor</ref> *</type>
+          <declname>processor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="47" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a0670ab9c9db88d07a7040916ed89dc08" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</definition>
+        <argsstring>(std::initializer_list&lt; std::pair&lt; nostd::string_view, opentelemetry::common::AttributeValue &gt; &gt; attributes, const opentelemetry::sdk::metrics::AttributesProcessor *processor)</argsstring>
+        <name>FilteredOrderedAttributeMap</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</qualifiedname>
+        <param>
+          <type>std::initializer_list&lt; std::pair&lt; nostd::string_view, opentelemetry::common::AttributeValue &gt; &gt;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">opentelemetry::sdk::metrics::AttributesProcessor</ref> *</type>
+          <declname>processor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="50" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1ab0520266adfeeb17a758b8aadfc0740e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</definition>
+        <argsstring>(const FilteredOrderedAttributeMap &amp;other)=default</argsstring>
+        <name>FilteredOrderedAttributeMap</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</qualifiedname>
+        <param>
+          <type>const FilteredOrderedAttributeMap &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="58" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a43731a3ea23f091b1f639ec5b56ecc82" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</definition>
+        <argsstring>(FilteredOrderedAttributeMap &amp;&amp;other)=default</argsstring>
+        <name>FilteredOrderedAttributeMap</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::FilteredOrderedAttributeMap</qualifiedname>
+        <param>
+          <type>FilteredOrderedAttributeMap &amp;&amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="59" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a37da96cd3c29c1ebbfc2193ea7cf3792" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>FilteredOrderedAttributeMap &amp;</type>
+        <definition>FilteredOrderedAttributeMap &amp; opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::operator=</definition>
+        <argsstring>(const FilteredOrderedAttributeMap &amp;other)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::operator=</qualifiedname>
+        <param>
+          <type>const FilteredOrderedAttributeMap &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="60" column="31"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1aa7e3778a6b71c1fbc28caf52c8b329d9" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>FilteredOrderedAttributeMap &amp;</type>
+        <definition>FilteredOrderedAttributeMap &amp; opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::operator=</definition>
+        <argsstring>(FilteredOrderedAttributeMap &amp;&amp;other)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::operator=</qualifiedname>
+        <param>
+          <type>FilteredOrderedAttributeMap &amp;&amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="61" column="31"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a8bd62ff77e266fa315731705b134b826" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::~FilteredOrderedAttributeMap</definition>
+        <argsstring>()=default</argsstring>
+        <name>~FilteredOrderedAttributeMap</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::~FilteredOrderedAttributeMap</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="63" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a3311f84aa228474a1fcf7d861834f9b5" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::operator==</definition>
+        <argsstring>(const FilteredOrderedAttributeMap &amp;other) const</argsstring>
+        <name>operator==</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::operator==</qualifiedname>
+        <param>
+          <type>const FilteredOrderedAttributeMap &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="68" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" bodystart="68" bodyend="72"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a5cf348aeffaf12d20611435f09d5f5f9" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::GetHash</definition>
+        <argsstring>() const</argsstring>
+        <name>GetHash</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::GetHash</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="74" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" bodystart="74" bodyend="74"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1ab59d731b5540b46aa02ea4e9bb39d1e2" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::UpdateHash</definition>
+        <argsstring>()</argsstring>
+        <name>UpdateHash</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap::UpdateHash</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="76" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" bodystart="76" bodyend="76"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="28" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" bodystart="29" bodyend="80"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a3ac220a38c5d20771d1270714aaf38a6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>FilteredOrderedAttributeMap</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a9ca870c6f1e051ae75e327aef367f387" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>FilteredOrderedAttributeMap</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a04368fc784f51cfbdb18728edce0fb4f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>FilteredOrderedAttributeMap</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a8e9483f188982531b557d6b1ca739c47" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>FilteredOrderedAttributeMap</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a0670ab9c9db88d07a7040916ed89dc08" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>FilteredOrderedAttributeMap</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1ab0520266adfeeb17a758b8aadfc0740e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>FilteredOrderedAttributeMap</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a43731a3ea23f091b1f639ec5b56ecc82" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>FilteredOrderedAttributeMap</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a5cf348aeffaf12d20611435f09d5f5f9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>GetHash</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a3573b894b4bc12c8d19b2b9c2e07017c" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>hash_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a37da96cd3c29c1ebbfc2193ea7cf3792" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1aa7e3778a6b71c1fbc28caf52c8b329d9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a3311f84aa228474a1fcf7d861834f9b5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>operator==</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1ab59d731b5540b46aa02ea4e9bb39d1e2" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>UpdateHash</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMap_1a8bd62ff77e266fa315731705b134b826" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMap</scope><name>~FilteredOrderedAttributeMap</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

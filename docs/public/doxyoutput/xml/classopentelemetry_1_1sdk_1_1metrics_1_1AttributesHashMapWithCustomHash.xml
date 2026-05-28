@@ -1,0 +1,305 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</compoundname>
+    <templateparamlist>
+      <param>
+        <type>typename CustomHash</type>
+        <defval>MetricAttributesHash</defval>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a410d0170821ccc78dfb8a68a56fead14" prot="private" static="no" mutable="no">
+        <type>std::unordered_map&lt; MetricAttributes, std::unique_ptr&lt; Aggregation &gt;, CustomHash &gt;</type>
+        <definition>std::unordered_map&lt;MetricAttributes, std::unique_ptr&lt;Aggregation&gt;, CustomHash&gt; opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::hash_map_</definition>
+        <argsstring></argsstring>
+        <name>hash_map_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::hash_map_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="182" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="182" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a3788a8a6d7eba8e27475fd305f707af7" prot="private" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::attributes_limit_</definition>
+        <argsstring></argsstring>
+        <name>attributes_limit_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::attributes_limit_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="183" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="183" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1add26e38643dfc0e8d8b714bd47cf85c2" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::AttributesHashMapWithCustomHash</definition>
+        <argsstring>(size_t attributes_limit=kAggregationCardinalityLimit)</argsstring>
+        <name>AttributesHashMapWithCustomHash</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::AttributesHashMapWithCustomHash</qualifiedname>
+        <param>
+          <type>size_t</type>
+          <declname>attributes_limit</declname>
+          <defval>kAggregationCardinalityLimit</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="48" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="48" bodyend="55"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a828f639a4d378ac19bac0c37c9ff7182" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>Aggregation *</type>
+        <definition>Aggregation * opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::Get</definition>
+        <argsstring>(const MetricAttributes &amp;attributes) const</argsstring>
+        <name>Get</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::Get</qualifiedname>
+        <param>
+          <type>const MetricAttributes &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="57" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="57" bodyend="65"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1ac166d3bae6b016e53c549c8722b88cdb" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::Has</definition>
+        <argsstring>(const MetricAttributes &amp;attributes) const</argsstring>
+        <name>Has</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::Has</qualifiedname>
+        <param>
+          <type>const MetricAttributes &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>check if key is present in hash </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="71" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="71" bodyend="74"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1adb434018cf1213470a47ea1be8a089c4" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>Aggregation *</type>
+        <definition>Aggregation * opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::GetOrSetDefault</definition>
+        <argsstring>(const MetricAttributes &amp;attributes, nostd::function_ref&lt; std::unique_ptr&lt; Aggregation &gt;()&gt; aggregation_callback)</argsstring>
+        <name>GetOrSetDefault</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::GetOrSetDefault</qualifiedname>
+        <param>
+          <type>const MetricAttributes &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>nostd::function_ref&lt; std::unique_ptr&lt; Aggregation &gt;()&gt;</type>
+          <declname>aggregation_callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>the pointer to value for given key if present. If not present, it uses the provided callback to generate value and store in the hash </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="81" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="81" bodyend="98"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a3ffbdf20ce835e5f464755efb52f3fa5" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>Aggregation *</type>
+        <definition>Aggregation * opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::GetOrSetDefault</definition>
+        <argsstring>(MetricAttributes &amp;&amp;attributes, nostd::function_ref&lt; std::unique_ptr&lt; Aggregation &gt;()&gt; aggregation_callback)</argsstring>
+        <name>GetOrSetDefault</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::GetOrSetDefault</qualifiedname>
+        <param>
+          <type>MetricAttributes &amp;&amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>nostd::function_ref&lt; std::unique_ptr&lt; Aggregation &gt;()&gt;</type>
+          <declname>aggregation_callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="100" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="100" bodyend="117"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1ad67b547b9d399ff873abcd83e66279e2" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::Set</definition>
+        <argsstring>(const MetricAttributes &amp;attributes, std::unique_ptr&lt; Aggregation &gt; aggr)</argsstring>
+        <name>Set</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::Set</qualifiedname>
+        <param>
+          <type>const MetricAttributes &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; Aggregation &gt;</type>
+          <declname>aggr</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the value for given key, overwriting the value if already present </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="121" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="121" bodyend="136"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a6dcaeb683cabb9df4c1e169834da492d" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::Set</definition>
+        <argsstring>(MetricAttributes &amp;&amp;attributes, std::unique_ptr&lt; Aggregation &gt; aggr)</argsstring>
+        <name>Set</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::Set</qualifiedname>
+        <param>
+          <type>MetricAttributes &amp;&amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; Aggregation &gt;</type>
+          <declname>aggr</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="138" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="138" bodyend="153"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a6bd1a16657b1f0f7e21ac31e28b57f0f" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::GetAllEntries</definition>
+        <argsstring>(nostd::function_ref&lt; bool(const MetricAttributes &amp;, Aggregation &amp;)&gt; callback) const</argsstring>
+        <name>GetAllEntries</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::GetAllEntries</qualifiedname>
+        <param>
+          <type>nostd::function_ref&lt; bool(const MetricAttributes &amp;, Aggregation &amp;)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Iterate the hash to yield key and value stored in hash. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="158" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="158" bodyend="169"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1abfec96e6ef57ae08d638ac41cce3d203" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::Size</definition>
+        <argsstring>()</argsstring>
+        <name>Size</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::Size</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Return the size of hash. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="174" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="174" bodyend="174"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a57aa8de2e2cb719a5427a2b32842c2fa" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>Aggregation *</type>
+        <definition>Aggregation * opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::GetOrSetOveflowAttributes</definition>
+        <argsstring>(nostd::function_ref&lt; std::unique_ptr&lt; Aggregation &gt;()&gt; aggregation_callback)</argsstring>
+        <name>GetOrSetOveflowAttributes</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::GetOrSetOveflowAttributes</qualifiedname>
+        <param>
+          <type>nostd::function_ref&lt; std::unique_ptr&lt; Aggregation &gt;()&gt;</type>
+          <declname>aggregation_callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="185" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="185" bodyend="190"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a81abbef9244e26d203fb344aeb9581bf" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>Aggregation *</type>
+        <definition>Aggregation * opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::GetOrSetOveflowAttributes</definition>
+        <argsstring>(std::unique_ptr&lt; Aggregation &gt; agg)</argsstring>
+        <name>GetOrSetOveflowAttributes</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::GetOrSetOveflowAttributes</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; Aggregation &gt;</type>
+          <declname>agg</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="192" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="192" bodyend="202"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1af57d765c73f7259fc9688bd0b8580d65" prot="private" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash&lt; CustomHash &gt;::IsOverflowAttributes</definition>
+        <argsstring>(const MetricAttributes &amp;attributes) const</argsstring>
+        <name>IsOverflowAttributes</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash::IsOverflowAttributes</qualifiedname>
+        <param>
+          <type>const MetricAttributes &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="204" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="204" bodyend="224"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="45" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="46" bodyend="225"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a3788a8a6d7eba8e27475fd305f707af7" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>attributes_limit_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1add26e38643dfc0e8d8b714bd47cf85c2" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>AttributesHashMapWithCustomHash</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a828f639a4d378ac19bac0c37c9ff7182" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>Get</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a6bd1a16657b1f0f7e21ac31e28b57f0f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>GetAllEntries</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1adb434018cf1213470a47ea1be8a089c4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>GetOrSetDefault</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a3ffbdf20ce835e5f464755efb52f3fa5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>GetOrSetDefault</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a57aa8de2e2cb719a5427a2b32842c2fa" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>GetOrSetOveflowAttributes</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a81abbef9244e26d203fb344aeb9581bf" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>GetOrSetOveflowAttributes</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1ac166d3bae6b016e53c549c8722b88cdb" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>Has</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a410d0170821ccc78dfb8a68a56fead14" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>hash_map_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1af57d765c73f7259fc9688bd0b8580d65" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>IsOverflowAttributes</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1ad67b547b9d399ff873abcd83e66279e2" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>Set</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1a6dcaeb683cabb9df4c1e169834da492d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>Set</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesHashMapWithCustomHash_1abfec96e6ef57ae08d638ac41cce3d203" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesHashMapWithCustomHash</scope><name>Size</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,11 @@
+<map id="opentelemetry::sdk::trace::Sampler" name="opentelemetry::sdk::trace::Sampler">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,101,153,141"/>
+<area shape="rect" id="Node000002" href="$classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler.html" title=" " alt="" coords="209,5,400,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,92,200,55,233,43,235,48,202,60,128,97"/>
+<area shape="rect" id="Node000003" href="$classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOnSampler.html" title=" " alt="" coords="209,69,400,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="167,106,209,100,210,106,168,112"/>
+<area shape="rect" id="Node000004" href="$classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler.html" title=" " alt="" coords="201,133,408,173"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="167,131,202,136,201,141,167,136"/>
+<area shape="rect" id="Node000005" href="$classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler.html" title=" " alt="" coords="209,198,400,253"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="129,146,202,183,232,195,229,200,200,188,127,150"/>
+</map>

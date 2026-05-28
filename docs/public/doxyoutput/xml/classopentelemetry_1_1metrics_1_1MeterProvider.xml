@@ -1,0 +1,192 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1metrics_1_1MeterProvider" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::metrics::MeterProvider</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1metrics_1_1NoopMeterProvider" prot="public" virt="non-virtual">opentelemetry::metrics::NoopMeterProvider</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProvider" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::MeterProvider</derivedcompoundref>
+    <includes refid="api_2include_2opentelemetry_2metrics_2meter__provider_8h" local="no">meter_provider.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1MeterProvider_1a5bb76e70b7e945087e199b5c598dc77c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::metrics::MeterProvider::MeterProvider</definition>
+        <argsstring>()=default</argsstring>
+        <name>MeterProvider</name>
+        <qualifiedname>opentelemetry::metrics::MeterProvider::MeterProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter_provider.h" line="25" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1MeterProvider_1ab8ec2ed04c2beb40a2de3e3295909e12" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::metrics::MeterProvider::MeterProvider</definition>
+        <argsstring>(const MeterProvider &amp;)=default</argsstring>
+        <name>MeterProvider</name>
+        <qualifiedname>opentelemetry::metrics::MeterProvider::MeterProvider</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter_provider.h" line="26" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1MeterProvider_1abe8dd1cbe932e41a0fd7ea2080ff97e5" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::metrics::MeterProvider::MeterProvider</definition>
+        <argsstring>(MeterProvider &amp;&amp;) noexcept=default</argsstring>
+        <name>MeterProvider</name>
+        <qualifiedname>opentelemetry::metrics::MeterProvider::MeterProvider</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter_provider.h" line="27" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1MeterProvider_1a1bf847829cb82a904f5092e900a38ee0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref> &amp;</type>
+        <definition>MeterProvider &amp; opentelemetry::metrics::MeterProvider::operator=</definition>
+        <argsstring>(const MeterProvider &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::metrics::MeterProvider::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter_provider.h" line="28" column="17"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1MeterProvider_1a3a60895c29cb7568206cf22776ef7ff8" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref> &amp;</type>
+        <definition>MeterProvider &amp; opentelemetry::metrics::MeterProvider::operator=</definition>
+        <argsstring>(MeterProvider &amp;&amp;) noexcept=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::metrics::MeterProvider::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter_provider.h" line="29" column="17"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1MeterProvider_1a8a28214a7105ef996a4adcf6cfd780fa" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::metrics::MeterProvider::~MeterProvider</definition>
+        <argsstring>()=default</argsstring>
+        <name>~MeterProvider</name>
+        <qualifiedname>opentelemetry::metrics::MeterProvider::~MeterProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter_provider.h" line="30" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1MeterProvider_1a89d90f6a56f4a508d60eff4ca17d9a61" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> &gt;</type>
+        <definition>virtual nostd::shared_ptr&lt; Meter &gt; opentelemetry::metrics::MeterProvider::GetMeter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view version=&quot;&quot;, nostd::string_view schema_url=&quot;&quot;) noexcept=0</argsstring>
+        <name>GetMeter</name>
+        <qualifiedname>opentelemetry::metrics::MeterProvider::GetMeter</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeterProvider_1a5b02d2ea82f34c0869ee2786f77031a1">GetMeter</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>version</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>schema_url</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Gets or creates a named <ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> instance (ABI)</para>
+<para><simplesect kind="since"><para>ABI_VERSION 1</para>
+</simplesect>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> instrumentation scope </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">version</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Instrumentation scope version, optional </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">schema_url</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Instrumentation scope schema URL, optional </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter_provider.h" line="129" column="29"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Creates new <ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> instances. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::metrics::MeterProvider</label>
+        <link refid="classopentelemetry_1_1metrics_1_1MeterProvider"/>
+      </node>
+      <node id="2">
+        <label>opentelemetry::metrics::NoopMeterProvider</label>
+        <link refid="classopentelemetry_1_1metrics_1_1NoopMeterProvider"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter_provider.h" line="22" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter_provider.h" bodystart="23" bodyend="151"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1a89d90f6a56f4a508d60eff4ca17d9a61" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::MeterProvider</scope><name>GetMeter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1a5bb76e70b7e945087e199b5c598dc77c" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::MeterProvider</scope><name>MeterProvider</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1ab8ec2ed04c2beb40a2de3e3295909e12" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::MeterProvider</scope><name>MeterProvider</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1abe8dd1cbe932e41a0fd7ea2080ff97e5" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::MeterProvider</scope><name>MeterProvider</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1a1bf847829cb82a904f5092e900a38ee0" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::MeterProvider</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1a3a60895c29cb7568206cf22776ef7ff8" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::MeterProvider</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1a8a28214a7105ef996a4adcf6cfd780fa" prot="public" virt="virtual"><scope>opentelemetry::metrics::MeterProvider</scope><name>~MeterProvider</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

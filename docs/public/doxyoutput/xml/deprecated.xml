@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="deprecated" kind="page">
+    <compoundname>deprecated</compoundname>
+    <title>Deprecated List</title>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><variablelist>
+<varlistentry><term>Class <ref refid="classopentelemetry_1_1logs_1_1EventLogger" kindref="compound">opentelemetry::logs::EventLogger</ref>  </term></varlistentry>
+<listitem><para><anchor id="deprecated_1_deprecated000001"/>  </para>
+</listitem>
+<varlistentry><term>Class <ref refid="classopentelemetry_1_1logs_1_1EventLoggerProvider" kindref="compound">opentelemetry::logs::EventLoggerProvider</ref>  </term></varlistentry>
+<listitem><para><anchor id="deprecated_1_deprecated000002"/>  </para>
+</listitem>
+<varlistentry><term>Class <ref refid="classopentelemetry_1_1logs_1_1NoopEventLogger" kindref="compound">opentelemetry::logs::NoopEventLogger</ref>  </term></varlistentry>
+<listitem><para><anchor id="deprecated_1_deprecated000003"/>  </para>
+</listitem>
+<varlistentry><term>Class <ref refid="classopentelemetry_1_1logs_1_1NoopEventLoggerProvider" kindref="compound">opentelemetry::logs::NoopEventLoggerProvider</ref>  </term></varlistentry>
+<listitem><para><anchor id="deprecated_1_deprecated000004"/>  </para>
+</listitem>
+<varlistentry><term>Member <ref refid="classopentelemetry_1_1logs_1_1Provider_1a50783a4d2df4dceeaefe03f858239cda" kindref="member">opentelemetry::logs::Provider::GetEventLoggerProvider</ref>  () noexcept</term></varlistentry>
+<listitem><para><anchor id="deprecated_1_deprecated000005"/>  </para>
+</listitem>
+<varlistentry><term>Member <ref refid="classopentelemetry_1_1logs_1_1Provider_1abf483d6ff93d12321952092b348cee20" kindref="member">opentelemetry::logs::Provider::SetEventLoggerProvider</ref>  (const nostd::shared_ptr&lt; EventLoggerProvider &gt; &amp;tp) noexcept</term></varlistentry>
+<listitem><para><anchor id="deprecated_1_deprecated000006"/>  </para>
+</listitem>
+<varlistentry><term>Class <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLogger" kindref="compound">opentelemetry::sdk::logs::EventLogger</ref>  </term></varlistentry>
+<listitem><para><anchor id="deprecated_1_deprecated000007"/>  </para>
+</listitem>
+<varlistentry><term>Class <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" kindref="compound">opentelemetry::sdk::logs::EventLoggerProvider</ref>  </term></varlistentry>
+<listitem><para><anchor id="deprecated_1_deprecated000008"/>  </para>
+</listitem>
+<varlistentry><term>Class <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProviderFactory" kindref="compound">opentelemetry::sdk::logs::EventLoggerProviderFactory</ref>  </term></varlistentry>
+<listitem><para><anchor id="deprecated_1_deprecated000009"/> </para>
+</listitem>
+</variablelist>
+</para>
+    </detaileddescription>
+    <location file="deprecated"/>
+  </compounddef>
+</doxygen>

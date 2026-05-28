@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1sdk" kind="namespace" language="C++">
+    <compoundname>opentelemetry::sdk</compoundname>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1common">opentelemetry::sdk::common</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1instrumentationlibrary">opentelemetry::sdk::instrumentationlibrary</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1instrumentationscope">opentelemetry::sdk::instrumentationscope</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1logs">opentelemetry::sdk::logs</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1metrics">opentelemetry::sdk::metrics</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1resource">opentelemetry::sdk::resource</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1trace">opentelemetry::sdk::trace</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationlibrary/instrumentation_library.h" line="11" column="1"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1Provider" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::Provider</compoundname>
+    <includes refid="sdk_2include_2opentelemetry_2sdk_2metrics_2provider_8h" local="no">provider.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Provider_1ae8a86c074d44a63fadabb66ca5131f8f" prot="public" static="yes" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>static void opentelemetry::sdk::metrics::Provider::SetMeterProvider</definition>
+        <argsstring>(const nostd::shared_ptr&lt; opentelemetry::metrics::MeterProvider &gt; &amp;mp) noexcept</argsstring>
+        <name>SetMeterProvider</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Provider::SetMeterProvider</qualifiedname>
+        <param>
+          <type>const nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">opentelemetry::metrics::MeterProvider</ref> &gt; &amp;</type>
+          <declname>mp</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Changes the singleton MeterProvider. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/provider.h" line="27" column="15"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Changes the singleton global MeterProvider. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/provider.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/provider.h" bodystart="22" bodyend="29"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Provider_1ae8a86c074d44a63fadabb66ca5131f8f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Provider</scope><name>SetMeterProvider</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

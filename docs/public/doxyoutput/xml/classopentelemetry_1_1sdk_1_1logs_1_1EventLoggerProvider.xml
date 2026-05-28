@@ -1,0 +1,173 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::sdk::logs::EventLoggerProvider</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1logs_1_1EventLoggerProvider" prot="public" virt="non-virtual">opentelemetry::logs::EventLoggerProvider</basecompoundref>
+    <includes refid="sdk_2include_2opentelemetry_2sdk_2logs_2event__logger__provider_8h" local="no">event_logger_provider.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1ab3f763910019f23f11be04d3d4ab513d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::EventLoggerProvider::EventLoggerProvider</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>EventLoggerProvider</name>
+        <qualifiedname>opentelemetry::sdk::logs::EventLoggerProvider::EventLoggerProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger_provider.h" line="27" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1ab4c1065c4cd54b006dfa29a5304e7e7f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::EventLoggerProvider::EventLoggerProvider</definition>
+        <argsstring>(const EventLoggerProvider &amp;)=delete</argsstring>
+        <name>EventLoggerProvider</name>
+        <qualifiedname>opentelemetry::sdk::logs::EventLoggerProvider::EventLoggerProvider</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger_provider.h" line="29" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1a41b29d24e48bb25c5cdaea74e4e75b80" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::EventLoggerProvider::EventLoggerProvider</definition>
+        <argsstring>(EventLoggerProvider &amp;&amp;)=delete</argsstring>
+        <name>EventLoggerProvider</name>
+        <qualifiedname>opentelemetry::sdk::logs::EventLoggerProvider::EventLoggerProvider</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger_provider.h" line="30" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1ae66f01e31466faa861fa36527c59c67b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref> &amp;</type>
+        <definition>EventLoggerProvider &amp; opentelemetry::sdk::logs::EventLoggerProvider::operator=</definition>
+        <argsstring>(const EventLoggerProvider &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::logs::EventLoggerProvider::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger_provider.h" line="31" column="23"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1a120003a5e4172d12765bf3e5becc5e8a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref> &amp;</type>
+        <definition>EventLoggerProvider &amp; opentelemetry::sdk::logs::EventLoggerProvider::operator=</definition>
+        <argsstring>(EventLoggerProvider &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::logs::EventLoggerProvider::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger_provider.h" line="32" column="23"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1adbc337e4db7d2d539882f3c061eda74e" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::EventLoggerProvider::~EventLoggerProvider</definition>
+        <argsstring>() override</argsstring>
+        <name>~EventLoggerProvider</name>
+        <qualifiedname>opentelemetry::sdk::logs::EventLoggerProvider::~EventLoggerProvider</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1logs_1_1EventLoggerProvider_1a498396ab947815cfccf437db40144fb9">~EventLoggerProvider</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger_provider.h" line="34" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1aecda72ae4281d1f2589faece207b2909" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1EventLogger" kindref="compound">opentelemetry::logs::EventLogger</ref> &gt;</type>
+        <definition>nostd::shared_ptr&lt; opentelemetry::logs::EventLogger &gt; opentelemetry::sdk::logs::EventLoggerProvider::CreateEventLogger</definition>
+        <argsstring>(nostd::shared_ptr&lt; opentelemetry::logs::Logger &gt; delegate_logger, nostd::string_view event_domain) noexcept override</argsstring>
+        <name>CreateEventLogger</name>
+        <qualifiedname>opentelemetry::sdk::logs::EventLoggerProvider::CreateEventLogger</qualifiedname>
+        <param>
+          <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1Logger" kindref="compound">opentelemetry::logs::Logger</ref> &gt;</type>
+          <declname>delegate_logger</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>event_domain</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger_provider.h" line="36" column="21"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Sdk implementation of <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref>. <xrefsect id="deprecated_1_deprecated000008"><xreftitle>Deprecated</xreftitle><xrefdescription></xrefdescription></xrefsect></para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::logs::EventLoggerProvider</label>
+        <link refid="classopentelemetry_1_1logs_1_1EventLoggerProvider"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::logs::EventLoggerProvider</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::logs::EventLoggerProvider</label>
+        <link refid="classopentelemetry_1_1logs_1_1EventLoggerProvider"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::logs::EventLoggerProvider</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger_provider.h" line="23" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger_provider.h" bodystart="25" bodyend="39"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1aecda72ae4281d1f2589faece207b2909" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::EventLoggerProvider</scope><name>CreateEventLogger</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1EventLoggerProvider_1a7ce8e362b830de88d4f7e098b4a311b3" prot="public" virt="pure-virtual" ambiguityscope="opentelemetry::logs::EventLoggerProvider::"><scope>opentelemetry::sdk::logs::EventLoggerProvider</scope><name>CreateEventLogger</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1ab3f763910019f23f11be04d3d4ab513d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::EventLoggerProvider</scope><name>EventLoggerProvider</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1ab4c1065c4cd54b006dfa29a5304e7e7f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::EventLoggerProvider</scope><name>EventLoggerProvider</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1a41b29d24e48bb25c5cdaea74e4e75b80" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::EventLoggerProvider</scope><name>EventLoggerProvider</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1EventLoggerProvider_1a6cd9d078f38a32f69963531fc7fa202c" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::logs::EventLoggerProvider::"><scope>opentelemetry::sdk::logs::EventLoggerProvider</scope><name>EventLoggerProvider</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1EventLoggerProvider_1a9492f5d3063fc3870ff3c0cf1c2e71e7" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::logs::EventLoggerProvider::"><scope>opentelemetry::sdk::logs::EventLoggerProvider</scope><name>EventLoggerProvider</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1ae66f01e31466faa861fa36527c59c67b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::EventLoggerProvider</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1a120003a5e4172d12765bf3e5becc5e8a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::EventLoggerProvider</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1EventLoggerProvider_1a196d61de7df8f57798836a0bb1f84ba2" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::logs::EventLoggerProvider::"><scope>opentelemetry::sdk::logs::EventLoggerProvider</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1EventLoggerProvider_1af45193f68edcecdd21edfb88caf082b0" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::logs::EventLoggerProvider::"><scope>opentelemetry::sdk::logs::EventLoggerProvider</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider_1adbc337e4db7d2d539882f3c061eda74e" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::EventLoggerProvider</scope><name>~EventLoggerProvider</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

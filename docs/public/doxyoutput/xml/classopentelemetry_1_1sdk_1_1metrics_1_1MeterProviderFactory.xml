@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProviderFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::MeterProviderFactory</compoundname>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProviderFactory_1a8e56b080d82d70cc99e4cb25371be434" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::metrics::MeterProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::metrics::MeterProvider &gt; opentelemetry::sdk::metrics::MeterProviderFactory::Create</definition>
+        <argsstring>()</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterProviderFactory::Create</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider_factory.h" line="24" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProviderFactory_1a545c52a1b7994f6407b0f04360d0be08" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::metrics::MeterProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::metrics::MeterProvider &gt; opentelemetry::sdk::metrics::MeterProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; ViewRegistry &gt; views)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; ViewRegistry &gt;</type>
+          <declname>views</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider_factory.h" line="26" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProviderFactory_1a156ee1463458949c11c931e4e218ebb5" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::metrics::MeterProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::metrics::MeterProvider &gt; opentelemetry::sdk::metrics::MeterProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; ViewRegistry &gt; views, const opentelemetry::sdk::resource::Resource &amp;resource)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; ViewRegistry &gt;</type>
+          <declname>views</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider_factory.h" line="29" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProviderFactory_1a99645f9fb94a358d9833fb06178c1e80" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::metrics::MeterProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::metrics::MeterProvider &gt; opentelemetry::sdk::metrics::MeterProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; ViewRegistry &gt; views, const opentelemetry::sdk::resource::Resource &amp;resource, std::unique_ptr&lt; instrumentationscope::ScopeConfigurator&lt; MeterConfig &gt; &gt; meter_configurator)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; ViewRegistry &gt;</type>
+          <declname>views</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> &gt; &gt;</type>
+          <declname>meter_configurator</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider_factory.h" line="33" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProviderFactory_1ae6906cd9eda281332e62cc66553cc5fc" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::metrics::MeterProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::metrics::MeterProvider &gt; opentelemetry::sdk::metrics::MeterProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; sdk::metrics::MeterContext &gt; context)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">sdk::metrics::MeterContext</ref> &gt;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider_factory.h" line="38" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider_factory.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_provider_factory.h" bodystart="22" bodyend="40"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProviderFactory_1a8e56b080d82d70cc99e4cb25371be434" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProviderFactory_1a545c52a1b7994f6407b0f04360d0be08" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProviderFactory_1a156ee1463458949c11c931e4e218ebb5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProviderFactory_1a99645f9fb94a358d9833fb06178c1e80" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterProviderFactory_1ae6906cd9eda281332e62cc66553cc5fc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterProviderFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

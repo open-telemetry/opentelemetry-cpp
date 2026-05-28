@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1sdk_1_1resource" kind="namespace" language="C++">
+    <compoundname>opentelemetry::sdk::resource</compoundname>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1resource_1_1OTELResourceDetector" prot="public">opentelemetry::sdk::resource::OTELResourceDetector</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource" prot="public">opentelemetry::sdk::resource::Resource</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector" prot="public">opentelemetry::sdk::resource::ResourceDetector</innerclass>
+    <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="resource_8h_1aeb8cd77428ac82eb65d391cee09c5b51" prot="public" static="no">
+        <type>opentelemetry::sdk::common::AttributeMap</type>
+        <definition>using opentelemetry::sdk::resource::ResourceAttributes = typedef opentelemetry::sdk::common::AttributeMap</definition>
+        <argsstring></argsstring>
+        <name>ResourceAttributes</name>
+        <qualifiedname>opentelemetry::sdk::resource::ResourceAttributes</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="17" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" bodystart="17" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/readable_log_record.h" line="30" column="1"/>
+  </compounddef>
+</doxygen>

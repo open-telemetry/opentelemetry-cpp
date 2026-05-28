@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MatchEverythingPattern" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::MatchEverythingPattern</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::sdk::metrics::Predicate</basecompoundref>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MatchEverythingPattern_1a139572ec61623540f80b82317777df4b" prot="private" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::MatchEverythingPattern::Match</definition>
+        <argsstring>(opentelemetry::nostd::string_view) const noexcept override</argsstring>
+        <name>Match</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MatchEverythingPattern::Match</qualifiedname>
+        <param>
+          <type>opentelemetry::nostd::string_view</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="78" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" bodystart="78" bodyend="78"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" line="76" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate.h" bodystart="77" bodyend="79"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MatchEverythingPattern_1a139572ec61623540f80b82317777df4b" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MatchEverythingPattern</scope><name>Match</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a887426a85c647f5527af2ba35628cc37" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MatchEverythingPattern</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a78a4ec7a90b2b5e4a76551eded3d8262" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MatchEverythingPattern</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a0851e32f18671b7a3045066b4a6b0b42" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MatchEverythingPattern</scope><name>Predicate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a2cc8c7abe32f21f60b5576a1a35a2f52" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MatchEverythingPattern</scope><name>Predicate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1abd232148c19aeedbb5bc67fa1c68df1b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MatchEverythingPattern</scope><name>Predicate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Predicate_1a34af40c8bec73a5bd25aa3c30ddbbf20" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::MatchEverythingPattern</scope><name>~Predicate</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

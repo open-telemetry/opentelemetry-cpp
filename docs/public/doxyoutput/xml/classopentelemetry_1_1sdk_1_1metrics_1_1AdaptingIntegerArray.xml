@@ -1,0 +1,276 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::AdaptingIntegerArray</compoundname>
+    <includes refid="circular__buffer_8h" local="no">circular_buffer.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1a2c77f8c834d3b312a1bb9963e86e8305" prot="private" static="no" mutable="no">
+        <type>nostd::variant&lt; std::vector&lt; uint8_t &gt;, std::vector&lt; uint16_t &gt;, std::vector&lt; uint32_t &gt;, std::vector&lt; uint64_t &gt; &gt;</type>
+        <definition>nostd::variant&lt;std::vector&lt;uint8_t&gt;, std::vector&lt;uint16_t&gt;, std::vector&lt;uint32_t&gt;, std::vector&lt;uint64_t&gt; &gt; opentelemetry::sdk::metrics::AdaptingIntegerArray::backing_</definition>
+        <argsstring></argsstring>
+        <name>backing_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingIntegerArray::backing_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="76" column="7" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="76" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1acb1ed6ed7651f57fa09388fa24a77703" prot="public" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::AdaptingIntegerArray::AdaptingIntegerArray</definition>
+        <argsstring>(size_t size)</argsstring>
+        <name>AdaptingIntegerArray</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingIntegerArray::AdaptingIntegerArray</qualifiedname>
+        <param>
+          <type>size_t</type>
+          <declname>size</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="33" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="33" bodyend="33"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1aef0e6e1782b4f529f8ed59c478dee739" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::AdaptingIntegerArray::AdaptingIntegerArray</definition>
+        <argsstring>(const AdaptingIntegerArray &amp;other)=default</argsstring>
+        <name>AdaptingIntegerArray</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingIntegerArray::AdaptingIntegerArray</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray" kindref="compound">AdaptingIntegerArray</ref> &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="34" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1adc64c1a198fd775e4a7264c3b970d33a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::AdaptingIntegerArray::AdaptingIntegerArray</definition>
+        <argsstring>(AdaptingIntegerArray &amp;&amp;other)=default</argsstring>
+        <name>AdaptingIntegerArray</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingIntegerArray::AdaptingIntegerArray</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray" kindref="compound">AdaptingIntegerArray</ref> &amp;&amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="35" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1a8ddb4787124eaa8cabca748363edeadb" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray" kindref="compound">AdaptingIntegerArray</ref> &amp;</type>
+        <definition>AdaptingIntegerArray &amp; opentelemetry::sdk::metrics::AdaptingIntegerArray::operator=</definition>
+        <argsstring>(const AdaptingIntegerArray &amp;other)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingIntegerArray::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray" kindref="compound">AdaptingIntegerArray</ref> &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="36" column="24"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1aeb5a8335802258f9ad2ef3051757cd8c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray" kindref="compound">AdaptingIntegerArray</ref> &amp;</type>
+        <definition>AdaptingIntegerArray &amp; opentelemetry::sdk::metrics::AdaptingIntegerArray::operator=</definition>
+        <argsstring>(AdaptingIntegerArray &amp;&amp;other)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingIntegerArray::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray" kindref="compound">AdaptingIntegerArray</ref> &amp;&amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="37" column="24"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1a152b61445d6364734e4bc247a35c1468" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::AdaptingIntegerArray::~AdaptingIntegerArray</definition>
+        <argsstring>()=default</argsstring>
+        <name>~AdaptingIntegerArray</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingIntegerArray::~AdaptingIntegerArray</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="39" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1ad185f19464a7ca05e5a292ef988538f6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::AdaptingIntegerArray::Increment</definition>
+        <argsstring>(size_t index, uint64_t count)</argsstring>
+        <name>Increment</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingIntegerArray::Increment</qualifiedname>
+        <param>
+          <type>size_t</type>
+          <declname>index</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>count</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Increments the value at the specified index by the given count in the array.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>index</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The index of the value to increment. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>count</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The count by which to increment the value. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="47" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1ac89fb6853950042d120c80873ba34b01" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t opentelemetry::sdk::metrics::AdaptingIntegerArray::Get</definition>
+        <argsstring>(size_t index) const</argsstring>
+        <name>Get</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingIntegerArray::Get</qualifiedname>
+        <param>
+          <type>size_t</type>
+          <declname>index</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the value at the specified index from the array.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>index</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The index of the value to retrieve. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The value at the specified index. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="55" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1a79df00be8ce49e0c4489329e02abb8fd" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::AdaptingIntegerArray::Size</definition>
+        <argsstring>() const</argsstring>
+        <name>Size</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingIntegerArray::Size</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the size of the array.</para>
+<para><simplesect kind="return"><para>The size of the array. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="62" column="10"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1a2e816a84c8e18e14363a443a5c80bf62" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::AdaptingIntegerArray::Clear</definition>
+        <argsstring>()</argsstring>
+        <name>Clear</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingIntegerArray::Clear</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Clears the array, resetting all values to zero. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="67" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1aa4eab58034aec8c00b4b48875a586692" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::AdaptingIntegerArray::EnlargeToFit</definition>
+        <argsstring>(uint64_t value)</argsstring>
+        <name>EnlargeToFit</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingIntegerArray::EnlargeToFit</qualifiedname>
+        <param>
+          <type>uint64_t</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="70" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>An integer array that automatically expands its memory consumption (via copy/allocation) when reaching limits. This assumes counts remain low, to lower memory overhead.</para>
+<para>This class is NOT thread-safe. It is expected to be behind a synchronized incrementer.</para>
+<para>Instances start by attempting to store one-byte per-cell in the integer array. As values grow, this will automatically instantiate the next-size integer array (uint8_t -&gt; uint16_t -&gt; uint32_t -&gt; uint64_t) and copy over values into the larger array. This class expects most usage to remain within the uint8_t boundary (e.g. cell values &lt; 256). </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="29" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="30" bodyend="77"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1acb1ed6ed7651f57fa09388fa24a77703" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingIntegerArray</scope><name>AdaptingIntegerArray</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1aef0e6e1782b4f529f8ed59c478dee739" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingIntegerArray</scope><name>AdaptingIntegerArray</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1adc64c1a198fd775e4a7264c3b970d33a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingIntegerArray</scope><name>AdaptingIntegerArray</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1a2c77f8c834d3b312a1bb9963e86e8305" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingIntegerArray</scope><name>backing_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1a2e816a84c8e18e14363a443a5c80bf62" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingIntegerArray</scope><name>Clear</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1aa4eab58034aec8c00b4b48875a586692" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingIntegerArray</scope><name>EnlargeToFit</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1ac89fb6853950042d120c80873ba34b01" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingIntegerArray</scope><name>Get</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1ad185f19464a7ca05e5a292ef988538f6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingIntegerArray</scope><name>Increment</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1a8ddb4787124eaa8cabca748363edeadb" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingIntegerArray</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1aeb5a8335802258f9ad2ef3051757cd8c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingIntegerArray</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1a79df00be8ce49e0c4489329e02abb8fd" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingIntegerArray</scope><name>Size</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray_1a152b61445d6364734e4bc247a35c1468" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingIntegerArray</scope><name>~AdaptingIntegerArray</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

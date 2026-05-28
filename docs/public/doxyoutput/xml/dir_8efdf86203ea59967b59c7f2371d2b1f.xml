@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_8efdf86203ea59967b59c7f2371d2b1f" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation</compoundname>
+    <innerfile refid="composite__propagator_8h">composite_propagator.h</innerfile>
+    <innerfile refid="environment__carrier_8h">environment_carrier.h</innerfile>
+    <innerfile refid="global__propagator_8h">global_propagator.h</innerfile>
+    <innerfile refid="noop__propagator_8h">noop_propagator.h</innerfile>
+    <innerfile refid="text__map__propagator_8h">text_map_propagator.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelectorFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::InstrumentSelectorFactory</compoundname>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelectorFactory_1a1c39c4baff97611b958e3fe4a55ad30d" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; InstrumentSelector &gt;</type>
+        <definition>static std::unique_ptr&lt; InstrumentSelector &gt; opentelemetry::sdk::metrics::InstrumentSelectorFactory::Create</definition>
+        <argsstring>(opentelemetry::sdk::metrics::InstrumentType instrument_type, const std::string &amp;name, const std::string &amp;unit)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentSelectorFactory::Create</qualifiedname>
+        <param>
+          <type>opentelemetry::sdk::metrics::InstrumentType</type>
+          <declname>instrument_type</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>unit</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector_factory.h" line="22" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector_factory.h" line="19" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/instrument_selector_factory.h" bodystart="20" bodyend="26"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1InstrumentSelectorFactory_1a1c39c4baff97611b958e3fe4a55ad30d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentSelectorFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

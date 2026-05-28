@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::logs::detail::LogRecordSetterTrait</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class ValueType</type>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_1af5efad5e665423545e871f5c4eea8328" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class ArgumentType</type>
+          </param>
+          <param>
+            <type>nostd::enable_if_t&lt; std::is_convertible&lt; ArgumentType, nostd::string_view &gt;::value||std::is_convertible&lt; ArgumentType, common::AttributeValue &gt;::value, void &gt; *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type><ref refid="classopentelemetry_1_1logs_1_1LogRecord" kindref="compound">LogRecord</ref> *</type>
+        <definition>static LogRecord * opentelemetry::logs::detail::LogRecordSetterTrait&lt; ValueType &gt;::Set</definition>
+        <argsstring>(LogRecord *log_record, ArgumentType &amp;&amp;arg) noexcept</argsstring>
+        <name>Set</name>
+        <qualifiedname>opentelemetry::logs::detail::LogRecordSetterTrait::Set</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1logs_1_1LogRecord" kindref="compound">LogRecord</ref> *</type>
+          <declname>log_record</declname>
+        </param>
+        <param>
+          <type>ArgumentType &amp;&amp;</type>
+          <declname>arg</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h" line="157" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h" bodystart="157" bodyend="162"/>
+      </memberdef>
+      <memberdef kind="function" id="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_1af5efad5e665423545e871f5c4eea8328" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class ArgumentType</type>
+          </param>
+          <param>
+            <type>nostd::enable_if_t&lt; std::is_base_of&lt; <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">common::KeyValueIterable</ref>, ArgumentType &gt;::value, bool &gt; *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type><ref refid="classopentelemetry_1_1logs_1_1LogRecord" kindref="compound">LogRecord</ref> *</type>
+        <definition>static LogRecord * opentelemetry::logs::detail::LogRecordSetterTrait&lt; ValueType &gt;::Set</definition>
+        <argsstring>(LogRecord *log_record, ArgumentType &amp;&amp;arg) noexcept</argsstring>
+        <name>Set</name>
+        <qualifiedname>opentelemetry::logs::detail::LogRecordSetterTrait::Set</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1logs_1_1LogRecord" kindref="compound">LogRecord</ref> *</type>
+          <declname>log_record</declname>
+        </param>
+        <param>
+          <type>ArgumentType &amp;&amp;</type>
+          <declname>arg</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h" line="167" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h" bodystart="167" bodyend="171"/>
+      </memberdef>
+      <memberdef kind="function" id="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_1a12cd3e7b5f62702c583dd050066bd2a0" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class ArgumentType</type>
+          </param>
+          <param>
+            <type>nostd::enable_if_t&lt; common::detail::is_key_value_iterable&lt; ArgumentType &gt;::value, int &gt; *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type><ref refid="classopentelemetry_1_1logs_1_1LogRecord" kindref="compound">LogRecord</ref> *</type>
+        <definition>static LogRecord * opentelemetry::logs::detail::LogRecordSetterTrait&lt; ValueType &gt;::Set</definition>
+        <argsstring>(LogRecord *log_record, const ArgumentType &amp;arg) noexcept</argsstring>
+        <name>Set</name>
+        <qualifiedname>opentelemetry::logs::detail::LogRecordSetterTrait::Set</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1logs_1_1LogRecord" kindref="compound">LogRecord</ref> *</type>
+          <declname>log_record</declname>
+        </param>
+        <param>
+          <type>const ArgumentType &amp;</type>
+          <declname>arg</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h" line="176" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h" bodystart="176" bodyend="184"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h" line="147" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h" bodystart="148" bodyend="185"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_1af5efad5e665423545e871f5c4eea8328" prot="public" virt="non-virtual"><scope>opentelemetry::logs::detail::LogRecordSetterTrait</scope><name>Set</name></member>
+      <member refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_1af5efad5e665423545e871f5c4eea8328" prot="public" virt="non-virtual"><scope>opentelemetry::logs::detail::LogRecordSetterTrait</scope><name>Set</name></member>
+      <member refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_1a12cd3e7b5f62702c583dd050066bd2a0" prot="public" virt="non-virtual"><scope>opentelemetry::logs::detail::LogRecordSetterTrait</scope><name>Set</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

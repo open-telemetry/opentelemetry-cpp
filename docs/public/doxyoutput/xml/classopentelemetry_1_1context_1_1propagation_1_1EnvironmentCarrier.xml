@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::context::propagation::EnvironmentCarrier</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::context::propagation::TextMapCarrier</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1af3a44501c6d4f84c857b68488c54f81c" prot="private" static="no" mutable="no">
+        <type>std::shared_ptr&lt; std::map&lt; std::string, std::string &gt; &gt;</type>
+        <definition>std::shared_ptr&lt;std::map&lt;std::string, std::string&gt; &gt; opentelemetry::context::propagation::EnvironmentCarrier::env_map_ptr_</definition>
+        <argsstring></argsstring>
+        <name>env_map_ptr_</name>
+        <qualifiedname>opentelemetry::context::propagation::EnvironmentCarrier::env_map_ptr_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" line="90" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" bodystart="90" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1ae92e47cc0dea98d27367d817502597cd" prot="private" static="no" mutable="yes">
+        <type>std::map&lt; std::string, std::string &gt;</type>
+        <definition>std::map&lt;std::string, std::string&gt; opentelemetry::context::propagation::EnvironmentCarrier::cache_</definition>
+        <argsstring></argsstring>
+        <name>cache_</name>
+        <qualifiedname>opentelemetry::context::propagation::EnvironmentCarrier::cache_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" line="91" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" bodystart="91" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1a198508db0111dbb2cb218a79ad40a176" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::propagation::EnvironmentCarrier::EnvironmentCarrier</definition>
+        <argsstring>() noexcept=default</argsstring>
+        <name>EnvironmentCarrier</name>
+        <qualifiedname>opentelemetry::context::propagation::EnvironmentCarrier::EnvironmentCarrier</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" line="43" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1a6dd1df4804f80be1f66a1727ae74a0ba" prot="public" static="no" const="no" explicit="yes" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::propagation::EnvironmentCarrier::EnvironmentCarrier</definition>
+        <argsstring>(std::shared_ptr&lt; std::map&lt; std::string, std::string &gt; &gt; env_map) noexcept</argsstring>
+        <name>EnvironmentCarrier</name>
+        <qualifiedname>opentelemetry::context::propagation::EnvironmentCarrier::EnvironmentCarrier</qualifiedname>
+        <param>
+          <type>std::shared_ptr&lt; std::map&lt; std::string, std::string &gt; &gt;</type>
+          <declname>env_map</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" line="46" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" bodystart="46" bodyend="48"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1ab78c986946a855ada193767b9ca5ba0a" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>nostd::string_view</type>
+        <definition>nostd::string_view opentelemetry::context::propagation::EnvironmentCarrier::Get</definition>
+        <argsstring>(nostd::string_view key) const noexcept override</argsstring>
+        <name>Get</name>
+        <qualifiedname>opentelemetry::context::propagation::EnvironmentCarrier::Get</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" line="53" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" bodystart="53" bodyend="73"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1a1a2e5f2c375149493f26cae530fe0624" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::context::propagation::EnvironmentCarrier::Set</definition>
+        <argsstring>(nostd::string_view key, nostd::string_view value) noexcept override</argsstring>
+        <name>Set</name>
+        <qualifiedname>opentelemetry::context::propagation::EnvironmentCarrier::Set</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" line="78" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" bodystart="78" bodyend="87"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1a18993deed2d0e045a02e34922b190cda" prot="private" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::string</type>
+        <definition>static std::string opentelemetry::context::propagation::EnvironmentCarrier::ToEnvName</definition>
+        <argsstring>(nostd::string_view key)</argsstring>
+        <name>ToEnvName</name>
+        <qualifiedname>opentelemetry::context::propagation::EnvironmentCarrier::ToEnvName</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" line="96" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" bodystart="96" bodyend="103"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" line="39" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h" bodystart="40" bodyend="104"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1ae92e47cc0dea98d27367d817502597cd" prot="private" virt="non-virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>cache_</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1af3a44501c6d4f84c857b68488c54f81c" prot="private" virt="non-virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>env_map_ptr_</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1a198508db0111dbb2cb218a79ad40a176" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>EnvironmentCarrier</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1a6dd1df4804f80be1f66a1727ae74a0ba" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>EnvironmentCarrier</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1ab78c986946a855ada193767b9ca5ba0a" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>Get</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapCarrier_1aa004929dc76321c40c740b64ced090d0" prot="public" virt="virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>Keys</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapCarrier_1a049a755de2b32432a64e48db358badf1" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapCarrier_1a443f0143e0d2160fa712336c0ee37d60" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1a1a2e5f2c375149493f26cae530fe0624" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>Set</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapCarrier_1ab50110cd460eee97a7ab9dc2422909cd" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>TextMapCarrier</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapCarrier_1aacba1637a2ba0f565b9f37d5954dcdc5" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>TextMapCarrier</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapCarrier_1a06808735a92cc765a6c7a6167aee6d52" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>TextMapCarrier</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1EnvironmentCarrier_1a18993deed2d0e045a02e34922b190cda" prot="private" virt="non-virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>ToEnvName</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapCarrier_1ae9d5c050c6cfdcfcc013b7c46a92df48" prot="public" virt="virtual"><scope>opentelemetry::context::propagation::EnvironmentCarrier</scope><name>~TextMapCarrier</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData" kind="struct" language="C++" prot="protected">
+    <compoundname>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a6e09bf6a9b71174cc76f717ec828f7cb" prot="public" static="no" mutable="no">
+        <type>std::condition_variable</type>
+        <definition>std::condition_variable opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::cv</definition>
+        <argsstring></argsstring>
+        <name>cv</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::cv</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="143" column="29" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" bodystart="143" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a924f4a9781fc3deb2e7e8250113755e2" prot="public" static="no" mutable="no">
+        <type>std::condition_variable</type>
+        <definition>std::condition_variable opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::force_flush_cv</definition>
+        <argsstring></argsstring>
+        <name>force_flush_cv</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::force_flush_cv</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="143" column="32" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" bodystart="143" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a1f38f7aeac24a005e675bfd0a95a0f96" prot="public" static="no" mutable="no">
+        <type>std::mutex</type>
+        <definition>std::mutex opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::cv_m</definition>
+        <argsstring></argsstring>
+        <name>cv_m</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::cv_m</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="144" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" bodystart="144" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1ad45631d92c0e0e24c8e13276537851fc" prot="public" static="no" mutable="no">
+        <type>std::mutex</type>
+        <definition>std::mutex opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::force_flush_cv_m</definition>
+        <argsstring></argsstring>
+        <name>force_flush_cv_m</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::force_flush_cv_m</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="144" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" bodystart="144" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a377d4af536c3d2752a05ac4ce0fd15a0" prot="public" static="no" mutable="no">
+        <type>std::mutex</type>
+        <definition>std::mutex opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::shutdown_m</definition>
+        <argsstring></argsstring>
+        <name>shutdown_m</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::shutdown_m</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="144" column="38" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" bodystart="144" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1aaf0b20711fd33e96007ca58f1ed3b5bd" prot="public" static="no" mutable="no">
+        <type>std::atomic&lt; bool &gt;</type>
+        <definition>std::atomic&lt;bool&gt; opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::is_force_wakeup_background_worker</definition>
+        <argsstring></argsstring>
+        <name>is_force_wakeup_background_worker</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::is_force_wakeup_background_worker</qualifiedname>
+        <initializer>{false}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="147" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" bodystart="147" bodyend="147"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a43ebdf8223ce36771ad15fb1c9784416" prot="public" static="no" mutable="no">
+        <type>std::atomic&lt; bool &gt;</type>
+        <definition>std::atomic&lt;bool&gt; opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::is_shutdown</definition>
+        <argsstring></argsstring>
+        <name>is_shutdown</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::is_shutdown</qualifiedname>
+        <initializer>{false}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="148" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" bodystart="148" bodyend="148"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a3898f32a9abed678dab79f9a6e8a867b" prot="public" static="no" mutable="no">
+        <type>std::atomic&lt; uint64_t &gt;</type>
+        <definition>std::atomic&lt;uint64_t&gt; opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::force_flush_pending_sequence</definition>
+        <argsstring></argsstring>
+        <name>force_flush_pending_sequence</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::force_flush_pending_sequence</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="149" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" bodystart="149" bodyend="149"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a91b7d991e0a034135bc1edd7fc843fd7" prot="public" static="no" mutable="no">
+        <type>std::atomic&lt; uint64_t &gt;</type>
+        <definition>std::atomic&lt;uint64_t&gt; opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::force_flush_notified_sequence</definition>
+        <argsstring></argsstring>
+        <name>force_flush_notified_sequence</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::force_flush_notified_sequence</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="150" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" bodystart="150" bodyend="150"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1ab302f7a6e424c71fcf4ece7b1e77c11a" prot="public" static="no" mutable="no">
+        <type>std::atomic&lt; std::chrono::microseconds::rep &gt;</type>
+        <definition>std::atomic&lt;std::chrono::microseconds::rep&gt; opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::force_flush_timeout_us</definition>
+        <argsstring></argsstring>
+        <name>force_flush_timeout_us</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::force_flush_timeout_us</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="151" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" bodystart="151" bodyend="151"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a0706a71923f30421fde92f2822d3a78d" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::SynchronizationData</definition>
+        <argsstring>()</argsstring>
+        <name>SynchronizationData</name>
+        <qualifiedname>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData::SynchronizationData</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="156" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" bodystart="156" bodyend="156"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="140" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" bodystart="141" bodyend="157"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a6e09bf6a9b71174cc76f717ec828f7cb" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</scope><name>cv</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a1f38f7aeac24a005e675bfd0a95a0f96" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</scope><name>cv_m</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a924f4a9781fc3deb2e7e8250113755e2" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</scope><name>force_flush_cv</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1ad45631d92c0e0e24c8e13276537851fc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</scope><name>force_flush_cv_m</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a91b7d991e0a034135bc1edd7fc843fd7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</scope><name>force_flush_notified_sequence</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a3898f32a9abed678dab79f9a6e8a867b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</scope><name>force_flush_pending_sequence</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1ab302f7a6e424c71fcf4ece7b1e77c11a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</scope><name>force_flush_timeout_us</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1aaf0b20711fd33e96007ca58f1ed3b5bd" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</scope><name>is_force_wakeup_background_worker</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a43ebdf8223ce36771ad15fb1c9784416" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</scope><name>is_shutdown</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a377d4af536c3d2752a05ac4ce0fd15a0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</scope><name>shutdown_m</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor_1_1SynchronizationData_1a0706a71923f30421fde92f2822d3a78d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::BatchLogRecordProcessor::SynchronizationData</scope><name>SynchronizationData</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer</compoundname>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1a232c3a3449d57a016e823f2004a09414" prot="private" static="no" mutable="no">
+        <type>int32_t</type>
+        <definition>int32_t opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::scale_</definition>
+        <argsstring></argsstring>
+        <name>scale_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::scale_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" line="43" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" bodystart="43" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1af421df5d53de31c57ea3c44b122f0592" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::scale_factor_</definition>
+        <argsstring></argsstring>
+        <name>scale_factor_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::scale_factor_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" line="44" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" bodystart="44" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1a1eaebae208b087cb8ee369ca666aa296" prot="public" static="no" const="no" explicit="yes" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::Base2ExponentialHistogramIndexer</definition>
+        <argsstring>(int32_t scale=0)</argsstring>
+        <name>Base2ExponentialHistogramIndexer</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::Base2ExponentialHistogramIndexer</qualifiedname>
+        <param>
+          <type>int32_t</type>
+          <declname>scale</declname>
+          <defval>0</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" line="26" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1a8a61caf6cecca7af5a0771f274704447" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::Base2ExponentialHistogramIndexer</definition>
+        <argsstring>(const Base2ExponentialHistogramIndexer &amp;)=default</argsstring>
+        <name>Base2ExponentialHistogramIndexer</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::Base2ExponentialHistogramIndexer</qualifiedname>
+        <param>
+          <type>const Base2ExponentialHistogramIndexer &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" line="28" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1a4c51a3e89fc89f17a99508a6b69d1858" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::Base2ExponentialHistogramIndexer</definition>
+        <argsstring>(Base2ExponentialHistogramIndexer &amp;&amp;)=default</argsstring>
+        <name>Base2ExponentialHistogramIndexer</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::Base2ExponentialHistogramIndexer</qualifiedname>
+        <param>
+          <type>Base2ExponentialHistogramIndexer &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" line="29" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1ac15e96d24c8b1eb159bf3bc5ef79a3b1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Base2ExponentialHistogramIndexer &amp;</type>
+        <definition>Base2ExponentialHistogramIndexer &amp; opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::operator=</definition>
+        <argsstring>(const Base2ExponentialHistogramIndexer &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::operator=</qualifiedname>
+        <param>
+          <type>const Base2ExponentialHistogramIndexer &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" line="30" column="36"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1acc77d704b175ab399f3e41d7668e3ca7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Base2ExponentialHistogramIndexer &amp;</type>
+        <definition>Base2ExponentialHistogramIndexer &amp; opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::operator=</definition>
+        <argsstring>(Base2ExponentialHistogramIndexer &amp;&amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::operator=</qualifiedname>
+        <param>
+          <type>Base2ExponentialHistogramIndexer &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" line="31" column="36"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1ae64d07d233932695feba8420eefc9eac" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::~Base2ExponentialHistogramIndexer</definition>
+        <argsstring>()=default</argsstring>
+        <name>~Base2ExponentialHistogramIndexer</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::~Base2ExponentialHistogramIndexer</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" line="32" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1a44936b853e0dc8f42c4c2e49fa2dfa7d" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>int32_t</type>
+        <definition>int32_t opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::ComputeIndex</definition>
+        <argsstring>(double value) const</argsstring>
+        <name>ComputeIndex</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer::ComputeIndex</qualifiedname>
+        <param>
+          <type>double</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Compute the index for the given value.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Measured value (must be non-zero). </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>the index of the bucket which the value maps to. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" line="40" column="11"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h" bodystart="21" bodyend="45"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1a1eaebae208b087cb8ee369ca666aa296" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer</scope><name>Base2ExponentialHistogramIndexer</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1a8a61caf6cecca7af5a0771f274704447" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer</scope><name>Base2ExponentialHistogramIndexer</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1a4c51a3e89fc89f17a99508a6b69d1858" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer</scope><name>Base2ExponentialHistogramIndexer</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1a44936b853e0dc8f42c4c2e49fa2dfa7d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer</scope><name>ComputeIndex</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1ac15e96d24c8b1eb159bf3bc5ef79a3b1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1acc77d704b175ab399f3e41d7668e3ca7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1a232c3a3449d57a016e823f2004a09414" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer</scope><name>scale_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1af421df5d53de31c57ea3c44b122f0592" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer</scope><name>scale_factor_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramIndexer_1ae64d07d233932695feba8420eefc9eac" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramIndexer</scope><name>~Base2ExponentialHistogramIndexer</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

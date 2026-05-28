@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1NoopMetricStorage" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::NoopMetricStorage</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::sdk::metrics::MetricStorage</basecompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1NoopMetricStorage_1a0356ab6bf8aa245bd3f29642bb021e2b" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::NoopMetricStorage::Collect</definition>
+        <argsstring>(CollectorHandle *, nostd::span&lt; std::shared_ptr&lt; CollectorHandle &gt; &gt;, opentelemetry::common::SystemTimestamp, opentelemetry::common::SystemTimestamp, nostd::function_ref&lt; bool(MetricData)&gt; callback) noexcept override</argsstring>
+        <name>Collect</name>
+        <qualifiedname>opentelemetry::sdk::metrics::NoopMetricStorage::Collect</qualifiedname>
+        <param>
+          <type>CollectorHandle *</type>
+        </param>
+        <param>
+          <type>nostd::span&lt; std::shared_ptr&lt; CollectorHandle &gt; &gt;</type>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        </param>
+        <param>
+          <type>nostd::function_ref&lt; bool(MetricData)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="106" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" bodystart="106" bodyend="114"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="103" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" bodystart="104" bodyend="115"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1NoopMetricStorage_1a0356ab6bf8aa245bd3f29642bb021e2b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopMetricStorage</scope><name>Collect</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1ad5cac0743cb4afebe6b807fb1d63eb6d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopMetricStorage</scope><name>MetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a5613c45082dda98dd49421e06a00cb85" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopMetricStorage</scope><name>MetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a4bf6c5840e65ab8e164941a23b216e6d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopMetricStorage</scope><name>MetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a3f1254022e433a9e3e972053b6387849" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopMetricStorage</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1a336a4d6914279ad55dc1f7267ecbe19d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopMetricStorage</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricStorage_1aaedfbda3546ec0a15f552814e880ecac" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::NoopMetricStorage</scope><name>~MetricStorage</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

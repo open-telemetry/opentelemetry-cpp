@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_a7414691051213a5c3d56b3236afb1ce" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation</compoundname>
+    <innerfile refid="aggregation_8h">aggregation.h</innerfile>
+    <innerfile refid="aggregation__config_8h">aggregation_config.h</innerfile>
+    <innerfile refid="base2__exponential__histogram__aggregation_8h">base2_exponential_histogram_aggregation.h</innerfile>
+    <innerfile refid="base2__exponential__histogram__indexer_8h">base2_exponential_histogram_indexer.h</innerfile>
+    <innerfile refid="default__aggregation_8h">default_aggregation.h</innerfile>
+    <innerfile refid="drop__aggregation_8h">drop_aggregation.h</innerfile>
+    <innerfile refid="histogram__aggregation_8h">histogram_aggregation.h</innerfile>
+    <innerfile refid="lastvalue__aggregation_8h">lastvalue_aggregation.h</innerfile>
+    <innerfile refid="sum__aggregation_8h">sum_aggregation.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/"/>
+  </compounddef>
+</doxygen>

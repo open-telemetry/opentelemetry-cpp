@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1trace_1_1propagation_1_1detail" kind="namespace" language="C++">
+    <compoundname>opentelemetry::trace::propagation::detail</compoundname>
+    <sectiondef kind="var">
+      <memberdef kind="variable" id="hex_8h_1a869a8775f228a4856553b41fa12f0361" prot="public" static="no" constexpr="yes" mutable="no">
+        <type>constexpr int8_t</type>
+        <definition>constexpr int8_t opentelemetry::trace::propagation::detail::kHexDigits[256]</definition>
+        <argsstring>[256]</argsstring>
+        <name>kHexDigits</name>
+        <qualifiedname>opentelemetry::trace::propagation::detail::kHexDigits</qualifiedname>
+        <initializer>= {
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  -1, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/detail/hex.h" line="23" column="18" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/detail/hex.h" bodystart="23" bodyend="35"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="hex_8h_1a6366ee6370c3bc3bdb939d28d8eda91c" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>int8_t</type>
+        <definition>int8_t opentelemetry::trace::propagation::detail::HexToInt</definition>
+        <argsstring>(char c)</argsstring>
+        <name>HexToInt</name>
+        <qualifiedname>opentelemetry::trace::propagation::detail::HexToInt</qualifiedname>
+        <param>
+          <type>char</type>
+          <declname>c</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/detail/hex.h" line="37" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/detail/hex.h" bodystart="37" bodyend="40"/>
+      </memberdef>
+      <memberdef kind="function" id="hex_8h_1a79ea234e3a4d23050b5a6cd5cf8fa348" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::trace::propagation::detail::IsValidHex</definition>
+        <argsstring>(nostd::string_view s)</argsstring>
+        <name>IsValidHex</name>
+        <qualifiedname>opentelemetry::trace::propagation::detail::IsValidHex</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>s</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/detail/hex.h" line="42" column="13" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/detail/hex.h" bodystart="42" bodyend="45"/>
+      </memberdef>
+      <memberdef kind="function" id="hex_8h_1af6fb78b372ccc03a10ffe4ab0693c0ef" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::trace::propagation::detail::HexToBinary</definition>
+        <argsstring>(nostd::string_view hex, uint8_t *buffer, size_t buffer_size)</argsstring>
+        <name>HexToBinary</name>
+        <qualifiedname>opentelemetry::trace::propagation::detail::HexToBinary</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>hex</declname>
+        </param>
+        <param>
+          <type>uint8_t *</type>
+          <declname>buffer</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>buffer_size</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Converts a hexadecimal to binary format if the hex string will fit the buffer. Smaller hex strings are left padded with zeroes. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/detail/hex.h" line="51" column="13" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/detail/hex.h" bodystart="51" bodyend="78"/>
+      </memberdef>
+      <memberdef kind="function" id="string_8h_1ad6a5c8103f5936277cda9b9e05b5a698" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::trace::propagation::detail::SplitString</definition>
+        <argsstring>(nostd::string_view s, char separator, nostd::string_view *results, size_t count)</argsstring>
+        <name>SplitString</name>
+        <qualifiedname>opentelemetry::trace::propagation::detail::SplitString</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>s</declname>
+        </param>
+        <param>
+          <type>char</type>
+          <declname>separator</declname>
+        </param>
+        <param>
+          <type>nostd::string_view *</type>
+          <declname>results</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>count</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Splits a string by separator, up to given buffer count words. Returns the amount of words the input was split into. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/detail/string.h" line="23" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/detail/string.h" bodystart="23" bodyend="58"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/detail/hex.h" line="20" column="1"/>
+  </compounddef>
+</doxygen>

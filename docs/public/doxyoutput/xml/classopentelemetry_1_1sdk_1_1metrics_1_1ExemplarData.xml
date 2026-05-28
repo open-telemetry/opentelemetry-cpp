@@ -1,0 +1,224 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::ExemplarData</compoundname>
+    <includes refid="exemplar__data_8h" local="no">exemplar_data.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1a53617a8f2f7c55a115d4cf7655b448ce" prot="private" static="no" mutable="no">
+        <type>opentelemetry::trace::SpanContext</type>
+        <definition>opentelemetry::trace::SpanContext opentelemetry::sdk::metrics::ExemplarData::context_</definition>
+        <argsstring></argsstring>
+        <name>context_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExemplarData::context_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="77" column="37" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="77" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1aeb3218b9a07e1abe771c657db7edabd2" prot="private" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::metrics::ExemplarData::timestamp_</definition>
+        <argsstring></argsstring>
+        <name>timestamp_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExemplarData::timestamp_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="78" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="78" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1aaeb69008adff9bc8abae1aea029f834a" prot="private" static="no" mutable="no">
+        <type>PointDataAttributes</type>
+        <definition>PointDataAttributes opentelemetry::sdk::metrics::ExemplarData::point_data_attr_</definition>
+        <argsstring></argsstring>
+        <name>point_data_attr_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExemplarData::point_data_attr_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="79" column="23" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="79" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1a037ce4b8d82836bb1bcadacf972d3154" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData" kindref="compound">ExemplarData</ref></type>
+        <definition>static ExemplarData opentelemetry::sdk::metrics::ExemplarData::Create</definition>
+        <argsstring>(const std::shared_ptr&lt; opentelemetry::trace::SpanContext &gt; &amp;context, const opentelemetry::common::SystemTimestamp &amp;timestamp, const PointDataAttributes &amp;point_data_attr)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExemplarData::Create</qualifiedname>
+        <param>
+          <type>const std::shared_ptr&lt; opentelemetry::trace::SpanContext &gt; &amp;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref> &amp;</type>
+          <declname>timestamp</declname>
+        </param>
+        <param>
+          <type>const PointDataAttributes &amp;</type>
+          <declname>point_data_attr</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="29" column="23" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="29" bodyend="34"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1a52835e8d51be8f63c5d6ab7b5eca50a3" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>PointType</type>
+        <definition>static PointType opentelemetry::sdk::metrics::ExemplarData::CreateSumPointData</definition>
+        <argsstring>(ValueType value)</argsstring>
+        <name>CreateSumPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExemplarData::CreateSumPointData</qualifiedname>
+        <param>
+          <type>ValueType</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="52" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="52" bodyend="57"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1ab25421641c4b04a68fafa026ccd67eaf" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>PointType</type>
+        <definition>static PointType opentelemetry::sdk::metrics::ExemplarData::CreateLastValuePointData</definition>
+        <argsstring>(ValueType value)</argsstring>
+        <name>CreateLastValuePointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExemplarData::CreateLastValuePointData</qualifiedname>
+        <param>
+          <type>ValueType</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="59" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="59" bodyend="66"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1a1753666afcebce47290751e40a7619ed" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>PointType</type>
+        <definition>static PointType opentelemetry::sdk::metrics::ExemplarData::CreateDropPointData</definition>
+        <argsstring>()</argsstring>
+        <name>CreateDropPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExemplarData::CreateDropPointData</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="68" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="68" bodyend="68"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1a2c116caf8746764853456dd2b99d46e1" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>MetricAttributes</type>
+        <definition>MetricAttributes opentelemetry::sdk::metrics::ExemplarData::GetFilteredAttributes</definition>
+        <argsstring>()</argsstring>
+        <name>GetFilteredAttributes</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExemplarData::GetFilteredAttributes</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>The set of key/value pairs that were filtered out by the aggregator, but recorded alongside the original measurement. Only key/value pairs that were filtered out by the aggregator should be included </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="41" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="41" bodyend="41"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1ac305432bf1146d0151a7ab6c7e16d47f" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::metrics::ExemplarData::GetEpochNanos</definition>
+        <argsstring>()</argsstring>
+        <name>GetEpochNanos</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExemplarData::GetEpochNanos</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the timestamp in nanos when measurement was collected. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="44" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="44" bodyend="44"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1a9c148f781b6e627f56cce303d49bc40d" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>const opentelemetry::trace::SpanContext &amp;</type>
+        <definition>const opentelemetry::trace::SpanContext &amp; opentelemetry::sdk::metrics::ExemplarData::GetSpanContext</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetSpanContext</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExemplarData::GetSpanContext</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the SpanContext associated with this exemplar. If the exemplar was not recorded inside a sampled trace, the Context will be invalid. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="50" column="43" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="50" bodyend="50"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1acce38b97b6b077554f3b1b6f7b603363" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ExemplarData::ExemplarData</definition>
+        <argsstring>(const std::shared_ptr&lt; opentelemetry::trace::SpanContext &gt; &amp;context, opentelemetry::common::SystemTimestamp timestamp, const PointDataAttributes &amp;point_data_attr)</argsstring>
+        <name>ExemplarData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ExemplarData::ExemplarData</qualifiedname>
+        <param>
+          <type>const std::shared_ptr&lt; opentelemetry::trace::SpanContext &gt; &amp;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>timestamp</declname>
+        </param>
+        <param>
+          <type>const PointDataAttributes &amp;</type>
+          <declname>point_data_attr</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="71" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="71" bodyend="75"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>A sample input measurement.</para>
+<para>Exemplars also hold information about the environment when the measurement was recorded, for example the span and trace ID of the active span when the exemplar was recorded. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" line="26" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/exemplar_data.h" bodystart="27" bodyend="80"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1a53617a8f2f7c55a115d4cf7655b448ce" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExemplarData</scope><name>context_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1a037ce4b8d82836bb1bcadacf972d3154" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExemplarData</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1a1753666afcebce47290751e40a7619ed" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExemplarData</scope><name>CreateDropPointData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1ab25421641c4b04a68fafa026ccd67eaf" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExemplarData</scope><name>CreateLastValuePointData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1a52835e8d51be8f63c5d6ab7b5eca50a3" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExemplarData</scope><name>CreateSumPointData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1acce38b97b6b077554f3b1b6f7b603363" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExemplarData</scope><name>ExemplarData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1ac305432bf1146d0151a7ab6c7e16d47f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExemplarData</scope><name>GetEpochNanos</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1a2c116caf8746764853456dd2b99d46e1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExemplarData</scope><name>GetFilteredAttributes</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1a9c148f781b6e627f56cce303d49bc40d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExemplarData</scope><name>GetSpanContext</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1aaeb69008adff9bc8abae1aea029f834a" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExemplarData</scope><name>point_data_attr_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ExemplarData_1aeb3218b9a07e1abe771c657db7edabd2" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ExemplarData</scope><name>timestamp_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

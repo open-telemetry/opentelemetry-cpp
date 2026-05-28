@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1Provider" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::logs::Provider</compoundname>
+    <includes refid="sdk_2include_2opentelemetry_2sdk_2logs_2provider_8h" local="no">provider.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1Provider_1a023341c1f8e2772068277d9e36f6d289" prot="public" static="yes" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>static void opentelemetry::sdk::logs::Provider::SetLoggerProvider</definition>
+        <argsstring>(const nostd::shared_ptr&lt; opentelemetry::logs::LoggerProvider &gt; &amp;lp) noexcept</argsstring>
+        <name>SetLoggerProvider</name>
+        <qualifiedname>opentelemetry::sdk::logs::Provider::SetLoggerProvider</qualifiedname>
+        <param>
+          <type>const nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">opentelemetry::logs::LoggerProvider</ref> &gt; &amp;</type>
+          <declname>lp</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Changes the singleton LoggerProvider. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/provider.h" line="27" column="15"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Changes the singleton global LoggerProvider. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/provider.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/provider.h" bodystart="22" bodyend="29"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Provider_1a023341c1f8e2772068277d9e36f6d289" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Provider</scope><name>SetLoggerProvider</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,222 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="text__map__propagator_8h" kind="file" language="C++">
+    <compoundname>text_map_propagator.h</compoundname>
+    <includes refid="context_2context_8h" local="yes">opentelemetry/context/context.h</includes>
+    <includes local="yes">opentelemetry/nostd/function_ref.h</includes>
+    <includes local="yes">opentelemetry/nostd/string_view.h</includes>
+    <includes local="yes">opentelemetry/version.h</includes>
+    <includedby refid="baggage__propagator_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/propagation/baggage_propagator.h</includedby>
+    <includedby refid="composite__propagator_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h</includedby>
+    <includedby refid="environment__carrier_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h</includedby>
+    <includedby refid="noop__propagator_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/noop_propagator.h</includedby>
+    <includedby refid="b3__propagator_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h</includedby>
+    <includedby refid="http__trace__context_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h</includedby>
+    <includedby refid="jaeger_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/jaeger.h</includedby>
+    <incdepgraph>
+      <node id="2">
+        <label>opentelemetry/context/context.h</label>
+        <link refid="context_2context_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>opentelemetry/context/context_value.h</label>
+        <link refid="context__value_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h</label>
+        <link refid="text__map__propagator_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>cstdint</label>
+      </node>
+      <node id="3">
+        <label>cstring</label>
+      </node>
+      <node id="11">
+        <label>opentelemetry/nostd/function_ref.h</label>
+      </node>
+      <node id="7">
+        <label>opentelemetry/nostd/shared_ptr.h</label>
+      </node>
+      <node id="10">
+        <label>opentelemetry/nostd/string_view.h</label>
+      </node>
+      <node id="8">
+        <label>opentelemetry/nostd/variant.h</label>
+      </node>
+      <node id="9">
+        <label>opentelemetry/version.h</label>
+      </node>
+      <node id="4">
+        <label>utility</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="2">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/propagation/baggage_propagator.h</label>
+        <link refid="baggage__propagator_8h_source"/>
+      </node>
+      <node id="3">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h</label>
+        <link refid="composite__propagator_8h_source"/>
+      </node>
+      <node id="4">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/environment_carrier.h</label>
+        <link refid="environment__carrier_8h_source"/>
+      </node>
+      <node id="6">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/global_propagator.h</label>
+        <link refid="global__propagator_8h_source"/>
+      </node>
+      <node id="5">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/noop_propagator.h</label>
+        <link refid="noop__propagator_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h</label>
+        <link refid="text__map__propagator_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h</label>
+        <link refid="b3__propagator_8h_source"/>
+      </node>
+      <node id="8">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h</label>
+        <link refid="http__trace__context_8h_source"/>
+      </node>
+      <node id="9">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/jaeger.h</label>
+        <link refid="jaeger_8h_source"/>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapCarrier" prot="public">opentelemetry::context::propagation::TextMapCarrier</innerclass>
+    <innerclass refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator" prot="public">opentelemetry::context::propagation::TextMapPropagator</innerclass>
+    <innernamespace refid="namespaceopentelemetry">opentelemetry</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1context">opentelemetry::context</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1context_1_1propagation">opentelemetry::context::propagation</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>The<sp/>OpenTelemetry<sp/>Authors</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/context/context.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/nostd/function_ref.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/nostd/string_view.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/version.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal">OPENTELEMETRY_BEGIN_NAMESPACE</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">context</highlight></codeline>
+<codeline lineno="13"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">propagation</highlight></codeline>
+<codeline lineno="15"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight><highlight class="comment">//<sp/>TextMapCarrier<sp/>is<sp/>the<sp/>storage<sp/>medium<sp/>used<sp/>by<sp/>TextMapPropagator.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">TextMapCarrier</highlight></codeline>
+<codeline lineno="19"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/>TextMapCarrier()<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/>TextMapCarrier(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>TextMapCarrier<sp/>&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/>TextMapCarrier<sp/>&amp;operator=(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>TextMapCarrier<sp/>&amp;)<sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/>TextMapCarrier(TextMapCarrier<sp/>&amp;&amp;)<sp/>noexcept<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>default;</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/>TextMapCarrier<sp/>&amp;operator=(TextMapCarrier<sp/>&amp;&amp;)<sp/>noexcept<sp/>=<sp/>default;</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>returns<sp/>the<sp/>value<sp/>associated<sp/>with<sp/>the<sp/>passed<sp/>key.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/>virtual<sp/>nostd::string_view<sp/>Get(nostd::string_view<sp/>key)<sp/>const<sp/>noexcept<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>stores<sp/>the<sp/>key-value<sp/>pair.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/>virtual<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>Set(nostd::string_view<sp/>key,<sp/>nostd::string_view<sp/>value)<sp/>noexcept<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">/*<sp/>list<sp/>of<sp/>all<sp/>the<sp/>keys<sp/>in<sp/>the<sp/>carrier.</highlight></codeline>
+<codeline lineno="34"><highlight class="comment"><sp/><sp/><sp/>By<sp/>default,<sp/>it<sp/>returns<sp/>true<sp/>without<sp/>invoking<sp/>callback<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/>virtual<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Keys(nostd::function_ref&lt;</highlight><highlight class="keywordtype">bool</highlight><highlight class="normal">(nostd::string_view)&gt;<sp/></highlight><highlight class="comment">/*<sp/>callback<sp/>*/</highlight><highlight class="normal">)<sp/>const<sp/>noexcept</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/>{</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/>}</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">virtual</highlight><highlight class="normal"><sp/>~TextMapCarrier()<sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="40"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal"></highlight><highlight class="comment">//<sp/>The<sp/>TextMapPropagator<sp/>class<sp/>provides<sp/>an<sp/>interface<sp/>that<sp/>enables<sp/>extracting<sp/>and<sp/>injecting</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight><highlight class="comment">//<sp/>context<sp/>into<sp/>carriers<sp/>that<sp/>travel<sp/>in-band<sp/>across<sp/>process<sp/>boundaries.<sp/>HTTP<sp/>frameworks<sp/>and<sp/>clients</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"></highlight><highlight class="comment">//<sp/>can<sp/>integrate<sp/>with<sp/>TextMapPropagator<sp/>by<sp/>providing<sp/>the<sp/>object<sp/>containing<sp/>the</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight><highlight class="comment">//<sp/>headers,<sp/>and<sp/>a<sp/>getter<sp/>and<sp/>setter<sp/>function<sp/>for<sp/>the<sp/>extraction<sp/>and</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="46"><highlight class="normal"></highlight><highlight class="comment">//<sp/>injection<sp/>of<sp/>values,<sp/>respectively.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="47"><highlight class="normal"></highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal">TextMapPropagator</highlight></codeline>
+<codeline lineno="49"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/>TextMapPropagator()<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/>TextMapPropagator(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>TextMapPropagator<sp/>&amp;)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/>TextMapPropagator<sp/>&amp;operator=(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>TextMapPropagator<sp/>&amp;)<sp/><sp/><sp/><sp/><sp/>=<sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/>TextMapPropagator(TextMapPropagator<sp/>&amp;&amp;)<sp/>noexcept<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>default;</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/>TextMapPropagator<sp/>&amp;operator=(TextMapPropagator<sp/>&amp;&amp;)<sp/>noexcept<sp/>=<sp/>default;</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Returns<sp/>the<sp/>context<sp/>that<sp/>is<sp/>stored<sp/>in<sp/>the<sp/>carrier<sp/>with<sp/>the<sp/>TextMapCarrier<sp/>as<sp/>extractor.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/>virtual<sp/>context::Context<sp/>Extract(const<sp/>TextMapCarrier<sp/>&amp;carrier,</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>context::Context<sp/>&amp;context)<sp/>noexcept<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"></highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Sets<sp/>the<sp/>context<sp/>for<sp/>carrier<sp/>with<sp/>self<sp/>defined<sp/>rules.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/>virtual<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>Inject(TextMapCarrier<sp/>&amp;carrier,<sp/>const<sp/>context::Context<sp/>&amp;context)<sp/>noexcept<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/></highlight><highlight class="comment">//<sp/>Gets<sp/>the<sp/>fields<sp/>set<sp/>in<sp/>the<sp/>carrier<sp/>by<sp/>the<sp/>`inject`<sp/>method</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/>virtual<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Fields(nostd::function_ref&lt;</highlight><highlight class="keywordtype">bool</highlight><highlight class="normal">(nostd::string_view)&gt;<sp/>callback)<sp/>const<sp/>noexcept<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"></highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/>virtual<sp/>~TextMapPropagator()<sp/>=<sp/>default;</highlight></codeline>
+<codeline lineno="68"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="69"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>propagation</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="70"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>context</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="71"><highlight class="normal">OPENTELEMETRY_END_NAMESPACE</highlight></codeline>
+    </programlisting>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h"/>
+  </compounddef>
+</doxygen>

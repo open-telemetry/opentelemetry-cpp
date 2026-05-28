@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMapHash" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMapHash</compoundname>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMapHash_1a88e2b1e328034ed73bfe0edff85a69d9" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::FilteredOrderedAttributeMapHash::operator()</definition>
+        <argsstring>(const opentelemetry::sdk::metrics::FilteredOrderedAttributeMap &amp;attributes) const</argsstring>
+        <name>operator()</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteredOrderedAttributeMapHash::operator()</qualifiedname>
+        <param>
+          <type>const opentelemetry::sdk::metrics::FilteredOrderedAttributeMap &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="85" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" bodystart="85" bodyend="89"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" line="82" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h" bodystart="83" bodyend="90"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteredOrderedAttributeMapHash_1a88e2b1e328034ed73bfe0edff85a69d9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteredOrderedAttributeMapHash</scope><name>operator()</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

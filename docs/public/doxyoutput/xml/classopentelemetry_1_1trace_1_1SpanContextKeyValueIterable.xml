@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::trace::SpanContextKeyValueIterable</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1trace_1_1NullSpanContext" prot="public" virt="non-virtual">opentelemetry::trace::NullSpanContext</derivedcompoundref>
+    <includes refid="span__context__kv__iterable_8h" local="no">span_context_kv_iterable.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1a47ff758a904bf428d1148613c3019f1b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::SpanContextKeyValueIterable::SpanContextKeyValueIterable</definition>
+        <argsstring>()=default</argsstring>
+        <name>SpanContextKeyValueIterable</name>
+        <qualifiedname>opentelemetry::trace::SpanContextKeyValueIterable::SpanContextKeyValueIterable</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" line="21" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1ae04201e61914772ceef07026032bc58a" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::trace::SpanContextKeyValueIterable::~SpanContextKeyValueIterable</definition>
+        <argsstring>()=default</argsstring>
+        <name>~SpanContextKeyValueIterable</name>
+        <qualifiedname>opentelemetry::trace::SpanContextKeyValueIterable::~SpanContextKeyValueIterable</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" line="22" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1aac708a6335aa3d5cb6ac7a098e03571c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::SpanContextKeyValueIterable::SpanContextKeyValueIterable</definition>
+        <argsstring>(const SpanContextKeyValueIterable &amp;)=default</argsstring>
+        <name>SpanContextKeyValueIterable</name>
+        <qualifiedname>opentelemetry::trace::SpanContextKeyValueIterable::SpanContextKeyValueIterable</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" kindref="compound">SpanContextKeyValueIterable</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" line="23" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1aa609f2054a074cd56cafed65ebc5f1e6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" kindref="compound">SpanContextKeyValueIterable</ref> &amp;</type>
+        <definition>SpanContextKeyValueIterable &amp; opentelemetry::trace::SpanContextKeyValueIterable::operator=</definition>
+        <argsstring>(const SpanContextKeyValueIterable &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::trace::SpanContextKeyValueIterable::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" kindref="compound">SpanContextKeyValueIterable</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" line="24" column="31"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1aca799053d817544df43af00d1acff3a0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::SpanContextKeyValueIterable::SpanContextKeyValueIterable</definition>
+        <argsstring>(SpanContextKeyValueIterable &amp;&amp;)=default</argsstring>
+        <name>SpanContextKeyValueIterable</name>
+        <qualifiedname>opentelemetry::trace::SpanContextKeyValueIterable::SpanContextKeyValueIterable</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" kindref="compound">SpanContextKeyValueIterable</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" line="25" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1ab0fa394b96849ca0945f8e4315a32af7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" kindref="compound">SpanContextKeyValueIterable</ref> &amp;</type>
+        <definition>SpanContextKeyValueIterable &amp; opentelemetry::trace::SpanContextKeyValueIterable::operator=</definition>
+        <argsstring>(SpanContextKeyValueIterable &amp;&amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::trace::SpanContextKeyValueIterable::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" kindref="compound">SpanContextKeyValueIterable</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" line="26" column="31"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1a5e1b66d1adbd5824cb14010c10b14c38" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::trace::SpanContextKeyValueIterable::ForEachKeyValue</definition>
+        <argsstring>(nostd::function_ref&lt; bool(SpanContext, const common::KeyValueIterable &amp;)&gt; callback) const noexcept=0</argsstring>
+        <name>ForEachKeyValue</name>
+        <qualifiedname>opentelemetry::trace::SpanContextKeyValueIterable::ForEachKeyValue</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NullSpanContext_1a2242d568eff8cb6db58c9fe61841b27a">ForEachKeyValue</reimplementedby>
+        <param>
+          <type>nostd::function_ref&lt; bool(SpanContext, const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">common::KeyValueIterable</ref> &amp;)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Iterate over SpanContext/key-value pairs <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>callback</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a callback to invoke for each key-value for each SpanContext. If the callback returns false, the iteration is aborted. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if every SpanContext/key-value pair was iterated over </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" line="34" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1acc6970c723ece6093aae27b749ff6f61" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>size_t</type>
+        <definition>virtual size_t opentelemetry::trace::SpanContextKeyValueIterable::size</definition>
+        <argsstring>() const noexcept=0</argsstring>
+        <name>size</name>
+        <qualifiedname>opentelemetry::trace::SpanContextKeyValueIterable::size</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NullSpanContext_1a9d49d70d84e95179434dff9e024155c6">size</reimplementedby>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>the number of key-value pairs </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" line="40" column="18"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Supports internal iteration over a collection of SpanContext/key-value pairs. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::trace::NullSpanContext</label>
+        <link refid="classopentelemetry_1_1trace_1_1NullSpanContext"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>opentelemetry::trace::SpanContextKeyValueIterable</label>
+        <link refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable"/>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" line="18" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" bodystart="19" bodyend="41"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1a5e1b66d1adbd5824cb14010c10b14c38" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::SpanContextKeyValueIterable</scope><name>ForEachKeyValue</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1aa609f2054a074cd56cafed65ebc5f1e6" prot="public" virt="non-virtual"><scope>opentelemetry::trace::SpanContextKeyValueIterable</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1ab0fa394b96849ca0945f8e4315a32af7" prot="public" virt="non-virtual"><scope>opentelemetry::trace::SpanContextKeyValueIterable</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1acc6970c723ece6093aae27b749ff6f61" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::SpanContextKeyValueIterable</scope><name>size</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1a47ff758a904bf428d1148613c3019f1b" prot="public" virt="non-virtual"><scope>opentelemetry::trace::SpanContextKeyValueIterable</scope><name>SpanContextKeyValueIterable</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1aac708a6335aa3d5cb6ac7a098e03571c" prot="public" virt="non-virtual"><scope>opentelemetry::trace::SpanContextKeyValueIterable</scope><name>SpanContextKeyValueIterable</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1aca799053d817544df43af00d1acff3a0" prot="public" virt="non-virtual"><scope>opentelemetry::trace::SpanContextKeyValueIterable</scope><name>SpanContextKeyValueIterable</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1ae04201e61914772ceef07026032bc58a" prot="public" virt="virtual"><scope>opentelemetry::trace::SpanContextKeyValueIterable</scope><name>~SpanContextKeyValueIterable</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

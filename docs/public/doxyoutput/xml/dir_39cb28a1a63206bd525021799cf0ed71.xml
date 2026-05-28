@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_39cb28a1a63206bd525021799cf0ed71" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data</compoundname>
+    <innerfile refid="circular__buffer_8h">circular_buffer.h</innerfile>
+    <innerfile refid="exemplar__data_8h">exemplar_data.h</innerfile>
+    <innerfile refid="metric__data_8h">metric_data.h</innerfile>
+    <innerfile refid="point__data_8h">point_data.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/"/>
+  </compounddef>
+</doxygen>

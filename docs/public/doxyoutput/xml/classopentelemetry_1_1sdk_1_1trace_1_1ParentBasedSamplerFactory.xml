@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSamplerFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::ParentBasedSamplerFactory</compoundname>
+    <includes refid="parent__factory_8h" local="no">parent_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSamplerFactory_1aa34fd44a1e1400d6db351333a5cfe52e" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; Sampler &gt; opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create</definition>
+        <argsstring>(const std::shared_ptr&lt; Sampler &gt; &amp;root_sampler)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create</qualifiedname>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt; &amp;</type>
+          <declname>root_sampler</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler" kindref="compound">ParentBasedSampler</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent_factory.h" line="26" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSamplerFactory_1ae1a83be3d53c4f62d0370f2381b30e13" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; Sampler &gt; opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create</definition>
+        <argsstring>(const std::shared_ptr&lt; Sampler &gt; &amp;root_sampler, const std::shared_ptr&lt; Sampler &gt; &amp;remote_parent_sampled_sampler, const std::shared_ptr&lt; Sampler &gt; &amp;remote_parent_nonsampled_sampler, const std::shared_ptr&lt; Sampler &gt; &amp;local_parent_sampled_sampler, const std::shared_ptr&lt; Sampler &gt; &amp;local_parent_nonsampled_sampler)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create</qualifiedname>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt; &amp;</type>
+          <declname>root_sampler</declname>
+        </param>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt; &amp;</type>
+          <declname>remote_parent_sampled_sampler</declname>
+        </param>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt; &amp;</type>
+          <declname>remote_parent_nonsampled_sampler</declname>
+        </param>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt; &amp;</type>
+          <declname>local_parent_sampled_sampler</declname>
+        </param>
+        <param>
+          <type>const std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt; &amp;</type>
+          <declname>local_parent_nonsampled_sampler</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler" kindref="compound">ParentBasedSampler</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent_factory.h" line="31" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler" kindref="compound">ParentBasedSampler</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent_factory.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/parent_factory.h" bodystart="21" bodyend="37"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSamplerFactory_1aa34fd44a1e1400d6db351333a5cfe52e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSamplerFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSamplerFactory_1ae1a83be3d53c4f62d0370f2381b30e13" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::ParentBasedSamplerFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

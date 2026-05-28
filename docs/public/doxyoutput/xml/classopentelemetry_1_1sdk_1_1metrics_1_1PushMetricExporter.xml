@@ -1,0 +1,224 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::metrics::PushMetricExporter</compoundname>
+    <includes refid="push__metric__exporter_8h" local="no">push_metric_exporter.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a13e4380ae60e1ac86c28c5362052517c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::PushMetricExporter::PushMetricExporter</definition>
+        <argsstring>()=default</argsstring>
+        <name>PushMetricExporter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PushMetricExporter::PushMetricExporter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/push_metric_exporter.h" line="27" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a09ac0e995cd8711084122319cf4d1de8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::PushMetricExporter::PushMetricExporter</definition>
+        <argsstring>(const PushMetricExporter &amp;)=delete</argsstring>
+        <name>PushMetricExporter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PushMetricExporter::PushMetricExporter</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kindref="compound">PushMetricExporter</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/push_metric_exporter.h" line="29" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a9a68eb67331929436e2471f1b88dbcd8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::PushMetricExporter::PushMetricExporter</definition>
+        <argsstring>(PushMetricExporter &amp;&amp;)=delete</argsstring>
+        <name>PushMetricExporter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PushMetricExporter::PushMetricExporter</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kindref="compound">PushMetricExporter</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/push_metric_exporter.h" line="30" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a30deda56893a25aa325931320f71e5cc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kindref="compound">PushMetricExporter</ref> &amp;</type>
+        <definition>PushMetricExporter &amp; opentelemetry::sdk::metrics::PushMetricExporter::operator=</definition>
+        <argsstring>(const PushMetricExporter &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PushMetricExporter::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kindref="compound">PushMetricExporter</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/push_metric_exporter.h" line="31" column="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a82edf542236c48c47701c653b6bd8b80" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kindref="compound">PushMetricExporter</ref> &amp;</type>
+        <definition>PushMetricExporter &amp; opentelemetry::sdk::metrics::PushMetricExporter::operator=</definition>
+        <argsstring>(PushMetricExporter &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PushMetricExporter::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kindref="compound">PushMetricExporter</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/push_metric_exporter.h" line="32" column="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a1039a8ed605f3c390b2d96b8b52754ea" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::metrics::PushMetricExporter::~PushMetricExporter</definition>
+        <argsstring>()=default</argsstring>
+        <name>~PushMetricExporter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PushMetricExporter::~PushMetricExporter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/push_metric_exporter.h" line="34" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1aebffe524b2591f32095f99a71363f699" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>opentelemetry::sdk::common::ExportResult</type>
+        <definition>virtual opentelemetry::sdk::common::ExportResult opentelemetry::sdk::metrics::PushMetricExporter::Export</definition>
+        <argsstring>(const ResourceMetrics &amp;data) noexcept=0</argsstring>
+        <name>Export</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PushMetricExporter::Export</qualifiedname>
+        <param>
+          <type>const ResourceMetrics &amp;</type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Exports a batch of metrics data. This method must not be called concurrently for the same exporter instance. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>data</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>metrics data </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/push_metric_exporter.h" line="41" column="52"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a48d35aaf54d96a23de4e04d713b2bb71" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>AggregationTemporality</type>
+        <definition>virtual AggregationTemporality opentelemetry::sdk::metrics::PushMetricExporter::GetAggregationTemporality</definition>
+        <argsstring>(InstrumentType instrument_type) const noexcept=0</argsstring>
+        <name>GetAggregationTemporality</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PushMetricExporter::GetAggregationTemporality</qualifiedname>
+        <param>
+          <type>InstrumentType</type>
+          <declname>instrument_type</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the AggregationTemporality for given Instrument Type for this exporter.</para>
+<para><simplesect kind="return"><para>AggregationTemporality </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/push_metric_exporter.h" line="48" column="34"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a8030729c633eeaa7127271afab3dd067" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::sdk::metrics::PushMetricExporter::ForceFlush</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept=0</argsstring>
+        <name>ForceFlush</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PushMetricExporter::ForceFlush</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Force flush the exporter. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/push_metric_exporter.h" line="54" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1adbce7c67bc4977c5ec9159afa145b3bd" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::sdk::metrics::PushMetricExporter::Shutdown</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept=0</argsstring>
+        <name>Shutdown</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PushMetricExporter::Shutdown</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Shut down the metric exporter. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timeout</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>an optional timeout. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>return the status of the operation. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/push_metric_exporter.h" line="62" column="16"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter" kindref="compound">PushMetricExporter</ref> defines the interface to be used by metrics libraries to push metrics data to the OpenTelemetry exporters. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/push_metric_exporter.h" line="24" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/push_metric_exporter.h" bodystart="25" bodyend="64"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1aebffe524b2591f32095f99a71363f699" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::PushMetricExporter</scope><name>Export</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a8030729c633eeaa7127271afab3dd067" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::PushMetricExporter</scope><name>ForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a48d35aaf54d96a23de4e04d713b2bb71" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::PushMetricExporter</scope><name>GetAggregationTemporality</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a30deda56893a25aa325931320f71e5cc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PushMetricExporter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a82edf542236c48c47701c653b6bd8b80" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PushMetricExporter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a13e4380ae60e1ac86c28c5362052517c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PushMetricExporter</scope><name>PushMetricExporter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a09ac0e995cd8711084122319cf4d1de8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PushMetricExporter</scope><name>PushMetricExporter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a9a68eb67331929436e2471f1b88dbcd8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PushMetricExporter</scope><name>PushMetricExporter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1adbce7c67bc4977c5ec9159afa145b3bd" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::PushMetricExporter</scope><name>Shutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PushMetricExporter_1a1039a8ed605f3c390b2d96b8b52754ea" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::PushMetricExporter</scope><name>~PushMetricExporter</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

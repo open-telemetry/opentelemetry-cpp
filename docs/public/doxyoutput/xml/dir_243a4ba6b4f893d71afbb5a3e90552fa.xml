@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_243a4ba6b4f893d71afbb5a3e90552fa" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/sdk</compoundname>
+    <innerdir refid="dir_195aa4215760a77c8f43641b003b8f9c">/home/ubuntu/opentelemetry-cpp/sdk/include</innerdir>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/"/>
+  </compounddef>
+</doxygen>

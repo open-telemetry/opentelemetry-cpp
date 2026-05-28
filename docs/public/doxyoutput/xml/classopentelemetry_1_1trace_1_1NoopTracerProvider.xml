@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1trace_1_1NoopTracerProvider" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::trace::NoopTracerProvider</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1trace_1_1TracerProvider" prot="public" virt="non-virtual">opentelemetry::trace::TracerProvider</basecompoundref>
+    <includes refid="trace_2noop_8h" local="no">noop.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1trace_1_1NoopTracerProvider_1a409bd2ae34f2d498e1fc2db3a7a7755d" prot="private" static="no" mutable="no">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1Tracer" kindref="compound">trace::Tracer</ref> &gt;</type>
+        <definition>nostd::shared_ptr&lt;trace::Tracer&gt; opentelemetry::trace::NoopTracerProvider::tracer_</definition>
+        <argsstring></argsstring>
+        <name>tracer_</name>
+        <qualifiedname>opentelemetry::trace::NoopTracerProvider::tracer_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="156" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="156" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopTracerProvider_1aa42d45188bf3cfae0b1e8c50731417c5" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::NoopTracerProvider::NoopTracerProvider</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>NoopTracerProvider</name>
+        <qualifiedname>opentelemetry::trace::NoopTracerProvider::NoopTracerProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="133" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="133" bodyend="135"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NoopTracerProvider_1a353049bc0cdf33cc653c5128ff8b47d9" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1Tracer" kindref="compound">trace::Tracer</ref> &gt;</type>
+        <definition>nostd::shared_ptr&lt; trace::Tracer &gt; opentelemetry::trace::NoopTracerProvider::GetTracer</definition>
+        <argsstring>(nostd::string_view, nostd::string_view, nostd::string_view) noexcept override</argsstring>
+        <name>GetTracer</name>
+        <qualifiedname>opentelemetry::trace::NoopTracerProvider::GetTracer</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1TracerProvider_1a55e668c2a550e3af3d4a6d15ce9a68f1">GetTracer</reimplements>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>version</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>schema_url</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Gets or creates a named tracer instance.</para>
+<para>Optionally a version can be passed to create a named and versioned tracer instance. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="147" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="147" bodyend="152"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>No-op implementation of a <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref>. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::trace::NoopTracerProvider</label>
+        <link refid="classopentelemetry_1_1trace_1_1NoopTracerProvider"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::trace::TracerProvider</label>
+        <link refid="classopentelemetry_1_1trace_1_1TracerProvider"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>opentelemetry::trace::NoopTracerProvider</label>
+        <link refid="classopentelemetry_1_1trace_1_1NoopTracerProvider"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::trace::TracerProvider</label>
+        <link refid="classopentelemetry_1_1trace_1_1TracerProvider"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" line="130" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/noop.h" bodystart="131" bodyend="157"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1trace_1_1NoopTracerProvider_1a353049bc0cdf33cc653c5128ff8b47d9" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopTracerProvider</scope><name>GetTracer</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopTracerProvider_1aa42d45188bf3cfae0b1e8c50731417c5" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopTracerProvider</scope><name>NoopTracerProvider</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1ae3b0586602788cea8b4b281e1616ac06" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopTracerProvider</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1a638087b5ce9b6bfd32ace6f3df801c60" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopTracerProvider</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NoopTracerProvider_1a409bd2ae34f2d498e1fc2db3a7a7755d" prot="private" virt="non-virtual"><scope>opentelemetry::trace::NoopTracerProvider</scope><name>tracer_</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1ac183df161cb2313093c97b454b703e0d" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopTracerProvider</scope><name>TracerProvider</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1ac2924187d7e13a5ee9b23fa9a0deaed6" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopTracerProvider</scope><name>TracerProvider</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1a76334fc448aa93bf6404cfeed7a20b11" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NoopTracerProvider</scope><name>TracerProvider</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1a62dc113a06db8fe65c2b76018edce1d8" prot="public" virt="virtual"><scope>opentelemetry::trace::NoopTracerProvider</scope><name>~TracerProvider</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

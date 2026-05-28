@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder</compoundname>
+    <includes refid="scope__configurator_8h" local="no">scope_configurator.h</includes>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1_1Condition" prot="private">opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::Condition</innerclass>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1a89b64859cae80c4f861e2b89c020d2ec" prot="private" static="no" mutable="no">
+        <type>T</type>
+        <definition>T opentelemetry::sdk::instrumentationscope::ScopeConfigurator&lt; T &gt;::Builder::default_scope_config_</definition>
+        <argsstring></argsstring>
+        <name>default_scope_config_</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::default_scope_config_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="120" column="7" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="120" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1a2e212c235400d25f244e27ac0f4a553d" prot="private" static="no" mutable="no">
+        <type>std::vector&lt; Condition &gt;</type>
+        <definition>std::vector&lt;Condition&gt; opentelemetry::sdk::instrumentationscope::ScopeConfigurator&lt; T &gt;::Builder::conditions_</definition>
+        <argsstring></argsstring>
+        <name>conditions_</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::conditions_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="121" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="121" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1a696deb6d387d2ba071439b2d9047f800" prot="public" static="no" const="no" explicit="yes" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::instrumentationscope::ScopeConfigurator&lt; T &gt;::Builder::Builder</definition>
+        <argsstring>(T default_scope_config) noexcept</argsstring>
+        <name>Builder</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::Builder</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>default_scope_config</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Constructor for a builder object that cam be used to create a scope configurator. A minimally configured builder would build a <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">ScopeConfigurator</ref> that applies the default_scope_config to every instrumentation scope. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>default_scope_config</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The default scope config that the built configurator should fall back on. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="37" column="14" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="37" bodyend="38"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1a7df7bc576e1084cc3c359e39607a4841" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder" kindref="compound">Builder</ref> &amp;</type>
+        <definition>Builder &amp; opentelemetry::sdk::instrumentationscope::ScopeConfigurator&lt; T &gt;::Builder::AddCondition</definition>
+        <argsstring>(std::function&lt; bool(const InstrumentationScope &amp;)&gt; scope_matcher, T scope_config)</argsstring>
+        <name>AddCondition</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::AddCondition</qualifiedname>
+        <param>
+          <type>std::function&lt; bool(const InstrumentationScope &amp;)&gt;</type>
+          <declname>scope_matcher</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>scope_config</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Allows the user to pass a generic function that evaluates an instrumentation scope through a boolean check. If the check passes, the provided config is applied. Conditions are evaluated in order. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>scope_matcher</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a function that returns true if the scope being evaluated matches the criteria defined by the function. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>scope_config</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the scope configuration to return for the matched scope. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>this </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="49" column="13" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="49" bodyend="54"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1a794361e80f890b74dc82165d688bac35" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder" kindref="compound">Builder</ref> &amp;</type>
+        <definition>Builder &amp; opentelemetry::sdk::instrumentationscope::ScopeConfigurator&lt; T &gt;::Builder::AddConditionNameEquals</definition>
+        <argsstring>(nostd::string_view scope_name, T scope_config)</argsstring>
+        <name>AddConditionNameEquals</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::AddConditionNameEquals</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>scope_name</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>scope_config</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>A convenience condition that specifically matches the scope name of the scope being evaluated. If the scope name matches to the provided string, then the provided scope configuration is applied to the scope. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>scope_name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The scope name to which the config needs to be applied. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>scope_config</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The scope config for the matching scopes. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>this </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="64" column="13" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="64" bodyend="72"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1a4ccd99d63432463c99c30f591c11c201" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">ScopeConfigurator</ref>&lt; T &gt;</type>
+        <definition>ScopeConfigurator&lt; T &gt; opentelemetry::sdk::instrumentationscope::ScopeConfigurator&lt; T &gt;::Builder::Build</definition>
+        <argsstring>() const</argsstring>
+        <name>Build</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::Build</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Constructs the scope configurator object that can be used to retrieve scope config depending on the instrumentation scope. <simplesect kind="return"><para>a configured scope configurator. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="79" column="23" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="79" bodyend="102"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>A builder class for the <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">ScopeConfigurator</ref> that facilitates the creation of ScopeConfigurators. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="27" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="28" bodyend="122"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1a7df7bc576e1084cc3c359e39607a4841" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder</scope><name>AddCondition</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1a794361e80f890b74dc82165d688bac35" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder</scope><name>AddConditionNameEquals</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1a4ccd99d63432463c99c30f591c11c201" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder</scope><name>Build</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1a696deb6d387d2ba071439b2d9047f800" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder</scope><name>Builder</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1a2e212c235400d25f244e27ac0f4a553d" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder</scope><name>conditions_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1a89b64859cae80c4f861e2b89c020d2ec" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder</scope><name>default_scope_config_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

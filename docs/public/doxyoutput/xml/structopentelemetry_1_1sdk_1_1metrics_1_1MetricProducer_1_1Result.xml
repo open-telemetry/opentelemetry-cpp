@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1_1Result" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::MetricProducer::Result</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1_1Result_1a1c6490d868bbddba43949e3bf4b25414" prot="public" static="no" mutable="no">
+        <type>ResourceMetrics</type>
+        <definition>ResourceMetrics opentelemetry::sdk::metrics::MetricProducer::Result::points_</definition>
+        <argsstring></argsstring>
+        <name>points_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricProducer::Result::points_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="107" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" bodystart="107" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1_1Result_1a5e7b342d114cb0067b44cc12c6aec818" prot="public" static="no" mutable="no">
+        <type>Status</type>
+        <definition>Status opentelemetry::sdk::metrics::MetricProducer::Result::status_</definition>
+        <argsstring></argsstring>
+        <name>status_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricProducer::Result::status_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="108" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" bodystart="108" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="105" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" bodystart="106" bodyend="109"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1_1Result_1a1c6490d868bbddba43949e3bf4b25414" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricProducer::Result</scope><name>points_</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer_1_1Result_1a5e7b342d114cb0067b44cc12c6aec818" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricProducer::Result</scope><name>status_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

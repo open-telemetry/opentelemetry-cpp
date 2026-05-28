@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::AlwaysOffSampler</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" prot="public" virt="non-virtual">opentelemetry::sdk::trace::Sampler</basecompoundref>
+    <includes refid="always__off_8h" local="no">always_off.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler_1ad01ea51e316a3c3feb0ca0ef98c6e75f" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type><ref refid="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult" kindref="compound">SamplingResult</ref></type>
+        <definition>SamplingResult opentelemetry::sdk::trace::AlwaysOffSampler::ShouldSample</definition>
+        <argsstring>(const opentelemetry::trace::SpanContext &amp;parent_context, opentelemetry::trace::TraceId, nostd::string_view, opentelemetry::trace::SpanKind, const opentelemetry::common::KeyValueIterable &amp;, const opentelemetry::trace::SpanContextKeyValueIterable &amp;) noexcept override</argsstring>
+        <name>ShouldSample</name>
+        <qualifiedname>opentelemetry::sdk::trace::AlwaysOffSampler::ShouldSample</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a9b242dce90cf9794dc0d1a444c6a65a4">ShouldSample</reimplements>
+        <param>
+          <type>const opentelemetry::trace::SpanContext &amp;</type>
+          <declname>parent_context</declname>
+        </param>
+        <param>
+          <type>opentelemetry::trace::TraceId</type>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <param>
+          <type>opentelemetry::trace::SpanKind</type>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" kindref="compound">opentelemetry::trace::SpanContextKeyValueIterable</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Returns DROP always </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_off.h" line="28" column="18" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_off.h" bodystart="28" bodyend="44"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler_1a89780bb64d73f78007f642ce08685600" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>nostd::string_view</type>
+        <definition>nostd::string_view opentelemetry::sdk::trace::AlwaysOffSampler::GetDescription</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetDescription</name>
+        <qualifiedname>opentelemetry::sdk::trace::AlwaysOffSampler::GetDescription</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a3005a357efac28b16b0728b644d70b23">GetDescription</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Description MUST be <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler" kindref="compound">AlwaysOffSampler</ref> </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_off.h" line="49" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_off.h" bodystart="49" bodyend="49"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>The always off sampler always returns DROP, effectively disabling tracing functionality. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::AlwaysOffSampler</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::Sampler</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::AlwaysOffSampler</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::Sampler</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_off.h" line="22" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_off.h" bodystart="23" bodyend="50"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler_1a89780bb64d73f78007f642ce08685600" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::AlwaysOffSampler</scope><name>GetDescription</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a2b02c0ea090d1ffb444633586c5fc7b7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::AlwaysOffSampler</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a39498e03f5c855401636c846bf5c7470" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::AlwaysOffSampler</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1aa42ac55b013a48f0824ddeae448a8b9c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::AlwaysOffSampler</scope><name>Sampler</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a9cc64fe1400ccec2b9dd59969e709e6f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::AlwaysOffSampler</scope><name>Sampler</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1a4e7c4c3bc6495cd80dc70b383583a785" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::AlwaysOffSampler</scope><name>Sampler</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler_1ad01ea51e316a3c3feb0ca0ef98c6e75f" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::AlwaysOffSampler</scope><name>ShouldSample</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler_1ab87388d70cd8b6c8d71f44592e487817" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::AlwaysOffSampler</scope><name>~Sampler</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

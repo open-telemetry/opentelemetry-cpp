@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1_1TraceState" kind="struct" language="C++" prot="private">
+    <compoundname>opentelemetry::sdk::logs::ReadWriteLogRecord::TraceState</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1_1TraceState_1ad31d62819b698fde4ad2f3f92536fe1e" prot="public" static="no" mutable="no">
+        <type>opentelemetry::trace::TraceId</type>
+        <definition>opentelemetry::trace::TraceId opentelemetry::sdk::logs::ReadWriteLogRecord::TraceState::trace_id</definition>
+        <argsstring></argsstring>
+        <name>trace_id</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::TraceState::trace_id</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="206" column="35" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="206" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1_1TraceState_1af8a8b90ade869ec2c6fb345bf0afe390" prot="public" static="no" mutable="no">
+        <type>opentelemetry::trace::SpanId</type>
+        <definition>opentelemetry::trace::SpanId opentelemetry::sdk::logs::ReadWriteLogRecord::TraceState::span_id</definition>
+        <argsstring></argsstring>
+        <name>span_id</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::TraceState::span_id</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="207" column="34" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="207" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1_1TraceState_1a4333a7582a71f1af9c1431fb002be02c" prot="public" static="no" mutable="no">
+        <type>opentelemetry::trace::TraceFlags</type>
+        <definition>opentelemetry::trace::TraceFlags opentelemetry::sdk::logs::ReadWriteLogRecord::TraceState::trace_flags</definition>
+        <argsstring></argsstring>
+        <name>trace_flags</name>
+        <qualifiedname>opentelemetry::sdk::logs::ReadWriteLogRecord::TraceState::trace_flags</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="208" column="38" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="208" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" line="204" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h" bodystart="205" bodyend="209"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1_1TraceState_1af8a8b90ade869ec2c6fb345bf0afe390" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord::TraceState</scope><name>span_id</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1_1TraceState_1a4333a7582a71f1af9c1431fb002be02c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord::TraceState</scope><name>trace_flags</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1_1TraceState_1ad31d62819b698fde4ad2f3f92536fe1e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::ReadWriteLogRecord::TraceState</scope><name>trace_id</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

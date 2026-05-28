@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1common_1_1DurationUtil" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::common::DurationUtil</compoundname>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1DurationUtil_1a28e620be53eca27147bcebb3bfc02a34" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Rep</type>
+          </param>
+          <param>
+            <type>class Period</type>
+          </param>
+        </templateparamlist>
+        <type>std::chrono::duration&lt; Rep, Period &gt;</type>
+        <definition>static std::chrono::duration&lt; Rep, Period &gt; opentelemetry::common::DurationUtil::AdjustWaitForTimeout</definition>
+        <argsstring>(std::chrono::duration&lt; Rep, Period &gt; timeout, std::chrono::duration&lt; Rep, Period &gt; indefinite_value) noexcept</argsstring>
+        <name>AdjustWaitForTimeout</name>
+        <qualifiedname>opentelemetry::common::DurationUtil::AdjustWaitForTimeout</qualifiedname>
+        <param>
+          <type>std::chrono::duration&lt; Rep, Period &gt;</type>
+          <declname>timeout</declname>
+        </param>
+        <param>
+          <type>std::chrono::duration&lt; Rep, Period &gt;</type>
+          <declname>indefinite_value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="176" column="32" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="176" bodyend="202"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="172" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="173" bodyend="203"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1common_1_1DurationUtil_1a28e620be53eca27147bcebb3bfc02a34" prot="public" virt="non-virtual"><scope>opentelemetry::common::DurationUtil</scope><name>AdjustWaitForTimeout</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

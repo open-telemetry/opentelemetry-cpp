@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributeHashGenerator" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::AttributeHashGenerator</compoundname>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributeHashGenerator_1a17999951706284109541d893bd329c4b" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::AttributeHashGenerator::operator()</definition>
+        <argsstring>(const MetricAttributes &amp;attributes) const</argsstring>
+        <name>operator()</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributeHashGenerator::operator()</qualifiedname>
+        <param>
+          <type>const MetricAttributes &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="38" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="38" bodyend="41"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" line="35" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/attributes_hashmap.h" bodystart="36" bodyend="42"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributeHashGenerator_1a17999951706284109541d893bd329c4b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributeHashGenerator</scope><name>operator()</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

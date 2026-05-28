@@ -1,0 +1,199 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::context::propagation::TextMapPropagator</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1baggage_1_1propagation_1_1BaggagePropagator" prot="public" virt="non-virtual">opentelemetry::baggage::propagation::BaggagePropagator</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator" prot="public" virt="non-virtual">opentelemetry::context::propagation::CompositePropagator</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1context_1_1propagation_1_1NoOpPropagator" prot="public" virt="non-virtual">opentelemetry::context::propagation::NoOpPropagator</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor" prot="public" virt="non-virtual">opentelemetry::trace::propagation::B3PropagatorExtractor</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1trace_1_1propagation_1_1HttpTraceContext" prot="public" virt="non-virtual">opentelemetry::trace::propagation::HttpTraceContext</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1trace_1_1propagation_1_1JaegerPropagator" prot="public" virt="non-virtual">opentelemetry::trace::propagation::JaegerPropagator</derivedcompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a95708796cfcbdade8ad81ea6402749c3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::propagation::TextMapPropagator::TextMapPropagator</definition>
+        <argsstring>()=default</argsstring>
+        <name>TextMapPropagator</name>
+        <qualifiedname>opentelemetry::context::propagation::TextMapPropagator::TextMapPropagator</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h" line="51" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a9eca02e8ef37c0f8e029175bc0cb9fec" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::propagation::TextMapPropagator::TextMapPropagator</definition>
+        <argsstring>(const TextMapPropagator &amp;)=default</argsstring>
+        <name>TextMapPropagator</name>
+        <qualifiedname>opentelemetry::context::propagation::TextMapPropagator::TextMapPropagator</qualifiedname>
+        <param>
+          <type>const TextMapPropagator &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h" line="52" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1aa14ca5a5b60a8b1d444397f04cc6ce2f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>TextMapPropagator &amp;</type>
+        <definition>TextMapPropagator &amp; opentelemetry::context::propagation::TextMapPropagator::operator=</definition>
+        <argsstring>(const TextMapPropagator &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::context::propagation::TextMapPropagator::operator=</qualifiedname>
+        <param>
+          <type>const TextMapPropagator &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h" line="53" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a81a7bb782548036a458c497105b1bcc0" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::propagation::TextMapPropagator::TextMapPropagator</definition>
+        <argsstring>(TextMapPropagator &amp;&amp;) noexcept=default</argsstring>
+        <name>TextMapPropagator</name>
+        <qualifiedname>opentelemetry::context::propagation::TextMapPropagator::TextMapPropagator</qualifiedname>
+        <param>
+          <type>TextMapPropagator &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h" line="54" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1af1e661fbae8179b4a4b944a00a30d7fe" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>TextMapPropagator &amp;</type>
+        <definition>TextMapPropagator &amp; opentelemetry::context::propagation::TextMapPropagator::operator=</definition>
+        <argsstring>(TextMapPropagator &amp;&amp;) noexcept=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::context::propagation::TextMapPropagator::operator=</qualifiedname>
+        <param>
+          <type>TextMapPropagator &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h" line="55" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1adb04991b7d60a99b33d4f21a8cff3f57" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>context::Context</type>
+        <definition>virtual context::Context opentelemetry::context::propagation::TextMapPropagator::Extract</definition>
+        <argsstring>(const TextMapCarrier &amp;carrier, context::Context &amp;context) noexcept=0</argsstring>
+        <name>Extract</name>
+        <qualifiedname>opentelemetry::context::propagation::TextMapPropagator::Extract</qualifiedname>
+        <param>
+          <type>const TextMapCarrier &amp;</type>
+          <declname>carrier</declname>
+        </param>
+        <param>
+          <type>context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h" line="58" column="28"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a9941d1d770a06527ee1b04f8c2cdac03" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::context::propagation::TextMapPropagator::Inject</definition>
+        <argsstring>(TextMapCarrier &amp;carrier, const context::Context &amp;context) noexcept=0</argsstring>
+        <name>Inject</name>
+        <qualifiedname>opentelemetry::context::propagation::TextMapPropagator::Inject</qualifiedname>
+        <param>
+          <type>TextMapCarrier &amp;</type>
+          <declname>carrier</declname>
+        </param>
+        <param>
+          <type>const context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h" line="62" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a7d9f7198f5d9c477a4143e325d22cd1f" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::context::propagation::TextMapPropagator::Fields</definition>
+        <argsstring>(nostd::function_ref&lt; bool(nostd::string_view)&gt; callback) const noexcept=0</argsstring>
+        <name>Fields</name>
+        <qualifiedname>opentelemetry::context::propagation::TextMapPropagator::Fields</qualifiedname>
+        <param>
+          <type>nostd::function_ref&lt; bool(nostd::string_view)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h" line="65" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a0a5f832aea596281984396b45ad09573" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::context::propagation::TextMapPropagator::~TextMapPropagator</definition>
+        <argsstring>()=default</argsstring>
+        <name>~TextMapPropagator</name>
+        <qualifiedname>opentelemetry::context::propagation::TextMapPropagator::~TextMapPropagator</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h" line="67" column="11"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::context::propagation::NoOpPropagator</label>
+        <link refid="classopentelemetry_1_1context_1_1propagation_1_1NoOpPropagator"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>opentelemetry::context::propagation::TextMapPropagator</label>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h" line="48" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/text_map_propagator.h" bodystart="49" bodyend="68"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1adb04991b7d60a99b33d4f21a8cff3f57" prot="public" virt="pure-virtual"><scope>opentelemetry::context::propagation::TextMapPropagator</scope><name>Extract</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a7d9f7198f5d9c477a4143e325d22cd1f" prot="public" virt="pure-virtual"><scope>opentelemetry::context::propagation::TextMapPropagator</scope><name>Fields</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a9941d1d770a06527ee1b04f8c2cdac03" prot="public" virt="pure-virtual"><scope>opentelemetry::context::propagation::TextMapPropagator</scope><name>Inject</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1aa14ca5a5b60a8b1d444397f04cc6ce2f" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::TextMapPropagator</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1af1e661fbae8179b4a4b944a00a30d7fe" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::TextMapPropagator</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a95708796cfcbdade8ad81ea6402749c3" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::TextMapPropagator</scope><name>TextMapPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a9eca02e8ef37c0f8e029175bc0cb9fec" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::TextMapPropagator</scope><name>TextMapPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a81a7bb782548036a458c497105b1bcc0" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::TextMapPropagator</scope><name>TextMapPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a0a5f832aea596281984396b45ad09573" prot="public" virt="virtual"><scope>opentelemetry::context::propagation::TextMapPropagator</scope><name>~TextMapPropagator</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

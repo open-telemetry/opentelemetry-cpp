@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::SyncMultiMetricStorage</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::sdk::metrics::SyncWritableMetricStorage</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage_1a443f52dc86e6ca7d259d1b67a4312757" prot="private" static="no" mutable="no">
+        <type>std::vector&lt; std::shared_ptr&lt; SyncWritableMetricStorage &gt; &gt;</type>
+        <definition>std::vector&lt;std::shared_ptr&lt;SyncWritableMetricStorage&gt; &gt; opentelemetry::sdk::metrics::SyncMultiMetricStorage::storages_</definition>
+        <argsstring></argsstring>
+        <name>storages_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SyncMultiMetricStorage::storages_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" line="70" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" bodystart="70" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage_1a83a224be8554ac99c72694cf8240e2c6" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::SyncMultiMetricStorage::AddStorage</definition>
+        <argsstring>(const std::shared_ptr&lt; SyncWritableMetricStorage &gt; &amp;storage)</argsstring>
+        <name>AddStorage</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SyncMultiMetricStorage::AddStorage</qualifiedname>
+        <param>
+          <type>const std::shared_ptr&lt; SyncWritableMetricStorage &gt; &amp;</type>
+          <declname>storage</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" line="28" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" bodystart="28" bodyend="31"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage_1a19dc077f2025f926a4e3d229eae43c53" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::SyncMultiMetricStorage::RecordLong</definition>
+        <argsstring>(int64_t value, const opentelemetry::context::Context &amp;context) noexcept override</argsstring>
+        <name>RecordLong</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SyncMultiMetricStorage::RecordLong</qualifiedname>
+        <param>
+          <type>int64_t</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" line="33" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" bodystart="33" bodyend="39"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage_1a245cf062de9df649bae5509526391488" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::SyncMultiMetricStorage::RecordLong</definition>
+        <argsstring>(int64_t value, const opentelemetry::common::KeyValueIterable &amp;attributes, const opentelemetry::context::Context &amp;context) noexcept override</argsstring>
+        <name>RecordLong</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SyncMultiMetricStorage::RecordLong</qualifiedname>
+        <param>
+          <type>int64_t</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" line="41" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" bodystart="41" bodyend="49"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage_1acc46c34c0261a637998663985d397001" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::SyncMultiMetricStorage::RecordDouble</definition>
+        <argsstring>(double value, const opentelemetry::context::Context &amp;context) noexcept override</argsstring>
+        <name>RecordDouble</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SyncMultiMetricStorage::RecordDouble</qualifiedname>
+        <param>
+          <type>double</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" line="51" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" bodystart="51" bodyend="57"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage_1a5826bc5e292785d7713402f3da0a2e05" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::SyncMultiMetricStorage::RecordDouble</definition>
+        <argsstring>(double value, const opentelemetry::common::KeyValueIterable &amp;attributes, const opentelemetry::context::Context &amp;context) noexcept override</argsstring>
+        <name>RecordDouble</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SyncMultiMetricStorage::RecordDouble</qualifiedname>
+        <param>
+          <type>double</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" line="59" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" bodystart="59" bodyend="67"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" line="25" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/multi_metric_storage.h" bodystart="26" bodyend="71"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage_1a83a224be8554ac99c72694cf8240e2c6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SyncMultiMetricStorage</scope><name>AddStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncWritableMetricStorage_1a11e4a191a2b2573ab45b5a5a82d014db" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SyncMultiMetricStorage</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncWritableMetricStorage_1ae970333e020954bff73ff6ccc3bc66ce" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SyncMultiMetricStorage</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage_1acc46c34c0261a637998663985d397001" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SyncMultiMetricStorage</scope><name>RecordDouble</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage_1a5826bc5e292785d7713402f3da0a2e05" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SyncMultiMetricStorage</scope><name>RecordDouble</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage_1a19dc077f2025f926a4e3d229eae43c53" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SyncMultiMetricStorage</scope><name>RecordLong</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage_1a245cf062de9df649bae5509526391488" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SyncMultiMetricStorage</scope><name>RecordLong</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncMultiMetricStorage_1a443f52dc86e6ca7d259d1b67a4312757" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SyncMultiMetricStorage</scope><name>storages_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncWritableMetricStorage_1aff5d0019a613c505df50a4dffd483037" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SyncMultiMetricStorage</scope><name>SyncWritableMetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncWritableMetricStorage_1a9cb9849955149b93c2326edd51918313" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SyncMultiMetricStorage</scope><name>SyncWritableMetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncWritableMetricStorage_1a0d797e61615ac4a7c43959f3696800b4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SyncMultiMetricStorage</scope><name>SyncWritableMetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SyncWritableMetricStorage_1ac0708e3a747aaebf44837cd2bdc7be6e" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::SyncMultiMetricStorage</scope><name>~SyncWritableMetricStorage</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

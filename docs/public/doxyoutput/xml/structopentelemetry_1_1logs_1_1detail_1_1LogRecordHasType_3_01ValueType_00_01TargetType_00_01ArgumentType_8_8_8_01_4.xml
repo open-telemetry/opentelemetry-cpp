@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1logs_1_1detail_1_1LogRecordHasType_3_01ValueType_00_01TargetType_00_01ArgumentType_8_8_8_01_4" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::logs::detail::LogRecordHasType&lt; ValueType, TargetType, ArgumentType... &gt;</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">std::conditional::type</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>class ValueType</type>
+      </param>
+      <param>
+        <type>class TargetType</type>
+      </param>
+      <param>
+        <type>class...</type>
+        <declname>ArgumentType</declname>
+        <defname>ArgumentType</defname>
+      </param>
+    </templateparamlist>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h" line="195" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h" bodystart="199" bodyend="199"/>
+    <listofallmembers>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

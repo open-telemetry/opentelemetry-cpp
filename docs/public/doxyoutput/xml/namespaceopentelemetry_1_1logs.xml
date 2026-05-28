@@ -1,0 +1,276 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1logs" kind="namespace" language="C++">
+    <compoundname>opentelemetry::logs</compoundname>
+    <innerclass refid="classopentelemetry_1_1logs_1_1EventId" prot="public">opentelemetry::logs::EventId</innerclass>
+    <innerclass refid="classopentelemetry_1_1logs_1_1EventLogger" prot="public">opentelemetry::logs::EventLogger</innerclass>
+    <innerclass refid="classopentelemetry_1_1logs_1_1EventLoggerProvider" prot="public">opentelemetry::logs::EventLoggerProvider</innerclass>
+    <innerclass refid="classopentelemetry_1_1logs_1_1Logger" prot="public">opentelemetry::logs::Logger</innerclass>
+    <innerclass refid="classopentelemetry_1_1logs_1_1LoggerProvider" prot="public">opentelemetry::logs::LoggerProvider</innerclass>
+    <innerclass refid="classopentelemetry_1_1logs_1_1LogRecord" prot="public">opentelemetry::logs::LogRecord</innerclass>
+    <innerclass refid="classopentelemetry_1_1logs_1_1NoopEventLogger" prot="public">opentelemetry::logs::NoopEventLogger</innerclass>
+    <innerclass refid="classopentelemetry_1_1logs_1_1NoopEventLoggerProvider" prot="public">opentelemetry::logs::NoopEventLoggerProvider</innerclass>
+    <innerclass refid="classopentelemetry_1_1logs_1_1NoopLogger" prot="public">opentelemetry::logs::NoopLogger</innerclass>
+    <innerclass refid="classopentelemetry_1_1logs_1_1NoopLoggerProvider" prot="public">opentelemetry::logs::NoopLoggerProvider</innerclass>
+    <innerclass refid="classopentelemetry_1_1logs_1_1Provider" prot="public">opentelemetry::logs::Provider</innerclass>
+    <innernamespace refid="namespaceopentelemetry_1_1logs_1_1detail">opentelemetry::logs::detail</innernamespace>
+    <sectiondef kind="enum">
+      <memberdef kind="enum" id="severity_8h_1ab2db73501e980a9d0685e86c4738acfd" prot="public" static="no" strong="yes">
+        <type>uint8_t</type>
+        <name>Severity</name>
+        <qualifiedname>opentelemetry::logs::Severity</qualifiedname>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdab10913c938482a8aa4ba85b7a1116cb4" prot="public">
+          <name>kInvalid</name>
+          <initializer>= 0</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdafa21506cd249f400de4a974b5a0c8e0e" prot="public">
+          <name>kTrace</name>
+          <initializer>= 1</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfda8a105b65a920d798edd10c5bbbcb50c4" prot="public">
+          <name>kTrace2</name>
+          <initializer>= 2</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfda050d4607fb2b73d0603087a37bb2e411" prot="public">
+          <name>kTrace3</name>
+          <initializer>= 3</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfda8c001fd83795ec23292e7e4a1de069f1" prot="public">
+          <name>kTrace4</name>
+          <initializer>= 4</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdabb53ce21b7c0b7c8a8f7860a41901d29" prot="public">
+          <name>kDebug</name>
+          <initializer>= 5</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfda3d9ecc06acb74a70036e816a1aa8bf54" prot="public">
+          <name>kDebug2</name>
+          <initializer>= 6</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdad53ced5090969ac7dd946f5dd66d0291" prot="public">
+          <name>kDebug3</name>
+          <initializer>= 7</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfda5303cfcf97fd94dde27d11a1a71b18e8" prot="public">
+          <name>kDebug4</name>
+          <initializer>= 8</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfda176a473e63c17ccdac91640c67f149bf" prot="public">
+          <name>kInfo</name>
+          <initializer>= 9</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdab97a624d00b7eea74414f455a3efff15" prot="public">
+          <name>kInfo2</name>
+          <initializer>= 10</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdabfdbe6c20fe605f0c3401d9db8913f9e" prot="public">
+          <name>kInfo3</name>
+          <initializer>= 11</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfda93616855f1d32de1cd39d0dabc1eeed7" prot="public">
+          <name>kInfo4</name>
+          <initializer>= 12</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfda61a920eb4a24199ec6a36dd90f2a30b7" prot="public">
+          <name>kWarn</name>
+          <initializer>= 13</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdaabf6f8097e4f7dbaa0cc7e191d7bf3fa" prot="public">
+          <name>kWarn2</name>
+          <initializer>= 14</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfda291c54de8ace1c21492cae6f501dbb32" prot="public">
+          <name>kWarn3</name>
+          <initializer>= 15</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdae541019b6f1e279356694338550bed43" prot="public">
+          <name>kWarn4</name>
+          <initializer>= 16</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdae3587c730cc1aa530fa4ddc9c4204e97" prot="public">
+          <name>kError</name>
+          <initializer>= 17</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdac04a7fb4f51ce940959deece4de75fa1" prot="public">
+          <name>kError2</name>
+          <initializer>= 18</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdaaf503b1ce1cf64d232c8b5e80395a876" prot="public">
+          <name>kError3</name>
+          <initializer>= 19</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfda049b9254ba14eda6098237982d8be2cc" prot="public">
+          <name>kError4</name>
+          <initializer>= 20</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdae66f945a3c2423ef09406cf09fa9de26" prot="public">
+          <name>kFatal</name>
+          <initializer>= 21</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfda3301377afccea2312887b3b2cfabef6c" prot="public">
+          <name>kFatal2</name>
+          <initializer>= 22</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdaa2fb8a80aadc87af3a80abdd0206e89c" prot="public">
+          <name>kFatal3</name>
+          <initializer>= 23</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="severity_8h_1ab2db73501e980a9d0685e86c4738acfdaaaed42b08dd5da179fa6983d1d675096" prot="public">
+          <name>kFatal4</name>
+          <initializer>= 24</initializer>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Severity Levels assigned to log events, based on Log Data Model, with the addition of kInvalid (mapped to a severity number of 0).</para>
+<para>See <ulink url="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-severitynumber">https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/data-model.md#field-severitynumber</ulink> </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/severity.h" line="22" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/severity.h" bodystart="23" bodyend="49"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="var">
+      <memberdef kind="variable" id="severity_8h_1a706e8aea392ce3539e30dff8772181f0" prot="public" static="no" mutable="no">
+        <type>const uint8_t</type>
+        <definition>const uint8_t opentelemetry::logs::kMaxSeverity</definition>
+        <argsstring></argsstring>
+        <name>kMaxSeverity</name>
+        <qualifiedname>opentelemetry::logs::kMaxSeverity</qualifiedname>
+        <initializer>= 255</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/severity.h" line="51" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/severity.h" bodystart="51" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="severity_8h_1aa83c3ecf64f62a2a29a4722b1dd3c475" prot="public" static="no" mutable="no">
+        <type>const nostd::string_view</type>
+        <definition>const nostd::string_view opentelemetry::logs::SeverityNumToText[25]</definition>
+        <argsstring>[25]</argsstring>
+        <name>SeverityNumToText</name>
+        <qualifiedname>opentelemetry::logs::SeverityNumToText</qualifiedname>
+        <initializer>= {
+    &quot;INVALID&quot;, &quot;TRACE&quot;,  &quot;TRACE2&quot;, &quot;TRACE3&quot;, &quot;TRACE4&quot;, &quot;DEBUG&quot;,  &quot;DEBUG2&quot;, &quot;DEBUG3&quot;, &quot;DEBUG4&quot;,
+    &quot;INFO&quot;,    &quot;INFO2&quot;,  &quot;INFO3&quot;,  &quot;INFO4&quot;,  &quot;WARN&quot;,   &quot;WARN2&quot;,  &quot;WARN3&quot;,  &quot;WARN4&quot;,  &quot;ERROR&quot;,
+    &quot;ERROR2&quot;,  &quot;ERROR3&quot;, &quot;ERROR4&quot;, &quot;FATAL&quot;,  &quot;FATAL2&quot;, &quot;FATAL3&quot;, &quot;FATAL4&quot;}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Mapping of the severity enum above, to a severity text string (in all caps). This severity text can be printed out by exporters. Capital letters follow the spec naming convention.</para>
+<para>Included to follow the specification&apos;s recommendation to print both severity number and text in each log record. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/severity.h" line="61" column="26" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/severity.h" bodystart="61" bodyend="64"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/event_id.h" line="13" column="1"/>
+  </compounddef>
+</doxygen>

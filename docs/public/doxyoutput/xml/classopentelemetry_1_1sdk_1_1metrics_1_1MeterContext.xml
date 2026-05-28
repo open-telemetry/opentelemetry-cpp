@@ -1,0 +1,547 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::MeterContext</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">std::enable_shared_from_this&lt; MeterContext &gt;</basecompoundref>
+    <includes refid="meter__context_8h" local="no">meter_context.h</includes>
+    <sectiondef kind="friend">
+      <memberdef kind="friend" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a704fd2e7651f59b7a535def508bfa9a2" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>class</type>
+        <definition>friend class ::testing::MetricCollectorTest</definition>
+        <argsstring></argsstring>
+        <name>::testing::MetricCollectorTest</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::MetricCollectorTest</qualifiedname>
+        <param>
+          <type>::testing::MetricCollectorTest</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="178" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" bodystart="178" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a973c100f48fcf6bf16a62ff81ec152c6" prot="private" static="no" mutable="no">
+        <type>opentelemetry::sdk::resource::Resource</type>
+        <definition>opentelemetry::sdk::resource::Resource opentelemetry::sdk::metrics::MeterContext::resource_</definition>
+        <argsstring></argsstring>
+        <name>resource_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::resource_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="180" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" bodystart="180" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1adb976aa427a5df9d4fc1ef7180ff21e6" prot="private" static="no" mutable="no">
+        <type>std::vector&lt; std::shared_ptr&lt; CollectorHandle &gt; &gt;</type>
+        <definition>std::vector&lt;std::shared_ptr&lt;CollectorHandle&gt; &gt; opentelemetry::sdk::metrics::MeterContext::collectors_</definition>
+        <argsstring></argsstring>
+        <name>collectors_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::collectors_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="181" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" bodystart="181" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a0b3d0164a28433565ddac1193fdb6d7c" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; ViewRegistry &gt;</type>
+        <definition>std::unique_ptr&lt;ViewRegistry&gt; opentelemetry::sdk::metrics::MeterContext::views_</definition>
+        <argsstring></argsstring>
+        <name>views_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::views_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="182" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" bodystart="182" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1ac0a239f3a5d6ec040bf8b32719699d44" prot="private" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::metrics::MeterContext::sdk_start_ts_</definition>
+        <argsstring></argsstring>
+        <name>sdk_start_ts_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::sdk_start_ts_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="183" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" bodystart="183" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1af082469ff168d67efdb528b10eb8707f" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> &gt; &gt;</type>
+        <definition>std::unique_ptr&lt;instrumentationscope::ScopeConfigurator&lt;MeterConfig&gt; &gt; opentelemetry::sdk::metrics::MeterContext::meter_configurator_</definition>
+        <argsstring></argsstring>
+        <name>meter_configurator_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::meter_configurator_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="184" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" bodystart="184" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1ac1deb2c141f7a461ef90114a416731a6" prot="private" static="no" mutable="no">
+        <type>std::vector&lt; std::shared_ptr&lt; Meter &gt; &gt;</type>
+        <definition>std::vector&lt;std::shared_ptr&lt;Meter&gt; &gt; opentelemetry::sdk::metrics::MeterContext::meters_</definition>
+        <argsstring></argsstring>
+        <name>meters_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::meters_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="185" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" bodystart="185" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1af994727a1e71961664f8170ab77fbae9" prot="private" static="no" mutable="no">
+        <type>std::atomic_flag</type>
+        <definition>std::atomic_flag opentelemetry::sdk::metrics::MeterContext::shutdown_latch_</definition>
+        <argsstring></argsstring>
+        <name>shutdown_latch_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::shutdown_latch_</qualifiedname>
+        <initializer>= ATOMIC_FLAG_INIT</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="195" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" bodystart="195" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1abc8060b273aa35cb23cb4af17701d0a6" prot="private" static="no" mutable="no">
+        <type>opentelemetry::common::SpinLockMutex</type>
+        <definition>opentelemetry::common::SpinLockMutex opentelemetry::sdk::metrics::MeterContext::forceflush_lock_</definition>
+        <argsstring></argsstring>
+        <name>forceflush_lock_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::forceflush_lock_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="197" column="40" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" bodystart="197" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a6f9755412f60fe73f56613f4ca289454" prot="private" static="no" mutable="no">
+        <type>opentelemetry::common::SpinLockMutex</type>
+        <definition>opentelemetry::common::SpinLockMutex opentelemetry::sdk::metrics::MeterContext::meter_lock_</definition>
+        <argsstring></argsstring>
+        <name>meter_lock_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::meter_lock_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="198" column="40" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" bodystart="198" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a4313d9dbac2f3a470057ea834482c734" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MeterContext::MeterContext</definition>
+        <argsstring>(std::unique_ptr&lt; ViewRegistry &gt; views=std::unique_ptr&lt; ViewRegistry &gt;(new ViewRegistry()), const opentelemetry::sdk::resource::Resource &amp;resource=opentelemetry::sdk::resource::Resource::Create({}), std::unique_ptr&lt; instrumentationscope::ScopeConfigurator&lt; MeterConfig &gt; &gt; meter_configurator=std::make_unique&lt; instrumentationscope::ScopeConfigurator&lt; MeterConfig &gt; &gt;(instrumentationscope::ScopeConfigurator&lt; MeterConfig &gt;::Builder(MeterConfig::Default()) .Build())) noexcept</argsstring>
+        <name>MeterContext</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::MeterContext</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; ViewRegistry &gt;</type>
+          <declname>views</declname>
+          <defval>std::unique_ptr&lt; ViewRegistry &gt;(new ViewRegistry())</defval>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+          <defval>opentelemetry::sdk::resource::Resource::Create({})</defval>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> &gt; &gt;</type>
+          <declname>meter_configurator</declname>
+          <defval>std::make_unique&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> &gt; &gt;(<ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> &gt;::Builder(<ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig_1a7f75cf87af050b37e190b24391ced907" kindref="member">MeterConfig::Default</ref>()) .Build())</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Initialize a new meter provider <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>views</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The views to be configured with meter context. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>resource</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The resource for this meter context. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>meter_configurator</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A scope configurator defining the behavior of a meter associated with this meter context. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="64" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1aa93d831e5aacb99d4a9495b3ad2f5b71" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+        <definition>const opentelemetry::sdk::resource::Resource &amp; opentelemetry::sdk::metrics::MeterContext::GetResource</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetResource</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::GetResource</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Obtain the resource associated with this meter context. <simplesect kind="return"><para>The resource for this meter context </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="77" column="48"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1abe146309a4c8a92422663f1b6ec7013a" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>ViewRegistry *</type>
+        <definition>ViewRegistry * opentelemetry::sdk::metrics::MeterContext::GetViewRegistry</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetViewRegistry</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::GetViewRegistry</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Obtain the <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1View" kindref="compound">View</ref> Registry configured <simplesect kind="return"><para>The reference to view registry </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="83" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1ac313b18e6cc85fd1d8b5e2ee9f23b12d" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>const <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> &gt; &amp;</type>
+        <definition>const instrumentationscope::ScopeConfigurator&lt; MeterConfig &gt; &amp; opentelemetry::sdk::metrics::MeterContext::GetMeterConfigurator</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetMeterConfigurator</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::GetMeterConfigurator</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Obtain the ScopeConfigurator with this meter context. <simplesect kind="return"><para>The ScopeConfigurator for this meter context. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="89" column="49"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1acbf6dc8c1c00afe269db87cb15c09ddd" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::MeterContext::ForEachMeter</definition>
+        <argsstring>(nostd::function_ref&lt; bool(std::shared_ptr&lt; Meter &gt; &amp;meter)&gt; callback) noexcept</argsstring>
+        <name>ForEachMeter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::ForEachMeter</qualifiedname>
+        <param>
+          <type>nostd::function_ref&lt; bool(std::shared_ptr&lt; Meter &gt; &amp;meter)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>NOTE - INTERNAL method, can change in the future. Process callback for each meter in thread-safe manner </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="95" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1af1108792f8ac5f0284ab331d642958b4" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::span&lt; std::shared_ptr&lt; Meter &gt; &gt;</type>
+        <definition>nostd::span&lt; std::shared_ptr&lt; Meter &gt; &gt; opentelemetry::sdk::metrics::MeterContext::GetMeters</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetMeters</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::GetMeters</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>NOTE - INTERNAL method, can change in the future. Get the configured meters. This method is NOT thread safe, and only called through MeterProvider </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="103" column="15"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a0f4d29cc33f1d6c4ffae247586356c9c" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::span&lt; std::shared_ptr&lt; CollectorHandle &gt; &gt;</type>
+        <definition>nostd::span&lt; std::shared_ptr&lt; CollectorHandle &gt; &gt; opentelemetry::sdk::metrics::MeterContext::GetCollectors</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetCollectors</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::GetCollectors</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Obtain the configured collectors. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="109" column="15"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a70814201d552a668c2b6eab531078d9d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::metrics::MeterContext::GetSDKStartTime</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetSDKStartTime</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::GetSDKStartTime</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>GET SDK Start time </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="115" column="42"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a68843c52b664d45231d8dc13415edbb2" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::MeterContext::AddMetricReader</definition>
+        <argsstring>(std::shared_ptr&lt; MetricReader &gt; reader, std::unique_ptr&lt; MetricFilter &gt; metric_filter=nullptr) noexcept</argsstring>
+        <name>AddMetricReader</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::AddMetricReader</qualifiedname>
+        <param>
+          <type>std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> &gt;</type>
+          <declname>reader</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter" kindref="compound">MetricFilter</ref> &gt;</type>
+          <declname>metric_filter</declname>
+          <defval>nullptr</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricCollector" kindref="compound">MetricCollector</ref> from a <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> using this <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref> and add it to the list of configured collectors. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>reader</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> for which a <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricCollector" kindref="compound">MetricCollector</ref> is to be created. This must not be a nullptr. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>metric_filter</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The optional <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter" kindref="compound">MetricFilter</ref> used when creating the <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricCollector" kindref="compound">MetricCollector</ref>.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Note: This reader may not receive any in-flight meter data, but will get newly created meter data. Note: This method is not thread safe, and should ideally be called from main thread. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="128" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a358bf8dad8e504abf0beb97510e40251" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::MeterContext::AddView</definition>
+        <argsstring>(std::unique_ptr&lt; InstrumentSelector &gt; instrument_selector, std::unique_ptr&lt; MeterSelector &gt; meter_selector, std::unique_ptr&lt; View &gt; view) noexcept</argsstring>
+        <name>AddView</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::AddView</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; InstrumentSelector &gt;</type>
+          <declname>instrument_selector</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; MeterSelector &gt;</type>
+          <declname>meter_selector</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1View" kindref="compound">View</ref> &gt;</type>
+          <declname>view</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Attaches a <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1View" kindref="compound">View</ref> to list of configured Views for this Meter context. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>instrument_selector</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The instrument selector for this view. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>meter_selector</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The meter selector for this view. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>view</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The Views for this meter context. This must not be a nullptr.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Note: This view may not receive any in-flight meter data, but will get newly created meter data. Note: This method is not thread safe, and should ideally be called from main thread. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="141" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a6ff0b9866190a7feebc0bc245e02e3c1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::MeterContext::AddMeter</definition>
+        <argsstring>(const std::shared_ptr&lt; Meter &gt; &amp;meter)</argsstring>
+        <name>AddMeter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::AddMeter</qualifiedname>
+        <param>
+          <type>const std::shared_ptr&lt; Meter &gt; &amp;</type>
+          <declname>meter</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>NOTE - INTERNAL method, can change in future. Adds a meter to the list of configured meters in thread safe manner.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>meter</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The meter to be added. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="159" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a54482bdb256752c3ab06db881f964850" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::MeterContext::RemoveMeter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view version, nostd::string_view schema_url)</argsstring>
+        <name>RemoveMeter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::RemoveMeter</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>version</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>schema_url</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="161" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a06dac1222475a67125db32891a1f6c71" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::MeterContext::ForceFlush</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept</argsstring>
+        <name>ForceFlush</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::ForceFlush</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Force all active Collectors to flush any buffered meter data within the given timeout. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="170" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1ac8edd50c0f5ca652614db521e1b1b894" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::MeterContext::Shutdown</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept</argsstring>
+        <name>Shutdown</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContext::Shutdown</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Shutdown the Collectors associated with this meter provider. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="175" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>A class which stores the MeterProvider context. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" line="54" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context.h" bodystart="55" bodyend="199"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a6ff0b9866190a7feebc0bc245e02e3c1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>AddMeter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a68843c52b664d45231d8dc13415edbb2" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>AddMetricReader</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a358bf8dad8e504abf0beb97510e40251" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>AddView</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1adb976aa427a5df9d4fc1ef7180ff21e6" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>collectors_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a06dac1222475a67125db32891a1f6c71" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>ForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1abc8060b273aa35cb23cb4af17701d0a6" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>forceflush_lock_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1acbf6dc8c1c00afe269db87cb15c09ddd" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>ForEachMeter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a0f4d29cc33f1d6c4ffae247586356c9c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>GetCollectors</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1ac313b18e6cc85fd1d8b5e2ee9f23b12d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>GetMeterConfigurator</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1af1108792f8ac5f0284ab331d642958b4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>GetMeters</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1aa93d831e5aacb99d4a9495b3ad2f5b71" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>GetResource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a70814201d552a668c2b6eab531078d9d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>GetSDKStartTime</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1abe146309a4c8a92422663f1b6ec7013a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>GetViewRegistry</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1af082469ff168d67efdb528b10eb8707f" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>meter_configurator_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a6f9755412f60fe73f56613f4ca289454" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>meter_lock_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a4313d9dbac2f3a470057ea834482c734" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>MeterContext</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1ac1deb2c141f7a461ef90114a416731a6" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>meters_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a54482bdb256752c3ab06db881f964850" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>RemoveMeter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a973c100f48fcf6bf16a62ff81ec152c6" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>resource_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1ac0a239f3a5d6ec040bf8b32719699d44" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>sdk_start_ts_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1ac8edd50c0f5ca652614db521e1b1b894" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>Shutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1af994727a1e71961664f8170ab77fbae9" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>shutdown_latch_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext_1a0b3d0164a28433565ddac1193fdb6d7c" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContext</scope><name>views_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

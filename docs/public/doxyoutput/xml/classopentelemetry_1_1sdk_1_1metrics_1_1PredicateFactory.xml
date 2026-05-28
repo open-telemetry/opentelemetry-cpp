@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1PredicateFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::PredicateFactory</compoundname>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1PredicateFactory_1aa3037abdd31942d16e25a0e1d3aa3b78" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::unique_ptr&lt; Predicate &gt;</type>
+        <definition>static std::unique_ptr&lt; Predicate &gt; opentelemetry::sdk::metrics::PredicateFactory::GetPredicate</definition>
+        <argsstring>(opentelemetry::nostd::string_view pattern, PredicateType type)</argsstring>
+        <name>GetPredicate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PredicateFactory::GetPredicate</qualifiedname>
+        <param>
+          <type>opentelemetry::nostd::string_view</type>
+          <declname>pattern</declname>
+        </param>
+        <param>
+          <type>PredicateType</type>
+          <declname>type</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate_factory.h" line="27" column="26" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate_factory.h" bodystart="27" bodyend="44"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate_factory.h" line="24" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/predicate_factory.h" bodystart="25" bodyend="45"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1PredicateFactory_1aa3037abdd31942d16e25a0e1d3aa3b78" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PredicateFactory</scope><name>GetPredicate</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

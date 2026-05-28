@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptor" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::InstrumentDescriptor</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptor_1aff19f6505a6fd8e9efaf3adc5130cc03" prot="public" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::metrics::InstrumentDescriptor::name_</definition>
+        <argsstring></argsstring>
+        <name>name_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentDescriptor::name_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="64" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="64" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptor_1aeb78c78fb1737d782dacaee641dfa13f" prot="public" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::metrics::InstrumentDescriptor::description_</definition>
+        <argsstring></argsstring>
+        <name>description_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentDescriptor::description_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="65" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="65" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptor_1afe43ec2a4e7d1496809d34b7e0b0ac7c" prot="public" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::metrics::InstrumentDescriptor::unit_</definition>
+        <argsstring></argsstring>
+        <name>unit_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentDescriptor::unit_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="66" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="66" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptor_1a57976fc8ede74bdad78de9b03f10de12" prot="public" static="no" mutable="no">
+        <type>InstrumentType</type>
+        <definition>InstrumentType opentelemetry::sdk::metrics::InstrumentDescriptor::type_</definition>
+        <argsstring></argsstring>
+        <name>type_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentDescriptor::type_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="67" column="18" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="67" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptor_1ae048119fbc38ca26c14a32a0231b48a8" prot="public" static="no" mutable="no">
+        <type>InstrumentValueType</type>
+        <definition>InstrumentValueType opentelemetry::sdk::metrics::InstrumentDescriptor::value_type_</definition>
+        <argsstring></argsstring>
+        <name>value_type_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentDescriptor::value_type_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="68" column="23" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="68" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="62" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="63" bodyend="69"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptor_1aeb78c78fb1737d782dacaee641dfa13f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentDescriptor</scope><name>description_</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptor_1aff19f6505a6fd8e9efaf3adc5130cc03" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentDescriptor</scope><name>name_</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptor_1a57976fc8ede74bdad78de9b03f10de12" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentDescriptor</scope><name>type_</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptor_1afe43ec2a4e7d1496809d34b7e0b0ac7c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentDescriptor</scope><name>unit_</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptor_1ae048119fbc38ca26c14a32a0231b48a8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentDescriptor</scope><name>value_type_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

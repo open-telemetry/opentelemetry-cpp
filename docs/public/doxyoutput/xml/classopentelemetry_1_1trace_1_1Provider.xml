@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1trace_1_1Provider" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::trace::Provider</compoundname>
+    <includes refid="api_2include_2opentelemetry_2trace_2provider_8h" local="no">provider.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Provider_1a3422e540577a88fa450f1804693758dc" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref> &gt;</type>
+        <definition>static nostd::shared_ptr&lt; TracerProvider &gt; opentelemetry::trace::Provider::GetTracerProvider</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetTracerProvider</name>
+        <qualifiedname>opentelemetry::trace::Provider::GetTracerProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the singleton <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref>.</para>
+<para>By default, a no-op <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref> is returned. This will never return a nullptr <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/provider.h" line="30" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/provider.h" bodystart="30" bodyend="34"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Provider_1a61ac7e5df0488494f3077c21195f901d" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>static void opentelemetry::trace::Provider::SetTracerProvider</definition>
+        <argsstring>(const nostd::shared_ptr&lt; TracerProvider &gt; &amp;tp) noexcept</argsstring>
+        <name>SetTracerProvider</name>
+        <qualifiedname>opentelemetry::trace::Provider::SetTracerProvider</qualifiedname>
+        <param>
+          <type>const nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref> &gt; &amp;</type>
+          <declname>tp</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Changes the singleton <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/provider.h" line="39" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/provider.h" bodystart="39" bodyend="43"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Provider_1a49f72592c5704d13b320143af3bbc390" prot="private" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>OPENTELEMETRY_API_SINGLETON nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref> &gt; &amp;</type>
+        <definition>static OPENTELEMETRY_API_SINGLETON nostd::shared_ptr&lt; TracerProvider &gt; &amp; opentelemetry::trace::Provider::GetProvider</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetProvider</name>
+        <qualifiedname>opentelemetry::trace::Provider::GetProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/provider.h" line="46" column="56" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/provider.h" bodystart="46" bodyend="50"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Provider_1ad051be3fcf0364b691479b7929e8188b" prot="private" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>OPENTELEMETRY_API_SINGLETON common::SpinLockMutex &amp;</type>
+        <definition>static OPENTELEMETRY_API_SINGLETON common::SpinLockMutex &amp; opentelemetry::trace::Provider::GetLock</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetLock</name>
+        <qualifiedname>opentelemetry::trace::Provider::GetLock</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/provider.h" line="52" column="60" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/provider.h" bodystart="52" bodyend="56"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Stores the singleton global <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/provider.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/provider.h" bodystart="22" bodyend="57"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1trace_1_1Provider_1ad051be3fcf0364b691479b7929e8188b" prot="private" virt="non-virtual"><scope>opentelemetry::trace::Provider</scope><name>GetLock</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Provider_1a49f72592c5704d13b320143af3bbc390" prot="private" virt="non-virtual"><scope>opentelemetry::trace::Provider</scope><name>GetProvider</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Provider_1a3422e540577a88fa450f1804693758dc" prot="public" virt="non-virtual"><scope>opentelemetry::trace::Provider</scope><name>GetTracerProvider</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Provider_1a61ac7e5df0488494f3077c21195f901d" prot="public" virt="non-virtual"><scope>opentelemetry::trace::Provider</scope><name>SetTracerProvider</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

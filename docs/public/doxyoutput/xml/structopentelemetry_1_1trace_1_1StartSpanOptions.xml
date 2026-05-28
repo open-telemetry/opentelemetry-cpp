@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1trace_1_1StartSpanOptions" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::trace::StartSpanOptions</compoundname>
+    <includes refid="span__startoptions_8h" local="no">span_startoptions.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1trace_1_1StartSpanOptions_1a69781f4dcd6b95377909c8d086d46f09" prot="public" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">common::SystemTimestamp</ref></type>
+        <definition>common::SystemTimestamp opentelemetry::trace::StartSpanOptions::start_system_time</definition>
+        <argsstring></argsstring>
+        <name>start_system_time</name>
+        <qualifiedname>opentelemetry::trace::StartSpanOptions::start_system_time</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_startoptions.h" line="32" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_startoptions.h" bodystart="32" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1trace_1_1StartSpanOptions_1af0c3f6f57012615b5c5b8b2c5458817f" prot="public" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1common_1_1SteadyTimestamp" kindref="compound">common::SteadyTimestamp</ref></type>
+        <definition>common::SteadyTimestamp opentelemetry::trace::StartSpanOptions::start_steady_time</definition>
+        <argsstring></argsstring>
+        <name>start_steady_time</name>
+        <qualifiedname>opentelemetry::trace::StartSpanOptions::start_steady_time</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_startoptions.h" line="33" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_startoptions.h" bodystart="33" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1trace_1_1StartSpanOptions_1a57bc0b466f38f8905e02bd1f6b0b1114" prot="public" static="no" mutable="no">
+        <type>nostd::variant&lt; SpanContext, context::Context &gt;</type>
+        <definition>nostd::variant&lt;SpanContext, context::Context&gt; opentelemetry::trace::StartSpanOptions::parent</definition>
+        <argsstring></argsstring>
+        <name>parent</name>
+        <qualifiedname>opentelemetry::trace::StartSpanOptions::parent</qualifiedname>
+        <initializer>= SpanContext::GetInvalid()</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_startoptions.h" line="62" column="18" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_startoptions.h" bodystart="62" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1trace_1_1StartSpanOptions_1a2be80054672f58b00b715897873b9f82" prot="public" static="no" mutable="no">
+        <type>SpanKind</type>
+        <definition>SpanKind opentelemetry::trace::StartSpanOptions::kind</definition>
+        <argsstring></argsstring>
+        <name>kind</name>
+        <qualifiedname>opentelemetry::trace::StartSpanOptions::kind</qualifiedname>
+        <initializer>= SpanKind::kInternal</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_startoptions.h" line="67" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_startoptions.h" bodystart="67" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="structopentelemetry_1_1trace_1_1StartSpanOptions" kindref="compound">StartSpanOptions</ref> provides options to set properties of a <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> at the time of its creation </para>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="3">
+        <label>opentelemetry::common::SteadyTimestamp</label>
+        <link refid="classopentelemetry_1_1common_1_1SteadyTimestamp"/>
+      </node>
+      <node id="2">
+        <label>opentelemetry::common::SystemTimestamp</label>
+        <link refid="classopentelemetry_1_1common_1_1SystemTimestamp"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::trace::StartSpanOptions</label>
+        <link refid="structopentelemetry_1_1trace_1_1StartSpanOptions"/>
+        <childnode refid="2" relation="usage">
+          <edgelabel>start_system_time</edgelabel>
+        </childnode>
+        <childnode refid="3" relation="usage">
+          <edgelabel>start_steady_time</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_startoptions.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_startoptions.h" bodystart="22" bodyend="68"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1trace_1_1StartSpanOptions_1a2be80054672f58b00b715897873b9f82" prot="public" virt="non-virtual"><scope>opentelemetry::trace::StartSpanOptions</scope><name>kind</name></member>
+      <member refid="structopentelemetry_1_1trace_1_1StartSpanOptions_1a57bc0b466f38f8905e02bd1f6b0b1114" prot="public" virt="non-virtual"><scope>opentelemetry::trace::StartSpanOptions</scope><name>parent</name></member>
+      <member refid="structopentelemetry_1_1trace_1_1StartSpanOptions_1af0c3f6f57012615b5c5b8b2c5458817f" prot="public" virt="non-virtual"><scope>opentelemetry::trace::StartSpanOptions</scope><name>start_steady_time</name></member>
+      <member refid="structopentelemetry_1_1trace_1_1StartSpanOptions_1a69781f4dcd6b95377909c8d086d46f09" prot="public" virt="non-virtual"><scope>opentelemetry::trace::StartSpanOptions</scope><name>start_system_time</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

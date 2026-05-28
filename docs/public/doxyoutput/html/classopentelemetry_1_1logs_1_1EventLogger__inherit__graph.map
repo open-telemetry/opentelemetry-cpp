@@ -1,0 +1,7 @@
+<map id="opentelemetry::logs::EventLogger" name="opentelemetry::logs::EventLogger">
+<area shape="rect" id="Node000001" title=" " alt="" coords="92,5,244,45"/>
+<area shape="rect" id="Node000002" href="$classopentelemetry_1_1logs_1_1NoopEventLogger.html" title=" " alt="" coords="5,93,157,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,57,102,95,99,91,137,53"/>
+<area shape="rect" id="Node000003" href="$classopentelemetry_1_1sdk_1_1logs_1_1EventLogger.html" title=" " alt="" coords="182,93,330,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="199,53,238,91,235,95,196,57"/>
+</map>

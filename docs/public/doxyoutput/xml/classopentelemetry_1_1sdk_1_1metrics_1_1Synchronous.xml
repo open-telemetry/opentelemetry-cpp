@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::Synchronous</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleCounter" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::DoubleCounter</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleHistogram" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::DoubleHistogram</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleUpDownCounter" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::DoubleUpDownCounter</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongCounter" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::LongCounter</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogram" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::LongHistogram</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::LongUpDownCounter</derivedcompoundref>
+    <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous_1afbc8adc2f1abe1e43f8d9545590f6fcf" prot="protected" static="no" mutable="no">
+        <type>InstrumentDescriptor</type>
+        <definition>InstrumentDescriptor opentelemetry::sdk::metrics::Synchronous::instrument_descriptor_</definition>
+        <argsstring></argsstring>
+        <name>instrument_descriptor_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Synchronous::instrument_descriptor_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="32" column="24" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" bodystart="32" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous_1a19bc4d3a4c503ae3b1d89508b6ee2cb9" prot="protected" static="no" mutable="no">
+        <type>std::unique_ptr&lt; SyncWritableMetricStorage &gt;</type>
+        <definition>std::unique_ptr&lt;SyncWritableMetricStorage&gt; opentelemetry::sdk::metrics::Synchronous::storage_</definition>
+        <argsstring></argsstring>
+        <name>storage_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Synchronous::storage_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="33" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" bodystart="33" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous_1a14f16a02f71aa80c5dc87c60a1ff4715" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Synchronous::Synchronous</definition>
+        <argsstring>(const InstrumentDescriptor &amp;instrument_descriptor, std::unique_ptr&lt; SyncWritableMetricStorage &gt; storage)</argsstring>
+        <name>Synchronous</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Synchronous::Synchronous</qualifiedname>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>instrument_descriptor</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; SyncWritableMetricStorage &gt;</type>
+          <declname>storage</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="26" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" bodystart="26" bodyend="29"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="23" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" bodystart="24" bodyend="34"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous_1afbc8adc2f1abe1e43f8d9545590f6fcf" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Synchronous</scope><name>instrument_descriptor_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous_1a19bc4d3a4c503ae3b1d89508b6ee2cb9" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Synchronous</scope><name>storage_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous_1a14f16a02f71aa80c5dc87c60a1ff4715" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Synchronous</scope><name>Synchronous</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

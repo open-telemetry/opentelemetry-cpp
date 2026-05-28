@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderRuntimeOptions" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderRuntimeOptions</compoundname>
+    <includes refid="periodic__exporting__metric__reader__runtime__options_8h" local="no">periodic_exporting_metric_reader_runtime_options.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderRuntimeOptions_1a4ef76a3b5183933ced947e677a65bdca" prot="public" static="no" mutable="no">
+        <type>std::shared_ptr&lt; sdk::common::ThreadInstrumentation &gt;</type>
+        <definition>std::shared_ptr&lt;sdk::common::ThreadInstrumentation&gt; opentelemetry::sdk::metrics::PeriodicExportingMetricReaderRuntimeOptions::periodic_thread_instrumentation</definition>
+        <argsstring></argsstring>
+        <name>periodic_thread_instrumentation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderRuntimeOptions::periodic_thread_instrumentation</qualifiedname>
+        <initializer>=
+      std::shared_ptr&lt;sdk::common::ThreadInstrumentation&gt;(nullptr)</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_runtime_options.h" line="22" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_runtime_options.h" bodystart="22" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Struct to hold PeriodicExortingMetricReader runtime options. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_runtime_options.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_runtime_options.h" bodystart="21" bodyend="24"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderRuntimeOptions_1a4ef76a3b5183933ced947e677a65bdca" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderRuntimeOptions</scope><name>periodic_thread_instrumentation</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

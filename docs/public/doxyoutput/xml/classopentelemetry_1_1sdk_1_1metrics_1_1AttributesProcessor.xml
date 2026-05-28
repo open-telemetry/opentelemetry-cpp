@@ -1,0 +1,190 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::metrics::AttributesProcessor</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAttributesProcessor" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::DefaultAttributesProcessor</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringAttributesProcessor" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::FilteringAttributesProcessor</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</derivedcompoundref>
+    <includes refid="attributes__processor_8h" local="no">attributes_processor.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1af44ca45436956bde1effe1721ecd23c6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::AttributesProcessor::AttributesProcessor</definition>
+        <argsstring>()=default</argsstring>
+        <name>AttributesProcessor</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesProcessor::AttributesProcessor</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="40" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1ac136dd8baccdde710c62b1794147e69c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::AttributesProcessor::AttributesProcessor</definition>
+        <argsstring>(const AttributesProcessor &amp;)=delete</argsstring>
+        <name>AttributesProcessor</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesProcessor::AttributesProcessor</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">AttributesProcessor</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="42" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1a057ee80fef19fa6f44ba77e00a9da27d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::AttributesProcessor::AttributesProcessor</definition>
+        <argsstring>(AttributesProcessor &amp;&amp;)=delete</argsstring>
+        <name>AttributesProcessor</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesProcessor::AttributesProcessor</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">AttributesProcessor</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="43" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1adc3e53ac9a8f697a7b97fc49f448b816" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">AttributesProcessor</ref> &amp;</type>
+        <definition>AttributesProcessor &amp; opentelemetry::sdk::metrics::AttributesProcessor::operator=</definition>
+        <argsstring>(const AttributesProcessor &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesProcessor::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">AttributesProcessor</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="44" column="23"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1abdf39182d0bfd31f197cf7978e2f7322" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">AttributesProcessor</ref> &amp;</type>
+        <definition>AttributesProcessor &amp; opentelemetry::sdk::metrics::AttributesProcessor::operator=</definition>
+        <argsstring>(AttributesProcessor &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesProcessor::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">AttributesProcessor</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="45" column="23"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1a629244cfbae6615e3ea99eebea145aae" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>MetricAttributes</type>
+        <definition>virtual MetricAttributes opentelemetry::sdk::metrics::AttributesProcessor::process</definition>
+        <argsstring>(const opentelemetry::common::KeyValueIterable &amp;attributes) const noexcept=0</argsstring>
+        <name>process</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesProcessor::process</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAttributesProcessor_1ab78419a12bfae8aab865e0edbed6c19d">process</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringAttributesProcessor_1a90c427b0be50af80a6b8bbff22ba4bbe">process</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor_1aed37b0311f5e8bbe6031f69c728d7d1a">process</reimplementedby>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="50" column="28"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1aa19770f734827fca23203955e0838bf5" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::sdk::metrics::AttributesProcessor::isPresent</definition>
+        <argsstring>(nostd::string_view key) const noexcept=0</argsstring>
+        <name>isPresent</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesProcessor::isPresent</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringAttributesProcessor_1a03fda22052745471c0334dab2da44016">isPresent</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor_1a297e9103d6ccf487a27f7b8934861e2f">isPresent</reimplementedby>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAttributesProcessor_1af20320d2e4218895b3354c145412c501">isPresent</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="53" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1aa37f359ee0f50a2a624bbe0a531f735e" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::metrics::AttributesProcessor::~AttributesProcessor</definition>
+        <argsstring>()=default</argsstring>
+        <name>~AttributesProcessor</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AttributesProcessor::~AttributesProcessor</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="55" column="11"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>The <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">AttributesProcessor</ref> is responsible for customizing which attribute(s) are to be reported as metrics dimension(s). </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::AttributesProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor"/>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::metrics::DefaultAttributesProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1DefaultAttributesProcessor"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>opentelemetry::sdk::metrics::FilteringAttributesProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringAttributesProcessor"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="37" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" bodystart="38" bodyend="56"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1af44ca45436956bde1effe1721ecd23c6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesProcessor</scope><name>AttributesProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1ac136dd8baccdde710c62b1794147e69c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesProcessor</scope><name>AttributesProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1a057ee80fef19fa6f44ba77e00a9da27d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesProcessor</scope><name>AttributesProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1aa19770f734827fca23203955e0838bf5" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::AttributesProcessor</scope><name>isPresent</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1adc3e53ac9a8f697a7b97fc49f448b816" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1abdf39182d0bfd31f197cf7978e2f7322" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AttributesProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1a629244cfbae6615e3ea99eebea145aae" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::AttributesProcessor</scope><name>process</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1aa37f359ee0f50a2a624bbe0a531f735e" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::AttributesProcessor</scope><name>~AttributesProcessor</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

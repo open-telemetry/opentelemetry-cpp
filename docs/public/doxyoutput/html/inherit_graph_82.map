@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classopentelemetry_1_1trace_1_1Span.html" title=" " alt="" coords="5,37,164,77"/>
+<area shape="rect" id="Node000001" href="$classopentelemetry_1_1trace_1_1DefaultSpan.html" title=" " alt="" coords="212,5,371,45"/>
+<area shape="poly" id="edge29_Node000000_Node000001" title=" " alt="" coords="177,40,212,35,212,40,178,46"/>
+<area shape="rect" id="Node000002" href="$classopentelemetry_1_1trace_1_1NoopSpan.html" title=" " alt="" coords="212,69,371,109"/>
+<area shape="poly" id="edge30_Node000000_Node000002" title=" " alt="" coords="178,69,212,74,212,80,177,74"/>
+</map>

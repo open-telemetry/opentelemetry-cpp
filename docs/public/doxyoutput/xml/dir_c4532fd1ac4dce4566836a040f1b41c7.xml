@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_c4532fd1ac4dce4566836a040f1b41c7" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace</compoundname>
+    <innerdir refid="dir_b89c0757dfc56f57ba82f694d8e78bd5">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation</innerdir>
+    <innerfile refid="trace_2context_8h">context.h</innerfile>
+    <innerfile refid="default__span_8h">default_span.h</innerfile>
+    <innerfile refid="trace_2noop_8h">noop.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2trace_2provider_8h">provider.h</innerfile>
+    <innerfile refid="scope_8h">scope.h</innerfile>
+    <innerfile refid="span_8h">span.h</innerfile>
+    <innerfile refid="span__context_8h">span_context.h</innerfile>
+    <innerfile refid="span__context__kv__iterable_8h">span_context_kv_iterable.h</innerfile>
+    <innerfile refid="span__id_8h">span_id.h</innerfile>
+    <innerfile refid="span__metadata_8h">span_metadata.h</innerfile>
+    <innerfile refid="span__startoptions_8h">span_startoptions.h</innerfile>
+    <innerfile refid="trace__flags_8h">trace_flags.h</innerfile>
+    <innerfile refid="trace__id_8h">trace_id.h</innerfile>
+    <innerfile refid="trace__state_8h">trace_state.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2trace_2tracer_8h">tracer.h</innerfile>
+    <innerfile refid="api_2include_2opentelemetry_2trace_2tracer__provider_8h">tracer_provider.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/"/>
+  </compounddef>
+</doxygen>

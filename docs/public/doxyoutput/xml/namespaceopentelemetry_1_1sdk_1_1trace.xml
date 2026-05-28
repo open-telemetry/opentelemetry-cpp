@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1sdk_1_1trace" kind="namespace" language="C++">
+    <compoundname>opentelemetry::sdk::trace</compoundname>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler" prot="public">opentelemetry::sdk::trace::AlwaysOffSampler</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSamplerFactory" prot="public">opentelemetry::sdk::trace::AlwaysOffSamplerFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOnSampler" prot="public">opentelemetry::sdk::trace::AlwaysOnSampler</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOnSamplerFactory" prot="public">opentelemetry::sdk::trace::AlwaysOnSamplerFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor" prot="public">opentelemetry::sdk::trace::BatchSpanProcessor</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorFactory" prot="public">opentelemetry::sdk::trace::BatchSpanProcessorFactory</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorOptions" prot="public">opentelemetry::sdk::trace::BatchSpanProcessorOptions</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorRuntimeOptions" prot="public">opentelemetry::sdk::trace::BatchSpanProcessorRuntimeOptions</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator" prot="public">opentelemetry::sdk::trace::IdGenerator</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable" prot="public">opentelemetry::sdk::trace::MultiRecordable</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiSpanProcessor" prot="public">opentelemetry::sdk::trace::MultiSpanProcessor</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1trace_1_1MultiSpanProcessorOptions" prot="public">opentelemetry::sdk::trace::MultiSpanProcessorOptions</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSampler" prot="public">opentelemetry::sdk::trace::ParentBasedSampler</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1ParentBasedSamplerFactory" prot="public">opentelemetry::sdk::trace::ParentBasedSamplerFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1Provider" prot="public">opentelemetry::sdk::trace::Provider</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1RandomIdGenerator" prot="public">opentelemetry::sdk::trace::RandomIdGenerator</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1RandomIdGeneratorFactory" prot="public">opentelemetry::sdk::trace::RandomIdGeneratorFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" prot="public">opentelemetry::sdk::trace::Recordable</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" prot="public">opentelemetry::sdk::trace::Sampler</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1trace_1_1SamplingResult" prot="public">opentelemetry::sdk::trace::SamplingResult</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1SimpleSpanProcessor" prot="public">opentelemetry::sdk::trace::SimpleSpanProcessor</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1SimpleSpanProcessorFactory" prot="public">opentelemetry::sdk::trace::SimpleSpanProcessorFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData" prot="public">opentelemetry::sdk::trace::SpanData</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent" prot="public">opentelemetry::sdk::trace::SpanDataEvent</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataLink" prot="public">opentelemetry::sdk::trace::SpanDataLink</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" prot="public">opentelemetry::sdk::trace::SpanExporter</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" prot="public">opentelemetry::sdk::trace::SpanProcessor</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler" prot="public">opentelemetry::sdk::trace::TraceIdRatioBasedSampler</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSamplerFactory" prot="public">opentelemetry::sdk::trace::TraceIdRatioBasedSamplerFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1Tracer" prot="public">opentelemetry::sdk::trace::Tracer</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" prot="public">opentelemetry::sdk::trace::TracerConfig</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" prot="public">opentelemetry::sdk::trace::TracerContext</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContextFactory" prot="public">opentelemetry::sdk::trace::TracerContextFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProvider" prot="public">opentelemetry::sdk::trace::TracerProvider</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory" prot="public">opentelemetry::sdk::trace::TracerProviderFactory</innerclass>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1trace_1_1batch__span__processor__options__env">opentelemetry::sdk::trace::batch_span_processor_options_env</innernamespace>
+    <sectiondef kind="enum">
+      <memberdef kind="enum" id="sampler_8h_1a9f1f547066f0c1fe9a66c88d62502c05" prot="public" static="no" strong="yes">
+        <type>std::uint8_t</type>
+        <name>Decision</name>
+        <qualifiedname>opentelemetry::sdk::trace::Decision</qualifiedname>
+        <enumvalue id="sampler_8h_1a9f1f547066f0c1fe9a66c88d62502c05abf8f3be424eb6a72b21549fbb24ffb57" prot="public">
+          <name>DROP</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="sampler_8h_1a9f1f547066f0c1fe9a66c88d62502c05a20f0446b4df4b29ac6bb31338510dac6" prot="public">
+          <name>RECORD_ONLY</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="sampler_8h_1a9f1f547066f0c1fe9a66c88d62502c05a17a140b546aa5ceaab27f7ba66acb945" prot="public">
+          <name>RECORD_AND_SAMPLE</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>A sampling Decision for a Span to be created. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" line="38" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/sampler.h" bodystart="39" bodyend="47"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="27" column="1"/>
+  </compounddef>
+</doxygen>

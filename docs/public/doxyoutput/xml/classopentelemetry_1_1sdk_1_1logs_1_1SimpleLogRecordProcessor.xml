@@ -1,0 +1,336 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::logs::SimpleLogRecordProcessor</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" prot="public" virt="non-virtual">opentelemetry::sdk::logs::LogRecordProcessor</basecompoundref>
+    <includes refid="simple__log__record__processor_8h" local="no">simple_log_record_processor.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1adbe28e549a15267b294084d80c26b673" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> &gt;</type>
+        <definition>std::unique_ptr&lt;LogRecordExporter&gt; opentelemetry::sdk::logs::SimpleLogRecordProcessor::exporter_</definition>
+        <argsstring></argsstring>
+        <name>exporter_</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::exporter_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="56" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" bodystart="56" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1aa8474bb2035cf03a0180b604ee2e1c96" prot="private" static="no" mutable="no">
+        <type>opentelemetry::common::SpinLockMutex</type>
+        <definition>opentelemetry::common::SpinLockMutex opentelemetry::sdk::logs::SimpleLogRecordProcessor::lock_</definition>
+        <argsstring></argsstring>
+        <name>lock_</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::lock_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="58" column="40" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" bodystart="58" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a9a8a1e292d18b6f5eae166a54da603ba" prot="private" static="no" mutable="no">
+        <type>std::atomic&lt; bool &gt;</type>
+        <definition>std::atomic&lt;bool&gt; opentelemetry::sdk::logs::SimpleLogRecordProcessor::is_shutdown_</definition>
+        <argsstring></argsstring>
+        <name>is_shutdown_</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::is_shutdown_</qualifiedname>
+        <initializer>{false}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="60" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" bodystart="60" bodyend="60"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a7d9ddb8ef96d6010132cc6ef18402f64" prot="public" static="no" const="no" explicit="yes" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::SimpleLogRecordProcessor::SimpleLogRecordProcessor</definition>
+        <argsstring>(std::unique_ptr&lt; LogRecordExporter &gt; &amp;&amp;exporter)</argsstring>
+        <name>SimpleLogRecordProcessor</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::SimpleLogRecordProcessor</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> &gt; &amp;&amp;</type>
+          <declname>exporter</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="33" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1af6e6daf9678af55d17704ac9acbf74b1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::SimpleLogRecordProcessor::SimpleLogRecordProcessor</definition>
+        <argsstring>(const SimpleLogRecordProcessor &amp;)=delete</argsstring>
+        <name>SimpleLogRecordProcessor</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::SimpleLogRecordProcessor</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor" kindref="compound">SimpleLogRecordProcessor</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="35" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a74ba01028ee833388b51d0d55ca4f86f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::SimpleLogRecordProcessor::SimpleLogRecordProcessor</definition>
+        <argsstring>(SimpleLogRecordProcessor &amp;&amp;)=delete</argsstring>
+        <name>SimpleLogRecordProcessor</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::SimpleLogRecordProcessor</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor" kindref="compound">SimpleLogRecordProcessor</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="36" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a6be80213f74f01f884fb6f38ca4b391f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor" kindref="compound">SimpleLogRecordProcessor</ref> &amp;</type>
+        <definition>SimpleLogRecordProcessor &amp; opentelemetry::sdk::logs::SimpleLogRecordProcessor::operator=</definition>
+        <argsstring>(const SimpleLogRecordProcessor &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor" kindref="compound">SimpleLogRecordProcessor</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="37" column="28"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a38877110dbcf512a54520f390c35b427" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor" kindref="compound">SimpleLogRecordProcessor</ref> &amp;</type>
+        <definition>SimpleLogRecordProcessor &amp; opentelemetry::sdk::logs::SimpleLogRecordProcessor::operator=</definition>
+        <argsstring>(SimpleLogRecordProcessor &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor" kindref="compound">SimpleLogRecordProcessor</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="38" column="28"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a44913b63b1367abff92f62ac7bc76237" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::SimpleLogRecordProcessor::~SimpleLogRecordProcessor</definition>
+        <argsstring>() override</argsstring>
+        <name>~SimpleLogRecordProcessor</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::~SimpleLogRecordProcessor</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="40" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a25f87474f0e1af2ab65e81bed7a50ee0" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable" kindref="compound">Recordable</ref> &gt;</type>
+        <definition>std::unique_ptr&lt; Recordable &gt; opentelemetry::sdk::logs::SimpleLogRecordProcessor::MakeRecordable</definition>
+        <argsstring>() noexcept override</argsstring>
+        <name>MakeRecordable</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::MakeRecordable</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1a83542b3ad27f3a1b4e841f0843dd46a8">MakeRecordable</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a log recordable. This requests a new log recordable from the associated exporter.</para>
+<para><simplesect kind="return"><para>a newly initialized recordable</para>
+</simplesect>
+Note: This method must be callable from multiple threads. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="42" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a1296df154b112b46644760e06fa54243" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::SimpleLogRecordProcessor::OnEmit</definition>
+        <argsstring>(std::unique_ptr&lt; Recordable &gt; &amp;&amp;record) noexcept override</argsstring>
+        <name>OnEmit</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::OnEmit</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1a0733b8a97200f61a3f846bda4d7fa16b">OnEmit</reimplements>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable" kindref="compound">Recordable</ref> &gt; &amp;&amp;</type>
+          <declname>record</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>OnEmit is called by the SDK once a log record has been successfully created. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>record</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the log recordable object </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="44" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a17e1dbc9a167c5303251663a234960f4" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::SimpleLogRecordProcessor::ForceFlush</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept override</argsstring>
+        <name>ForceFlush</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::ForceFlush</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1a80c989cce8620ead7d634fd4ff6d65b8">ForceFlush</reimplements>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Exports all log records that have not yet been exported to the configured Exporter. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timeout</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>that the forceflush is required to finish within. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>a result code indicating whether it succeeded, failed or timed out </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="46" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a18d6f7b48d5aafebfd7432760145f583" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::SimpleLogRecordProcessor::Shutdown</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept override</argsstring>
+        <name>Shutdown</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::Shutdown</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1a42a1e31ae03d325bc4593dfca747c5d1">Shutdown</reimplements>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Shuts down the processor and does any cleanup required. ShutDown should only be called once for each processor. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timeout</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>minimum amount of microseconds to wait for shutdown before giving up and returning failure. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if the shutdown succeeded, false otherwise </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="49" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1ab4a46d064c2d9cea4b1a9f8ed4d05e79" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::SimpleLogRecordProcessor::IsShutdown</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>IsShutdown</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessor::IsShutdown</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="52" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>The simple log processor passes all log records in a batch of 1 to the configured <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref>.</para>
+<para>All calls to the configured <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> are synchronized using a spin-lock on an atomic_flag. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::sdk::logs::LogRecordProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::logs::SimpleLogRecordProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::sdk::logs::LogRecordProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::logs::SimpleLogRecordProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" line="29" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h" bodystart="30" bodyend="61"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1aa554bd68a239486afd6970a40a63133e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>Enabled</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1ad2c88a4ad254de8fcf11784872e0baeb" prot="protected" virt="virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>EnabledImplementation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1adbe28e549a15267b294084d80c26b673" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>exporter_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a17e1dbc9a167c5303251663a234960f4" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>ForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a9a8a1e292d18b6f5eae166a54da603ba" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>is_shutdown_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1ab4a46d064c2d9cea4b1a9f8ed4d05e79" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>IsShutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1aa8474bb2035cf03a0180b604ee2e1c96" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>lock_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1a8ed524cd4573cc2a2093d7aa7937329d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>LogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1afc3a8be73caffddc38771fc501d7d83c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>LogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1aca045ca771e512a5b0462c1a91faadcc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>LogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a25f87474f0e1af2ab65e81bed7a50ee0" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>MakeRecordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a1296df154b112b46644760e06fa54243" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>OnEmit</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a6be80213f74f01f884fb6f38ca4b391f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a38877110dbcf512a54520f390c35b427" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1afa0587cc1913b6e807055e6f27fa6891" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::logs::LogRecordProcessor::"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1aebdd387181502a8ffcf15acf81ee3448" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::logs::LogRecordProcessor::"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a18d6f7b48d5aafebfd7432760145f583" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>Shutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a7d9ddb8ef96d6010132cc6ef18402f64" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>SimpleLogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1af6e6daf9678af55d17704ac9acbf74b1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>SimpleLogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a74ba01028ee833388b51d0d55ca4f86f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>SimpleLogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1a79af9efbf5a6bc51ea5e56ecb16647ac" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>~LogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor_1a44913b63b1367abff92f62ac7bc76237" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessor</scope><name>~SimpleLogRecordProcessor</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

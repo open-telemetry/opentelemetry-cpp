@@ -1,0 +1,222 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1context_1_1RuntimeContextStorage" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::context::RuntimeContextStorage</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1context_1_1ThreadLocalContextStorage" prot="public" virt="non-virtual">opentelemetry::context::ThreadLocalContextStorage</derivedcompoundref>
+    <includes refid="runtime__context_8h" local="no">runtime_context.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a9e7bd62470d5b162570c61a0db56facc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::RuntimeContextStorage::RuntimeContextStorage</definition>
+        <argsstring>()=default</argsstring>
+        <name>RuntimeContextStorage</name>
+        <qualifiedname>opentelemetry::context::RuntimeContextStorage::RuntimeContextStorage</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="58" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1RuntimeContextStorage_1aae17e019e35162eea04fd17fcd31db21" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::RuntimeContextStorage::RuntimeContextStorage</definition>
+        <argsstring>(const RuntimeContextStorage &amp;)=default</argsstring>
+        <name>RuntimeContextStorage</name>
+        <qualifiedname>opentelemetry::context::RuntimeContextStorage::RuntimeContextStorage</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1context_1_1RuntimeContextStorage" kindref="compound">RuntimeContextStorage</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="60" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a4da9745dfcce406b4b561d81bed1167d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1context_1_1RuntimeContextStorage" kindref="compound">RuntimeContextStorage</ref> &amp;</type>
+        <definition>RuntimeContextStorage &amp; opentelemetry::context::RuntimeContextStorage::operator=</definition>
+        <argsstring>(const RuntimeContextStorage &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::context::RuntimeContextStorage::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1context_1_1RuntimeContextStorage" kindref="compound">RuntimeContextStorage</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="61" column="25"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a7379fbb04be9b7d80d7f86cbc0c75b2f" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::RuntimeContextStorage::RuntimeContextStorage</definition>
+        <argsstring>(RuntimeContextStorage &amp;&amp;) noexcept=delete</argsstring>
+        <name>RuntimeContextStorage</name>
+        <qualifiedname>opentelemetry::context::RuntimeContextStorage::RuntimeContextStorage</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1context_1_1RuntimeContextStorage" kindref="compound">RuntimeContextStorage</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="62" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a6a4a002bd1d5bb3f2c7bc7c1571c148e" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1context_1_1RuntimeContextStorage" kindref="compound">RuntimeContextStorage</ref> &amp;</type>
+        <definition>RuntimeContextStorage &amp; opentelemetry::context::RuntimeContextStorage::operator=</definition>
+        <argsstring>(RuntimeContextStorage &amp;&amp;) noexcept=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::context::RuntimeContextStorage::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1context_1_1RuntimeContextStorage" kindref="compound">RuntimeContextStorage</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="63" column="25"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a0d43ffe70877306e58e101c15653bd18" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>Context</type>
+        <definition>virtual Context opentelemetry::context::RuntimeContextStorage::GetCurrent</definition>
+        <argsstring>() noexcept=0</argsstring>
+        <name>GetCurrent</name>
+        <qualifiedname>opentelemetry::context::RuntimeContextStorage::GetCurrent</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Return the current context. <simplesect kind="return"><para>the current context </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="69" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a332c797e19783deded57086ea5ca2e31" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::unique_ptr&lt; Token &gt;</type>
+        <definition>virtual nostd::unique_ptr&lt; Token &gt; opentelemetry::context::RuntimeContextStorage::Attach</definition>
+        <argsstring>(const Context &amp;context) noexcept=0</argsstring>
+        <name>Attach</name>
+        <qualifiedname>opentelemetry::context::RuntimeContextStorage::Attach</qualifiedname>
+        <param>
+          <type>const Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the current context. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The new current context </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>a token for the new current context. This never returns a nullptr. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="76" column="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a6091e4e0192a58263fec836695a7bb9f" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::context::RuntimeContextStorage::Detach</definition>
+        <argsstring>(Token &amp;token) noexcept=0</argsstring>
+        <name>Detach</name>
+        <qualifiedname>opentelemetry::context::RuntimeContextStorage::Detach</qualifiedname>
+        <param>
+          <type>Token &amp;</type>
+          <declname>token</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Detach the context related to the given token. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>token</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a token related to a context </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if the context could be detached </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="83" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a68ccf6f118212e33d72202f107210849" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::context::RuntimeContextStorage::~RuntimeContextStorage</definition>
+        <argsstring>()=default</argsstring>
+        <name>~RuntimeContextStorage</name>
+        <qualifiedname>opentelemetry::context::RuntimeContextStorage::~RuntimeContextStorage</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="85" column="11"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="protected-func">
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1RuntimeContextStorage_1aa1601e6cee2fa8834252ac7b0c25815b" prot="protected" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>nostd::unique_ptr&lt; Token &gt;</type>
+        <definition>nostd::unique_ptr&lt; Token &gt; opentelemetry::context::RuntimeContextStorage::CreateToken</definition>
+        <argsstring>(const Context &amp;context) noexcept</argsstring>
+        <name>CreateToken</name>
+        <qualifiedname>opentelemetry::context::RuntimeContextStorage::CreateToken</qualifiedname>
+        <param>
+          <type>const Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="88" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" bodystart="88" bodyend="91"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classopentelemetry_1_1context_1_1RuntimeContextStorage" kindref="compound">RuntimeContextStorage</ref> is used by RuntimeContext to store Context frames.</para>
+<para>Custom context management strategies can be implemented by deriving from this class and passing an initialized <ref refid="classopentelemetry_1_1context_1_1RuntimeContextStorage" kindref="compound">RuntimeContextStorage</ref> object to RuntimeContext::SetRuntimeContextStorage. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="55" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" bodystart="56" bodyend="92"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a332c797e19783deded57086ea5ca2e31" prot="public" virt="pure-virtual"><scope>opentelemetry::context::RuntimeContextStorage</scope><name>Attach</name></member>
+      <member refid="classopentelemetry_1_1context_1_1RuntimeContextStorage_1aa1601e6cee2fa8834252ac7b0c25815b" prot="protected" virt="non-virtual"><scope>opentelemetry::context::RuntimeContextStorage</scope><name>CreateToken</name></member>
+      <member refid="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a6091e4e0192a58263fec836695a7bb9f" prot="public" virt="pure-virtual"><scope>opentelemetry::context::RuntimeContextStorage</scope><name>Detach</name></member>
+      <member refid="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a0d43ffe70877306e58e101c15653bd18" prot="public" virt="pure-virtual"><scope>opentelemetry::context::RuntimeContextStorage</scope><name>GetCurrent</name></member>
+      <member refid="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a4da9745dfcce406b4b561d81bed1167d" prot="public" virt="non-virtual"><scope>opentelemetry::context::RuntimeContextStorage</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a6a4a002bd1d5bb3f2c7bc7c1571c148e" prot="public" virt="non-virtual"><scope>opentelemetry::context::RuntimeContextStorage</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a9e7bd62470d5b162570c61a0db56facc" prot="public" virt="non-virtual"><scope>opentelemetry::context::RuntimeContextStorage</scope><name>RuntimeContextStorage</name></member>
+      <member refid="classopentelemetry_1_1context_1_1RuntimeContextStorage_1aae17e019e35162eea04fd17fcd31db21" prot="public" virt="non-virtual"><scope>opentelemetry::context::RuntimeContextStorage</scope><name>RuntimeContextStorage</name></member>
+      <member refid="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a7379fbb04be9b7d80d7f86cbc0c75b2f" prot="public" virt="non-virtual"><scope>opentelemetry::context::RuntimeContextStorage</scope><name>RuntimeContextStorage</name></member>
+      <member refid="classopentelemetry_1_1context_1_1RuntimeContextStorage_1a68ccf6f118212e33d72202f107210849" prot="public" virt="virtual"><scope>opentelemetry::context::RuntimeContextStorage</scope><name>~RuntimeContextStorage</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

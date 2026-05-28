@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1NoopAsyncWritableMetricStorage" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::sdk::metrics::AsyncWritableMetricStorage</basecompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1NoopAsyncWritableMetricStorage_1a9454a6a7fd35f3e024b9d490a733f349" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage::RecordLong</definition>
+        <argsstring>(const std::unordered_map&lt; MetricAttributes, int64_t, AttributeHashGenerator &gt; &amp;, opentelemetry::common::SystemTimestamp) noexcept override</argsstring>
+        <name>RecordLong</name>
+        <qualifiedname>opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage::RecordLong</qualifiedname>
+        <param>
+          <type>const std::unordered_map&lt; MetricAttributes, int64_t, AttributeHashGenerator &gt; &amp;</type>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="141" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" bodystart="141" bodyend="144"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1NoopAsyncWritableMetricStorage_1a5319cb9d4475b489bcdc5ff48c6cba52" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage::RecordDouble</definition>
+        <argsstring>(const std::unordered_map&lt; MetricAttributes, double, AttributeHashGenerator &gt; &amp;, opentelemetry::common::SystemTimestamp) noexcept override</argsstring>
+        <name>RecordDouble</name>
+        <qualifiedname>opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage::RecordDouble</qualifiedname>
+        <param>
+          <type>const std::unordered_map&lt; MetricAttributes, double, AttributeHashGenerator &gt; &amp;</type>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="146" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" bodystart="146" bodyend="149"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" line="138" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/metric_storage.h" bodystart="139" bodyend="150"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AsyncWritableMetricStorage_1adc35e7acc565102b1ba80fc53821a226" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage</scope><name>AsyncWritableMetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AsyncWritableMetricStorage_1a73a06f3fa09ba2c27d7560ed67cab3d8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage</scope><name>AsyncWritableMetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AsyncWritableMetricStorage_1afc58a35163cdcc51e13f3a9180e6fb76" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage</scope><name>AsyncWritableMetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AsyncWritableMetricStorage_1af47eec8b29b93b1408f7a33723fb6f5b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AsyncWritableMetricStorage_1a8c75c6e5e8cd3f0c837b51f1e1416f83" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1NoopAsyncWritableMetricStorage_1a5319cb9d4475b489bcdc5ff48c6cba52" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage</scope><name>RecordDouble</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1NoopAsyncWritableMetricStorage_1a9454a6a7fd35f3e024b9d490a733f349" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage</scope><name>RecordLong</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AsyncWritableMetricStorage_1af31799a821385ecf58f970fbbd27f3e1" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::NoopAsyncWritableMetricStorage</scope><name>~AsyncWritableMetricStorage</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_03dac4adb71d85db85ad7ffb3badb471" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace</compoundname>
+    <innerdir refid="dir_e1e3c6b24db96176468aa6db1405608e">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers</innerdir>
+    <innerfile refid="batch__span__processor_8h">batch_span_processor.h</innerfile>
+    <innerfile refid="batch__span__processor__factory_8h">batch_span_processor_factory.h</innerfile>
+    <innerfile refid="batch__span__processor__options_8h">batch_span_processor_options.h</innerfile>
+    <innerfile refid="batch__span__processor__runtime__options_8h">batch_span_processor_runtime_options.h</innerfile>
+    <innerfile refid="trace_2exporter_8h">exporter.h</innerfile>
+    <innerfile refid="id__generator_8h">id_generator.h</innerfile>
+    <innerfile refid="trace_2multi__recordable_8h">multi_recordable.h</innerfile>
+    <innerfile refid="multi__span__processor_8h">multi_span_processor.h</innerfile>
+    <innerfile refid="trace_2processor_8h">processor.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2trace_2provider_8h">provider.h</innerfile>
+    <innerfile refid="random__id__generator_8h">random_id_generator.h</innerfile>
+    <innerfile refid="random__id__generator__factory_8h">random_id_generator_factory.h</innerfile>
+    <innerfile refid="trace_2recordable_8h">recordable.h</innerfile>
+    <innerfile refid="sampler_8h">sampler.h</innerfile>
+    <innerfile refid="simple__processor_8h">simple_processor.h</innerfile>
+    <innerfile refid="simple__processor__factory_8h">simple_processor_factory.h</innerfile>
+    <innerfile refid="span__data_8h">span_data.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2trace_2tracer_8h">tracer.h</innerfile>
+    <innerfile refid="tracer__config_8h">tracer_config.h</innerfile>
+    <innerfile refid="tracer__context_8h">tracer_context.h</innerfile>
+    <innerfile refid="tracer__context__factory_8h">tracer_context_factory.h</innerfile>
+    <innerfile refid="sdk_2include_2opentelemetry_2sdk_2trace_2tracer__provider_8h">tracer_provider.h</innerfile>
+    <innerfile refid="tracer__provider__factory_8h">tracer_provider_factory.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/"/>
+  </compounddef>
+</doxygen>

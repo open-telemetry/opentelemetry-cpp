@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1logs_1_1Provider" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::logs::Provider</compoundname>
+    <includes refid="api_2include_2opentelemetry_2logs_2provider_8h" local="no">provider.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1Provider_1aca48db284c9a66dce1cc2a04dadd143c" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref> &gt;</type>
+        <definition>static nostd::shared_ptr&lt; LoggerProvider &gt; opentelemetry::logs::Provider::GetLoggerProvider</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetLoggerProvider</name>
+        <qualifiedname>opentelemetry::logs::Provider::GetLoggerProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the singleton <ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref>.</para>
+<para>By default, a no-op <ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref> is returned. This will never return a nullptr <ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" line="35" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" bodystart="35" bodyend="39"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1Provider_1a8b54ab9db96e33002622894f43d151c0" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>static void opentelemetry::logs::Provider::SetLoggerProvider</definition>
+        <argsstring>(const nostd::shared_ptr&lt; LoggerProvider &gt; &amp;tp) noexcept</argsstring>
+        <name>SetLoggerProvider</name>
+        <qualifiedname>opentelemetry::logs::Provider::SetLoggerProvider</qualifiedname>
+        <param>
+          <type>const nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref> &gt; &amp;</type>
+          <declname>tp</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Changes the singleton <ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" line="44" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" bodystart="44" bodyend="48"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1Provider_1a50783a4d2df4dceeaefe03f858239cda" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>OPENTELEMETRY_DEPRECATED nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref> &gt;</type>
+        <definition>static OPENTELEMETRY_DEPRECATED nostd::shared_ptr&lt; EventLoggerProvider &gt; opentelemetry::logs::Provider::GetEventLoggerProvider</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetEventLoggerProvider</name>
+        <qualifiedname>opentelemetry::logs::Provider::GetEventLoggerProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the singleton <ref refid="classopentelemetry_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref>.</para>
+<para>By default, a no-op <ref refid="classopentelemetry_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref> is returned. This will never return a nullptr <ref refid="classopentelemetry_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref>. <xrefsect id="deprecated_1_deprecated000005"><xreftitle>Deprecated</xreftitle><xrefdescription></xrefdescription></xrefsect></para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" line="59" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" bodystart="59" bodyend="63"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1Provider_1abf483d6ff93d12321952092b348cee20" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>OPENTELEMETRY_DEPRECATED void</type>
+        <definition>static OPENTELEMETRY_DEPRECATED void opentelemetry::logs::Provider::SetEventLoggerProvider</definition>
+        <argsstring>(const nostd::shared_ptr&lt; EventLoggerProvider &gt; &amp;tp) noexcept</argsstring>
+        <name>SetEventLoggerProvider</name>
+        <qualifiedname>opentelemetry::logs::Provider::SetEventLoggerProvider</qualifiedname>
+        <param>
+          <type>const nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref> &gt; &amp;</type>
+          <declname>tp</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Changes the singleton <ref refid="classopentelemetry_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref>. <xrefsect id="deprecated_1_deprecated000006"><xreftitle>Deprecated</xreftitle><xrefdescription></xrefdescription></xrefsect></para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" line="69" column="40" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" bodystart="69" bodyend="74"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1Provider_1ad63d534a5d404d16a181d26326eec2c3" prot="private" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>OPENTELEMETRY_API_SINGLETON nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref> &gt; &amp;</type>
+        <definition>static OPENTELEMETRY_API_SINGLETON nostd::shared_ptr&lt; LoggerProvider &gt; &amp; opentelemetry::logs::Provider::GetProvider</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetProvider</name>
+        <qualifiedname>opentelemetry::logs::Provider::GetProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" line="78" column="56" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" bodystart="78" bodyend="82"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1Provider_1a695e9cd3803edbd99660421f2fb837f4" prot="private" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>OPENTELEMETRY_API_SINGLETON nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref> &gt; &amp;</type>
+        <definition>static OPENTELEMETRY_API_SINGLETON nostd::shared_ptr&lt; EventLoggerProvider &gt; &amp; opentelemetry::logs::Provider::GetEventProvider</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetEventProvider</name>
+        <qualifiedname>opentelemetry::logs::Provider::GetEventProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" line="86" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" bodystart="86" bodyend="90"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1Provider_1a56435ef568555264bcfd40489d3f3f0f" prot="private" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>OPENTELEMETRY_API_SINGLETON common::SpinLockMutex &amp;</type>
+        <definition>static OPENTELEMETRY_API_SINGLETON common::SpinLockMutex &amp; opentelemetry::logs::Provider::GetLock</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetLock</name>
+        <qualifiedname>opentelemetry::logs::Provider::GetLock</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" line="93" column="60" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" bodystart="93" bodyend="97"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Stores the singleton global <ref refid="classopentelemetry_1_1logs_1_1LoggerProvider" kindref="compound">LoggerProvider</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" line="26" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h" bodystart="27" bodyend="98"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1logs_1_1Provider_1a50783a4d2df4dceeaefe03f858239cda" prot="public" virt="non-virtual"><scope>opentelemetry::logs::Provider</scope><name>GetEventLoggerProvider</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Provider_1a695e9cd3803edbd99660421f2fb837f4" prot="private" virt="non-virtual"><scope>opentelemetry::logs::Provider</scope><name>GetEventProvider</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Provider_1a56435ef568555264bcfd40489d3f3f0f" prot="private" virt="non-virtual"><scope>opentelemetry::logs::Provider</scope><name>GetLock</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Provider_1aca48db284c9a66dce1cc2a04dadd143c" prot="public" virt="non-virtual"><scope>opentelemetry::logs::Provider</scope><name>GetLoggerProvider</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Provider_1ad63d534a5d404d16a181d26326eec2c3" prot="private" virt="non-virtual"><scope>opentelemetry::logs::Provider</scope><name>GetProvider</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Provider_1abf483d6ff93d12321952092b348cee20" prot="public" virt="non-virtual"><scope>opentelemetry::logs::Provider</scope><name>SetEventLoggerProvider</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Provider_1a8b54ab9db96e33002622894f43d151c0" prot="public" virt="non-virtual"><scope>opentelemetry::logs::Provider</scope><name>SetLoggerProvider</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

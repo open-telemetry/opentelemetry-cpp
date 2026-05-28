@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1Provider" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::Provider</compoundname>
+    <includes refid="sdk_2include_2opentelemetry_2sdk_2trace_2provider_8h" local="no">provider.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Provider_1a12a80d3ac159b03070f8ff8168d82201" prot="public" static="yes" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>static void opentelemetry::sdk::trace::Provider::SetTracerProvider</definition>
+        <argsstring>(const nostd::shared_ptr&lt; opentelemetry::trace::TracerProvider &gt; &amp;tp) noexcept</argsstring>
+        <name>SetTracerProvider</name>
+        <qualifiedname>opentelemetry::sdk::trace::Provider::SetTracerProvider</qualifiedname>
+        <param>
+          <type>const nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">opentelemetry::trace::TracerProvider</ref> &gt; &amp;</type>
+          <declname>tp</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Changes the singleton TracerProvider. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/provider.h" line="25" column="15"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Changes the singleton global TracerProvider. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/provider.h" line="19" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/provider.h" bodystart="20" bodyend="27"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Provider_1a12a80d3ac159b03070f8ff8168d82201" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Provider</scope><name>SetTracerProvider</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

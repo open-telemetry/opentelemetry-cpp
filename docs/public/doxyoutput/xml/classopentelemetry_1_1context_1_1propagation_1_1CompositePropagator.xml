@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::context::propagation::CompositePropagator</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::context::propagation::TextMapPropagator</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator_1a300d19668fe37f3d9eeef285c38a4e69" prot="private" static="no" mutable="no">
+        <type>std::vector&lt; std::unique_ptr&lt; TextMapPropagator &gt; &gt;</type>
+        <definition>std::vector&lt;std::unique_ptr&lt;TextMapPropagator&gt; &gt; opentelemetry::context::propagation::CompositePropagator::propagators_</definition>
+        <argsstring></argsstring>
+        <name>propagators_</name>
+        <qualifiedname>opentelemetry::context::propagation::CompositePropagator::propagators_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" line="89" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" bodystart="89" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator_1a53312357908cf3c187198c44470a46b1" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::propagation::CompositePropagator::CompositePropagator</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; TextMapPropagator &gt; &gt; propagators)</argsstring>
+        <name>CompositePropagator</name>
+        <qualifiedname>opentelemetry::context::propagation::CompositePropagator::CompositePropagator</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; TextMapPropagator &gt; &gt;</type>
+          <declname>propagators</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" line="21" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" bodystart="21" bodyend="23"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator_1a52433c367b0c46bdeb6ca70f265c16b3" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::context::propagation::CompositePropagator::Inject</definition>
+        <argsstring>(TextMapCarrier &amp;carrier, const context::Context &amp;context) noexcept override</argsstring>
+        <name>Inject</name>
+        <qualifiedname>opentelemetry::context::propagation::CompositePropagator::Inject</qualifiedname>
+        <param>
+          <type>TextMapCarrier &amp;</type>
+          <declname>carrier</declname>
+        </param>
+        <param>
+          <type>const context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Run each of the configured propagators with the given context and carrier. Propagators are run in the order they are configured, so if multiple propagators write the same carrier key, the propagator later in the list will &quot;win&quot;.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>carrier</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Carrier into which context will be injected </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Context to inject </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" line="36" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" bodystart="36" bodyend="42"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator_1adac4599d07c3eead60719aaab6c7f7f3" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>context::Context</type>
+        <definition>context::Context opentelemetry::context::propagation::CompositePropagator::Extract</definition>
+        <argsstring>(const TextMapCarrier &amp;carrier, context::Context &amp;context) noexcept override</argsstring>
+        <name>Extract</name>
+        <qualifiedname>opentelemetry::context::propagation::CompositePropagator::Extract</qualifiedname>
+        <param>
+          <type>const TextMapCarrier &amp;</type>
+          <declname>carrier</declname>
+        </param>
+        <param>
+          <type>context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Run each of the configured propagators with the given context and carrier. Propagators are run in the order they are configured, so if multiple propagators write the same context key, the propagator later in the list will &quot;win&quot;.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>carrier</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Carrier from which to extract context </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Context to add values to </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" line="53" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" bodystart="53" bodyend="71"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator_1a8c945c0163a770b1b429d0f66d261baa" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::context::propagation::CompositePropagator::Fields</definition>
+        <argsstring>(nostd::function_ref&lt; bool(nostd::string_view)&gt; callback) const noexcept override</argsstring>
+        <name>Fields</name>
+        <qualifiedname>opentelemetry::context::propagation::CompositePropagator::Fields</qualifiedname>
+        <param>
+          <type>nostd::function_ref&lt; bool(nostd::string_view)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Invoke callback with fields set to carrier by <computeroutput>inject</computeroutput> method for all the configured propagators Returns true if all invocation return true </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" line="78" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" bodystart="78" bodyend="86"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" line="18" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/composite_propagator.h" bodystart="19" bodyend="90"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator_1a53312357908cf3c187198c44470a46b1" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::CompositePropagator</scope><name>CompositePropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator_1adac4599d07c3eead60719aaab6c7f7f3" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::CompositePropagator</scope><name>Extract</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator_1a8c945c0163a770b1b429d0f66d261baa" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::CompositePropagator</scope><name>Fields</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator_1a52433c367b0c46bdeb6ca70f265c16b3" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::CompositePropagator</scope><name>Inject</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1aa14ca5a5b60a8b1d444397f04cc6ce2f" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::CompositePropagator</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1af1e661fbae8179b4a4b944a00a30d7fe" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::CompositePropagator</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1CompositePropagator_1a300d19668fe37f3d9eeef285c38a4e69" prot="private" virt="non-virtual"><scope>opentelemetry::context::propagation::CompositePropagator</scope><name>propagators_</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a95708796cfcbdade8ad81ea6402749c3" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::CompositePropagator</scope><name>TextMapPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a9eca02e8ef37c0f8e029175bc0cb9fec" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::CompositePropagator</scope><name>TextMapPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a81a7bb782548036a458c497105b1bcc0" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::CompositePropagator</scope><name>TextMapPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a0a5f832aea596281984396b45ad09573" prot="public" virt="virtual"><scope>opentelemetry::context::propagation::CompositePropagator</scope><name>~TextMapPropagator</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

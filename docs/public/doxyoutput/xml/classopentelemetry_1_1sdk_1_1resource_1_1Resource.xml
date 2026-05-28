@@ -1,0 +1,332 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1resource_1_1Resource" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::resource::Resource</compoundname>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a4119ea4dedabe5810da8a44375a905d4" prot="private" static="no" mutable="no">
+        <type>ResourceAttributes</type>
+        <definition>ResourceAttributes opentelemetry::sdk::resource::Resource::attributes_</definition>
+        <argsstring></argsstring>
+        <name>attributes_</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::attributes_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="77" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" bodystart="77" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1aef409801dc514001566834e0a05d383b" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::resource::Resource::schema_url_</definition>
+        <argsstring></argsstring>
+        <name>schema_url_</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::schema_url_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="78" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" bodystart="78" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a966c415c4e636c7303b6cf9c424814f6" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::resource::Resource::Resource</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>Resource</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::Resource</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="22" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a55774f84455ee5a16372ee2b43c5c586" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::resource::Resource::Resource</definition>
+        <argsstring>(const ResourceAttributes &amp;attributes) noexcept</argsstring>
+        <name>Resource</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::Resource</qualifiedname>
+        <param>
+          <type>const ResourceAttributes &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="24" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a072bd2cfc439a08608d04fcf426a6307" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::resource::Resource::Resource</definition>
+        <argsstring>(const ResourceAttributes &amp;attributes, const std::string &amp;schema_url) noexcept</argsstring>
+        <name>Resource</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::Resource</qualifiedname>
+        <param>
+          <type>const ResourceAttributes &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>schema_url</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="26" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a3a45389930f702c64bacc6788ae9c6e7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::resource::Resource::Resource</definition>
+        <argsstring>(const Resource &amp;)=default</argsstring>
+        <name>Resource</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::Resource</qualifiedname>
+        <param>
+          <type>const Resource &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="28" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a38d8c929caa98e87b898f5314101ec6e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::resource::Resource::Resource</definition>
+        <argsstring>(Resource &amp;&amp;)=default</argsstring>
+        <name>Resource</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::Resource</qualifiedname>
+        <param>
+          <type>Resource &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="29" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a1bef677d94dcd983162849651ab62687" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Resource &amp;</type>
+        <definition>Resource &amp; opentelemetry::sdk::resource::Resource::operator=</definition>
+        <argsstring>(const Resource &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::operator=</qualifiedname>
+        <param>
+          <type>const Resource &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="30" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a669f73444f46259b56dddf86c960f0c0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Resource &amp;</type>
+        <definition>Resource &amp; opentelemetry::sdk::resource::Resource::operator=</definition>
+        <argsstring>(Resource &amp;&amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::operator=</qualifiedname>
+        <param>
+          <type>Resource &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="31" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a7f56415df7b308f40cb6f10cb5266a16" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::resource::Resource::~Resource</definition>
+        <argsstring>()=default</argsstring>
+        <name>~Resource</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::~Resource</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="33" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a0e1228e40433823dc39ca1e95767fc28" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>const ResourceAttributes &amp;</type>
+        <definition>const ResourceAttributes &amp; opentelemetry::sdk::resource::Resource::GetAttributes</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetAttributes</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::GetAttributes</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="35" column="28"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a228caa0128cbddf900a79b74b17010ba" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>const std::string &amp;</type>
+        <definition>const std::string &amp; opentelemetry::sdk::resource::Resource::GetSchemaURL</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetSchemaURL</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::GetSchemaURL</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="36" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a5cc278bb2f2b75c9b5e6921ffaa530d0" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>Resource</type>
+        <definition>Resource opentelemetry::sdk::resource::Resource::Merge</definition>
+        <argsstring>(const Resource &amp;other) const noexcept</argsstring>
+        <name>Merge</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::Merge</qualifiedname>
+        <param>
+          <type>const Resource &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a new, merged <computeroutput><ref refid="_1a966c415c4e636c7303b6cf9c424814f6" kindref="member">Resource</ref></computeroutput> by merging the current Resource with the other Resource. In case of a collision, the other Resource takes precedence.</para>
+<para>The specification notes that if schema urls collide, the resulting schema url is implementation-defined. In the C++ implementation, the schema url of <computeroutput>other</computeroutput> is picked.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>other</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the Resource that will be merged with this. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>the newly merged Resource. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="51" column="12"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a9d6d59409bde2e391fcbee3862447fc9" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Resource</type>
+        <definition>static Resource opentelemetry::sdk::resource::Resource::Create</definition>
+        <argsstring>(const ResourceAttributes &amp;attributes, const std::string &amp;schema_url=std::string{})</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::Create</qualifiedname>
+        <param>
+          <type>const ResourceAttributes &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>schema_url</declname>
+          <defval>std::string{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a newly created Resource with the specified attributes. It adds (merge) SDK attributes and OTEL attributes before returning. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>attributes</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>for this resource </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>schema_url</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The schema URL for this resource. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>the newly created Resource. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="61" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1ab2dc4b0e171b81c5987e4481ff123c6a" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Resource &amp;</type>
+        <definition>static Resource &amp; opentelemetry::sdk::resource::Resource::GetEmpty</definition>
+        <argsstring>()</argsstring>
+        <name>GetEmpty</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::GetEmpty</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns an Empty resource. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="68" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a6d5a99c61e6efe06713d1f51c439ee64" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Resource &amp;</type>
+        <definition>static Resource &amp; opentelemetry::sdk::resource::Resource::GetDefault</definition>
+        <argsstring>()</argsstring>
+        <name>GetDefault</name>
+        <qualifiedname>opentelemetry::sdk::resource::Resource::GetDefault</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a Resource that indentifies the SDK in use. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="74" column="19"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" line="19" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource.h" bodystart="20" bodyend="79"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a4119ea4dedabe5810da8a44375a905d4" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>attributes_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a9d6d59409bde2e391fcbee3862447fc9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a0e1228e40433823dc39ca1e95767fc28" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>GetAttributes</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a6d5a99c61e6efe06713d1f51c439ee64" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>GetDefault</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1ab2dc4b0e171b81c5987e4481ff123c6a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>GetEmpty</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a228caa0128cbddf900a79b74b17010ba" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>GetSchemaURL</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a5cc278bb2f2b75c9b5e6921ffaa530d0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>Merge</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a1bef677d94dcd983162849651ab62687" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a669f73444f46259b56dddf86c960f0c0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a966c415c4e636c7303b6cf9c424814f6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>Resource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a55774f84455ee5a16372ee2b43c5c586" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>Resource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a072bd2cfc439a08608d04fcf426a6307" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>Resource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a3a45389930f702c64bacc6788ae9c6e7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>Resource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a38d8c929caa98e87b898f5314101ec6e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>Resource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1aef409801dc514001566834e0a05d383b" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>schema_url_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1Resource_1a7f56415df7b308f40cb6f10cb5266a16" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::Resource</scope><name>~Resource</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

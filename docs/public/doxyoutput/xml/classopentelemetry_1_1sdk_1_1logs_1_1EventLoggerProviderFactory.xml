@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProviderFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::logs::EventLoggerProviderFactory</compoundname>
+    <includes refid="event__logger__provider__factory_8h" local="no">event_logger_provider_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProviderFactory_1ac4b8ab5a55c0afddee799790be75c622" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" kindref="compound">opentelemetry::sdk::logs::EventLoggerProvider</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::logs::EventLoggerProvider &gt; opentelemetry::sdk::logs::EventLoggerProviderFactory::Create</definition>
+        <argsstring>()</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::EventLoggerProviderFactory::Create</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger_provider_factory.h" line="32" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" kindref="compound">EventLoggerProvider</ref>. <xrefsect id="deprecated_1_deprecated000009"><xreftitle>Deprecated</xreftitle><xrefdescription></xrefdescription></xrefsect></para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger_provider_factory.h" line="25" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger_provider_factory.h" bodystart="26" bodyend="33"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProviderFactory_1ac4b8ab5a55c0afddee799790be75c622" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::EventLoggerProviderFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

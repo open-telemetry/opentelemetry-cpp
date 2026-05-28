@@ -1,0 +1,203 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1common_1_1SystemTimestamp" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::common::SystemTimestamp</compoundname>
+    <includes refid="timestamp_8h" local="no">timestamp.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1common_1_1SystemTimestamp_1ac2b27aea10fa05517de1f69d0def6a84" prot="private" static="no" mutable="no">
+        <type>int64_t</type>
+        <definition>int64_t opentelemetry::common::SystemTimestamp::nanos_since_epoch_</definition>
+        <argsstring></argsstring>
+        <name>nanos_since_epoch_</name>
+        <qualifiedname>opentelemetry::common::SystemTimestamp::nanos_since_epoch_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="90" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="90" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SystemTimestamp_1a6e976197ea6c7ab986a42ec04d0089ae" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::common::SystemTimestamp::SystemTimestamp</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>SystemTimestamp</name>
+        <qualifiedname>opentelemetry::common::SystemTimestamp::SystemTimestamp</qualifiedname>
+        <briefdescription>
+<para>Initializes a system timestamp pointing to the start of the epoch. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="25" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="25" bodyend="25"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SystemTimestamp_1a91858bacc33ba746a16c22708fae2469" prot="public" static="no" const="no" explicit="yes" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class Rep</type>
+          </param>
+          <param>
+            <type>class Period</type>
+          </param>
+        </templateparamlist>
+        <type></type>
+        <definition>opentelemetry::common::SystemTimestamp::SystemTimestamp</definition>
+        <argsstring>(const std::chrono::duration&lt; Rep, Period &gt; &amp;time_since_epoch) noexcept</argsstring>
+        <name>SystemTimestamp</name>
+        <qualifiedname>opentelemetry::common::SystemTimestamp::SystemTimestamp</qualifiedname>
+        <param>
+          <type>const std::chrono::duration&lt; Rep, Period &gt; &amp;</type>
+          <declname>time_since_epoch</declname>
+        </param>
+        <briefdescription>
+<para>Initializes a system timestamp from a duration. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>time_since_epoch</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Time elapsed since the beginning of the epoch. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="33" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="33" bodyend="36"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SystemTimestamp_1ae9fee35d646bfea0bbc344f02201bb73" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::common::SystemTimestamp::SystemTimestamp</definition>
+        <argsstring>(const std::chrono::system_clock::time_point &amp;time_point) noexcept</argsstring>
+        <name>SystemTimestamp</name>
+        <qualifiedname>opentelemetry::common::SystemTimestamp::SystemTimestamp</qualifiedname>
+        <param>
+          <type>const std::chrono::system_clock::time_point &amp;</type>
+          <declname>time_point</declname>
+        </param>
+        <briefdescription>
+<para>Initializes a system timestamp based on a point in time. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>time_point</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A point in time. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="43" column="4" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="43" bodyend="45"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SystemTimestamp_1a902e954e55f702c55b13971b5d50bf0e" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::common::SystemTimestamp::operator std::chrono::system_clock::time_point</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>operator std::chrono::system_clock::time_point</name>
+        <qualifiedname>opentelemetry::common::SystemTimestamp::time_point</qualifiedname>
+        <briefdescription>
+<para>Returns a time point for the time stamp. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>A time point corresponding to the time stamp. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="52" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="52" bodyend="57"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SystemTimestamp_1ab5ad80a7684332cd07e0b8ef1b86b85e" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>std::chrono::nanoseconds</type>
+        <definition>std::chrono::nanoseconds opentelemetry::common::SystemTimestamp::time_since_epoch</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>time_since_epoch</name>
+        <qualifiedname>opentelemetry::common::SystemTimestamp::time_since_epoch</qualifiedname>
+        <briefdescription>
+<para>Returns the nanoseconds since the beginning of the epoch. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Elapsed nanoseconds since the beginning of the epoch for this timestamp. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="64" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="64" bodyend="67"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SystemTimestamp_1a5f6de61924a1aedf4ea9a38573a95d66" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::common::SystemTimestamp::operator==</definition>
+        <argsstring>(const SystemTimestamp &amp;other) const noexcept</argsstring>
+        <name>operator==</name>
+        <qualifiedname>opentelemetry::common::SystemTimestamp::operator==</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">SystemTimestamp</ref> &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+<para>Compare two steady time stamps. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>true if the two time stamps are equal. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="74" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="74" bodyend="77"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1common_1_1SystemTimestamp_1a66cb56490c9e425f105c41b0b794371a" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::common::SystemTimestamp::operator!=</definition>
+        <argsstring>(const SystemTimestamp &amp;other) const noexcept</argsstring>
+        <name>operator!=</name>
+        <qualifiedname>opentelemetry::common::SystemTimestamp::operator!=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">SystemTimestamp</ref> &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+<para>Compare two steady time stamps for inequality. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>true if the two time stamps are not equal. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="84" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="84" bodyend="87"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+<para>A timepoint relative to the system clock epoch. </para>
+    </briefdescription>
+    <detaileddescription>
+<para>This is used for marking the beginning and end of an operation. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" line="19" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/timestamp.h" bodystart="20" bodyend="91"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1common_1_1SystemTimestamp_1ac2b27aea10fa05517de1f69d0def6a84" prot="private" virt="non-virtual"><scope>opentelemetry::common::SystemTimestamp</scope><name>nanos_since_epoch_</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SystemTimestamp_1a902e954e55f702c55b13971b5d50bf0e" prot="public" virt="non-virtual"><scope>opentelemetry::common::SystemTimestamp</scope><name>operator std::chrono::system_clock::time_point</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SystemTimestamp_1a66cb56490c9e425f105c41b0b794371a" prot="public" virt="non-virtual"><scope>opentelemetry::common::SystemTimestamp</scope><name>operator!=</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SystemTimestamp_1a5f6de61924a1aedf4ea9a38573a95d66" prot="public" virt="non-virtual"><scope>opentelemetry::common::SystemTimestamp</scope><name>operator==</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SystemTimestamp_1a6e976197ea6c7ab986a42ec04d0089ae" prot="public" virt="non-virtual"><scope>opentelemetry::common::SystemTimestamp</scope><name>SystemTimestamp</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SystemTimestamp_1a91858bacc33ba746a16c22708fae2469" prot="public" virt="non-virtual"><scope>opentelemetry::common::SystemTimestamp</scope><name>SystemTimestamp</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SystemTimestamp_1ae9fee35d646bfea0bbc344f02201bb73" prot="public" virt="non-virtual"><scope>opentelemetry::common::SystemTimestamp</scope><name>SystemTimestamp</name></member>
+      <member refid="classopentelemetry_1_1common_1_1SystemTimestamp_1ab5ad80a7684332cd07e0b8ef1b86b85e" prot="public" virt="non-virtual"><scope>opentelemetry::common::SystemTimestamp</scope><name>time_since_epoch</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

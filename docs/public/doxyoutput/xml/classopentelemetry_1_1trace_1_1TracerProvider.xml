@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1trace_1_1TracerProvider" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::trace::TracerProvider</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProvider" prot="public" virt="non-virtual">opentelemetry::sdk::trace::TracerProvider</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1trace_1_1NoopTracerProvider" prot="public" virt="non-virtual">opentelemetry::trace::NoopTracerProvider</derivedcompoundref>
+    <includes refid="api_2include_2opentelemetry_2trace_2tracer__provider_8h" local="no">tracer_provider.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TracerProvider_1ac183df161cb2313093c97b454b703e0d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::TracerProvider::TracerProvider</definition>
+        <argsstring>()=default</argsstring>
+        <name>TracerProvider</name>
+        <qualifiedname>opentelemetry::trace::TracerProvider::TracerProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/tracer_provider.h" line="24" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TracerProvider_1a62dc113a06db8fe65c2b76018edce1d8" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::trace::TracerProvider::~TracerProvider</definition>
+        <argsstring>()=default</argsstring>
+        <name>~TracerProvider</name>
+        <qualifiedname>opentelemetry::trace::TracerProvider::~TracerProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/tracer_provider.h" line="25" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TracerProvider_1ac2924187d7e13a5ee9b23fa9a0deaed6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::TracerProvider::TracerProvider</definition>
+        <argsstring>(const TracerProvider &amp;)=default</argsstring>
+        <name>TracerProvider</name>
+        <qualifiedname>opentelemetry::trace::TracerProvider::TracerProvider</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/tracer_provider.h" line="26" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TracerProvider_1ae3b0586602788cea8b4b281e1616ac06" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref> &amp;</type>
+        <definition>TracerProvider &amp; opentelemetry::trace::TracerProvider::operator=</definition>
+        <argsstring>(const TracerProvider &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::trace::TracerProvider::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/tracer_provider.h" line="27" column="18"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TracerProvider_1a76334fc448aa93bf6404cfeed7a20b11" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::TracerProvider::TracerProvider</definition>
+        <argsstring>(TracerProvider &amp;&amp;)=default</argsstring>
+        <name>TracerProvider</name>
+        <qualifiedname>opentelemetry::trace::TracerProvider::TracerProvider</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/tracer_provider.h" line="28" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TracerProvider_1a638087b5ce9b6bfd32ace6f3df801c60" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref> &amp;</type>
+        <definition>TracerProvider &amp; opentelemetry::trace::TracerProvider::operator=</definition>
+        <argsstring>(TracerProvider &amp;&amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::trace::TracerProvider::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">TracerProvider</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/tracer_provider.h" line="29" column="18"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TracerProvider_1a55e668c2a550e3af3d4a6d15ce9a68f1" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1Tracer" kindref="compound">Tracer</ref> &gt;</type>
+        <definition>virtual nostd::shared_ptr&lt; Tracer &gt; opentelemetry::trace::TracerProvider::GetTracer</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view version=&quot;&quot;, nostd::string_view schema_url=&quot;&quot;) noexcept=0</argsstring>
+        <name>GetTracer</name>
+        <qualifiedname>opentelemetry::trace::TracerProvider::GetTracer</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1trace_1_1NoopTracerProvider_1a353049bc0cdf33cc653c5128ff8b47d9">GetTracer</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>version</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>schema_url</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Gets or creates a named tracer instance.</para>
+<para>Optionally a version can be passed to create a named and versioned tracer instance. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/tracer_provider.h" line="126" column="29"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Creates new <ref refid="classopentelemetry_1_1trace_1_1Tracer" kindref="compound">Tracer</ref> instances. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::trace::NoopTracerProvider</label>
+        <link refid="classopentelemetry_1_1trace_1_1NoopTracerProvider"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>opentelemetry::trace::TracerProvider</label>
+        <link refid="classopentelemetry_1_1trace_1_1TracerProvider"/>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/tracer_provider.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/tracer_provider.h" bodystart="22" bodyend="130"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1a55e668c2a550e3af3d4a6d15ce9a68f1" prot="public" virt="pure-virtual"><scope>opentelemetry::trace::TracerProvider</scope><name>GetTracer</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1ae3b0586602788cea8b4b281e1616ac06" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TracerProvider</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1a638087b5ce9b6bfd32ace6f3df801c60" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TracerProvider</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1ac183df161cb2313093c97b454b703e0d" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TracerProvider</scope><name>TracerProvider</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1ac2924187d7e13a5ee9b23fa9a0deaed6" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TracerProvider</scope><name>TracerProvider</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1a76334fc448aa93bf6404cfeed7a20b11" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TracerProvider</scope><name>TracerProvider</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TracerProvider_1a62dc113a06db8fe65c2b76018edce1d8" prot="public" virt="virtual"><scope>opentelemetry::trace::TracerProvider</scope><name>~TracerProvider</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

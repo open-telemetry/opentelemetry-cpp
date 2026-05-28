@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_c62aacbd96ca3feb778ece95e81f5342" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export</compoundname>
+    <innerfile refid="metric__filter_8h">metric_filter.h</innerfile>
+    <innerfile refid="metric__producer_8h">metric_producer.h</innerfile>
+    <innerfile refid="periodic__exporting__metric__reader_8h">periodic_exporting_metric_reader.h</innerfile>
+    <innerfile refid="periodic__exporting__metric__reader__factory_8h">periodic_exporting_metric_reader_factory.h</innerfile>
+    <innerfile refid="periodic__exporting__metric__reader__options_8h">periodic_exporting_metric_reader_options.h</innerfile>
+    <innerfile refid="periodic__exporting__metric__reader__runtime__options_8h">periodic_exporting_metric_reader_runtime_options.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/"/>
+  </compounddef>
+</doxygen>

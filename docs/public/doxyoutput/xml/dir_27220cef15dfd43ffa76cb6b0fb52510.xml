@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_27220cef15dfd43ffa76cb6b0fb52510" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context</compoundname>
+    <innerdir refid="dir_8efdf86203ea59967b59c7f2371d2b1f">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation</innerdir>
+    <innerfile refid="context_2context_8h">context.h</innerfile>
+    <innerfile refid="context__value_8h">context_value.h</innerfile>
+    <innerfile refid="runtime__context_8h">runtime_context.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/"/>
+  </compounddef>
+</doxygen>

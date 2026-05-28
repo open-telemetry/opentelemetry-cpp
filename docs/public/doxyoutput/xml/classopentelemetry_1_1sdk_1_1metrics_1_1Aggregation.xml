@@ -1,0 +1,268 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::metrics::Aggregation</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregation" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregation</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleHistogramAggregation" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::DoubleHistogramAggregation</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleLastValueAggregation" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::DoubleLastValueAggregation</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1DoubleSumAggregation" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::DoubleSumAggregation</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1DropAggregation" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::DropAggregation</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongHistogramAggregation" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::LongHistogramAggregation</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongLastValueAggregation" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::LongLastValueAggregation</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongSumAggregation" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::LongSumAggregation</derivedcompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a834fa952a06bf6327398c3296dabc684" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::metrics::Aggregation::Aggregate</definition>
+        <argsstring>(int64_t value, const PointAttributes &amp;attributes={}) noexcept=0</argsstring>
+        <name>Aggregate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Aggregation::Aggregate</qualifiedname>
+        <param>
+          <type>int64_t</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const PointAttributes &amp;</type>
+          <declname>attributes</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="19" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a109ec9c3b133b09745bcb0d1155b7805" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::metrics::Aggregation::Aggregate</definition>
+        <argsstring>(double value, const PointAttributes &amp;attributes={}) noexcept=0</argsstring>
+        <name>Aggregate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Aggregation::Aggregate</qualifiedname>
+        <param>
+          <type>double</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const PointAttributes &amp;</type>
+          <declname>attributes</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="21" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1ab62b7c3e9b19f46f91ee17cab6f77ede" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>std::unique_ptr&lt; Aggregation &gt;</type>
+        <definition>virtual std::unique_ptr&lt; Aggregation &gt; opentelemetry::sdk::metrics::Aggregation::Merge</definition>
+        <argsstring>(const Aggregation &amp;delta) const noexcept=0</argsstring>
+        <name>Merge</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Aggregation::Merge</qualifiedname>
+        <param>
+          <type>const Aggregation &amp;</type>
+          <declname>delta</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the result of the merge of the two aggregations.</para>
+<para>This should always assume that the aggregations do not overlap and merge together for a new cumulative report.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>delta</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the newly captured (delta) aggregation </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>the result of the merge of the given aggregation. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="33" column="27"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1ae1c393b63a373342416110d07cf2d324" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>std::unique_ptr&lt; Aggregation &gt;</type>
+        <definition>virtual std::unique_ptr&lt; Aggregation &gt; opentelemetry::sdk::metrics::Aggregation::Diff</definition>
+        <argsstring>(const Aggregation &amp;next) const noexcept=0</argsstring>
+        <name>Diff</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Aggregation::Diff</qualifiedname>
+        <param>
+          <type>const Aggregation &amp;</type>
+          <declname>next</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a new delta aggregation by comparing two cumulative measurements.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>next</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the newly captured (cumulative) aggregation. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The resulting delta aggregation. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="41" column="27"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1ac2d9dc52fdedc21c803f6661759ef825" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>PointType</type>
+        <definition>virtual PointType opentelemetry::sdk::metrics::Aggregation::ToPoint</definition>
+        <argsstring>() const noexcept=0</argsstring>
+        <name>ToPoint</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Aggregation::ToPoint</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the point data that the aggregation will produce.</para>
+<para><simplesect kind="return"><para>PointType </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="49" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1af6a4b0195c2b59d6592864a944bebd96" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Aggregation::Aggregation</definition>
+        <argsstring>()=default</argsstring>
+        <name>Aggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Aggregation::Aggregation</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="51" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a29cfcd740ec1da70be6a3523d06e5eba" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Aggregation::Aggregation</definition>
+        <argsstring>(const Aggregation &amp;)=delete</argsstring>
+        <name>Aggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Aggregation::Aggregation</qualifiedname>
+        <param>
+          <type>const Aggregation &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="53" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a6da32b25e5f17a10ff72fc46f6142239" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Aggregation::Aggregation</definition>
+        <argsstring>(Aggregation &amp;&amp;)=delete</argsstring>
+        <name>Aggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Aggregation::Aggregation</qualifiedname>
+        <param>
+          <type>Aggregation &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="54" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a8bebc1d6cc3ea50af4726b95a6717e9b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Aggregation &amp;</type>
+        <definition>Aggregation &amp; opentelemetry::sdk::metrics::Aggregation::operator=</definition>
+        <argsstring>(const Aggregation &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Aggregation::operator=</qualifiedname>
+        <param>
+          <type>const Aggregation &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="55" column="15"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a4f0021ce4ded2fabb2d92acd132d5288" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Aggregation &amp;</type>
+        <definition>Aggregation &amp; opentelemetry::sdk::metrics::Aggregation::operator=</definition>
+        <argsstring>(Aggregation &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Aggregation::operator=</qualifiedname>
+        <param>
+          <type>Aggregation &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="56" column="15"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a3b49d27663b7598b277bacfe282447ce" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::metrics::Aggregation::~Aggregation</definition>
+        <argsstring>()=default</argsstring>
+        <name>~Aggregation</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Aggregation::~Aggregation</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="58" column="11"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::Aggregation</label>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::metrics::DropAggregation</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1DropAggregation"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" line="16" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation.h" bodystart="17" bodyend="59"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a834fa952a06bf6327398c3296dabc684" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::Aggregation</scope><name>Aggregate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a109ec9c3b133b09745bcb0d1155b7805" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::Aggregation</scope><name>Aggregate</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1af6a4b0195c2b59d6592864a944bebd96" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Aggregation</scope><name>Aggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a29cfcd740ec1da70be6a3523d06e5eba" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Aggregation</scope><name>Aggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a6da32b25e5f17a10ff72fc46f6142239" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Aggregation</scope><name>Aggregation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1ae1c393b63a373342416110d07cf2d324" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::Aggregation</scope><name>Diff</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1ab62b7c3e9b19f46f91ee17cab6f77ede" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::Aggregation</scope><name>Merge</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a8bebc1d6cc3ea50af4726b95a6717e9b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Aggregation</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a4f0021ce4ded2fabb2d92acd132d5288" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Aggregation</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1ac2d9dc52fdedc21c803f6661759ef825" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::Aggregation</scope><name>ToPoint</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Aggregation_1a3b49d27663b7598b277bacfe282447ce" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::Aggregation</scope><name>~Aggregation</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

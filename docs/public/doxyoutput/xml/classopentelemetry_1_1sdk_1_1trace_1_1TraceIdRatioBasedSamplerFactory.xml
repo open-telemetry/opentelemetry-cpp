@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSamplerFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::TraceIdRatioBasedSamplerFactory</compoundname>
+    <includes refid="trace__id__ratio__factory_8h" local="no">trace_id_ratio_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSamplerFactory_1a0880b75dd2ea2224b10b10e13a770762" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; Sampler &gt; opentelemetry::sdk::trace::TraceIdRatioBasedSamplerFactory::Create</definition>
+        <argsstring>(double ratio)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::TraceIdRatioBasedSamplerFactory::Create</qualifiedname>
+        <param>
+          <type>double</type>
+          <declname>ratio</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler" kindref="compound">TraceIdRatioBasedSampler</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h" line="26" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSampler" kindref="compound">TraceIdRatioBasedSampler</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h" bodystart="21" bodyend="27"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TraceIdRatioBasedSamplerFactory_1a0880b75dd2ea2224b10b10e13a770762" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TraceIdRatioBasedSamplerFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

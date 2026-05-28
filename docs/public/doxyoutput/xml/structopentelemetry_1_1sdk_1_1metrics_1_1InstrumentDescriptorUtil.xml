@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorUtil" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::InstrumentDescriptorUtil</compoundname>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorUtil_1a0bea22abd63bb8e83568edbf652180cd" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>static bool opentelemetry::sdk::metrics::InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals</definition>
+        <argsstring>(const std::string &amp;lhs, const std::string &amp;rhs) noexcept</argsstring>
+        <name>CaseInsensitiveAsciiEquals</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals</qualifiedname>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>lhs</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>rhs</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="74" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="74" bodyend="81"/>
+      </memberdef>
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorUtil_1a967147f9bcb71ef91acd3ed2ec81907b" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>static bool opentelemetry::sdk::metrics::InstrumentDescriptorUtil::IsDuplicate</definition>
+        <argsstring>(const InstrumentDescriptor &amp;lhs, const InstrumentDescriptor &amp;rhs) noexcept</argsstring>
+        <name>IsDuplicate</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentDescriptorUtil::IsDuplicate</qualifiedname>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>lhs</declname>
+        </param>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>rhs</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="87" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="87" bodyend="116"/>
+      </memberdef>
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorUtil_1a2fa48ec4f97068a76a838c0854475bc1" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>opentelemetry::nostd::string_view</type>
+        <definition>static opentelemetry::nostd::string_view opentelemetry::sdk::metrics::InstrumentDescriptorUtil::GetInstrumentTypeString</definition>
+        <argsstring>(InstrumentType type) noexcept</argsstring>
+        <name>GetInstrumentTypeString</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentDescriptorUtil::GetInstrumentTypeString</qualifiedname>
+        <param>
+          <type>InstrumentType</type>
+          <declname>type</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="118" column="44" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="118" bodyend="139"/>
+      </memberdef>
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorUtil_1a98781f2d268ebdb9bd2a470799ce9286" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>opentelemetry::nostd::string_view</type>
+        <definition>static opentelemetry::nostd::string_view opentelemetry::sdk::metrics::InstrumentDescriptorUtil::GetInstrumentValueTypeString</definition>
+        <argsstring>(InstrumentValueType value_type) noexcept</argsstring>
+        <name>GetInstrumentValueTypeString</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentDescriptorUtil::GetInstrumentValueTypeString</qualifiedname>
+        <param>
+          <type>InstrumentValueType</type>
+          <declname>value_type</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="141" column="44" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="141" bodyend="157"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="71" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="72" bodyend="158"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorUtil_1a0bea22abd63bb8e83568edbf652180cd" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentDescriptorUtil</scope><name>CaseInsensitiveAsciiEquals</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorUtil_1a2fa48ec4f97068a76a838c0854475bc1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentDescriptorUtil</scope><name>GetInstrumentTypeString</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorUtil_1a98781f2d268ebdb9bd2a470799ce9286" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentDescriptorUtil</scope><name>GetInstrumentValueTypeString</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorUtil_1a967147f9bcb71ef91acd3ed2ec81907b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentDescriptorUtil</scope><name>IsDuplicate</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

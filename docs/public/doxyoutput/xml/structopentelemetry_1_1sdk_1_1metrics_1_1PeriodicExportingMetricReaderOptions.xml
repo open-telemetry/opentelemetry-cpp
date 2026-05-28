@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderOptions" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions</compoundname>
+    <includes refid="periodic__exporting__metric__reader__options_8h" local="no">periodic_exporting_metric_reader_options.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderOptions_1af724d0669df915609f53d136537cb4a7" prot="public" static="no" mutable="no">
+        <type>std::chrono::milliseconds</type>
+        <definition>std::chrono::milliseconds opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions::export_interval_millis</definition>
+        <argsstring></argsstring>
+        <name>export_interval_millis</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions::export_interval_millis</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h" line="26" column="29" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h" bodystart="26" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderOptions_1af924fc396f47e42c3d8d708090f1c731" prot="public" static="no" mutable="no">
+        <type>std::chrono::milliseconds</type>
+        <definition>std::chrono::milliseconds opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions::export_timeout_millis</definition>
+        <argsstring></argsstring>
+        <name>export_timeout_millis</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions::export_timeout_millis</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h" line="29" column="29" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h" bodystart="29" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderOptions_1a81a32d30f0b4f76a872dc22eff270f87" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions::PeriodicExportingMetricReaderOptions</definition>
+        <argsstring>()</argsstring>
+        <name>PeriodicExportingMetricReaderOptions</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions::PeriodicExportingMetricReaderOptions</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h" line="31" column="3"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Struct to hold PeriodicExortingMetricReader options. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h" line="23" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h" bodystart="24" bodyend="32"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderOptions_1af724d0669df915609f53d136537cb4a7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions</scope><name>export_interval_millis</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderOptions_1af924fc396f47e42c3d8d708090f1c731" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions</scope><name>export_timeout_millis</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReaderOptions_1a81a32d30f0b4f76a872dc22eff270f87" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions</scope><name>PeriodicExportingMetricReaderOptions</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

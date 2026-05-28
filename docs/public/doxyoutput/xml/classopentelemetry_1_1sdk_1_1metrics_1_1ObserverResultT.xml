@@ -1,0 +1,246 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::sdk::metrics::ObserverResultT</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1metrics_1_1ObserverResultT" prot="public" virt="non-virtual">opentelemetry::metrics::ObserverResultT&lt; T &gt;</basecompoundref>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1add02b025e2994000634a271452769404" prot="private" static="no" mutable="no">
+        <type>std::unordered_map&lt; MetricAttributes, T, AttributeHashGenerator &gt;</type>
+        <definition>std::unordered_map&lt;MetricAttributes, T, AttributeHashGenerator&gt; opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;::data_</definition>
+        <argsstring></argsstring>
+        <name>data_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObserverResultT::data_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" line="76" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" bodystart="76" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a3184fd4bcdb547e709ae84eaa55cac61" prot="private" static="no" mutable="no">
+        <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">AttributesProcessor</ref> *</type>
+        <definition>const AttributesProcessor* opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;::attributes_processor_</definition>
+        <argsstring></argsstring>
+        <name>attributes_processor_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObserverResultT::attributes_processor_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" line="77" column="29" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" bodystart="77" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1ac8fe9d43b75c55d55f15bd347f9bbb67" prot="public" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;::ObserverResultT</definition>
+        <argsstring>(const AttributesProcessor *attributes_processor=nullptr)</argsstring>
+        <name>ObserverResultT</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObserverResultT::ObserverResultT</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" kindref="compound">AttributesProcessor</ref> *</type>
+          <declname>attributes_processor</declname>
+          <defval>nullptr</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" line="26" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" bodystart="26" bodyend="28"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a25d1aae348152068c345db0680a8fd1b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;::ObserverResultT</definition>
+        <argsstring>(const ObserverResultT &amp;)=default</argsstring>
+        <name>ObserverResultT</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObserverResultT::ObserverResultT</qualifiedname>
+        <param>
+          <type>const ObserverResultT &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" line="30" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1acb329e5abc161ad755852e05a1adca48" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;::ObserverResultT</definition>
+        <argsstring>(ObserverResultT &amp;&amp;)=default</argsstring>
+        <name>ObserverResultT</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObserverResultT::ObserverResultT</qualifiedname>
+        <param>
+          <type>ObserverResultT &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" line="31" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a8cd30cee1705ca9897ffee18bd05ca80" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>ObserverResultT &amp;</type>
+        <definition>ObserverResultT &amp; opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;::operator=</definition>
+        <argsstring>(const ObserverResultT &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObserverResultT::operator=</qualifiedname>
+        <param>
+          <type>const ObserverResultT &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" line="32" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a5342255f9ef23b299ea4da74bae48904" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>ObserverResultT &amp;</type>
+        <definition>ObserverResultT &amp; opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;::operator=</definition>
+        <argsstring>(ObserverResultT &amp;&amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObserverResultT::operator=</qualifiedname>
+        <param>
+          <type>ObserverResultT &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" line="33" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a9bd217508255185e35f2fe20af9be5c5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;::~ObserverResultT</definition>
+        <argsstring>() override=default</argsstring>
+        <name>~ObserverResultT</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObserverResultT::~ObserverResultT</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" line="35" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a922b4b690b9a5caa2574673c50343128" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;::Observe</definition>
+        <argsstring>(T value) noexcept override</argsstring>
+        <name>Observe</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObserverResultT::Observe</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" line="37" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" bodystart="37" bodyend="43"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a0a130a73a31a77a7cf7e883894eefb0c" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;::Observe</definition>
+        <argsstring>(T value, const opentelemetry::common::KeyValueIterable &amp;attributes) noexcept override</argsstring>
+        <name>Observe</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObserverResultT::Observe</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" line="53" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" bodystart="53" bodyend="60"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a6b4ad62ea6ca82fc7c9df3cf1bbb1b16" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>const std::unordered_map&lt; MetricAttributes, T, AttributeHashGenerator &gt; &amp;</type>
+        <definition>const std::unordered_map&lt; MetricAttributes, T, AttributeHashGenerator &gt; &amp; opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;::GetMeasurements</definition>
+        <argsstring>()</argsstring>
+        <name>GetMeasurements</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObserverResultT::GetMeasurements</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" line="70" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" bodystart="70" bodyend="73"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::metrics::ObserverResultT&lt; T &gt;</label>
+        <link refid="classopentelemetry_1_1metrics_1_1ObserverResultT"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::metrics::ObserverResultT&lt; T &gt;</label>
+        <link refid="classopentelemetry_1_1metrics_1_1ObserverResultT"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::ObserverResultT&lt; T &gt;</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" line="23" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/observer_result.h" bodystart="24" bodyend="78"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a3184fd4bcdb547e709ae84eaa55cac61" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>attributes_processor_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1add02b025e2994000634a271452769404" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>data_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a6b4ad62ea6ca82fc7c9df3cf1bbb1b16" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>GetMeasurements</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a922b4b690b9a5caa2574673c50343128" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>Observe</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a0a130a73a31a77a7cf7e883894eefb0c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>Observe</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1ObserverResultT_1a5e722c7ca7153edb22688eb06111dccf" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::ObserverResultT::"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>Observe</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1ObserverResultT_1abfecbc2730f4515f550f664d927332fa" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::ObserverResultT::"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>Observe</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1ac8fe9d43b75c55d55f15bd347f9bbb67" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>ObserverResultT</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a25d1aae348152068c345db0680a8fd1b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>ObserverResultT</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1acb329e5abc161ad755852e05a1adca48" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>ObserverResultT</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1ObserverResultT_1ac5a28950bceab23e050e751fd145057d" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::ObserverResultT::"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>ObserverResultT</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1ObserverResultT_1a5c6237653c60f5ab6088c7f95d535aaa" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::ObserverResultT::"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>ObserverResultT</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1ObserverResultT_1ac9c6cfaeb411b60c46bfb2689ca1e870" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::ObserverResultT::"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>ObserverResultT</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a8cd30cee1705ca9897ffee18bd05ca80" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a5342255f9ef23b299ea4da74bae48904" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1ObserverResultT_1adc53a1b33c581f435de594181e6629ce" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::ObserverResultT::"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1ObserverResultT_1a14f01d50651593ed8ce7738b5ecf99bd" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::metrics::ObserverResultT::"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObserverResultT_1a9bd217508255185e35f2fe20af9be5c5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObserverResultT</scope><name>~ObserverResultT</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,190 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1trace_1_1TraceId" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::trace::TraceId</compoundname>
+    <sectiondef kind="public-static-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1trace_1_1TraceId_1add776e5d8c31ecfdfce566ba98306ffa" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr size_t</type>
+        <definition>constexpr size_t opentelemetry::trace::TraceId::kSize</definition>
+        <argsstring></argsstring>
+        <name>kSize</name>
+        <qualifiedname>opentelemetry::trace::TraceId::kSize</qualifiedname>
+        <initializer>= 16</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" line="23" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" bodystart="23" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1trace_1_1TraceId_1a60673097f2dd6e73648505fe18e4b8d4" prot="private" static="no" mutable="no">
+        <type>uint8_t</type>
+        <definition>uint8_t opentelemetry::trace::TraceId::rep_[kSize]</definition>
+        <argsstring>[kSize]</argsstring>
+        <name>rep_</name>
+        <qualifiedname>opentelemetry::trace::TraceId::rep_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" line="68" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" bodystart="68" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceId_1a73bbf06b352440f299c9c88ff465a97b" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::TraceId::TraceId</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>TraceId</name>
+        <qualifiedname>opentelemetry::trace::TraceId::TraceId</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" line="26" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" bodystart="26" bodyend="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceId_1a79aa2b40745e9cf1082f918d6b9b2753" prot="public" static="no" const="no" explicit="yes" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::TraceId::TraceId</definition>
+        <argsstring>(nostd::span&lt; const uint8_t, kSize &gt; id) noexcept</argsstring>
+        <name>TraceId</name>
+        <qualifiedname>opentelemetry::trace::TraceId::TraceId</qualifiedname>
+        <param>
+          <type>nostd::span&lt; const uint8_t, kSize &gt;</type>
+          <declname>id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" line="29" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" bodystart="29" bodyend="32"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceId_1ad18ec71bc6b4870551467320c434d23d" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::TraceId::ToLowerBase16</definition>
+        <argsstring>(nostd::span&lt; char, 2 *kSize &gt; buffer) const noexcept</argsstring>
+        <name>ToLowerBase16</name>
+        <qualifiedname>opentelemetry::trace::TraceId::ToLowerBase16</qualifiedname>
+        <param>
+          <type>nostd::span&lt; char, 2 *kSize &gt;</type>
+          <declname>buffer</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" line="35" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" bodystart="35" bodyend="43"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceId_1aefb0996099cc2171f08203aef47ff965" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>nostd::span&lt; const uint8_t, kSize &gt;</type>
+        <definition>nostd::span&lt; const uint8_t, kSize &gt; opentelemetry::trace::TraceId::Id</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>Id</name>
+        <qualifiedname>opentelemetry::trace::TraceId::Id</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" line="46" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" bodystart="46" bodyend="49"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceId_1a490b6435e454c8b963468b5ffd6eae98" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::trace::TraceId::operator==</definition>
+        <argsstring>(const TraceId &amp;that) const noexcept</argsstring>
+        <name>operator==</name>
+        <qualifiedname>opentelemetry::trace::TraceId::operator==</qualifiedname>
+        <param>
+          <type>const TraceId &amp;</type>
+          <declname>that</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" line="51" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" bodystart="51" bodyend="54"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceId_1af32fb8d34c03e332b10449435a2951cd" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::trace::TraceId::operator!=</definition>
+        <argsstring>(const TraceId &amp;that) const noexcept</argsstring>
+        <name>operator!=</name>
+        <qualifiedname>opentelemetry::trace::TraceId::operator!=</qualifiedname>
+        <param>
+          <type>const TraceId &amp;</type>
+          <declname>that</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" line="56" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" bodystart="56" bodyend="56"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceId_1ab5cd9a9d2266e3147dcdec4645fa71e8" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::trace::TraceId::IsValid</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>IsValid</name>
+        <qualifiedname>opentelemetry::trace::TraceId::IsValid</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" line="59" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" bodystart="59" bodyend="59"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1TraceId_1aeaadf8ebc3ed33219f4397005aa546e5" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::trace::TraceId::CopyBytesTo</definition>
+        <argsstring>(nostd::span&lt; uint8_t, kSize &gt; dest) const noexcept</argsstring>
+        <name>CopyBytesTo</name>
+        <qualifiedname>opentelemetry::trace::TraceId::CopyBytesTo</qualifiedname>
+        <param>
+          <type>nostd::span&lt; uint8_t, kSize &gt;</type>
+          <declname>dest</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" line="62" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" bodystart="62" bodyend="65"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" line="19" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/trace_id.h" bodystart="20" bodyend="69"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1trace_1_1TraceId_1aeaadf8ebc3ed33219f4397005aa546e5" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceId</scope><name>CopyBytesTo</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceId_1aefb0996099cc2171f08203aef47ff965" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceId</scope><name>Id</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceId_1ab5cd9a9d2266e3147dcdec4645fa71e8" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceId</scope><name>IsValid</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceId_1add776e5d8c31ecfdfce566ba98306ffa" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceId</scope><name>kSize</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceId_1af32fb8d34c03e332b10449435a2951cd" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceId</scope><name>operator!=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceId_1a490b6435e454c8b963468b5ffd6eae98" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceId</scope><name>operator==</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceId_1a60673097f2dd6e73648505fe18e4b8d4" prot="private" virt="non-virtual"><scope>opentelemetry::trace::TraceId</scope><name>rep_</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceId_1ad18ec71bc6b4870551467320c434d23d" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceId</scope><name>ToLowerBase16</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceId_1a73bbf06b352440f299c9c88ff465a97b" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceId</scope><name>TraceId</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1TraceId_1a79aa2b40745e9cf1082f918d6b9b2753" prot="public" virt="non-virtual"><scope>opentelemetry::trace::TraceId</scope><name>TraceId</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

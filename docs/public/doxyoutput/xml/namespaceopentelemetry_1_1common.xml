@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1common" kind="namespace" language="C++">
+    <compoundname>opentelemetry::common</compoundname>
+    <innerclass refid="classopentelemetry_1_1common_1_1DurationUtil" prot="public">opentelemetry::common::DurationUtil</innerclass>
+    <innerclass refid="classopentelemetry_1_1common_1_1KeyValueIterable" prot="public">opentelemetry::common::KeyValueIterable</innerclass>
+    <innerclass refid="classopentelemetry_1_1common_1_1NoopKeyValueIterable" prot="public">opentelemetry::common::NoopKeyValueIterable</innerclass>
+    <innerclass refid="classopentelemetry_1_1common_1_1SteadyTimestamp" prot="public">opentelemetry::common::SteadyTimestamp</innerclass>
+    <innerclass refid="classopentelemetry_1_1common_1_1SystemTimestamp" prot="public">opentelemetry::common::SystemTimestamp</innerclass>
+    <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="attribute__value_8h_1ab62d36234f187512346450ce2a8e32a6" prot="public" static="no">
+        <type>nostd::variant&lt; bool, int32_t, int64_t, uint32_t, double, const char *, nostd::string_view, nostd::span&lt; const bool &gt;, nostd::span&lt; const int32_t &gt;, nostd::span&lt; const int64_t &gt;, nostd::span&lt; const uint32_t &gt;, nostd::span&lt; const double &gt;, nostd::span&lt; const nostd::string_view &gt;, uint64_t, nostd::span&lt; const uint64_t &gt;, nostd::span&lt; const uint8_t &gt; &gt;</type>
+        <definition>using opentelemetry::common::AttributeValue = typedef nostd::variant&lt;bool, int32_t, int64_t, uint32_t, double, const char *, nostd::string_view, nostd::span&lt;const bool&gt;, nostd::span&lt;const int32_t&gt;, nostd::span&lt;const int64_t&gt;, nostd::span&lt;const uint32_t&gt;, nostd::span&lt;const double&gt;, nostd::span&lt;const nostd::string_view&gt;, uint64_t, nostd::span&lt;const uint64_t&gt;, nostd::span&lt;const uint8_t&gt; &gt;</definition>
+        <argsstring></argsstring>
+        <name>AttributeValue</name>
+        <qualifiedname>opentelemetry::common::AttributeValue</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>OpenTelemetry signals can be enriched by adding attributes. The <computeroutput>AttributeValue</computeroutput> type is defined as a variant of all attribute value types the OpenTelemetry C++ API supports.</para>
+<para>The following attribute value types are supported by the OpenTelemetry specification:<itemizedlist>
+<listitem><para>Primitive types: string, boolean, double precision floating point (IEEE 754-1985) or signed 64 bit integer.</para>
+</listitem><listitem><para>Homogenous arrays of primitive type values.</para>
+</listitem></itemizedlist>
+</para>
+<para><simplesect kind="warning"><para>The OpenTelemetry C++ API does not support the following attribute: uint64_t, nostd::span&lt;const uint64_t&gt;, and nostd::span&lt;const uint8_t&gt; types. <parblock><para>The OpenTelemetry C++ API currently supports several attribute value types that are not covered by the OpenTelemetry specification:<itemizedlist>
+<listitem><para><computeroutput>uint64_t</computeroutput> </para>
+</listitem><listitem><para><computeroutput>nostd::span&lt;const uint64_t&gt;</computeroutput> </para>
+</listitem><listitem><para><computeroutput>nostd::span&lt;const uint8_t&gt;</computeroutput> </para>
+</listitem></itemizedlist>
+</para>
+<para>Those types are reserved for future use and currently should not be used. There are no guarantees around how those values are handled by exporters. </para>
+</parblock></para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/attribute_value.h" line="38" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/attribute_value.h" bodystart="58" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common/attribute_value.h" line="14" column="1"/>
+  </compounddef>
+</doxygen>

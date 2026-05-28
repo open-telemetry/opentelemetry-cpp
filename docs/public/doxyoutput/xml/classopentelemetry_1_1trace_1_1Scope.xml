@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1trace_1_1Scope" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::trace::Scope</compoundname>
+    <includes refid="scope_8h" local="no">scope.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1trace_1_1Scope_1ad5ba84ab11e605b623f113a3a133cf73" prot="private" static="no" mutable="no">
+        <type>nostd::unique_ptr&lt; context::Token &gt;</type>
+        <definition>nostd::unique_ptr&lt;context::Token&gt; opentelemetry::trace::Scope::token_</definition>
+        <argsstring></argsstring>
+        <name>token_</name>
+        <qualifiedname>opentelemetry::trace::Scope::token_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/scope.h" line="38" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/scope.h" bodystart="38" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1Scope_1ab3b891619632d1e0adbc9211ef4477b3" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::trace::Scope::Scope</definition>
+        <argsstring>(const nostd::shared_ptr&lt; Span &gt; &amp;span) noexcept</argsstring>
+        <name>Scope</name>
+        <qualifiedname>opentelemetry::trace::Scope::Scope</qualifiedname>
+        <param>
+          <type>const nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> &gt; &amp;</type>
+          <declname>span</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Initialize a new scope. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>span</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the given span will be set as the currently active span. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/scope.h" line="32" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/scope.h" bodystart="32" bodyend="35"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Controls how long a span is active.</para>
+<para>On creation of the <ref refid="classopentelemetry_1_1trace_1_1Scope" kindref="compound">Scope</ref> object, the given span is set to the currently active span. On destruction, the given span is ended and the previously active span will be the currently active span again. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/scope.h" line="25" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/scope.h" bodystart="26" bodyend="39"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1trace_1_1Scope_1ab3b891619632d1e0adbc9211ef4477b3" prot="public" virt="non-virtual"><scope>opentelemetry::trace::Scope</scope><name>Scope</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1Scope_1ad5ba84ab11e605b623f113a3a133cf73" prot="private" virt="non-virtual"><scope>opentelemetry::trace::Scope</scope><name>token_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

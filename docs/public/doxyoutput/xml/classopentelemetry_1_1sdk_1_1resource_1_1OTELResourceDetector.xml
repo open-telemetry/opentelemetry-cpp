@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1resource_1_1OTELResourceDetector" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::resource::OTELResourceDetector</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector" prot="public" virt="non-virtual">opentelemetry::sdk::resource::ResourceDetector</basecompoundref>
+    <includes refid="resource__detector_8h" local="no">resource_detector.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1OTELResourceDetector_1aba1f56311a179aa571058db74ac08936" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>Resource</type>
+        <definition>Resource opentelemetry::sdk::resource::OTELResourceDetector::Detect</definition>
+        <argsstring>() noexcept override</argsstring>
+        <name>Detect</name>
+        <qualifiedname>opentelemetry::sdk::resource::OTELResourceDetector::Detect</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a38f2e5d441fc8ae74ee480844aebc6d3">Detect</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" line="46" column="12"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>OTelResourceDetector to detect the presence of and create a Resource from the OTEL_RESOURCE_ATTRIBUTES environment variable. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::sdk::resource::OTELResourceDetector</label>
+        <link refid="classopentelemetry_1_1sdk_1_1resource_1_1OTELResourceDetector"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::resource::ResourceDetector</label>
+        <link refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>opentelemetry::sdk::resource::OTELResourceDetector</label>
+        <link refid="classopentelemetry_1_1sdk_1_1resource_1_1OTELResourceDetector"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::resource::ResourceDetector</label>
+        <link refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" line="43" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" bodystart="44" bodyend="47"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a26937b8e54e86eb9bc88a01e5e2086e5" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::resource::OTELResourceDetector</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1OTELResourceDetector_1aba1f56311a179aa571058db74ac08936" prot="public" virt="virtual"><scope>opentelemetry::sdk::resource::OTELResourceDetector</scope><name>Detect</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1ab3c2705671bfdf05c520e104538b295f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::OTELResourceDetector</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a7662190dc68804ca301ea65a48154b77" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::OTELResourceDetector</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1ac16659f48b43f2d787aefc311d666c62" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::OTELResourceDetector</scope><name>ResourceDetector</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a479e568423ea2f66ed33024d3737fe53" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::OTELResourceDetector</scope><name>ResourceDetector</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a3041bb424c462bd7bee2bea3adea1d4a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::OTELResourceDetector</scope><name>ResourceDetector</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a684ba2fba575c0776b508aafc45c0dac" prot="public" virt="virtual"><scope>opentelemetry::sdk::resource::OTELResourceDetector</scope><name>~ResourceDetector</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

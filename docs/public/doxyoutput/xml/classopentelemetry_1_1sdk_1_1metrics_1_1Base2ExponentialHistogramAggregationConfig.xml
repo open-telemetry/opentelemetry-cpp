@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregationConfig" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::sdk::metrics::AggregationConfig</basecompoundref>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregationConfig_1a97a16dc5cae2295f02071e70f181ddc7" prot="public" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig::max_buckets_</definition>
+        <argsstring></argsstring>
+        <name>max_buckets_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig::max_buckets_</qualifiedname>
+        <initializer>= 160</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation_config.h" line="72" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation_config.h" bodystart="72" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregationConfig_1a561fe18cd5fd4d374f1e049ddfc38c3b" prot="public" static="no" mutable="no">
+        <type>int32_t</type>
+        <definition>int32_t opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig::max_scale_</definition>
+        <argsstring></argsstring>
+        <name>max_scale_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig::max_scale_</qualifiedname>
+        <initializer>= 20</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation_config.h" line="73" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation_config.h" bodystart="73" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregationConfig_1a34b1c041d12e94c84eb09162c6d39064" prot="public" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig::record_min_max_</definition>
+        <argsstring></argsstring>
+        <name>record_min_max_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig::record_min_max_</qualifiedname>
+        <initializer>= true</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation_config.h" line="74" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation_config.h" bodystart="74" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregationConfig_1a47188e2a0a12e1aca6f3aab88c77d7cf" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig::Base2ExponentialHistogramAggregationConfig</definition>
+        <argsstring>(size_t cardinality_limit=kAggregationCardinalityLimit)</argsstring>
+        <name>Base2ExponentialHistogramAggregationConfig</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig::Base2ExponentialHistogramAggregationConfig</qualifiedname>
+        <param>
+          <type>size_t</type>
+          <declname>cardinality_limit</declname>
+          <defval>kAggregationCardinalityLimit</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation_config.h" line="62" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation_config.h" bodystart="62" bodyend="65"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregationConfig_1a5ea43aa67699de38d5c5a215f7946818" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>AggregationType</type>
+        <definition>AggregationType opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig::GetType</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>GetType</name>
+        <qualifiedname>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig::GetType</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation_config.h" line="67" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation_config.h" bodystart="67" bodyend="70"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation_config.h" line="59" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/aggregation/aggregation_config.h" bodystart="60" bodyend="75"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AggregationConfig_1a43be098cbd1ab64c2f1b81becaadb19e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>AggregationConfig</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AggregationConfig_1a65d879cc4ebe153457f98c08cac5ab1f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>AggregationConfig</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AggregationConfig_1a89695c5ed030080e4a693bf99564b6c3" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>AggregationConfig</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregationConfig_1a47188e2a0a12e1aca6f3aab88c77d7cf" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>Base2ExponentialHistogramAggregationConfig</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AggregationConfig_1a2d58e43620eb727270d80db98a63857c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>cardinality_limit_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AggregationConfig_1a90434762f3b64c090b6b3d5fed4ecd87" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>GetOrDefault</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregationConfig_1a5ea43aa67699de38d5c5a215f7946818" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>GetType</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregationConfig_1a97a16dc5cae2295f02071e70f181ddc7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>max_buckets_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregationConfig_1a561fe18cd5fd4d374f1e049ddfc38c3b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>max_scale_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AggregationConfig_1a1f195eb10a1412d5af780604684f7851" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AggregationConfig_1aed5e43a585203a6ba1acb7b83ea6bff8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Base2ExponentialHistogramAggregationConfig_1a34b1c041d12e94c84eb09162c6d39064" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>record_min_max_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AggregationConfig_1acecbf38e550bd454ee20099753e6dff1" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig</scope><name>~AggregationConfig</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,137 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1metrics_1_1NoopMeterProvider" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::metrics::NoopMeterProvider</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1metrics_1_1MeterProvider" prot="public" virt="non-virtual">opentelemetry::metrics::MeterProvider</basecompoundref>
+    <includes refid="metrics_2noop_8h" local="no">noop.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1metrics_1_1NoopMeterProvider_1a76cc3ecea590a85d3d4e6c0d027e9f9d" prot="private" static="no" mutable="no">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> &gt;</type>
+        <definition>nostd::shared_ptr&lt;Meter&gt; opentelemetry::metrics::NoopMeterProvider::meter_</definition>
+        <argsstring></argsstring>
+        <name>meter_</name>
+        <qualifiedname>opentelemetry::metrics::NoopMeterProvider::meter_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" line="278" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" bodystart="278" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1NoopMeterProvider_1a1e1e158bfda74d3a3890e461ee0db645" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::metrics::NoopMeterProvider::NoopMeterProvider</definition>
+        <argsstring>()</argsstring>
+        <name>NoopMeterProvider</name>
+        <qualifiedname>opentelemetry::metrics::NoopMeterProvider::NoopMeterProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" line="250" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" bodystart="250" bodyend="250"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1NoopMeterProvider_1a5b02d2ea82f34c0869ee2786f77031a1" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> &gt;</type>
+        <definition>nostd::shared_ptr&lt; Meter &gt; opentelemetry::metrics::NoopMeterProvider::GetMeter</definition>
+        <argsstring>(nostd::string_view, nostd::string_view, nostd::string_view) noexcept override</argsstring>
+        <name>GetMeter</name>
+        <qualifiedname>opentelemetry::metrics::NoopMeterProvider::GetMeter</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1metrics_1_1MeterProvider_1a89d90f6a56f4a508d60eff4ca17d9a61">GetMeter</reimplements>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>version</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>schema_url</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Gets or creates a named <ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> instance (ABI)</para>
+<para><simplesect kind="since"><para>ABI_VERSION 1</para>
+</simplesect>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para><ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> instrumentation scope </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">version</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Instrumentation scope version, optional </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">schema_url</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Instrumentation scope schema URL, optional </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" line="262" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" bodystart="262" bodyend="267"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>No-op implementation of a <ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref>. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::metrics::MeterProvider</label>
+        <link refid="classopentelemetry_1_1metrics_1_1MeterProvider"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::metrics::NoopMeterProvider</label>
+        <link refid="classopentelemetry_1_1metrics_1_1NoopMeterProvider"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::metrics::MeterProvider</label>
+        <link refid="classopentelemetry_1_1metrics_1_1MeterProvider"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::metrics::NoopMeterProvider</label>
+        <link refid="classopentelemetry_1_1metrics_1_1NoopMeterProvider"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" line="247" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/noop.h" bodystart="248" bodyend="279"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1metrics_1_1NoopMeterProvider_1a5b02d2ea82f34c0869ee2786f77031a1" prot="public" virt="virtual"><scope>opentelemetry::metrics::NoopMeterProvider</scope><name>GetMeter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1NoopMeterProvider_1a76cc3ecea590a85d3d4e6c0d027e9f9d" prot="private" virt="non-virtual"><scope>opentelemetry::metrics::NoopMeterProvider</scope><name>meter_</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1a5bb76e70b7e945087e199b5c598dc77c" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopMeterProvider</scope><name>MeterProvider</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1ab8ec2ed04c2beb40a2de3e3295909e12" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopMeterProvider</scope><name>MeterProvider</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1abe8dd1cbe932e41a0fd7ea2080ff97e5" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopMeterProvider</scope><name>MeterProvider</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1NoopMeterProvider_1a1e1e158bfda74d3a3890e461ee0db645" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopMeterProvider</scope><name>NoopMeterProvider</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1a1bf847829cb82a904f5092e900a38ee0" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopMeterProvider</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1a3a60895c29cb7568206cf22776ef7ff8" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::NoopMeterProvider</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MeterProvider_1a8a28214a7105ef996a4adcf6cfd780fa" prot="public" virt="virtual"><scope>opentelemetry::metrics::NoopMeterProvider</scope><name>~MeterProvider</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

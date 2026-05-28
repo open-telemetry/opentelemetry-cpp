@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::logs::LoggerContext</compoundname>
+    <includes refid="logger__context_8h" local="no">logger_context.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1a0dcd9cd946e8c2d7bc05d332dee33960" prot="private" static="no" mutable="no">
+        <type>opentelemetry::sdk::resource::Resource</type>
+        <definition>opentelemetry::sdk::resource::Resource opentelemetry::sdk::logs::LoggerContext::resource_</definition>
+        <argsstring></argsstring>
+        <name>resource_</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContext::resource_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" line="92" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" bodystart="92" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1a3128b2812e829b58acaa177facf108f7" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt;</type>
+        <definition>std::unique_ptr&lt;LogRecordProcessor&gt; opentelemetry::sdk::logs::LoggerContext::processor_</definition>
+        <argsstring></argsstring>
+        <name>processor_</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContext::processor_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" line="93" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" bodystart="93" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1ac50a8b9343cc66a9243cc327621ce254" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> &gt; &gt;</type>
+        <definition>std::unique_ptr&lt;instrumentationscope::ScopeConfigurator&lt;LoggerConfig&gt; &gt; opentelemetry::sdk::logs::LoggerContext::logger_configurator_</definition>
+        <argsstring></argsstring>
+        <name>logger_configurator_</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContext::logger_configurator_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" line="95" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" bodystart="95" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1af5a3e9979bfd221b508311db58cb4f93" prot="public" static="no" const="no" explicit="yes" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::LoggerContext::LoggerContext</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; LogRecordProcessor &gt; &gt; &amp;&amp;processors, const opentelemetry::sdk::resource::Resource &amp;resource=opentelemetry::sdk::resource::Resource::Create({}), std::unique_ptr&lt; instrumentationscope::ScopeConfigurator&lt; LoggerConfig &gt; &gt; logger_configurator=std::make_unique&lt; instrumentationscope::ScopeConfigurator&lt; LoggerConfig &gt; &gt;(instrumentationscope::ScopeConfigurator&lt; LoggerConfig &gt;::Builder(LoggerConfig::Default()) .Build())) noexcept</argsstring>
+        <name>LoggerContext</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContext::LoggerContext</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+          <defval>opentelemetry::sdk::resource::Resource::Create({})</defval>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> &gt; &gt;</type>
+          <declname>logger_configurator</declname>
+          <defval>std::make_unique&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> &gt; &gt;(<ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> &gt;::Builder(<ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1aa246a623bd7126b9047d3bf6de2a9f63" kindref="member">LoggerConfig::Default</ref>()) .Build())</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" line="38" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1a48c9364219d0c6188acf4c742151c20c" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::LoggerContext::AddProcessor</definition>
+        <argsstring>(std::unique_ptr&lt; LogRecordProcessor &gt; processor) noexcept</argsstring>
+        <name>AddProcessor</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContext::AddProcessor</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt;</type>
+          <declname>processor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Attaches a log processor to list of configured processors to this logger context. Processor once attached can&apos;t be removed. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>processor</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The new log processor for this tracer. This must not be a nullptr. Ownership is given to the <computeroutput><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref></computeroutput>.</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Note: This method is not thread safe. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" line="56" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1a9f7611ec954bfd227365f87113c17b58" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &amp;</type>
+        <definition>LogRecordProcessor &amp; opentelemetry::sdk::logs::LoggerContext::GetProcessor</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetProcessor</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContext::GetProcessor</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Obtain the configured (composite) processor.</para>
+<para>Note: When more than one processor is active, this will return an &quot;aggregate&quot; processor </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" line="64" column="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1ad4aaec7d3956f5bb3666c13070b67a8d" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+        <definition>const opentelemetry::sdk::resource::Resource &amp; opentelemetry::sdk::logs::LoggerContext::GetResource</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetResource</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContext::GetResource</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Obtain the resource associated with this tracer context. <simplesect kind="return"><para>The resource for this tracer context. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" line="70" column="48"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1a8b54c378ee037195863ee636a81def1e" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>const <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> &gt; &amp;</type>
+        <definition>const instrumentationscope::ScopeConfigurator&lt; LoggerConfig &gt; &amp; opentelemetry::sdk::logs::LoggerContext::GetLoggerConfigurator</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetLoggerConfigurator</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContext::GetLoggerConfigurator</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Obtain the ScopeConfigurator with this logger context. <simplesect kind="return"><para>The ScopeConfigurator for this logger context. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" line="76" column="49"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1a21e47c70be66aa422a26c0de25d0b610" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::LoggerContext::ForceFlush</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept</argsstring>
+        <name>ForceFlush</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContext::ForceFlush</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Force all active LogProcessors to flush any buffered logs within the given timeout. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" line="83" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1ac19e9da21711c86f5b3edef33a1b45b9" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::LoggerContext::Shutdown</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept</argsstring>
+        <name>Shutdown</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerContext::Shutdown</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Shutdown the log processor associated with this tracer provider. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" line="88" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>A class which stores the <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> context.</para>
+<para>This class meets the following design criteria:<itemizedlist>
+<listitem><para>A shared reference between LoggerProvider and Logger instantiated.</para>
+</listitem><listitem><para>A thread-safe class that allows updating/altering processor/exporter pipelines and sampling config.</para>
+</listitem><listitem><para>The owner/destroyer of Processors/Exporters. These will remain active until this class is destroyed. I.e. Sampling, Exporting, flushing, Custom Iterator etc. are all ok if this object is alive, and they will work together. If this object is destroyed, then no shared references to Processor, Exporter, <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable" kindref="compound">Recordable</ref>, Custom Iterator etc. should exist, and all associated pipelines will have been flushed. </para>
+</listitem></itemizedlist>
+</para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" line="35" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h" bodystart="36" bodyend="96"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1a48c9364219d0c6188acf4c742151c20c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContext</scope><name>AddProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1a21e47c70be66aa422a26c0de25d0b610" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContext</scope><name>ForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1a8b54c378ee037195863ee636a81def1e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContext</scope><name>GetLoggerConfigurator</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1a9f7611ec954bfd227365f87113c17b58" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContext</scope><name>GetProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1ad4aaec7d3956f5bb3666c13070b67a8d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContext</scope><name>GetResource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1ac50a8b9343cc66a9243cc327621ce254" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContext</scope><name>logger_configurator_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1af5a3e9979bfd221b508311db58cb4f93" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContext</scope><name>LoggerContext</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1a3128b2812e829b58acaa177facf108f7" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContext</scope><name>processor_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1a0dcd9cd946e8c2d7bc05d332dee33960" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContext</scope><name>resource_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext_1ac19e9da21711c86f5b3edef33a1b45b9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerContext</scope><name>Shutdown</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

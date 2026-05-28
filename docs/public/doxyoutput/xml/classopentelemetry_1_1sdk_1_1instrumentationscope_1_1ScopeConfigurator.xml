@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator</compoundname>
+    <includes refid="scope__configurator_8h" local="no">scope_configurator.h</includes>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder" prot="public">opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder</innerclass>
+    <templateparamlist>
+      <param>
+        <type>typename T</type>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1a3316f2f2d6e6fb2ab4f0ef060cac9086" prot="private" static="no" mutable="no">
+        <type>std::function&lt; T(const InstrumentationScope &amp;)&gt;</type>
+        <definition>std::function&lt;T(const InstrumentationScope &amp;)&gt; opentelemetry::sdk::instrumentationscope::ScopeConfigurator&lt; T &gt;::configurator_</definition>
+        <argsstring></argsstring>
+        <name>configurator_</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::configurator_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="142" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="142" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1ab7789daa7220c7134ddbda02bc5adef7" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>T</type>
+        <definition>T opentelemetry::sdk::instrumentationscope::ScopeConfigurator&lt; T &gt;::ComputeConfig</definition>
+        <argsstring>(const InstrumentationScope &amp;scope_info) const</argsstring>
+        <name>ComputeConfig</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::ComputeConfig</qualifiedname>
+        <param>
+          <type>const InstrumentationScope &amp;</type>
+          <declname>scope_info</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Invokes the underlying configurator function to get a valid scope configuration. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>scope_info</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The InstrumentationScope containing scope information for which configuration needs to be retrieved. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="131" column="5" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="131" bodyend="134"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1a9f756d608bc32dad8619882baf4f3fdd" prot="private" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::instrumentationscope::ScopeConfigurator&lt; T &gt;::ScopeConfigurator</definition>
+        <argsstring>(std::function&lt; T(const InstrumentationScope &amp;)&gt; configurator)</argsstring>
+        <name>ScopeConfigurator</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::ScopeConfigurator</qualifiedname>
+        <param>
+          <type>std::function&lt; T(const InstrumentationScope &amp;)&gt;</type>
+          <declname>configurator</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="138" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="138" bodyend="140"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>A scope configurator is a function that returns the scope config for a given instrumentation scope. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="22" bodyend="143"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1ab7789daa7220c7134ddbda02bc5adef7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::ScopeConfigurator</scope><name>ComputeConfig</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1a3316f2f2d6e6fb2ab4f0ef060cac9086" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::ScopeConfigurator</scope><name>configurator_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1a9f756d608bc32dad8619882baf4f3fdd" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::ScopeConfigurator</scope><name>ScopeConfigurator</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

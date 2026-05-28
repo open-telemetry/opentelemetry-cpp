@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classopentelemetry_1_1logs_1_1EventLogger.html" title=" " alt="" coords="5,37,157,77"/>
+<area shape="rect" id="Node000001" href="$classopentelemetry_1_1logs_1_1NoopEventLogger.html" title=" " alt="" coords="205,5,357,45"/>
+<area shape="poly" id="edge2_Node000000_Node000001" title=" " alt="" coords="171,40,205,35,205,40,171,46"/>
+<area shape="rect" id="Node000002" href="$classopentelemetry_1_1sdk_1_1logs_1_1EventLogger.html" title=" " alt="" coords="207,69,355,109"/>
+<area shape="poly" id="edge3_Node000000_Node000002" title=" " alt="" coords="172,69,207,75,207,80,171,74"/>
+</map>

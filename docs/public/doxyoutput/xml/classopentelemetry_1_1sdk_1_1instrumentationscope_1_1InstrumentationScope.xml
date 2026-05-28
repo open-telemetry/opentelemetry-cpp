@@ -1,0 +1,627 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::instrumentationscope::InstrumentationScope</compoundname>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a581ca79463ceb8afd6b07475b87bfc8b" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::instrumentationscope::InstrumentationScope::name_</definition>
+        <argsstring></argsstring>
+        <name>name_</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::name_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="175" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="175" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1aa7621a4bbfbf4c90bb4011bcc86bcac5" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::instrumentationscope::InstrumentationScope::version_</definition>
+        <argsstring></argsstring>
+        <name>version_</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::version_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="176" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="176" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1af543a031f022225e1dfe032b2ce2f516" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::instrumentationscope::InstrumentationScope::schema_url_</definition>
+        <argsstring></argsstring>
+        <name>schema_url_</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::schema_url_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="177" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="177" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a695c3da3f0795eadae2d61a13a9aabcd" prot="private" static="no" mutable="no">
+        <type>std::size_t</type>
+        <definition>std::size_t opentelemetry::sdk::instrumentationscope::InstrumentationScope::hash_code_</definition>
+        <argsstring></argsstring>
+        <name>hash_code_</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::hash_code_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="178" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="178" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1ad82ce86870f32e09c74d6aa3f579c341" prot="private" static="no" mutable="no">
+        <type>InstrumentationScopeAttributes</type>
+        <definition>InstrumentationScopeAttributes opentelemetry::sdk::instrumentationscope::InstrumentationScope::attributes_</definition>
+        <argsstring></argsstring>
+        <name>attributes_</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::attributes_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="180" column="34" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="180" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a06c6ccb2239c897577d9a85912262d86" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::instrumentationscope::InstrumentationScope::InstrumentationScope</definition>
+        <argsstring>(const InstrumentationScope &amp;)=default</argsstring>
+        <name>InstrumentationScope</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::InstrumentationScope</qualifiedname>
+        <param>
+          <type>const InstrumentationScope &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="29" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a18422652633617133e93e0e9571a0cf5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::instrumentationscope::InstrumentationScope::InstrumentationScope</definition>
+        <argsstring>(InstrumentationScope &amp;&amp;)=default</argsstring>
+        <name>InstrumentationScope</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::InstrumentationScope</qualifiedname>
+        <param>
+          <type>InstrumentationScope &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="30" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a9c169cd02d3f9b2a6619480fd4e12693" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>InstrumentationScope &amp;</type>
+        <definition>InstrumentationScope &amp; opentelemetry::sdk::instrumentationscope::InstrumentationScope::operator=</definition>
+        <argsstring>(const InstrumentationScope &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::operator=</qualifiedname>
+        <param>
+          <type>const InstrumentationScope &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="31" column="24"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a5f08fd761ffe281b940add922ddd5008" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>InstrumentationScope &amp;</type>
+        <definition>InstrumentationScope &amp; opentelemetry::sdk::instrumentationscope::InstrumentationScope::operator=</definition>
+        <argsstring>(InstrumentationScope &amp;&amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::operator=</qualifiedname>
+        <param>
+          <type>InstrumentationScope &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="32" column="24"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a3432968c8c4a7f895e0d827d04eed0a6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::instrumentationscope::InstrumentationScope::~InstrumentationScope</definition>
+        <argsstring>()=default</argsstring>
+        <name>~InstrumentationScope</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::~InstrumentationScope</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="33" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a32effb1db53e2144d266db08ee33fc57" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>std::size_t</type>
+        <definition>std::size_t opentelemetry::sdk::instrumentationscope::InstrumentationScope::HashCode</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>HashCode</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::HashCode</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="101" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="101" bodyend="101"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a9ae7a6aa1e42ecc89e7efaa544539369" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::instrumentationscope::InstrumentationScope::operator==</definition>
+        <argsstring>(const InstrumentationScope &amp;other) const noexcept</argsstring>
+        <name>operator==</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::operator==</qualifiedname>
+        <param>
+          <type>const InstrumentationScope &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Compare 2 instrumentation libraries. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>other</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the instrumentation scope to compare to. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if the 2 instrumentation libraries are equal, false otherwise. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="108" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="108" bodyend="112"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a887f9be1c9018d046456d610133ac068" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::instrumentationscope::InstrumentationScope::equal</definition>
+        <argsstring>(const nostd::string_view name, const nostd::string_view version, const nostd::string_view schema_url=&quot;&quot;, const opentelemetry::common::KeyValueIterable *attributes=nullptr) const noexcept</argsstring>
+        <name>equal</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::equal</qualifiedname>
+        <param>
+          <type>const nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>const nostd::string_view</type>
+          <declname>version</declname>
+        </param>
+        <param>
+          <type>const nostd::string_view</type>
+          <declname>schema_url</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> *</type>
+          <declname>attributes</declname>
+          <defval>nullptr</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Check whether the instrumentation scope has given name and version. This could be used to check version equality and avoid heap allocation. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>name of the instrumentation scope to compare. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>version</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>version of the instrumentation scope to compare. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>schema_url</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>schema url of the telemetry emitted by the scope. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>attributes</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>attributes of the instrumentation scope to compare. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if name and version in this instrumentation scope are equal with the given name and version. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="124" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="124" bodyend="145"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a791a20af37d517e7ab76ce62b60b0bd6" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>const std::string &amp;</type>
+        <definition>const std::string &amp; opentelemetry::sdk::instrumentationscope::InstrumentationScope::GetName</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetName</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::GetName</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="147" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="147" bodyend="147"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a93b1f0bffeec7a4c6451231b1da90b85" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>const std::string &amp;</type>
+        <definition>const std::string &amp; opentelemetry::sdk::instrumentationscope::InstrumentationScope::GetVersion</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetVersion</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::GetVersion</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="148" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="148" bodyend="148"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a40a6d50e774b3e23e8dd23c73dea8050" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>const std::string &amp;</type>
+        <definition>const std::string &amp; opentelemetry::sdk::instrumentationscope::InstrumentationScope::GetSchemaURL</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetSchemaURL</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::GetSchemaURL</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="149" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="149" bodyend="149"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a55726a1d315e1edacc72945320fcc0f2" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>const InstrumentationScopeAttributes &amp;</type>
+        <definition>const InstrumentationScopeAttributes &amp; opentelemetry::sdk::instrumentationscope::InstrumentationScope::GetAttributes</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetAttributes</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::GetAttributes</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="150" column="40" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="150" bodyend="150"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a251489c4dc6017ea88aa717425ef83db" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::instrumentationscope::InstrumentationScope::SetAttribute</definition>
+        <argsstring>(nostd::string_view key, const opentelemetry::common::AttributeValue &amp;value) noexcept</argsstring>
+        <name>SetAttribute</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::SetAttribute</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::common::AttributeValue &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="152" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="152" bodyend="157"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a5ecee161b9b9fe1a03ec4318bf9974e0" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>nostd::unique_ptr&lt; InstrumentationScope &gt;</type>
+        <definition>static nostd::unique_ptr&lt; InstrumentationScope &gt; opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view version=&quot;&quot;, nostd::string_view schema_url=&quot;&quot;, InstrumentationScopeAttributes &amp;&amp;attributes={})</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>version</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>schema_url</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>InstrumentationScopeAttributes &amp;&amp;</type>
+          <declname>attributes</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a newly created InstrumentationScope with the specified library name and version. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>name of the instrumentation scope. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>version</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>version of the instrumentation scope. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>schema_url</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>schema url of the telemetry emitted by the library. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>attributes</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>attributes of the instrumentation scope. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>the newly created InstrumentationScope. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="43" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="43" bodyend="51"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a35e6078b82a39a7ac211485597aac583" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>nostd::unique_ptr&lt; InstrumentationScope &gt;</type>
+        <definition>static nostd::unique_ptr&lt; InstrumentationScope &gt; opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view version, nostd::string_view schema_url, const InstrumentationScopeAttributes &amp;attributes)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>version</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>schema_url</declname>
+        </param>
+        <param>
+          <type>const InstrumentationScopeAttributes &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a newly created InstrumentationScope with the specified library name and version. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>name of the instrumentation scope. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>version</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>version of the instrumentation scope. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>schema_url</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>schema url of the telemetry emitted by the library. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>attributes</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>attributes of the instrumentation scope. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>the newly created InstrumentationScope. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="61" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="61" bodyend="69"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a1d1d9a0ab2d49ff96174477fa0c54d26" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class ArgumentType</type>
+          </param>
+          <param>
+            <type>nostd::enable_if_t&lt; opentelemetry::common::detail::is_key_value_iterable&lt; ArgumentType &gt;::value &gt; *</type>
+            <defval>nullptr</defval>
+          </param>
+        </templateparamlist>
+        <type>nostd::unique_ptr&lt; InstrumentationScope &gt;</type>
+        <definition>static nostd::unique_ptr&lt; InstrumentationScope &gt; opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view version, nostd::string_view schema_url, const ArgumentType &amp;arg)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>version</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>schema_url</declname>
+        </param>
+        <param>
+          <type>const ArgumentType &amp;</type>
+          <declname>arg</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a newly created InstrumentationScope with the specified library name and version. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>name of the instrumentation scope. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>version</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>version of the instrumentation scope. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>schema_url</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>schema url of the telemetry emitted by the library. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>arg</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>arguments used to create attributes of the instrumentation scope. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>the newly created InstrumentationScope. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="83" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="83" bodyend="99"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a85ba2a63917b469b1fb3dd1cdc9b293f" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::instrumentationscope::InstrumentationScope::InstrumentationScope</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view version, nostd::string_view schema_url=&quot;&quot;, InstrumentationScopeAttributes &amp;&amp;attributes={})</argsstring>
+        <name>InstrumentationScope</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::InstrumentationScope::InstrumentationScope</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>version</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>schema_url</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>InstrumentationScopeAttributes &amp;&amp;</type>
+          <declname>attributes</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="160" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="160" bodyend="172"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" line="26" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/instrumentation_scope.h" bodystart="27" bodyend="181"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1ad82ce86870f32e09c74d6aa3f579c341" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>attributes_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a5ecee161b9b9fe1a03ec4318bf9974e0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a35e6078b82a39a7ac211485597aac583" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a1d1d9a0ab2d49ff96174477fa0c54d26" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a887f9be1c9018d046456d610133ac068" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>equal</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a55726a1d315e1edacc72945320fcc0f2" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>GetAttributes</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a791a20af37d517e7ab76ce62b60b0bd6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>GetName</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a40a6d50e774b3e23e8dd23c73dea8050" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>GetSchemaURL</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a93b1f0bffeec7a4c6451231b1da90b85" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>GetVersion</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a695c3da3f0795eadae2d61a13a9aabcd" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>hash_code_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a32effb1db53e2144d266db08ee33fc57" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>HashCode</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a06c6ccb2239c897577d9a85912262d86" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>InstrumentationScope</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a18422652633617133e93e0e9571a0cf5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>InstrumentationScope</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a85ba2a63917b469b1fb3dd1cdc9b293f" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>InstrumentationScope</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a581ca79463ceb8afd6b07475b87bfc8b" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>name_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a9c169cd02d3f9b2a6619480fd4e12693" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a5f08fd761ffe281b940add922ddd5008" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a9ae7a6aa1e42ecc89e7efaa544539369" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>operator==</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1af543a031f022225e1dfe032b2ce2f516" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>schema_url_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a251489c4dc6017ea88aa717425ef83db" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>SetAttribute</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1aa7621a4bbfbf4c90bb4011bcc86bcac5" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>version_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1InstrumentationScope_1a3432968c8c4a7f895e0d827d04eed0a6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::InstrumentationScope</scope><name>~InstrumentationScope</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

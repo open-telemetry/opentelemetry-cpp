@@ -1,0 +1,662 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1metrics_1_1Meter" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::metrics::Meter</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1metrics_1_1NoopMeter" prot="public" virt="non-virtual">opentelemetry::metrics::NoopMeter</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1Meter" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::Meter</derivedcompoundref>
+    <includes refid="api_2include_2opentelemetry_2metrics_2meter_8h" local="no">meter.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1acf0063e9ed6fd844d338f6b048fdff0c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::metrics::Meter::Meter</definition>
+        <argsstring>()=default</argsstring>
+        <name>Meter</name>
+        <qualifiedname>opentelemetry::metrics::Meter::Meter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="45" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a9563e74279ca3f7f9ad15e62f29eab20" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::metrics::Meter::Meter</definition>
+        <argsstring>(const Meter &amp;)=default</argsstring>
+        <name>Meter</name>
+        <qualifiedname>opentelemetry::metrics::Meter::Meter</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="46" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a16c5314f6a526135a8c3a10873e15b3a" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::metrics::Meter::Meter</definition>
+        <argsstring>(Meter &amp;&amp;) noexcept=default</argsstring>
+        <name>Meter</name>
+        <qualifiedname>opentelemetry::metrics::Meter::Meter</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="47" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1aee4c6c9917d4d0d666c6344e4e9fb5d1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> &amp;</type>
+        <definition>Meter &amp; opentelemetry::metrics::Meter::operator=</definition>
+        <argsstring>(const Meter &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::metrics::Meter::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="48" column="9"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1ac3b3b654d2b370582987de13bef3d7a6" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> &amp;</type>
+        <definition>Meter &amp; opentelemetry::metrics::Meter::operator=</definition>
+        <argsstring>(Meter &amp;&amp;) noexcept=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::metrics::Meter::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1metrics_1_1Meter" kindref="compound">Meter</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="49" column="9"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a3b23539c8ee14eb382a80fbae7859eee" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::metrics::Meter::~Meter</definition>
+        <argsstring>()=default</argsstring>
+        <name>~Meter</name>
+        <qualifiedname>opentelemetry::metrics::Meter::~Meter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="50" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a6ab50d3cabf7e1022497c169edb30e99" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::unique_ptr&lt; Counter&lt; uint64_t &gt; &gt;</type>
+        <definition>virtual nostd::unique_ptr&lt; Counter&lt; uint64_t &gt; &gt; opentelemetry::metrics::Meter::CreateUInt64Counter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept=0</argsstring>
+        <name>CreateUInt64Counter</name>
+        <qualifiedname>opentelemetry::metrics::Meter::CreateUInt64Counter</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeter_1a0faea68d362a5d0ab316d70977584b85">CreateUInt64Counter</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Creates a Counter with the passed characteristics and returns a unique_ptr to that Counter.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name of the new Counter. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>description</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a brief description of what the Counter is used for. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>unit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the unit of metric values following <ulink url="https://unitsofmeasure.org/ucum.html">https://unitsofmeasure.org/ucum.html</ulink>. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>a shared pointer to the created Counter. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="61" column="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a85bd2f04f538d85d58c601f5d10e7551" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::unique_ptr&lt; Counter&lt; double &gt; &gt;</type>
+        <definition>virtual nostd::unique_ptr&lt; Counter&lt; double &gt; &gt; opentelemetry::metrics::Meter::CreateDoubleCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept=0</argsstring>
+        <name>CreateDoubleCounter</name>
+        <qualifiedname>opentelemetry::metrics::Meter::CreateDoubleCounter</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeter_1a338a346e8f56dbb43a7e853fe26b3dbb">CreateDoubleCounter</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="66" column="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a33edec9888d217c7488f86ac40f536f8" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::shared_ptr&lt; ObservableInstrument &gt;</type>
+        <definition>virtual nostd::shared_ptr&lt; ObservableInstrument &gt; opentelemetry::metrics::Meter::CreateInt64ObservableCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept=0</argsstring>
+        <name>CreateInt64ObservableCounter</name>
+        <qualifiedname>opentelemetry::metrics::Meter::CreateInt64ObservableCounter</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeter_1a3a85b901ef7220cf644287d0a7137438">CreateInt64ObservableCounter</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Creates a Asynchronous (Observable) counter with the passed characteristics and returns a shared_ptr to that Observable Counter</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name of the new Observable Counter. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>description</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a brief description of what the Observable Counter is used for. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>unit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the unit of metric values following <ulink url="https://unitsofmeasure.org/ucum.html">https://unitsofmeasure.org/ucum.html</ulink>. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="79" column="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1aaba834ca58724fb10aa9dd054c6a50a1" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::shared_ptr&lt; ObservableInstrument &gt;</type>
+        <definition>virtual nostd::shared_ptr&lt; ObservableInstrument &gt; opentelemetry::metrics::Meter::CreateDoubleObservableCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept=0</argsstring>
+        <name>CreateDoubleObservableCounter</name>
+        <qualifiedname>opentelemetry::metrics::Meter::CreateDoubleObservableCounter</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeter_1a9376eaea5aadd8d98386e437eb623db6">CreateDoubleObservableCounter</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="84" column="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a107b308c9b6d0a28fe0ffde2b0f0d880" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1Histogram" kindref="compound">Histogram</ref>&lt; uint64_t &gt; &gt;</type>
+        <definition>virtual nostd::unique_ptr&lt; Histogram&lt; uint64_t &gt; &gt; opentelemetry::metrics::Meter::CreateUInt64Histogram</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept=0</argsstring>
+        <name>CreateUInt64Histogram</name>
+        <qualifiedname>opentelemetry::metrics::Meter::CreateUInt64Histogram</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeter_1aa980729c6103c684ea524bac8f014608">CreateUInt64Histogram</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Creates a <ref refid="classopentelemetry_1_1metrics_1_1Histogram" kindref="compound">Histogram</ref> with the passed characteristics and returns a unique_ptr to that <ref refid="classopentelemetry_1_1metrics_1_1Histogram" kindref="compound">Histogram</ref>.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name of the new <ref refid="classopentelemetry_1_1metrics_1_1Histogram" kindref="compound">Histogram</ref>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>description</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a brief description of what the <ref refid="classopentelemetry_1_1metrics_1_1Histogram" kindref="compound">Histogram</ref> is used for. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>unit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the unit of metric values following <ulink url="https://unitsofmeasure.org/ucum.html">https://unitsofmeasure.org/ucum.html</ulink>. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>a shared pointer to the created <ref refid="classopentelemetry_1_1metrics_1_1Histogram" kindref="compound">Histogram</ref>. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="97" column="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a0ef64337ac10a428e506eb92e74b0870" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1Histogram" kindref="compound">Histogram</ref>&lt; double &gt; &gt;</type>
+        <definition>virtual nostd::unique_ptr&lt; Histogram&lt; double &gt; &gt; opentelemetry::metrics::Meter::CreateDoubleHistogram</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept=0</argsstring>
+        <name>CreateDoubleHistogram</name>
+        <qualifiedname>opentelemetry::metrics::Meter::CreateDoubleHistogram</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeter_1af54677042fcec139515fa1d324f5ac44">CreateDoubleHistogram</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="102" column="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a1bb88612f6225cbb3c152da654dd0ad7" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::shared_ptr&lt; ObservableInstrument &gt;</type>
+        <definition>virtual nostd::shared_ptr&lt; ObservableInstrument &gt; opentelemetry::metrics::Meter::CreateInt64ObservableGauge</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept=0</argsstring>
+        <name>CreateInt64ObservableGauge</name>
+        <qualifiedname>opentelemetry::metrics::Meter::CreateInt64ObservableGauge</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeter_1a1de5b8451244588417aea61e31826e57">CreateInt64ObservableGauge</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Creates a Asynchronous (Observable) Gauge with the passed characteristics and returns a shared_ptr to that Observable Gauge</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name of the new Observable Gauge. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>description</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a brief description of what the Observable Gauge is used for. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>unit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the unit of metric values following <ulink url="https://unitsofmeasure.org/ucum.html">https://unitsofmeasure.org/ucum.html</ulink>. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="136" column="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a4a956320a827893a64d37e63b498a4bf" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::shared_ptr&lt; ObservableInstrument &gt;</type>
+        <definition>virtual nostd::shared_ptr&lt; ObservableInstrument &gt; opentelemetry::metrics::Meter::CreateDoubleObservableGauge</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept=0</argsstring>
+        <name>CreateDoubleObservableGauge</name>
+        <qualifiedname>opentelemetry::metrics::Meter::CreateDoubleObservableGauge</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeter_1a0e4a3aad57b6761e8e7f43a1dd956788">CreateDoubleObservableGauge</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="141" column="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1aaae94e21413c3daf725486bbca229558" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">UpDownCounter</ref>&lt; int64_t &gt; &gt;</type>
+        <definition>virtual nostd::unique_ptr&lt; UpDownCounter&lt; int64_t &gt; &gt; opentelemetry::metrics::Meter::CreateInt64UpDownCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept=0</argsstring>
+        <name>CreateInt64UpDownCounter</name>
+        <qualifiedname>opentelemetry::metrics::Meter::CreateInt64UpDownCounter</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeter_1a12daf48b77de4c687edf7d54edbd68e8">CreateInt64UpDownCounter</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Creates an <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">UpDownCounter</ref> with the passed characteristics and returns a unique_ptr to that <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">UpDownCounter</ref>.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name of the new <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">UpDownCounter</ref>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>description</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a brief description of what the <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">UpDownCounter</ref> is used for. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>unit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the unit of metric values following <ulink url="https://unitsofmeasure.org/ucum.html">https://unitsofmeasure.org/ucum.html</ulink>. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>a shared pointer to the created <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">UpDownCounter</ref>. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="155" column="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a525236f248f3d28efa2d1a74a0738860" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">UpDownCounter</ref>&lt; double &gt; &gt;</type>
+        <definition>virtual nostd::unique_ptr&lt; UpDownCounter&lt; double &gt; &gt; opentelemetry::metrics::Meter::CreateDoubleUpDownCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept=0</argsstring>
+        <name>CreateDoubleUpDownCounter</name>
+        <qualifiedname>opentelemetry::metrics::Meter::CreateDoubleUpDownCounter</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeter_1a37bf6f1d8315635664f8f934239a944d">CreateDoubleUpDownCounter</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="160" column="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a8e4c279a307c88ecdd85b08278053321" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::shared_ptr&lt; ObservableInstrument &gt;</type>
+        <definition>virtual nostd::shared_ptr&lt; ObservableInstrument &gt; opentelemetry::metrics::Meter::CreateInt64ObservableUpDownCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept=0</argsstring>
+        <name>CreateInt64ObservableUpDownCounter</name>
+        <qualifiedname>opentelemetry::metrics::Meter::CreateInt64ObservableUpDownCounter</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeter_1afa989b9e627b40c548ba02221cf50f87">CreateInt64ObservableUpDownCounter</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Creates a Asynchronous (Observable) <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">UpDownCounter</ref> with the passed characteristics and returns a shared_ptr to that Observable <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">UpDownCounter</ref></para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name of the new Observable <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">UpDownCounter</ref>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>description</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a brief description of what the Observable <ref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" kindref="compound">UpDownCounter</ref> is used for. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>unit</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the unit of metric values following <ulink url="https://unitsofmeasure.org/ucum.html">https://unitsofmeasure.org/ucum.html</ulink>. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="173" column="29"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Meter_1a93169f60bbbcaa179ce3bd1948a8dacb" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>nostd::shared_ptr&lt; ObservableInstrument &gt;</type>
+        <definition>virtual nostd::shared_ptr&lt; ObservableInstrument &gt; opentelemetry::metrics::Meter::CreateDoubleObservableUpDownCounter</definition>
+        <argsstring>(nostd::string_view name, nostd::string_view description=&quot;&quot;, nostd::string_view unit=&quot;&quot;) noexcept=0</argsstring>
+        <name>CreateDoubleObservableUpDownCounter</name>
+        <qualifiedname>opentelemetry::metrics::Meter::CreateDoubleObservableUpDownCounter</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1metrics_1_1NoopMeter_1a7c0684a2ed97ac7fc74a330289f9439a">CreateDoubleObservableUpDownCounter</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>unit</declname>
+          <defval>&quot;&quot;</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="178" column="29"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Handles instrument creation and provides a facility for batch recording.</para>
+<para>This class provides methods to create new metric instruments, record a batch of values to a specified set of instruments, and collect measurements from all instruments. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::metrics::Meter</label>
+        <link refid="classopentelemetry_1_1metrics_1_1Meter"/>
+      </node>
+      <node id="2">
+        <label>opentelemetry::metrics::NoopMeter</label>
+        <link refid="classopentelemetry_1_1metrics_1_1NoopMeter"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" line="42" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/meter.h" bodystart="43" bodyend="208"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a85bd2f04f538d85d58c601f5d10e7551" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Meter</scope><name>CreateDoubleCounter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a0ef64337ac10a428e506eb92e74b0870" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Meter</scope><name>CreateDoubleHistogram</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1aaba834ca58724fb10aa9dd054c6a50a1" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Meter</scope><name>CreateDoubleObservableCounter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a4a956320a827893a64d37e63b498a4bf" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Meter</scope><name>CreateDoubleObservableGauge</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a93169f60bbbcaa179ce3bd1948a8dacb" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Meter</scope><name>CreateDoubleObservableUpDownCounter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a525236f248f3d28efa2d1a74a0738860" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Meter</scope><name>CreateDoubleUpDownCounter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a33edec9888d217c7488f86ac40f536f8" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Meter</scope><name>CreateInt64ObservableCounter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a1bb88612f6225cbb3c152da654dd0ad7" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Meter</scope><name>CreateInt64ObservableGauge</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a8e4c279a307c88ecdd85b08278053321" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Meter</scope><name>CreateInt64ObservableUpDownCounter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1aaae94e21413c3daf725486bbca229558" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Meter</scope><name>CreateInt64UpDownCounter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a6ab50d3cabf7e1022497c169edb30e99" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Meter</scope><name>CreateUInt64Counter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a107b308c9b6d0a28fe0ffde2b0f0d880" prot="public" virt="pure-virtual"><scope>opentelemetry::metrics::Meter</scope><name>CreateUInt64Histogram</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1acf0063e9ed6fd844d338f6b048fdff0c" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Meter</scope><name>Meter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a9563e74279ca3f7f9ad15e62f29eab20" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Meter</scope><name>Meter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a16c5314f6a526135a8c3a10873e15b3a" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Meter</scope><name>Meter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1aee4c6c9917d4d0d666c6344e4e9fb5d1" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Meter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1ac3b3b654d2b370582987de13bef3d7a6" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Meter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Meter_1a3b23539c8ee14eb382a80fbae7859eee" prot="public" virt="virtual"><scope>opentelemetry::metrics::Meter</scope><name>~Meter</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

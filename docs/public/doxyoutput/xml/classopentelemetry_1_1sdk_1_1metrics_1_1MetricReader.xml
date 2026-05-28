@@ -1,0 +1,331 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::metrics::MetricReader</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1PeriodicExportingMetricReader" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::PeriodicExportingMetricReader</derivedcompoundref>
+    <includes refid="metric__reader_8h" local="no">metric_reader.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a8685f6c77e83f598e935d9a63d87e7c2" prot="private" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> *</type>
+        <definition>MetricProducer* opentelemetry::sdk::metrics::MetricReader::metric_producer_</definition>
+        <argsstring></argsstring>
+        <name>metric_producer_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::metric_producer_</qualifiedname>
+        <initializer>{nullptr}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="74" column="18" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" bodystart="74" bodyend="74"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a79c82aebcb60af0deee3b0695c15a85c" prot="private" static="no" mutable="no">
+        <type>std::atomic&lt; bool &gt;</type>
+        <definition>std::atomic&lt;bool&gt; opentelemetry::sdk::metrics::MetricReader::shutdown_</definition>
+        <argsstring></argsstring>
+        <name>shutdown_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::shutdown_</qualifiedname>
+        <initializer>{false}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="75" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" bodystart="75" bodyend="75"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a0985198d8444fa6797434a7610b436ac" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MetricReader::MetricReader</definition>
+        <argsstring>()=default</argsstring>
+        <name>MetricReader</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::MetricReader</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="25" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1aae6780957c372d84739a27311e990fa5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MetricReader::MetricReader</definition>
+        <argsstring>(const MetricReader &amp;)=delete</argsstring>
+        <name>MetricReader</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::MetricReader</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="26" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a548aa7fa897e6c791a1172941192ff75" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MetricReader::MetricReader</definition>
+        <argsstring>(MetricReader &amp;&amp;)=delete</argsstring>
+        <name>MetricReader</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::MetricReader</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="27" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a59025ed628180c4039e5f57e295ac075" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> &amp;</type>
+        <definition>MetricReader &amp; opentelemetry::sdk::metrics::MetricReader::operator=</definition>
+        <argsstring>(const MetricReader &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="28" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1adc3493e55373b25da84fda122999c27f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> &amp;</type>
+        <definition>MetricReader &amp; opentelemetry::sdk::metrics::MetricReader::operator=</definition>
+        <argsstring>(MetricReader &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="29" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1ac61640ae321fcaf8cce700b9db7e7b14" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::MetricReader::SetMetricProducer</definition>
+        <argsstring>(MetricProducer *metric_producer)</argsstring>
+        <name>SetMetricProducer</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::SetMetricProducer</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> *</type>
+          <declname>metric_producer</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="31" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1ac66b811f9a14ff773041f40a46233f3a" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::MetricReader::Collect</definition>
+        <argsstring>(nostd::function_ref&lt; bool(ResourceMetrics &amp;metric_data)&gt; callback) noexcept</argsstring>
+        <name>Collect</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::Collect</qualifiedname>
+        <param>
+          <type>nostd::function_ref&lt; bool(ResourceMetrics &amp;metric_data)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Collect the metrics from SDK. <simplesect kind="return"><para>return the status of the operation. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="37" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a67806a9617e8b568e5a7f50c8d1f70f9" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>AggregationTemporality</type>
+        <definition>virtual AggregationTemporality opentelemetry::sdk::metrics::MetricReader::GetAggregationTemporality</definition>
+        <argsstring>(InstrumentType instrument_type) const noexcept=0</argsstring>
+        <name>GetAggregationTemporality</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::GetAggregationTemporality</qualifiedname>
+        <param>
+          <type>InstrumentType</type>
+          <declname>instrument_type</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the AggregationTemporality for given Instrument Type for this reader.</para>
+<para><simplesect kind="return"><para>AggregationTemporality </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="45" column="34"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a0955a89e21ec0b535a2a5d98c1da5fc0" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::MetricReader::Shutdown</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept</argsstring>
+        <name>Shutdown</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::Shutdown</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Shutdown the metric reader. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="51" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a2cb9d92ef82fc1f7996b7f23eb431ebc" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::MetricReader::ForceFlush</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept</argsstring>
+        <name>ForceFlush</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::ForceFlush</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Force flush the metric read by the reader. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="56" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1af998e10d2dc26947e94297e064f05801" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::MetricReader::IsShutdown</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>IsShutdown</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::IsShutdown</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Return the status of Metric reader. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="61" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a6142bde6259181630f714a5381174efb" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::metrics::MetricReader::~MetricReader</definition>
+        <argsstring>()=default</argsstring>
+        <name>~MetricReader</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::~MetricReader</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="63" column="11"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a228af0e1bee5abb13f0a35ad0aca2844" prot="private" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::sdk::metrics::MetricReader::OnForceFlush</definition>
+        <argsstring>(std::chrono::microseconds timeout) noexcept=0</argsstring>
+        <name>OnForceFlush</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::OnForceFlush</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="66" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1ad6422323bfb2e52477ec76ec6dc9ec77" prot="private" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::sdk::metrics::MetricReader::OnShutDown</definition>
+        <argsstring>(std::chrono::microseconds timeout) noexcept=0</argsstring>
+        <name>OnShutDown</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::OnShutDown</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="68" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a8180626b3de32be36e45a695bd6066b5" prot="private" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::metrics::MetricReader::OnInitialized</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>OnInitialized</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricReader::OnInitialized</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="70" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" bodystart="70" bodyend="70"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader" kindref="compound">MetricReader</ref> defines the interface to collect metrics from SDK </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" line="22" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/metric_reader.h" bodystart="23" bodyend="76"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1ac66b811f9a14ff773041f40a46233f3a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>Collect</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a2cb9d92ef82fc1f7996b7f23eb431ebc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>ForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a67806a9617e8b568e5a7f50c8d1f70f9" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>GetAggregationTemporality</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1af998e10d2dc26947e94297e064f05801" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>IsShutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a8685f6c77e83f598e935d9a63d87e7c2" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>metric_producer_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a0985198d8444fa6797434a7610b436ac" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>MetricReader</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1aae6780957c372d84739a27311e990fa5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>MetricReader</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a548aa7fa897e6c791a1172941192ff75" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>MetricReader</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a228af0e1bee5abb13f0a35ad0aca2844" prot="private" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>OnForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a8180626b3de32be36e45a695bd6066b5" prot="private" virt="virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>OnInitialized</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1ad6422323bfb2e52477ec76ec6dc9ec77" prot="private" virt="pure-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>OnShutDown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a59025ed628180c4039e5f57e295ac075" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1adc3493e55373b25da84fda122999c27f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1ac61640ae321fcaf8cce700b9db7e7b14" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>SetMetricProducer</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a0955a89e21ec0b535a2a5d98c1da5fc0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>Shutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a79c82aebcb60af0deee3b0695c15a85c" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>shutdown_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricReader_1a6142bde6259181630f714a5381174efb" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::MetricReader</scope><name>~MetricReader</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

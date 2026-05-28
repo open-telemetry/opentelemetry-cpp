@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1metrics_1_1PointDataAttributes" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::PointDataAttributes</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1PointDataAttributes_1ad73b694dd95f243438a6c1e7da176b3b" prot="public" static="no" mutable="no">
+        <type>PointAttributes</type>
+        <definition>PointAttributes opentelemetry::sdk::metrics::PointDataAttributes::attributes</definition>
+        <argsstring></argsstring>
+        <name>attributes</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PointDataAttributes::attributes</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" line="29" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" bodystart="29" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1PointDataAttributes_1afb663ee9b8c3d054706ef258d8d660ea" prot="public" static="no" mutable="no">
+        <type>PointType</type>
+        <definition>PointType opentelemetry::sdk::metrics::PointDataAttributes::point_data</definition>
+        <argsstring></argsstring>
+        <name>point_data</name>
+        <qualifiedname>opentelemetry::sdk::metrics::PointDataAttributes::point_data</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" line="30" column="13" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" bodystart="30" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" line="27" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" bodystart="28" bodyend="31"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1PointDataAttributes_1ad73b694dd95f243438a6c1e7da176b3b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PointDataAttributes</scope><name>attributes</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1PointDataAttributes_1afb663ee9b8c3d054706ef258d8d660ea" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::PointDataAttributes</scope><name>point_data</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1context" kind="namespace" language="C++">
+    <compoundname>opentelemetry::context</compoundname>
+    <innerclass refid="classopentelemetry_1_1context_1_1Context" prot="public">opentelemetry::context::Context</innerclass>
+    <innerclass refid="classopentelemetry_1_1context_1_1RuntimeContext" prot="public">opentelemetry::context::RuntimeContext</innerclass>
+    <innerclass refid="classopentelemetry_1_1context_1_1RuntimeContextStorage" prot="public">opentelemetry::context::RuntimeContextStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1context_1_1ThreadLocalContextStorage" prot="public">opentelemetry::context::ThreadLocalContextStorage</innerclass>
+    <innerclass refid="classopentelemetry_1_1context_1_1Token" prot="public">opentelemetry::context::Token</innerclass>
+    <innernamespace refid="namespaceopentelemetry_1_1context_1_1propagation">opentelemetry::context::propagation</innernamespace>
+    <sectiondef kind="typedef">
+      <memberdef kind="typedef" id="context__value_8h_1a7fdb5447f51bbde8dc2537f6c623bdc6" prot="public" static="no">
+        <type>nostd::variant&lt; nostd::monostate, bool, int64_t, uint64_t, double, nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">trace::Span</ref> &gt;, nostd::shared_ptr&lt; trace::SpanContext &gt;, nostd::shared_ptr&lt; baggage::Baggage &gt; &gt;</type>
+        <definition>using opentelemetry::context::ContextValue = typedef nostd::variant&lt;nostd::monostate, bool, int64_t, uint64_t, double, nostd::shared_ptr&lt;trace::Span&gt;, nostd::shared_ptr&lt;trace::SpanContext&gt;, nostd::shared_ptr&lt;baggage::Baggage&gt; &gt;</definition>
+        <argsstring></argsstring>
+        <name>ContextValue</name>
+        <qualifiedname>opentelemetry::context::ContextValue</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context_value.h" line="26" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context_value.h" bodystart="33" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="runtime__context_8h_1a3b5e88034e1c19cc2f3c43332b79782b" prot="public" static="yes" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1context_1_1RuntimeContextStorage" kindref="compound">RuntimeContextStorage</ref> *</type>
+        <definition>static RuntimeContextStorage * opentelemetry::context::GetDefaultStorage</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetDefaultStorage</name>
+        <qualifiedname>opentelemetry::context::GetDefaultStorage</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Construct and return the default <ref refid="classopentelemetry_1_1context_1_1RuntimeContextStorage" kindref="compound">RuntimeContextStorage</ref> <simplesect kind="return"><para>a ThreadLocalContextStorage </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="392" column="30" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" bodystart="392" bodyend="395" declfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" declline="98" declcolumn="30"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" line="16" column="1"/>
+  </compounddef>
+</doxygen>

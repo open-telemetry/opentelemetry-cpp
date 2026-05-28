@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_85f8b9db71648cd4677aa03e5606da7f" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/exemplar</compoundname>
+    <innerfile refid="aligned__histogram__bucket__exemplar__reservoir_8h">aligned_histogram_bucket_exemplar_reservoir.h</innerfile>
+    <innerfile refid="filter__type_8h">filter_type.h</innerfile>
+    <innerfile refid="fixed__size__exemplar__reservoir_8h">fixed_size_exemplar_reservoir.h</innerfile>
+    <innerfile refid="no__exemplar__reservoir_8h">no_exemplar_reservoir.h</innerfile>
+    <innerfile refid="reservoir_8h">reservoir.h</innerfile>
+    <innerfile refid="reservoir__cell_8h">reservoir_cell.h</innerfile>
+    <innerfile refid="reservoir__cell__selector_8h">reservoir_cell_selector.h</innerfile>
+    <innerfile refid="reservoir__utils_8h">reservoir_utils.h</innerfile>
+    <innerfile refid="simple__fixed__size__exemplar__reservoir_8h">simple_fixed_size_exemplar_reservoir.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/exemplar/"/>
+  </compounddef>
+</doxygen>

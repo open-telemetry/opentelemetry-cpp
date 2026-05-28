@@ -1,0 +1,306 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::TracerProviderFactory</compoundname>
+    <includes refid="tracer__provider__factory_8h" local="no">tracer_provider_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a81a219616382c8116e2969cbfb81179c" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt; opentelemetry::sdk::trace::TracerProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; SpanProcessor &gt; processor)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt;</type>
+          <declname>processor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" line="33" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1ab2398bb8bd5098abe2d0d19a4d399024" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt; opentelemetry::sdk::trace::TracerProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; SpanProcessor &gt; processor, const opentelemetry::sdk::resource::Resource &amp;resource)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt;</type>
+          <declname>processor</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" line="36" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1abf9b4863b70ccb722965babe1989af25" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt; opentelemetry::sdk::trace::TracerProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; SpanProcessor &gt; processor, const opentelemetry::sdk::resource::Resource &amp;resource, std::unique_ptr&lt; Sampler &gt; sampler)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt;</type>
+          <declname>processor</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+          <declname>sampler</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" line="40" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1af89e07cf552a8acf83cf5aac7865236d" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt; opentelemetry::sdk::trace::TracerProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; SpanProcessor &gt; processor, const opentelemetry::sdk::resource::Resource &amp;resource, std::unique_ptr&lt; Sampler &gt; sampler, std::unique_ptr&lt; IdGenerator &gt; id_generator)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt;</type>
+          <declname>processor</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+          <declname>sampler</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator" kindref="compound">IdGenerator</ref> &gt;</type>
+          <declname>id_generator</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" line="45" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a79214d8c357323209c0cdbbae4f08b67" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt; opentelemetry::sdk::trace::TracerProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; SpanProcessor &gt; processor, const opentelemetry::sdk::resource::Resource &amp;resource, std::unique_ptr&lt; Sampler &gt; sampler, std::unique_ptr&lt; IdGenerator &gt; id_generator, std::unique_ptr&lt; instrumentationscope::ScopeConfigurator&lt; TracerConfig &gt; &gt; tracer_configurator)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt;</type>
+          <declname>processor</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+          <declname>sampler</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator" kindref="compound">IdGenerator</ref> &gt;</type>
+          <declname>id_generator</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref> &gt; &gt;</type>
+          <declname>tracer_configurator</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" line="51" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a1c2570ac2aec69908699cd14fda27594" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt; opentelemetry::sdk::trace::TracerProviderFactory::Create</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; SpanProcessor &gt; &gt; &amp;&amp;processors)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" line="60" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a288d57ce0a79711a2afbe3f9c3978204" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt; opentelemetry::sdk::trace::TracerProviderFactory::Create</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; SpanProcessor &gt; &gt; &amp;&amp;processors, const opentelemetry::sdk::resource::Resource &amp;resource)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" line="63" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a92ee122d69aacb6a23fe0e2d7f7bcb27" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt; opentelemetry::sdk::trace::TracerProviderFactory::Create</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; SpanProcessor &gt; &gt; &amp;&amp;processors, const opentelemetry::sdk::resource::Resource &amp;resource, std::unique_ptr&lt; Sampler &gt; sampler)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+          <declname>sampler</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" line="67" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a2bf9ef6cd3fbc63c956de3782f2ab217" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt; opentelemetry::sdk::trace::TracerProviderFactory::Create</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; SpanProcessor &gt; &gt; &amp;&amp;processors, const opentelemetry::sdk::resource::Resource &amp;resource, std::unique_ptr&lt; Sampler &gt; sampler, std::unique_ptr&lt; IdGenerator &gt; id_generator)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+          <declname>sampler</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator" kindref="compound">IdGenerator</ref> &gt;</type>
+          <declname>id_generator</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" line="72" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1ae8e797d7bbd21df9a7123120547fd337" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt; opentelemetry::sdk::trace::TracerProviderFactory::Create</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; SpanProcessor &gt; &gt; &amp;&amp;processors, const opentelemetry::sdk::resource::Resource &amp;resource, std::unique_ptr&lt; Sampler &gt; sampler, std::unique_ptr&lt; IdGenerator &gt; id_generator, std::unique_ptr&lt; instrumentationscope::ScopeConfigurator&lt; TracerConfig &gt; &gt; tracer_configurator)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+          <declname>sampler</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1IdGenerator" kindref="compound">IdGenerator</ref> &gt;</type>
+          <declname>id_generator</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerConfig" kindref="compound">TracerConfig</ref> &gt; &gt;</type>
+          <declname>tracer_configurator</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" line="78" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a508a0bd8bd3ceb49188d6cb279895f7a" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt;</type>
+        <definition>static std::unique_ptr&lt; opentelemetry::sdk::trace::TracerProvider &gt; opentelemetry::sdk::trace::TracerProviderFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; TracerContext &gt; context)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::TracerProviderFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerContext" kindref="compound">TracerContext</ref> &gt;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" line="87" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for TracerProvider. See <ref refid="classopentelemetry_1_1trace_1_1TracerProvider" kindref="compound">opentelemetry::trace::TracerProvider</ref> </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" line="28" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/tracer_provider_factory.h" bodystart="29" bodyend="89"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a81a219616382c8116e2969cbfb81179c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1ab2398bb8bd5098abe2d0d19a4d399024" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1abf9b4863b70ccb722965babe1989af25" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1af89e07cf552a8acf83cf5aac7865236d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a79214d8c357323209c0cdbbae4f08b67" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a1c2570ac2aec69908699cd14fda27594" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a288d57ce0a79711a2afbe3f9c3978204" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a92ee122d69aacb6a23fe0e2d7f7bcb27" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a2bf9ef6cd3fbc63c956de3782f2ab217" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1ae8e797d7bbd21df9a7123120547fd337" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerProviderFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1TracerProviderFactory_1a508a0bd8bd3ceb49188d6cb279895f7a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::TracerProviderFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

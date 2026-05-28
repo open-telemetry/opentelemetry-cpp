@@ -1,0 +1,212 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord" kind="class" language="C++" prot="private">
+    <compoundname>opentelemetry::logs::NoopLogger::NoopLogRecord</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1logs_1_1LogRecord" prot="public" virt="non-virtual">opentelemetry::logs::LogRecord</basecompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1abce48c0cf09d6c28a69e55b3803758bf" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::logs::NoopLogger::NoopLogRecord::SetTimestamp</definition>
+        <argsstring>(common::SystemTimestamp) noexcept override</argsstring>
+        <name>SetTimestamp</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::NoopLogRecord::SetTimestamp</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">common::SystemTimestamp</ref></type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="59" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="59" bodyend="59"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a8735860a06f09da010eea36a5636693d" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::logs::NoopLogger::NoopLogRecord::SetObservedTimestamp</definition>
+        <argsstring>(common::SystemTimestamp) noexcept override</argsstring>
+        <name>SetObservedTimestamp</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::NoopLogRecord::SetObservedTimestamp</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">common::SystemTimestamp</ref></type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="60" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="60" bodyend="60"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a9c51bfa70f6b3785a4d8e417a6d63b4c" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::logs::NoopLogger::NoopLogRecord::SetSeverity</definition>
+        <argsstring>(logs::Severity) noexcept override</argsstring>
+        <name>SetSeverity</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::NoopLogRecord::SetSeverity</qualifiedname>
+        <param>
+          <type>logs::Severity</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="61" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="61" bodyend="61"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a2512ef46a0dd4880062edbba8ce4786e" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::logs::NoopLogger::NoopLogRecord::SetBody</definition>
+        <argsstring>(const common::AttributeValue &amp;) noexcept override</argsstring>
+        <name>SetBody</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::NoopLogRecord::SetBody</qualifiedname>
+        <param>
+          <type>const common::AttributeValue &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="62" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="62" bodyend="62"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a571e22a760b4d08a7e90e63c5ab9812a" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::logs::NoopLogger::NoopLogRecord::SetAttribute</definition>
+        <argsstring>(nostd::string_view, const common::AttributeValue &amp;) noexcept override</argsstring>
+        <name>SetAttribute</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::NoopLogRecord::SetAttribute</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <param>
+          <type>const common::AttributeValue &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="63" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="63" bodyend="65"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a83aaea24bfe2ba7365c570cdfc743fbb" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::logs::NoopLogger::NoopLogRecord::SetEventId</definition>
+        <argsstring>(int64_t, nostd::string_view) noexcept override</argsstring>
+        <name>SetEventId</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::NoopLogRecord::SetEventId</qualifiedname>
+        <param>
+          <type>int64_t</type>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="66" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="66" bodyend="66"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a008244c78514f2dca51cbbdcd07fbb88" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::logs::NoopLogger::NoopLogRecord::SetTraceId</definition>
+        <argsstring>(const trace::TraceId &amp;) noexcept override</argsstring>
+        <name>SetTraceId</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::NoopLogRecord::SetTraceId</qualifiedname>
+        <param>
+          <type>const trace::TraceId &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="67" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="67" bodyend="67"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a65d84f27d507dae6c61593f731cb805a" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::logs::NoopLogger::NoopLogRecord::SetSpanId</definition>
+        <argsstring>(const trace::SpanId &amp;) noexcept override</argsstring>
+        <name>SetSpanId</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::NoopLogRecord::SetSpanId</qualifiedname>
+        <param>
+          <type>const trace::SpanId &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="68" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="68" bodyend="68"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a2721985603501a4ddc387f739e987dca" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::logs::NoopLogger::NoopLogRecord::SetTraceFlags</definition>
+        <argsstring>(const trace::TraceFlags &amp;) noexcept override</argsstring>
+        <name>SetTraceFlags</name>
+        <qualifiedname>opentelemetry::logs::NoopLogger::NoopLogRecord::SetTraceFlags</qualifiedname>
+        <param>
+          <type>const trace::TraceFlags &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="69" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="69" bodyend="69"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::logs::LogRecord</label>
+        <link refid="classopentelemetry_1_1logs_1_1LogRecord"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::logs::NoopLogger::NoopLogRecord</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::logs::LogRecord</label>
+        <link refid="classopentelemetry_1_1logs_1_1LogRecord"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::logs::NoopLogger::NoopLogRecord</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" line="56" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h" bodystart="57" bodyend="70"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1abe66675b44bad2280904bde5c823aaf9" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>LogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1abef51ee0d83791eeb2f2964df14d48ac" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>LogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1aca9c888fac59ec29f5ca379d10da0c86" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>LogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a84bfdebe71f551bfcf2ce6f62b85482c" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a4df43247ea78b8f295f4d97a8a2c33eb" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a571e22a760b4d08a7e90e63c5ab9812a" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>SetAttribute</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a2512ef46a0dd4880062edbba8ce4786e" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>SetBody</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a83aaea24bfe2ba7365c570cdfc743fbb" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>SetEventId</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a8735860a06f09da010eea36a5636693d" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>SetObservedTimestamp</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a9c51bfa70f6b3785a4d8e417a6d63b4c" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>SetSeverity</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a65d84f27d507dae6c61593f731cb805a" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>SetSpanId</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1abce48c0cf09d6c28a69e55b3803758bf" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>SetTimestamp</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a2721985603501a4ddc387f739e987dca" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>SetTraceFlags</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1NoopLogger_1_1NoopLogRecord_1a008244c78514f2dca51cbbdcd07fbb88" prot="public" virt="non-virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>SetTraceId</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a4ff305825b55bfeebfd6060431039e19" prot="public" virt="virtual"><scope>opentelemetry::logs::NoopLogger::NoopLogRecord</scope><name>~LogRecord</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,178 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1context_1_1Token" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::context::Token</compoundname>
+    <sectiondef kind="friend">
+      <memberdef kind="friend" id="classopentelemetry_1_1context_1_1Token_1a825ba896bb4d255775588d5ee0c78fc6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>class</type>
+        <definition>friend class RuntimeContextStorage</definition>
+        <argsstring></argsstring>
+        <name>RuntimeContextStorage</name>
+        <qualifiedname>opentelemetry::context::Token::RuntimeContextStorage</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1context_1_1RuntimeContextStorage" kindref="compound">RuntimeContextStorage</ref></type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="36" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" bodystart="36" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1context_1_1Token_1ac238860d4281d53e49fea798d5b68bf6" prot="protected" static="no" mutable="no">
+        <type>const Context</type>
+        <definition>const Context opentelemetry::context::Token::context_</definition>
+        <argsstring></argsstring>
+        <name>context_</name>
+        <qualifiedname>opentelemetry::context::Token::context_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="45" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" bodystart="45" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Token_1a3ed8f92d14cc78bb69e7cddc9601558e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::Token::Token</definition>
+        <argsstring>(const Token &amp;)=delete</argsstring>
+        <name>Token</name>
+        <qualifiedname>opentelemetry::context::Token::Token</qualifiedname>
+        <param>
+          <type>const Token &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="27" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Token_1a338c50566ba85b353e42d423388b5661" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Token &amp;</type>
+        <definition>Token &amp; opentelemetry::context::Token::operator=</definition>
+        <argsstring>(const Token &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::context::Token::operator=</qualifiedname>
+        <param>
+          <type>const Token &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="28" column="9"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Token_1abd7d4ee0a7bf224d2219ecbed2e23ce1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::Token::Token</definition>
+        <argsstring>(Token &amp;&amp;)=delete</argsstring>
+        <name>Token</name>
+        <qualifiedname>opentelemetry::context::Token::Token</qualifiedname>
+        <param>
+          <type>Token &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="29" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Token_1a053715715174477dbe6edcdbf799b84f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Token &amp;</type>
+        <definition>Token &amp; opentelemetry::context::Token::operator=</definition>
+        <argsstring>(Token &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::context::Token::operator=</qualifiedname>
+        <param>
+          <type>Token &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="30" column="9"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Token_1a7ae1c3c7148d764aef9b2a57aa883a87" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::context::Token::operator==</definition>
+        <argsstring>(const Context &amp;other) const noexcept</argsstring>
+        <name>operator==</name>
+        <qualifiedname>opentelemetry::context::Token::operator==</qualifiedname>
+        <param>
+          <type>const Context &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="32" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" bodystart="32" bodyend="32"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Token_1aaab60c9e0d2a9087a5cd56a227c3ef0e" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type></type>
+        <definition>opentelemetry::context::Token::~Token</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>~Token</name>
+        <qualifiedname>opentelemetry::context::Token::~Token</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="34" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" bodystart="200" bodyend="203"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="protected-func">
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Token_1a9d996b91ca70547859c8a8448e9a85af" prot="protected" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::Token::Token</definition>
+        <argsstring>(const Context &amp;context)</argsstring>
+        <name>Token</name>
+        <qualifiedname>opentelemetry::context::Token::Token</qualifiedname>
+        <param>
+          <type>const Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="41" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" bodystart="41" bodyend="41"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" line="24" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/runtime_context.h" bodystart="25" bodyend="46"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1context_1_1Token_1ac238860d4281d53e49fea798d5b68bf6" prot="protected" virt="non-virtual"><scope>opentelemetry::context::Token</scope><name>context_</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Token_1a338c50566ba85b353e42d423388b5661" prot="public" virt="non-virtual"><scope>opentelemetry::context::Token</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Token_1a053715715174477dbe6edcdbf799b84f" prot="public" virt="non-virtual"><scope>opentelemetry::context::Token</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Token_1a7ae1c3c7148d764aef9b2a57aa883a87" prot="public" virt="non-virtual"><scope>opentelemetry::context::Token</scope><name>operator==</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Token_1a3ed8f92d14cc78bb69e7cddc9601558e" prot="public" virt="non-virtual"><scope>opentelemetry::context::Token</scope><name>Token</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Token_1abd7d4ee0a7bf224d2219ecbed2e23ce1" prot="public" virt="non-virtual"><scope>opentelemetry::context::Token</scope><name>Token</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Token_1a9d996b91ca70547859c8a8448e9a85af" prot="protected" virt="non-virtual"><scope>opentelemetry::context::Token</scope><name>Token</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Token_1aaab60c9e0d2a9087a5cd56a227c3ef0e" prot="public" virt="virtual"><scope>opentelemetry::context::Token</scope><name>~Token</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

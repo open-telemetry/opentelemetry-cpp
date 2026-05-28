@@ -1,0 +1,389 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</compoundname>
+    <includes refid="circular__buffer_8h" local="no">circular_buffer.h</includes>
+    <sectiondef kind="private-static-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a9aef00fc8f44461185f227063f43fbd4" prot="private" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr int32_t</type>
+        <definition>constexpr int32_t opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::kNullIndex</definition>
+        <argsstring></argsstring>
+        <name>kNullIndex</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::kNullIndex</qualifiedname>
+        <initializer>= (std::numeric_limits&lt;int32_t&gt;::min)()</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="149" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="149" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a8be5be79c4f94ed04d33d0e3faed1f36" prot="private" static="no" mutable="no">
+        <type>int32_t</type>
+        <definition>int32_t opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::start_index_</definition>
+        <argsstring></argsstring>
+        <name>start_index_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::start_index_</qualifiedname>
+        <initializer>= kNullIndex</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="152" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="152" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a3f72073d7c880ac272d96b26ed246828" prot="private" static="no" mutable="no">
+        <type>int32_t</type>
+        <definition>int32_t opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::end_index_</definition>
+        <argsstring></argsstring>
+        <name>end_index_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::end_index_</qualifiedname>
+        <initializer>= kNullIndex</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="154" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="154" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a224259f7c8d214c90c1bcb3ef3fb7100" prot="private" static="no" mutable="no">
+        <type>int32_t</type>
+        <definition>int32_t opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::base_index_</definition>
+        <argsstring></argsstring>
+        <name>base_index_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::base_index_</qualifiedname>
+        <initializer>= kNullIndex</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="157" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="157" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a1c5779d0d0339095162db931adf89983" prot="private" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingIntegerArray" kindref="compound">AdaptingIntegerArray</ref></type>
+        <definition>AdaptingIntegerArray opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::backing_</definition>
+        <argsstring></argsstring>
+        <name>backing_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::backing_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="158" column="24" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="158" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a2f0a1fa3c3fb407d7e3eff1b2bd6f07f" prot="public" static="no" const="no" explicit="yes" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::AdaptingCircularBufferCounter</definition>
+        <argsstring>(size_t max_size)</argsstring>
+        <name>AdaptingCircularBufferCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::AdaptingCircularBufferCounter</qualifiedname>
+        <param>
+          <type>size_t</type>
+          <declname>max_size</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="91" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="91" bodyend="91"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a6aa3d1aed62f56b242df12085bf33fb8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::AdaptingCircularBufferCounter</definition>
+        <argsstring>(const AdaptingCircularBufferCounter &amp;other)=default</argsstring>
+        <name>AdaptingCircularBufferCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::AdaptingCircularBufferCounter</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" kindref="compound">AdaptingCircularBufferCounter</ref> &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="92" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a5213d6b121d32425f967d04cb506c8ce" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::AdaptingCircularBufferCounter</definition>
+        <argsstring>(AdaptingCircularBufferCounter &amp;&amp;other)=default</argsstring>
+        <name>AdaptingCircularBufferCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::AdaptingCircularBufferCounter</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" kindref="compound">AdaptingCircularBufferCounter</ref> &amp;&amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="93" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1af2663c55e3d1d44a381b65081cb4dcc1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" kindref="compound">AdaptingCircularBufferCounter</ref> &amp;</type>
+        <definition>AdaptingCircularBufferCounter &amp; opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::operator=</definition>
+        <argsstring>(const AdaptingCircularBufferCounter &amp;other)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" kindref="compound">AdaptingCircularBufferCounter</ref> &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="94" column="33"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1af575d89572080281d2d0514efc705cf4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" kindref="compound">AdaptingCircularBufferCounter</ref> &amp;</type>
+        <definition>AdaptingCircularBufferCounter &amp; opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::operator=</definition>
+        <argsstring>(AdaptingCircularBufferCounter &amp;&amp;other)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter" kindref="compound">AdaptingCircularBufferCounter</ref> &amp;&amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="95" column="33"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a0bec0189d6ff818697816ff39834f0ed" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::~AdaptingCircularBufferCounter</definition>
+        <argsstring>()=default</argsstring>
+        <name>~AdaptingCircularBufferCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::~AdaptingCircularBufferCounter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="97" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a06c25bf07fd850f9e89481292fd53473" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>int32_t</type>
+        <definition>int32_t opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::StartIndex</definition>
+        <argsstring>() const</argsstring>
+        <name>StartIndex</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::StartIndex</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>The first index with a recording. May be negative.</para>
+<para>Note: the returned value is not meaningful when Empty returns true.</para>
+<para><simplesect kind="return"><para>the first index with a recording. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="106" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="106" bodyend="106"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a1923bff4e450dd568898f4e7855460c9" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>int32_t</type>
+        <definition>int32_t opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::EndIndex</definition>
+        <argsstring>() const</argsstring>
+        <name>EndIndex</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::EndIndex</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>The last index with a recording. May be negative.</para>
+<para>Note: the returned value is not meaningful when Empty returns true.</para>
+<para><simplesect kind="return"><para>The last index with a recording. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="115" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="115" bodyend="115"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a2d43e64bf446b95de1b9ad0e2814856e" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::Empty</definition>
+        <argsstring>() const</argsstring>
+        <name>Empty</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::Empty</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns true if no recordings, false if at least one recording. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="120" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="120" bodyend="120"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1ae8308bbb165ac49b19136c81eea0fad9" prot="public" static="no" const="yes" explicit="no" inline="yes" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::MaxSize</definition>
+        <argsstring>() const</argsstring>
+        <name>MaxSize</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::MaxSize</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the maximum number of buckets allowed in this counter. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="125" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="125" bodyend="125"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a7404f63017b7d7383671f7e88383ddba" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::Clear</definition>
+        <argsstring>()</argsstring>
+        <name>Clear</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::Clear</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Resets all bucket counts to zero and resets index start/end tracking. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="128" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a31f60db1c499a79c51636745abce9036" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::Increment</definition>
+        <argsstring>(int32_t index, uint64_t delta)</argsstring>
+        <name>Increment</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::Increment</qualifiedname>
+        <param>
+          <type>int32_t</type>
+          <declname>index</declname>
+        </param>
+        <param>
+          <type>uint64_t</type>
+          <declname>delta</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Persist new data at index, incrementing by delta amount.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>index</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The index of where to perform the incrementation. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>delta</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>How much to increment the index by. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>success status. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="137" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a6de9ff73382440b21cac5bc9dadd2ffa" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>uint64_t</type>
+        <definition>uint64_t opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::Get</definition>
+        <argsstring>(int32_t index) const</argsstring>
+        <name>Get</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::Get</qualifiedname>
+        <param>
+          <type>int32_t</type>
+          <declname>index</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the number of recordings for the given index.</para>
+<para><simplesect kind="return"><para>the number of recordings for the index, or 0 if the index is out of bounds. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="144" column="12"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a1b5f9b7cc50dc45aa8abd557c3e35e20" prot="private" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::ToBufferIndex</definition>
+        <argsstring>(int32_t index) const</argsstring>
+        <name>ToBufferIndex</name>
+        <qualifiedname>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter::ToBufferIndex</qualifiedname>
+        <param>
+          <type>int32_t</type>
+          <declname>index</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="147" column="10"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>A circle-buffer-backed exponential counter.</para>
+<para>The first recorded value becomes the &apos;base_index&apos;. Going backwards leads to start/stop index.</para>
+<para>This expand start/end index as it sees values.</para>
+<para>This class is NOT thread-safe. It is expected to be behind a synchronized incrementer. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" line="88" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/circular_buffer.h" bodystart="89" bodyend="159"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a2f0a1fa3c3fb407d7e3eff1b2bd6f07f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>AdaptingCircularBufferCounter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a6aa3d1aed62f56b242df12085bf33fb8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>AdaptingCircularBufferCounter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a5213d6b121d32425f967d04cb506c8ce" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>AdaptingCircularBufferCounter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a1c5779d0d0339095162db931adf89983" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>backing_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a224259f7c8d214c90c1bcb3ef3fb7100" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>base_index_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a7404f63017b7d7383671f7e88383ddba" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>Clear</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a2d43e64bf446b95de1b9ad0e2814856e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>Empty</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a3f72073d7c880ac272d96b26ed246828" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>end_index_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a1923bff4e450dd568898f4e7855460c9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>EndIndex</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a6de9ff73382440b21cac5bc9dadd2ffa" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>Get</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a31f60db1c499a79c51636745abce9036" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>Increment</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a9aef00fc8f44461185f227063f43fbd4" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>kNullIndex</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1ae8308bbb165ac49b19136c81eea0fad9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>MaxSize</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1af2663c55e3d1d44a381b65081cb4dcc1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1af575d89572080281d2d0514efc705cf4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a8be5be79c4f94ed04d33d0e3faed1f36" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>start_index_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a06c25bf07fd850f9e89481292fd53473" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>StartIndex</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a1b5f9b7cc50dc45aa8abd557c3e35e20" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>ToBufferIndex</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AdaptingCircularBufferCounter_1a0bec0189d6ff818697816ff39834f0ed" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::AdaptingCircularBufferCounter</scope><name>~AdaptingCircularBufferCounter</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

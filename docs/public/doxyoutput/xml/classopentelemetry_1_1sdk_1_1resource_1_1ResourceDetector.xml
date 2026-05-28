@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::resource::ResourceDetector</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1resource_1_1OTELResourceDetector" prot="public" virt="non-virtual">opentelemetry::sdk::resource::OTELResourceDetector</derivedcompoundref>
+    <includes refid="resource__detector_8h" local="no">resource_detector.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1ac16659f48b43f2d787aefc311d666c62" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::resource::ResourceDetector::ResourceDetector</definition>
+        <argsstring>()=default</argsstring>
+        <name>ResourceDetector</name>
+        <qualifiedname>opentelemetry::sdk::resource::ResourceDetector::ResourceDetector</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" line="23" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a479e568423ea2f66ed33024d3737fe53" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::resource::ResourceDetector::ResourceDetector</definition>
+        <argsstring>(const ResourceDetector &amp;)=delete</argsstring>
+        <name>ResourceDetector</name>
+        <qualifiedname>opentelemetry::sdk::resource::ResourceDetector::ResourceDetector</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector" kindref="compound">ResourceDetector</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" line="25" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a3041bb424c462bd7bee2bea3adea1d4a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::resource::ResourceDetector::ResourceDetector</definition>
+        <argsstring>(ResourceDetector &amp;&amp;)=delete</argsstring>
+        <name>ResourceDetector</name>
+        <qualifiedname>opentelemetry::sdk::resource::ResourceDetector::ResourceDetector</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector" kindref="compound">ResourceDetector</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" line="26" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1ab3c2705671bfdf05c520e104538b295f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector" kindref="compound">ResourceDetector</ref> &amp;</type>
+        <definition>ResourceDetector &amp; opentelemetry::sdk::resource::ResourceDetector::operator=</definition>
+        <argsstring>(const ResourceDetector &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::resource::ResourceDetector::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector" kindref="compound">ResourceDetector</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" line="27" column="20"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a7662190dc68804ca301ea65a48154b77" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector" kindref="compound">ResourceDetector</ref> &amp;</type>
+        <definition>ResourceDetector &amp; opentelemetry::sdk::resource::ResourceDetector::operator=</definition>
+        <argsstring>(ResourceDetector &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::resource::ResourceDetector::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector" kindref="compound">ResourceDetector</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" line="28" column="20"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a684ba2fba575c0776b508aafc45c0dac" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::resource::ResourceDetector::~ResourceDetector</definition>
+        <argsstring>()=default</argsstring>
+        <name>~ResourceDetector</name>
+        <qualifiedname>opentelemetry::sdk::resource::ResourceDetector::~ResourceDetector</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" line="30" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a38f2e5d441fc8ae74ee480844aebc6d3" prot="public" static="no" const="no" explicit="no" inline="no" virt="pure-virtual">
+        <type>Resource</type>
+        <definition>virtual Resource opentelemetry::sdk::resource::ResourceDetector::Detect</definition>
+        <argsstring>()=0</argsstring>
+        <name>Detect</name>
+        <qualifiedname>opentelemetry::sdk::resource::ResourceDetector::Detect</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1resource_1_1OTELResourceDetector_1aba1f56311a179aa571058db74ac08936">Detect</reimplementedby>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" line="32" column="20"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="protected-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a26937b8e54e86eb9bc88a01e5e2086e5" prot="protected" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>Resource</type>
+        <definition>static Resource opentelemetry::sdk::resource::ResourceDetector::Create</definition>
+        <argsstring>(const ResourceAttributes &amp;attributes, const std::string &amp;schema_url=std::string{})</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::resource::ResourceDetector::Create</qualifiedname>
+        <param>
+          <type>const ResourceAttributes &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>schema_url</declname>
+          <defval>std::string{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" line="35" column="19"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Interface for a Resource Detector </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::sdk::resource::OTELResourceDetector</label>
+        <link refid="classopentelemetry_1_1sdk_1_1resource_1_1OTELResourceDetector"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::resource::ResourceDetector</label>
+        <link refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector"/>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/resource/resource_detector.h" bodystart="21" bodyend="37"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a26937b8e54e86eb9bc88a01e5e2086e5" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::resource::ResourceDetector</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a38f2e5d441fc8ae74ee480844aebc6d3" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::resource::ResourceDetector</scope><name>Detect</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1ab3c2705671bfdf05c520e104538b295f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::ResourceDetector</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a7662190dc68804ca301ea65a48154b77" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::ResourceDetector</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1ac16659f48b43f2d787aefc311d666c62" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::ResourceDetector</scope><name>ResourceDetector</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a479e568423ea2f66ed33024d3737fe53" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::ResourceDetector</scope><name>ResourceDetector</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a3041bb424c462bd7bee2bea3adea1d4a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::resource::ResourceDetector</scope><name>ResourceDetector</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1resource_1_1ResourceDetector_1a684ba2fba575c0776b508aafc45c0dac" prot="public" virt="virtual"><scope>opentelemetry::sdk::resource::ResourceDetector</scope><name>~ResourceDetector</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

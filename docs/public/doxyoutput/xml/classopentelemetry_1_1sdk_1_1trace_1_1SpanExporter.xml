@@ -1,0 +1,230 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::trace::SpanExporter</compoundname>
+    <includes refid="trace_2exporter_8h" local="no">exporter.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1adba994291e6f2f4f59033afbeaf7abfa" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::SpanExporter::SpanExporter</definition>
+        <argsstring>()</argsstring>
+        <name>SpanExporter</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanExporter::SpanExporter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h" line="27" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1a9893a2f538c04e951768dd48ea9cc5a2" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::SpanExporter::SpanExporter</definition>
+        <argsstring>(const SpanExporter &amp;)=delete</argsstring>
+        <name>SpanExporter</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanExporter::SpanExporter</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h" line="29" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1ad2a1415bfe65d769112d71c65ffa27c1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::SpanExporter::SpanExporter</definition>
+        <argsstring>(SpanExporter &amp;&amp;)=delete</argsstring>
+        <name>SpanExporter</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanExporter::SpanExporter</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h" line="30" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1ac1aaf48c1a9847d90fd4e639948895b2" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &amp;</type>
+        <definition>SpanExporter &amp; opentelemetry::sdk::trace::SpanExporter::operator=</definition>
+        <argsstring>(const SpanExporter &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanExporter::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h" line="31" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1ae1de5e9c0b212f4d09d777b8fb08675d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &amp;</type>
+        <definition>SpanExporter &amp; opentelemetry::sdk::trace::SpanExporter::operator=</definition>
+        <argsstring>(SpanExporter &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanExporter::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h" line="32" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1a49707bdb08bed9147312764af7894851" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::trace::SpanExporter::~SpanExporter</definition>
+        <argsstring>()</argsstring>
+        <name>~SpanExporter</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanExporter::~SpanExporter</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h" line="34" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1a7927bc624121701e3505f0967f2e1006" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &gt;</type>
+        <definition>virtual std::unique_ptr&lt; Recordable &gt; opentelemetry::sdk::trace::SpanExporter::MakeRecordable</definition>
+        <argsstring>() noexcept=0</argsstring>
+        <name>MakeRecordable</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanExporter::MakeRecordable</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a span recordable. This object will be used to record span data and will subsequently be passed to <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1a950d6a555c6a8e66dd6c2a97ef911a07" kindref="member">SpanExporter::Export</ref>. Vendors can implement custom recordables or use the default <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData" kindref="compound">SpanData</ref> recordable provided by the SDK. <simplesect kind="return"><para>a newly initialized <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> object</para>
+</simplesect>
+Note: This method must be callable from multiple threads. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h" line="45" column="27"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1a950d6a555c6a8e66dd6c2a97ef911a07" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>sdk::common::ExportResult</type>
+        <definition>virtual sdk::common::ExportResult opentelemetry::sdk::trace::SpanExporter::Export</definition>
+        <argsstring>(const nostd::span&lt; std::unique_ptr&lt; Recordable &gt; &gt; &amp;spans) noexcept=0</argsstring>
+        <name>Export</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanExporter::Export</qualifiedname>
+        <param>
+          <type>const nostd::span&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &gt; &gt; &amp;</type>
+          <declname>spans</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Exports a batch of span recordables. This method must not be called concurrently for the same exporter instance. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>spans</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a span of unique pointers to span recordables </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h" line="52" column="37"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1acaf622c871eaa8aba30c05b4178dd962" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::sdk::trace::SpanExporter::ForceFlush</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept=0</argsstring>
+        <name>ForceFlush</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanExporter::ForceFlush</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Export all spans that have been exported. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timeout</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>an optional timeout, the default timeout means that no timeout is applied. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>return true when all data are exported, and false when timeout </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h" line="61" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1a914133b202dc52f0228445560010a1b6" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>bool</type>
+        <definition>virtual bool opentelemetry::sdk::trace::SpanExporter::Shutdown</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept=0</argsstring>
+        <name>Shutdown</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanExporter::Shutdown</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Shut down the exporter. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timeout</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>an optional timeout. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>return the status of the operation. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h" line="69" column="16"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> defines the interface that protocol-specific span exporters must implement. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h" line="24" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/exporter.h" bodystart="25" bodyend="71"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1a950d6a555c6a8e66dd6c2a97ef911a07" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::SpanExporter</scope><name>Export</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1acaf622c871eaa8aba30c05b4178dd962" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::SpanExporter</scope><name>ForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1a7927bc624121701e3505f0967f2e1006" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::SpanExporter</scope><name>MakeRecordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1ac1aaf48c1a9847d90fd4e639948895b2" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SpanExporter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1ae1de5e9c0b212f4d09d777b8fb08675d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SpanExporter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1a914133b202dc52f0228445560010a1b6" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::SpanExporter</scope><name>Shutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1adba994291e6f2f4f59033afbeaf7abfa" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SpanExporter</scope><name>SpanExporter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1a9893a2f538c04e951768dd48ea9cc5a2" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SpanExporter</scope><name>SpanExporter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1ad2a1415bfe65d769112d71c65ffa27c1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SpanExporter</scope><name>SpanExporter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter_1a49707bdb08bed9147312764af7894851" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::SpanExporter</scope><name>~SpanExporter</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

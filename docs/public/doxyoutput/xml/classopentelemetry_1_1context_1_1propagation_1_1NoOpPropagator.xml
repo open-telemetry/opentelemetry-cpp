@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1context_1_1propagation_1_1NoOpPropagator" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::context::propagation::NoOpPropagator</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::context::propagation::TextMapPropagator</basecompoundref>
+    <includes refid="noop__propagator_8h" local="no">noop_propagator.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1NoOpPropagator_1a4c87f5049a61523637269e05a0dd845f" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>context::Context</type>
+        <definition>context::Context opentelemetry::context::propagation::NoOpPropagator::Extract</definition>
+        <argsstring>(const TextMapCarrier &amp;, context::Context &amp;context) noexcept override</argsstring>
+        <name>Extract</name>
+        <qualifiedname>opentelemetry::context::propagation::NoOpPropagator::Extract</qualifiedname>
+        <param>
+          <type>const TextMapCarrier &amp;</type>
+        </param>
+        <param>
+          <type>context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Noop extract function does nothing and returns the input context </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/noop_propagator.h" line="22" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/noop_propagator.h" bodystart="22" bodyend="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1NoOpPropagator_1a11790f7c93d0d893156bd095e4afaaa7" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::context::propagation::NoOpPropagator::Inject</definition>
+        <argsstring>(TextMapCarrier &amp;, const context::Context &amp;) noexcept override</argsstring>
+        <name>Inject</name>
+        <qualifiedname>opentelemetry::context::propagation::NoOpPropagator::Inject</qualifiedname>
+        <param>
+          <type>TextMapCarrier &amp;</type>
+        </param>
+        <param>
+          <type>const context::Context &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Noop inject function does nothing </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/noop_propagator.h" line="29" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/noop_propagator.h" bodystart="29" bodyend="31"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1propagation_1_1NoOpPropagator_1a61a3276146a93ba1a41a1ccd79acecbe" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::context::propagation::NoOpPropagator::Fields</definition>
+        <argsstring>(nostd::function_ref&lt; bool(nostd::string_view)&gt;) const noexcept override</argsstring>
+        <name>Fields</name>
+        <qualifiedname>opentelemetry::context::propagation::NoOpPropagator::Fields</qualifiedname>
+        <param>
+          <type>nostd::function_ref&lt; bool(nostd::string_view)&gt;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/noop_propagator.h" line="33" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/noop_propagator.h" bodystart="33" bodyend="36"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>No-op implementation TextMapPropagator </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/noop_propagator.h" line="18" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/propagation/noop_propagator.h" bodystart="19" bodyend="37"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1NoOpPropagator_1a4c87f5049a61523637269e05a0dd845f" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::NoOpPropagator</scope><name>Extract</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1NoOpPropagator_1a61a3276146a93ba1a41a1ccd79acecbe" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::NoOpPropagator</scope><name>Fields</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1NoOpPropagator_1a11790f7c93d0d893156bd095e4afaaa7" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::NoOpPropagator</scope><name>Inject</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1aa14ca5a5b60a8b1d444397f04cc6ce2f" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::NoOpPropagator</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1af1e661fbae8179b4a4b944a00a30d7fe" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::NoOpPropagator</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a95708796cfcbdade8ad81ea6402749c3" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::NoOpPropagator</scope><name>TextMapPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a9eca02e8ef37c0f8e029175bc0cb9fec" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::NoOpPropagator</scope><name>TextMapPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a81a7bb782548036a458c497105b1bcc0" prot="public" virt="non-virtual"><scope>opentelemetry::context::propagation::NoOpPropagator</scope><name>TextMapPropagator</name></member>
+      <member refid="classopentelemetry_1_1context_1_1propagation_1_1TextMapPropagator_1a0a5f832aea596281984396b45ad09573" prot="public" virt="virtual"><scope>opentelemetry::context::propagation::NoOpPropagator</scope><name>~TextMapPropagator</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

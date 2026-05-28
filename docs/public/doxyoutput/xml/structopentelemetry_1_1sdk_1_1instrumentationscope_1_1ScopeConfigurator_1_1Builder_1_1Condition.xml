@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1_1Condition" kind="struct" language="C++" prot="private">
+    <compoundname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::Condition</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1_1Condition_1a62a7e8cf7a032461c251f488f74aedf8" prot="public" static="no" mutable="no">
+        <type>std::function&lt; bool(const InstrumentationScope &amp;)&gt;</type>
+        <definition>std::function&lt;bool(const InstrumentationScope &amp;)&gt; opentelemetry::sdk::instrumentationscope::ScopeConfigurator&lt; T &gt;::Builder::Condition::scope_matcher</definition>
+        <argsstring></argsstring>
+        <name>scope_matcher</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::Condition::scope_matcher</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="112" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="112" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1_1Condition_1a4d35d1c358a97d08f020f1e355fbb8cd" prot="public" static="no" mutable="no">
+        <type>T</type>
+        <definition>T opentelemetry::sdk::instrumentationscope::ScopeConfigurator&lt; T &gt;::Builder::Condition::scope_config</definition>
+        <argsstring></argsstring>
+        <name>scope_config</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::Condition::scope_config</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="113" column="9" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="113" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1_1Condition_1ae054fb4bc9fea2fc60c3957777324797" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::instrumentationscope::ScopeConfigurator&lt; T &gt;::Builder::Condition::Condition</definition>
+        <argsstring>(std::function&lt; bool(const InstrumentationScope &amp;)&gt; matcher, T config)</argsstring>
+        <name>Condition</name>
+        <qualifiedname>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::Condition::Condition</qualifiedname>
+        <param>
+          <type>std::function&lt; bool(const InstrumentationScope &amp;)&gt;</type>
+          <declname>matcher</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>config</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="115" column="7" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="115" bodyend="117"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>An internal struct to encapsulate &apos;conditions&apos; that can be applied to a ScopeConfiguratorBuilder. The applied conditions influence the behavior of the generated <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">ScopeConfigurator</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" line="110" column="5" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/instrumentationscope/scope_configurator.h" bodystart="111" bodyend="118"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1_1Condition_1ae054fb4bc9fea2fc60c3957777324797" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::Condition</scope><name>Condition</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1_1Condition_1a4d35d1c358a97d08f020f1e355fbb8cd" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::Condition</scope><name>scope_config</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator_1_1Builder_1_1Condition_1a62a7e8cf7a032461c251f488f74aedf8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::instrumentationscope::ScopeConfigurator::Builder::Condition</scope><name>scope_matcher</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

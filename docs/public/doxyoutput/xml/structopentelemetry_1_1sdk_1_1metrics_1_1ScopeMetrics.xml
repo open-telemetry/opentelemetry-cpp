@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::ScopeMetrics</compoundname>
+    <includes refid="metric__producer_8h" local="no">metric_producer.h</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1a476ac12f77bb54a167a4b6885119af34" prot="public" static="no" mutable="no">
+        <type>const opentelemetry::sdk::instrumentationscope::InstrumentationScope *</type>
+        <definition>const opentelemetry::sdk::instrumentationscope::InstrumentationScope* opentelemetry::sdk::metrics::ScopeMetrics::scope_</definition>
+        <argsstring></argsstring>
+        <name>scope_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ScopeMetrics::scope_</qualifiedname>
+        <initializer>= nullptr</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="39" column="72" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" bodystart="39" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1ade77d78aee1b458f744777547c6c2d3d" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; MetricData &gt;</type>
+        <definition>std::vector&lt;MetricData&gt; opentelemetry::sdk::metrics::ScopeMetrics::metric_data_</definition>
+        <argsstring></argsstring>
+        <name>metric_data_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ScopeMetrics::metric_data_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="40" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" bodystart="40" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1a3d95cc0ed8da09e3a0347702b8ab1c9d" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class ScopePtr</type>
+          </param>
+          <param>
+            <type>class MetricDataType</type>
+          </param>
+        </templateparamlist>
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ScopeMetrics::ScopeMetrics</definition>
+        <argsstring>(ScopePtr &amp;&amp;scope, MetricDataType &amp;&amp;metric)</argsstring>
+        <name>ScopeMetrics</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ScopeMetrics::ScopeMetrics</qualifiedname>
+        <param>
+          <type>ScopePtr &amp;&amp;</type>
+          <declname>scope</declname>
+        </param>
+        <param>
+          <type>MetricDataType &amp;&amp;</type>
+          <declname>metric</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="43" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" bodystart="43" bodyend="45"/>
+      </memberdef>
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1aeeb5f88a708756bf35a7fc4e42e6a858" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ScopeMetrics::ScopeMetrics</definition>
+        <argsstring>()</argsstring>
+        <name>ScopeMetrics</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ScopeMetrics::ScopeMetrics</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="47" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" bodystart="47" bodyend="47"/>
+      </memberdef>
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1af95dc115c797ee8511e1ef64698c3875" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ScopeMetrics::ScopeMetrics</definition>
+        <argsstring>(const ScopeMetrics &amp;)=default</argsstring>
+        <name>ScopeMetrics</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ScopeMetrics::ScopeMetrics</qualifiedname>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="48" column="10"/>
+      </memberdef>
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1ac2ebcbcd8268330eefac18cf5cc69f7d" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ScopeMetrics::ScopeMetrics</definition>
+        <argsstring>(ScopeMetrics &amp;&amp;)=default</argsstring>
+        <name>ScopeMetrics</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ScopeMetrics::ScopeMetrics</qualifiedname>
+        <param>
+          <type><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="49" column="10"/>
+      </memberdef>
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1a82ff490f343cd0efa6502656af59bb00" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref> &amp;</type>
+        <definition>ScopeMetrics &amp; opentelemetry::sdk::metrics::ScopeMetrics::operator=</definition>
+        <argsstring>(const ScopeMetrics &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ScopeMetrics::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="51" column="23"/>
+      </memberdef>
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1a88463e2335010cdd9a6637908cfad558" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref> &amp;</type>
+        <definition>ScopeMetrics &amp; opentelemetry::sdk::metrics::ScopeMetrics::operator=</definition>
+        <argsstring>(ScopeMetrics &amp;&amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ScopeMetrics::operator=</qualifiedname>
+        <param>
+          <type><ref refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics" kindref="compound">ScopeMetrics</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="53" column="23"/>
+      </memberdef>
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1a84015f1b70a300390bbfc637f2440cc4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ScopeMetrics::~ScopeMetrics</definition>
+        <argsstring>()=default</argsstring>
+        <name>~ScopeMetrics</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ScopeMetrics::~ScopeMetrics</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="55" column="3"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Metric Data to be exported along with resources and Instrumentation scope. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" line="37" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_producer.h" bodystart="38" bodyend="56"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1ade77d78aee1b458f744777547c6c2d3d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ScopeMetrics</scope><name>metric_data_</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1a82ff490f343cd0efa6502656af59bb00" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ScopeMetrics</scope><name>operator=</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1a88463e2335010cdd9a6637908cfad558" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ScopeMetrics</scope><name>operator=</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1a476ac12f77bb54a167a4b6885119af34" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ScopeMetrics</scope><name>scope_</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1a3d95cc0ed8da09e3a0347702b8ab1c9d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ScopeMetrics</scope><name>ScopeMetrics</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1aeeb5f88a708756bf35a7fc4e42e6a858" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ScopeMetrics</scope><name>ScopeMetrics</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1af95dc115c797ee8511e1ef64698c3875" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ScopeMetrics</scope><name>ScopeMetrics</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1ac2ebcbcd8268330eefac18cf5cc69f7d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ScopeMetrics</scope><name>ScopeMetrics</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1ScopeMetrics_1a84015f1b70a300390bbfc637f2440cc4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ScopeMetrics</scope><name>~ScopeMetrics</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

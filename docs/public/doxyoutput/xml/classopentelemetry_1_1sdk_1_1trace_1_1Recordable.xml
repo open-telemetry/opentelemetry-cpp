@@ -1,0 +1,734 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::trace::Recordable</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1trace_1_1MultiRecordable" prot="public" virt="non-virtual">opentelemetry::sdk::trace::MultiRecordable</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData" prot="public" virt="non-virtual">opentelemetry::sdk::trace::SpanData</derivedcompoundref>
+    <includes refid="trace_2recordable_8h" local="no">recordable.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ab2d9d7d398e67eb92c0dbffbf05ffae5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::Recordable::Recordable</definition>
+        <argsstring>()=default</argsstring>
+        <name>Recordable</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::Recordable</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="47" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1aa75e478152aeb4fcffcfb84bea7f09d1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::Recordable::Recordable</definition>
+        <argsstring>(const Recordable &amp;)=delete</argsstring>
+        <name>Recordable</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::Recordable</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="49" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a1c5766960f385cbe62c078ca96249ed7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::Recordable::Recordable</definition>
+        <argsstring>(Recordable &amp;&amp;)=delete</argsstring>
+        <name>Recordable</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::Recordable</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="50" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a1ba6855d07d1fda235b192d41f178a9d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &amp;</type>
+        <definition>Recordable &amp; opentelemetry::sdk::trace::Recordable::operator=</definition>
+        <argsstring>(const Recordable &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="51" column="14"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a6e8d0062a9dbe80dc34a3a8e64f76125" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &amp;</type>
+        <definition>Recordable &amp; opentelemetry::sdk::trace::Recordable::operator=</definition>
+        <argsstring>(Recordable &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="52" column="14"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1acd25970d099f9692a6d7b803d73c1d97" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::trace::Recordable::~Recordable</definition>
+        <argsstring>()=default</argsstring>
+        <name>~Recordable</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::~Recordable</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="54" column="11"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a2afaa081ec4ecdc46980eb9852ad3a6d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::Recordable::SetIdentity</definition>
+        <argsstring>(const opentelemetry::trace::SpanContext &amp;span_context, opentelemetry::trace::SpanId parent_span_id) noexcept=0</argsstring>
+        <name>SetIdentity</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::SetIdentity</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1af251ff2190b2b7d1774f874ba47c39bb">SetIdentity</reimplementedby>
+        <param>
+          <type>const opentelemetry::trace::SpanContext &amp;</type>
+          <declname>span_context</declname>
+        </param>
+        <param>
+          <type>opentelemetry::trace::SpanId</type>
+          <declname>parent_span_id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the span context and parent span id <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>span_context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the span context to set </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>parent_span_id</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the parent span id to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="61" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a5e81e61abb51e5c750abae602d1b2936" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::Recordable::SetAttribute</definition>
+        <argsstring>(nostd::string_view key, const opentelemetry::common::AttributeValue &amp;value) noexcept=0</argsstring>
+        <name>SetAttribute</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::SetAttribute</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1ad8ab379d24fa67efea94698ced98402a">SetAttribute</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::common::AttributeValue &amp;</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set an attribute of a span. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>key</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name of the attribute </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the attribute value </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="69" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a9fe4708db82e231cf4efc0627f469f10" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::Recordable::AddEvent</definition>
+        <argsstring>(nostd::string_view name, opentelemetry::common::SystemTimestamp timestamp, const opentelemetry::common::KeyValueIterable &amp;attributes) noexcept=0</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::AddEvent</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1aae41f976d81215c67f734a11a2971e63">AddEvent</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>timestamp</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Add an event to a span. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name of the event </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>timestamp</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the timestamp of the event </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>attributes</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the attributes associated with the event </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="78" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ae8da3008b9f7a7a455dbb184060c3408" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::Recordable::AddEvent</definition>
+        <argsstring>(nostd::string_view name)</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::AddEvent</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Add an event to a span with default timestamp and attributes. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name of the event </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="86" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" bodystart="86" bodyend="90"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ae270986d5dab09b199275f3f77d442af" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::Recordable::AddEvent</definition>
+        <argsstring>(nostd::string_view name, opentelemetry::common::SystemTimestamp timestamp)</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::AddEvent</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>timestamp</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Add an event to a span with default (empty) attributes. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name of the event </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>timestamp</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the timestamp of the event </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="97" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" bodystart="97" bodyend="100"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a2dfcde84d24a896e1d903a77f257e7ae" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::Recordable::AddEvent</definition>
+        <argsstring>(nostd::string_view name, const opentelemetry::common::KeyValueIterable &amp;attributes) noexcept</argsstring>
+        <name>AddEvent</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::AddEvent</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Add an event to a span. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name of the event </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>attributes</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the attributes associated with the event </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="107" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" bodystart="107" bodyend="112"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a7d859e42a167c436da3a2a8612a82541" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::Recordable::AddLink</definition>
+        <argsstring>(const opentelemetry::trace::SpanContext &amp;span_context, const opentelemetry::common::KeyValueIterable &amp;attributes) noexcept=0</argsstring>
+        <name>AddLink</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::AddLink</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1aef76de6b3a57f249ba2d4580d8ba7073">AddLink</reimplementedby>
+        <param>
+          <type>const opentelemetry::trace::SpanContext &amp;</type>
+          <declname>span_context</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Add a link to a span. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>span_context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the span context of the linked span </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>attributes</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the attributes associated with the link </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="119" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1aa70ce55618751e46bad04114bf375ec4" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::Recordable::AddLink</definition>
+        <argsstring>(const opentelemetry::trace::SpanContext &amp;span_context)</argsstring>
+        <name>AddLink</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::AddLink</qualifiedname>
+        <param>
+          <type>const opentelemetry::trace::SpanContext &amp;</type>
+          <declname>span_context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Add a link to a span with default (empty) attributes. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>span_context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the span context of the linked span </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="126" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" bodystart="126" bodyend="129"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a4b4a2180c208c2d631adb646ce5e4c3a" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::Recordable::SetStatus</definition>
+        <argsstring>(opentelemetry::trace::StatusCode code, nostd::string_view description) noexcept=0</argsstring>
+        <name>SetStatus</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::SetStatus</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a2d43a2cf5d80925bf8606038fd0e80b4">SetStatus</reimplementedby>
+        <param>
+          <type>opentelemetry::trace::StatusCode</type>
+          <declname>code</declname>
+        </param>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>description</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the status of the span. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>code</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the status code </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>description</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a description of the status </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="136" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ae3f424fe00194c5099267a30bfdd6e23" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::Recordable::SetName</definition>
+        <argsstring>(nostd::string_view name) noexcept=0</argsstring>
+        <name>SetName</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::SetName</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a24c071dcf439cbbe7be4d71c833dc721">SetName</reimplementedby>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the name of the span. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the name to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="143" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a6c2b3840316c95e3d1b9277e36d370d8" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::Recordable::SetTraceFlags</definition>
+        <argsstring>(opentelemetry::trace::TraceFlags) noexcept</argsstring>
+        <name>SetTraceFlags</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::SetTraceFlags</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1aaaa4df970c0b8d623b939058cc484f0a">SetTraceFlags</reimplementedby>
+        <param>
+          <type>opentelemetry::trace::TraceFlags</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the trace flags of the span. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="148" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" bodystart="148" bodyend="148"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1aa2cd076005c8c41e1dcefca435ffea9a" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::Recordable::SetSpanKind</definition>
+        <argsstring>(opentelemetry::trace::SpanKind span_kind) noexcept=0</argsstring>
+        <name>SetSpanKind</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::SetSpanKind</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a2111bf3de2d31bc4d39a04e222222819">SetSpanKind</reimplementedby>
+        <param>
+          <type>opentelemetry::trace::SpanKind</type>
+          <declname>span_kind</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the spankind of the span. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>span_kind</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the spankind to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="154" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1acc2675ec3a467a98c00f1b04763b2f33" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::Recordable::SetResource</definition>
+        <argsstring>(const opentelemetry::sdk::resource::Resource &amp;resource) noexcept=0</argsstring>
+        <name>SetResource</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::SetResource</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1af81f44e6d4b4be3d982ef46340cc7eb4">SetResource</reimplementedby>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set Resource of the span <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>resource</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the resource to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="160" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a30c9085940d2267fd5833679d038d86c" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::Recordable::SetStartTime</definition>
+        <argsstring>(opentelemetry::common::SystemTimestamp start_time) noexcept=0</argsstring>
+        <name>SetStartTime</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::SetStartTime</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a74d329fbaec721f28e1209a91c6ccfc7">SetStartTime</reimplementedby>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>start_time</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the start time of the span. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>start_time</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the start time to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="166" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1afa94e4cac4f8330b0e2ac8cd3bd5e608" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::Recordable::SetDuration</definition>
+        <argsstring>(std::chrono::nanoseconds duration) noexcept=0</argsstring>
+        <name>SetDuration</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::SetDuration</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1a571fbfe6811bbb671bd338886948a1e5">SetDuration</reimplementedby>
+        <param>
+          <type>std::chrono::nanoseconds</type>
+          <declname>duration</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the duration of the span. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>duration</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the duration to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="172" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ab7b76fe73cdcdcb3af1a961c6b643a57" prot="public" static="no" const="yes" explicit="yes" inline="yes" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::sdk::trace::Recordable::operator SpanData *</definition>
+        <argsstring>() const</argsstring>
+        <name>operator SpanData *</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::operator SpanData *</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData" kindref="compound">SpanData</ref> object for this <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref>.</para>
+<para><simplesect kind="return"><para>SpanData* </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="180" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" bodystart="180" bodyend="180"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a6c83acf2d36ca37f206f74e2de21790d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::Recordable::SetInstrumentationScope</definition>
+        <argsstring>(const InstrumentationScope &amp;instrumentation_scope) noexcept=0</argsstring>
+        <name>SetInstrumentationScope</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::SetInstrumentationScope</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData_1afd8c6534bb5f4978939e83da05fe6e65">SetInstrumentationScope</reimplementedby>
+        <param>
+          <type>const InstrumentationScope &amp;</type>
+          <declname>instrumentation_scope</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set the instrumentation scope of the span. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>instrumentation_scope</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the instrumentation scope to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="186" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1acd38d088ff100fe4c884c72da7f69642" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::Recordable::SetInstrumentationLibrary</definition>
+        <argsstring>(const InstrumentationScope &amp;instrumentation_scope) noexcept</argsstring>
+        <name>SetInstrumentationLibrary</name>
+        <qualifiedname>opentelemetry::sdk::trace::Recordable::SetInstrumentationLibrary</qualifiedname>
+        <param>
+          <type>const InstrumentationScope &amp;</type>
+          <declname>instrumentation_scope</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="190" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" bodystart="190" bodyend="193"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Maintains a representation of a span in a format that can be processed by a recorder.</para>
+<para>This class is thread-compatible. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::Recordable</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable"/>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::SpanData</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" line="44" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/recordable.h" bodystart="45" bodyend="194"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a9fe4708db82e231cf4efc0627f469f10" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ae8da3008b9f7a7a455dbb184060c3408" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ae270986d5dab09b199275f3f77d442af" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a2dfcde84d24a896e1d903a77f257e7ae" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>AddEvent</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a7d859e42a167c436da3a2a8612a82541" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>AddLink</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1aa70ce55618751e46bad04114bf375ec4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>AddLink</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ab7b76fe73cdcdcb3af1a961c6b643a57" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>operator SpanData *</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a1ba6855d07d1fda235b192d41f178a9d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a6e8d0062a9dbe80dc34a3a8e64f76125" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ab2d9d7d398e67eb92c0dbffbf05ffae5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>Recordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1aa75e478152aeb4fcffcfb84bea7f09d1" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>Recordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a1c5766960f385cbe62c078ca96249ed7" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>Recordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a5e81e61abb51e5c750abae602d1b2936" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>SetAttribute</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1afa94e4cac4f8330b0e2ac8cd3bd5e608" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>SetDuration</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a2afaa081ec4ecdc46980eb9852ad3a6d" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>SetIdentity</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1acd38d088ff100fe4c884c72da7f69642" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>SetInstrumentationLibrary</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a6c83acf2d36ca37f206f74e2de21790d" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>SetInstrumentationScope</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1ae3f424fe00194c5099267a30bfdd6e23" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>SetName</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1acc2675ec3a467a98c00f1b04763b2f33" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>SetResource</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1aa2cd076005c8c41e1dcefca435ffea9a" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>SetSpanKind</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a30c9085940d2267fd5833679d038d86c" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>SetStartTime</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a4b4a2180c208c2d631adb646ce5e4c3a" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>SetStatus</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1a6c2b3840316c95e3d1b9277e36d370d8" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>SetTraceFlags</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable_1acd25970d099f9692a6d7b803d73c1d97" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::Recordable</scope><name>~Recordable</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

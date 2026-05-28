@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::SumPointData</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1ab5b5af833ac95bd0b9a48bc8052b7f77" prot="public" static="no" mutable="no">
+        <type>ValueType</type>
+        <definition>ValueType opentelemetry::sdk::metrics::SumPointData::value_</definition>
+        <argsstring></argsstring>
+        <name>value_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SumPointData::value_</qualifiedname>
+        <initializer>= {}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="35" column="13" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="35" bodyend="35"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1af27b0c3245bffd9a15946a0958e93a9e" prot="public" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::SumPointData::is_monotonic_</definition>
+        <argsstring></argsstring>
+        <name>is_monotonic_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SumPointData::is_monotonic_</qualifiedname>
+        <initializer>= true</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="36" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="36" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1a16ae2316b292346cce6eae2257c4654d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::SumPointData::SumPointData</definition>
+        <argsstring>(SumPointData &amp;&amp;)=default</argsstring>
+        <name>SumPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SumPointData::SumPointData</qualifiedname>
+        <param>
+          <type>SumPointData &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="28" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1a86667552b6417c63c2195bc5f1d1864f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::SumPointData::SumPointData</definition>
+        <argsstring>(const SumPointData &amp;)=default</argsstring>
+        <name>SumPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SumPointData::SumPointData</qualifiedname>
+        <param>
+          <type>const SumPointData &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="29" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1a6188ad5e067e8da7cc22b6e6f0dbeb10" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>SumPointData &amp;</type>
+        <definition>SumPointData &amp; opentelemetry::sdk::metrics::SumPointData::operator=</definition>
+        <argsstring>(SumPointData &amp;&amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SumPointData::operator=</qualifiedname>
+        <param>
+          <type>SumPointData &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="30" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1aa6eba4eb47411a9c26266bc70097f44f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::SumPointData::SumPointData</definition>
+        <argsstring>()=default</argsstring>
+        <name>SumPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SumPointData::SumPointData</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="31" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1a4d236df7126a9b30faf29846ec1305cd" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>SumPointData &amp;</type>
+        <definition>SumPointData &amp; opentelemetry::sdk::metrics::SumPointData::operator=</definition>
+        <argsstring>(const SumPointData &amp;other)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SumPointData::operator=</qualifiedname>
+        <param>
+          <type>const SumPointData &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="32" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1afe47eff2684b00bbbaea7bbc6d27c84d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::SumPointData::~SumPointData</definition>
+        <argsstring>()=default</argsstring>
+        <name>~SumPointData</name>
+        <qualifiedname>opentelemetry::sdk::metrics::SumPointData::~SumPointData</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="33" column="3"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" line="24" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/point_data.h" bodystart="25" bodyend="37"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1af27b0c3245bffd9a15946a0958e93a9e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SumPointData</scope><name>is_monotonic_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1a6188ad5e067e8da7cc22b6e6f0dbeb10" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SumPointData</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1a4d236df7126a9b30faf29846ec1305cd" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SumPointData</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1a16ae2316b292346cce6eae2257c4654d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SumPointData</scope><name>SumPointData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1a86667552b6417c63c2195bc5f1d1864f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SumPointData</scope><name>SumPointData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1aa6eba4eb47411a9c26266bc70097f44f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SumPointData</scope><name>SumPointData</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1ab5b5af833ac95bd0b9a48bc8052b7f77" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SumPointData</scope><name>value_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1SumPointData_1afe47eff2684b00bbbaea7bbc6d27c84d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::SumPointData</scope><name>~SumPointData</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

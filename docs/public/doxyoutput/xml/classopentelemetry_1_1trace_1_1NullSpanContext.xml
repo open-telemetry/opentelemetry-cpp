@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1trace_1_1NullSpanContext" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::trace::NullSpanContext</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" prot="public" virt="non-virtual">opentelemetry::trace::SpanContextKeyValueIterable</basecompoundref>
+    <includes refid="span__context__kv__iterable_8h" local="no">span_context_kv_iterable.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NullSpanContext_1a2242d568eff8cb6db58c9fe61841b27a" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::trace::NullSpanContext::ForEachKeyValue</definition>
+        <argsstring>(nostd::function_ref&lt; bool(SpanContext, const common::KeyValueIterable &amp;)&gt;) const noexcept override</argsstring>
+        <name>ForEachKeyValue</name>
+        <qualifiedname>opentelemetry::trace::NullSpanContext::ForEachKeyValue</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1a5e1b66d1adbd5824cb14010c10b14c38">ForEachKeyValue</reimplements>
+        <param>
+          <type>nostd::function_ref&lt; bool(SpanContext, const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">common::KeyValueIterable</ref> &amp;)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Iterate over SpanContext/key-value pairs <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>callback</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>a callback to invoke for each key-value for each SpanContext. If the callback returns false, the iteration is aborted. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if every SpanContext/key-value pair was iterated over </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" line="49" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" bodystart="49" bodyend="53"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1trace_1_1NullSpanContext_1a9d49d70d84e95179434dff9e024155c6" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::trace::NullSpanContext::size</definition>
+        <argsstring>() const noexcept override</argsstring>
+        <name>size</name>
+        <qualifiedname>opentelemetry::trace::NullSpanContext::size</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1acc6970c723ece6093aae27b749ff6f61">size</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>the number of key-value pairs </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" line="55" column="10" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" bodystart="55" bodyend="55"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+<para>Null <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> context that does not carry any information. </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::trace::NullSpanContext</label>
+        <link refid="classopentelemetry_1_1trace_1_1NullSpanContext"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::trace::SpanContextKeyValueIterable</label>
+        <link refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>opentelemetry::trace::NullSpanContext</label>
+        <link refid="classopentelemetry_1_1trace_1_1NullSpanContext"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::trace::SpanContextKeyValueIterable</label>
+        <link refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" line="46" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_context_kv_iterable.h" bodystart="47" bodyend="56"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1trace_1_1NullSpanContext_1a2242d568eff8cb6db58c9fe61841b27a" prot="public" virt="virtual"><scope>opentelemetry::trace::NullSpanContext</scope><name>ForEachKeyValue</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1aa609f2054a074cd56cafed65ebc5f1e6" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NullSpanContext</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1ab0fa394b96849ca0945f8e4315a32af7" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NullSpanContext</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1NullSpanContext_1a9d49d70d84e95179434dff9e024155c6" prot="public" virt="virtual"><scope>opentelemetry::trace::NullSpanContext</scope><name>size</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1a47ff758a904bf428d1148613c3019f1b" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NullSpanContext</scope><name>SpanContextKeyValueIterable</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1aac708a6335aa3d5cb6ac7a098e03571c" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NullSpanContext</scope><name>SpanContextKeyValueIterable</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1aca799053d817544df43af00d1acff3a0" prot="public" virt="non-virtual"><scope>opentelemetry::trace::NullSpanContext</scope><name>SpanContextKeyValueIterable</name></member>
+      <member refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable_1ae04201e61914772ceef07026032bc58a" prot="public" virt="virtual"><scope>opentelemetry::trace::NullSpanContext</scope><name>~SpanContextKeyValueIterable</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::LongUpDownCounter</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::sdk::metrics::Synchronous</basecompoundref>
+    <basecompoundref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" prot="public" virt="non-virtual">opentelemetry::metrics::UpDownCounter&lt; int64_t &gt;</basecompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter_1abd46c9b5021d60f69c50438f7931328a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::LongUpDownCounter::LongUpDownCounter</definition>
+        <argsstring>(const InstrumentDescriptor &amp;instrument_descriptor, std::unique_ptr&lt; SyncWritableMetricStorage &gt; storage)</argsstring>
+        <name>LongUpDownCounter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongUpDownCounter::LongUpDownCounter</qualifiedname>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>instrument_descriptor</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; SyncWritableMetricStorage &gt;</type>
+          <declname>storage</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="74" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter_1a6247156126f243affe1c68288f81c15d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::LongUpDownCounter::Add</definition>
+        <argsstring>(int64_t value, const opentelemetry::common::KeyValueIterable &amp;attributes) noexcept override</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongUpDownCounter::Add</qualifiedname>
+        <param>
+          <type>int64_t</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="77" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter_1ae67c396c565ed94e7bc689a52353545d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::LongUpDownCounter::Add</definition>
+        <argsstring>(int64_t value, const opentelemetry::common::KeyValueIterable &amp;attributes, const opentelemetry::context::Context &amp;context) noexcept override</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongUpDownCounter::Add</qualifiedname>
+        <param>
+          <type>int64_t</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="79" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter_1a65c65aa26540de0a1c30979b8b826787" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::LongUpDownCounter::Add</definition>
+        <argsstring>(int64_t value) noexcept override</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongUpDownCounter::Add</qualifiedname>
+        <param>
+          <type>int64_t</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="83" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter_1a503561e585037590a30113514c541610" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::LongUpDownCounter::Add</definition>
+        <argsstring>(int64_t value, const opentelemetry::context::Context &amp;context) noexcept override</argsstring>
+        <name>Add</name>
+        <qualifiedname>opentelemetry::sdk::metrics::LongUpDownCounter::Add</qualifiedname>
+        <param>
+          <type>int64_t</type>
+          <declname>value</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="84" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::metrics::UpDownCounter&lt; int64_t &gt;</label>
+        <link refid="classopentelemetry_1_1metrics_1_1UpDownCounter"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::LongUpDownCounter</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::metrics::UpDownCounter&lt; int64_t &gt;</label>
+        <link refid="classopentelemetry_1_1metrics_1_1UpDownCounter"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::LongUpDownCounter</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" line="71" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/sync_instruments.h" bodystart="72" bodyend="85"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter_1a6247156126f243affe1c68288f81c15d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter_1ae67c396c565ed94e7bc689a52353545d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter_1a65c65aa26540de0a1c30979b8b826787" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter_1a503561e585037590a30113514c541610" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1UpDownCounter_1a3e26086edd11a5bea98de00cceafdc0b" prot="public" virt="non-virtual" ambiguityscope="UpDownCounter&lt; int64_t &gt;::"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1UpDownCounter_1aa4fb21c8da36734f0fb44c52c860f394" prot="public" virt="non-virtual" ambiguityscope="UpDownCounter&lt; int64_t &gt;::"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1UpDownCounter_1a757428488f42825c147e9b52557adbad" prot="public" virt="non-virtual" ambiguityscope="UpDownCounter&lt; int64_t &gt;::"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1UpDownCounter_1ae89ad09422ccbe4b3bdc91584621609c" prot="public" virt="non-virtual" ambiguityscope="UpDownCounter&lt; int64_t &gt;::"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>Add</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous_1afbc8adc2f1abe1e43f8d9545590f6fcf" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>instrument_descriptor_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1LongUpDownCounter_1abd46c9b5021d60f69c50438f7931328a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>LongUpDownCounter</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a3a119c3d01bcbeb27f003798f709dbb9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a96a92a09ac869edb8c85adbf2f22aefe" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous_1a19bc4d3a4c503ae3b1d89508b6ee2cb9" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>storage_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1Synchronous_1a14f16a02f71aa80c5dc87c60a1ff4715" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>Synchronous</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a958cd63a32c41bd53ddb57c74a4af161" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1ad1da5a4adfa52aac49ae6bc98ac39294" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a163d350c750a10cb2c68ad9c88d9ef2b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a2cb1a911901a8e09c73dfaf2c3113dae" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::LongUpDownCounter</scope><name>~SynchronousInstrument</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

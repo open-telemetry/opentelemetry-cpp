@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessorFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::logs::SimpleLogRecordProcessorFactory</compoundname>
+    <includes refid="simple__log__record__processor__factory_8h" local="no">simple_log_record_processor_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessorFactory_1afb4cc794f101555e6cec1c3641320769" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; LogRecordProcessor &gt; opentelemetry::sdk::logs::SimpleLogRecordProcessorFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; LogRecordExporter &gt; &amp;&amp;exporter)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::SimpleLogRecordProcessorFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" kindref="compound">LogRecordExporter</ref> &gt; &amp;&amp;</type>
+          <declname>exporter</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor" kindref="compound">SimpleLogRecordProcessor</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor_factory.h" line="27" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor" kindref="compound">SimpleLogRecordProcessor</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor_factory.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor_factory.h" bodystart="22" bodyend="28"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessorFactory_1afb4cc794f101555e6cec1c3641320769" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::SimpleLogRecordProcessorFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

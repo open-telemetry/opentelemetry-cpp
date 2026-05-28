@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::TemporalMetricStorage</compoundname>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1af34bf0e106ed8c9d2c32d1f470f8b1e8" prot="private" static="no" mutable="no">
+        <type>InstrumentDescriptor</type>
+        <definition>InstrumentDescriptor opentelemetry::sdk::metrics::TemporalMetricStorage::instrument_descriptor_</definition>
+        <argsstring></argsstring>
+        <name>instrument_descriptor_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::TemporalMetricStorage::instrument_descriptor_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="47" column="24" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" bodystart="47" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1a43c2aa07987d04fd7f1005ca1df4fc46" prot="private" static="no" mutable="no">
+        <type>AggregationType</type>
+        <definition>AggregationType opentelemetry::sdk::metrics::TemporalMetricStorage::aggregation_type_</definition>
+        <argsstring></argsstring>
+        <name>aggregation_type_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::TemporalMetricStorage::aggregation_type_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="48" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" bodystart="48" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1ae3f2c75e798edd20124560b4f8fb51c5" prot="private" static="no" mutable="no">
+        <type>std::unordered_map&lt; CollectorHandle *, std::list&lt; std::shared_ptr&lt; AttributesHashMap &gt; &gt; &gt;</type>
+        <definition>std::unordered_map&lt;CollectorHandle *, std::list&lt;std::shared_ptr&lt;AttributesHashMap&gt; &gt; &gt; opentelemetry::sdk::metrics::TemporalMetricStorage::unreported_metrics_</definition>
+        <argsstring></argsstring>
+        <name>unreported_metrics_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::TemporalMetricStorage::unreported_metrics_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="52" column="7" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" bodystart="52" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1af082c8676a8415ebf630bec654c87a67" prot="private" static="no" mutable="no">
+        <type>std::unordered_map&lt; CollectorHandle *, LastReportedMetrics &gt;</type>
+        <definition>std::unordered_map&lt;CollectorHandle *, LastReportedMetrics&gt; opentelemetry::sdk::metrics::TemporalMetricStorage::last_reported_metrics_</definition>
+        <argsstring></argsstring>
+        <name>last_reported_metrics_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::TemporalMetricStorage::last_reported_metrics_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="54" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" bodystart="54" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1abfea9413933de84c0e6cea091edb7950" prot="private" static="no" mutable="yes">
+        <type>opentelemetry::common::SpinLockMutex</type>
+        <definition>opentelemetry::common::SpinLockMutex opentelemetry::sdk::metrics::TemporalMetricStorage::lock_</definition>
+        <argsstring></argsstring>
+        <name>lock_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::TemporalMetricStorage::lock_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="57" column="48" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" bodystart="57" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1aca03d872bf86c13841c61ee9fd7655a5" prot="private" static="no" mutable="no">
+        <type>const AggregationConfig *</type>
+        <definition>const AggregationConfig* opentelemetry::sdk::metrics::TemporalMetricStorage::aggregation_config_</definition>
+        <argsstring></argsstring>
+        <name>aggregation_config_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::TemporalMetricStorage::aggregation_config_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="58" column="27" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" bodystart="58" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1acd1c880a88bbfc41afd859cfa3c74759" prot="private" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::metrics::TemporalMetricStorage::last_delta_collection_ts_</definition>
+        <argsstring></argsstring>
+        <name>last_delta_collection_ts_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::TemporalMetricStorage::last_delta_collection_ts_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="59" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" bodystart="59" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1ae705c0d3a95eea168f950be90005cd25" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::TemporalMetricStorage::has_last_delta_collection_ts_</definition>
+        <argsstring></argsstring>
+        <name>has_last_delta_collection_ts_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::TemporalMetricStorage::has_last_delta_collection_ts_</qualifiedname>
+        <initializer>= false</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="60" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" bodystart="60" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1a916cf40bda66c0bf48bdd6d852b6027d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::TemporalMetricStorage::TemporalMetricStorage</definition>
+        <argsstring>(InstrumentDescriptor instrument_descriptor, AggregationType aggregation_type, const AggregationConfig *aggregation_config)</argsstring>
+        <name>TemporalMetricStorage</name>
+        <qualifiedname>opentelemetry::sdk::metrics::TemporalMetricStorage::TemporalMetricStorage</qualifiedname>
+        <param>
+          <type>InstrumentDescriptor</type>
+          <declname>instrument_descriptor</declname>
+        </param>
+        <param>
+          <type>AggregationType</type>
+          <declname>aggregation_type</declname>
+        </param>
+        <param>
+          <type>const AggregationConfig *</type>
+          <declname>aggregation_config</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="35" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1a1fa1da51b90518c7f2259b000428893c" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::TemporalMetricStorage::buildMetrics</definition>
+        <argsstring>(CollectorHandle *collector, nostd::span&lt; std::shared_ptr&lt; CollectorHandle &gt; &gt; collectors, opentelemetry::common::SystemTimestamp sdk_start_ts, opentelemetry::common::SystemTimestamp collection_ts, const std::shared_ptr&lt; AttributesHashMap &gt; &amp;delta_metrics, nostd::function_ref&lt; bool(MetricData)&gt; callback) noexcept</argsstring>
+        <name>buildMetrics</name>
+        <qualifiedname>opentelemetry::sdk::metrics::TemporalMetricStorage::buildMetrics</qualifiedname>
+        <param>
+          <type>CollectorHandle *</type>
+          <declname>collector</declname>
+        </param>
+        <param>
+          <type>nostd::span&lt; std::shared_ptr&lt; CollectorHandle &gt; &gt;</type>
+          <declname>collectors</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>sdk_start_ts</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>collection_ts</declname>
+        </param>
+        <param>
+          <type>const std::shared_ptr&lt; AttributesHashMap &gt; &amp;</type>
+          <declname>delta_metrics</declname>
+        </param>
+        <param>
+          <type>nostd::function_ref&lt; bool(MetricData)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="39" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" line="32" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/temporal_metric_storage.h" bodystart="33" bodyend="61"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1aca03d872bf86c13841c61ee9fd7655a5" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::TemporalMetricStorage</scope><name>aggregation_config_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1a43c2aa07987d04fd7f1005ca1df4fc46" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::TemporalMetricStorage</scope><name>aggregation_type_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1a1fa1da51b90518c7f2259b000428893c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::TemporalMetricStorage</scope><name>buildMetrics</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1ae705c0d3a95eea168f950be90005cd25" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::TemporalMetricStorage</scope><name>has_last_delta_collection_ts_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1af34bf0e106ed8c9d2c32d1f470f8b1e8" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::TemporalMetricStorage</scope><name>instrument_descriptor_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1acd1c880a88bbfc41afd859cfa3c74759" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::TemporalMetricStorage</scope><name>last_delta_collection_ts_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1af082c8676a8415ebf630bec654c87a67" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::TemporalMetricStorage</scope><name>last_reported_metrics_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1abfea9413933de84c0e6cea091edb7950" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::TemporalMetricStorage</scope><name>lock_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1a916cf40bda66c0bf48bdd6d852b6027d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::TemporalMetricStorage</scope><name>TemporalMetricStorage</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1TemporalMetricStorage_1ae3f2c75e798edd20124560b4f8fb51c5" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::TemporalMetricStorage</scope><name>unreported_metrics_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

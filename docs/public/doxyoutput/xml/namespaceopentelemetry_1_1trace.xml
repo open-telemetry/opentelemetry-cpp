@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1trace" kind="namespace" language="C++">
+    <compoundname>opentelemetry::trace</compoundname>
+    <innerclass refid="classopentelemetry_1_1trace_1_1DefaultSpan" prot="public">opentelemetry::trace::DefaultSpan</innerclass>
+    <innerclass refid="structopentelemetry_1_1trace_1_1EndSpanOptions" prot="public">opentelemetry::trace::EndSpanOptions</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1NoopSpan" prot="public">opentelemetry::trace::NoopSpan</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1NoopTracer" prot="public">opentelemetry::trace::NoopTracer</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1NoopTracerProvider" prot="public">opentelemetry::trace::NoopTracerProvider</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1NullSpanContext" prot="public">opentelemetry::trace::NullSpanContext</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1Provider" prot="public">opentelemetry::trace::Provider</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1Scope" prot="public">opentelemetry::trace::Scope</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1Span" prot="public">opentelemetry::trace::Span</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1SpanContext" prot="public">opentelemetry::trace::SpanContext</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1SpanContextKeyValueIterable" prot="public">opentelemetry::trace::SpanContextKeyValueIterable</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1SpanId" prot="public">opentelemetry::trace::SpanId</innerclass>
+    <innerclass refid="structopentelemetry_1_1trace_1_1StartSpanOptions" prot="public">opentelemetry::trace::StartSpanOptions</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1TraceFlags" prot="public">opentelemetry::trace::TraceFlags</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1TraceId" prot="public">opentelemetry::trace::TraceId</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1Tracer" prot="public">opentelemetry::trace::Tracer</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1TracerProvider" prot="public">opentelemetry::trace::TracerProvider</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1TraceState" prot="public">opentelemetry::trace::TraceState</innerclass>
+    <innernamespace refid="namespaceopentelemetry_1_1trace_1_1propagation">opentelemetry::trace::propagation</innernamespace>
+    <sectiondef kind="enum">
+      <memberdef kind="enum" id="span__metadata_8h_1ac1b0a7fc6c499a47d4071b3f9f34b358" prot="public" static="no" strong="yes">
+        <type></type>
+        <name>SpanKind</name>
+        <qualifiedname>opentelemetry::trace::SpanKind</qualifiedname>
+        <enumvalue id="span__metadata_8h_1ac1b0a7fc6c499a47d4071b3f9f34b358a96509148247c627a753b021d6dbea774" prot="public">
+          <name>kInternal</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="span__metadata_8h_1ac1b0a7fc6c499a47d4071b3f9f34b358a715c76514601e8aea81451c7edb84c8e" prot="public">
+          <name>kServer</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="span__metadata_8h_1ac1b0a7fc6c499a47d4071b3f9f34b358a5e096345ff5df364fa85084d1bb1aa70" prot="public">
+          <name>kClient</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="span__metadata_8h_1ac1b0a7fc6c499a47d4071b3f9f34b358a86f1bbaafa45cdc1469b0acad27fcdd1" prot="public">
+          <name>kProducer</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="span__metadata_8h_1ac1b0a7fc6c499a47d4071b3f9f34b358a967ffffa9aaf87c52e2c54522118083a" prot="public">
+          <name>kConsumer</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h" bodystart="22" bodyend="28"/>
+      </memberdef>
+      <memberdef kind="enum" id="span__metadata_8h_1a023fcada4081cd9ab1c7e28ce59b32a0" prot="public" static="no" strong="yes">
+        <type></type>
+        <name>StatusCode</name>
+        <qualifiedname>opentelemetry::trace::StatusCode</qualifiedname>
+        <enumvalue id="span__metadata_8h_1a023fcada4081cd9ab1c7e28ce59b32a0ac69d34d47bfd5244204004878441d53f" prot="public">
+          <name>kUnset</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="span__metadata_8h_1a023fcada4081cd9ab1c7e28ce59b32a0ae69fa9a656f76dd8a4d89f21992b2d3a" prot="public">
+          <name>kOk</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="span__metadata_8h_1a023fcada4081cd9ab1c7e28ce59b32a0ae3587c730cc1aa530fa4ddc9c4204e97" prot="public">
+          <name>kError</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h" line="38" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h" bodystart="40" bodyend="44"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="var">
+      <memberdef kind="variable" id="span__metadata_8h_1a4186633e71de5cb5a43ecf74493379c3" prot="public" static="no" constexpr="yes" mutable="no">
+        <type>constexpr char</type>
+        <definition>constexpr char opentelemetry::trace::kSpanKey[]</definition>
+        <argsstring>[]</argsstring>
+        <name>kSpanKey</name>
+        <qualifiedname>opentelemetry::trace::kSpanKey</qualifiedname>
+        <initializer>= &quot;active_span&quot;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h" line="31" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h" bodystart="31" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="span__metadata_8h_1ad45ad44a490579411933073e79a285f0" prot="public" static="no" constexpr="yes" mutable="no">
+        <type>constexpr char</type>
+        <definition>constexpr char opentelemetry::trace::kIsRootSpanKey[]</definition>
+        <argsstring>[]</argsstring>
+        <name>kIsRootSpanKey</name>
+        <qualifiedname>opentelemetry::trace::kIsRootSpanKey</qualifiedname>
+        <initializer>= &quot;is_root_span&quot;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h" line="32" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/span_metadata.h" bodystart="32" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="trace_2context_8h_1ad9ad8c6e348bb74b3f807f724a6d10ae" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> &gt;</type>
+        <definition>nostd::shared_ptr&lt; Span &gt; opentelemetry::trace::GetSpan</definition>
+        <argsstring>(const context::Context &amp;context) noexcept</argsstring>
+        <name>GetSpan</name>
+        <qualifiedname>opentelemetry::trace::GetSpan</qualifiedname>
+        <param>
+          <type>const context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/context.h" line="16" column="26" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/context.h" bodystart="16" bodyend="24"/>
+      </memberdef>
+      <memberdef kind="function" id="trace_2context_8h_1af9865e8b8fba5b15d3657520e66ef803" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::trace::IsRootSpan</definition>
+        <argsstring>(const context::Context &amp;context) noexcept</argsstring>
+        <name>IsRootSpan</name>
+        <qualifiedname>opentelemetry::trace::IsRootSpan</qualifiedname>
+        <param>
+          <type>const context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/context.h" line="27" column="13" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/context.h" bodystart="27" bodyend="35"/>
+      </memberdef>
+      <memberdef kind="function" id="trace_2context_8h_1a9f38aaa9eda54b0ba5fc9c18c8e2754e" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>context::Context</type>
+        <definition>context::Context opentelemetry::trace::SetSpan</definition>
+        <argsstring>(context::Context &amp;context, const nostd::shared_ptr&lt; Span &gt; &amp;span) noexcept</argsstring>
+        <name>SetSpan</name>
+        <qualifiedname>opentelemetry::trace::SetSpan</qualifiedname>
+        <param>
+          <type>context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type>const nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1trace_1_1Span" kindref="compound">Span</ref> &gt; &amp;</type>
+          <declname>span</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/context.h" line="38" column="25" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/context.h" bodystart="38" bodyend="42"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context_value.h" line="18" column="1"/>
+  </compounddef>
+</doxygen>

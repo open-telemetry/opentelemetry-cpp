@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSamplerFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::AlwaysOffSamplerFactory</compoundname>
+    <includes refid="always__off__factory_8h" local="no">always_off_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSamplerFactory_1a13584d444dc3c896e8dcc00e5155d6ea" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Sampler" kindref="compound">Sampler</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; Sampler &gt; opentelemetry::sdk::trace::AlwaysOffSamplerFactory::Create</definition>
+        <argsstring>()</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::AlwaysOffSamplerFactory::Create</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create an <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler" kindref="compound">AlwaysOffSampler</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_off_factory.h" line="26" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSampler" kindref="compound">AlwaysOffSampler</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_off_factory.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/samplers/always_off_factory.h" bodystart="21" bodyend="27"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1AlwaysOffSamplerFactory_1a13584d444dc3c896e8dcc00e5155d6ea" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::AlwaysOffSamplerFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

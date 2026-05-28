@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData" kind="struct" language="C++" prot="protected">
+    <compoundname>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a78aba9ae816c24af743aba4666266fd0" prot="public" static="no" mutable="no">
+        <type>std::condition_variable</type>
+        <definition>std::condition_variable opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::cv</definition>
+        <argsstring></argsstring>
+        <name>cv</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::cv</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="148" column="29" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="148" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1ae74396d7790a0963fde14fce315e8abe" prot="public" static="no" mutable="no">
+        <type>std::condition_variable</type>
+        <definition>std::condition_variable opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::force_flush_cv</definition>
+        <argsstring></argsstring>
+        <name>force_flush_cv</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::force_flush_cv</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="148" column="32" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="148" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a3e20e992e7cdf48d081f8a29ab6e670e" prot="public" static="no" mutable="no">
+        <type>std::mutex</type>
+        <definition>std::mutex opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::cv_m</definition>
+        <argsstring></argsstring>
+        <name>cv_m</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::cv_m</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="149" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="149" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a952804b2ccfca3aab959254bcf6d1fb4" prot="public" static="no" mutable="no">
+        <type>std::mutex</type>
+        <definition>std::mutex opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::force_flush_cv_m</definition>
+        <argsstring></argsstring>
+        <name>force_flush_cv_m</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::force_flush_cv_m</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="149" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="149" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a5b8d2f2bb2fe86f689d1d57819a9f606" prot="public" static="no" mutable="no">
+        <type>std::mutex</type>
+        <definition>std::mutex opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::shutdown_m</definition>
+        <argsstring></argsstring>
+        <name>shutdown_m</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::shutdown_m</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="149" column="38" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="149" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a4db6f08733bbaa37e3b191a688901e46" prot="public" static="no" mutable="no">
+        <type>std::atomic&lt; bool &gt;</type>
+        <definition>std::atomic&lt;bool&gt; opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::is_force_wakeup_background_worker</definition>
+        <argsstring></argsstring>
+        <name>is_force_wakeup_background_worker</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::is_force_wakeup_background_worker</qualifiedname>
+        <initializer>{false}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="152" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="152" bodyend="152"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1aac4dae72c97bfe5495497951210cfee4" prot="public" static="no" mutable="no">
+        <type>std::atomic&lt; bool &gt;</type>
+        <definition>std::atomic&lt;bool&gt; opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::is_shutdown</definition>
+        <argsstring></argsstring>
+        <name>is_shutdown</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::is_shutdown</qualifiedname>
+        <initializer>{false}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="153" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="153" bodyend="153"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a80ce9daef5c8044e0ff02397fd411b3b" prot="public" static="no" mutable="no">
+        <type>std::atomic&lt; uint64_t &gt;</type>
+        <definition>std::atomic&lt;uint64_t&gt; opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::force_flush_pending_sequence</definition>
+        <argsstring></argsstring>
+        <name>force_flush_pending_sequence</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::force_flush_pending_sequence</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="154" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="154" bodyend="154"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a626b9e77291125d61b622db93bbc5c8d" prot="public" static="no" mutable="no">
+        <type>std::atomic&lt; uint64_t &gt;</type>
+        <definition>std::atomic&lt;uint64_t&gt; opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::force_flush_notified_sequence</definition>
+        <argsstring></argsstring>
+        <name>force_flush_notified_sequence</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::force_flush_notified_sequence</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="155" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="155" bodyend="155"/>
+      </memberdef>
+      <memberdef kind="variable" id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a20258233246e2164a4971b3c87aa75dc" prot="public" static="no" mutable="no">
+        <type>std::atomic&lt; std::chrono::microseconds::rep &gt;</type>
+        <definition>std::atomic&lt;std::chrono::microseconds::rep&gt; opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::force_flush_timeout_us</definition>
+        <argsstring></argsstring>
+        <name>force_flush_timeout_us</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::force_flush_timeout_us</qualifiedname>
+        <initializer>{0}</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="156" column="17" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="156" bodyend="156"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a9d4ccbd10cf54c0335c682df66cf61f9" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::SynchronizationData</definition>
+        <argsstring>()</argsstring>
+        <name>SynchronizationData</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData::SynchronizationData</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="161" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="161" bodyend="161"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="145" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="146" bodyend="162"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a78aba9ae816c24af743aba4666266fd0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</scope><name>cv</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a3e20e992e7cdf48d081f8a29ab6e670e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</scope><name>cv_m</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1ae74396d7790a0963fde14fce315e8abe" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</scope><name>force_flush_cv</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a952804b2ccfca3aab959254bcf6d1fb4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</scope><name>force_flush_cv_m</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a626b9e77291125d61b622db93bbc5c8d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</scope><name>force_flush_notified_sequence</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a80ce9daef5c8044e0ff02397fd411b3b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</scope><name>force_flush_pending_sequence</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a20258233246e2164a4971b3c87aa75dc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</scope><name>force_flush_timeout_us</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a4db6f08733bbaa37e3b191a688901e46" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</scope><name>is_force_wakeup_background_worker</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1aac4dae72c97bfe5495497951210cfee4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</scope><name>is_shutdown</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a5b8d2f2bb2fe86f689d1d57819a9f606" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</scope><name>shutdown_m</name></member>
+      <member refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData_1a9d4ccbd10cf54c0335c682df66cf61f9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</scope><name>SynchronizationData</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

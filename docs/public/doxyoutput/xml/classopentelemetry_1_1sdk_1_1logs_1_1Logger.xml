@@ -1,0 +1,346 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1Logger" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::sdk::logs::Logger</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1logs_1_1Logger" prot="public" virt="non-virtual">opentelemetry::logs::Logger</basecompoundref>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1aca496fda4f9c42a16cf077d7e834e9a8" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::logs::Logger::logger_name_</definition>
+        <argsstring></argsstring>
+        <name>logger_name_</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::logger_name_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="80" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" bodystart="80" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a86a4d1640b578cf63ffdc66631e1abf3" prot="private" static="no" mutable="no">
+        <type>std::unique_ptr&lt; instrumentationscope::InstrumentationScope &gt;</type>
+        <definition>std::unique_ptr&lt;instrumentationscope::InstrumentationScope&gt; opentelemetry::sdk::logs::Logger::instrumentation_scope_</definition>
+        <argsstring></argsstring>
+        <name>instrumentation_scope_</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::instrumentation_scope_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="84" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" bodystart="84" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a4085d00c7b83a3b9e43434f1c4b33419" prot="private" static="no" mutable="no">
+        <type>std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> &gt;</type>
+        <definition>std::shared_ptr&lt;LoggerContext&gt; opentelemetry::sdk::logs::Logger::context_</definition>
+        <argsstring></argsstring>
+        <name>context_</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::context_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="85" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" bodystart="85" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a66fdd21bbdafb0eb9876eb360ded7246" prot="private" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref></type>
+        <definition>LoggerConfig opentelemetry::sdk::logs::Logger::logger_config_</definition>
+        <argsstring></argsstring>
+        <name>logger_config_</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::logger_config_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="86" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" bodystart="86" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a12f363585937a4c161f4e7929d3af92b" prot="private" static="yes" mutable="no">
+        <type><ref refid="classopentelemetry_1_1logs_1_1NoopLogger" kindref="compound">opentelemetry::logs::NoopLogger</ref></type>
+        <definition>opentelemetry::logs::NoopLogger opentelemetry::sdk::logs::Logger::kNoopLogger</definition>
+        <argsstring></argsstring>
+        <name>kNoopLogger</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::kNoopLogger</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="87" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" bodystart="87" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1afbfe7a062d1bb8ac08baf2b1446bf264" prot="public" static="no" const="no" explicit="yes" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::Logger::Logger</definition>
+        <argsstring>(opentelemetry::nostd::string_view name, std::shared_ptr&lt; LoggerContext &gt; context, std::unique_ptr&lt; instrumentationscope::InstrumentationScope &gt; instrumentation_scope=instrumentationscope::InstrumentationScope::Create(&quot;&quot;)) noexcept</argsstring>
+        <name>Logger</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::Logger</qualifiedname>
+        <param>
+          <type>opentelemetry::nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>std::shared_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" kindref="compound">LoggerContext</ref> &gt;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; instrumentationscope::InstrumentationScope &gt;</type>
+          <declname>instrumentation_scope</declname>
+          <defval>instrumentationscope::InstrumentationScope::Create(&quot;&quot;)</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Initialize a new logger. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>name</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The name of this logger instance </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The logger provider that owns this logger. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>instrumentation_scope</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The instrumentation scope for this logger. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="35" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a0a6d3d05d060440d8af50f20c50f2125" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>const opentelemetry::nostd::string_view</type>
+        <definition>const opentelemetry::nostd::string_view opentelemetry::sdk::logs::Logger::GetName</definition>
+        <argsstring>() noexcept override</argsstring>
+        <name>GetName</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::GetName</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the name of this logger. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="44" column="43"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1ad89cafa404eefed932fedeb5aebd9804" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1LogRecord" kindref="compound">opentelemetry::logs::LogRecord</ref> &gt;</type>
+        <definition>nostd::unique_ptr&lt; opentelemetry::logs::LogRecord &gt; opentelemetry::sdk::logs::Logger::CreateLogRecord</definition>
+        <argsstring>() noexcept override</argsstring>
+        <name>CreateLogRecord</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::CreateLogRecord</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="46" column="21"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1af503e1a8a0c708172e470f11fee2658d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::Logger::EmitLogRecord</definition>
+        <argsstring>(nostd::unique_ptr&lt; opentelemetry::logs::LogRecord &gt; &amp;&amp;log_record) noexcept override</argsstring>
+        <name>EmitLogRecord</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::EmitLogRecord</qualifiedname>
+        <param>
+          <type>nostd::unique_ptr&lt; <ref refid="classopentelemetry_1_1logs_1_1LogRecord" kindref="compound">opentelemetry::logs::LogRecord</ref> &gt; &amp;&amp;</type>
+          <declname>log_record</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="50" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a6e79817c0b8c45e63473cea26db49939" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;</type>
+        <definition>const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp; opentelemetry::sdk::logs::Logger::GetInstrumentationScope</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetInstrumentationScope</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::GetInstrumentationScope</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the associated instrumentation scope </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="54" column="72"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a9b4d4023166a6f5c5959fb0ab532f7ae" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;</type>
+        <definition>const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp; opentelemetry::sdk::logs::Logger::GetInstrumentationLibrary</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetInstrumentationLibrary</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::GetInstrumentationLibrary</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="58" column="72" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" bodystart="58" bodyend="62"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a9734929ec9457bb6613bff95fe7f31b1" prot="private" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::Logger::EnabledImplementation</definition>
+        <argsstring>(opentelemetry::logs::Severity severity, const opentelemetry::logs::EventId &amp;event_id) const noexcept override</argsstring>
+        <name>EnabledImplementation</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::EnabledImplementation</qualifiedname>
+        <param>
+          <type>opentelemetry::logs::Severity</type>
+          <declname>severity</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1logs_1_1EventId" kindref="compound">opentelemetry::logs::EventId</ref> &amp;</type>
+          <declname>event_id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="65" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a7eaddae2667fad00aa0c06f245130232" prot="private" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::Logger::EnabledImplementation</definition>
+        <argsstring>(opentelemetry::logs::Severity severity, int64_t event_id) const noexcept override</argsstring>
+        <name>EnabledImplementation</name>
+        <qualifiedname>opentelemetry::sdk::logs::Logger::EnabledImplementation</qualifiedname>
+        <param>
+          <type>opentelemetry::logs::Severity</type>
+          <declname>severity</declname>
+        </param>
+        <param>
+          <type>int64_t</type>
+          <declname>event_id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="68" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::logs::Logger</label>
+        <link refid="classopentelemetry_1_1logs_1_1Logger"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::logs::Logger</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::logs::Logger</label>
+        <link refid="classopentelemetry_1_1logs_1_1Logger"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::logs::Logger</label>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" line="26" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h" bodystart="27" bodyend="88"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a4085d00c7b83a3b9e43434f1c4b33419" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>context_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1ad89cafa404eefed932fedeb5aebd9804" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>CreateLogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a662d7f7448baf3a8cf1647a0fe09f434" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Debug</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a946b8b8cfbd2b387d682b7f58585f391" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Debug</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1aed68931625e7da86ca13425ef324f514" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Debug</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a3e84c030d24d91c1dc17fb75929e4db5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Debug</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1af68637ee922e284773df64e25b084ac8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Debug</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1af503e1a8a0c708172e470f11fee2658d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>EmitLogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1aac46b634e048cbbd8ffb9e81340a6f86" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::logs::Logger::"><scope>opentelemetry::sdk::logs::Logger</scope><name>EmitLogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1aab0f909b701a8a5fe1d8f1165d228f6b" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::logs::Logger::"><scope>opentelemetry::sdk::logs::Logger</scope><name>EmitLogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1aa5abf0bcdf7bb7f14bdb6812247ce54b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Enabled</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a8e728ca5d4879953b3ea163d40965c64" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Enabled</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ac429d287bb2152f9fd93e5ae1149c0f4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Enabled</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a9734929ec9457bb6613bff95fe7f31b1" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>EnabledImplementation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a7eaddae2667fad00aa0c06f245130232" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>EnabledImplementation</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ae8e088b2cd9fc1e04fcdab4598d146f4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Error</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1af2320d2b7ef200d6f3ab41afbeecf848" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Error</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a3b5e070bb6e8561994268b08e6672978" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Error</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a5c7db814af1905e6d75bf6e58db5c8e0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Error</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ab018f29af1ada301dceda2f4e49e4bea" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Error</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a87bfa2db3523333c9259897837994b39" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Fatal</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a3d7143a054dfdfa263d8101d90ca58e9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Fatal</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a7a25ec83b21a121ba4a885d43c68a621" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Fatal</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a9216f7e58a458e9fa7d1f0daa194e804" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Fatal</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ae1a053ae3e168b23ec5b7c86bbdd3a2f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Fatal</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a9b4d4023166a6f5c5959fb0ab532f7ae" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>GetInstrumentationLibrary</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a6e79817c0b8c45e63473cea26db49939" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>GetInstrumentationScope</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a0a6d3d05d060440d8af50f20c50f2125" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>GetName</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ab97295acd6925afc06435e6dc32e10dc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Info</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a41a91426f132bc3eb060343525fdf520" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Info</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a2cd854b19e474f5e43e9472f84bade6e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Info</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a654f236423f9def6cf9c448bed76139d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Info</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ae5edf5456546c59f34a7993298a5563f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Info</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a86a4d1640b578cf63ffdc66631e1abf3" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>instrumentation_scope_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a12f363585937a4c161f4e7929d3af92b" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>kNoopLogger</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a9ebfc008fb193c7eec494a3eefecbe21" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Log</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a183704d4f6d87fc03e804cc78e5c0162" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Log</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a1c134b198d9bb55edad603b9a4b496fb" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Log</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1aea97ceaf12ec14cf681513f8481f6805" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Log</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1afbfe7a062d1bb8ac08baf2b1446bf264" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Logger</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a67471e5d5592da4d0a49385e8d6fb6ef" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::logs::Logger::"><scope>opentelemetry::sdk::logs::Logger</scope><name>Logger</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a8d52dbed8eb70f141ee18d4af283b1a2" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::logs::Logger::"><scope>opentelemetry::sdk::logs::Logger</scope><name>Logger</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a48e4730ec26685f0498927c09be1bd01" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::logs::Logger::"><scope>opentelemetry::sdk::logs::Logger</scope><name>Logger</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1a66fdd21bbdafb0eb9876eb360ded7246" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>logger_config_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger_1aca496fda4f9c42a16cf077d7e834e9a8" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>logger_name_</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a1db870558fcc7f4ac34b8a3f3763c25d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1aa442b5510983020d507ebfc0e6585a7b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1acb6424fa78ca8d0ff71de6f74c247914" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>SetMinimumSeverity</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a5e9438c63f239bf36407c403a81b6a43" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Trace</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1aecac6a08860cff862d59a70773e31dfa" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Trace</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a1118374fd446d6b73e66d1d10fb44ca4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Trace</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a9bf1f8fd504b306dd10899026f66d858" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Trace</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a6f9e4db4dd7ae34ba41c170b2692592b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Trace</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a0669700cd35cac8ec83e92df0fb18c3e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Warn</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1af240d1289807b1a718e0b07e64fcfedb" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Warn</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1abcc8de1ec177ea49535194000c4f34c9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Warn</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a1693fab147d05538b795fb754a3b8f83" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Warn</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1ace0c385d77532ca84406ae60d51d0898" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>Warn</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1Logger_1a81f083c110081f9fd350f1b77033853c" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::Logger</scope><name>~Logger</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

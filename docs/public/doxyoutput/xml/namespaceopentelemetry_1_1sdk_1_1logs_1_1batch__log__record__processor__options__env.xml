@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1sdk_1_1logs_1_1batch__log__record__processor__options__env" kind="namespace" language="C++">
+    <compoundname>opentelemetry::sdk::logs::batch_log_record_processor_options_env</compoundname>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="batch__log__record__processor__options_8h_1a2be47036f788b49400b048d4a767da28" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>OPENTELEMETRY_EXPORT size_t</type>
+        <definition>OPENTELEMETRY_EXPORT size_t opentelemetry::sdk::logs::batch_log_record_processor_options_env::GetMaxQueueSizeFromEnv</definition>
+        <argsstring>()</argsstring>
+        <name>GetMaxQueueSizeFromEnv</name>
+        <qualifiedname>opentelemetry::sdk::logs::batch_log_record_processor_options_env::GetMaxQueueSizeFromEnv</qualifiedname>
+        <briefdescription>
+<para>Returns the max queue size from the OTEL_BLRP_MAX_QUEUE_SIZE environment variable or the default value (2048) if not set. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" line="23" column="29" declfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" declline="23" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="batch__log__record__processor__options_8h_1a68192803db61e73732af06e127c0ccfb" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>OPENTELEMETRY_EXPORT std::chrono::milliseconds</type>
+        <definition>OPENTELEMETRY_EXPORT std::chrono::milliseconds opentelemetry::sdk::logs::batch_log_record_processor_options_env::GetScheduleDelayFromEnv</definition>
+        <argsstring>()</argsstring>
+        <name>GetScheduleDelayFromEnv</name>
+        <qualifiedname>opentelemetry::sdk::logs::batch_log_record_processor_options_env::GetScheduleDelayFromEnv</qualifiedname>
+        <briefdescription>
+<para>Returns the schedule delay from the OTEL_BLRP_SCHEDULE_DELAY environment variable or the default value (1000ms) if not set. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" line="27" column="48" declfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" declline="27" declcolumn="48"/>
+      </memberdef>
+      <memberdef kind="function" id="batch__log__record__processor__options_8h_1a46831d43fbaed30d0b365a222f38673e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>OPENTELEMETRY_EXPORT std::chrono::milliseconds</type>
+        <definition>OPENTELEMETRY_EXPORT std::chrono::milliseconds opentelemetry::sdk::logs::batch_log_record_processor_options_env::GetExportTimeoutFromEnv</definition>
+        <argsstring>()</argsstring>
+        <name>GetExportTimeoutFromEnv</name>
+        <qualifiedname>opentelemetry::sdk::logs::batch_log_record_processor_options_env::GetExportTimeoutFromEnv</qualifiedname>
+        <briefdescription>
+<para>Returns the export timeout from the OTEL_BLRP_EXPORT_TIMEOUT environment variable or the default value (30000ms) if not set. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" line="31" column="48" declfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" declline="31" declcolumn="48"/>
+      </memberdef>
+      <memberdef kind="function" id="batch__log__record__processor__options_8h_1a10c56962443e7387c0b5708ca33aab49" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>OPENTELEMETRY_EXPORT size_t</type>
+        <definition>OPENTELEMETRY_EXPORT size_t opentelemetry::sdk::logs::batch_log_record_processor_options_env::GetMaxExportBatchSizeFromEnv</definition>
+        <argsstring>()</argsstring>
+        <name>GetMaxExportBatchSizeFromEnv</name>
+        <qualifiedname>opentelemetry::sdk::logs::batch_log_record_processor_options_env::GetMaxExportBatchSizeFromEnv</qualifiedname>
+        <briefdescription>
+<para>Returns the max export batch size from the OTEL_BLRP_MAX_EXPORT_BATCH_SIZE environment variable or the default value (512) if not set. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" line="35" column="29" declfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" declline="35" declcolumn="29"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_options.h" line="18" column="1"/>
+  </compounddef>
+</doxygen>

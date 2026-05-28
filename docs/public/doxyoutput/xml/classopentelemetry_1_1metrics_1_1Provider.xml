@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1metrics_1_1Provider" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::metrics::Provider</compoundname>
+    <includes refid="api_2include_2opentelemetry_2metrics_2provider_8h" local="no">provider.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Provider_1a08e74a948659ab31bcbefcca949f538d" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref> &gt;</type>
+        <definition>static nostd::shared_ptr&lt; MeterProvider &gt; opentelemetry::metrics::Provider::GetMeterProvider</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetMeterProvider</name>
+        <qualifiedname>opentelemetry::metrics::Provider::GetMeterProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the singleton <ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref>.</para>
+<para>By default, a no-op <ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref> is returned. This will never return a nullptr <ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/provider.h" line="30" column="28" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/provider.h" bodystart="30" bodyend="34"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Provider_1a649815d737037c99d27ba8cf5c5ed60b" prot="public" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>static void opentelemetry::metrics::Provider::SetMeterProvider</definition>
+        <argsstring>(const nostd::shared_ptr&lt; MeterProvider &gt; &amp;tp) noexcept</argsstring>
+        <name>SetMeterProvider</name>
+        <qualifiedname>opentelemetry::metrics::Provider::SetMeterProvider</qualifiedname>
+        <param>
+          <type>const nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref> &gt; &amp;</type>
+          <declname>tp</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Changes the singleton <ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/provider.h" line="39" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/provider.h" bodystart="39" bodyend="43"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Provider_1a7724ef8924918ce3e3e3cb56cedb8290" prot="private" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>OPENTELEMETRY_API_SINGLETON nostd::shared_ptr&lt; <ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref> &gt; &amp;</type>
+        <definition>static OPENTELEMETRY_API_SINGLETON nostd::shared_ptr&lt; MeterProvider &gt; &amp; opentelemetry::metrics::Provider::GetProvider</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetProvider</name>
+        <qualifiedname>opentelemetry::metrics::Provider::GetProvider</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/provider.h" line="46" column="56" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/provider.h" bodystart="46" bodyend="50"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1Provider_1aa4c4b3461dfa36d4c21e7fae79278984" prot="private" static="yes" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>OPENTELEMETRY_API_SINGLETON common::SpinLockMutex &amp;</type>
+        <definition>static OPENTELEMETRY_API_SINGLETON common::SpinLockMutex &amp; opentelemetry::metrics::Provider::GetLock</definition>
+        <argsstring>() noexcept</argsstring>
+        <name>GetLock</name>
+        <qualifiedname>opentelemetry::metrics::Provider::GetLock</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/provider.h" line="52" column="60" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/provider.h" bodystart="52" bodyend="56"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Stores the singleton global <ref refid="classopentelemetry_1_1metrics_1_1MeterProvider" kindref="compound">MeterProvider</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/provider.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/provider.h" bodystart="22" bodyend="57"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1metrics_1_1Provider_1aa4c4b3461dfa36d4c21e7fae79278984" prot="private" virt="non-virtual"><scope>opentelemetry::metrics::Provider</scope><name>GetLock</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Provider_1a08e74a948659ab31bcbefcca949f538d" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Provider</scope><name>GetMeterProvider</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Provider_1a7724ef8924918ce3e3e3cb56cedb8290" prot="private" virt="non-virtual"><scope>opentelemetry::metrics::Provider</scope><name>GetProvider</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1Provider_1a649815d737037c99d27ba8cf5c5ed60b" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::Provider</scope><name>SetMeterProvider</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,167 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1metrics_1_1SynchronousInstrument" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::metrics::SynchronousInstrument</compoundname>
+    <derivedcompoundref refid="classopentelemetry_1_1metrics_1_1Counter" prot="public" virt="non-virtual">opentelemetry::metrics::Counter&lt; double &gt;</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1metrics_1_1Counter" prot="public" virt="non-virtual">opentelemetry::metrics::Counter&lt; uint64_t &gt;</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1metrics_1_1Histogram" prot="public" virt="non-virtual">opentelemetry::metrics::Histogram&lt; double &gt;</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1metrics_1_1Histogram" prot="public" virt="non-virtual">opentelemetry::metrics::Histogram&lt; uint64_t &gt;</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" prot="public" virt="non-virtual">opentelemetry::metrics::UpDownCounter&lt; double &gt;</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" prot="public" virt="non-virtual">opentelemetry::metrics::UpDownCounter&lt; int64_t &gt;</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1metrics_1_1Counter" prot="public" virt="non-virtual">opentelemetry::metrics::Counter&lt; T &gt;</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1metrics_1_1Histogram" prot="public" virt="non-virtual">opentelemetry::metrics::Histogram&lt; T &gt;</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1metrics_1_1UpDownCounter" prot="public" virt="non-virtual">opentelemetry::metrics::UpDownCounter&lt; T &gt;</derivedcompoundref>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a958cd63a32c41bd53ddb57c74a4af161" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::metrics::SynchronousInstrument::SynchronousInstrument</definition>
+        <argsstring>()=default</argsstring>
+        <name>SynchronousInstrument</name>
+        <qualifiedname>opentelemetry::metrics::SynchronousInstrument::SynchronousInstrument</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="21" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1ad1da5a4adfa52aac49ae6bc98ac39294" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::metrics::SynchronousInstrument::SynchronousInstrument</definition>
+        <argsstring>(const SynchronousInstrument &amp;)=default</argsstring>
+        <name>SynchronousInstrument</name>
+        <qualifiedname>opentelemetry::metrics::SynchronousInstrument::SynchronousInstrument</qualifiedname>
+        <param>
+          <type>const SynchronousInstrument &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="22" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a163d350c750a10cb2c68ad9c88d9ef2b" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::metrics::SynchronousInstrument::SynchronousInstrument</definition>
+        <argsstring>(SynchronousInstrument &amp;&amp;) noexcept=default</argsstring>
+        <name>SynchronousInstrument</name>
+        <qualifiedname>opentelemetry::metrics::SynchronousInstrument::SynchronousInstrument</qualifiedname>
+        <param>
+          <type>SynchronousInstrument &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="23" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a3a119c3d01bcbeb27f003798f709dbb9" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>SynchronousInstrument &amp;</type>
+        <definition>SynchronousInstrument &amp; opentelemetry::metrics::SynchronousInstrument::operator=</definition>
+        <argsstring>(const SynchronousInstrument &amp;)=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::metrics::SynchronousInstrument::operator=</qualifiedname>
+        <param>
+          <type>const SynchronousInstrument &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="24" column="25"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a96a92a09ac869edb8c85adbf2f22aefe" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>SynchronousInstrument &amp;</type>
+        <definition>SynchronousInstrument &amp; opentelemetry::metrics::SynchronousInstrument::operator=</definition>
+        <argsstring>(SynchronousInstrument &amp;&amp;) noexcept=default</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::metrics::SynchronousInstrument::operator=</qualifiedname>
+        <param>
+          <type>SynchronousInstrument &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="25" column="25"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a2cb1a911901a8e09c73dfaf2c3113dae" prot="public" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type></type>
+        <definition>virtual opentelemetry::metrics::SynchronousInstrument::~SynchronousInstrument</definition>
+        <argsstring>()=default</argsstring>
+        <name>~SynchronousInstrument</name>
+        <qualifiedname>opentelemetry::metrics::SynchronousInstrument::~SynchronousInstrument</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="26" column="11"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::metrics::Histogram&lt; double &gt;</label>
+        <link refid="classopentelemetry_1_1metrics_1_1Histogram"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>opentelemetry::metrics::Histogram&lt; uint64_t &gt;</label>
+        <link refid="classopentelemetry_1_1metrics_1_1Histogram"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>opentelemetry::metrics::UpDownCounter&lt; double &gt;</label>
+        <link refid="classopentelemetry_1_1metrics_1_1UpDownCounter"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>opentelemetry::metrics::UpDownCounter&lt; int64_t &gt;</label>
+        <link refid="classopentelemetry_1_1metrics_1_1UpDownCounter"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>opentelemetry::metrics::Histogram&lt; T &gt;</label>
+        <link refid="classopentelemetry_1_1metrics_1_1Histogram"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>opentelemetry::metrics::SynchronousInstrument</label>
+      </node>
+      <node id="7">
+        <label>opentelemetry::metrics::UpDownCounter&lt; T &gt;</label>
+        <link refid="classopentelemetry_1_1metrics_1_1UpDownCounter"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" line="18" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics/sync_instruments.h" bodystart="19" bodyend="27"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a3a119c3d01bcbeb27f003798f709dbb9" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::SynchronousInstrument</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a96a92a09ac869edb8c85adbf2f22aefe" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::SynchronousInstrument</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a958cd63a32c41bd53ddb57c74a4af161" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::SynchronousInstrument</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1ad1da5a4adfa52aac49ae6bc98ac39294" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::SynchronousInstrument</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a163d350c750a10cb2c68ad9c88d9ef2b" prot="public" virt="non-virtual"><scope>opentelemetry::metrics::SynchronousInstrument</scope><name>SynchronousInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1SynchronousInstrument_1a2cb1a911901a8e09c73dfaf2c3113dae" prot="public" virt="virtual"><scope>opentelemetry::metrics::SynchronousInstrument</scope><name>~SynchronousInstrument</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,287 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::ObservableRegistry</compoundname>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1af63f7955c71f9d384deb65de846bb5b2" prot="private" static="no" mutable="no">
+        <type>std::unordered_map&lt; uintptr_t, std::unique_ptr&lt; ObservableCallbackRecord &gt; &gt;</type>
+        <definition>std::unordered_map&lt;uintptr_t, std::unique_ptr&lt;ObservableCallbackRecord&gt; &gt; opentelemetry::sdk::metrics::ObservableRegistry::callbacks_</definition>
+        <argsstring></argsstring>
+        <name>callbacks_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::callbacks_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="65" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" bodystart="65" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1ad5f1493c5206675aa0fa1e72b3ab6046" prot="private" static="no" mutable="no">
+        <type>std::mutex</type>
+        <definition>std::mutex opentelemetry::sdk::metrics::ObservableRegistry::callbacks_m_</definition>
+        <argsstring></argsstring>
+        <name>callbacks_m_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::callbacks_m_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="66" column="14" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" bodystart="66" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1a636633b57fd637f8429c5bf5a29c8941" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ObservableRegistry::ObservableRegistry</definition>
+        <argsstring>()</argsstring>
+        <name>ObservableRegistry</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::ObservableRegistry</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="36" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1ad190107aea435ba7219b7d04d1bf130a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ObservableRegistry::ObservableRegistry</definition>
+        <argsstring>(const ObservableRegistry &amp;)=delete</argsstring>
+        <name>ObservableRegistry</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::ObservableRegistry</qualifiedname>
+        <param>
+          <type>const ObservableRegistry &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="37" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1ad8fd6c18bcc2e82f97ddd26fc053abb0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ObservableRegistry::ObservableRegistry</definition>
+        <argsstring>(ObservableRegistry &amp;&amp;)=delete</argsstring>
+        <name>ObservableRegistry</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::ObservableRegistry</qualifiedname>
+        <param>
+          <type>ObservableRegistry &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="38" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1a749c34e61f338ada03e568cb51ecb9c3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>ObservableRegistry &amp;</type>
+        <definition>ObservableRegistry &amp; opentelemetry::sdk::metrics::ObservableRegistry::operator=</definition>
+        <argsstring>(const ObservableRegistry &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::operator=</qualifiedname>
+        <param>
+          <type>const ObservableRegistry &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="39" column="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1af7d7859b18d9373afe0b2d44fe433047" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>ObservableRegistry &amp;</type>
+        <definition>ObservableRegistry &amp; opentelemetry::sdk::metrics::ObservableRegistry::operator=</definition>
+        <argsstring>(ObservableRegistry &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::operator=</qualifiedname>
+        <param>
+          <type>ObservableRegistry &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="40" column="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1a1122195aabea1844dd04614645192f6c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::ObservableRegistry::~ObservableRegistry</definition>
+        <argsstring>()</argsstring>
+        <name>~ObservableRegistry</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::~ObservableRegistry</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="41" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1a1f938e55b4e77224047770c136e5b904" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::ObservableRegistry::AddCallback</definition>
+        <argsstring>(opentelemetry::metrics::ObservableCallbackPtr callback, void *state, opentelemetry::metrics::ObservableInstrument *instrument)</argsstring>
+        <name>AddCallback</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::AddCallback</qualifiedname>
+        <param>
+          <type>opentelemetry::metrics::ObservableCallbackPtr</type>
+          <declname>callback</declname>
+        </param>
+        <param>
+          <type>void *</type>
+          <declname>state</declname>
+        </param>
+        <param>
+          <type>opentelemetry::metrics::ObservableInstrument *</type>
+          <declname>instrument</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="44" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1a1a6dad2ae44d839870043e6ebcb3ac81" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uintptr_t</type>
+        <definition>uintptr_t opentelemetry::sdk::metrics::ObservableRegistry::AddCallback</definition>
+        <argsstring>(opentelemetry::metrics::MultiObservableCallbackPtr callback, void *state, nostd::span&lt; opentelemetry::metrics::ObservableInstrument * &gt; instruments)</argsstring>
+        <name>AddCallback</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::AddCallback</qualifiedname>
+        <param>
+          <type>opentelemetry::metrics::MultiObservableCallbackPtr</type>
+          <declname>callback</declname>
+        </param>
+        <param>
+          <type>void *</type>
+          <declname>state</declname>
+        </param>
+        <param>
+          <type>nostd::span&lt; opentelemetry::metrics::ObservableInstrument * &gt;</type>
+          <declname>instruments</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="48" column="13"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1ad850bfd1ba2aa0e1abc658058de19832" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::ObservableRegistry::RemoveCallback</definition>
+        <argsstring>(uintptr_t id)</argsstring>
+        <name>RemoveCallback</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::RemoveCallback</qualifiedname>
+        <param>
+          <type>uintptr_t</type>
+          <declname>id</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="53" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1a896448d58f78e06bff377558428f3026" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::ObservableRegistry::RemoveCallback</definition>
+        <argsstring>(opentelemetry::metrics::ObservableCallbackPtr callback, void *state, opentelemetry::metrics::ObservableInstrument *instrument)</argsstring>
+        <name>RemoveCallback</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::RemoveCallback</qualifiedname>
+        <param>
+          <type>opentelemetry::metrics::ObservableCallbackPtr</type>
+          <declname>callback</declname>
+        </param>
+        <param>
+          <type>void *</type>
+          <declname>state</declname>
+        </param>
+        <param>
+          <type>opentelemetry::metrics::ObservableInstrument *</type>
+          <declname>instrument</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="56" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1ac5100f36f073930bda1e9bb06abd8f3b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::ObservableRegistry::CleanupCallback</definition>
+        <argsstring>(opentelemetry::metrics::ObservableInstrument *instrument)</argsstring>
+        <name>CleanupCallback</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::CleanupCallback</qualifiedname>
+        <param>
+          <type>opentelemetry::metrics::ObservableInstrument *</type>
+          <declname>instrument</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="60" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1ab168a7ea882ee63685690d60dbd04bda" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::ObservableRegistry::Observe</definition>
+        <argsstring>(opentelemetry::common::SystemTimestamp collection_ts)</argsstring>
+        <name>Observe</name>
+        <qualifiedname>opentelemetry::sdk::metrics::ObservableRegistry::Observe</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>collection_ts</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="62" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" line="30" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/state/observable_registry.h" bodystart="31" bodyend="67"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1a1f938e55b4e77224047770c136e5b904" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>AddCallback</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1a1a6dad2ae44d839870043e6ebcb3ac81" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>AddCallback</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1af63f7955c71f9d384deb65de846bb5b2" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>callbacks_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1ad5f1493c5206675aa0fa1e72b3ab6046" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>callbacks_m_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1ac5100f36f073930bda1e9bb06abd8f3b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>CleanupCallback</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1a636633b57fd637f8429c5bf5a29c8941" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>ObservableRegistry</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1ad190107aea435ba7219b7d04d1bf130a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>ObservableRegistry</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1ad8fd6c18bcc2e82f97ddd26fc053abb0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>ObservableRegistry</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1ab168a7ea882ee63685690d60dbd04bda" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>Observe</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1a749c34e61f338ada03e568cb51ecb9c3" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1af7d7859b18d9373afe0b2d44fe433047" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1ad850bfd1ba2aa0e1abc658058de19832" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>RemoveCallback</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1a896448d58f78e06bff377558428f3026" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>RemoveCallback</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1ObservableRegistry_1a1122195aabea1844dd04614645192f6c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::ObservableRegistry</scope><name>~ObservableRegistry</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

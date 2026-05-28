@@ -1,0 +1,406 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::logs::MultiLogRecordProcessor</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" prot="public" virt="non-virtual">opentelemetry::sdk::logs::LogRecordProcessor</basecompoundref>
+    <includes refid="multi__log__record__processor_8h" local="no">multi_log_record_processor.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a79177a20e6d9874e82d694b4b1a0d654" prot="private" static="no" mutable="no">
+        <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &gt;</type>
+        <definition>std::vector&lt;std::unique_ptr&lt;LogRecordProcessor&gt; &gt; opentelemetry::sdk::logs::MultiLogRecordProcessor::processors_</definition>
+        <argsstring></argsstring>
+        <name>processors_</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::processors_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="91" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" bodystart="91" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ad413ec46ab72fcd098eefdb9ee3d199e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::MultiLogRecordProcessor::MultiLogRecordProcessor</definition>
+        <argsstring>(std::vector&lt; std::unique_ptr&lt; LogRecordProcessor &gt; &gt; &amp;&amp;processors)</argsstring>
+        <name>MultiLogRecordProcessor</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::MultiLogRecordProcessor</qualifiedname>
+        <param>
+          <type>std::vector&lt; std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &gt; &amp;&amp;</type>
+          <declname>processors</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="28" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a4108c8536007fc86aa31af5a22c72102" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::MultiLogRecordProcessor::MultiLogRecordProcessor</definition>
+        <argsstring>(const MultiLogRecordProcessor &amp;)=delete</argsstring>
+        <name>MultiLogRecordProcessor</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::MultiLogRecordProcessor</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor" kindref="compound">MultiLogRecordProcessor</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="30" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ab8f83c2dceda8a58a352b9da327bb911" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::MultiLogRecordProcessor::MultiLogRecordProcessor</definition>
+        <argsstring>(MultiLogRecordProcessor &amp;&amp;)=delete</argsstring>
+        <name>MultiLogRecordProcessor</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::MultiLogRecordProcessor</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor" kindref="compound">MultiLogRecordProcessor</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="31" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ac81e5908d37b65554a38fd810a94435d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor" kindref="compound">MultiLogRecordProcessor</ref> &amp;</type>
+        <definition>MultiLogRecordProcessor &amp; opentelemetry::sdk::logs::MultiLogRecordProcessor::operator=</definition>
+        <argsstring>(const MultiLogRecordProcessor &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor" kindref="compound">MultiLogRecordProcessor</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="32" column="27"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ad3ea220faaae8b29c6bcf8b43c12e496" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor" kindref="compound">MultiLogRecordProcessor</ref> &amp;</type>
+        <definition>MultiLogRecordProcessor &amp; opentelemetry::sdk::logs::MultiLogRecordProcessor::operator=</definition>
+        <argsstring>(MultiLogRecordProcessor &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor" kindref="compound">MultiLogRecordProcessor</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="33" column="27"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a65c4b0be9127516d395d8f8b676a586f" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::MultiLogRecordProcessor::~MultiLogRecordProcessor</definition>
+        <argsstring>() override</argsstring>
+        <name>~MultiLogRecordProcessor</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::~MultiLogRecordProcessor</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="35" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1adcde2802acd221f8d25c56a1703807e3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::MultiLogRecordProcessor::AddProcessor</definition>
+        <argsstring>(std::unique_ptr&lt; LogRecordProcessor &gt; &amp;&amp;processor)</argsstring>
+        <name>AddProcessor</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::AddProcessor</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" kindref="compound">LogRecordProcessor</ref> &gt; &amp;&amp;</type>
+          <declname>processor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="37" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ac6964edaa9862df59a81a30a53f9585b" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable" kindref="compound">Recordable</ref> &gt;</type>
+        <definition>std::unique_ptr&lt; Recordable &gt; opentelemetry::sdk::logs::MultiLogRecordProcessor::MakeRecordable</definition>
+        <argsstring>() noexcept override</argsstring>
+        <name>MakeRecordable</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::MakeRecordable</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1a83542b3ad27f3a1b4e841f0843dd46a8">MakeRecordable</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a log recordable. This requests a new log recordable from the associated exporter.</para>
+<para><simplesect kind="return"><para>a newly initialized recordable</para>
+</simplesect>
+Note: This method must be callable from multiple threads. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="39" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a96fbaf6d387602339da2ac63372ee1ad" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::logs::MultiLogRecordProcessor::OnEmit</definition>
+        <argsstring>(std::unique_ptr&lt; Recordable &gt; &amp;&amp;record) noexcept override</argsstring>
+        <name>OnEmit</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::OnEmit</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1a0733b8a97200f61a3f846bda4d7fa16b">OnEmit</reimplements>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable" kindref="compound">Recordable</ref> &gt; &amp;&amp;</type>
+          <declname>record</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>OnEmit is called by the SDK once a log record has been successfully created. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>record</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the log record </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="45" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a3448ffd0c1140d66b54945e890269990" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::MultiLogRecordProcessor::ForceFlush</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept override</argsstring>
+        <name>ForceFlush</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::ForceFlush</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1a80c989cce8620ead7d634fd4ff6d65b8">ForceFlush</reimplements>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Exports all log records that have not yet been exported to the configured Exporter. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timeout</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>that the forceflush is required to finish within. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>a result code indicating whether it succeeded, failed or timed out </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="52" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ac4e450df9dfa69e524e90e3f9a99b22e" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::MultiLogRecordProcessor::Shutdown</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept override</argsstring>
+        <name>Shutdown</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::Shutdown</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1a42a1e31ae03d325bc4593dfca747c5d1">Shutdown</reimplements>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Shuts down the processor and does any cleanup required. ShutDown should only be called once for each processor. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timeout</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>minimum amount of microseconds to wait for shutdown before giving up and returning failure. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if the shutdown succeeded, false otherwise </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="62" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="protected-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a85a57ee92f85a23fe16c661b0fa67e76" prot="protected" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::MultiLogRecordProcessor::InternalForceFlush</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept</argsstring>
+        <name>InternalForceFlush</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::InternalForceFlush</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Exports all log records that have not yet been exported to the configured Exporter. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timeout</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>that the forceflush is required to finish within. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>a result code indicating whether it succeeded, failed or timed out </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="71" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ab7821d55df44ed9af0699d29f2cd5a45" prot="protected" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::MultiLogRecordProcessor::InternalShutdown</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept</argsstring>
+        <name>InternalShutdown</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::InternalShutdown</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Shuts down the processor and does any cleanup required. ShutDown should only be called once for each processor. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timeout</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>minimum amount of microseconds to wait for shutdown before giving up and returning failure. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if the shutdown succeeded, false otherwise </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="81" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a98392cd5e868e9f1f657df3873a84ae1" prot="protected" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::MultiLogRecordProcessor::EnabledImplementation</definition>
+        <argsstring>(const opentelemetry::context::Context &amp;context, const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;instrumentation_scope, opentelemetry::logs::Severity severity, opentelemetry::nostd::string_view event_name) const noexcept override</argsstring>
+        <name>EnabledImplementation</name>
+        <qualifiedname>opentelemetry::sdk::logs::MultiLogRecordProcessor::EnabledImplementation</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1ad2c88a4ad254de8fcf11784872e0baeb">EnabledImplementation</reimplements>
+        <param>
+          <type>const opentelemetry::context::Context &amp;</type>
+          <declname>context</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;</type>
+          <declname>instrumentation_scope</declname>
+        </param>
+        <param>
+          <type>opentelemetry::logs::Severity</type>
+          <declname>severity</declname>
+        </param>
+        <param>
+          <type>opentelemetry::nostd::string_view</type>
+          <declname>event_name</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="84" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Log processor allow hooks for receive method invocations.</para>
+<para>Built-in log processors are responsible for batching and conversion of logs to exportable representation and passing batches to exporters. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::sdk::logs::LogRecordProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::logs::MultiLogRecordProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::sdk::logs::LogRecordProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::logs::MultiLogRecordProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" line="25" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h" bodystart="26" bodyend="92"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1adcde2802acd221f8d25c56a1703807e3" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>AddProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1aa554bd68a239486afd6970a40a63133e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>Enabled</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a98392cd5e868e9f1f657df3873a84ae1" prot="protected" virt="virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>EnabledImplementation</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a3448ffd0c1140d66b54945e890269990" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>ForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a85a57ee92f85a23fe16c661b0fa67e76" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>InternalForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ab7821d55df44ed9af0699d29f2cd5a45" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>InternalShutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1a8ed524cd4573cc2a2093d7aa7937329d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>LogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1afc3a8be73caffddc38771fc501d7d83c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>LogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1aca045ca771e512a5b0462c1a91faadcc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>LogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ac6964edaa9862df59a81a30a53f9585b" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>MakeRecordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ad413ec46ab72fcd098eefdb9ee3d199e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>MultiLogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a4108c8536007fc86aa31af5a22c72102" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>MultiLogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ab8f83c2dceda8a58a352b9da327bb911" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>MultiLogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a96fbaf6d387602339da2ac63372ee1ad" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>OnEmit</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ac81e5908d37b65554a38fd810a94435d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ad3ea220faaae8b29c6bcf8b43c12e496" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1afa0587cc1913b6e807055e6f27fa6891" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::logs::LogRecordProcessor::"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1aebdd387181502a8ffcf15acf81ee3448" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::logs::LogRecordProcessor::"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a79177a20e6d9874e82d694b4b1a0d654" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>processors_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1ac4e450df9dfa69e524e90e3f9a99b22e" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>Shutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor_1a79af9efbf5a6bc51ea5e56ecb16647ac" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>~LogRecordProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor_1a65c4b0be9127516d395d8f8b676a586f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::MultiLogRecordProcessor</scope><name>~MultiLogRecordProcessor</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

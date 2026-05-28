@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorHash" kind="struct" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::InstrumentDescriptorHash</compoundname>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorHash_1a211a7af4e4e499a494795a66f90de821" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>std::size_t</type>
+        <definition>std::size_t opentelemetry::sdk::metrics::InstrumentDescriptorHash::operator()</definition>
+        <argsstring>(const InstrumentDescriptor &amp;instrument_descriptor) const noexcept</argsstring>
+        <name>operator()</name>
+        <qualifiedname>opentelemetry::sdk::metrics::InstrumentDescriptorHash::operator()</qualifiedname>
+        <param>
+          <type>const InstrumentDescriptor &amp;</type>
+          <declname>instrument_descriptor</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="199" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="199" bodyend="214"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" line="197" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/instruments.h" bodystart="198" bodyend="215"/>
+    <listofallmembers>
+      <member refid="structopentelemetry_1_1sdk_1_1metrics_1_1InstrumentDescriptorHash_1a211a7af4e4e499a494795a66f90de821" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::InstrumentDescriptorHash</scope><name>operator()</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

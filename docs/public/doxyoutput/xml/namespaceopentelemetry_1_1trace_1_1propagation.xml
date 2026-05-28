@@ -1,0 +1,229 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1trace_1_1propagation" kind="namespace" language="C++">
+    <compoundname>opentelemetry::trace::propagation</compoundname>
+    <innerclass refid="classopentelemetry_1_1trace_1_1propagation_1_1B3Propagator" prot="public">opentelemetry::trace::propagation::B3Propagator</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorExtractor" prot="public">opentelemetry::trace::propagation::B3PropagatorExtractor</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1propagation_1_1B3PropagatorMultiHeader" prot="public">opentelemetry::trace::propagation::B3PropagatorMultiHeader</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1propagation_1_1HttpTraceContext" prot="public">opentelemetry::trace::propagation::HttpTraceContext</innerclass>
+    <innerclass refid="classopentelemetry_1_1trace_1_1propagation_1_1JaegerPropagator" prot="public">opentelemetry::trace::propagation::JaegerPropagator</innerclass>
+    <innernamespace refid="namespaceopentelemetry_1_1trace_1_1propagation_1_1detail">opentelemetry::trace::propagation::detail</innernamespace>
+    <sectiondef kind="var">
+      <memberdef kind="variable" id="b3__propagator_8h_1a32e3218eb5fc176c34782517fbbc8a1d" prot="public" static="yes" mutable="no">
+        <type>const nostd::string_view</type>
+        <definition>const nostd::string_view opentelemetry::trace::propagation::kB3CombinedHeader</definition>
+        <argsstring></argsstring>
+        <name>kB3CombinedHeader</name>
+        <qualifiedname>opentelemetry::trace::propagation::kB3CombinedHeader</qualifiedname>
+        <initializer>= &quot;b3&quot;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="21" column="33" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" bodystart="21" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="b3__propagator_8h_1a6e88bea569327e043ab79854a319c953" prot="public" static="yes" mutable="no">
+        <type>const nostd::string_view</type>
+        <definition>const nostd::string_view opentelemetry::trace::propagation::kB3TraceIdHeader</definition>
+        <argsstring></argsstring>
+        <name>kB3TraceIdHeader</name>
+        <qualifiedname>opentelemetry::trace::propagation::kB3TraceIdHeader</qualifiedname>
+        <initializer>= &quot;X-B3-TraceId&quot;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="23" column="33" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" bodystart="23" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="b3__propagator_8h_1afe497aec44ffca340e8bb10843528025" prot="public" static="yes" mutable="no">
+        <type>const nostd::string_view</type>
+        <definition>const nostd::string_view opentelemetry::trace::propagation::kB3SpanIdHeader</definition>
+        <argsstring></argsstring>
+        <name>kB3SpanIdHeader</name>
+        <qualifiedname>opentelemetry::trace::propagation::kB3SpanIdHeader</qualifiedname>
+        <initializer>= &quot;X-B3-SpanId&quot;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="24" column="33" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" bodystart="24" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="b3__propagator_8h_1a14f3fcaa18bd9fd160810ab7bd92f4fb" prot="public" static="yes" mutable="no">
+        <type>const nostd::string_view</type>
+        <definition>const nostd::string_view opentelemetry::trace::propagation::kB3SampledHeader</definition>
+        <argsstring></argsstring>
+        <name>kB3SampledHeader</name>
+        <qualifiedname>opentelemetry::trace::propagation::kB3SampledHeader</qualifiedname>
+        <initializer>= &quot;X-B3-Sampled&quot;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="25" column="33" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" bodystart="25" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="b3__propagator_8h_1a1397e54aa09a6fcb69ad08615e9abd91" prot="public" static="yes" mutable="no">
+        <type>const int</type>
+        <definition>const int opentelemetry::trace::propagation::kTraceIdHexStrLength</definition>
+        <argsstring></argsstring>
+        <name>kTraceIdHexStrLength</name>
+        <qualifiedname>opentelemetry::trace::propagation::kTraceIdHexStrLength</qualifiedname>
+        <initializer>= 32</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="37" column="18" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" bodystart="37" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="b3__propagator_8h_1adf56553100476ce681a3d2ced67b4699" prot="public" static="yes" mutable="no">
+        <type>const int</type>
+        <definition>const int opentelemetry::trace::propagation::kSpanIdHexStrLength</definition>
+        <argsstring></argsstring>
+        <name>kSpanIdHexStrLength</name>
+        <qualifiedname>opentelemetry::trace::propagation::kSpanIdHexStrLength</qualifiedname>
+        <initializer>= 16</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="38" column="18" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" bodystart="38" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="http__trace__context_8h_1a03387b158272a9c517bb51d9f8eeb45b" prot="public" static="yes" mutable="no">
+        <type>const nostd::string_view</type>
+        <definition>const nostd::string_view opentelemetry::trace::propagation::kTraceParent</definition>
+        <argsstring></argsstring>
+        <name>kTraceParent</name>
+        <qualifiedname>opentelemetry::trace::propagation::kTraceParent</qualifiedname>
+        <initializer>= &quot;traceparent&quot;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" line="24" column="33" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" bodystart="24" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="http__trace__context_8h_1aa0aba9cc0c6daf8370c42634f947a061" prot="public" static="yes" mutable="no">
+        <type>const nostd::string_view</type>
+        <definition>const nostd::string_view opentelemetry::trace::propagation::kTraceState</definition>
+        <argsstring></argsstring>
+        <name>kTraceState</name>
+        <qualifiedname>opentelemetry::trace::propagation::kTraceState</qualifiedname>
+        <initializer>= &quot;tracestate&quot;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" line="25" column="33" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" bodystart="25" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="http__trace__context_8h_1a3bf3c0a43f1928388310ba6ab17b5979" prot="public" static="yes" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t opentelemetry::trace::propagation::kVersionSize</definition>
+        <argsstring></argsstring>
+        <name>kVersionSize</name>
+        <qualifiedname>opentelemetry::trace::propagation::kVersionSize</qualifiedname>
+        <initializer>= 2</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" line="26" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" bodystart="26" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="http__trace__context_8h_1ab2200fe8feda2c0b88677694401593a8" prot="public" static="yes" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t opentelemetry::trace::propagation::kTraceIdSize</definition>
+        <argsstring></argsstring>
+        <name>kTraceIdSize</name>
+        <qualifiedname>opentelemetry::trace::propagation::kTraceIdSize</qualifiedname>
+        <initializer>= 32</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" line="27" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" bodystart="27" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="http__trace__context_8h_1abacc941dc8e727df32f435a2e3d6fcd6" prot="public" static="yes" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t opentelemetry::trace::propagation::kSpanIdSize</definition>
+        <argsstring></argsstring>
+        <name>kSpanIdSize</name>
+        <qualifiedname>opentelemetry::trace::propagation::kSpanIdSize</qualifiedname>
+        <initializer>= 16</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" line="28" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" bodystart="28" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="http__trace__context_8h_1ae25221d992773f4aad56283290d7350c" prot="public" static="yes" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t opentelemetry::trace::propagation::kTraceFlagsSize</definition>
+        <argsstring></argsstring>
+        <name>kTraceFlagsSize</name>
+        <qualifiedname>opentelemetry::trace::propagation::kTraceFlagsSize</qualifiedname>
+        <initializer>= 2</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" line="29" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" bodystart="29" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="http__trace__context_8h_1a8080dcd8da5cf2626676aabaabb33970" prot="public" static="yes" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t opentelemetry::trace::propagation::kTraceParentSize</definition>
+        <argsstring></argsstring>
+        <name>kTraceParentSize</name>
+        <qualifiedname>opentelemetry::trace::propagation::kTraceParentSize</qualifiedname>
+        <initializer>= 55</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" line="30" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/http_trace_context.h" bodystart="30" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="jaeger_8h_1aeb17028af11f0d4edd8b359d9e90550c" prot="public" static="yes" mutable="no">
+        <type>const nostd::string_view</type>
+        <definition>const nostd::string_view opentelemetry::trace::propagation::kJaegerTraceHeader</definition>
+        <argsstring></argsstring>
+        <name>kJaegerTraceHeader</name>
+        <qualifiedname>opentelemetry::trace::propagation::kJaegerTraceHeader</qualifiedname>
+        <initializer>= &quot;uber-trace-id&quot;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/jaeger.h" line="18" column="33" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/jaeger.h" bodystart="18" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace/propagation/b3_propagator.h" line="18" column="1"/>
+  </compounddef>
+</doxygen>

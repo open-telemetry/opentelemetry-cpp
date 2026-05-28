@@ -1,0 +1,265 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="severity_8h" kind="file" language="C++">
+    <compoundname>severity.h</compoundname>
+    <includes local="no">cstdint</includes>
+    <includes local="yes">opentelemetry/nostd/string_view.h</includes>
+    <includes local="yes">opentelemetry/version.h</includes>
+    <includedby refid="api_2include_2opentelemetry_2logs_2logger_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger.h</includedby>
+    <includedby refid="logger__type__traits_8h" local="yes">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h</includedby>
+    <includedby refid="logger__config_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h</includedby>
+    <includedby refid="logs_2processor_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/processor.h</includedby>
+    <includedby refid="read__write__log__record_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h</includedby>
+    <includedby refid="readable__log__record_8h" local="yes">/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/readable_log_record.h</includedby>
+    <incdepgraph>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/severity.h</label>
+        <link refid="severity_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>cstdint</label>
+      </node>
+      <node id="3">
+        <label>opentelemetry/nostd/string_view.h</label>
+      </node>
+      <node id="4">
+        <label>opentelemetry/version.h</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="3">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/event_logger.h</label>
+        <link refid="api_2include_2opentelemetry_2logs_2event__logger_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger.h</label>
+        <link refid="api_2include_2opentelemetry_2logs_2logger_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h</label>
+        <link refid="logger__type__traits_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/noop.h</label>
+        <link refid="logs_2noop_8h_source"/>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/provider.h</label>
+        <link refid="api_2include_2opentelemetry_2logs_2provider_8h_source"/>
+      </node>
+      <node id="1">
+        <label>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/severity.h</label>
+        <link refid="severity_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h</label>
+        <link refid="batch__log__record__processor_8h_source"/>
+      </node>
+      <node id="16">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor_factory.h</label>
+        <link refid="batch__log__record__processor__factory_8h_source"/>
+      </node>
+      <node id="9">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/event_logger.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2logs_2event__logger_8h_source"/>
+      </node>
+      <node id="6">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2logs_2logger_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h</label>
+        <link refid="logger__config_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context.h</label>
+        <link refid="logger__context_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_context_factory.h</label>
+        <link refid="logger__context__factory_8h_source"/>
+      </node>
+      <node id="7">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider.h</label>
+        <link refid="sdk_2include_2opentelemetry_2sdk_2logs_2logger__provider_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_provider_factory.h</label>
+        <link refid="logger__provider__factory_8h_source"/>
+      </node>
+      <node id="17">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor.h</label>
+        <link refid="multi__log__record__processor_8h_source"/>
+      </node>
+      <node id="18">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_log_record_processor_factory.h</label>
+        <link refid="multi__log__record__processor__factory_8h_source"/>
+      </node>
+      <node id="19">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/multi_recordable.h</label>
+        <link refid="logs_2multi__recordable_8h_source"/>
+      </node>
+      <node id="14">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/processor.h</label>
+        <link refid="logs_2processor_8h_source"/>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/read_write_log_record.h</label>
+        <link refid="read__write__log__record_8h_source"/>
+      </node>
+      <node id="23">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/readable_log_record.h</label>
+        <link refid="readable__log__record_8h_source"/>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="20">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor.h</label>
+        <link refid="simple__log__record__processor_8h_source"/>
+      </node>
+      <node id="21">
+        <label>/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/simple_log_record_processor_factory.h</label>
+        <link refid="simple__log__record__processor__factory_8h_source"/>
+      </node>
+    </invincdepgraph>
+    <innernamespace refid="namespaceopentelemetry">opentelemetry</innernamespace>
+    <innernamespace refid="namespaceopentelemetry_1_1logs">opentelemetry::logs</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="comment">//<sp/>Copyright<sp/>The<sp/>OpenTelemetry<sp/>Authors</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="comment">//<sp/>SPDX-License-Identifier:<sp/>Apache-2.0</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#pragma<sp/>once</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;cstdint&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/nostd/string_view.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;opentelemetry/version.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal">OPENTELEMETRY_BEGIN_NAMESPACE</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">logs</highlight></codeline>
+<codeline lineno="13"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight><highlight class="keyword">enum<sp/>class</highlight><highlight class="normal"><sp/>Severity<sp/>:<sp/>uint8_t</highlight></codeline>
+<codeline lineno="23"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/>kInvalid<sp/>=<sp/>0,</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/>kTrace<sp/><sp/><sp/>=<sp/>1,</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/>kTrace2<sp/><sp/>=<sp/>2,</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/>kTrace3<sp/><sp/>=<sp/>3,</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/>kTrace4<sp/><sp/>=<sp/>4,</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/>kDebug<sp/><sp/><sp/>=<sp/>5,</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/>kDebug2<sp/><sp/>=<sp/>6,</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/>kDebug3<sp/><sp/>=<sp/>7,</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/>kDebug4<sp/><sp/>=<sp/>8,</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/>kInfo<sp/><sp/><sp/><sp/>=<sp/>9,</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/>kInfo2<sp/><sp/><sp/>=<sp/>10,</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/>kInfo3<sp/><sp/><sp/>=<sp/>11,</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/>kInfo4<sp/><sp/><sp/>=<sp/>12,</highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/>kWarn<sp/><sp/><sp/><sp/>=<sp/>13,</highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/>kWarn2<sp/><sp/><sp/>=<sp/>14,</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/>kWarn3<sp/><sp/><sp/>=<sp/>15,</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><sp/><sp/>kWarn4<sp/><sp/><sp/>=<sp/>16,</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/>kError<sp/><sp/><sp/>=<sp/>17,</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/>kError2<sp/><sp/>=<sp/>18,</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/>kError3<sp/><sp/>=<sp/>19,</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/>kError4<sp/><sp/>=<sp/>20,</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/>kFatal<sp/><sp/><sp/>=<sp/>21,</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/>kFatal2<sp/><sp/>=<sp/>22,</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/>kFatal3<sp/><sp/>=<sp/>23,</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/>kFatal4<sp/><sp/>=<sp/>24</highlight></codeline>
+<codeline lineno="49"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight></codeline>
+<codeline lineno="51"><highlight class="normal"></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint8_t<sp/>kMaxSeverity<sp/>=<sp/>255;</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"></highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>nostd::string_view<sp/>SeverityNumToText[25]<sp/>=<sp/>{</highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;INVALID&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;TRACE&quot;</highlight><highlight class="normal">,<sp/><sp/></highlight><highlight class="stringliteral">&quot;TRACE2&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;TRACE3&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;TRACE4&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;DEBUG&quot;</highlight><highlight class="normal">,<sp/><sp/></highlight><highlight class="stringliteral">&quot;DEBUG2&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;DEBUG3&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;DEBUG4&quot;</highlight><highlight class="normal">,</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;INFO&quot;</highlight><highlight class="normal">,<sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;INFO2&quot;</highlight><highlight class="normal">,<sp/><sp/></highlight><highlight class="stringliteral">&quot;INFO3&quot;</highlight><highlight class="normal">,<sp/><sp/></highlight><highlight class="stringliteral">&quot;INFO4&quot;</highlight><highlight class="normal">,<sp/><sp/></highlight><highlight class="stringliteral">&quot;WARN&quot;</highlight><highlight class="normal">,<sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;WARN2&quot;</highlight><highlight class="normal">,<sp/><sp/></highlight><highlight class="stringliteral">&quot;WARN3&quot;</highlight><highlight class="normal">,<sp/><sp/></highlight><highlight class="stringliteral">&quot;WARN4&quot;</highlight><highlight class="normal">,<sp/><sp/></highlight><highlight class="stringliteral">&quot;ERROR&quot;</highlight><highlight class="normal">,</highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="stringliteral">&quot;ERROR2&quot;</highlight><highlight class="normal">,<sp/><sp/></highlight><highlight class="stringliteral">&quot;ERROR3&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;ERROR4&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;FATAL&quot;</highlight><highlight class="normal">,<sp/><sp/></highlight><highlight class="stringliteral">&quot;FATAL2&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;FATAL3&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;FATAL4&quot;</highlight><highlight class="normal">};</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal">}<sp/><sp/></highlight><highlight class="comment">//<sp/>namespace<sp/>logs</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="67"><highlight class="normal">OPENTELEMETRY_END_NAMESPACE</highlight></codeline>
+    </programlisting>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/severity.h"/>
+  </compounddef>
+</doxygen>

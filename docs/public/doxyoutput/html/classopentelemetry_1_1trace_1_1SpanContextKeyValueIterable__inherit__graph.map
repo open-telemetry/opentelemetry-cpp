@@ -1,0 +1,5 @@
+<map id="opentelemetry::trace::SpanContextKeyValueIterable" name="opentelemetry::trace::SpanContextKeyValueIterable">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,228,45"/>
+<area shape="rect" id="Node000002" href="$classopentelemetry_1_1trace_1_1NullSpanContext.html" title="Null Span context that does not carry any information." alt="" coords="37,93,196,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,59,119,93,114,93,114,59"/>
+</map>

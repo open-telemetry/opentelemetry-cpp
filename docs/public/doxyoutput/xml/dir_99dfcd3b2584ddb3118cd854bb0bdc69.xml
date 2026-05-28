@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_99dfcd3b2584ddb3118cd854bb0bdc69" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry</compoundname>
+    <innerdir refid="dir_bdee043f6e1cd2615d69a1f313a75459">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage</innerdir>
+    <innerdir refid="dir_88fa0ebc10e82247b5c4b2a51925e112">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/common</innerdir>
+    <innerdir refid="dir_27220cef15dfd43ffa76cb6b0fb52510">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context</innerdir>
+    <innerdir refid="dir_f326b02a259940e063304ce4339b49f5">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs</innerdir>
+    <innerdir refid="dir_f9f23a095dc66ede01080ec64cebeb98">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/metrics</innerdir>
+    <innerdir refid="dir_c4532fd1ac4dce4566836a040f1b41c7">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/trace</innerdir>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/"/>
+  </compounddef>
+</doxygen>

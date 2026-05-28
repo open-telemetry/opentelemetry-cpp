@@ -1,0 +1,260 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::MetricFilter</compoundname>
+    <includes refid="metric__filter_8h" local="no">metric_filter.h</includes>
+    <sectiondef kind="public-type">
+      <memberdef kind="enum" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1a855b1aacdecfdd8470cad405d1e4b61e" prot="public" static="no" strong="yes">
+        <type>std::uint8_t</type>
+        <name>MetricFilterResult</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricFilter::MetricFilterResult</qualifiedname>
+        <enumvalue id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1a855b1aacdecfdd8470cad405d1e4b61ea05400af3ee9ba0e07027cba790b26be6" prot="public">
+          <name>kAccept</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1a855b1aacdecfdd8470cad405d1e4b61eabbb0cc7bb38684a413a6c6bde2db64aa" prot="public">
+          <name>kDrop</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1a855b1aacdecfdd8470cad405d1e4b61ea33bfd1cc44cf8767ae3e5721b02f5a72" prot="public">
+          <name>kAcceptPartial</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" line="39" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" bodystart="40" bodyend="44"/>
+      </memberdef>
+      <memberdef kind="enum" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1af45f2f0368a4fa3bc4276b20894b6037" prot="public" static="no" strong="yes">
+        <type>std::uint8_t</type>
+        <name>AttributesFilterResult</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricFilter::AttributesFilterResult</qualifiedname>
+        <enumvalue id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1af45f2f0368a4fa3bc4276b20894b6037a05400af3ee9ba0e07027cba790b26be6" prot="public">
+          <name>kAccept</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <enumvalue id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1af45f2f0368a4fa3bc4276b20894b6037abbb0cc7bb38684a413a6c6bde2db64aa" prot="public">
+          <name>kDrop</name>
+          <briefdescription>
+          </briefdescription>
+          <detaileddescription>
+          </detaileddescription>
+        </enumvalue>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" line="46" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" bodystart="47" bodyend="50"/>
+      </memberdef>
+      <memberdef kind="typedef" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1a030717417d0a330818cd1d52d7cbaeb6" prot="public" static="no">
+        <type>std::function&lt; MetricFilterResult(const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;scope, opentelemetry::nostd::string_view name, const InstrumentType &amp;type, opentelemetry::nostd::string_view unit)&gt;</type>
+        <definition>using opentelemetry::sdk::metrics::MetricFilter::TestMetricFn =  std::function&lt;MetricFilterResult( const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;scope, opentelemetry::nostd::string_view name, const InstrumentType &amp;type, opentelemetry::nostd::string_view unit)&gt;</definition>
+        <argsstring></argsstring>
+        <name>TestMetricFn</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricFilter::TestMetricFn</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" line="52" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" bodystart="56" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="typedef" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1aa84187e0c2cc64ff766ee7a58c728c64" prot="public" static="no">
+        <type>std::function&lt; AttributesFilterResult(const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;scope, opentelemetry::nostd::string_view name, const InstrumentType &amp;type, opentelemetry::nostd::string_view unit, const PointAttributes &amp;attributes)&gt;</type>
+        <definition>using opentelemetry::sdk::metrics::MetricFilter::TestAttributesFn =  std::function&lt;AttributesFilterResult( const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;scope, opentelemetry::nostd::string_view name, const InstrumentType &amp;type, opentelemetry::nostd::string_view unit, const PointAttributes &amp;attributes)&gt;</definition>
+        <argsstring></argsstring>
+        <name>TestAttributesFn</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricFilter::TestAttributesFn</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" line="58" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" bodystart="63" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1afe665d31dc64830377ed2f6e219b78f9" prot="private" static="no" mutable="no">
+        <type>TestMetricFn</type>
+        <definition>TestMetricFn opentelemetry::sdk::metrics::MetricFilter::test_metric_fn_</definition>
+        <argsstring></argsstring>
+        <name>test_metric_fn_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricFilter::test_metric_fn_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" line="107" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" bodystart="107" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1af82f1ddc6d81ced647f1431b2ba71e87" prot="private" static="no" mutable="no">
+        <type>TestAttributesFn</type>
+        <definition>TestAttributesFn opentelemetry::sdk::metrics::MetricFilter::test_attributes_fn_</definition>
+        <argsstring></argsstring>
+        <name>test_attributes_fn_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricFilter::test_attributes_fn_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" line="108" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" bodystart="108" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1a67a6ccacf2372c9b4f8b467aa2d6601b" prot="public" static="yes" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter" kindref="compound">MetricFilter</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; MetricFilter &gt; opentelemetry::sdk::metrics::MetricFilter::Create</definition>
+        <argsstring>(const TestMetricFn &amp;test_metric_fn, const TestAttributesFn &amp;test_attributes_fn)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricFilter::Create</qualifiedname>
+        <param>
+          <type>const TestMetricFn &amp;</type>
+          <declname>test_metric_fn</declname>
+        </param>
+        <param>
+          <type>const TestAttributesFn &amp;</type>
+          <declname>test_attributes_fn</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" line="66" column="26" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" bodystart="66" bodyend="70"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1ac6b7b54cf539de22bb98b9409ee34b0f" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::MetricFilter::MetricFilter</definition>
+        <argsstring>(const TestMetricFn &amp;test_metric_fn, const TestAttributesFn &amp;test_attributes_fn)</argsstring>
+        <name>MetricFilter</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricFilter::MetricFilter</qualifiedname>
+        <param>
+          <type>const TestMetricFn &amp;</type>
+          <declname>test_metric_fn</declname>
+        </param>
+        <param>
+          <type>const TestAttributesFn &amp;</type>
+          <declname>test_attributes_fn</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" line="72" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" bodystart="72" bodyend="74"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1ae1e21eaaac40c549f29eaa9839574195" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>MetricFilterResult</type>
+        <definition>MetricFilterResult opentelemetry::sdk::metrics::MetricFilter::TestMetric</definition>
+        <argsstring>(const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;scope, opentelemetry::nostd::string_view name, const InstrumentType &amp;type, opentelemetry::nostd::string_view unit)</argsstring>
+        <name>TestMetric</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricFilter::TestMetric</qualifiedname>
+        <param>
+          <type>const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;</type>
+          <declname>scope</declname>
+        </param>
+        <param>
+          <type>opentelemetry::nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>const InstrumentType &amp;</type>
+          <declname>type</declname>
+        </param>
+        <param>
+          <type>opentelemetry::nostd::string_view</type>
+          <declname>unit</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>TestMetric is called once for every metric stream, in each <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> Produce operation. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" line="80" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" bodystart="80" bodyend="87"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1a2351e63e9a044d9390da990d25e51ab5" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>AttributesFilterResult</type>
+        <definition>AttributesFilterResult opentelemetry::sdk::metrics::MetricFilter::TestAttributes</definition>
+        <argsstring>(const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;scope, opentelemetry::nostd::string_view name, const InstrumentType &amp;type, opentelemetry::nostd::string_view unit, const PointAttributes &amp;attributes)</argsstring>
+        <name>TestAttributes</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricFilter::TestAttributes</qualifiedname>
+        <param>
+          <type>const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;</type>
+          <declname>scope</declname>
+        </param>
+        <param>
+          <type>opentelemetry::nostd::string_view</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>const InstrumentType &amp;</type>
+          <declname>type</declname>
+        </param>
+        <param>
+          <type>opentelemetry::nostd::string_view</type>
+          <declname>unit</declname>
+        </param>
+        <param>
+          <type>const PointAttributes &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>TestAttributes determines for a given metric stream and attribute set if it should be allowed or filtered out.</para>
+<para>This operation should only be called if TestMetric operation returned kAcceptPartial for the given metric stream arguments. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" line="96" column="26" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" bodystart="96" bodyend="104"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter" kindref="compound">MetricFilter</ref> defines the interface which enables the MetricReader’s registered MetricProducers or the SDK’s <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> to filter aggregated data points (Metric Points) inside its Produce operation. The filtering is done at the <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> for performance reasons.</para>
+<para>The <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter" kindref="compound">MetricFilter</ref> allows filtering an entire metric stream - dropping or allowing all its attribute sets - by its TestMetric operation, which accepts the metric stream information (scope, name, kind and unit) and returns an enumeration: kAccept, kDrop or kAcceptPartial. If the latter returned, the TestAttributes operation is to be called per attribute set of that metric stream, returning an enumeration determining if the data point for that (metric stream, attributes) pair is to be allowed in the result of the <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricProducer" kindref="compound">MetricProducer</ref> Produce operation. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" line="36" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/export/metric_filter.h" bodystart="37" bodyend="109"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1af45f2f0368a4fa3bc4276b20894b6037" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricFilter</scope><name>AttributesFilterResult</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1a67a6ccacf2372c9b4f8b467aa2d6601b" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricFilter</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1ac6b7b54cf539de22bb98b9409ee34b0f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricFilter</scope><name>MetricFilter</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1a855b1aacdecfdd8470cad405d1e4b61e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricFilter</scope><name>MetricFilterResult</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1af82f1ddc6d81ced647f1431b2ba71e87" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricFilter</scope><name>test_attributes_fn_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1afe665d31dc64830377ed2f6e219b78f9" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricFilter</scope><name>test_metric_fn_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1a2351e63e9a044d9390da990d25e51ab5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricFilter</scope><name>TestAttributes</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1aa84187e0c2cc64ff766ee7a58c728c64" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricFilter</scope><name>TestAttributesFn</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1ae1e21eaaac40c549f29eaa9839574195" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricFilter</scope><name>TestMetric</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricFilter_1a030717417d0a330818cd1d52d7cbaeb6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricFilter</scope><name>TestMetricFn</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

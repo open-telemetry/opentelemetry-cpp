@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricData" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::MetricData</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricData_1abdaec6777bee6a76a8df7b4525a5943f" prot="public" static="no" mutable="no">
+        <type>InstrumentDescriptor</type>
+        <definition>InstrumentDescriptor opentelemetry::sdk::metrics::MetricData::instrument_descriptor</definition>
+        <argsstring></argsstring>
+        <name>instrument_descriptor</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricData::instrument_descriptor</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" line="36" column="24" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" bodystart="36" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricData_1ab4092b0d336e148f94d53896b5b4bc39" prot="public" static="no" mutable="no">
+        <type>AggregationTemporality</type>
+        <definition>AggregationTemporality opentelemetry::sdk::metrics::MetricData::aggregation_temporality</definition>
+        <argsstring></argsstring>
+        <name>aggregation_temporality</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricData::aggregation_temporality</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" line="37" column="26" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" bodystart="37" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricData_1a47a68b62a4d0e4056663bb270e1f3c5e" prot="public" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::metrics::MetricData::start_ts</definition>
+        <argsstring></argsstring>
+        <name>start_ts</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricData::start_ts</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" line="38" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" bodystart="38" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricData_1a6535268a2951ebb9983253104c1d6ff0" prot="public" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::metrics::MetricData::end_ts</definition>
+        <argsstring></argsstring>
+        <name>end_ts</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricData::end_ts</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" line="39" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" bodystart="39" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MetricData_1a71347234b9427a6a0573564699623cda" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; PointDataAttributes &gt;</type>
+        <definition>std::vector&lt;PointDataAttributes&gt; opentelemetry::sdk::metrics::MetricData::point_data_attr_</definition>
+        <argsstring></argsstring>
+        <name>point_data_attr_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MetricData::point_data_attr_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" line="40" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" bodystart="40" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::common::SystemTimestamp</label>
+        <link refid="classopentelemetry_1_1common_1_1SystemTimestamp"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::MetricData</label>
+        <childnode refid="2" relation="usage">
+          <edgelabel>end_ts</edgelabel>
+          <edgelabel>start_ts</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" line="33" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/data/metric_data.h" bodystart="34" bodyend="41"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricData_1ab4092b0d336e148f94d53896b5b4bc39" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricData</scope><name>aggregation_temporality</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricData_1a6535268a2951ebb9983253104c1d6ff0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricData</scope><name>end_ts</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricData_1abdaec6777bee6a76a8df7b4525a5943f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricData</scope><name>instrument_descriptor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricData_1a71347234b9427a6a0573564699623cda" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricData</scope><name>point_data_attr_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MetricData_1a47a68b62a4d0e4056663bb270e1f3c5e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MetricData</scope><name>start_ts</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

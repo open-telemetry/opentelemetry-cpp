@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1Recordable" kind="class" language="C++" prot="public" abstract="yes">
+    <compoundname>opentelemetry::sdk::logs::Recordable</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1logs_1_1LogRecord" prot="public" virt="non-virtual">opentelemetry::logs::LogRecord</basecompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiRecordable" prot="public" virt="non-virtual">opentelemetry::sdk::logs::MultiRecordable</derivedcompoundref>
+    <derivedcompoundref refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord" prot="public" virt="non-virtual">opentelemetry::sdk::logs::ReadableLogRecord</derivedcompoundref>
+    <includes refid="logs_2recordable_8h" local="no">recordable.h</includes>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1Recordable_1ad615f379dd3ea6063ee237501741c6e9" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::logs::Recordable::SetResource</definition>
+        <argsstring>(const opentelemetry::sdk::resource::Resource &amp;resource) noexcept=0</argsstring>
+        <name>SetResource</name>
+        <qualifiedname>opentelemetry::sdk::logs::Recordable::SetResource</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a357d890484ef08d6801ac3cc573ade63">SetResource</reimplementedby>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set Resource of this log <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>resource</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the resource to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/recordable.h" line="37" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1Recordable_1a1385ac5d0c3fd3924edb9f0ba4cbb6b5" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="pure-virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::logs::Recordable::SetInstrumentationScope</definition>
+        <argsstring>(const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;instrumentation_scope) noexcept=0</argsstring>
+        <name>SetInstrumentationScope</name>
+        <qualifiedname>opentelemetry::sdk::logs::Recordable::SetInstrumentationScope</qualifiedname>
+        <reimplementedby refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord_1a9f9f5f916bf4c8a3a90ae7ce519c42b5">SetInstrumentationScope</reimplementedby>
+        <param>
+          <type>const opentelemetry::sdk::instrumentationscope::InstrumentationScope &amp;</type>
+          <declname>instrumentation_scope</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Set instrumentation_scope for this log. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>instrumentation_scope</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the instrumentation scope to set </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/recordable.h" line="43" column="16"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Maintains a representation of a log in a format that can be processed by a recorder.</para>
+<para>This class is thread-compatible. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::logs::LogRecord</label>
+        <link refid="classopentelemetry_1_1logs_1_1LogRecord"/>
+      </node>
+      <node id="4">
+        <label>opentelemetry::sdk::logs::ReadWriteLogRecord</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord"/>
+        <childnode refid="3" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>opentelemetry::sdk::logs::ReadableLogRecord</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::logs::Recordable</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::logs::LogRecord</label>
+        <link refid="classopentelemetry_1_1logs_1_1LogRecord"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::logs::Recordable</label>
+        <link refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/recordable.h" line="30" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/recordable.h" bodystart="31" bodyend="46"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1abe66675b44bad2280904bde5c823aaf9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>LogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1abef51ee0d83791eeb2f2964df14d48ac" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>LogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1aca9c888fac59ec29f5ca379d10da0c86" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>LogRecord</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a84bfdebe71f551bfcf2ce6f62b85482c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a4df43247ea78b8f295f4d97a8a2c33eb" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1ad5e8d7872301717e194b5b4090f73cb5" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>SetAttribute</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1acdb2834aa663aba2b557fcb5897c0b5b" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>SetBody</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a3d4148b3ba65373283ea998da86f719c" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>SetEventId</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable_1a1385ac5d0c3fd3924edb9f0ba4cbb6b5" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>SetInstrumentationScope</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a9e37e10ae9db0860cc3bbaaf7574fbd9" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>SetObservedTimestamp</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable_1ad615f379dd3ea6063ee237501741c6e9" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>SetResource</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a264185f7c7772e0c2f3b6f723fa8638d" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>SetSeverity</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a5c67a07ae1564a14f97ad2ec81c596a1" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>SetSpanId</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1aa7f956bb9e85881049fcddaa2f6c6021" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>SetTimestamp</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a00a2039945541466f88b6373fe57b2d3" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>SetTraceFlags</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1abe990638818f67bd11bbdd55c4b95bd4" prot="public" virt="pure-virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>SetTraceId</name></member>
+      <member refid="classopentelemetry_1_1logs_1_1LogRecord_1a4ff305825b55bfeebfd6060431039e19" prot="public" virt="virtual"><scope>opentelemetry::sdk::logs::Recordable</scope><name>~LogRecord</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

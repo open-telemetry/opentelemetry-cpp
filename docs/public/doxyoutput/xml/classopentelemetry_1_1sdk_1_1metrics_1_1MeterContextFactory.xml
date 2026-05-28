@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContextFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::MeterContextFactory</compoundname>
+    <includes refid="meter__context__factory_8h" local="no">meter_context_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContextFactory_1a24cb9473f3a7f4ce518d4528d48862d4" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; MeterContext &gt; opentelemetry::sdk::metrics::MeterContextFactory::Create</definition>
+        <argsstring>()</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContextFactory::Create</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref> with valid defaults. <simplesect kind="return"><para>A unique pointer to the created <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref> object. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context_factory.h" line="29" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContextFactory_1afd22a13ddf6d249181f6896aef1f06ed" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; MeterContext &gt; opentelemetry::sdk::metrics::MeterContextFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; ViewRegistry &gt; views)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContextFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; ViewRegistry &gt;</type>
+          <declname>views</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref> with specified views. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>views</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>ViewRegistry containing OpenTelemetry views registered with this meter context. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context_factory.h" line="35" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContextFactory_1a6a2f2a6d991d94b28a98af6f23409d38" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; MeterContext &gt; opentelemetry::sdk::metrics::MeterContextFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; ViewRegistry &gt; views, const opentelemetry::sdk::resource::Resource &amp;resource)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContextFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; ViewRegistry &gt;</type>
+          <declname>views</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref> with specified views and resource. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>views</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>ViewRegistry containing OpenTelemetry views registered with this meter context. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>resource</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The OpenTelemetry resource associated with this meter context. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A unique pointer to the created <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref> object. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context_factory.h" line="43" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContextFactory_1a4dbad98abc07aa9bb922f2441164e47d" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; MeterContext &gt; opentelemetry::sdk::metrics::MeterContextFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; ViewRegistry &gt; views, const opentelemetry::sdk::resource::Resource &amp;resource, std::unique_ptr&lt; instrumentationscope::ScopeConfigurator&lt; MeterConfig &gt; &gt; meter_configurator)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterContextFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; ViewRegistry &gt;</type>
+          <declname>views</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::sdk::resource::Resource &amp;</type>
+          <declname>resource</declname>
+        </param>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1instrumentationscope_1_1ScopeConfigurator" kindref="compound">instrumentationscope::ScopeConfigurator</ref>&lt; <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterConfig" kindref="compound">MeterConfig</ref> &gt; &gt;</type>
+          <declname>meter_configurator</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref> with specified views, resource and meter scope configurator. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>views</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>ViewRegistry containing OpenTelemetry views registered with this meter context. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>resource</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The OpenTelemetry resource associated with this meter context. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>meter_configurator</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A scope configurator defining the behavior of a meter associated with this meter context. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>A unique pointer to the created <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref> object. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context_factory.h" line="55" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for <ref refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContext" kindref="compound">MeterContext</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context_factory.h" line="22" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/meter_context_factory.h" bodystart="23" bodyend="59"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContextFactory_1a24cb9473f3a7f4ce518d4528d48862d4" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContextFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContextFactory_1afd22a13ddf6d249181f6896aef1f06ed" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContextFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContextFactory_1a6a2f2a6d991d94b28a98af6f23409d38" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContextFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterContextFactory_1a4dbad98abc07aa9bb922f2441164e47d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterContextFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::SpanDataEvent</compoundname>
+    <includes refid="span__data_8h" local="no">span_data.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1ac0ff7a095cf3c2dafd876d87de06606e" prot="private" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::trace::SpanDataEvent::name_</definition>
+        <argsstring></argsstring>
+        <name>name_</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanDataEvent::name_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" line="65" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" bodystart="65" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1a3930d586f28f481cfe14b243fef29cda" prot="private" static="no" mutable="no">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::trace::SpanDataEvent::timestamp_</definition>
+        <argsstring></argsstring>
+        <name>timestamp_</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanDataEvent::timestamp_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" line="66" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" bodystart="66" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1a48c1f3bd648adc31f62cbd098b5cc0c6" prot="private" static="no" mutable="no">
+        <type>opentelemetry::sdk::common::AttributeMap</type>
+        <definition>opentelemetry::sdk::common::AttributeMap opentelemetry::sdk::trace::SpanDataEvent::attribute_map_</definition>
+        <argsstring></argsstring>
+        <name>attribute_map_</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanDataEvent::attribute_map_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" line="67" column="44" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" bodystart="67" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1a736981a7c4c7168710f175df213cc41d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::SpanDataEvent::SpanDataEvent</definition>
+        <argsstring>(std::string name, opentelemetry::common::SystemTimestamp timestamp, const opentelemetry::common::KeyValueIterable &amp;attributes)</argsstring>
+        <name>SpanDataEvent</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanDataEvent::SpanDataEvent</qualifiedname>
+        <param>
+          <type>std::string</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>timestamp</declname>
+        </param>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" line="41" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1ab734172815b82acdff0f984eaed83452" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>std::string</type>
+        <definition>std::string opentelemetry::sdk::trace::SpanDataEvent::GetName</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetName</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanDataEvent::GetName</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the name for this event <simplesect kind="return"><para>the name for this event </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" line="49" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" bodystart="49" bodyend="49"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1a5d66721ecec4699a74c4ecaed18087b9" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+        <definition>opentelemetry::common::SystemTimestamp opentelemetry::sdk::trace::SpanDataEvent::GetTimestamp</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetTimestamp</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanDataEvent::GetTimestamp</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the timestamp for this event <simplesect kind="return"><para>the timestamp for this event </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" line="55" column="42" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" bodystart="55" bodyend="55"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1aba3ba9f56debfbd908c59f39ffed1bfe" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>const std::unordered_map&lt; std::string, opentelemetry::sdk::common::OwnedAttributeValue &gt; &amp;</type>
+        <definition>const std::unordered_map&lt; std::string, opentelemetry::sdk::common::OwnedAttributeValue &gt; &amp; opentelemetry::sdk::trace::SpanDataEvent::GetAttributes</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetAttributes</name>
+        <qualifiedname>opentelemetry::sdk::trace::SpanDataEvent::GetAttributes</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Get the attributes for this event <simplesect kind="return"><para>the attributes for this event </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" line="62" column="3"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Class for storing events in <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanData" kindref="compound">SpanData</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" line="38" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/span_data.h" bodystart="39" bodyend="68"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1a48c1f3bd648adc31f62cbd098b5cc0c6" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::SpanDataEvent</scope><name>attribute_map_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1aba3ba9f56debfbd908c59f39ffed1bfe" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SpanDataEvent</scope><name>GetAttributes</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1ab734172815b82acdff0f984eaed83452" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SpanDataEvent</scope><name>GetName</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1a5d66721ecec4699a74c4ecaed18087b9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SpanDataEvent</scope><name>GetTimestamp</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1ac0ff7a095cf3c2dafd876d87de06606e" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::SpanDataEvent</scope><name>name_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1a736981a7c4c7168710f175df213cc41d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::SpanDataEvent</scope><name>SpanDataEvent</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanDataEvent_1a3930d586f28f481cfe14b243fef29cda" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::trace::SpanDataEvent</scope><name>timestamp_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::BatchSpanProcessorFactory</compoundname>
+    <includes refid="batch__span__processor__factory_8h" local="no">batch_span_processor_factory.h</includes>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorFactory_1a8a0a812ea5f3419e34a50ca7cb2087ec" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; SpanProcessor &gt; opentelemetry::sdk::trace::BatchSpanProcessorFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; SpanExporter &gt; &amp;&amp;exporter, const BatchSpanProcessorOptions &amp;options)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessorFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &gt; &amp;&amp;</type>
+          <declname>exporter</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorOptions" kindref="compound">BatchSpanProcessorOptions</ref> &amp;</type>
+          <declname>options</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor" kindref="compound">BatchSpanProcessor</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor_factory.h" line="29" column="26"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorFactory_1a865c312aa98675dd13b2003c7b1cd147" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> &gt;</type>
+        <definition>static std::unique_ptr&lt; SpanProcessor &gt; opentelemetry::sdk::trace::BatchSpanProcessorFactory::Create</definition>
+        <argsstring>(std::unique_ptr&lt; SpanExporter &gt; &amp;&amp;exporter, const BatchSpanProcessorOptions &amp;options, const BatchSpanProcessorRuntimeOptions &amp;runtime_options)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessorFactory::Create</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &gt; &amp;&amp;</type>
+          <declname>exporter</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorOptions" kindref="compound">BatchSpanProcessorOptions</ref> &amp;</type>
+          <declname>options</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorRuntimeOptions" kindref="compound">BatchSpanProcessorRuntimeOptions</ref> &amp;</type>
+          <declname>runtime_options</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Create a <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor" kindref="compound">BatchSpanProcessor</ref>. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor_factory.h" line="35" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>Factory class for <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor" kindref="compound">BatchSpanProcessor</ref>. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor_factory.h" line="23" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor_factory.h" bodystart="24" bodyend="39"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorFactory_1a8a0a812ea5f3419e34a50ca7cb2087ec" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessorFactory</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorFactory_1a865c312aa98675dd13b2003c7b1cd147" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessorFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

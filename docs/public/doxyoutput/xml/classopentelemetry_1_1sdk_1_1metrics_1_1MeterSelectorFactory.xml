@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelectorFactory" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::MeterSelectorFactory</compoundname>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelectorFactory_1a6db7f12d1f7e00885151a07273e5188d" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>std::unique_ptr&lt; MeterSelector &gt;</type>
+        <definition>static std::unique_ptr&lt; MeterSelector &gt; opentelemetry::sdk::metrics::MeterSelectorFactory::Create</definition>
+        <argsstring>(const std::string &amp;name, const std::string &amp;version, const std::string &amp;schema)</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MeterSelectorFactory::Create</qualifiedname>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>name</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>version</declname>
+        </param>
+        <param>
+          <type>const std::string &amp;</type>
+          <declname>schema</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector_factory.h" line="21" column="26"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector_factory.h" line="18" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/meter_selector_factory.h" bodystart="19" bodyend="24"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MeterSelectorFactory_1a6db7f12d1f7e00885151a07273e5188d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MeterSelectorFactory</scope><name>Create</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

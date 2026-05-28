@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1sdk_1_1logs" kind="namespace" language="C++">
+    <compoundname>opentelemetry::sdk::logs</compoundname>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessor" prot="public">opentelemetry::sdk::logs::BatchLogRecordProcessor</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorFactory" prot="public">opentelemetry::sdk::logs::BatchLogRecordProcessorFactory</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorOptions" prot="public">opentelemetry::sdk::logs::BatchLogRecordProcessorOptions</innerclass>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1logs_1_1BatchLogRecordProcessorRuntimeOptions" prot="public">opentelemetry::sdk::logs::BatchLogRecordProcessorRuntimeOptions</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLogger" prot="public">opentelemetry::sdk::logs::EventLogger</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProvider" prot="public">opentelemetry::sdk::logs::EventLoggerProvider</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1EventLoggerProviderFactory" prot="public">opentelemetry::sdk::logs::EventLoggerProviderFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1Logger" prot="public">opentelemetry::sdk::logs::Logger</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" prot="public">opentelemetry::sdk::logs::LoggerConfig</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContext" prot="public">opentelemetry::sdk::logs::LoggerContext</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerContextFactory" prot="public">opentelemetry::sdk::logs::LoggerContextFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProvider" prot="public">opentelemetry::sdk::logs::LoggerProvider</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerProviderFactory" prot="public">opentelemetry::sdk::logs::LoggerProviderFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordExporter" prot="public">opentelemetry::sdk::logs::LogRecordExporter</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1LogRecordProcessor" prot="public">opentelemetry::sdk::logs::LogRecordProcessor</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessor" prot="public">opentelemetry::sdk::logs::MultiLogRecordProcessor</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiLogRecordProcessorFactory" prot="public">opentelemetry::sdk::logs::MultiLogRecordProcessorFactory</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1MultiRecordable" prot="public">opentelemetry::sdk::logs::MultiRecordable</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1Provider" prot="public">opentelemetry::sdk::logs::Provider</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadableLogRecord" prot="public">opentelemetry::sdk::logs::ReadableLogRecord</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1ReadWriteLogRecord" prot="public">opentelemetry::sdk::logs::ReadWriteLogRecord</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1Recordable" prot="public">opentelemetry::sdk::logs::Recordable</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessor" prot="public">opentelemetry::sdk::logs::SimpleLogRecordProcessor</innerclass>
+    <innerclass refid="classopentelemetry_1_1sdk_1_1logs_1_1SimpleLogRecordProcessorFactory" prot="public">opentelemetry::sdk::logs::SimpleLogRecordProcessorFactory</innerclass>
+    <innernamespace refid="namespaceopentelemetry_1_1sdk_1_1logs_1_1batch__log__record__processor__options__env">opentelemetry::sdk::logs::batch_log_record_processor_options_env</innernamespace>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/batch_log_record_processor.h" line="27" column="1"/>
+  </compounddef>
+</doxygen>

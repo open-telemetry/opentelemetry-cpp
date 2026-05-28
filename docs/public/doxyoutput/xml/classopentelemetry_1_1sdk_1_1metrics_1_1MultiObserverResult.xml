@@ -1,0 +1,224 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult" kind="class" language="C++" prot="public" final="yes">
+    <compoundname>opentelemetry::sdk::metrics::MultiObserverResult</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">opentelemetry::metrics::MultiObserverResult</basecompoundref>
+    <sectiondef kind="private-type">
+      <memberdef kind="typedef" id="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1ac4aabdd303a80713d59d4fab8d1e0ac0" prot="private" static="no">
+        <type>nostd::variant&lt; nostd::monostate, ObserverResultT&lt; double &gt;, ObserverResultT&lt; int64_t &gt; &gt;</type>
+        <definition>using opentelemetry::sdk::metrics::MultiObserverResult::ObserverResultDirect =  nostd::variant&lt;nostd::monostate, ObserverResultT&lt;double&gt;, ObserverResultT&lt;int64_t&gt; &gt;</definition>
+        <argsstring></argsstring>
+        <name>ObserverResultDirect</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MultiObserverResult::ObserverResultDirect</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" line="44" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" bodystart="45" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a0520cf52d413908f592ff89f8f3c4a18" prot="private" static="no" mutable="no">
+        <type>std::unordered_map&lt; opentelemetry::metrics::ObservableInstrument *, ObserverResultDirect &gt;</type>
+        <definition>std::unordered_map&lt;opentelemetry::metrics::ObservableInstrument *, ObserverResultDirect&gt; opentelemetry::sdk::metrics::MultiObserverResult::observer_results_</definition>
+        <argsstring></argsstring>
+        <name>observer_results_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MultiObserverResult::observer_results_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" line="47" column="7" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" bodystart="47" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a69b65e1d1762101fab2f2b539ed3d61a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::MultiObserverResult::RegisterInstrument</definition>
+        <argsstring>(opentelemetry::metrics::ObservableInstrument *instrument)</argsstring>
+        <name>RegisterInstrument</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MultiObserverResult::RegisterInstrument</qualifiedname>
+        <param>
+          <type>opentelemetry::metrics::ObservableInstrument *</type>
+          <declname>instrument</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" line="25" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a0440d222fef14f09141d64c0b71b4899" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::MultiObserverResult::DeregisterInstrument</definition>
+        <argsstring>(opentelemetry::metrics::ObservableInstrument *instrument)</argsstring>
+        <name>DeregisterInstrument</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MultiObserverResult::DeregisterInstrument</qualifiedname>
+        <param>
+          <type>opentelemetry::metrics::ObservableInstrument *</type>
+          <declname>instrument</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" line="26" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a183075beb5382ff9d7a90ef97a6f33dd" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t opentelemetry::sdk::metrics::MultiObserverResult::InstrumentCount</definition>
+        <argsstring>() const</argsstring>
+        <name>InstrumentCount</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MultiObserverResult::InstrumentCount</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" line="27" column="10"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1aa85d433fddd63e8cefef543cac24d6cf" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::MultiObserverResult::HasInstrument</definition>
+        <argsstring>(const opentelemetry::metrics::ObservableInstrument *instrument) const</argsstring>
+        <name>HasInstrument</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MultiObserverResult::HasInstrument</qualifiedname>
+        <param>
+          <type>const opentelemetry::metrics::ObservableInstrument *</type>
+          <declname>instrument</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" line="28" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1ac177fffcf13652eefc998247b5b93155" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::MultiObserverResult::GetInstruments</definition>
+        <argsstring>(nostd::function_ref&lt; void(opentelemetry::metrics::ObservableInstrument *)&gt; callback)</argsstring>
+        <name>GetInstruments</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MultiObserverResult::GetInstruments</qualifiedname>
+        <param>
+          <type>nostd::function_ref&lt; void(opentelemetry::metrics::ObservableInstrument *)&gt;</type>
+          <declname>callback</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" line="29" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a88582afa6fe936bf13b591674d271a7e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::MultiObserverResult::Reset</definition>
+        <argsstring>()</argsstring>
+        <name>Reset</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MultiObserverResult::Reset</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" line="31" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a18139bd9e1066d21caccbd49087bfaa6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::metrics::MultiObserverResult::StoreResults</definition>
+        <argsstring>(opentelemetry::common::SystemTimestamp collection_ts)</argsstring>
+        <name>StoreResults</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MultiObserverResult::StoreResults</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1common_1_1SystemTimestamp" kindref="compound">opentelemetry::common::SystemTimestamp</ref></type>
+          <declname>collection_ts</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" line="32" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="protected-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a42e86fd2a254989bb24868e3683f5eca" prot="protected" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1metrics_1_1ObserverResultT" kindref="compound">opentelemetry::metrics::ObserverResultT</ref>&lt; double &gt; &amp;</type>
+        <definition>opentelemetry::metrics::ObserverResultT&lt; double &gt; &amp; opentelemetry::sdk::metrics::MultiObserverResult::ForInstrumentDouble</definition>
+        <argsstring>(const opentelemetry::metrics::ObservableInstrument *instrument) override</argsstring>
+        <name>ForInstrumentDouble</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MultiObserverResult::ForInstrumentDouble</qualifiedname>
+        <param>
+          <type>const opentelemetry::metrics::ObservableInstrument *</type>
+          <declname>instrument</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" line="35" column="43"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1ae4794d3d5a9a57be77b08ae4f1d8a7b2" prot="protected" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1metrics_1_1ObserverResultT" kindref="compound">opentelemetry::metrics::ObserverResultT</ref>&lt; int64_t &gt; &amp;</type>
+        <definition>opentelemetry::metrics::ObserverResultT&lt; int64_t &gt; &amp; opentelemetry::sdk::metrics::MultiObserverResult::ForInstrumentInt64</definition>
+        <argsstring>(const opentelemetry::metrics::ObservableInstrument *instrument) override</argsstring>
+        <name>ForInstrumentInt64</name>
+        <qualifiedname>opentelemetry::sdk::metrics::MultiObserverResult::ForInstrumentInt64</qualifiedname>
+        <param>
+          <type>const opentelemetry::metrics::ObservableInstrument *</type>
+          <declname>instrument</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" line="37" column="43"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" line="21" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/multi_observer_result.h" bodystart="23" bodyend="48"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a0440d222fef14f09141d64c0b71b4899" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>DeregisterInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MultiObserverResult_1ab3e8e6163e57a778074c55a1c1e185e9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>ForInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MultiObserverResult_1ae1cc3d14d189a7a4a4ba187519dfa322" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>ForInstrument</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MultiObserverResult_1a8c96b2481560ee5645ed3021d6e0bfde" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>ForInstrument</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a42e86fd2a254989bb24868e3683f5eca" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>ForInstrumentDouble</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1ae4794d3d5a9a57be77b08ae4f1d8a7b2" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>ForInstrumentInt64</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1ac177fffcf13652eefc998247b5b93155" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>GetInstruments</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1aa85d433fddd63e8cefef543cac24d6cf" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>HasInstrument</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a183075beb5382ff9d7a90ef97a6f33dd" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>InstrumentCount</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MultiObserverResult_1a847abb58a546b9ee50bd75196f11482e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>MultiObserverResult</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MultiObserverResult_1abac9a7522de7d37d700e1c451c863e41" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>MultiObserverResult</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MultiObserverResult_1aa36de3166135d24b02360a9f5fbe2ba0" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>MultiObserverResult</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a0520cf52d413908f592ff89f8f3c4a18" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>observer_results_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1ac4aabdd303a80713d59d4fab8d1e0ac0" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>ObserverResultDirect</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MultiObserverResult_1ae9e22ef2cc43187bc051e0ecf707c13e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MultiObserverResult_1a97cbfa42305f71c5aa598ee5a701345d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a69b65e1d1762101fab2f2b539ed3d61a" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>RegisterInstrument</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a88582afa6fe936bf13b591674d271a7e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>Reset</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1MultiObserverResult_1a18139bd9e1066d21caccbd49087bfaa6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>StoreResults</name></member>
+      <member refid="classopentelemetry_1_1metrics_1_1MultiObserverResult_1ae2e0eeaa8d4e6d6f2fe06722b2f242c0" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::MultiObserverResult</scope><name>~MultiObserverResult</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceopentelemetry_1_1logs_1_1detail" kind="namespace" language="C++">
+    <compoundname>opentelemetry::logs::detail</compoundname>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordHasType" prot="public">opentelemetry::logs::detail::LogRecordHasType</innerclass>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordHasType_3_01ValueType_01_4" prot="public">opentelemetry::logs::detail::LogRecordHasType&lt; ValueType &gt;</innerclass>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordHasType_3_01ValueType_00_01TargetType_00_01ArgumentType_8_8_8_01_4" prot="public">opentelemetry::logs::detail::LogRecordHasType&lt; ValueType, TargetType, ArgumentType... &gt;</innerclass>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait" prot="public">opentelemetry::logs::detail::LogRecordSetterTrait</innerclass>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_3_01common_1_1KeyValueIterable_01_4" prot="public">opentelemetry::logs::detail::LogRecordSetterTrait&lt; common::KeyValueIterable &gt;</innerclass>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_3_01common_1_1SystemTimestamp_01_4" prot="public">opentelemetry::logs::detail::LogRecordSetterTrait&lt; common::SystemTimestamp &gt;</innerclass>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_3_01EventId_01_4" prot="public">opentelemetry::logs::detail::LogRecordSetterTrait&lt; EventId &gt;</innerclass>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_3_01Severity_01_4" prot="public">opentelemetry::logs::detail::LogRecordSetterTrait&lt; Severity &gt;</innerclass>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_3_01std_1_1chrono_1_1system__clock_1_1time__point_01_4" prot="public">opentelemetry::logs::detail::LogRecordSetterTrait&lt; std::chrono::system_clock::time_point &gt;</innerclass>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_3_01trace_1_1SpanContext_01_4" prot="public">opentelemetry::logs::detail::LogRecordSetterTrait&lt; trace::SpanContext &gt;</innerclass>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_3_01trace_1_1SpanId_01_4" prot="public">opentelemetry::logs::detail::LogRecordSetterTrait&lt; trace::SpanId &gt;</innerclass>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_3_01trace_1_1TraceFlags_01_4" prot="public">opentelemetry::logs::detail::LogRecordSetterTrait&lt; trace::TraceFlags &gt;</innerclass>
+    <innerclass refid="structopentelemetry_1_1logs_1_1detail_1_1LogRecordSetterTrait_3_01trace_1_1TraceId_01_4" prot="public">opentelemetry::logs::detail::LogRecordSetterTrait&lt; trace::TraceId &gt;</innerclass>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/logs/logger_type_traits.h" line="27" column="1"/>
+  </compounddef>
+</doxygen>

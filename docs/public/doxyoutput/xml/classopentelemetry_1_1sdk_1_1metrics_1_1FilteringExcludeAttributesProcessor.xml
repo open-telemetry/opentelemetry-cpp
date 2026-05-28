@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor" prot="public" virt="non-virtual">opentelemetry::sdk::metrics::AttributesProcessor</basecompoundref>
+    <includes refid="attributes__processor_8h" local="no">attributes_processor.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor_1ac3cf94d4b49387c5809f313d3e77bd70" prot="private" static="no" mutable="no">
+        <type>FilterAttributeMap</type>
+        <definition>FilterAttributeMap opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor::exclude_list_</definition>
+        <argsstring></argsstring>
+        <name>exclude_list_</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor::exclude_list_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="162" column="22" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" bodystart="162" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor_1abaaca8a818385642c3958fae3a897860" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor::FilteringExcludeAttributesProcessor</definition>
+        <argsstring>(FilterAttributeMap &amp;&amp;exclude_list={})</argsstring>
+        <name>FilteringExcludeAttributesProcessor</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor::FilteringExcludeAttributesProcessor</qualifiedname>
+        <param>
+          <type>FilterAttributeMap &amp;&amp;</type>
+          <declname>exclude_list</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="129" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" bodystart="129" bodyend="131"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor_1a88cb3e4975bb932b2890de1bd190d18f" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor::FilteringExcludeAttributesProcessor</definition>
+        <argsstring>(const FilterAttributeMap &amp;exclude_list={})</argsstring>
+        <name>FilteringExcludeAttributesProcessor</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor::FilteringExcludeAttributesProcessor</qualifiedname>
+        <param>
+          <type>const FilterAttributeMap &amp;</type>
+          <declname>exclude_list</declname>
+          <defval>{}</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="133" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" bodystart="133" bodyend="135"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor_1aed37b0311f5e8bbe6031f69c728d7d1a" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>MetricAttributes</type>
+        <definition>MetricAttributes opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor::process</definition>
+        <argsstring>(const opentelemetry::common::KeyValueIterable &amp;attributes) const noexcept override</argsstring>
+        <name>process</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor::process</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1a629244cfbae6615e3ea99eebea145aae">process</reimplements>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1common_1_1KeyValueIterable" kindref="compound">opentelemetry::common::KeyValueIterable</ref> &amp;</type>
+          <declname>attributes</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="137" column="20" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" bodystart="137" bodyend="153"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor_1a297e9103d6ccf487a27f7b8934861e2f" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor::isPresent</definition>
+        <argsstring>(nostd::string_view key) const noexcept override</argsstring>
+        <name>isPresent</name>
+        <qualifiedname>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor::isPresent</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1aa19770f734827fca23203955e0838bf5">isPresent</reimplements>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="155" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" bodystart="155" bodyend="159"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>FilteringExcludeAttributeProcessor filters by exclude attribute list and drops names if they are present in the exclude list </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>opentelemetry::sdk::metrics::AttributesProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>opentelemetry::sdk::metrics::AttributesProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor"/>
+      </node>
+      <node id="1">
+        <label>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" line="126" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/metrics/view/attributes_processor.h" bodystart="127" bodyend="163"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1af44ca45436956bde1effe1721ecd23c6" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</scope><name>AttributesProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1ac136dd8baccdde710c62b1794147e69c" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</scope><name>AttributesProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1a057ee80fef19fa6f44ba77e00a9da27d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</scope><name>AttributesProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor_1ac3cf94d4b49387c5809f313d3e77bd70" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</scope><name>exclude_list_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor_1abaaca8a818385642c3958fae3a897860" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</scope><name>FilteringExcludeAttributesProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor_1a88cb3e4975bb932b2890de1bd190d18f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</scope><name>FilteringExcludeAttributesProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor_1a297e9103d6ccf487a27f7b8934861e2f" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</scope><name>isPresent</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1adc3e53ac9a8f697a7b97fc49f448b816" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1abdf39182d0bfd31f197cf7978e2f7322" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1FilteringExcludeAttributesProcessor_1aed37b0311f5e8bbe6031f69c728d7d1a" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</scope><name>process</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1metrics_1_1AttributesProcessor_1aa37f359ee0f50a2a624bbe0a531f735e" prot="public" virt="virtual"><scope>opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor</scope><name>~AttributesProcessor</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

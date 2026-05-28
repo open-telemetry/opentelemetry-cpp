@@ -1,0 +1,280 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::logs::LoggerConfig</compoundname>
+    <includes refid="logger__config_8h" local="no">logger_config.h</includes>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a8cc265093dc249aa4225d886f4ea7ef2" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::LoggerConfig::enabled_</definition>
+        <argsstring></argsstring>
+        <name>enabled_</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerConfig::enabled_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="83" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" bodystart="83" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a0fd94ace971532c25f3d8a47ffe7913f" prot="private" static="no" mutable="no">
+        <type>opentelemetry::logs::Severity</type>
+        <definition>opentelemetry::logs::Severity opentelemetry::sdk::logs::LoggerConfig::minimum_severity_</definition>
+        <argsstring></argsstring>
+        <name>minimum_severity_</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerConfig::minimum_severity_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="84" column="33" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" bodystart="84" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a91e8577e53baa331e247759afa7eb2af" prot="private" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::LoggerConfig::trace_based_</definition>
+        <argsstring></argsstring>
+        <name>trace_based_</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerConfig::trace_based_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="85" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" bodystart="85" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a4f72708dc02668a2f3ed950401840ee2" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::LoggerConfig::operator==</definition>
+        <argsstring>(const LoggerConfig &amp;other) const noexcept</argsstring>
+        <name>operator==</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerConfig::operator==</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="23" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1af11a7ff4fba70a381ef85007e07d69c8" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::LoggerConfig::IsEnabled</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>IsEnabled</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerConfig::IsEnabled</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns if the Logger is enabled or disabled. Loggers are enabled by default. <simplesect kind="return"><para>a boolean indicating if the Logger is enabled. Defaults to true. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="29" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1af2f21fb04bd56a73d7a50eccd40d4e96" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>opentelemetry::logs::Severity</type>
+        <definition>opentelemetry::logs::Severity opentelemetry::sdk::logs::LoggerConfig::GetMinimumSeverity</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>GetMinimumSeverity</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerConfig::GetMinimumSeverity</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns the configured minimum severity for the Logger. <simplesect kind="return"><para>the minimum severity. Defaults to Severity::kInvalid. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="35" column="33"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a92aa697e2fc803f8e2788a008bc23a25" prot="public" static="no" const="yes" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::logs::LoggerConfig::IsTraceBased</definition>
+        <argsstring>() const noexcept</argsstring>
+        <name>IsTraceBased</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerConfig::IsTraceBased</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns if trace-based filtering is enabled for the Logger. <simplesect kind="return"><para>a boolean indicating if trace-based filtering is enabled. Defaults to false. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="41" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1af62fd8fbe25948d9f2e507451a8c42e9" prot="public" static="yes" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref></type>
+        <definition>static LoggerConfig opentelemetry::sdk::logs::LoggerConfig::Create</definition>
+        <argsstring>(bool enabled, opentelemetry::logs::Severity minimum_severity, bool trace_based) noexcept</argsstring>
+        <name>Create</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerConfig::Create</qualifiedname>
+        <param>
+          <type>bool</type>
+          <declname>enabled</declname>
+        </param>
+        <param>
+          <type>opentelemetry::logs::Severity</type>
+          <declname>minimum_severity</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>trace_based</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> with the provided settings. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>enabled</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>if false, the Logger behaves like a no-op logger. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>minimum_severity</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>the minimum severity required for filtering. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>trace_based</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>if true, trace-based filtering is enabled. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>a <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> with the provided settings. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="50" column="23"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a1254188c433584d7c26bdc59c5f1217e" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref></type>
+        <definition>static LoggerConfig opentelemetry::sdk::logs::LoggerConfig::Enabled</definition>
+        <argsstring>()</argsstring>
+        <name>Enabled</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerConfig::Enabled</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> that represents an enabled Logger. <simplesect kind="return"><para>a static constant <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> that represents an enabled logger. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="58" column="23"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1ac00abc92a262738df1ba18957f25fc6f" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref></type>
+        <definition>static LoggerConfig opentelemetry::sdk::logs::LoggerConfig::Disabled</definition>
+        <argsstring>()</argsstring>
+        <name>Disabled</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerConfig::Disabled</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> that represents a disabled Logger. A disabled logger behaves like a no-op logger. <simplesect kind="return"><para>a static constant <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> that represents a disabled logger. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="65" column="23"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1aa246a623bd7126b9047d3bf6de2a9f63" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref></type>
+        <definition>static LoggerConfig opentelemetry::sdk::logs::LoggerConfig::Default</definition>
+        <argsstring>()</argsstring>
+        <name>Default</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerConfig::Default</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Returns a <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> that represents a Logger configured with the default behavior. The default behavior is guided by the OpenTelemetry specification. <simplesect kind="return"><para>a static constant <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> that represents a logger configured with default behavior. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="73" column="23"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a1a892a8672bea22bf184a5e5994f0aeb" prot="private" static="no" const="no" explicit="yes" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::logs::LoggerConfig::LoggerConfig</definition>
+        <argsstring>(bool enabled=true, opentelemetry::logs::Severity minimum_severity=opentelemetry::logs::Severity::kInvalid, bool trace_based=false) noexcept</argsstring>
+        <name>LoggerConfig</name>
+        <qualifiedname>opentelemetry::sdk::logs::LoggerConfig::LoggerConfig</qualifiedname>
+        <param>
+          <type>bool</type>
+          <declname>enabled</declname>
+          <defval>true</defval>
+        </param>
+        <param>
+          <type>opentelemetry::logs::Severity</type>
+          <declname>minimum_severity</declname>
+          <defval>opentelemetry::logs::Severity::kInvalid</defval>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>trace_based</declname>
+          <defval>false</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="76" column="12" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" bodystart="76" bodyend="81"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> defines various configurable aspects of a Logger&apos;s behavior. This class should not be used directly to configure a Logger&apos;s behavior, instead a ScopeConfigurator should be used to compute the desired <ref refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig" kindref="compound">LoggerConfig</ref> which can then be used to configure a Logger. </para>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" line="20" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/logs/logger_config.h" bodystart="21" bodyend="86"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1af62fd8fbe25948d9f2e507451a8c42e9" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerConfig</scope><name>Create</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1aa246a623bd7126b9047d3bf6de2a9f63" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerConfig</scope><name>Default</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1ac00abc92a262738df1ba18957f25fc6f" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerConfig</scope><name>Disabled</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a1254188c433584d7c26bdc59c5f1217e" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerConfig</scope><name>Enabled</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a8cc265093dc249aa4225d886f4ea7ef2" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerConfig</scope><name>enabled_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1af2f21fb04bd56a73d7a50eccd40d4e96" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerConfig</scope><name>GetMinimumSeverity</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1af11a7ff4fba70a381ef85007e07d69c8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerConfig</scope><name>IsEnabled</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a92aa697e2fc803f8e2788a008bc23a25" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerConfig</scope><name>IsTraceBased</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a1a892a8672bea22bf184a5e5994f0aeb" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerConfig</scope><name>LoggerConfig</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a0fd94ace971532c25f3d8a47ffe7913f" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerConfig</scope><name>minimum_severity_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a4f72708dc02668a2f3ed950401840ee2" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerConfig</scope><name>operator==</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1logs_1_1LoggerConfig_1a91e8577e53baa331e247759afa7eb2af" prot="private" virt="non-virtual"><scope>opentelemetry::sdk::logs::LoggerConfig</scope><name>trace_based_</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

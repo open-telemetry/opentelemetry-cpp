@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_bdee043f6e1cd2615d69a1f313a75459" kind="dir">
+    <compoundname>/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage</compoundname>
+    <innerdir refid="dir_376eea8eb57c1a0ad224e9141fc9ffc7">/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/propagation</innerdir>
+    <innerfile refid="baggage_8h">baggage.h</innerfile>
+    <innerfile refid="baggage__context_8h">baggage_context.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/baggage/"/>
+  </compounddef>
+</doxygen>

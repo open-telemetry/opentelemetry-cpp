@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1context_1_1Context" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::context::Context</compoundname>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1context_1_1Context_1a760a3849d5f8cd570d0f562d9651767e" prot="private" static="no" mutable="no">
+        <type>nostd::shared_ptr&lt; DataList &gt;</type>
+        <definition>nostd::shared_ptr&lt;DataList&gt; opentelemetry::context::Context::head_</definition>
+        <argsstring></argsstring>
+        <name>head_</name>
+        <qualifiedname>opentelemetry::context::Context::head_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" line="167" column="21" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" bodystart="167" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Context_1afe874de9f405d45061d134ab9ab9bb6d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::Context::Context</definition>
+        <argsstring>()=default</argsstring>
+        <name>Context</name>
+        <qualifiedname>opentelemetry::context::Context::Context</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" line="27" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Context_1a20d59816abd1cb170b852d14a72b64a9" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type></type>
+        <definition>opentelemetry::context::Context::Context</definition>
+        <argsstring>(const T &amp;keys_and_values) noexcept</argsstring>
+        <name>Context</name>
+        <qualifiedname>opentelemetry::context::Context::Context</qualifiedname>
+        <param>
+          <type>const T &amp;</type>
+          <declname>keys_and_values</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" line="31" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" bodystart="31" bodyend="33"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Context_1a5e40ab4c289de7c9fad897ca62c03589" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::context::Context::Context</definition>
+        <argsstring>(nostd::string_view key, ContextValue value) noexcept</argsstring>
+        <name>Context</name>
+        <qualifiedname>opentelemetry::context::Context::Context</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>ContextValue</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" line="37" column="3" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" bodystart="37" bodyend="39"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Context_1a5d83c526eb6164e2a0d03fe143be3ee2" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>Context</type>
+        <definition>Context opentelemetry::context::Context::SetValues</definition>
+        <argsstring>(T &amp;values) noexcept</argsstring>
+        <name>SetValues</name>
+        <qualifiedname>opentelemetry::context::Context::SetValues</qualifiedname>
+        <param>
+          <type>T &amp;</type>
+          <declname>values</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" line="45" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" bodystart="45" bodyend="55"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Context_1add1dbd8d135b59c1d6c74dc1859d0f74" prot="public" static="no" const="no" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>Context</type>
+        <definition>Context opentelemetry::context::Context::SetValue</definition>
+        <argsstring>(nostd::string_view key, ContextValue value) noexcept</argsstring>
+        <name>SetValue</name>
+        <qualifiedname>opentelemetry::context::Context::SetValue</qualifiedname>
+        <param>
+          <type>nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <param>
+          <type>ContextValue</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" line="60" column="11" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" bodystart="60" bodyend="65"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Context_1a3546a00f93bcd1e8d9605cf78c73757f" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>context::ContextValue</type>
+        <definition>context::ContextValue opentelemetry::context::Context::GetValue</definition>
+        <argsstring>(const nostd::string_view key) const noexcept</argsstring>
+        <name>GetValue</name>
+        <qualifiedname>opentelemetry::context::Context::GetValue</qualifiedname>
+        <param>
+          <type>const nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" line="68" column="25" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" bodystart="68" bodyend="81"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Context_1a3447441878474a8a1c6b28c9a570046d" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::context::Context::HasKey</definition>
+        <argsstring>(const nostd::string_view key) const noexcept</argsstring>
+        <name>HasKey</name>
+        <qualifiedname>opentelemetry::context::Context::HasKey</qualifiedname>
+        <param>
+          <type>const nostd::string_view</type>
+          <declname>key</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" line="84" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" bodystart="84" bodyend="87"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1context_1_1Context_1a7a11c6f2905d4bf25aeeaed94489afb1" prot="public" static="no" const="yes" explicit="no" inline="yes" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::context::Context::operator==</definition>
+        <argsstring>(const Context &amp;other) const noexcept</argsstring>
+        <name>operator==</name>
+        <qualifiedname>opentelemetry::context::Context::operator==</qualifiedname>
+        <param>
+          <type>const Context &amp;</type>
+          <declname>other</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" line="89" column="8" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" bodystart="89" bodyend="89"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" line="23" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/api/include/opentelemetry/context/context.h" bodystart="24" bodyend="168"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1context_1_1Context_1afe874de9f405d45061d134ab9ab9bb6d" prot="public" virt="non-virtual"><scope>opentelemetry::context::Context</scope><name>Context</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Context_1a20d59816abd1cb170b852d14a72b64a9" prot="public" virt="non-virtual"><scope>opentelemetry::context::Context</scope><name>Context</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Context_1a5e40ab4c289de7c9fad897ca62c03589" prot="public" virt="non-virtual"><scope>opentelemetry::context::Context</scope><name>Context</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Context_1a3546a00f93bcd1e8d9605cf78c73757f" prot="public" virt="non-virtual"><scope>opentelemetry::context::Context</scope><name>GetValue</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Context_1a3447441878474a8a1c6b28c9a570046d" prot="public" virt="non-virtual"><scope>opentelemetry::context::Context</scope><name>HasKey</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Context_1a760a3849d5f8cd570d0f562d9651767e" prot="private" virt="non-virtual"><scope>opentelemetry::context::Context</scope><name>head_</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Context_1a7a11c6f2905d4bf25aeeaed94489afb1" prot="public" virt="non-virtual"><scope>opentelemetry::context::Context</scope><name>operator==</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Context_1add1dbd8d135b59c1d6c74dc1859d0f74" prot="public" virt="non-virtual"><scope>opentelemetry::context::Context</scope><name>SetValue</name></member>
+      <member refid="classopentelemetry_1_1context_1_1Context_1a5d83c526eb6164e2a0d03fe143be3ee2" prot="public" virt="non-virtual"><scope>opentelemetry::context::Context</scope><name>SetValues</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

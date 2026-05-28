@@ -1,0 +1,669 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor" kind="class" language="C++" prot="public">
+    <compoundname>opentelemetry::sdk::trace::BatchSpanProcessor</compoundname>
+    <basecompoundref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" prot="public" virt="non-virtual">opentelemetry::sdk::trace::SpanProcessor</basecompoundref>
+    <includes refid="batch__span__processor_8h" local="no">batch_span_processor.h</includes>
+    <innerclass refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1_1SynchronizationData" prot="protected">opentelemetry::sdk::trace::BatchSpanProcessor::SynchronizationData</innerclass>
+    <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a58039a8ebb85f8a4e8bf788b4cc79711" prot="protected" static="no" mutable="no">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &gt;</type>
+        <definition>std::unique_ptr&lt;SpanExporter&gt; opentelemetry::sdk::trace::BatchSpanProcessor::exporter_</definition>
+        <argsstring></argsstring>
+        <name>exporter_</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::exporter_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="179" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="179" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1aa39b63978c46ac635f022766ab412483" prot="protected" static="no" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t opentelemetry::sdk::trace::BatchSpanProcessor::max_queue_size_</definition>
+        <argsstring></argsstring>
+        <name>max_queue_size_</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::max_queue_size_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="182" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="182" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a8fffc19a8a3b30d7c0bfca5d01415606" prot="protected" static="no" mutable="no">
+        <type>const std::chrono::milliseconds</type>
+        <definition>const std::chrono::milliseconds opentelemetry::sdk::trace::BatchSpanProcessor::schedule_delay_millis_</definition>
+        <argsstring></argsstring>
+        <name>schedule_delay_millis_</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::schedule_delay_millis_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="183" column="35" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="183" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a3d94ab15ff92982b274911062bcb7a63" prot="protected" static="no" mutable="no">
+        <type>const size_t</type>
+        <definition>const size_t opentelemetry::sdk::trace::BatchSpanProcessor::max_export_batch_size_</definition>
+        <argsstring></argsstring>
+        <name>max_export_batch_size_</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::max_export_batch_size_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="184" column="16" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="184" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a4d803052dc0821bf8847cbf4254d73f8" prot="protected" static="no" mutable="no">
+        <type>opentelemetry::sdk::common::CircularBuffer&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &gt;</type>
+        <definition>opentelemetry::sdk::common::CircularBuffer&lt;Recordable&gt; opentelemetry::sdk::trace::BatchSpanProcessor::buffer_</definition>
+        <argsstring></argsstring>
+        <name>buffer_</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::buffer_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="187" column="46" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="187" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1afecd9b0c9ee103ad66f44dac900dd6fb" prot="protected" static="no" mutable="no">
+        <type>std::shared_ptr&lt; SynchronizationData &gt;</type>
+        <definition>std::shared_ptr&lt;SynchronizationData&gt; opentelemetry::sdk::trace::BatchSpanProcessor::synchronization_data_</definition>
+        <argsstring></argsstring>
+        <name>synchronization_data_</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::synchronization_data_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="189" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="189" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a13829d9b13ac2b7c70c6f6f12cc877ef" prot="protected" static="no" mutable="no">
+        <type>std::shared_ptr&lt; sdk::common::ThreadInstrumentation &gt;</type>
+        <definition>std::shared_ptr&lt;sdk::common::ThreadInstrumentation&gt; opentelemetry::sdk::trace::BatchSpanProcessor::worker_thread_instrumentation_</definition>
+        <argsstring></argsstring>
+        <name>worker_thread_instrumentation_</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::worker_thread_instrumentation_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="192" column="19" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="192" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ade4099d4388e0b2805fe3a83df52cb52" prot="protected" static="no" mutable="no">
+        <type>std::thread</type>
+        <definition>std::thread opentelemetry::sdk::trace::BatchSpanProcessor::worker_thread_</definition>
+        <argsstring></argsstring>
+        <name>worker_thread_</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::worker_thread_</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="193" column="15" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="193" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ad8773502348727985b72da53e042f3dc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::BatchSpanProcessor::BatchSpanProcessor</definition>
+        <argsstring>(std::unique_ptr&lt; SpanExporter &gt; &amp;&amp;exporter, const BatchSpanProcessorOptions &amp;options)</argsstring>
+        <name>BatchSpanProcessor</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::BatchSpanProcessor</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &gt; &amp;&amp;</type>
+          <declname>exporter</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorOptions" kindref="compound">BatchSpanProcessorOptions</ref> &amp;</type>
+          <declname>options</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Creates a batch span processor by configuring the specified exporter and other parameters as per the official, language-agnostic opentelemetry specs.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>exporter</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The backend exporter to pass the ended spans to. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>options</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The batch <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> configuration options. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="44" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ab46398edcb499059195b31043d35cd2d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::BatchSpanProcessor::BatchSpanProcessor</definition>
+        <argsstring>(std::unique_ptr&lt; SpanExporter &gt; &amp;&amp;exporter, const BatchSpanProcessorOptions &amp;options, const BatchSpanProcessorRuntimeOptions &amp;runtime_options)</argsstring>
+        <name>BatchSpanProcessor</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::BatchSpanProcessor</qualifiedname>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &gt; &amp;&amp;</type>
+          <declname>exporter</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorOptions" kindref="compound">BatchSpanProcessorOptions</ref> &amp;</type>
+          <declname>options</declname>
+        </param>
+        <param>
+          <type>const <ref refid="structopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessorRuntimeOptions" kindref="compound">BatchSpanProcessorRuntimeOptions</ref> &amp;</type>
+          <declname>runtime_options</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Creates a batch span processor by configuring the specified exporter and other parameters as per the official, language-agnostic opentelemetry specs.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>exporter</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The backend exporter to pass the ended spans to. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>options</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The batch <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> configuration options. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>runtime_options</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The batch <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> runtime options. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="55" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a1b7d0df32fe360380b3fea51cc3b5b07" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::BatchSpanProcessor::BatchSpanProcessor</definition>
+        <argsstring>(const BatchSpanProcessor &amp;)=delete</argsstring>
+        <name>BatchSpanProcessor</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::BatchSpanProcessor</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor" kindref="compound">BatchSpanProcessor</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="59" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ad5d25283e29e3b35d2075c6e4eaab3d8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::BatchSpanProcessor::BatchSpanProcessor</definition>
+        <argsstring>(BatchSpanProcessor &amp;&amp;)=delete</argsstring>
+        <name>BatchSpanProcessor</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::BatchSpanProcessor</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor" kindref="compound">BatchSpanProcessor</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="60" column="3"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a14b00d03e29f92a94cae1bb9c18b43ef" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor" kindref="compound">BatchSpanProcessor</ref> &amp;</type>
+        <definition>BatchSpanProcessor &amp; opentelemetry::sdk::trace::BatchSpanProcessor::operator=</definition>
+        <argsstring>(const BatchSpanProcessor &amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::operator=</qualifiedname>
+        <param>
+          <type>const <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor" kindref="compound">BatchSpanProcessor</ref> &amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="61" column="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a3da816cf319a598dfc70d36834451ebc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor" kindref="compound">BatchSpanProcessor</ref> &amp;</type>
+        <definition>BatchSpanProcessor &amp; opentelemetry::sdk::trace::BatchSpanProcessor::operator=</definition>
+        <argsstring>(BatchSpanProcessor &amp;&amp;)=delete</argsstring>
+        <name>operator=</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::operator=</qualifiedname>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor" kindref="compound">BatchSpanProcessor</ref> &amp;&amp;</type>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="62" column="22"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a653aa9aeefa324db02bf4952e9b6d03d" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &gt;</type>
+        <definition>std::unique_ptr&lt; Recordable &gt; opentelemetry::sdk::trace::BatchSpanProcessor::MakeRecordable</definition>
+        <argsstring>() noexcept override</argsstring>
+        <name>MakeRecordable</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::MakeRecordable</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor_1a0b4bf89482c20fcd3e026d4ab83dfa49">MakeRecordable</reimplements>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Requests a Recordable(Span) from the configured exporter.</para>
+<para><simplesect kind="return"><para>A recordable generated by the backend exporter </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="69" column="19"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ae5ffa4fb65b5ad227283129c5552c1ba" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::BatchSpanProcessor::OnStart</definition>
+        <argsstring>(Recordable &amp;span, const opentelemetry::trace::SpanContext &amp;parent_context) noexcept override</argsstring>
+        <name>OnStart</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::OnStart</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor_1aa663fa94ed184714869a5e9a2a1e5d00">OnStart</reimplements>
+        <param>
+          <type><ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &amp;</type>
+          <declname>span</declname>
+        </param>
+        <param>
+          <type>const opentelemetry::trace::SpanContext &amp;</type>
+          <declname>parent_context</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Called when a span is started.</para>
+<para>NOTE: This method is a no-op.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>span</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>- The span that just started </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>parent_context</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>- The parent context of the span that just started </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="79" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ad94ef39519737b686575313f0ad337c9" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::BatchSpanProcessor::OnEnd</definition>
+        <argsstring>(std::unique_ptr&lt; Recordable &gt; &amp;&amp;span) noexcept override</argsstring>
+        <name>OnEnd</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::OnEnd</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor_1a1c40834dfa3d4358dd8d5be6d0c83f4b">OnEnd</reimplements>
+        <param>
+          <type>std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1Recordable" kindref="compound">Recordable</ref> &gt; &amp;&amp;</type>
+          <declname>span</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Called when a span ends.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>span</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>- A recordable for a span that just ended </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="87" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a8552a5c51d3b28580d4c6cbe50809199" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::trace::BatchSpanProcessor::ForceFlush</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept override</argsstring>
+        <name>ForceFlush</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::ForceFlush</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor_1a1f809e668bcccb40ae041a64db9c2270">ForceFlush</reimplements>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Export all ended spans that have not been exported yet.</para>
+<para>NOTE: Timeout functionality not supported yet. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="94" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ab73b9197ef958ff108c9cb79c779c65b" prot="public" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::trace::BatchSpanProcessor::Shutdown</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept override</argsstring>
+        <name>Shutdown</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::Shutdown</qualifiedname>
+        <reimplements refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor_1a2ab53348196258a6b53a6362290886d9">Shutdown</reimplements>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Shuts down the processor and does any cleanup required. Completely drains the buffer/queue of all its ended spans and passes them to the exporter.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timeout</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>minimum amount of microseconds to wait for shutdown before giving up and returning failure. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if the shutdown succeeded, false otherwise </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="105" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a24b04f113471609019aced758506b2e5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>opentelemetry::sdk::trace::BatchSpanProcessor::~BatchSpanProcessor</definition>
+        <argsstring>() override</argsstring>
+        <name>~BatchSpanProcessor</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::~BatchSpanProcessor</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Class destructor which invokes the <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ab73b9197ef958ff108c9cb79c779c65b" kindref="member">Shutdown()</ref> method. The <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ab73b9197ef958ff108c9cb79c779c65b" kindref="member">Shutdown()</ref> method is supposed to be invoked when the Tracer is shutdown (as per other languages), but the C++ Tracer only takes shared ownership of the processor, and thus doesn&apos;t call Shutdown (as the processor might be shared with other Tracers). </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="114" column="3"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="protected-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a3e0f30cbc9322f840e9dd3dcd1c11d29" prot="protected" static="no" const="no" explicit="no" inline="no" noexcept="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool opentelemetry::sdk::trace::BatchSpanProcessor::InternalShutdown</definition>
+        <argsstring>(std::chrono::microseconds timeout=(std::chrono::microseconds::max)()) noexcept</argsstring>
+        <name>InternalShutdown</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::InternalShutdown</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds</type>
+          <declname>timeout</declname>
+          <defval>(std::chrono::microseconds::max)()</defval>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Shuts down the processor and does any cleanup required. Completely drains the buffer/queue of all its ended spans and passes them to the exporter.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timeout</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>minimum amount of microseconds to wait for shutdown before giving up and returning failure. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>true if the shutdown succeeded, false otherwise </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="125" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a90f74d7599e8edc73013b65e551abe47" prot="protected" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::BatchSpanProcessor::DoBackgroundWork</definition>
+        <argsstring>()</argsstring>
+        <name>DoBackgroundWork</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::DoBackgroundWork</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>The background routine performed by the worker thread. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="131" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a3c6b175a758dae8e613e51492f8b137d" prot="protected" static="no" const="no" explicit="no" inline="no" virt="virtual">
+        <type>void</type>
+        <definition>virtual void opentelemetry::sdk::trace::BatchSpanProcessor::Export</definition>
+        <argsstring>()</argsstring>
+        <name>Export</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::Export</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Exports all ended spans to the configured exporter. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="137" column="16"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1aaaa3e5f79fa94f2f2586f65c2007fa61" prot="protected" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::BatchSpanProcessor::DrainQueue</definition>
+        <argsstring>()</argsstring>
+        <name>DrainQueue</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::DrainQueue</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Called when <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ab73b9197ef958ff108c9cb79c779c65b" kindref="member">Shutdown()</ref> is invoked. Completely drains the queue of all its ended spans and passes them to the exporter. </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="143" column="8"/>
+      </memberdef>
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a23cd1fb941e84247ee49f9bdfcd0f1bd" prot="protected" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void opentelemetry::sdk::trace::BatchSpanProcessor::GetWaitAdjustedTime</definition>
+        <argsstring>(std::chrono::microseconds &amp;timeout, std::chrono::time_point&lt; std::chrono::system_clock &gt; &amp;start_time)</argsstring>
+        <name>GetWaitAdjustedTime</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::GetWaitAdjustedTime</qualifiedname>
+        <param>
+          <type>std::chrono::microseconds &amp;</type>
+          <declname>timeout</declname>
+        </param>
+        <param>
+          <type>std::chrono::time_point&lt; std::chrono::system_clock &gt; &amp;</type>
+          <declname>start_time</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="176" column="8"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="protected-static-func">
+      <memberdef kind="function" id="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1aa621da17da1578dfcc41ba040ad32391" prot="protected" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>static void opentelemetry::sdk::trace::BatchSpanProcessor::NotifyCompletion</definition>
+        <argsstring>(uint64_t notify_force_flush, const std::unique_ptr&lt; SpanExporter &gt; &amp;exporter, const std::shared_ptr&lt; SynchronizationData &gt; &amp;synchronization_data)</argsstring>
+        <name>NotifyCompletion</name>
+        <qualifiedname>opentelemetry::sdk::trace::BatchSpanProcessor::NotifyCompletion</qualifiedname>
+        <param>
+          <type>uint64_t</type>
+          <declname>notify_force_flush</declname>
+        </param>
+        <param>
+          <type>const std::unique_ptr&lt; <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref> &gt; &amp;</type>
+          <declname>exporter</declname>
+        </param>
+        <param>
+          <type>const std::shared_ptr&lt; SynchronizationData &gt; &amp;</type>
+          <declname>synchronization_data</declname>
+        </param>
+        <briefdescription>
+<para>Notify completion of shutdown and force flush. This may be called from the any thread at any time. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>notify_force_flush</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Sequence to indicate whether to notify force flush completion. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>exporter</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The span exporter instance that handles exporting spans to the backend. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>synchronization_data</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Synchronization data to be notified. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="172" column="15"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para>This is an implementation of the <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor" kindref="compound">SpanProcessor</ref> which creates batches of finished spans and passes the export-friendly span data representations to the configured <ref refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanExporter" kindref="compound">SpanExporter</ref>. </para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::BatchSpanProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::SpanProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="1">
+        <label>opentelemetry::sdk::trace::BatchSpanProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>opentelemetry::sdk::trace::SpanProcessor</label>
+        <link refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor"/>
+      </node>
+    </collaborationgraph>
+    <location file="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" line="34" column="1" bodyfile="/home/ubuntu/opentelemetry-cpp/sdk/include/opentelemetry/sdk/trace/batch_span_processor.h" bodystart="35" bodyend="194"/>
+    <listofallmembers>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ad8773502348727985b72da53e042f3dc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>BatchSpanProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ab46398edcb499059195b31043d35cd2d" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>BatchSpanProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a1b7d0df32fe360380b3fea51cc3b5b07" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>BatchSpanProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ad5d25283e29e3b35d2075c6e4eaab3d8" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>BatchSpanProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a4d803052dc0821bf8847cbf4254d73f8" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>buffer_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a90f74d7599e8edc73013b65e551abe47" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>DoBackgroundWork</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1aaaa3e5f79fa94f2f2586f65c2007fa61" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>DrainQueue</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a3c6b175a758dae8e613e51492f8b137d" prot="protected" virt="virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>Export</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a58039a8ebb85f8a4e8bf788b4cc79711" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>exporter_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a8552a5c51d3b28580d4c6cbe50809199" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>ForceFlush</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a23cd1fb941e84247ee49f9bdfcd0f1bd" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>GetWaitAdjustedTime</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a3e0f30cbc9322f840e9dd3dcd1c11d29" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>InternalShutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a653aa9aeefa324db02bf4952e9b6d03d" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>MakeRecordable</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a3d94ab15ff92982b274911062bcb7a63" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>max_export_batch_size_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1aa39b63978c46ac635f022766ab412483" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>max_queue_size_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1aa621da17da1578dfcc41ba040ad32391" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>NotifyCompletion</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ad94ef39519737b686575313f0ad337c9" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>OnEnd</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ae5ffa4fb65b5ad227283129c5552c1ba" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>OnStart</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a14b00d03e29f92a94cae1bb9c18b43ef" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a3da816cf319a598dfc70d36834451ebc" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor_1aea13dda7ddb2f7c79e284505e96fa862" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::trace::SpanProcessor::"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor_1ad4a8780f962cf11d05634bbbc0a15775" prot="public" virt="non-virtual" ambiguityscope="opentelemetry::sdk::trace::SpanProcessor::"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>operator=</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a8fffc19a8a3b30d7c0bfca5d01415606" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>schedule_delay_millis_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ab73b9197ef958ff108c9cb79c779c65b" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>Shutdown</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor_1a6e075e8acf8bbe3fa0099f3e4c7a3eed" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>SpanProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor_1a6d10be94088fa219d4e81bb76ed8df35" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>SpanProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor_1a7ed2fcc94bd9f97d5db742b073feb178" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>SpanProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1afecd9b0c9ee103ad66f44dac900dd6fb" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>synchronization_data_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1ade4099d4388e0b2805fe3a83df52cb52" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>worker_thread_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a13829d9b13ac2b7c70c6f6f12cc877ef" prot="protected" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>worker_thread_instrumentation_</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1BatchSpanProcessor_1a24b04f113471609019aced758506b2e5" prot="public" virt="non-virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>~BatchSpanProcessor</name></member>
+      <member refid="classopentelemetry_1_1sdk_1_1trace_1_1SpanProcessor_1a16fe88340103a574a4e0e6126a2cf996" prot="public" virt="virtual"><scope>opentelemetry::sdk::trace::BatchSpanProcessor</scope><name>~SpanProcessor</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
