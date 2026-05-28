@@ -301,33 +301,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricOtelSdkExporterS
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricOtelSdkExporterSpanExportedCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricOtelSdkExporterSpanExportedCount,
                                          descrMetricOtelSdkExporterSpanExportedCount,
                                          unitMetricOtelSdkExporterSpanExportedCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricOtelSdkExporterSpanExportedCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricOtelSdkExporterSpanExportedCount,
                                           descrMetricOtelSdkExporterSpanExportedCount,
                                           unitMetricOtelSdkExporterSpanExportedCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricOtelSdkExporterSpanExportedCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricOtelSdkExporterSpanExportedCount,
                                                    descrMetricOtelSdkExporterSpanExportedCount,
                                                    unitMetricOtelSdkExporterSpanExportedCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricOtelSdkExporterSpanExportedCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricOtelSdkExporterSpanExportedCount,
                                                     descrMetricOtelSdkExporterSpanExportedCount,
                                                     unitMetricOtelSdkExporterSpanExportedCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -391,33 +399,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricOtelSdkExporterS
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricOtelSdkExporterSpanInflightCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricOtelSdkExporterSpanInflightCount,
                                          descrMetricOtelSdkExporterSpanInflightCount,
                                          unitMetricOtelSdkExporterSpanInflightCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricOtelSdkExporterSpanInflightCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricOtelSdkExporterSpanInflightCount,
                                           descrMetricOtelSdkExporterSpanInflightCount,
                                           unitMetricOtelSdkExporterSpanInflightCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricOtelSdkExporterSpanInflightCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricOtelSdkExporterSpanInflightCount,
                                                    descrMetricOtelSdkExporterSpanInflightCount,
                                                    unitMetricOtelSdkExporterSpanInflightCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricOtelSdkExporterSpanInflightCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricOtelSdkExporterSpanInflightCount,
                                                     descrMetricOtelSdkExporterSpanInflightCount,
                                                     unitMetricOtelSdkExporterSpanInflightCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -686,33 +702,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricOtelSdkProcessor
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricOtelSdkProcessorSpanProcessedCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricOtelSdkProcessorSpanProcessedCount,
                                          descrMetricOtelSdkProcessorSpanProcessedCount,
                                          unitMetricOtelSdkProcessorSpanProcessedCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricOtelSdkProcessorSpanProcessedCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricOtelSdkProcessorSpanProcessedCount,
                                           descrMetricOtelSdkProcessorSpanProcessedCount,
                                           unitMetricOtelSdkProcessorSpanProcessedCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricOtelSdkProcessorSpanProcessedCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricOtelSdkProcessorSpanProcessedCount,
                                                    descrMetricOtelSdkProcessorSpanProcessedCount,
                                                    unitMetricOtelSdkProcessorSpanProcessedCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricOtelSdkProcessorSpanProcessedCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricOtelSdkProcessorSpanProcessedCount,
                                                     descrMetricOtelSdkProcessorSpanProcessedCount,
                                                     unitMetricOtelSdkProcessorSpanProcessedCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -823,29 +847,37 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricOtelSdkSpanEnded
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
 CreateSyncInt64MetricOtelSdkSpanEnded(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateUInt64Counter(kMetricOtelSdkSpanEnded, descrMetricOtelSdkSpanEnded,
                                     unitMetricOtelSdkSpanEnded);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<double>>
 CreateSyncDoubleMetricOtelSdkSpanEnded(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleCounter(kMetricOtelSdkSpanEnded, descrMetricOtelSdkSpanEnded,
                                     unitMetricOtelSdkSpanEnded);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricOtelSdkSpanEnded(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableCounter(kMetricOtelSdkSpanEnded, descrMetricOtelSdkSpanEnded,
                                              unitMetricOtelSdkSpanEnded);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricOtelSdkSpanEnded(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableCounter(kMetricOtelSdkSpanEnded, descrMetricOtelSdkSpanEnded,
                                               unitMetricOtelSdkSpanEnded);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -866,31 +898,39 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricOtelSdkSpanEnded
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<uint64_t>>
 CreateSyncInt64MetricOtelSdkSpanEndedCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateUInt64Counter(kMetricOtelSdkSpanEndedCount, descrMetricOtelSdkSpanEndedCount,
                                     unitMetricOtelSdkSpanEndedCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::Counter<double>>
 CreateSyncDoubleMetricOtelSdkSpanEndedCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleCounter(kMetricOtelSdkSpanEndedCount, descrMetricOtelSdkSpanEndedCount,
                                     unitMetricOtelSdkSpanEndedCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricOtelSdkSpanEndedCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableCounter(kMetricOtelSdkSpanEndedCount,
                                              descrMetricOtelSdkSpanEndedCount,
                                              unitMetricOtelSdkSpanEndedCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricOtelSdkSpanEndedCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableCounter(kMetricOtelSdkSpanEndedCount,
                                               descrMetricOtelSdkSpanEndedCount,
                                               unitMetricOtelSdkSpanEndedCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -947,29 +987,37 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricOtelSdkSpanLiveC
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricOtelSdkSpanLiveCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(
       kMetricOtelSdkSpanLiveCount, descrMetricOtelSdkSpanLiveCount, unitMetricOtelSdkSpanLiveCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricOtelSdkSpanLiveCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(
       kMetricOtelSdkSpanLiveCount, descrMetricOtelSdkSpanLiveCount, unitMetricOtelSdkSpanLiveCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricOtelSdkSpanLiveCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(
       kMetricOtelSdkSpanLiveCount, descrMetricOtelSdkSpanLiveCount, unitMetricOtelSdkSpanLiveCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricOtelSdkSpanLiveCount(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(
       kMetricOtelSdkSpanLiveCount, descrMetricOtelSdkSpanLiveCount, unitMetricOtelSdkSpanLiveCount);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
