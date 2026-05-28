@@ -25,14 +25,16 @@ jobs:
           sudo apt-get install -y doxygen graphviz
       - name: Generate documentation
         run: |
-
           VERSION=$(grep '^#define OPENTELEMETRY_VERSION "' api/include/opentelemetry/version.h | cut -d '"' -f2)
+
           cd docs/public
 
-          sed "s|^PROJECT_NUMBER[[:space:]]*=.*|PROJECT_NUMBER = ${VERSION}|" \
-            Doxyfile > Doxyfile.generated
+          cp Doxyfile Doxyfile.generated
 
-          rm -rf doxyoutput
+          echo "PROJECT_NUMBER = ${VERSION}" >> Doxyfile.generated
+          echo "PROJECT_BRIEF =" >> Doxyfile.generated
+
+          rm -rf html
 
           doxygen Doxyfile.generated
 
