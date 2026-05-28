@@ -23,6 +23,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y doxygen graphviz
+
       - name: Generate documentation
         run: |
           VERSION=$(grep '^#define OPENTELEMETRY_VERSION "' api/include/opentelemetry/version.h | cut -d '"' -f2)
@@ -40,9 +41,8 @@ jobs:
           doxygen Doxyfile.generated
 
       - name: Deploy to GitHub Pages
-          uses: peaceiris/actions-gh-pages@v3
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            publish_dir: ./docs/public/html
-            force_orphan: true
-            
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/public/doxyoutput/html
+          force_orphan: true
