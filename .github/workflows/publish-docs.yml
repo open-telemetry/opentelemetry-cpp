@@ -31,18 +31,18 @@ jobs:
 
           cp Doxyfile Doxyfile.generated
 
-          echo "PROJECT_NUMBER = ${VERSION}" >> Doxyfile.generated
+          sed -i "s/^PROJECT_NUMBER.*/PROJECT_NUMBER = ${VERSION}/" Doxyfile.generated
 
-          sed -i 's/^PROJECT_BRIEF.*/PROJECT_BRIEF =/' Doxyfile.generated
+          sed -i '/^PROJECT_BRIEF/d' Doxyfile.generated
 
-          rm -rf html
+          rm -rf doxyoutput/html
 
           doxygen Doxyfile.generated
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/public/doxyoutput/html
-          destination_dir: docs
-          
+          uses: peaceiris/actions-gh-pages@v3
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_dir: ./docs/public/html
+            force_orphan: true
+            
