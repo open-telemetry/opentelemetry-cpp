@@ -32,7 +32,8 @@ jobs:
           cp Doxyfile Doxyfile.generated
 
           echo "PROJECT_NUMBER = ${VERSION}" >> Doxyfile.generated
-          echo "PROJECT_BRIEF =" >> Doxyfile.generated
+
+          sed -i 's/^PROJECT_BRIEF.*/PROJECT_BRIEF =/' Doxyfile.generated
 
           rm -rf html
 
