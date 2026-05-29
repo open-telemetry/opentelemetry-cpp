@@ -62,8 +62,7 @@ public:
    * Create a Log Record object using either a Context or a SpanContext.
    *
    * @param context_or_span Variant carrying either a full Context or just a
-   *                        SpanContext. Avoids allocating a Context purely to
-   *                        propagate trace identity.
+   *                        SpanContext.
    * @return nostd::unique_ptr<LogRecord>
    */
   virtual nostd::unique_ptr<LogRecord> CreateLogRecord(

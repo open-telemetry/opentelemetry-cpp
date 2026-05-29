@@ -717,7 +717,7 @@ TEST(LoggerSDK, EmitLogRecordWithExplicitSpanContextStampsTraceFields)
   }
   opentelemetry::trace::Scope runtime_scope{runtime_span};
 
-  const auto explicit_span_ctx = MakeTestSpan(/*sampled=*/true)->GetContext();
+  const auto explicit_span_ctx = MakeTestSpan(true)->GetContext();
 
   logger->EmitLogRecord(logs_api::Severity::kInfo, nostd::string_view{"msg"}, explicit_span_ctx);
 
@@ -745,7 +745,7 @@ TEST(LoggerSDK, EmitLogRecordWithExplicitTracePartsStampsTraceFields)
   }
   opentelemetry::trace::Scope runtime_scope{runtime_span};
 
-  const auto explicit_span_ctx = MakeTestSpan(/*sampled=*/true)->GetContext();
+  const auto explicit_span_ctx = MakeTestSpan(true)->GetContext();
 
   logger->EmitLogRecord(logs_api::Severity::kInfo, nostd::string_view{"msg"},
                         explicit_span_ctx.trace_id(), explicit_span_ctx.span_id(),
