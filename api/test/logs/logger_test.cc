@@ -366,7 +366,9 @@ public:
 
   void SetEnabledImplResult(bool enabled) noexcept { enabled_impl_result_ = enabled; }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   using Logger::SetExtendedEnabledRequired;
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   size_t create_log_record_calls_{0};
   size_t emit_log_record_calls_{0};
@@ -510,7 +512,9 @@ TEST(Logger, EmitLogRecordTemplateShortCircuitsBelowMinimumSeverity)
 TEST(Logger, EmitLogRecordTemplateInvokesEnabledImplementationAndEmitsWhenAllowed)
 {
   EnablementAwareTestLogger logger(Severity::kTrace, true);
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   logger.SetExtendedEnabledRequired(true);
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   logger.Info(nostd::string_view{"emitted"});
 
@@ -523,7 +527,9 @@ TEST(Logger, EmitLogRecordTemplateInvokesEnabledImplementationAndEmitsWhenAllowe
 TEST(Logger, EmitLogRecordTemplateShortCircuitsWhenEnabledImplementationReturnsFalse)
 {
   EnablementAwareTestLogger logger(Severity::kTrace, false);
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   logger.SetExtendedEnabledRequired(true);
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   logger.Info(nostd::string_view{"filtered"});
 
@@ -548,6 +554,7 @@ TEST(Logger, EmitLogRecordWithRecordBypassesFiltering)
   EXPECT_EQ(logger.emit_log_record_calls_, 1u);
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(Logger, EmitLogRecordTemplateSkipsEnabledImplementationWhenExtendedEnabledNotRequired)
 {
   EnablementAwareTestLogger logger(Severity::kTrace, false);
@@ -560,7 +567,6 @@ TEST(Logger, EmitLogRecordTemplateSkipsEnabledImplementationWhenExtendedEnabledN
   EXPECT_EQ(logger.emit_log_record_calls_, 1u);
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(Logger, EmitLogRecordWithContextInArgsRoutesContextVariantToEnabledAndEmits)
 {
   EnablementAwareTestLogger logger(Severity::kTrace, true);

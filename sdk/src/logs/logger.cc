@@ -138,8 +138,10 @@ Logger::Logger(
                          ? static_cast<uint8_t>(logger_config_.GetMinimumSeverity())
                          : opentelemetry::logs::kMaxSeverity);
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   SetExtendedEnabledRequired(logger_config_.IsTraceBased() ||
                              context_->GetProcessor().HasEnabledFilter());
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 }
 
 const opentelemetry::nostd::string_view Logger::GetName() noexcept
