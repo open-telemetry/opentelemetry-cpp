@@ -77,7 +77,7 @@ public:
                             const opentelemetry::context::Context &context) noexcept = 0;
 };
 
-/* Represents the async metric stroage */
+/* Represents the async metric storage */
 class AsyncWritableMetricStorage
 {
 public:
