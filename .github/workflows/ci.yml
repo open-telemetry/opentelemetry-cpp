@@ -159,6 +159,44 @@ jobs:
       run: |
         (cd ./functional/otlp; ./run_test.sh)
 
+  cmake_gcc_maintainer_abiv2_test:
+    name: CMake gcc 14 (maintainer mode, abiv2)
+    runs-on: ubuntu-24.04
+    env:
+      CC: /usr/bin/gcc-14
+      CXX: /usr/bin/g++-14
+      CXX_STANDARD: '17'
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+      with:
+        egress-policy: audit
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: install dependencies
+      run: |
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
+    - name: run cmake gcc (maintainer mode, abiv2, Debug)
+      env:
+        BUILD_TYPE: Debug
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.abiv2.test
+    - name: run cmake gcc (maintainer mode, abiv2, Release)
+      env:
+        BUILD_TYPE: Release
+      run: |
+        ./ci/do_ci.sh cmake.maintainer.abiv2.test
+    - name: generate test cert
+      run: |
+        (cd ./functional/cert; ./generate_cert.sh)
+    - name: run func test
+      run: |
+        (cd ./functional/otlp; ./run_test.sh)
+
   cmake_clang_maintainer_sync_test:
     name: CMake clang 18 (maintainer mode, sync)
     runs-on: ubuntu-24.04
