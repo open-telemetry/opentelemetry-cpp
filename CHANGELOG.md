@@ -21,6 +21,9 @@ Increment the:
 * [CODE HEALTH] Fix IWYU Clang22 warnings
   [#4083](https://github.com/open-telemetry/opentelemetry-cpp/pull/4083)
 
+* [EXPORTER] Spec-compliant uint64_t attribute encoding in OTLP
+  [#4090](https://github.com/open-telemetry/opentelemetry-cpp/pull/4090)
+
 * [CODE HEALTH] Remove unused alias declarations
   [#4091](https://github.com/open-telemetry/opentelemetry-cpp/pull/4091)
 
