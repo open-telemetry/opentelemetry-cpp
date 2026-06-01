@@ -9,6 +9,7 @@
 #  include <stddef.h>
 #  include <stdint.h>
 #  include <chrono>
+#  include <limits>
 #  include <map>
 #  include <memory>
 #  include <string>
@@ -34,6 +35,7 @@
 #  include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #  include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
+#  include "opentelemetry/sdk/metrics/sync_instruments.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -145,7 +147,7 @@ bool HasOverflowPoint(SyncMetricStorage &storage, AggregationTemporality tempora
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find("otel.metrics.overflow") != p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey) != p.attributes.end())
                       {
                         found = true;
                       }
@@ -170,6 +172,53 @@ TEST(BoundSyncInstruments, BoundCounterMatchesUnbound)
 
   EXPECT_EQ(SumLongFor(*holder, AggregationTemporality::kDelta, attrs), 10);
   EXPECT_EQ(CollectAndCountPoints(*holder, AggregationTemporality::kDelta), 0u);
+}
+
+TEST(BoundSyncInstruments, UnboundCounterDropsValueAboveInt64Max)
+{
+  InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kCounter,
+                            InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
+  AggregationConfig cfg;
+  std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
+      desc, AggregationType::kSum, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  SyncMetricStorage *storage_ptr = storage.get();
+  LongCounter counter(desc, std::move(storage));
+  M attrs    = {{"key", "v"}};
+  auto kv    = KeyValueIterableView<M>(attrs);
+
+  counter.Add(static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1, kv);
+  counter.Add(7, kv);
+
+  EXPECT_EQ(SumLongFor(*storage_ptr, AggregationTemporality::kDelta, attrs), 7);
+}
+
+TEST(BoundSyncInstruments, BoundCounterDropsValueAboveInt64Max)
+{
+  InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kCounter,
+                            InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
+  AggregationConfig cfg;
+  std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
+      desc, AggregationType::kSum, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  SyncMetricStorage *storage_ptr = storage.get();
+  LongCounter counter(desc, std::move(storage));
+  M attrs    = {{"key", "v"}};
+  auto bound = counter.Bind(KeyValueIterableView<M>(attrs));
+  ASSERT_NE(bound, nullptr);
+
+  bound->Add(static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1);
+  bound->Add(7);
+
+  EXPECT_EQ(SumLongFor(*storage_ptr, AggregationTemporality::kDelta, attrs), 7);
 }
 
 // 2) Bound histogram records and exports same datapoint as unbound.
@@ -199,6 +248,85 @@ TEST(BoundSyncInstruments, BoundHistogramMatchesUnbound)
                     }
                     return true;
                   });
+  EXPECT_TRUE(seen);
+}
+
+TEST(BoundSyncInstruments, UnboundHistogramDropsValueAboveInt64Max)
+{
+  InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kHistogram,
+                            InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
+  HistogramAggregationConfig cfg;
+  std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
+      desc, AggregationType::kHistogram, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  SyncMetricStorage *storage_ptr = storage.get();
+  LongHistogram histogram(desc, std::move(storage));
+  M attrs    = {{"key", "v"}};
+  auto kv    = KeyValueIterableView<M>(attrs);
+
+  histogram.Record(static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1, kv);
+  histogram.Record(9, kv);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+  bool seen = false;
+  storage_ptr->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
+                       std::chrono::system_clock::now(), [&](const MetricData &md) {
+                         for (const auto &p : md.point_data_attr_)
+                         {
+                           const auto &h =
+                               opentelemetry::nostd::get<HistogramPointData>(p.point_data);
+                           EXPECT_EQ(h.count_, 1u);
+                           EXPECT_EQ(opentelemetry::nostd::get<int64_t>(h.sum_), 9);
+                           seen = true;
+                         }
+                         return true;
+                       });
+  EXPECT_TRUE(seen);
+}
+
+TEST(BoundSyncInstruments, BoundHistogramDropsValueAboveInt64Max)
+{
+  InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kHistogram,
+                            InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
+  HistogramAggregationConfig cfg;
+  std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
+      desc, AggregationType::kHistogram, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  SyncMetricStorage *storage_ptr = storage.get();
+  LongHistogram histogram(desc, std::move(storage));
+  M attrs    = {{"key", "v"}};
+  auto bound = histogram.Bind(KeyValueIterableView<M>(attrs));
+  ASSERT_NE(bound, nullptr);
+
+  bound->Record(static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1);
+  bound->Record(9);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+  bool seen = false;
+  storage_ptr->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
+                       std::chrono::system_clock::now(), [&](const MetricData &md) {
+                         for (const auto &p : md.point_data_attr_)
+                         {
+                           const auto &h =
+                               opentelemetry::nostd::get<HistogramPointData>(p.point_data);
+                           EXPECT_EQ(h.count_, 1u);
+                           EXPECT_EQ(opentelemetry::nostd::get<int64_t>(h.sum_), 9);
+                           seen = true;
+                         }
+                         return true;
+                       });
   EXPECT_TRUE(seen);
 }
 
@@ -443,7 +571,7 @@ TEST(BoundSyncInstruments, BindingAtOverflowGoesToOverflowBucket)
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find("otel.metrics.overflow") != p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey) != p.attributes.end())
                       {
                         seen           = true;
                         const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
@@ -572,7 +700,7 @@ TEST(BoundSyncInstruments, BindOnExistingUnboundKeyDoesNotOverflow)
       std::chrono::system_clock::now(), [&](const MetricData &md) {
         for (const auto &p : md.point_data_attr_)
         {
-          if (p.attributes.find("otel.metrics.overflow") != p.attributes.end())
+          if (p.attributes.find(kAttributesLimitOverflowKey) != p.attributes.end())
             overflow_seen = true;
           auto it = p.attributes.find("k");
           if (it != p.attributes.end() && opentelemetry::nostd::get<std::string>(it->second) == "1")
@@ -613,7 +741,7 @@ TEST(BoundSyncInstruments, UnboundOnExistingBoundKeyDoesNotOverflow)
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find("otel.metrics.overflow") != p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey) != p.attributes.end())
                         overflow_seen = true;
                       auto it = p.attributes.find("k");
                       if (it == p.attributes.end())
@@ -681,7 +809,7 @@ TEST(BoundSyncInstruments, RetainedBoundEntriesOverflowValue)
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find("otel.metrics.overflow") == p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey) == p.attributes.end())
                         continue;
                       const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
                       overflow_sum += opentelemetry::nostd::get<int64_t>(sp.value_);
@@ -716,7 +844,7 @@ TEST(BoundSyncInstruments, NoAttributeUnboundFollowsUnifiedPolicyLong)
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find("otel.metrics.overflow") == p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey) == p.attributes.end())
                         continue;
                       const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
                       overflow_sum += opentelemetry::nostd::get<int64_t>(sp.value_);
@@ -747,7 +875,7 @@ TEST(BoundSyncInstruments, NoAttributeUnboundFollowsUnifiedPolicyDouble)
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find("otel.metrics.overflow") == p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey) == p.attributes.end())
                         continue;
                       const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
                       overflow_sum += opentelemetry::nostd::get<double>(sp.value_);
@@ -885,7 +1013,7 @@ TEST(BoundSyncInstruments, OverflowParityAllowsFillingRemainingSlot)
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find("otel.metrics.overflow") != p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey) != p.attributes.end())
                       {
                         overflow_seen = true;
                       }

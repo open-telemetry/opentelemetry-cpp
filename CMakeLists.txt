@@ -60,11 +60,23 @@ endif()
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
 
+if(DEFINED WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+   AND WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+   AND NOT WITH_ABI_VERSION_2)
+  message(
+    FATAL_ERROR
+      "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW requires WITH_ABI_VERSION_2")
+endif()
+
+include(CMakeDependentOption)
+
 # Experimental: bound synchronous metric instruments (Counter, Histogram).
 # Requires WITH_ABI_VERSION_2. Context-bearing bound operations, exemplar
 # parity, Gauge, and UpDownCounter bound support are follow-ups.
-option(WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
-       "EXPERIMENTAL: bound synchronous metric instruments preview" OFF)
+cmake_dependent_option(
+  WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  "EXPERIMENTAL: bound synchronous metric instruments preview" OFF
+  "WITH_ABI_VERSION_2" OFF)
 
 option(WITH_CONFIGURATION "EXPERIMENTAL: YAML configuration file" OFF)
 
@@ -499,10 +511,6 @@ message(STATUS "WITH_API_ONLY: ${WITH_API_ONLY}")
 message(STATUS "WITH_NO_DEPRECATED_CODE: ${WITH_NO_DEPRECATED_CODE}")
 message(STATUS "WITH_ABI_VERSION_1: ${WITH_ABI_VERSION_1}")
 message(STATUS "WITH_ABI_VERSION_2: ${WITH_ABI_VERSION_2}")
-message(
-  STATUS
-    "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW: ${WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW}"
-)
 message(STATUS "OTELCPP_VERSIONED_LIBS: ${OTELCPP_VERSIONED_LIBS}")
 message(STATUS "OTELCPP_MAINTAINER_MODE: ${OTELCPP_MAINTAINER_MODE}")
 message(STATUS "WITH_STL: ${WITH_STL}")
@@ -541,6 +549,10 @@ message(
   STATUS
     "WITH_OTLP_GRPC_CREDENTIAL_PREVIEW: ${WITH_OTLP_GRPC_CREDENTIAL_PREVIEW}")
 message(STATUS "WITH_OTLP_RETRY_PREVIEW: ${WITH_OTLP_RETRY_PREVIEW}")
+message(
+  STATUS
+    "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW: ${WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW}"
+)
 message(STATUS "---------------------------------------------")
 message(STATUS "third-party options")
 message(STATUS "---------------------------------------------")

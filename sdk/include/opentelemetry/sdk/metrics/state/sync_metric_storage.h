@@ -229,8 +229,7 @@ public:
                std::unique_ptr<Aggregation> initial_aggregation) noexcept
         : value_type_(value_type),
           attributes_(std::move(attributes)),
-          current_(std::move(initial_aggregation)),
-          dirty_(false)
+          current_(std::move(initial_aggregation))
     {}
 
     void RecordLong(int64_t value) noexcept override;
@@ -243,7 +242,7 @@ public:
     // Protected by lock_.
     opentelemetry::common::SpinLockMutex lock_;
     std::unique_ptr<Aggregation> current_;
-    bool dirty_;
+    bool dirty_ = false;
   };
 #endif
 

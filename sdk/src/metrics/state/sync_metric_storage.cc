@@ -14,6 +14,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/data/exemplar_data.h"
@@ -225,6 +226,9 @@ void SyncMetricStorage::BoundEntry::RecordLong(int64_t value) noexcept
 {
   if (value_type_ != InstrumentValueType::kLong)
   {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[SyncMetricStorage::BoundEntry::RecordLong] Value not recorded - storage value type "
+        "is not long");
     return;
   }
   std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
@@ -236,6 +240,9 @@ void SyncMetricStorage::BoundEntry::RecordDouble(double value) noexcept
 {
   if (value_type_ != InstrumentValueType::kDouble)
   {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[SyncMetricStorage::BoundEntry::RecordDouble] Value not recorded - storage value type "
+        "is not double");
     return;
   }
   std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);

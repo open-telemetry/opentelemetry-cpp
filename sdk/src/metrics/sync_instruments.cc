@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stdint.h>
+#include <limits>
 #include <ostream>
 #include <string>
 #include <utility>
@@ -20,6 +21,22 @@ namespace sdk
 {
 namespace metrics
 {
+namespace
+{
+
+bool ToInt64Value(uint64_t value, const char *operation, int64_t &converted) noexcept
+{
+  if (value > static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
+  {
+    OTEL_INTERNAL_LOG_WARN(operation << " Value not recorded - value exceeds int64_t max");
+    return false;
+  }
+  converted = static_cast<int64_t>(value);
+  return true;
+}
+
+}  // namespace
+
 LongCounter::LongCounter(const InstrumentDescriptor &instrument_descriptor,
                          std::unique_ptr<SyncWritableMetricStorage> storage)
     : Synchronous(instrument_descriptor, std::move(storage))
@@ -41,7 +58,11 @@ void LongCounter::Add(uint64_t value,
                            << instrument_descriptor_.name_);
     return;
   }
-  return storage_->RecordLong(static_cast<int64_t>(value), attributes, context);
+  int64_t converted;
+  if (ToInt64Value(value, "[LongCounter::Add(V,A)]", converted))
+  {
+    return storage_->RecordLong(converted, attributes, context);
+  }
 }
 
 void LongCounter::Add(uint64_t value,
@@ -54,7 +75,11 @@ void LongCounter::Add(uint64_t value,
                            << instrument_descriptor_.name_);
     return;
   }
-  return storage_->RecordLong(static_cast<int64_t>(value), attributes, context);
+  int64_t converted;
+  if (ToInt64Value(value, "[LongCounter::Add(V,A,C)]", converted))
+  {
+    return storage_->RecordLong(converted, attributes, context);
+  }
 }
 
 void LongCounter::Add(uint64_t value) noexcept
@@ -66,7 +91,11 @@ void LongCounter::Add(uint64_t value) noexcept
                            << instrument_descriptor_.name_);
     return;
   }
-  return storage_->RecordLong(static_cast<int64_t>(value), context);
+  int64_t converted;
+  if (ToInt64Value(value, "[LongCounter::Add(V)]", converted))
+  {
+    return storage_->RecordLong(converted, context);
+  }
 }
 
 void LongCounter::Add(uint64_t value, const opentelemetry::context::Context &context) noexcept
@@ -77,7 +106,11 @@ void LongCounter::Add(uint64_t value, const opentelemetry::context::Context &con
                            << instrument_descriptor_.name_);
     return;
   }
-  return storage_->RecordLong(static_cast<int64_t>(value), context);
+  int64_t converted;
+  if (ToInt64Value(value, "[LongCounter::Add(V,C)]", converted))
+  {
+    return storage_->RecordLong(converted, context);
+  }
 }
 
 DoubleCounter::DoubleCounter(const InstrumentDescriptor &instrument_descriptor,
@@ -435,7 +468,11 @@ void LongHistogram::Record(uint64_t value,
         << instrument_descriptor_.name_);
     return;
   }
-  return storage_->RecordLong(static_cast<int64_t>(value), attributes, context);
+  int64_t converted;
+  if (ToInt64Value(value, "[LongHistogram::Record(V,A,C)]", converted))
+  {
+    return storage_->RecordLong(converted, attributes, context);
+  }
 }
 
 void LongHistogram::Record(uint64_t value, const opentelemetry::context::Context &context) noexcept
@@ -446,7 +483,11 @@ void LongHistogram::Record(uint64_t value, const opentelemetry::context::Context
                            << instrument_descriptor_.name_);
     return;
   }
-  return storage_->RecordLong(static_cast<int64_t>(value), context);
+  int64_t converted;
+  if (ToInt64Value(value, "[LongHistogram::Record(V,C)]", converted))
+  {
+    return storage_->RecordLong(converted, context);
+  }
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -460,7 +501,11 @@ void LongHistogram::Record(uint64_t value,
     return;
   }
   auto context = opentelemetry::context::Context{};
-  return storage_->RecordLong(static_cast<int64_t>(value), attributes, context);
+  int64_t converted;
+  if (ToInt64Value(value, "[LongHistogram::Record(V,A)]", converted))
+  {
+    return storage_->RecordLong(converted, attributes, context);
+  }
 }
 
 void LongHistogram::Record(uint64_t value) noexcept
@@ -472,7 +517,11 @@ void LongHistogram::Record(uint64_t value) noexcept
     return;
   }
   auto context = opentelemetry::context::Context{};
-  return storage_->RecordLong(static_cast<int64_t>(value), context);
+  int64_t converted;
+  if (ToInt64Value(value, "[LongHistogram::Record(V)]", converted))
+  {
+    return storage_->RecordLong(converted, context);
+  }
 }
 #endif
 
@@ -583,7 +632,11 @@ public:
   {
     if (storage_)
     {
-      storage_->RecordLong(static_cast<int64_t>(value));
+      int64_t converted;
+      if (ToInt64Value(value, "[BoundLongCounter::Add(V)]", converted))
+      {
+        storage_->RecordLong(converted);
+      }
     }
   }
 
@@ -624,7 +677,11 @@ public:
   {
     if (storage_)
     {
-      storage_->RecordLong(static_cast<int64_t>(value));
+      int64_t converted;
+      if (ToInt64Value(value, "[BoundLongHistogram::Record(V)]", converted))
+      {
+        storage_->RecordLong(converted);
+      }
     }
   }
 

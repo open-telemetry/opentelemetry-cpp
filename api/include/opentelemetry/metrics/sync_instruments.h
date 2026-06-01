@@ -40,8 +40,9 @@ public:
  * @since ABI_VERSION 2
  * A bound counter handle obtained via Counter<T>::Bind(...). The associated
  * attribute set is captured at Bind time so the hot path avoids per-call
- * attribute processing and hashmap lookup. The handle must not outlive the
- * Counter instrument from which it was obtained.
+ * attribute processing and hashmap lookup. Calls made after the originating
+ * Counter or SDK storage is destroyed or shut down may be dropped and are not
+ * guaranteed to be exported.
  */
 template <class T>
 class BoundCounter
@@ -164,7 +165,8 @@ public:
    * @since ABI_VERSION 2
    * Returns a bound counter handle for the given attribute set. Repeated calls
    * to BoundCounter<T>::Add(value) avoid per-call attribute processing and
-   * hashmap lookup. The bound handle MUST NOT outlive this Counter instrument.
+   * hashmap lookup. Calls made after the Counter or SDK storage is destroyed or
+   * shut down may be dropped and are not guaranteed to be exported.
    */
   virtual nostd::unique_ptr<BoundCounter<T>> Bind(
       const common::KeyValueIterable &attributes) noexcept = 0;
@@ -231,8 +233,9 @@ public:
    * @since ABI_VERSION 2
    * Returns a bound histogram handle for the given attribute set. Repeated
    * calls to BoundHistogram<T>::Record(value) avoid per-call attribute
-   * processing and hashmap lookup. The bound handle MUST NOT outlive this
-   * Histogram instrument.
+   * processing and hashmap lookup. Calls made after the Histogram or SDK
+   * storage is destroyed or shut down may be dropped and are not guaranteed to
+   * be exported.
    */
   virtual nostd::unique_ptr<BoundHistogram<T>> Bind(
       const common::KeyValueIterable &attributes) noexcept = 0;
