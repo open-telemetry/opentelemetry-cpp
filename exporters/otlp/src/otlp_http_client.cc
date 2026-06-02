@@ -46,6 +46,8 @@
 #include <google/protobuf/stubs/port.h>
 #include <string_view>
 #include <google/protobuf/util/json_util.h>
+// IWYU pragma: no_include <google/protobuf/stubs/status.h>
+// IWYU pragma: no_include <google/protobuf/stubs/stringpiece.h>
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
