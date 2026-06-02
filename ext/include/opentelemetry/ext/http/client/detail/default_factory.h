@@ -6,11 +6,10 @@
 #include <memory>
 
 #include "opentelemetry/ext/http/client/http_client_factory.h"
-#ifndef ENABLE_HTTP_CLIENT_CURL
-#  include "opentelemetry/sdk/common/global_log_handler.h"
-#endif
 #ifdef ENABLE_HTTP_CLIENT_CURL
 #  include "opentelemetry/ext/http/client/curl/http_client_factory_curl.h"
+#else
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
