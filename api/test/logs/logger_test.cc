@@ -509,12 +509,11 @@ TEST(Logger, EmitLogRecordTemplateShortCircuitsBelowMinimumSeverity)
   EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(Logger, EmitLogRecordTemplateInvokesEnabledImplementationAndEmitsWhenAllowed)
 {
   EnablementAwareTestLogger logger(Severity::kTrace, true);
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   logger.SetExtendedEnabledRequired(true);
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   logger.Info(nostd::string_view{"emitted"});
 
@@ -527,9 +526,7 @@ TEST(Logger, EmitLogRecordTemplateInvokesEnabledImplementationAndEmitsWhenAllowe
 TEST(Logger, EmitLogRecordTemplateShortCircuitsWhenEnabledImplementationReturnsFalse)
 {
   EnablementAwareTestLogger logger(Severity::kTrace, false);
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   logger.SetExtendedEnabledRequired(true);
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   logger.Info(nostd::string_view{"filtered"});
 
@@ -537,6 +534,7 @@ TEST(Logger, EmitLogRecordTemplateShortCircuitsWhenEnabledImplementationReturnsF
   EXPECT_EQ(logger.create_log_record_calls_, 0u);
   EXPECT_EQ(logger.emit_log_record_calls_, 0u);
 }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 TEST(Logger, EmitLogRecordWithRecordBypassesFiltering)
 {

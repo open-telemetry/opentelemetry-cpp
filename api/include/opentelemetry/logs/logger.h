@@ -163,6 +163,12 @@ public:
   template <class... ArgumentType>
   void EmitLogRecord(ArgumentType &&...args)
   {
+    const Severity arg_severity = detail::FindSeverityInArgs(args...);
+    if (arg_severity != Severity::kInvalid && !Enabled(arg_severity))
+    {
+      return;
+    }
+
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     nostd::variant<trace::SpanContext, opentelemetry::context::Context> context_or_span =
         trace::SpanContext::GetInvalid();
@@ -191,18 +197,10 @@ public:
         context_or_span = opentelemetry::context::RuntimeContext::GetCurrent();
       }
     }
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-    const Severity arg_severity = detail::FindSeverityInArgs(args...);
     if (arg_severity != Severity::kInvalid)
     {
-      if (!Enabled(arg_severity))
-      {
-        return;
-      }
-
       const EventId *event_id_ptr = detail::FindEventIdInArgs(args...);
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
       if (ExtendedEnabledRequired())
       {
         const bool extended_enabled =
@@ -213,18 +211,8 @@ public:
           return;
         }
       }
-#else
-      const bool extended_enabled =
-          event_id_ptr ? EnabledImplementation(arg_severity, *event_id_ptr)
-                       : EnabledImplementation(arg_severity, static_cast<int64_t>(0));
-      if (!extended_enabled)
-      {
-        return;
-      }
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
     }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord(context_or_span);
 #else
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
