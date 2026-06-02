@@ -26,6 +26,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
+#include "opentelemetry/ext/http/client/detail/default_factory.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
@@ -661,7 +662,7 @@ void ConvertListFieldToJson(nlohmann::json &value,
 }  // namespace
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
-    : OtlpHttpClient(std::move(options), ext::http::client::GetDefaultHttpClientFactory())
+    : OtlpHttpClient(std::move(options), ext::http::client::detail::GetDefaultHttpClientFactory())
 {}
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,

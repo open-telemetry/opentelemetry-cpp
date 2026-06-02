@@ -16,6 +16,7 @@
 #include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
+#include "opentelemetry/ext/http/client/detail/default_factory.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
@@ -36,11 +37,12 @@ namespace zipkin
 // -------------------------------- Constructors --------------------------------
 
 ZipkinExporter::ZipkinExporter(const ZipkinExporterOptions &options)
-    : ZipkinExporter(options, ext::http::client::GetDefaultHttpClientFactory())
+    : ZipkinExporter(options, ext::http::client::detail::GetDefaultHttpClientFactory())
 {}
 
 ZipkinExporter::ZipkinExporter()
-    : ZipkinExporter(ZipkinExporterOptions(), ext::http::client::GetDefaultHttpClientFactory())
+    : ZipkinExporter(ZipkinExporterOptions(),
+                     ext::http::client::detail::GetDefaultHttpClientFactory())
 {}
 
 ZipkinExporter::ZipkinExporter(const ZipkinExporterOptions &options,

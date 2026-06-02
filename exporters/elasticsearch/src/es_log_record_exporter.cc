@@ -16,6 +16,7 @@
 
 #include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
+#include "opentelemetry/ext/http/client/detail/default_factory.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/nostd/function_ref.h"
@@ -320,7 +321,8 @@ ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter()
 
 ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
     const ElasticsearchExporterOptions &options)
-    : ElasticsearchLogRecordExporter(options, ext::http::client::GetDefaultHttpClientFactory())
+    : ElasticsearchLogRecordExporter(options,
+                                     ext::http::client::detail::GetDefaultHttpClientFactory())
 {}
 
 ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(

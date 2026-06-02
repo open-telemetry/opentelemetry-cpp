@@ -137,12 +137,6 @@ std::shared_ptr<HttpClientSync> LoggingHttpClientFactory::CreateSync()
   return nullptr;
 }
 
-std::shared_ptr<HttpClientFactory> GetDefaultHttpClientFactory()
-{
-  static auto instance = std::make_shared<LoggingHttpClientFactory>();
-  return instance;
-}
-
 }  // namespace client
 }  // namespace http
 }  // namespace ext

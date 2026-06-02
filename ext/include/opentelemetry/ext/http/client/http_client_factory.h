@@ -34,11 +34,6 @@ public:
       const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation) = 0;
 };
 
-// Returns an HttpCurlClientFactory instance when compiled with curl support.
-// Not defined otherwise — binaries that link any exporter must provide their
-// own definition or use the factory/client constructor overloads exclusively.
-std::shared_ptr<HttpClientFactory> GetDefaultHttpClientFactory();
-
 }  // namespace client
 }  // namespace http
 }  // namespace ext

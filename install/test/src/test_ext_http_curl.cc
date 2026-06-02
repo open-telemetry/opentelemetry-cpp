@@ -3,11 +3,12 @@
 
 #include <gtest/gtest.h>
 
+#include <opentelemetry/ext/http/client/curl/http_client_factory_curl.h>
 #include <opentelemetry/ext/http/client/http_client.h>
-#include <opentelemetry/ext/http/client/http_client_factory.h>
 
 TEST(ExtHttpCurlInstall, HttpClient)
 {
-  auto client = opentelemetry::ext::http::client::GetDefaultHttpClientFactory()->Create();
+  auto client =
+      std::make_shared<opentelemetry::ext::http::client::curl::HttpCurlClientFactory>()->Create();
   ASSERT_TRUE(client != nullptr);
 }

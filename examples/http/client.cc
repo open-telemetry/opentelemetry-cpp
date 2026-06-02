@@ -5,8 +5,8 @@
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/ext/http/client/curl/http_client_factory_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -40,7 +40,7 @@ namespace semconv     = opentelemetry::semconv;
 
 void sendRequest(const std::string &url)
 {
-  auto http_client = http_client::GetDefaultHttpClientFactory()->CreateSync();
+  auto http_client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->CreateSync();
 
   // start active span
   StartSpanOptions options;

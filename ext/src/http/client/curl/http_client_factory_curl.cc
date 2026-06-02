@@ -25,9 +25,3 @@ std::shared_ptr<http_client::HttpClientSync> http_client::curl::HttpCurlClientFa
 {
   return std::make_shared<http_client::curl::HttpClientSync>();
 }
-
-std::shared_ptr<http_client::HttpClientFactory> http_client::GetDefaultHttpClientFactory()
-{
-  static auto instance = std::make_shared<http_client::curl::HttpCurlClientFactory>();
-  return instance;
-}
