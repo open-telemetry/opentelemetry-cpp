@@ -45,6 +45,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/stubs/port.h>
 #include <string_view>
+#include <google/protobuf/util/json_util.h>
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
@@ -78,8 +79,12 @@ public:
   ResponseHandler(std::function<bool(opentelemetry::sdk::common::ExportResult,
                                      google::protobuf::Message *)> &&callback,
                   google::protobuf::Message *response,
+                  HttpRequestContentType content_type,
                   bool console_debug = false)
-      : result_callback_{std::move(callback)}, response_{response}, console_debug_{console_debug}
+      : result_callback_{std::move(callback)},
+        response_{response},
+        content_type_{content_type},
+        console_debug_{console_debug}
   {}
 
   std::string BuildResponseLogMessage(http_client::Response &response,
@@ -132,7 +137,14 @@ public:
     // On 2xx, parse the body into the caller-provided typed response
     if (response_ != nullptr && result == sdk::common::ExportResult::kSuccess)
     {
-      if (!response_->ParseFromString(body_))
+      if (content_type_ == HttpRequestContentType::kJson)
+      {
+        if (!google::protobuf::util::JsonStringToMessage(body_, response_).ok())
+        {
+          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Failed to parse JSON response body");
+        }
+      }
+      else if (!response_->ParseFromString(body_))
       {
         OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Failed to parse response body");
       }
@@ -383,6 +395,9 @@ private:
 
   // Optional typed response, filled on 2xx
   google::protobuf::Message *response_ = nullptr;
+
+  // Request and response body encoding
+  HttpRequestContentType content_type_;
 
   // Whether to print the results from the callback
   bool console_debug_ = false;
@@ -1052,8 +1067,8 @@ OtlpHttpClient::createSession(
 
   return HttpSessionData{
       std::move(session),
-      std::shared_ptr<opentelemetry::ext::http::client::EventHandler>{
-          new ResponseHandler(std::move(result_callback), response, options_.console_debug)},
+      std::shared_ptr<opentelemetry::ext::http::client::EventHandler>{new ResponseHandler(
+          std::move(result_callback), response, options_.content_type, options_.console_debug)},
       std::move(arena), response};
 }
 

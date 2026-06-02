@@ -909,6 +909,46 @@ TEST_F(OtlpHttpExporterTestPeer, ExportPartialSuccess)
   EXPECT_TRUE(contains("too many spans!!"));
 }
 
+// Exporter logs the rejection on partial_success when the response is JSON encoded.
+TEST_F(OtlpHttpExporterTestPeer, ExportPartialSuccessJson)
+{
+  ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
+
+  std::string serialized =
+      R"({"partialSuccess":{"rejectedSpans":"21","errorMessage":"too many spans!!"}})";
+
+  auto mock_otlp_client =
+      OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_client.first});
+
+  auto no_send_client =
+      std::static_pointer_cast<http_client::nosend::HttpClient>(mock_otlp_client.second);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&serialized](const std::shared_ptr<http_client::EventHandler> &callback) {
+        http_client::nosend::Response response;
+        response.body_.assign(serialized.begin(), serialized.end());
+        response.Finish(*callback.get());
+      });
+
+  auto recordable = exporter->MakeRecordable();
+  recordable->SetName("Test span");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, exporter->Export(batch));
+
+  auto entries  = log.Drain();
+  auto contains = [&](const std::string &needle) {
+    return std::any_of(entries.begin(), entries.end(), [&](const ScopedTestLogHandler::Entry &e) {
+      return e.msg.find(needle) != std::string::npos;
+    });
+  };
+  EXPECT_TRUE(contains("partial success"));
+  EXPECT_TRUE(contains("21 span(s) rejected"));
+  EXPECT_TRUE(contains("too many spans!!"));
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
