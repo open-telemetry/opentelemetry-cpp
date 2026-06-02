@@ -336,19 +336,23 @@ public:
     // first.
     OtlpHttpClient *owner                                    = owner_;
     const opentelemetry::ext::http::client::Session *session = session_;
+    auto callback                                            = std::move(result_callback_);
+    google::protobuf::Message *response                      = response_;
 
-    owner_   = nullptr;
-    session_ = nullptr;
+    owner_    = nullptr;
+    session_  = nullptr;
+    response_ = nullptr;
+
+    // Run the callback before releasing the session, so the arena-owned response stays alive.
+    if (callback)
+    {
+      callback(result, response);
+    }
 
     if (nullptr != owner && nullptr != session)
     {
       // Release the session at last
       owner->ReleaseSession(*session);
-
-      if (result_callback_)
-      {
-        result_callback_(result, response_);
-      }
     }
   }
 
