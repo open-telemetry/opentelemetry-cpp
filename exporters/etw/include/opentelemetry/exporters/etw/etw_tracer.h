@@ -3,10 +3,8 @@
 
 #pragma once
 
-#include <algorithm>
 #include <atomic>
 
-#include <cctype>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -1062,54 +1060,6 @@ public:
   opentelemetry::trace::Tracer &tracer() const noexcept { return this->owner_; }
 };
 
-static inline std::string TrimWhitespace(std::string input)
-{
-  auto is_space = [](unsigned char c) { return std::isspace(c) != 0; };
-  auto begin    = std::find_if_not(input.begin(), input.end(), is_space);
-  if (begin == input.end())
-  {
-    return std::string{};
-  }
-  auto end = std::find_if_not(input.rbegin(), input.rend(), is_space).base();
-  return std::string(begin, end);
-}
-
-static inline ETWProvider::EventFormat ParseEncodingArg(nostd::string_view args,
-                                                        ETWProvider::EventFormat fallback)
-{
-  if (args.size() == 0)
-  {
-    return fallback;
-  }
-
-  std::string arg(args.data(), args.size());
-  arg = TrimWhitespace(std::move(arg));
-  if (arg.empty())
-  {
-    return fallback;
-  }
-
-  std::transform(arg.begin(), arg.end(), arg.begin(),
-                 [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
-
-  if (arg == "MSGPACK" || arg == "MESSAGEPACK")
-  {
-    return ETWProvider::EventFormat::ETW_MSGPACK;
-  }
-
-  if (arg == "XML")
-  {
-    return ETWProvider::EventFormat::ETW_XML;
-  }
-
-  if (arg == "ETW" || arg == "TLD")
-  {
-    return ETWProvider::EventFormat::ETW_MANIFEST;
-  }
-
-  return fallback;
-}
-
 /**
  * @brief ETW TracerProvider
  */
@@ -1211,11 +1161,12 @@ public:
    * @brief Obtain ETW Tracer.
    * @param name ProviderId (instrumentation name) - Name or GUID
    *
-   * @param args Additional arguments that controls `codec` of the provider.
-   * Possible values are:
-   * - "ETW"            - 'classic' Trace Logging Dynamic manifest ETW events.
-   * - "MSGPACK"        - MessagePack-encoded binary payload ETW events.
-   * - "XML"            - XML events (reserved for future use)
+   * @param args Instrumentation version (unused by ETW).
+   * @param schema_url Schema URL (unused by ETW).
+   *
+   * Encoding is controlled via TelemetryProviderOptions["encoding"] passed
+   * to the TracerProvider constructor. Valid values: "ETW"/"TLD" (default),
+   * "MSGPACK", "XML".
    * @return
    */
   nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
@@ -1229,8 +1180,9 @@ public:
 #endif
       ) noexcept override
   {
+    UNREFERENCED_PARAMETER(args);
     UNREFERENCED_PARAMETER(schema_url);
-    ETWProvider::EventFormat evtFmt = ParseEncodingArg(args, config_.encoding);
+    ETWProvider::EventFormat evtFmt = config_.encoding;
     TracerCacheKey key{name.data(), name.size(), evtFmt};
 
     std::lock_guard<std::mutex> lock(tracers_mu_);

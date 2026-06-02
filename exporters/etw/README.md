@@ -15,10 +15,20 @@ being deployed on Windows.
 ## Tracer lifetime and reuse
 
 For ETW, the tracer name maps to the ETW provider name/GUID. Applications
-should create one tracer per provider name (and encoding) and reuse it for the
-process or component lifetime. `TracerProvider::GetTracer()` may cache tracers
-internally, so avoid calling `GetTracer()->StartSpan()` in hot paths. Instead,
-obtain the tracer once during setup and reuse it for span creation.
+should create one tracer per provider name and reuse it for the process or
+component lifetime. `TracerProvider::GetTracer()` caches tracers internally,
+so avoid calling `GetTracer()->StartSpan()` in hot paths. Instead, obtain the
+tracer once during setup and reuse it for span creation.
+
+Encoding (ETW/TLD, MSGPACK, XML) is configured via `TelemetryProviderOptions`
+passed to the `TracerProvider` constructor:
+
+```cpp
+TelemetryProviderOptions opts;
+opts["encoding"] = std::string("MsgPack");
+etw::TracerProvider tp(opts);
+auto tracer = tp.GetTracer("MyProvider");
+```
 
 It is recommended to consume this exporter via
 [vcpkg](https://vcpkg.io/en/package/opentelemetry-cpp).
