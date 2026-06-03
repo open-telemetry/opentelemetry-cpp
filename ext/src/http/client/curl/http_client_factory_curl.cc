@@ -5,7 +5,6 @@
 
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_client_factory_curl.h"
-#include "opentelemetry/ext/http/client/http_client_factory.h"
 
 namespace http_client = opentelemetry::ext::http::client;
 
