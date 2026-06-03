@@ -40,6 +40,9 @@ namespace curl        = opentelemetry::ext::http::client::curl;
 namespace http_client = opentelemetry::ext::http::client;
 namespace nostd       = opentelemetry::nostd;
 
+namespace
+{
+
 class CustomEventHandler : public http_client::EventHandler
 {
 public:
@@ -822,3 +825,5 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
   session_manager->FinishAllSessions();
 }
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
+
+}  // namespace
