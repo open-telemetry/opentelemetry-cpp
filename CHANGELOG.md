@@ -33,6 +33,9 @@ Increment the:
 * [CODE HEALTH] Remove last unused nostd namespace alias in otlp_populate
   [#4114](https://github.com/open-telemetry/opentelemetry-cpp/pull/4114)
 
+* [CODE HEALTH] Move curl_http_test classes into anonymous namespace
+  [#4115](https://github.com/open-telemetry/opentelemetry-cpp/pull/4115)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
