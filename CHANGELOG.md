@@ -30,6 +30,9 @@ Increment the:
 * [SDK] MeterProvider: do not warn in destructor after explicit Shutdown
   [#4085](https://github.com/open-telemetry/opentelemetry-cpp/pull/4085)
 
+* [CODE HEALTH] Remove last unused nostd namespace alias in otlp_populate
+  [#4114](https://github.com/open-telemetry/opentelemetry-cpp/pull/4114)
+
 * [API] `Logger::EmitLogRecord(...)` templates now apply the `Enabled` filter
   chain when a `Severity` is in args.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
