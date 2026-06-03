@@ -64,6 +64,17 @@ namespace exporter
 namespace otlp
 {
 
+class ProtobufGlobalSymbolGuard
+{
+public:
+  ProtobufGlobalSymbolGuard() = default;
+  ~ProtobufGlobalSymbolGuard() { google::protobuf::ShutdownProtobufLibrary(); }
+  ProtobufGlobalSymbolGuard(const ProtobufGlobalSymbolGuard &)            = delete;
+  ProtobufGlobalSymbolGuard &operator=(const ProtobufGlobalSymbolGuard &) = delete;
+  ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
+  ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
+};
+
 template <class IntegerType>
 static IntegerType JsonToInteger(const nlohmann::json &value)
 {
@@ -981,7 +992,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigJsonBytesMappingTest)
   opts.json_bytes_mapping = JsonBytesMappingKind::kHex;
   std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter(opts));
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
-  google::protobuf::ShutdownProtobufLibrary();
+  static ProtobufGlobalSymbolGuard global_symbol_guard;
 }
 
 TEST(OtlpHttpMetricExporterTest, ConfigDefaultProtocolTest)

@@ -53,6 +53,17 @@ namespace exporter
 namespace otlp
 {
 
+class ProtobufGlobalSymbolGuard
+{
+public:
+  ProtobufGlobalSymbolGuard() = default;
+  ~ProtobufGlobalSymbolGuard() { google::protobuf::ShutdownProtobufLibrary(); }
+  ProtobufGlobalSymbolGuard(const ProtobufGlobalSymbolGuard &)            = delete;
+  ProtobufGlobalSymbolGuard &operator=(const ProtobufGlobalSymbolGuard &) = delete;
+  ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
+  ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
+};
+
 namespace trace_api = opentelemetry::trace;
 namespace resource  = opentelemetry::sdk::resource;
 
@@ -570,7 +581,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestSync)
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTestAsync();
-  google::protobuf::ShutdownProtobufLibrary();
+  static ProtobufGlobalSymbolGuard global_symbol_guard;
 }
 #  endif
 
