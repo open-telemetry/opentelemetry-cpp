@@ -31,7 +31,6 @@
 #  include "opentelemetry/trace/tracer_provider.h"
 
 #  include <algorithm>
-#  include <mutex>
 #  include <utility>
 #  include <vector>
 

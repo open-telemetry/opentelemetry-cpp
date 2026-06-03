@@ -41,7 +41,6 @@
 #  include <gtest/gtest.h>
 #  include <algorithm>
 #  include <future>
-#  include <mutex>
 #  include <utility>
 #  include <vector>
 
