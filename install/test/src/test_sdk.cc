@@ -53,8 +53,6 @@ public:
   void SetObservedTimestamp(common::SystemTimestamp timestamp) noexcept override {}
   void SetSeverity(logs::Severity severity) noexcept override {}
   void SetBody(const common::AttributeValue &message) noexcept override {}
-  void SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept override
-  {}
   void SetEventId(int64_t id, nostd::string_view name = {}) noexcept override {}
   void SetTraceId(const trace::TraceId &trace_id) noexcept override {}
   void SetSpanId(const trace::SpanId &span_id) noexcept override {}
@@ -62,6 +60,11 @@ public:
   void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept override {}
   void SetInstrumentationScope(
       const scope_sdk::InstrumentationScope &instrumentation_scope) noexcept override
+  {}
+
+protected:
+  void SetAttributeImpl(nostd::string_view key,
+                        const common::AttributeValue &value) noexcept override
   {}
 };
 

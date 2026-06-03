@@ -151,8 +151,9 @@ const opentelemetry::trace::TraceFlags &ReadWriteLogRecord::GetTraceFlags() cons
   return empty;
 }
 
-void ReadWriteLogRecord::SetAttribute(nostd::string_view key,
-                                      const opentelemetry::common::AttributeValue &value) noexcept
+void ReadWriteLogRecord::SetAttributeImpl(
+    nostd::string_view key,
+    const opentelemetry::common::AttributeValue &value) noexcept
 {
   std::string safe_key(key);
   opentelemetry::sdk::common::AttributeConverter converter;

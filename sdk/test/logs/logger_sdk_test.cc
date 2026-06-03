@@ -184,24 +184,6 @@ public:
     return trace_flags_;
   }
 
-  void SetAttribute(nostd::string_view key,
-                    const opentelemetry::common::AttributeValue &value) noexcept override
-  {
-    if (!nostd::holds_alternative<nostd::string_view>(value))
-    {
-      return;
-    }
-
-    if (key == "event.domain")
-    {
-      event_domain_ = static_cast<std::string>(nostd::get<nostd::string_view>(value));
-    }
-    else if (key == "event.name")
-    {
-      event_name_ = static_cast<std::string>(nostd::get<nostd::string_view>(value));
-    }
-  }
-
   inline const std::string &GetEventName() const noexcept { return event_name_; }
 
   inline const std::string &GetEventDomain() const noexcept { return event_domain_; }
@@ -222,6 +204,25 @@ public:
     event_name_         = other.event_name_;
     event_domain_       = other.event_domain_;
     observed_timestamp_ = other.observed_timestamp_;
+  }
+
+protected:
+  void SetAttributeImpl(nostd::string_view key,
+                        const opentelemetry::common::AttributeValue &value) noexcept override
+  {
+    if (!nostd::holds_alternative<nostd::string_view>(value))
+    {
+      return;
+    }
+
+    if (key == "event.domain")
+    {
+      event_domain_ = static_cast<std::string>(nostd::get<nostd::string_view>(value));
+    }
+    else if (key == "event.name")
+    {
+      event_name_ = static_cast<std::string>(nostd::get<nostd::string_view>(value));
+    }
   }
 
 private:

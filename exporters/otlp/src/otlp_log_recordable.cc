@@ -233,8 +233,9 @@ void OtlpLogRecordable::SetTraceFlags(const opentelemetry::trace::TraceFlags &tr
   proto_record_.set_flags(trace_flags.flags());
 }
 
-void OtlpLogRecordable::SetAttribute(opentelemetry::nostd::string_view key,
-                                     const opentelemetry::common::AttributeValue &value) noexcept
+void OtlpLogRecordable::SetAttributeImpl(
+    opentelemetry::nostd::string_view key,
+    const opentelemetry::common::AttributeValue &value) noexcept
 {
   OtlpPopulateAttributeUtils::PopulateAttribute(proto_record_.add_attributes(), key, value, true);
 }

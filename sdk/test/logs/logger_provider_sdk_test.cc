@@ -229,14 +229,15 @@ public:
 
   void SetTraceFlags(const opentelemetry::trace::TraceFlags &) noexcept override {}
 
-  void SetAttribute(nostd::string_view,
-                    const opentelemetry::common::AttributeValue &) noexcept override
-  {}
-
   void SetResource(const opentelemetry::sdk::resource::Resource &) noexcept override {}
 
   void SetInstrumentationScope(
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope &) noexcept override
+  {}
+
+protected:
+  void SetAttributeImpl(nostd::string_view,
+                        const opentelemetry::common::AttributeValue &) noexcept override
   {}
 };
 
