@@ -136,19 +136,21 @@ public:
       }
     }
 
-    // On 2xx, parse the body into the caller-provided typed response
-    if (response_ != nullptr && result == sdk::common::ExportResult::kSuccess)
+    // On 2xx with a non-empty body, parse it into the caller-provided typed response
+    if (response_ != nullptr && result == sdk::common::ExportResult::kSuccess && !body_.empty())
     {
       if (content_type_ == HttpRequestContentType::kJson)
       {
         if (!google::protobuf::util::JsonStringToMessage(body_, response_).ok())
         {
           OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Failed to parse JSON response body");
+          result = sdk::common::ExportResult::kFailure;
         }
       }
       else if (!response_->ParseFromString(body_))
       {
         OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Failed to parse response body");
+        result = sdk::common::ExportResult::kFailure;
       }
     }
 
