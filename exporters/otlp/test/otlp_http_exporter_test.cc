@@ -53,6 +53,8 @@ namespace exporter
 namespace otlp
 {
 
+namespace
+{
 class ProtobufGlobalSymbolGuard
 {
 public:
@@ -63,6 +65,7 @@ public:
   ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
   ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
 };
+}  // namespace
 
 namespace trace_api = opentelemetry::trace;
 namespace resource  = opentelemetry::sdk::resource;
