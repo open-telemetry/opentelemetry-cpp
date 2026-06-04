@@ -42,6 +42,9 @@ Increment the:
 * [CODE HEALTH] Move registry.cc propagator builders into anonymous namespace
   [#4121](https://github.com/open-telemetry/opentelemetry-cpp/pull/4121)
 
+* [CODE HEALTH] Move sdk_builder.cc builders into anonymous namespace
+  [#4122](https://github.com/open-telemetry/opentelemetry-cpp/pull/4122)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
