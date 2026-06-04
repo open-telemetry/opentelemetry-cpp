@@ -17,6 +17,10 @@ jobs:
       contents: read  # for actions/checkout to fetch code
       security-events: write  # for github/codeql-action/autobuild to send a status report
     runs-on: ubuntu-latest
+    env:
+      CC: /usr/bin/gcc-14
+      CXX: /usr/bin/g++-14
+      CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
@@ -24,23 +28,47 @@ jobs:
         egress-policy: audit
 
     - name: Checkout repository
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
       with:
          submodules: 'recursive'
-    - name: Remove Third_party Modules from Code Scan
+    - name: Install dependencies
       run: |
-        rm -rf third_party
-    - name: Setup
-      env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
+        sudo apt-get update -y
+        sudo apt-get install -y --no-install-recommends --no-install-suggests \
+          build-essential \
+          cmake \
+          ninja-build \
+          gcc-14 \
+          g++-14 \
+          zlib1g-dev \
+          libssl-dev \
+          libcurl4-openssl-dev \
+          nlohmann-json3-dev \
+          libabsl-dev \
+          libprotobuf-dev \
+          libgrpc++-dev \
+          protobuf-compiler \
+          protobuf-compiler-grpc \
+          libgmock-dev \
+          libgtest-dev \
+          libbenchmark-dev
+    - name: Install rapidyaml
       run: |
-        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
+      uses: github/codeql-action/init@87557b9c84dde89fdd9b10e88954ac2f4248e463 # v4.36.1
       with:
-       languages: cpp
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
+        languages: cpp
+        config: |
+          paths-ignore:
+            - third_party
+    - name: Build (abiv2)
+      run: |
+        mkdir -p $HOME/build && cd $HOME/build
+        cmake -G Ninja \
+              -C ${GITHUB_WORKSPACE}/test_common/cmake/all-options-abiv2-preview.cmake \
+              -DWITH_OPENTRACING=OFF \
+              "${GITHUB_WORKSPACE}"
+        cmake --build . --parallel
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
+      uses: github/codeql-action/analyze@87557b9c84dde89fdd9b10e88954ac2f4248e463 # v4.36.1
