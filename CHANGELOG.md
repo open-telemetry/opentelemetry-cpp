@@ -39,6 +39,9 @@ Increment the:
 * [CODE HEALTH] Move simple_log_record_processor_test into anonymous namespace
   [#4116](https://github.com/open-telemetry/opentelemetry-cpp/pull/4116)
 
+* [CODE HEALTH] Move registry.cc propagator builders into anonymous namespace
+  [#4121](https://github.com/open-telemetry/opentelemetry-cpp/pull/4121)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
