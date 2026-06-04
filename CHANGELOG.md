@@ -33,6 +33,15 @@ Increment the:
 * [CODE HEALTH] Remove last unused nostd namespace alias in otlp_populate
   [#4114](https://github.com/open-telemetry/opentelemetry-cpp/pull/4114)
 
+* [CODE HEALTH] Move curl_http_test classes into anonymous namespace
+  [#4115](https://github.com/open-telemetry/opentelemetry-cpp/pull/4115)
+
+* [CODE HEALTH] Move simple_log_record_processor_test into anonymous namespace
+  [#4116](https://github.com/open-telemetry/opentelemetry-cpp/pull/4116)
+
+* [CODE HEALTH] Move registry.cc propagator builders into anonymous namespace
+  [#4121](https://github.com/open-telemetry/opentelemetry-cpp/pull/4121)
+
 * [API] `Logger::EmitLogRecord(...)` templates now apply the `Enabled` filter
   chain when a `Severity` is in args.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
