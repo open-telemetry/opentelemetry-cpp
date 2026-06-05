@@ -48,6 +48,9 @@ Increment the:
 * [CODE HEALTH] Move logger_sdk_test classes into anonymous namespace
   [#4124](https://github.com/open-telemetry/opentelemetry-cpp/pull/4124)
 
+* [CODE HEALTH] Move func_http_main classes into anonymous namespace
+  [#4128](https://github.com/open-telemetry/opentelemetry-cpp/pull/4128)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
