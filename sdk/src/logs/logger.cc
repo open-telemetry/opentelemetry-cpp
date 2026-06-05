@@ -102,6 +102,7 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
   }
 
   auto recordable = context_->GetProcessor().MakeRecordable();
+  recordable->SetLogRecordLimits(logger_config_.GetLogRecordLimits());
 
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
 

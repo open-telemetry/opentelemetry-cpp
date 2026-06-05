@@ -60,6 +60,8 @@ public:
           &instrumentation_scope) noexcept = 0;
 
 protected:
+  const LogRecordLimits &GetLogRecordLimits() const noexcept { return limits_; }
+
   virtual void SetAttributeImpl(opentelemetry::nostd::string_view key,
                                 const opentelemetry::common::AttributeValue &value) noexcept = 0;
 
