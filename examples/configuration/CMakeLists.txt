@@ -20,8 +20,9 @@ add_executable(
   custom_log_record_processor_builder.cc)
 
 target_link_libraries(
-  example_yaml ${CMAKE_THREAD_LIBS_INIT}
-  PRIVATE common_metrics_foo_library
+  example_yaml
+  PRIVATE ${CMAKE_THREAD_LIBS_INIT}
+          common_metrics_foo_library
           common_logs_foo_library
           opentelemetry-cpp::ostream_span_exporter_builder
           opentelemetry-cpp::ostream_metrics_exporter_builder

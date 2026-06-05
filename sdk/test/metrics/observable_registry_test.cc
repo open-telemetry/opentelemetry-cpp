@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <string>
 
 #include "opentelemetry/sdk/metrics/state/observable_registry.h"
 

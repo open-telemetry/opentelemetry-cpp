@@ -14,7 +14,6 @@
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
@@ -24,6 +23,7 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
@@ -46,10 +46,10 @@
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/span_context_kv_iterable.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/span_startoptions.h"
+#include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/trace/tracer.h"
@@ -272,6 +272,50 @@ TEST(Tracer, StartSpanSampleOff)
   // The span doesn't write any span data because the sampling decision is alway
   // DROP.
   ASSERT_EQ(0, span_data->GetSpans().size());
+}
+
+TEST(Tracer, StartSpanSetsRandomTraceFlagForRootSpan)
+{
+  InMemorySpanExporter *exporter = new InMemorySpanExporter();
+  // AlwaysOn keeps the sampled bit set while RandomIdGenerator marks the
+  // locally generated trace-id as random.
+  auto tracer = initTracer(std::unique_ptr<SpanExporter>{exporter}, new AlwaysOnSampler(),
+                           new RandomIdGenerator());
+
+  auto span    = tracer->StartSpan("span 1");
+  auto context = span->GetContext();
+
+  EXPECT_TRUE(context.IsValid());
+  EXPECT_TRUE(context.IsSampled());
+  EXPECT_TRUE(context.trace_flags().IsRandom());
+  EXPECT_EQ(context.trace_flags().flags(),
+            trace_api::TraceFlags::kIsSampled | trace_api::TraceFlags::kIsRandom);
+}
+
+TEST(Tracer, StartSpanPreservesRandomTraceFlagFromParent)
+{
+  InMemorySpanExporter *exporter          = new InMemorySpanExporter();
+  constexpr uint8_t parent_span_id_buf[]  = {1, 2, 3, 4, 5, 6, 7, 8};
+  constexpr uint8_t parent_trace_id_buf[] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
+  // Build a remote parent with only the random bit set so the child path can
+  // prove it preserves the incoming signal even when sampling is turned off.
+  trace_api::SpanContext parent_context{
+      trace_api::TraceId{parent_trace_id_buf}, trace_api::SpanId{parent_span_id_buf},
+      trace_api::TraceFlags{trace_api::TraceFlags::kIsRandom}, true};
+
+  auto tracer = initTracer(std::unique_ptr<SpanExporter>{exporter}, new AlwaysOffSampler());
+
+  trace_api::StartSpanOptions options;
+  options.parent = parent_context;
+
+  auto span    = tracer->StartSpan("span 1", options);
+  auto context = span->GetContext();
+
+  EXPECT_TRUE(context.IsValid());
+  EXPECT_FALSE(context.IsSampled());
+  EXPECT_TRUE(context.trace_flags().IsRandom());
+  EXPECT_EQ(context.trace_flags().flags(), static_cast<uint8_t>(trace_api::TraceFlags::kIsRandom));
+  EXPECT_EQ(context.trace_id(), parent_context.trace_id());
 }
 
 TEST(Tracer, StartSpanCustomIdGenerator)

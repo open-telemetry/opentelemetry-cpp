@@ -9,7 +9,7 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.20.0")
   cmake_policy(SET CMP0117 NEW)
 endif()
 
-set(OPENTELEMETRY_VERSION_NUMBER "1.27.0")
+set(OPENTELEMETRY_VERSION_NUMBER "1.28.0")
 set(OPENTELEMETRY_VERSION_SUFFIX "-dev")
 set(OPENTELEMETRY_VERSION
     "${OPENTELEMETRY_VERSION_NUMBER}${OPENTELEMETRY_VERSION_SUFFIX}")
@@ -152,6 +152,10 @@ option(
   WITH_OTLP_HTTP_COMPRESSION
   "Whether to include gzip compression for the OTLP http exporter in the SDK"
   OFF)
+
+option(
+  WITH_OTLP_UTF8_VALIDITY
+  "Whether to enable UTF-8 validity checks for the OTLP exporter in the SDK" ON)
 
 option(WITH_CURL_LOGGING "Whether to enable select CURL verbosity in OTel logs"
        OFF)

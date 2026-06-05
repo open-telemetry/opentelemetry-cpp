@@ -190,6 +190,7 @@ and it can be changed at compile time.
     OTEL_INTERNAL_LOG_DEBUG(" Connection Established Successfully. Headers:", http_attributes);
 
 The custom log handler can be defined by inheriting from `opentelemetry::sdk::common::internal_log::LogHandler` class.
+Register the handler as an `opentelemetry::nostd::shared_ptr`.
 
 .. code:: cpp
 
@@ -200,10 +201,11 @@ The custom log handler can be defined by inheriting from `opentelemetry::sdk::co
                     int line,
                     const char *msg,
                     const opentelemetry::sdk::common::AttributeMap &attributes) noexcept override
-
         {
             // add implementation here
         }
     };
-    opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(std::make_shared<CustomLogHandler>());
+    using opentelemetry::sdk::common::internal_log::LogHandler;
+    opentelemetry::nostd::shared_ptr<LogHandler> custom_log_handler(new CustomLogHandler{});
+    opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(custom_log_handler);
     opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(opentelemetry::sdk::common::internal_log::LogLevel::Debug);

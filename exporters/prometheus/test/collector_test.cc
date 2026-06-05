@@ -5,11 +5,11 @@
 #include <prometheus/metric_family.h>
 #include <stddef.h>
 #include <chrono>
+#include <string>
 #include <thread>
 #include <vector>
 
 #include "opentelemetry/exporters/prometheus/collector.h"
-#include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
@@ -19,9 +19,6 @@ using namespace prometheus_test;
 using opentelemetry::exporter::metrics::PrometheusCollector;
 using opentelemetry::sdk::metrics::MetricProducer;
 using opentelemetry::sdk::metrics::ResourceMetrics;
-namespace metric_api      = opentelemetry::metrics;
-namespace metric_sdk      = opentelemetry::sdk::metrics;
-namespace metric_exporter = opentelemetry::exporter::metrics;
 
 class MockMetricProducer : public MetricProducer
 {
@@ -78,7 +75,7 @@ TEST(PrometheusCollector, BasicTests)
   MockMetricReader reader;
   MockMetricProducer producer;
   reader.SetMetricProducer(&producer);
-  PrometheusCollector collector(&reader, true, false);
+  PrometheusCollector collector(&reader, true, false, false, false);
   auto data = collector.Collect();
 
   // Collection size should be the same as the size

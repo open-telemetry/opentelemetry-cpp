@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstdint>
 #include <cstring>
+#include <limits>
 #include <map>
 #include <string>
 #include <utility>
@@ -18,6 +19,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -55,8 +57,6 @@ namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace resource  = opentelemetry::sdk::resource;
 namespace proto     = opentelemetry::proto;
-
-namespace trace_sdk_2 = opentelemetry::sdk::trace;
 
 TEST(OtlpRecordable, SetIdentity)
 {
@@ -186,6 +186,19 @@ TEST(OtlpRecordable, SetStatus)
   rec2.SetStatus(code_ok, description);
   EXPECT_EQ(rec2.span().status().code(), proto::trace::v1::Status_StatusCode(code_ok));
   EXPECT_EQ(rec2.span().status().message(), "");
+}
+
+TEST(OtlpRecordable, SetTraceFlags)
+{
+  OtlpRecordable rec;
+  // OTLP stores the W3C trace-flags bits on the exported span so downstream
+  // processors can observe the random flag.
+  trace_api::TraceFlags flags{
+      static_cast<uint8_t>(trace_api::TraceFlags::kIsSampled | trace_api::TraceFlags::kIsRandom)};
+
+  rec.SetTraceFlags(flags);
+
+  EXPECT_EQ(rec.span().flags(), static_cast<uint32_t>(flags.flags()));
 }
 
 TEST(OtlpRecordable, AddEventDefault)
@@ -599,6 +612,50 @@ TYPED_TEST(IntAttributeTest, SetIntArrayAttribute)
   }
 }
 
+// Per OpenTelemetry spec, uint64_t attribute values exceeding INT64_MAX must be
+// encoded as a decimal string rather than wrapping to a negative int64.
+// https://opentelemetry.io/docs/specs/otel/common/attribute-type-mapping/#integer-values
+TEST(OtlpRecordable, SetUint64OverflowAsStringPerSpec)
+{
+  const uint64_t overflow_val = static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1U;
+  common::AttributeValue val(overflow_val);
+  OtlpRecordable rec;
+  rec.SetAttribute("u64_overflow", val);
+  EXPECT_EQ(rec.span().attributes(0).value().value_case(),
+            opentelemetry::proto::common::v1::AnyValue::kStringValue);
+  EXPECT_EQ(rec.span().attributes(0).value().string_value(), std::to_string(overflow_val));
+}
+
+TEST(OtlpRecordable, SetUint64BoundaryAsIntPerSpec)
+{
+  // INT64_MAX boundary still fits int_value (encoding split is val > INT64_MAX).
+  const uint64_t boundary = static_cast<uint64_t>(std::numeric_limits<int64_t>::max());
+  common::AttributeValue val(boundary);
+  OtlpRecordable rec;
+  rec.SetAttribute("u64_boundary", val);
+  EXPECT_EQ(rec.span().attributes(0).value().value_case(),
+            opentelemetry::proto::common::v1::AnyValue::kIntValue);
+  EXPECT_EQ(rec.span().attributes(0).value().int_value(), std::numeric_limits<int64_t>::max());
+}
+
+TEST(OtlpRecordable, SetUint64ArrayOverflowAsStringPerSpec)
+{
+  const uint64_t overflow_val = static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1U;
+  const uint64_t in_range_val = 42;
+  const uint64_t arr[]        = {in_range_val, overflow_val};
+  nostd::span<const uint64_t> arr_span(arr, 2);
+  common::AttributeValue val(arr_span);
+  OtlpRecordable rec;
+  rec.SetAttribute("u64_arr_mixed", val);
+  const auto &array_v = rec.span().attributes(0).value().array_value();
+  ASSERT_EQ(array_v.values_size(), 2);
+  EXPECT_EQ(array_v.values(0).value_case(), opentelemetry::proto::common::v1::AnyValue::kIntValue);
+  EXPECT_EQ(array_v.values(0).int_value(), static_cast<int64_t>(in_range_val));
+  EXPECT_EQ(array_v.values(1).value_case(),
+            opentelemetry::proto::common::v1::AnyValue::kStringValue);
+  EXPECT_EQ(array_v.values(1).string_value(), std::to_string(overflow_val));
+}
+
 TEST(OtlpRecordableTest, TestCollectionLimits)
 {
   // Initialize recordable with strict limits:
@@ -674,6 +731,52 @@ TEST(OtlpRecordableTest, TestLinkLimits)
   // The link itself should have 1 attribute kept, 1 dropped
   EXPECT_EQ(link_list[0].attributes_size(), 1);
   EXPECT_EQ(link_list[0].dropped_attributes_count(), 1);
+}
+
+// Test PopulateRequest ignores a null request pointer
+TEST(OtlpRecordable, PopulateRequestNullRequest)
+{
+  auto rec1      = std::unique_ptr<sdk::trace::Recordable>(std::make_unique<OtlpRecordable>());
+  auto resource1 = resource::Resource::Create({{"service.name", "one"}});
+  rec1->SetResource(resource1);
+
+  std::vector<std::unique_ptr<sdk::trace::Recordable>> spans;
+  spans.push_back(std::move(rec1));
+  const nostd::span<std::unique_ptr<sdk::trace::Recordable>, 1> spans_span(spans.data(), 1);
+
+  // Should not crash when request is null
+  OtlpRecordableUtils::PopulateRequest(spans_span, nullptr);
+}
+
+// Test PopulateRequest deduplicates scope by value when pointer identities differ
+TEST(OtlpRecordable, PopulateRequestSameScope)
+{
+  auto resource = resource::Resource::Create({{"service.name", "same"}});
+
+  // Two independent InstrumentationScope objects with identical values
+  auto inst_lib_a = trace_sdk::InstrumentationScope::Create("lib", "1.0");
+  auto inst_lib_b = trace_sdk::InstrumentationScope::Create("lib", "1.0");
+
+  auto rec1 = std::unique_ptr<sdk::trace::Recordable>(std::make_unique<OtlpRecordable>());
+  rec1->SetResource(resource);
+  rec1->SetInstrumentationScope(*inst_lib_a);
+
+  auto rec2 = std::unique_ptr<sdk::trace::Recordable>(std::make_unique<OtlpRecordable>());
+  rec2->SetResource(resource);
+  rec2->SetInstrumentationScope(*inst_lib_b);
+
+  proto::collector::trace::v1::ExportTraceServiceRequest req;
+  std::vector<std::unique_ptr<sdk::trace::Recordable>> spans;
+  spans.push_back(std::move(rec1));
+  spans.push_back(std::move(rec2));
+  const nostd::span<std::unique_ptr<sdk::trace::Recordable>, 2> spans_span(spans.data(), 2);
+  OtlpRecordableUtils::PopulateRequest(spans_span, &req);
+
+  // One resource, one scope (deduplicated by value), two spans
+  ASSERT_EQ(req.resource_spans_size(), 1);
+  ASSERT_EQ(req.resource_spans(0).scope_spans_size(), 1);
+  EXPECT_EQ(req.resource_spans(0).scope_spans(0).spans_size(), 2);
+  EXPECT_EQ(req.resource_spans(0).scope_spans(0).scope().name(), "lib");
 }
 }  // namespace otlp
 }  // namespace exporter

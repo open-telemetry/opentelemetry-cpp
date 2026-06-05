@@ -40,4 +40,28 @@ TEST(TraceFlagsTest, Sampled)
   EXPECT_EQ(1, buf[0]);
 }
 
+TEST(TraceFlagsTest, Random)
+{
+  TraceFlags flags{TraceFlags::kIsRandom};
+  EXPECT_TRUE(flags.IsRandom());
+  EXPECT_EQ(2, flags.flags());
+  EXPECT_EQ("02", Hex(flags));
+
+  uint8_t buf[1];
+  flags.CopyBytesTo(buf);
+  EXPECT_EQ(2, buf[0]);
+}
+
+TEST(TraceFlagsTest, Both)
+{
+  TraceFlags flags{TraceFlags::kIsSampled | TraceFlags::kIsRandom};
+  EXPECT_TRUE(flags.IsSampled());
+  EXPECT_TRUE(flags.IsRandom());
+  EXPECT_EQ(3, flags.flags());
+  EXPECT_EQ("03", Hex(flags));
+
+  uint8_t buf[1];
+  flags.CopyBytesTo(buf);
+  EXPECT_EQ(3, buf[0]);
+}
 }  // namespace

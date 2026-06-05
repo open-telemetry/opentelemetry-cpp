@@ -31,11 +31,7 @@
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/composable_always_on_sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
@@ -191,6 +187,9 @@ namespace configuration
 {
 
 using common::WildcardMatch;
+
+namespace
+{
 
 class ResourceAttributeValueSetter
     : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor
@@ -750,6 +749,8 @@ public:
 private:
   const SdkBuilder *sdk_builder_;
 };
+
+}  // namespace
 
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateAlwaysOffSampler(
     const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration * /* model */) const

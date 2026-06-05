@@ -13,7 +13,6 @@
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"

@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <string.h>
+#include <string>
 
 #include <opentelemetry/common/macros.h>
 #include <opentelemetry/common/string_util.h>

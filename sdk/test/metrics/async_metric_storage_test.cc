@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 #include <chrono>
 #include <cstdint>
-#include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -15,6 +14,7 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
@@ -36,9 +36,6 @@ using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::resource;
 using namespace opentelemetry::common;
-namespace nostd = opentelemetry::nostd;
-
-using M = std::map<std::string, std::string>;
 
 class WritableMetricStorageTestFixture : public ::testing::TestWithParam<AggregationTemporality>
 {};

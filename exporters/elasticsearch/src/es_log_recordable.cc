@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -22,7 +23,6 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <type_traits>
-#include <unordered_map>
 #include <utility>
 
 #if defined(__cpp_lib_format)

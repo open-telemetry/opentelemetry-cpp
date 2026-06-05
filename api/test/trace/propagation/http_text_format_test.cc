@@ -61,6 +61,27 @@ TEST(TextMapPropagatorTest, TraceFlagsBufferGeneration)
   EXPECT_EQ(MapHttpTraceContext::TraceFlagsFromHex("00"), trace::TraceFlags());
 }
 
+TEST(TextMapPropagatorTest, PropagateRandomTraceFlag)
+{
+  TextMapCarrierTest carrier;
+  // Only random bit is set(02), sampled bit is not set
+  auto const traceparent = "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-02";
+  // Use a remote traceparent with only the random bit set and verify the
+  // propagator round-trips it without forcing the sampled bit on.
+  carrier.headers_ = {{"traceparent", traceparent}};
+  auto ctx1        = context::Context{};
+  auto ctx2        = format.Extract(carrier, ctx1);
+
+  auto span = trace::GetSpan(ctx2);
+  EXPECT_TRUE(span->GetContext().IsValid());
+  EXPECT_FALSE(span->GetContext().IsSampled());              // Sampled bit is not set
+  EXPECT_TRUE(span->GetContext().trace_flags().IsRandom());  // Random bit is set
+
+  TextMapCarrierTest carrier2;
+  format.Inject(carrier2, ctx2);
+  EXPECT_EQ(carrier2.headers_["traceparent"], traceparent);
+}
+
 TEST(TextMapPropagatorTest, NoSendEmptyTraceState)
 {
   // If the trace state is empty, do not set the header.

@@ -4,6 +4,7 @@
 #include "common.h"
 #include <utility>
 
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 
 using namespace opentelemetry::sdk::instrumentationscope;
@@ -11,6 +12,10 @@ using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::common;
 
 // MockMetricExporter
+
+MockMetricExporter::MockMetricExporter(AggregationTemporality temporality)
+    : temporality_(temporality)
+{}
 
 ExportResult MockMetricExporter::Export(const ResourceMetrics & /*resource_metrics*/) noexcept
 {
@@ -20,7 +25,7 @@ ExportResult MockMetricExporter::Export(const ResourceMetrics & /*resource_metri
 AggregationTemporality MockMetricExporter::GetAggregationTemporality(
     InstrumentType /*instrument_type*/) const noexcept
 {
-  return AggregationTemporality::kCumulative;
+  return temporality_;
 }
 
 bool MockMetricExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
