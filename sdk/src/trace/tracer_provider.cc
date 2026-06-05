@@ -140,29 +140,20 @@ void TracerProvider::UpdateTracerConfigurator(
     return;
   }
 
-  // copy the tracer_configurator outside the provider mutex lock
-  auto tracer_configurator_copy{
-      std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
-          *tracer_configurator)};
-
-  // Lock the provider mutex while capturing the current tracers
-  std::vector<std::shared_ptr<Tracer>> current_tracers;
-  {
-    const std::lock_guard<std::mutex> guard(lock_);
-    context_->SetTracerConfigurator(std::move(tracer_configurator));
-    current_tracers = tracers_;
-  }
-
-  // Call tracer_configurator_copy->ComputeConfig outside the mutex lock_ to avoid potential
-  // deadlocks if ComputeConfig calls back into the provider
+  // Lock the provider mutex to ensure that calls to GetTracer are exclusive with respect to the
+  // TracerConfigurator update and corresponding TracerConfig updates. This ensures that a Tracer
+  // will never be returned from GetTracer with a TracerConfig that is out of date with respect to
+  // the provider-level TracerConfigurator.
+  const std::lock_guard<std::mutex> guard(lock_);
+  context_->SetTracerConfigurator(std::move(tracer_configurator));
 
   // The only way to set the TracerConfig of a tracer is on Tracer construction in
   // TracerProvider::GetTracer or through Tracer::UpdateTracerConfig (which is private and only
   // accessed by TracerProvider).
-  for (auto &tracer : current_tracers)
+  for (auto &tracer : tracers_)
   {
     TracerConfig new_config =
-        tracer_configurator_copy->ComputeConfig(tracer->GetInstrumentationScope());
+        context_->GetTracerConfigurator().ComputeConfig(tracer->GetInstrumentationScope());
     tracer->UpdateTracerConfig(new_config);
   }
 }

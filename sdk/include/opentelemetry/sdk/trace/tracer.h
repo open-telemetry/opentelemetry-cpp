@@ -123,7 +123,7 @@ private:
   mutable std::mutex tracer_config_mutex_;
   TracerConfig tracer_config_;
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
-  std::atomic<bool> is_enabled_;
+  std::atomic<bool> is_enabled_{false};
 #endif
   static const std::shared_ptr<opentelemetry::trace::NoopTracer> kNoopTracer;
 };
