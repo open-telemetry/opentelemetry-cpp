@@ -188,6 +188,9 @@ namespace configuration
 
 using common::WildcardMatch;
 
+namespace
+{
+
 class ResourceAttributeValueSetter
     : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor
 {
@@ -746,6 +749,8 @@ public:
 private:
   const SdkBuilder *sdk_builder_;
 };
+
+}  // namespace
 
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateAlwaysOffSampler(
     const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration * /* model */) const

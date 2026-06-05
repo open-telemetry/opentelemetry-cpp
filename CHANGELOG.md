@@ -42,6 +42,9 @@ Increment the:
 * [CODE HEALTH] Move registry.cc propagator builders into anonymous namespace
   [#4121](https://github.com/open-telemetry/opentelemetry-cpp/pull/4121)
 
+* [CODE HEALTH] Move sdk_builder.cc builders into anonymous namespace
+  [#4122](https://github.com/open-telemetry/opentelemetry-cpp/pull/4122)
+
 * [API] `Logger::EmitLogRecord(...)` templates now apply the `Enabled` filter
   chain when a `Severity` is in args.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
