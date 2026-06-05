@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 
+#include "opentelemetry/sdk/configuration/experimental_resource_detection.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
 #include "opentelemetry/version.h"
@@ -23,6 +24,7 @@ class ResourceConfiguration
 public:
   std::unique_ptr<AttributesConfiguration> attributes;
   std::unique_ptr<IncludeExcludeConfiguration> detectors;
+  std::unique_ptr<ExperimentalResourceDetection> detection_development;
   std::string schema_url;
   std::string attributes_list;
 };

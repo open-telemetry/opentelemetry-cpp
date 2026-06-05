@@ -24,6 +24,7 @@
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
+#include "opentelemetry/sdk/configuration/experimental_resource_detection.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
@@ -121,6 +122,12 @@ public:
       const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<IncludeExcludeConfiguration> ParseIncludeExcludeConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  std::unique_ptr<ExperimentalResourceDetector> ParseExperimentalResourceDetectorConfiguration(
+      const std::unique_ptr<DocumentNode> &node) const;
+
+  std::unique_ptr<ExperimentalResourceDetection> ParseExperimentalResourceDetectionConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
   std::unique_ptr<HeadersConfiguration> ParseHeadersConfiguration(

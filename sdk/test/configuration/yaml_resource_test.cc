@@ -300,3 +300,54 @@ resource:
   ASSERT_EQ(config->resource->detectors->excluded->string_array[0], "foo.ex");
   ASSERT_EQ(config->resource->detectors->excluded->string_array[1], "bar.ex");
 }
+
+TEST(YamlResource, empty_detection_development)
+{
+  std::string yaml = R"(
+file_format: "1.0-resource"
+resource:
+  detection/development:
+    attributes:
+      included:
+    detectors: []
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_NE(config->resource->detection_development, nullptr);
+  ASSERT_NE(config->resource->detection_development->attributes, nullptr);
+  ASSERT_NE(config->resource->detection_development->attributes->included, nullptr);
+  ASSERT_EQ(config->resource->detection_development->attributes->included->string_array.size(), 0);
+  ASSERT_EQ(config->resource->detection_development->attributes->excluded, nullptr);
+  ASSERT_EQ(config->resource->detection_development->detectors.size(), 0);
+}
+
+TEST(YamlResource, some_detection_development_detectors)
+{
+  std::string yaml = R"(
+file_format: "1.0-resource"
+resource:
+  detection/development:
+    detectors:
+      - container:
+      - host:
+      - process:
+      - service:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_NE(config->resource->detection_development, nullptr);
+  ASSERT_EQ(config->resource->detection_development->detectors.size(), 4);
+
+  ASSERT_NE(config->resource->detection_development->detectors[0]->container, nullptr);
+  ASSERT_EQ(config->resource->detection_development->detectors[0]->host, nullptr);
+  ASSERT_EQ(config->resource->detection_development->detectors[0]->process, nullptr);
+  ASSERT_EQ(config->resource->detection_development->detectors[0]->service, nullptr);
+
+  ASSERT_NE(config->resource->detection_development->detectors[1]->host, nullptr);
+  ASSERT_NE(config->resource->detection_development->detectors[2]->process, nullptr);
+  ASSERT_NE(config->resource->detection_development->detectors[3]->service, nullptr);
+}

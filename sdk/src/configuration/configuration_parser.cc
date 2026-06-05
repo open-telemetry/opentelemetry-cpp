@@ -58,6 +58,7 @@
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/experimental_resource_detection.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
@@ -312,6 +313,80 @@ std::unique_ptr<IncludeExcludeConfiguration> ConfigurationParser::ParseIncludeEx
   if (child)
   {
     model->excluded = ParseStringArrayConfiguration(child);
+  }
+
+  return model;
+}
+
+std::unique_ptr<ExperimentalResourceDetector>
+ConfigurationParser::ParseExperimentalResourceDetectorConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<ExperimentalResourceDetector>();
+  std::size_t property_count = 0;
+  std::string detector_name;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    detector_name = it.Name();
+    property_count++;
+  }
+
+  if (property_count != 1)
+  {
+    std::string message("Illegal experimental detector properties count: ");
+    message.append(std::to_string(property_count));
+    throw InvalidSchemaException(node->Location(), message);
+  }
+
+  if (detector_name == "container")
+  {
+    model->container = std::make_unique<ExperimentalContainerResourceDetector>();
+  }
+  else if (detector_name == "host")
+  {
+    model->host = std::make_unique<ExperimentalHostResourceDetector>();
+  }
+  else if (detector_name == "process")
+  {
+    model->process = std::make_unique<ExperimentalProcessResourceDetector>();
+  }
+  else if (detector_name == "service")
+  {
+    model->service = std::make_unique<ExperimentalServiceResourceDetector>();
+  }
+  else
+  {
+    std::string message("Illegal experimental detector name: ");
+    message.append(detector_name);
+    throw InvalidSchemaException(node->Location(), message);
+  }
+
+  return model;
+}
+
+std::unique_ptr<ExperimentalResourceDetection>
+ConfigurationParser::ParseExperimentalResourceDetectionConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<ExperimentalResourceDetection>();
+  std::unique_ptr<DocumentNode> child;
+
+  child = node->GetChildNode("attributes");
+  if (child)
+  {
+    model->attributes = ParseIncludeExcludeConfiguration(child);
+  }
+
+  child = node->GetChildNode("detectors");
+  if (child)
+  {
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      std::unique_ptr<DocumentNode> detector_node(*it);
+      model->detectors.push_back(
+          ParseExperimentalResourceDetectorConfiguration(detector_node));
+    }
   }
 
   return model;
@@ -2517,6 +2592,12 @@ std::unique_ptr<ResourceConfiguration> ConfigurationParser::ParseResourceConfigu
   if (child)
   {
     model->detectors = ParseIncludeExcludeConfiguration(child);
+  }
+
+  child = node->GetChildNode("detection/development");
+  if (child)
+  {
+    model->detection_development = ParseExperimentalResourceDetectionConfiguration(child);
   }
 
   return model;
