@@ -28,6 +28,9 @@ namespace sdk
 namespace configuration
 {
 
+namespace
+{
+
 class TraceContextBuilder : public TextMapPropagatorBuilder
 {
 public:
@@ -77,6 +80,8 @@ public:
     return result;
   }
 };
+
+}  // namespace
 
 Registry::Registry()
 {

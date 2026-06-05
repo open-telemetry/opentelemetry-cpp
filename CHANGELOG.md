@@ -21,11 +21,29 @@ Increment the:
 * [CODE HEALTH] Fix IWYU Clang22 warnings
   [#4083](https://github.com/open-telemetry/opentelemetry-cpp/pull/4083)
 
+* [EXPORTER] Spec-compliant uint64_t attribute encoding in OTLP
+  [#4090](https://github.com/open-telemetry/opentelemetry-cpp/pull/4090)
+
 * [CODE HEALTH] Remove unused alias declarations
   [#4091](https://github.com/open-telemetry/opentelemetry-cpp/pull/4091)
 
 * [SDK] MeterProvider: do not warn in destructor after explicit Shutdown
   [#4085](https://github.com/open-telemetry/opentelemetry-cpp/pull/4085)
+
+* [CODE HEALTH] Remove last unused nostd namespace alias in otlp_populate
+  [#4114](https://github.com/open-telemetry/opentelemetry-cpp/pull/4114)
+
+* [CODE HEALTH] Move curl_http_test classes into anonymous namespace
+  [#4115](https://github.com/open-telemetry/opentelemetry-cpp/pull/4115)
+
+* [CODE HEALTH] Move simple_log_record_processor_test into anonymous namespace
+  [#4116](https://github.com/open-telemetry/opentelemetry-cpp/pull/4116)
+
+* [CODE HEALTH] Move registry.cc propagator builders into anonymous namespace
+  [#4121](https://github.com/open-telemetry/opentelemetry-cpp/pull/4121)
+
+* [CODE HEALTH] Move sdk_builder.cc builders into anonymous namespace
+  [#4122](https://github.com/open-telemetry/opentelemetry-cpp/pull/4122)
 
 ## [1.27.0] 2026-05-13
 

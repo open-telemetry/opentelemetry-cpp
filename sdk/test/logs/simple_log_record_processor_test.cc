@@ -32,6 +32,9 @@ namespace logs_api              = opentelemetry::logs;
 namespace instrumentation_scope = opentelemetry::sdk::instrumentationscope;
 namespace nostd                 = opentelemetry::nostd;
 
+namespace
+{
+
 class TestLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
 public:
@@ -386,3 +389,5 @@ TEST(SimpleLogRecordProcessorTest, EmptyMultiLogRecordProcessorIsDisabled)
   EXPECT_FALSE(
       processor.Enabled(test_context, *scope, logs_api::Severity::kDebug, "test-event-name"));
 }
+
+}  // namespace

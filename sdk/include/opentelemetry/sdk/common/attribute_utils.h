@@ -251,10 +251,10 @@ public:
 class OrderedAttributeMap : public std::map<std::string, OwnedAttributeValue>
 {
 public:
-  // Contruct empty attribute map
+  // Construct empty attribute map
   OrderedAttributeMap() : std::map<std::string, OwnedAttributeValue>() {}
 
-  // Contruct attribute map and populate with attributes
+  // Construct attribute map and populate with attributes
   OrderedAttributeMap(const opentelemetry::common::KeyValueIterable &attributes)
       : OrderedAttributeMap()
   {
