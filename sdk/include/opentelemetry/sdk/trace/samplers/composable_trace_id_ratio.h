@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <string>
 
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/samplers/composable_sampler.h"
 #include "opentelemetry/version.h"
 

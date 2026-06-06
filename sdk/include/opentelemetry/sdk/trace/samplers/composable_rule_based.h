@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/samplers/composable_sampler.h"
 #include "opentelemetry/sdk/trace/samplers/predicate.h"
 #include "opentelemetry/version.h"

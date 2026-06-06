@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <string>
 
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
 

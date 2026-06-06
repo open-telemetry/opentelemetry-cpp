@@ -7,9 +7,9 @@
 #include <string>
 #include <utility>
 
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
 

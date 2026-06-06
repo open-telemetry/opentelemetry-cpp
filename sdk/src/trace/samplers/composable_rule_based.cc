@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE

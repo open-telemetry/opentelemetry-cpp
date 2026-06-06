@@ -7,6 +7,7 @@
 #include <string>
 
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
 
 #include "ot_trace_state.h"

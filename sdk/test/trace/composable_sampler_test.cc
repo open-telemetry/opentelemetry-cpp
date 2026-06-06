@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <stddef.h>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -13,11 +14,13 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/composable_always_off.h"
 #include "opentelemetry/sdk/trace/samplers/composable_always_on.h"
 #include "opentelemetry/sdk/trace/samplers/composable_parent_threshold.h"
 #include "opentelemetry/sdk/trace/samplers/composable_rule_based.h"
+#include "opentelemetry/sdk/trace/samplers/composable_sampler.h"
 #include "opentelemetry/sdk/trace/samplers/composable_trace_id_ratio.h"
 #include "opentelemetry/sdk/trace/samplers/composite_sampler.h"
 #include "opentelemetry/sdk/trace/samplers/composite_sampler_factory.h"
@@ -25,6 +28,7 @@
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
 #include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"

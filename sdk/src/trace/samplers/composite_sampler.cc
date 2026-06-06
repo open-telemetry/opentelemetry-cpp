@@ -10,12 +10,12 @@
 #include <utility>
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/composable_sampler.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
 
