@@ -1,12 +1,15 @@
 # Tracer Configurator Example
 
-This example demonstrates how to set a `TracerConfigurator` on construction of the `TracerProvider` and to update it using `TracerProvider::UpdateTracerConfigurator`
-to enable or disable specific tracers at runtime without restarting the application or recreating the tracers.
+This example demonstrates how to set a `TracerConfigurator` on construction
+of the `TracerProvider` and to update it at runtime using
+`TracerProvider::UpdateTracerConfigurator` to enable or disable specific
+tracers without restarting the application or recreating the tracers.
 
-`TracerProvider::UpdateTracerConfigurator` is thread-safe and updates the `TracerConfig` on all
-existing tracers.
+`TracerProvider::UpdateTracerConfigurator` is thread-safe and updates the
+`TracerConfig` on all existing tracers.
 
-Three tracers with unique instrumentation scope names are used to simulate a user application:
+Three tracers with unique instrumentation scope names are used to simulate
+a user application:
 
 - `my_application`: simulated user application
 - `my_library`: simulated user library
@@ -15,8 +18,10 @@ Three tracers with unique instrumentation scope names are used to simulate a use
 The example walks through a simulated debugging workflow in four stages:
 
 - Stage 1: Disable all tracers by default
-- Stage 2: Enable `my_application` and `my_library` tracers to identify the failed spans in user code
-- Stage 3: Enable all tracers to observe the root cause failure in the `external_library` span
+- Stage 2: Enable `my_application` and `my_library` tracers to identify
+  the failed spans in user code
+- Stage 3: Enable all tracers to observe the root cause failure in the
+  `external_library` span
 - Stage 4: Disable all tracers after investigation completes
 
 ## Build and run
