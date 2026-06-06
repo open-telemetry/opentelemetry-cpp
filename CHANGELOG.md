@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add ComposableSampler interface and CompositeSampler (work in progress)
+  [#4028](https://github.com/open-telemetry/opentelemetry-cpp/issues/4028)
+
 * [RELEASE] Bump main branch to 1.28.0-dev
   [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)
 
