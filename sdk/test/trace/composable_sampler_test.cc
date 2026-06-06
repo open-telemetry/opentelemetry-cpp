@@ -11,7 +11,9 @@
 
 #include <gtest/gtest.h>
 
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/utility.h"
@@ -47,6 +49,7 @@ using opentelemetry::sdk::trace::CompositeSamplerFactory;
 using opentelemetry::sdk::trace::Decision;
 using opentelemetry::sdk::trace::Predicate;
 using opentelemetry::sdk::trace::PredicatedSampler;
+using opentelemetry::sdk::trace::SamplingIntent;
 
 namespace
 {
@@ -145,6 +148,41 @@ public:
   }
 
   opentelemetry::nostd::string_view GetDescription() const noexcept override { return "MatchAll"; }
+};
+
+// Keeps every span and exercises the optional attribute and trace state
+// providers of SamplingIntent.
+class AnnotatingSampler : public ComposableSampler
+{
+public:
+  SamplingIntent GetSamplingIntent(
+      const trace_api::SpanContext & /*parent_context*/,
+      trace_api::TraceId /*trace_id*/,
+      opentelemetry::nostd::string_view /*name*/,
+      trace_api::SpanKind /*span_kind*/,
+      const common::KeyValueIterable & /*attributes*/,
+      const trace_api::SpanContextKeyValueIterable & /*links*/) noexcept override
+  {
+    SamplingIntent intent;
+    intent.has_threshold       = true;
+    intent.threshold_value     = 0;
+    intent.threshold_reliable  = true;
+    intent.attributes_provider = []() {
+      opentelemetry::sdk::trace::SamplingIntentAttributes attrs;
+      attrs["annotated"] = true;
+      return attrs;
+    };
+    intent.trace_state_provider =
+        [](opentelemetry::nostd::shared_ptr<trace_api::TraceState> trace_state) {
+          return trace_state->Set("p", "1");
+        };
+    return intent;
+  }
+
+  opentelemetry::nostd::string_view GetDescription() const noexcept override
+  {
+    return "AnnotatingSampler";
+  }
 };
 
 }  // namespace
@@ -283,4 +321,58 @@ TEST(ComposableSampler, Descriptions)
 
   CompositeSampler composite(std::make_shared<ComposableAlwaysOnSampler>());
   EXPECT_EQ("CompositeSampler{ComposableAlwaysOnSampler}", std::string(composite.GetDescription()));
+}
+
+TEST(ComposableSampler, IntentProvidersAreApplied)
+{
+  auto sampler = CompositeSamplerFactory::Create(std::make_shared<AnnotatingSampler>());
+  opentelemetry::sdk::trace::SamplingResult result;
+  EXPECT_EQ(Decision::RECORD_AND_SAMPLE,
+            Sample(*sampler, trace_api::SpanContext::GetInvalid(), MakeTraceId(0x00), &result));
+  ASSERT_NE(nullptr, result.attributes);
+  EXPECT_EQ(1u, result.attributes->count("annotated"));
+  std::string p;
+  ASSERT_TRUE(result.trace_state->Get("p", p));
+  EXPECT_EQ("1", p);
+  EXPECT_EQ("th:0", OtOf(result));
+}
+
+TEST(ComposableSampler, PreservesOtherSubkeysAndIgnoresInvalidValues)
+{
+  auto sampler = CompositeSamplerFactory::Create(std::make_shared<ComposableAlwaysOnSampler>());
+  // th and rv carry invalid hex (both ignored); keep:me is an unknown subkey
+  // that must be preserved.
+  auto parent = MakeParent(false, "th:xx;rv:zzzzzzzzzzzzzz;keep:me");
+  opentelemetry::sdk::trace::SamplingResult result;
+  EXPECT_EQ(Decision::RECORD_AND_SAMPLE, Sample(*sampler, parent, MakeTraceId(0x00), &result));
+  std::string ot = OtOf(result);
+  EXPECT_NE(std::string::npos, ot.find("th:0"));
+  EXPECT_NE(std::string::npos, ot.find("keep:me"));
+}
+
+TEST(ComposableSampler, DropsTrailingSubkeysOverSizeLimit)
+{
+  auto sampler = CompositeSamplerFactory::Create(std::make_shared<ComposableAlwaysOnSampler>());
+  // Fits in 256 on input, but once th:0 is prepended the trailing subkey no
+  // longer fits and is dropped.
+  std::string parent_ot = "rv:ffffffffffffff;x:" + std::string(236, 'a');
+  auto parent           = MakeParent(false, parent_ot);
+  opentelemetry::sdk::trace::SamplingResult result;
+  EXPECT_EQ(Decision::RECORD_AND_SAMPLE, Sample(*sampler, parent, MakeTraceId(0x00), &result));
+  std::string ot = OtOf(result);
+  EXPECT_NE(std::string::npos, ot.find("th:0"));
+  EXPECT_EQ(std::string::npos, ot.find("x:aaa"));
+}
+
+TEST(ComposableSampler, RatioClampedToValidRange)
+{
+  auto over =
+      CompositeSamplerFactory::Create(std::make_shared<ComposableTraceIdRatioBasedSampler>(2.0));
+  EXPECT_EQ(Decision::RECORD_AND_SAMPLE,
+            Sample(*over, trace_api::SpanContext::GetInvalid(), MakeTraceId(0x00)));
+
+  auto under =
+      CompositeSamplerFactory::Create(std::make_shared<ComposableTraceIdRatioBasedSampler>(-1.0));
+  EXPECT_EQ(Decision::DROP,
+            Sample(*under, trace_api::SpanContext::GetInvalid(), MakeTraceId(0xFF)));
 }

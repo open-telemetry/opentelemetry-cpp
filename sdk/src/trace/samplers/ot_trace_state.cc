@@ -99,12 +99,9 @@ uint64_t CalculateThreshold(double sampling_probability) noexcept
   {
     return 0;
   }
-  // 0x1p56 == 2^56. The product lies in (0, 2^56), so the rounded result fits.
+  // 0x1p56 == 2^56. sampling_probability is in (0, 1) here, so the rounded
+  // product is in [0, kMaxThreshold] and the subtraction never underflows.
   uint64_t kept = static_cast<uint64_t>(std::llround(sampling_probability * 0x1p56));
-  if (kept > kMaxThreshold)
-  {
-    kept = kMaxThreshold;
-  }
   return kMaxThreshold - kept;
 }
 
