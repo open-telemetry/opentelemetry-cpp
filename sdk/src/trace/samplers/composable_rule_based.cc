@@ -16,22 +16,29 @@ namespace sdk
 namespace trace
 {
 
-ComposableRuleBasedSampler::ComposableRuleBasedSampler(std::vector<PredicatedSampler> rules)
-    : rules_(std::move(rules))
+namespace
 {
-  description_ = "ComposableRuleBasedSampler{";
-  bool first   = true;
-  for (const auto &rule : rules_)
+std::string BuildDescription(const std::vector<PredicatedSampler> &rules)
+{
+  std::string description = "ComposableRuleBasedSampler{";
+  bool first              = true;
+  for (const auto &rule : rules)
   {
     if (!first)
     {
-      description_ += ",";
+      description += ",";
     }
-    description_ += std::string(rule.sampler->GetDescription());
+    description += std::string(rule.sampler->GetDescription());
     first = false;
   }
-  description_ += "}";
+  description += "}";
+  return description;
 }
+}  // namespace
+
+ComposableRuleBasedSampler::ComposableRuleBasedSampler(std::vector<PredicatedSampler> rules)
+    : rules_(std::move(rules)), description_(BuildDescription(rules_))
+{}
 
 SamplingIntent ComposableRuleBasedSampler::GetSamplingIntent(
     const opentelemetry::trace::SpanContext &parent_context,
