@@ -48,6 +48,15 @@ Increment the:
 * [CODE HEALTH] Move sdk_builder.cc builders into anonymous namespace
   [#4122](https://github.com/open-telemetry/opentelemetry-cpp/pull/4122)
 
+* [CODE HEALTH] Move logger_sdk_test classes into anonymous namespace
+  [#4124](https://github.com/open-telemetry/opentelemetry-cpp/pull/4124)
+
+* [CODE HEALTH] Move func_http_main classes into anonymous namespace
+  [#4128](https://github.com/open-telemetry/opentelemetry-cpp/pull/4128)
+
+* [CODE HEALTH] Move func_grpc_main classes into anonymous namespace
+  [#4129](https://github.com/open-telemetry/opentelemetry-cpp/pull/4129)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
