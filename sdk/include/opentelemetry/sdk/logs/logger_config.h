@@ -52,6 +52,7 @@ public:
    * @param enabled if false, the Logger behaves like a no-op logger.
    * @param minimum_severity the minimum severity required for filtering.
    * @param trace_based if true, trace-based filtering is enabled.
+   * @param log_record_limits the limits applied to log records created by the Logger.
    * @return a LoggerConfig with the provided settings.
    */
   static LoggerConfig Create(bool enabled,
