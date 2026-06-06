@@ -351,3 +351,32 @@ resource:
   ASSERT_NE(config->resource->detection_development->detectors[2]->process, nullptr);
   ASSERT_NE(config->resource->detection_development->detectors[3]->service, nullptr);
 }
+
+TEST(YamlResource, experimental_detector_invalid_property_count)
+{
+  std::string yaml = R"YAML(
+file_format: "1.0-resource"
+resource:
+  detection/development:
+    detectors:
+      - container: {}
+        host: {}
+)YAML";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(YamlResource, experimental_detector_illegal_name)
+{
+  std::string yaml = R"YAML(
+file_format: "1.0-resource"
+resource:
+  detection/development:
+    detectors:
+      - unknown:
+)YAML";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
