@@ -4,19 +4,18 @@
 #include <stddef.h>
 #include <cstdint>
 #include <map>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/composable_always_off.h"
 #include "opentelemetry/sdk/trace/samplers/composable_always_on.h"
