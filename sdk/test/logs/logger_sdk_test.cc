@@ -116,6 +116,9 @@ TEST(LoggerSDK, LogToNullProcessor)
   logger->Debug("Test log");
 }
 
+namespace
+{
+
 class MockLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
 public:
@@ -879,3 +882,5 @@ TEST(LoggerSDK, EventLog)
   ASSERT_FALSE(shared_recordable->GetSpanId().IsValid());
 }
 #endif
+
+}  // namespace

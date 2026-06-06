@@ -33,6 +33,27 @@ Increment the:
 * [CODE HEALTH] Remove last unused nostd namespace alias in otlp_populate
   [#4114](https://github.com/open-telemetry/opentelemetry-cpp/pull/4114)
 
+* [CODE HEALTH] Move curl_http_test classes into anonymous namespace
+  [#4115](https://github.com/open-telemetry/opentelemetry-cpp/pull/4115)
+
+* [CODE HEALTH] Move simple_log_record_processor_test into anonymous namespace
+  [#4116](https://github.com/open-telemetry/opentelemetry-cpp/pull/4116)
+
+* [CODE HEALTH] Move registry.cc propagator builders into anonymous namespace
+  [#4121](https://github.com/open-telemetry/opentelemetry-cpp/pull/4121)
+
+* [CODE HEALTH] Move sdk_builder.cc builders into anonymous namespace
+  [#4122](https://github.com/open-telemetry/opentelemetry-cpp/pull/4122)
+
+* [CODE HEALTH] Move logger_sdk_test classes into anonymous namespace
+  [#4124](https://github.com/open-telemetry/opentelemetry-cpp/pull/4124)
+
+* [CODE HEALTH] Move func_http_main classes into anonymous namespace
+  [#4128](https://github.com/open-telemetry/opentelemetry-cpp/pull/4128)
+
+* [CODE HEALTH] Move func_grpc_main classes into anonymous namespace
+  [#4129](https://github.com/open-telemetry/opentelemetry-cpp/pull/4129)
+
 * [LOGS SDK] Add log record attribute value length limit configuration
 
   * Introduces support for the `OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT`
