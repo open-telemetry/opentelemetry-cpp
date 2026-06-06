@@ -45,6 +45,15 @@ Increment the:
 * [CODE HEALTH] Move sdk_builder.cc builders into anonymous namespace
   [#4122](https://github.com/open-telemetry/opentelemetry-cpp/pull/4122)
 
+* [CODE HEALTH] Move logger_sdk_test classes into anonymous namespace
+  [#4124](https://github.com/open-telemetry/opentelemetry-cpp/pull/4124)
+
+* [CODE HEALTH] Move func_http_main classes into anonymous namespace
+  [#4128](https://github.com/open-telemetry/opentelemetry-cpp/pull/4128)
+
+* [CODE HEALTH] Move func_grpc_main classes into anonymous namespace
+  [#4129](https://github.com/open-telemetry/opentelemetry-cpp/pull/4129)
+
 * [API] `Logger::EmitLogRecord(...)` templates now apply the `Enabled` filter
   chain when a `Severity` is in args.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
