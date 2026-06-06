@@ -243,7 +243,9 @@ inline const EventId *FindEventIdInArgs() noexcept
 }
 
 template <class... Rest>
-inline const EventId *FindEventIdInArgs(const EventId &event_id, Rest &&.../*rest*/) noexcept
+inline const EventId *FindEventIdInArgs(const EventId &event_id
+                                            OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND,
+                                        Rest &&.../*rest*/) noexcept
 {
   return &event_id;
 }
@@ -265,7 +267,7 @@ inline const opentelemetry::context::Context *FindContextInArgs() noexcept
 
 template <class... Rest>
 inline const opentelemetry::context::Context *FindContextInArgs(
-    const opentelemetry::context::Context &context,
+    const opentelemetry::context::Context &context OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND,
     Rest &&.../*rest*/) noexcept
 {
   return &context;
@@ -288,7 +290,8 @@ inline const trace::SpanContext *FindSpanContextInArgs() noexcept
 }
 
 template <class... Rest>
-inline const trace::SpanContext *FindSpanContextInArgs(const trace::SpanContext &span_context,
+inline const trace::SpanContext *FindSpanContextInArgs(const trace::SpanContext &span_context
+                                                           OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND,
                                                        Rest &&.../*rest*/) noexcept
 {
   return &span_context;
@@ -310,7 +313,8 @@ inline const trace::TraceId *FindTraceIdInArgs() noexcept
 }
 
 template <class... Rest>
-inline const trace::TraceId *FindTraceIdInArgs(const trace::TraceId &trace_id,
+inline const trace::TraceId *FindTraceIdInArgs(const trace::TraceId &trace_id
+                                                   OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND,
                                                Rest &&.../*rest*/) noexcept
 {
   return &trace_id;
@@ -332,7 +336,8 @@ inline const trace::SpanId *FindSpanIdInArgs() noexcept
 }
 
 template <class... Rest>
-inline const trace::SpanId *FindSpanIdInArgs(const trace::SpanId &span_id,
+inline const trace::SpanId *FindSpanIdInArgs(const trace::SpanId &span_id
+                                                 OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND,
                                              Rest &&.../*rest*/) noexcept
 {
   return &span_id;
@@ -354,7 +359,8 @@ inline const trace::TraceFlags *FindTraceFlagsInArgs() noexcept
 }
 
 template <class... Rest>
-inline const trace::TraceFlags *FindTraceFlagsInArgs(const trace::TraceFlags &trace_flags,
+inline const trace::TraceFlags *FindTraceFlagsInArgs(const trace::TraceFlags &trace_flags
+                                                         OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND,
                                                      Rest &&.../*rest*/) noexcept
 {
   return &trace_flags;
