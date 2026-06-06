@@ -25,4 +25,3 @@ public:
 }  // namespace configuration
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
-
