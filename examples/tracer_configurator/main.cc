@@ -6,21 +6,24 @@
 // tracers provided by the TracerProvider. It is thread safe and can be called concurrently with
 // tracer and span creation.
 //
-// Two instrumentation scopes are shown:
-// 1. "my_library" (example instrumented user code),
-// 2. "external_library_foo" (example instrumented third-party dependency).
+// Three instrumentation scopes are shown:
+// 1. "my_application" (example instrumented user application code),
+// 2. "my_library" (example instrumented user library code),
+// 3. "external_library" (example instrumented third-party dependency).
 //
 // The example simulates a debugging workflow where only the tracer configuration is changed at
 // runtime through the provider:
 //
-//   Stage 1 – Start with all tracing disabled (low-overhead production default).
-//   Stage 2 – An issue is reported. Enable only the user library traces to get an initial signal.
-//   Stage 3 – The issue involves external libraries too. Enable all traces for full visibility.
-//   Stage 4 – Investigation complete. Disable all tracing again.
+// Stage 1: Start with all tracing disabled (low-overhead production default).
+// Stage 2: An issue is reported. Enable only the user application and library tracers.
+// Stage 3: The issue involves external libraries too. Enable all tracers for full visibility.
+// Stage 4: Investigation complete. Disable all tracing again.
 
+#include <chrono>
 #include <initializer_list>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -36,8 +39,13 @@
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/semconv/service_attributes.h"
+#include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
 namespace trace_sdk      = opentelemetry::sdk::trace;
 namespace trace_exporter = opentelemetry::exporter::trace;
@@ -46,15 +54,96 @@ namespace nostd          = opentelemetry::nostd;
 
 namespace
 {
-void DoWork(opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> &tracer,
-            nostd::string_view tracer_name,
-            nostd::string_view operation)
+
+// Simulate some work in the external library
+namespace external_library
 {
-  auto span = tracer->StartSpan(operation);
-  std::cout << (span->IsRecording() ? "[active] " : "[off]    ") << tracer_name << " / "
-            << operation << "\n";
-  span->End();
-}
+class ExternalModule
+{
+public:
+  ExternalModule()
+      : tracer_(opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("external_library"))
+  {}
+
+  // Simulate an operation in the external library that always returns false to simulate an error
+  bool Execute()
+  {
+    std::cout << "[external_library] Execute\n";
+
+    auto span = tracer_->StartSpan("ExternalModule.Execute");
+    opentelemetry::trace::Scope scope(span);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+    span->SetStatus(opentelemetry::trace::StatusCode::kError,
+                    "Something went wrong in external_library");
+    return false;
+  }
+
+private:
+  nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
+};
+}  // namespace external_library
+
+// Simulate some operation in a user library
+namespace my_library
+{
+class MyModule
+{
+public:
+  MyModule() : tracer_(opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("my_library"))
+  {}
+
+  // Simulate an operation in the user library that calls into the external library
+  bool Execute()
+  {
+    std::cout << "[my_library] Execute\n";
+    auto user_library_tracer =
+        opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("my_library");
+
+    auto span = user_library_tracer->StartSpan("MyModule.Execute");
+    opentelemetry::trace::Scope scope(span);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+
+    const bool result = external_module_.Execute();
+
+    span->SetStatus(result ? opentelemetry::trace::StatusCode::kOk
+                           : opentelemetry::trace::StatusCode::kError);
+
+    return result;
+  }
+
+private:
+  nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
+  external_library::ExternalModule external_module_;
+};
+}  // namespace my_library
+
+// Simulate a user application that uses the user library
+class MyApplication
+{
+public:
+  MyApplication()
+      : tracer_(opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("my_application"))
+  {}
+
+  // Simulate an operation in the user application that calls into the user library
+  void Execute()
+  {
+    std::cout << "[my_application] Execute\n";
+    auto span = tracer_->StartSpan("MyApplication.Execute");
+    opentelemetry::trace::Scope scope(span);
+
+    const bool result = my_module_.Execute();
+    span->SetStatus(result ? opentelemetry::trace::StatusCode::kOk
+                           : opentelemetry::trace::StatusCode::kError);
+  }
+
+private:
+  nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
+  my_library::MyModule my_module_;
+};
 
 // Builds a ScopeConfigurator that enables all tracers (the default).
 std::unique_ptr<scope_cfg::ScopeConfigurator<trace_sdk::TracerConfig>> EnableAll()
@@ -86,29 +175,44 @@ std::unique_ptr<scope_cfg::ScopeConfigurator<trace_sdk::TracerConfig>> DisableAl
           trace_sdk::TracerConfig::Disabled())
           .Build());
 }
-}  // namespace
 
-int main()
+// Creates a TracerProvider with an OStreamSpanExporter and disable all tracers by default.
+std::shared_ptr<trace_sdk::TracerProvider> CreateTracerProvider()
 {
   auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create();
   auto processor = trace_sdk::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
-  // Start with all tracing disabled
   auto provider = std::make_shared<trace_sdk::TracerProvider>(
-      std::move(processor), opentelemetry::sdk::resource::Resource::Create({}),
+      std::move(processor),
+      opentelemetry::sdk::resource::Resource::Create(
+          {{opentelemetry::semconv::service::kServiceName, "tracer_configurator_example"}}),
       std::make_unique<trace_sdk::AlwaysOnSampler>(),
       std::make_unique<trace_sdk::RandomIdGenerator>(), DisableAll());
+  return provider;
+}
 
-  auto my_library_tracer           = provider->GetTracer("my_library");
-  auto external_library_foo_tracer = provider->GetTracer("external_library_foo");
+}  // namespace
+
+int main()
+{
+  // Create and set the global TracerProvider with all tracers disabled.
+  // The SDK TracerProvider::UpdateTracerConfigurator() method will be used to change tracer
+  // configurations at runtime.
+  auto sdk_tracer_provider = CreateTracerProvider();
+
+  // Set the global provider to our SDK TracerProvider instance.
+  opentelemetry::trace::Provider::SetTracerProvider(
+      nostd::shared_ptr<opentelemetry::trace::TracerProvider>(sdk_tracer_provider));
+
+  // Create an instance of the user application.
+  MyApplication my_app;
 
   // -------------------------------------------------------------------------
   // Stage 1: all tracing disabled
   // -------------------------------------------------------------------------
-  std::cout << "=== Stage 1: disable all (production default) ===\n";
+  std::cout << "=== Stage 1: all tracers initially disabled ===\n";
 
-  DoWork(my_library_tracer, "my_library", "DoWork");                            // disabled
-  DoWork(external_library_foo_tracer, "external_library_foo", "FooOperation");  // disabled
+  my_app.Execute();  // all tracers disabled
 
   // -------------------------------------------------------------------------
   // Stage 2: enable only user library tracing
@@ -116,34 +220,32 @@ int main()
   // EnableOnly() sets Disabled() as the default and adds explicit per-name
   // overrides. Existing tracer handles reflect the change immediately
   // -------------------------------------------------------------------------
-  std::cout << "\n=== Stage 2: enable only 'my_library' ===\n";
+  std::cout << "\n=== Stage 2: enable only 'my_application' and 'my_library' tracers ===\n";
 
-  provider->UpdateTracerConfigurator(EnableOnly({"my_library"}));
+  sdk_tracer_provider->UpdateTracerConfigurator(EnableOnly({"my_application", "my_library"}));
 
-  DoWork(my_library_tracer, "my_library", "DoWork");                            // enabled
-  DoWork(external_library_foo_tracer, "external_library_foo", "FooOperation");  // disabled
+  my_app.Execute();  // my_application and my_library tracers enabled, external_library tracer
+                     // disabled
 
   // -------------------------------------------------------------------------
   // Stage 3: enable tracing in all libraries
   // -------------------------------------------------------------------------
-  std::cout << "\n=== Stage 3: enable all ===\n";
+  std::cout << "\n=== Stage 3: enable all tracers ===\n";
 
-  provider->UpdateTracerConfigurator(EnableAll());
+  sdk_tracer_provider->UpdateTracerConfigurator(EnableAll());
 
-  DoWork(my_library_tracer, "my_library", "DoWork");                            // enabled
-  DoWork(external_library_foo_tracer, "external_library_foo", "FooOperation");  // enabled
+  my_app.Execute();  // all tracers enabled
 
   // -------------------------------------------------------------------------
   // Stage 4: disable all tracing again
   // -------------------------------------------------------------------------
-  std::cout << "\n=== Stage 4: disable all ===\n";
+  std::cout << "\n=== Stage 4: disable all tracers ===\n";
 
-  provider->UpdateTracerConfigurator(DisableAll());
+  sdk_tracer_provider->UpdateTracerConfigurator(DisableAll());
 
-  DoWork(my_library_tracer, "my_library", "DoWork");                            // disabled
-  DoWork(external_library_foo_tracer, "external_library_foo", "FooOperation");  // disabled
+  my_app.Execute();  // all tracers disabled
 
-  provider->ForceFlush();
-  provider->Shutdown();
+  sdk_tracer_provider->ForceFlush();
+  sdk_tracer_provider->Shutdown();
   return 0;
 }
