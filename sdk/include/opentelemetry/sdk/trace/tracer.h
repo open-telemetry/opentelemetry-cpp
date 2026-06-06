@@ -104,6 +104,18 @@ public:
   // Note: Test only
   Sampler &GetSampler() { return context_->GetSampler(); }
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+  /** Returns whether the tracer is enabled. ABIv1 only.*/
+  bool Enabled() const noexcept { return is_enabled_.load(std::memory_order_relaxed); }
+
+protected:
+  /** Updates the enabled state of the tracer. ABIv1 only. */
+  void UpdateEnabled(const bool enabled) noexcept
+  {
+    is_enabled_.store(enabled, std::memory_order_relaxed);
+  }
+#endif
+
 private:
   // TracerProvider needs access to UpdateTracerConfig to propagate configuration updates to
   // existing tracers.

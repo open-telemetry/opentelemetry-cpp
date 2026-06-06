@@ -48,14 +48,8 @@ Tracer::Tracer(std::shared_ptr<TracerContext> context,
     : instrumentation_scope_{std::move(instrumentation_scope)},
       context_{std::move(context)},
       tracer_config_(context_->GetTracerConfigurator().ComputeConfig(*instrumentation_scope_))
-#if OPENTELEMETRY_ABI_VERSION_NO < 2
-      ,
-      is_enabled_(tracer_config_.IsEnabled())
-#endif
 {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   UpdateEnabled(tracer_config_.IsEnabled());
-#endif
 }
 
 nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
@@ -65,11 +59,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     const opentelemetry::trace::StartSpanOptions &options) noexcept
 {
   // Check if the tracer is enabled using the API Tracer::Enabled() accessor if available.
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   if (!Enabled())
-#else
-  if (!is_enabled_.load(std::memory_order_relaxed))
-#endif
   {
     return kNoopTracer->StartSpan(name, attributes, links, options);
   }
@@ -218,12 +208,7 @@ void Tracer::UpdateTracerConfig(TracerConfig config) noexcept
     std::lock_guard<std::mutex> lock(tracer_config_mutex_);
     tracer_config_ = config;
   }
-
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   UpdateEnabled(enabled);
-#else
-  is_enabled_.store(enabled, std::memory_order_relaxed);
-#endif
 }
 
 }  // namespace trace
