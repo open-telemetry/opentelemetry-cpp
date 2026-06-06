@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <stdlib.h>
+#include <string>
 
 #include "opentelemetry/metrics/meter_provider.h"
 #include "opentelemetry/metrics/noop.h"

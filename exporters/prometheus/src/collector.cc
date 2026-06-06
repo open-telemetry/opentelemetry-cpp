@@ -13,8 +13,6 @@
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/version.h"
 
-namespace metric_sdk = opentelemetry::sdk::metrics;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {

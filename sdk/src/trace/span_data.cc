@@ -18,7 +18,6 @@
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/version.h"
 

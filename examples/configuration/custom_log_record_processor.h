@@ -4,11 +4,9 @@
 #pragma once
 
 #include <chrono>
-#include <memory>
 #include <string>
 
 #include "opentelemetry/sdk/logs/processor.h"
-#include "opentelemetry/sdk/logs/recordable.h"
 
 class CustomLogRecordProcessor : public opentelemetry::sdk::logs::LogRecordProcessor
 {

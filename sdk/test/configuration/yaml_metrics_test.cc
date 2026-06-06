@@ -22,7 +22,6 @@
 #include "opentelemetry/sdk/configuration/meter_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
-#include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_encoding.h"

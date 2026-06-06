@@ -4,7 +4,6 @@
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include <gtest/gtest.h>
 #include <array>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>

@@ -13,7 +13,6 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -32,6 +31,9 @@ namespace context               = opentelemetry::context;
 namespace logs_api              = opentelemetry::logs;
 namespace instrumentation_scope = opentelemetry::sdk::instrumentationscope;
 namespace nostd                 = opentelemetry::nostd;
+
+namespace
+{
 
 class TestLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
@@ -387,3 +389,5 @@ TEST(SimpleLogRecordProcessorTest, EmptyMultiLogRecordProcessorIsDisabled)
   EXPECT_FALSE(
       processor.Enabled(test_context, *scope, logs_api::Severity::kDebug, "test-event-name"));
 }
+
+}  // namespace

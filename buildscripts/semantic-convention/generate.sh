@@ -16,10 +16,10 @@ ROOT_DIR="${SCRIPT_DIR}/../../"
 # freeze the spec & generator tools versions to make the generation reproducible
 
 # repository: https://github.com/open-telemetry/semantic-conventions
-SEMCONV_VERSION=1.40.0
+SEMCONV_VERSION=1.41.1
 
 # repository: https://github.com/open-telemetry/weaver
-WEAVER_VERSION=0.21.2
+WEAVER_VERSION=0.23.0
 
 SEMCONV_VERSION_TAG=v$SEMCONV_VERSION
 WEAVER_VERSION_TAG=v$WEAVER_VERSION
@@ -112,9 +112,11 @@ generate "./" "./" "stable"
 mkdir -p ${ROOT_DIR}/tmpgen/${INCUBATING_DIR}
 generate "./" "./${INCUBATING_DIR}/" "any"
 
+rm ${ROOT_DIR}/api/include/opentelemetry/semconv/*.h
 cp -r ${ROOT_DIR}/tmpgen/*.h \
       ${ROOT_DIR}/api/include/opentelemetry/semconv/
 
+rm ${ROOT_DIR}/api/include/opentelemetry/semconv/${INCUBATING_DIR}/*.h
 cp -r ${ROOT_DIR}/tmpgen/${INCUBATING_DIR}/*.h \
-      ${ROOT_DIR}/api/include/opentelemetry/semconv/incubating
+      ${ROOT_DIR}/api/include/opentelemetry/semconv/${INCUBATING_DIR}
 
