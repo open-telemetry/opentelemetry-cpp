@@ -58,6 +58,8 @@ Increment the:
 
   * Introduces support for the `OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT`
     environment variable.
+  * Wires declarative configuration
+    `logger_provider.limits.attribute_value_length_limit` into created loggers.
   * The configured limit is applied to log record attributes before SDK
     `Recordable` implementations store or export the attribute value.
 

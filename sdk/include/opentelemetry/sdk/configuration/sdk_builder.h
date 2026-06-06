@@ -49,6 +49,7 @@
 #include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
@@ -259,7 +260,9 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
       opentelemetry::sdk::logs::LoggerConfig>>
-  CreateLoggerConfigurator(const std::unique_ptr<LoggerConfiguratorConfiguration> &model) const;
+  CreateLoggerConfigurator(const std::unique_ptr<LoggerConfiguratorConfiguration> &model,
+                           const opentelemetry::sdk::logs::LogRecordLimits &log_record_limits =
+                               opentelemetry::sdk::logs::LogRecordLimits{}) const;
 
   std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> CreateLoggerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,

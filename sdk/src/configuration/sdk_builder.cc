@@ -16,6 +16,7 @@
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/context/propagation/composite_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -64,6 +65,7 @@
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
@@ -133,6 +135,7 @@
 #include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
@@ -190,6 +193,41 @@ using common::WildcardMatch;
 
 namespace
 {
+
+opentelemetry::sdk::logs::LogRecordLimits CreateLogRecordLimits(
+    const std::unique_ptr<LogRecordLimitsConfiguration> &model)
+{
+  opentelemetry::sdk::logs::LogRecordLimits limits;
+
+  if (model)
+  {
+    limits.attribute_value_length_limit = model->attribute_value_length_limit;
+  }
+
+  return limits;
+}
+
+opentelemetry::sdk::logs::LoggerConfig CreateLoggerConfig(
+    const LoggerConfigConfiguration &model,
+    const opentelemetry::sdk::logs::LogRecordLimits &log_record_limits)
+{
+  return opentelemetry::sdk::logs::LoggerConfig::Create(
+      model.enabled, opentelemetry::logs::Severity::kInvalid, false, log_record_limits);
+}
+
+std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+    opentelemetry::sdk::logs::LoggerConfig>>
+CreateDefaultLoggerConfigurator(const opentelemetry::sdk::logs::LogRecordLimits &log_record_limits)
+{
+  using opentelemetry::sdk::instrumentationscope::ScopeConfigurator;
+  using opentelemetry::sdk::logs::LoggerConfig;
+
+  return std::make_unique<ScopeConfigurator<LoggerConfig>>(
+      ScopeConfigurator<LoggerConfig>::Builder(
+          LoggerConfig::Create(true, opentelemetry::logs::Severity::kInvalid, false,
+                               log_record_limits))
+          .Build());
+}
 
 class ResourceAttributeValueSetter
     : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor
@@ -1868,22 +1906,21 @@ std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> SdkBuilder::Create
 std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
     opentelemetry::sdk::logs::LoggerConfig>>
 SdkBuilder::CreateLoggerConfigurator(
-    const std::unique_ptr<LoggerConfiguratorConfiguration> &model) const
+    const std::unique_ptr<LoggerConfiguratorConfiguration> &model,
+    const opentelemetry::sdk::logs::LogRecordLimits &log_record_limits) const
 {
   using opentelemetry::sdk::instrumentationscope::InstrumentationScope;
   using opentelemetry::sdk::instrumentationscope::ScopeConfigurator;
   using opentelemetry::sdk::logs::LoggerConfig;
 
-  LoggerConfig default_config =
-      model->default_config.enabled ? LoggerConfig::Enabled() : LoggerConfig::Disabled();
+  LoggerConfig default_config = CreateLoggerConfig(model->default_config, log_record_limits);
 
   auto builder = ScopeConfigurator<LoggerConfig>::Builder(default_config);
 
   for (const auto &entry : model->loggers)
   {
-    LoggerConfig entry_config =
-        entry.config.enabled ? LoggerConfig::Enabled() : LoggerConfig::Disabled();
-    std::string pattern = entry.name;
+    LoggerConfig entry_config = CreateLoggerConfig(entry.config, log_record_limits);
+    std::string pattern       = entry.name;
     builder.AddCondition(
         [pattern](const InstrumentationScope &scope) {
           return WildcardMatch(pattern, scope.GetName());
@@ -1908,10 +1945,17 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
   }
 
   // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3303
-  // FIXME-SDK: use limits
+  auto log_record_limits = CreateLogRecordLimits(model->limits);
   if (model->logger_configurator)
   {
-    auto logger_configurator = CreateLoggerConfigurator(model->logger_configurator);
+    auto logger_configurator =
+        CreateLoggerConfigurator(model->logger_configurator, log_record_limits);
+    sdk = opentelemetry::sdk::logs::LoggerProviderFactory::Create(
+        std::move(sdk_processors), resource, std::move(logger_configurator));
+  }
+  else if (model->limits)
+  {
+    auto logger_configurator = CreateDefaultLoggerConfigurator(log_record_limits);
     sdk                      = opentelemetry::sdk::logs::LoggerProviderFactory::Create(
         std::move(sdk_processors), resource, std::move(logger_configurator));
   }

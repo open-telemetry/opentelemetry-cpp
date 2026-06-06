@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stddef.h>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
@@ -459,7 +461,8 @@ logger_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->logger_provider, nullptr);
   ASSERT_NE(config->logger_provider->limits, nullptr);
-  ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit, 4096);
+  ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit,
+            (std::numeric_limits<size_t>::max)());
   ASSERT_EQ(config->logger_provider->limits->attribute_count_limit, 128);
 }
 
