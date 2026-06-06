@@ -49,9 +49,10 @@ Increment the:
   chain when a `Severity` is in args.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
-* [API/SDK] (ABI v2) Add `Logger::CreateLogRecord(const Context &)` virtual
-  for explicit-context record creation. `Logger::EmitLogRecord(args...)`
-  also detects a `Context`, `SpanContext`
+* [API/SDK] (ABI v2) Add
+  `Logger::CreateLogRecord(const nostd::variant<trace::SpanContext, context::Context> &)`
+  virtual for explicit-context record creation.
+  `Logger::EmitLogRecord(args...)` also detects a `Context`, `SpanContext`
   or `TraceId` + `SpanId` [+ `TraceFlags`] in args and routes filtering.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
