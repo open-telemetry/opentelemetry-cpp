@@ -3,9 +3,17 @@
 
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <vector>
+
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/logs/log_record.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/version.h"
 
@@ -42,7 +50,15 @@ public:
   void SetAttribute(opentelemetry::nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept final
   {
-    SetAttributeImpl(key, value);
+    if (limits_.attribute_value_length_limit == (std::numeric_limits<std::size_t>::max)())
+    {
+      SetAttributeImpl(key, value);
+      return;
+    }
+
+    AttributeValueLengthLimiter limiter(limits_.attribute_value_length_limit);
+    auto limited_value = opentelemetry::nostd::visit(limiter, value);
+    SetAttributeImpl(key, limited_value);
   }
 
   /**
@@ -62,10 +78,114 @@ public:
 protected:
   const LogRecordLimits &GetLogRecordLimits() const noexcept { return limits_; }
 
+  /**
+   * Set an attribute after SDK-level processing is applied.
+   *
+   * AttributeValue can contain non-owning views. Implementations must consume or copy value
+   * synchronously before this method returns.
+   */
   virtual void SetAttributeImpl(opentelemetry::nostd::string_view key,
                                 const opentelemetry::common::AttributeValue &value) noexcept = 0;
 
 private:
+  class AttributeValueLengthLimiter
+  {
+  public:
+    explicit AttributeValueLengthLimiter(std::size_t limit) noexcept : limit_(limit) {}
+
+    opentelemetry::common::AttributeValue operator()(const char *value) const noexcept
+    {
+      if (value == nullptr)
+      {
+        return value;
+      }
+
+      const auto value_length = std::strlen(value);
+      if (value_length <= limit_)
+      {
+        return value;
+      }
+
+      return opentelemetry::nostd::string_view(value, limit_);
+    }
+
+    opentelemetry::common::AttributeValue operator()(
+        opentelemetry::nostd::string_view value) const noexcept
+    {
+      if (value.size() <= limit_)
+      {
+        return value;
+      }
+
+      return opentelemetry::nostd::string_view(value.data(), limit_);
+    }
+
+    opentelemetry::common::AttributeValue operator()(
+        opentelemetry::nostd::span<const opentelemetry::nostd::string_view> values) noexcept
+    {
+      if (!HasLimitedStringValue(values))
+      {
+        return values;
+      }
+
+      limited_string_values_.clear();
+      limited_string_values_.reserve(values.size());
+      for (auto value : values)
+      {
+        limited_string_values_.push_back(GetLimitedStringValue(value));
+      }
+
+      return opentelemetry::nostd::span<const opentelemetry::nostd::string_view>(
+          limited_string_values_);
+    }
+
+    opentelemetry::common::AttributeValue operator()(
+        opentelemetry::nostd::span<const uint8_t> value) const noexcept
+    {
+      if (value.size() <= limit_)
+      {
+        return value;
+      }
+
+      return opentelemetry::nostd::span<const uint8_t>(value.data(), limit_);
+    }
+
+    template <typename T>
+    opentelemetry::common::AttributeValue operator()(T value) const noexcept
+    {
+      return value;
+    }
+
+  private:
+    bool HasLimitedStringValue(
+        opentelemetry::nostd::span<const opentelemetry::nostd::string_view> values) const noexcept
+    {
+      for (auto value : values)
+      {
+        if (value.size() > limit_)
+        {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    opentelemetry::nostd::string_view GetLimitedStringValue(
+        opentelemetry::nostd::string_view value) const noexcept
+    {
+      if (value.size() <= limit_)
+      {
+        return value;
+      }
+
+      return opentelemetry::nostd::string_view(value.data(), limit_);
+    }
+
+    std::size_t limit_;
+    std::vector<opentelemetry::nostd::string_view> limited_string_values_;
+  };
+
   LogRecordLimits limits_;
 };
 

@@ -33,6 +33,23 @@ Increment the:
 * [CODE HEALTH] Remove last unused nostd namespace alias in otlp_populate
   [#4114](https://github.com/open-telemetry/opentelemetry-cpp/pull/4114)
 
+* [LOGS SDK] Add log record attribute value length limit configuration
+
+  * Introduces support for the `OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT`
+    environment variable.
+  * The configured limit is applied to log record attributes before SDK
+    `Recordable` implementations store or export the attribute value.
+
+Breaking changes:
+
+* [LOGS SDK] Apply log record attribute value limits in `Recordable::SetAttribute`
+
+  * `opentelemetry::sdk::logs::Recordable::SetAttribute(...)` is now final.
+  * SDK `Recordable` subclasses should move custom attribute handling from
+    `SetAttribute(...)` overrides to `SetAttributeImpl(...)` overrides.
+  * This is an SDK-level API/ABI and semantic breaking change for SDK
+    extensions. The API `opentelemetry::logs::LogRecord` surface is unchanged.
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
