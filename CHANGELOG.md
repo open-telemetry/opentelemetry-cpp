@@ -58,7 +58,7 @@ Increment the:
   LoggerConfig declarative configuration
   [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
 
-* [CI] iwyu and clang-tidy: install pinned googletest, benchmark, protobuf, gRPC, abseil via install_thirdparty.sh and re-align IWYU diagnostics with third_party_release headers
+* [CI] iwyu and clang-tidy: use install_thirdparty.sh for third-party
   [#TBD](https://github.com/open-telemetry/opentelemetry-cpp/pull/TBD)
 
 ## [1.27.0] 2026-05-13

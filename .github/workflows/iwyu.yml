@@ -60,7 +60,7 @@ jobs:
         if: steps.cache_thirdparty.outputs.cache-hit != 'true'
         run: |
           sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release \
-            --packages "ryml;googletest;benchmark;protobuf;grpc;abseil"
+            --packages "ryml;zlib;googletest;benchmark;protobuf;grpc;abseil"
 
       - name: Refresh ld.so.cache
         run: sudo ldconfig
