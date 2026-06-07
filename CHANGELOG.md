@@ -59,7 +59,7 @@ Increment the:
   [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
 
 * [CI] iwyu and clang-tidy: use install_thirdparty.sh for third-party
-  [#TBD](https://github.com/open-telemetry/opentelemetry-cpp/pull/TBD)
+  [#4136](https://github.com/open-telemetry/opentelemetry-cpp/pull/4136)
 
 ## [1.27.0] 2026-05-13
 
