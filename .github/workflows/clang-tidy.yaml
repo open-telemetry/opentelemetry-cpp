@@ -42,8 +42,7 @@ jobs:
           cmake \
           zlib1g-dev \
           libssl-dev \
-          libcurl4-openssl-dev \
-          nlohmann-json3-dev
+          libcurl4-openssl-dev
 
       - name: Install clang-22 toolchain
         run: |
