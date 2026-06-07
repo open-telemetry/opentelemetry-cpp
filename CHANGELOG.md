@@ -54,6 +54,10 @@ Increment the:
 * [CODE HEALTH] Move func_grpc_main classes into anonymous namespace
   [#4129](https://github.com/open-telemetry/opentelemetry-cpp/pull/4129)
 
+* [CONFIGURATION] Implement missing minimum_severity and trace_based for
+  LoggerConfig declarative configuration
+  [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
+
 * [CI] iwyu and clang-tidy: install pinned googletest, benchmark, protobuf, gRPC, abseil via install_thirdparty.sh and re-align IWYU diagnostics with third_party_release headers
   [#TBD](https://github.com/open-telemetry/opentelemetry-cpp/pull/TBD)
 
