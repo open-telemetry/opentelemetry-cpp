@@ -55,6 +55,9 @@ static std::string opt_cert_dir;
 static std::string opt_test_name;
 static test_mode opt_mode = MODE_NONE;
 
+namespace
+{
+
 /*
   Log parsing
 */
@@ -335,6 +338,8 @@ struct test_case
   std::string m_name;
   test_func_t m_func;
 };
+
+}  // namespace
 
 static int test_basic();
 
