@@ -58,6 +58,9 @@ Increment the:
   LoggerConfig declarative configuration
   [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
 
+* [CODE HEALTH] Fix clang-tidy bugprone-exception-escape in ostream exporters
+  [#4137](https://github.com/open-telemetry/opentelemetry-cpp/pull/4137)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
