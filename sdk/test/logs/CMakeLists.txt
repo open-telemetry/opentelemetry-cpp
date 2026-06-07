@@ -19,3 +19,10 @@ foreach(
     TEST_PREFIX logs.
     TEST_LIST ${testname})
 endforeach()
+
+if(WITH_BENCHMARK)
+  add_executable(log_record_benchmark log_record_benchmark.cc)
+  target_link_libraries(
+    log_record_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_logs opentelemetry_trace)
+endif()

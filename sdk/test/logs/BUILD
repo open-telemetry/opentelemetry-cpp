@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 cc_test(
     name = "logger_provider_sdk_test",
@@ -108,5 +109,20 @@ cc_test(
     deps = [
         "//sdk/src/logs",
         "@com_google_googletest//:gtest_main",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "log_record_benchmark",
+    srcs = [
+        "log_record_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "logs",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/logs",
     ],
 )
