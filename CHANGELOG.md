@@ -54,6 +54,9 @@ Increment the:
 * [CODE HEALTH] Move func_grpc_main classes into anonymous namespace
   [#4129](https://github.com/open-telemetry/opentelemetry-cpp/pull/4129)
 
+* [CI] iwyu and clang-tidy: install pinned googletest, benchmark, protobuf, gRPC, abseil via install_thirdparty.sh and re-align IWYU diagnostics with third_party_release headers
+  [#TBD](https://github.com/open-telemetry/opentelemetry-cpp/pull/TBD)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
