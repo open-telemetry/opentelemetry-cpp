@@ -34,7 +34,8 @@ class TemporalMetricStorage
 public:
   TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
                         AggregationType aggregation_type,
-                        const AggregationConfig *aggregation_config);
+                        const AggregationConfig *aggregation_config,
+                        bool is_async = false);
 
   bool buildMetrics(CollectorHandle *collector,
                     nostd::span<std::shared_ptr<CollectorHandle>> collectors,
@@ -56,6 +57,7 @@ private:
   // Lock while building metrics
   mutable opentelemetry::common::SpinLockMutex lock_;
   const AggregationConfig *aggregation_config_;
+  bool is_async_;
   opentelemetry::common::SystemTimestamp last_delta_collection_ts_;
   bool has_last_delta_collection_ts_ = false;
 };

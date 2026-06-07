@@ -31,10 +31,12 @@ namespace metrics
 
 TemporalMetricStorage::TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
                                              AggregationType aggregation_type,
-                                             const AggregationConfig *aggregation_config)
+                                             const AggregationConfig *aggregation_config,
+                                             bool is_async)
     : instrument_descriptor_(std::move(instrument_descriptor)),
       aggregation_type_(aggregation_type),
-      aggregation_config_(aggregation_config)
+      aggregation_config_(aggregation_config),
+      is_async_(is_async)
 {}
 
 bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
@@ -148,8 +150,11 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
             {
               merged_metrics->Set(attributes, agg->Merge(aggregation));
             }
-            else
+            else if (!is_async_)
             {
+              // For sync instruments, carry forward attribute sets not observed this cycle.
+              // For async instruments, drop them per the spec: the SDK SHOULD NOT produce
+              // aggregated metric data for attribute sets not observed in the current callback.
               auto def_agg = DefaultAggregation::CreateAggregation(
                   aggregation_type_, instrument_descriptor_, aggregation_config_);
               merged_metrics->Set(attributes, def_agg->Merge(aggregation));
