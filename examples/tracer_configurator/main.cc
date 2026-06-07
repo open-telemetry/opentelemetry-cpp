@@ -55,7 +55,7 @@ namespace nostd          = opentelemetry::nostd;
 namespace
 {
 
-// Simulate some work in the external library
+// Example external library
 namespace external_library
 {
 class ExternalModule
@@ -65,7 +65,7 @@ public:
       : tracer_(opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("external_library"))
   {}
 
-  // Simulate an operation in the external library that always returns false to simulate an error
+  // Example operation in the external library that always returns false to simulate an error
   bool Execute()
   {
     std::cout << "[external_library] Execute\n";
@@ -85,7 +85,7 @@ private:
 };
 }  // namespace external_library
 
-// Simulate some operation in a user library
+// Example user library
 namespace my_library
 {
 class MyModule
@@ -94,14 +94,12 @@ public:
   MyModule() : tracer_(opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("my_library"))
   {}
 
-  // Simulate an operation in the user library that calls into the external library
+  // Example operation in the user library that calls into the external library
   bool Execute()
   {
     std::cout << "[my_library] Execute\n";
-    auto user_library_tracer =
-        opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("my_library");
 
-    auto span = user_library_tracer->StartSpan("MyModule.Execute");
+    auto span = tracer_->StartSpan("MyModule.Execute");
     opentelemetry::trace::Scope scope(span);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -120,7 +118,7 @@ private:
 };
 }  // namespace my_library
 
-// Simulate a user application that uses the user library
+// Example user application that uses the user library
 class MyApplication
 {
 public:
@@ -128,7 +126,7 @@ public:
       : tracer_(opentelemetry::trace::Provider::GetTracerProvider()->GetTracer("my_application"))
   {}
 
-  // Simulate an operation in the user application that calls into the user library
+  // Example operation in the user application that calls into the user library
   void Execute()
   {
     std::cout << "[my_application] Execute\n";
@@ -145,7 +143,7 @@ private:
   my_library::MyModule my_module_;
 };
 
-// Builds a ScopeConfigurator that enables all tracers (the default).
+// Builds a ScopeConfigurator that enables all tracers.
 std::unique_ptr<scope_cfg::ScopeConfigurator<trace_sdk::TracerConfig>> EnableAll()
 {
   return std::make_unique<scope_cfg::ScopeConfigurator<trace_sdk::TracerConfig>>(
@@ -176,7 +174,7 @@ std::unique_ptr<scope_cfg::ScopeConfigurator<trace_sdk::TracerConfig>> DisableAl
           .Build());
 }
 
-// Creates a TracerProvider with an OStreamSpanExporter and disable all tracers by default.
+// Creates a TracerProvider with an OStreamSpanExporter and disables all tracers by default.
 std::shared_ptr<trace_sdk::TracerProvider> CreateTracerProvider()
 {
   auto exporter  = trace_exporter::OStreamSpanExporterFactory::Create();
@@ -195,9 +193,7 @@ std::shared_ptr<trace_sdk::TracerProvider> CreateTracerProvider()
 
 int main()
 {
-  // Create and set the global TracerProvider with all tracers disabled.
-  // The SDK TracerProvider::UpdateTracerConfigurator() method will be used to change tracer
-  // configurations at runtime.
+  // Create the SDK TracerProvider with the DisableAll configurator
   auto sdk_tracer_provider = CreateTracerProvider();
 
   // Set the global provider to our SDK TracerProvider instance.
@@ -208,17 +204,16 @@ int main()
   MyApplication my_app;
 
   // -------------------------------------------------------------------------
-  // Stage 1: all tracing disabled
+  // Stage 1: all tracing initially disabled
   // -------------------------------------------------------------------------
   std::cout << "=== Stage 1: all tracers initially disabled ===\n";
 
   my_app.Execute();  // all tracers disabled
 
   // -------------------------------------------------------------------------
-  // Stage 2: enable only user library tracing
+  // Stage 2: enable only user application and library tracing
   //
-  // EnableOnly() sets Disabled() as the default and adds explicit per-name
-  // overrides. Existing tracer handles reflect the change immediately
+  // EnableOnly() configurator will disable all but the named tracer scopes
   // -------------------------------------------------------------------------
   std::cout << "\n=== Stage 2: enable only 'my_application' and 'my_library' tracers ===\n";
 
@@ -228,7 +223,7 @@ int main()
                      // disabled
 
   // -------------------------------------------------------------------------
-  // Stage 3: enable tracing in all libraries
+  // Stage 3: EnableAll() configurator will enable tracing in all libraries
   // -------------------------------------------------------------------------
   std::cout << "\n=== Stage 3: enable all tracers ===\n";
 
@@ -237,7 +232,7 @@ int main()
   my_app.Execute();  // all tracers enabled
 
   // -------------------------------------------------------------------------
-  // Stage 4: disable all tracing again
+  // Stage 4: DisableAll() configurator will disable all tracers again
   // -------------------------------------------------------------------------
   std::cout << "\n=== Stage 4: disable all tracers ===\n";
 
