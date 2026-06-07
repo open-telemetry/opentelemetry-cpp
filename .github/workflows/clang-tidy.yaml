@@ -43,15 +43,7 @@ jobs:
           zlib1g-dev \
           libssl-dev \
           libcurl4-openssl-dev \
-          nlohmann-json3-dev \
-          libabsl-dev \
-          libprotobuf-dev \
-          libgrpc++-dev \
-          protobuf-compiler \
-          protobuf-compiler-grpc \
-          libgmock-dev \
-          libgtest-dev \
-          libbenchmark-dev
+          nlohmann-json3-dev
 
       - name: Install clang-22 toolchain
         run: |
@@ -62,9 +54,21 @@ jobs:
           echo "Using clang-tidy version: $(clang-tidy --version)"
           echo "clang-tidy installed at: $(which clang-tidy)"
 
-      - name: Install rapidyaml
+      - name: Cache pinned third-party
+        id: cache_thirdparty
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: /usr/local
+          key: clang-tidy-thirdparty-${{ runner.os }}-${{ hashFiles('third_party_release', 'ci/install_thirdparty.sh') }}
+
+      - name: Install pinned third-party
+        if: steps.cache_thirdparty.outputs.cache-hit != 'true'
         run: |
-          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
+          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release \
+            --packages "ryml;googletest;benchmark;protobuf;grpc;abseil"
+
+      - name: Refresh ld.so.cache
+        run: sudo ldconfig
 
       - name: Build and run clang-tidy
         id: build

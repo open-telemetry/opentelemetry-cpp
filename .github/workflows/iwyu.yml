@@ -43,23 +43,27 @@ jobs:
             ninja-build \
             libssl-dev \
             libcurl4-openssl-dev \
-            libabsl-dev \
-            libprotobuf-dev \
-            libgrpc++-dev \
-            protobuf-compiler \
-            protobuf-compiler-grpc \
-            libgmock-dev \
-            libgtest-dev \
-            libbenchmark-dev \
             llvm-22-dev \
             libclang-22-dev \
             clang-22 \
             cmake
           sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-22 200
 
-      - name: Install rapidyaml
+      - name: Cache pinned third-party
+        id: cache_thirdparty
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: /usr/local
+          key: iwyu-thirdparty-${{ runner.os }}-${{ hashFiles('third_party_release', 'ci/install_thirdparty.sh') }}
+
+      - name: Install pinned third-party
+        if: steps.cache_thirdparty.outputs.cache-hit != 'true'
         run: |
-          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
+          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release \
+            --packages "ryml;googletest;benchmark;protobuf;grpc;abseil"
+
+      - name: Refresh ld.so.cache
+        run: sudo ldconfig
 
       - name: Install include-what-you-use
         run: |
