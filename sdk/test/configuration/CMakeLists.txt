@@ -12,7 +12,7 @@ foreach(
   yaml_distribution_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
-                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_configuration)
+                        ${CMAKE_THREAD_LIBS_INIT} opentelemetry_configuration_yaml)
   gtest_add_tests(
     TARGET ${testname}
     TEST_PREFIX trace.
