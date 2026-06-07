@@ -109,10 +109,29 @@ sdk::common::ExportResult OStreamMetricExporter::Export(
     return sdk::common::ExportResult::kFailure;
   }
 
-  for (auto &record : data.scope_metric_data_)
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
   {
-    printInstrumentationInfoMetricData(record, data);
+#endif
+    for (auto &record : data.scope_metric_data_)
+    {
+      printInstrumentationInfoMetricData(record, data);
+    }
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
+  catch (const std::exception &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OStream Metric] Export failed with exception: " << e.what());
+    return sdk::common::ExportResult::kFailure;
+  }
+  catch (...)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OStream Metric] Export failed with unknown exception");
+    return sdk::common::ExportResult::kFailure;
+  }
+#endif
+
   return sdk::common::ExportResult::kSuccess;
 }
 
