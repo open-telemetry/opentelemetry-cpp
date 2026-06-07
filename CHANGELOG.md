@@ -57,6 +57,10 @@ Increment the:
 * [CODE HEALTH] Move func_grpc_main classes into anonymous namespace
   [#4129](https://github.com/open-telemetry/opentelemetry-cpp/pull/4129)
 
+* [CONFIGURATION] Implement missing minimum_severity and trace_based for
+  LoggerConfig declarative configuration
+  [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
