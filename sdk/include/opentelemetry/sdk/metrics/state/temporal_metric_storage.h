@@ -56,6 +56,7 @@ private:
   // Lock while building metrics
   mutable opentelemetry::common::SpinLockMutex lock_;
   const AggregationConfig *aggregation_config_;
+  opentelemetry::common::SystemTimestamp instrument_creation_ts_;
   opentelemetry::common::SystemTimestamp last_delta_collection_ts_;
   bool has_last_delta_collection_ts_ = false;
 };
