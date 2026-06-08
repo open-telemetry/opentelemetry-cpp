@@ -87,9 +87,10 @@ public:
    *       constructed @p log_record themselves are responsible for calling
    *       @c Enabled(severity, ...) before invoking this overload if they want
    *       the LoggerConfig filtering rules (minimum severity, trace-based,
-   *       processor.Enabled) to be honored. The no-record overload
-   *       @c EmitLogRecord(args...) below does call the filter chain
-   *       automatically when @c Severity is present in @p args.
+   *       processor.Enabled) to be honored. In ABI v2 builds, the no-record
+   *       overload @c EmitLogRecord(args...) below does call the filter chain
+   *       automatically when @c Severity is present in @p args; in ABI v1
+   *       builds neither overload applies the filter chain.
    *
    * @param log_record Log record
    * @param args Arguments which can be used to set data of log record by type.
