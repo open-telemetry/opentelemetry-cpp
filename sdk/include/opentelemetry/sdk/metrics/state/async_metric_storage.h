@@ -141,9 +141,9 @@ public:
                                                   Aggregation &aggregation) {
             if (delta_metrics->Has(attributes))
             {
-              new_cumulative->Set(attributes, DefaultAggregation::CloneAggregation(
-                                                  aggregation_type_, instrument_descriptor_,
-                                                  aggregation));
+              new_cumulative->Set(attributes,
+                                  DefaultAggregation::CloneAggregation(
+                                      aggregation_type_, instrument_descriptor_, aggregation));
             }
             return true;
           });
