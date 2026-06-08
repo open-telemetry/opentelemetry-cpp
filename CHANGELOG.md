@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add `TracerProvider::UpdateTracerConfigurator()` and example
+  [#4065](https://github.com/open-telemetry/opentelemetry-cpp/issues/4065)
+
 * [RELEASE] Bump main branch to 1.28.0-dev
   [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)
 
@@ -53,6 +56,10 @@ Increment the:
 
 * [CODE HEALTH] Move func_grpc_main classes into anonymous namespace
   [#4129](https://github.com/open-telemetry/opentelemetry-cpp/pull/4129)
+
+* [CONFIGURATION] Implement missing minimum_severity and trace_based for
+  LoggerConfig declarative configuration
+  [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
 
 * [API] `Logger::EmitLogRecord(...)` templates now apply the `Enabled` filter
   chain when a `Severity` is in args.
