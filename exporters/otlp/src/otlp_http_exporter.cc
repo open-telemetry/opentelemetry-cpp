@@ -217,8 +217,8 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
                        options_.max_concurrent_requests);
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #else
-  http_client_->Export(*service_request, std::move(arena), response, std::move(handle_result), 0);
-  return opentelemetry::sdk::common::ExportResult::kSuccess;
+  return http_client_->Export(*service_request, std::move(arena), response,
+                              std::move(handle_result), 0);
 #endif
 }
 

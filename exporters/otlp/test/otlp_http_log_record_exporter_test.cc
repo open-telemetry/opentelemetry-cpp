@@ -971,6 +971,32 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportPartialSuccessJson)
   EXPECT_TRUE(contains("too many logs!!"));
 }
 
+// A malformed response body on a 2xx should return as kFailure.
+TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportParseFailureReturnsFailure)
+{
+  std::string serialized = "{some bad JSON";
+
+  auto mock_otlp_client =
+      OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_client.first});
+
+  auto no_send_client =
+      std::static_pointer_cast<http_client::nosend::HttpClient>(mock_otlp_client.second);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&serialized](const std::shared_ptr<http_client::EventHandler> &callback) {
+        http_client::nosend::Response response;
+        response.body_.assign(serialized.begin(), serialized.end());
+        response.Finish(*callback.get());
+      });
+
+  auto recordable = exporter->MakeRecordable();
+  nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> batch(&recordable, 1);
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kFailure, exporter->Export(batch));
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

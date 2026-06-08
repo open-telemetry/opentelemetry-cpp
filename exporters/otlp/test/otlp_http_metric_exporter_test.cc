@@ -1359,6 +1359,50 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportPartialSuccessJson)
   EXPECT_TRUE(contains("too many data points!!"));
 }
 
+// A malformed response body on a 2xx should return as kFailure.
+TEST_F(OtlpHttpMetricExporterTestPeer, ExportParseFailureReturnsFailure)
+{
+  auto mock_otlp_client =
+      OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_client.first});
+
+  auto no_send_client =
+      std::static_pointer_cast<http_client::nosend::HttpClient>(mock_otlp_client.second);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+  sum_point_data.value_ = 10.0;
+  opentelemetry::sdk::metrics::ResourceMetrics data;
+  auto resource = opentelemetry::sdk::resource::Resource::Create(
+      opentelemetry::sdk::resource::ResourceAttributes{});
+  data.resource_ = &resource;
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+      "library_name", "1.5.0");
+  opentelemetry::sdk::metrics::MetricData metric_data{
+      opentelemetry::sdk::metrics::InstrumentDescriptor{
+          "metrics_name", "description", "unit",
+          opentelemetry::sdk::metrics::InstrumentType::kCounter,
+          opentelemetry::sdk::metrics::InstrumentValueType::kDouble},
+      opentelemetry::sdk::metrics::AggregationTemporality::kDelta,
+      opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
+      std::vector<opentelemetry::sdk::metrics::PointDataAttributes>{
+          {opentelemetry::sdk::metrics::PointAttributes{}, sum_point_data}}};
+  data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
+      {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+
+  std::string serialized = "{some bad JSON";
+
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&serialized](const std::shared_ptr<http_client::EventHandler> &callback) {
+        http_client::nosend::Response response;
+        response.body_.assign(serialized.begin(), serialized.end());
+        response.Finish(*callback.get());
+      });
+
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kFailure, exporter->Export(data));
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
