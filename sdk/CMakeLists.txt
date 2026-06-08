@@ -25,7 +25,6 @@ otel_add_component(
   opentelemetry_logs
   opentelemetry_trace
   opentelemetry_metrics
-  opentelemetry_configuration
   FILES_DIRECTORY
   "include/opentelemetry/"
   FILES_DESTINATION
@@ -33,6 +32,22 @@ otel_add_component(
   FILES_MATCHING
   PATTERN
   "*.h"
+  PATTERN
+  "sdk/configuration/*.h"
+  EXCLUDE)
+
+otel_add_component(
+  COMPONENT
+  configuration
+  TARGETS
+  opentelemetry_configuration
+  FILES_DIRECTORY
+  "include/opentelemetry/"
+  FILES_DESTINATION
+  "include/opentelemetry"
+  FILES_MATCHING
+  PATTERN
+  "sdk/configuration/*.h"
   PATTERN
   "sdk/configuration/ryml_*.h"
   EXCLUDE

@@ -488,6 +488,7 @@ elif [[ "$1" == "cmake.install.test" ]]; then
     "api"
     "sdk"
     "configuration"
+    "configuration_yaml"
     "ext_common"
     "ext_http_curl"
     "exporters_in_memory"

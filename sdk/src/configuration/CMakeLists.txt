@@ -37,10 +37,8 @@ endif()
 
 if(WITH_CONFIGURATION)
   add_library(
-    opentelemetry_configuration_yaml
-    yaml_configuration_parser.cc
-    ryml_document.cc
-    ryml_document_node.cc)
+    opentelemetry_configuration_yaml yaml_configuration_parser.cc
+                                     ryml_document.cc ryml_document_node.cc)
 
   set_target_properties(opentelemetry_configuration_yaml
                         PROPERTIES EXPORT_NAME configuration_yaml)

@@ -60,7 +60,8 @@ endif()
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
 
-option(WITH_CONFIGURATION "EXPERIMENTAL: YAML configuration file support (ryml dependency)" OFF)
+option(WITH_CONFIGURATION
+       "EXPERIMENTAL: YAML configuration file support (ryml dependency)" OFF)
 
 #
 # We do not want to have WITH_ABI_VERSION = "1" or "2", and instead prefer two
