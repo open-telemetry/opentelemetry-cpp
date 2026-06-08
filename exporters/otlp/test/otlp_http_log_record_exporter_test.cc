@@ -971,7 +971,8 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportPartialSuccessJson)
   EXPECT_TRUE(contains("too many logs!!"));
 }
 
-// A malformed response body on a 2xx should return as kFailure.
+// A malformed response body on a 2xx should return as kFailure for sync exports.
+#  ifndef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportParseFailureReturnsFailure)
 {
   std::string serialized = "{some bad JSON";
@@ -996,6 +997,7 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportParseFailureReturnsFailure)
   nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> batch(&recordable, 1);
   EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kFailure, exporter->Export(batch));
 }
+#  endif
 
 }  // namespace otlp
 }  // namespace exporter

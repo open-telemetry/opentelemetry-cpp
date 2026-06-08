@@ -1359,7 +1359,8 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportPartialSuccessJson)
   EXPECT_TRUE(contains("too many data points!!"));
 }
 
-// A malformed response body on a 2xx should return as kFailure.
+// A malformed response body on a 2xx should return as kFailure for sync exports.
+#ifndef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpMetricExporterTestPeer, ExportParseFailureReturnsFailure)
 {
   auto mock_otlp_client =
@@ -1402,6 +1403,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportParseFailureReturnsFailure)
 
   EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kFailure, exporter->Export(data));
 }
+#endif
 
 }  // namespace otlp
 }  // namespace exporter
