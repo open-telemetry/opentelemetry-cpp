@@ -498,6 +498,7 @@ TEST(Logger, EnabledWithExplicitContextUsesContextAwareImplementation)
 }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(Logger, EmitLogRecordTemplateShortCircuitsBelowMinimumSeverity)
 {
   EnablementAwareTestLogger logger(Severity::kWarn);
@@ -509,7 +510,6 @@ TEST(Logger, EmitLogRecordTemplateShortCircuitsBelowMinimumSeverity)
   EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(Logger, EmitLogRecordTemplateInvokesEnabledImplementationAndEmitsWhenAllowed)
 {
   EnablementAwareTestLogger logger(Severity::kTrace, true);

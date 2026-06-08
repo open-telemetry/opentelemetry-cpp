@@ -163,13 +163,13 @@ public:
   template <class... ArgumentType>
   void EmitLogRecord(ArgumentType &&...args)
   {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
     const Severity arg_severity = detail::FindSeverityInArgs(args...);
     if (arg_severity != Severity::kInvalid && !Enabled(arg_severity))
     {
       return;
     }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
     nostd::variant<trace::SpanContext, opentelemetry::context::Context> context_or_span =
         trace::SpanContext::GetInvalid();
 

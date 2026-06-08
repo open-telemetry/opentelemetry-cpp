@@ -61,8 +61,9 @@ Increment the:
   LoggerConfig declarative configuration
   [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
 
-* [API] `Logger::EmitLogRecord(...)` templates now apply the `Enabled` filter
-  chain when a `Severity` is in args.
+* [API] (ABI v2) `Logger::EmitLogRecord(...)` templates now apply the
+  `Enabled` filter chain when a `Severity` is in args. v1 behavior is
+  unchanged.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
 * [API/SDK] (ABI v2) Add `Logger::CreateLogRecord` virtual taking
