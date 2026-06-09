@@ -756,47 +756,6 @@ OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
 }
 
 // ----------------------------- HTTP Client methods ------------------------------
-opentelemetry::sdk::common::ExportResult OtlpHttpClient::Export(
-    const google::protobuf::Message &message) noexcept
-{
-  std::shared_ptr<opentelemetry::sdk::common::ExportResult> session_result =
-      std::make_shared<opentelemetry::sdk::common::ExportResult>(
-          opentelemetry::sdk::common::ExportResult::kSuccess);
-  opentelemetry::sdk::common::ExportResult export_result = Export(
-      message,
-      [session_result](opentelemetry::sdk::common::ExportResult result) {
-        *session_result = result;
-        return result == opentelemetry::sdk::common::ExportResult::kSuccess;
-      },
-      0);
-
-  if (opentelemetry::sdk::common::ExportResult::kSuccess != export_result)
-  {
-    return export_result;
-  }
-
-  return *session_result;
-}
-
-sdk::common::ExportResult OtlpHttpClient::Export(
-    const google::protobuf::Message &message,
-    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
-{
-  return Export(message, std::move(result_callback), options_.max_concurrent_requests);
-}
-
-sdk::common::ExportResult OtlpHttpClient::Export(
-    const google::protobuf::Message &message,
-    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
-    std::size_t max_running_requests) noexcept
-{
-  auto adapted = [cb = std::move(result_callback)](opentelemetry::sdk::common::ExportResult result,
-                                                   google::protobuf::Message * /*response*/) {
-    return cb(result);
-  };
-  return Export(message, nullptr, nullptr, std::move(adapted), max_running_requests);
-}
-
 sdk::common::ExportResult OtlpHttpClient::Export(
     const google::protobuf::Message &message,
     std::unique_ptr<google::protobuf::Arena> &&arena,
@@ -950,19 +909,6 @@ void OtlpHttpClient::ReleaseSession(
   {
     session_waker_.notify_all();
   }
-}
-
-opentelemetry::nostd::variant<opentelemetry::sdk::common::ExportResult,
-                              OtlpHttpClient::HttpSessionData>
-OtlpHttpClient::createSession(
-    const google::protobuf::Message &message,
-    std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept
-{
-  auto adapted = [cb = std::move(result_callback)](opentelemetry::sdk::common::ExportResult result,
-                                                   google::protobuf::Message * /*response*/) {
-    return cb(result);
-  };
-  return createSession(message, nullptr, nullptr, std::move(adapted));
 }
 
 opentelemetry::nostd::variant<opentelemetry::sdk::common::ExportResult,

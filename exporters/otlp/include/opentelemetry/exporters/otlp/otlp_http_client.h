@@ -174,38 +174,6 @@ public:
   OtlpHttpClient &operator=(OtlpHttpClient &&)      = delete;
 
   /**
-   * Sync export
-   * @param message message to export, it should be ExportTraceServiceRequest,
-   * ExportMetricsServiceRequest or ExportLogsServiceRequest
-   * @return return the status of this operation
-   */
-  sdk::common::ExportResult Export(const google::protobuf::Message &message) noexcept;
-
-  /**
-   * Async export
-   * @param message message to export, it should be ExportTraceServiceRequest,
-   * ExportMetricsServiceRequest or ExportLogsServiceRequest
-   * @param result_callback callback to call when the exporting is done
-   * @return return the status of this operation
-   */
-  sdk::common::ExportResult Export(
-      const google::protobuf::Message &message,
-      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept;
-
-  /**
-   * Async export
-   * @param message message to export, it should be ExportTraceServiceRequest,
-   * ExportMetricsServiceRequest or ExportLogsServiceRequest
-   * @param result_callback callback to call when the exporting is done
-   * @param max_running_requests wait for at most max_running_requests running requests
-   * @return return the status of this operation
-   */
-  sdk::common::ExportResult Export(
-      const google::protobuf::Message &message,
-      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
-      std::size_t max_running_requests) noexcept;
-
-  /**
    * Async export with typed response
    * @param message message to export, it should be ExportTraceServiceRequest,
    * ExportMetricsServiceRequest or ExportLogsServiceRequest
@@ -276,15 +244,6 @@ private:
     HttpSessionData(const HttpSessionData &)            = delete;
     HttpSessionData &operator=(const HttpSessionData &) = delete;
   };
-
-  /**
-   * @brief Create a Session object or return a error result
-   *
-   * @param message The message to send
-   */
-  nostd::variant<sdk::common::ExportResult, HttpSessionData> createSession(
-      const google::protobuf::Message &message,
-      std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback) noexcept;
 
   /**
    * @brief Create a Session object that deserializes the response body or return an error result.
