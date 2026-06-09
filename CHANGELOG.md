@@ -87,6 +87,9 @@ Increment the:
   with `nostd::variant<trace::SpanContext, context::Context>`.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
+* [SDK] Per-instrument creation time as delta first-interval start_ts
+  [#4144](https://github.com/open-telemetry/opentelemetry-cpp/pull/4144)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
