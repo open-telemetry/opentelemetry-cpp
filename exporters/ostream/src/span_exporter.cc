@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <exception>
 #include <iostream>
 #include <map>
 #include <string>

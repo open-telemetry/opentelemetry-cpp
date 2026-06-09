@@ -6,6 +6,7 @@
 #include <atomic>
 #include <chrono>
 #include <ctime>
+#include <exception>
 #include <iterator>
 #include <map>
 #include <memory>
