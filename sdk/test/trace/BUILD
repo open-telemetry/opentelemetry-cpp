@@ -14,6 +14,7 @@ cc_test(
         "trace",
     ],
     deps = [
+        "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/resource",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
