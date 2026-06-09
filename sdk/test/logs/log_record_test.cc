@@ -96,6 +96,8 @@ public:
 
   const nostd::string_view GetName() noexcept override { return "test body logger"; }
 
+  using opentelemetry::logs::Logger::CreateLogRecord;
+
   nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override
   {
     return nostd::unique_ptr<opentelemetry::logs::LogRecord>(new ReadWriteLogRecord());
@@ -115,6 +117,22 @@ public:
   const opentelemetry::sdk::common::OwnedAttributeValue &GetLastLogRecord() const noexcept
   {
     return last_body_;
+  }
+
+protected:
+  using opentelemetry::logs::Logger::EnabledImplementation;
+
+  bool EnabledImplementation(opentelemetry::logs::Severity /*severity*/,
+                             int64_t /*event_id*/) const noexcept override
+  {
+    return true;
+  }
+
+  bool EnabledImplementation(
+      opentelemetry::logs::Severity /*severity*/,
+      const opentelemetry::logs::EventId & /*event_id*/) const noexcept override
+  {
+    return true;
   }
 
 private:
