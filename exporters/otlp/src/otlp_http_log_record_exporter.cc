@@ -176,7 +176,7 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
   // block to reduce memory fragments.
   arena_options.max_block_size = 65536;
   // Ownership transfers into HttpSessionData until the request completes
-  std::unique_ptr<google::protobuf::Arena> arena{new google::protobuf::Arena{arena_options}};
+  auto arena = std::make_unique<google::protobuf::Arena>(arena_options);
 
   proto::collector::logs::v1::ExportLogsServiceRequest *service_request =
       google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceRequest>(
