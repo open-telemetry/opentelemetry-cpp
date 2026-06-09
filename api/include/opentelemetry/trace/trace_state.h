@@ -266,7 +266,7 @@ private:
       return false;
 #  if OPENTELEMETRY_HAVE_EXCEPTIONS
     }
-    catch (...)
+    catch (const std::regex_error &)
     {
       return false;
     }
@@ -286,7 +286,7 @@ private:
       return std::regex_match(std::string(value.data(), value.size()), reg_value);
 #  if OPENTELEMETRY_HAVE_EXCEPTIONS
     }
-    catch (...)
+    catch (const std::regex_error &)
     {
       return false;
     }
