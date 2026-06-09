@@ -107,6 +107,8 @@ public:
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
+  bool HasEnabledFilter() const noexcept override { return false; }
+
   /**
    * Class destructor which invokes the Shutdown() method.
    */

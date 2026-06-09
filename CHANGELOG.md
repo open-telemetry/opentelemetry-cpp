@@ -61,6 +61,32 @@ Increment the:
   LoggerConfig declarative configuration
   [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
 
+* [API] (ABI v2) `Logger::EmitLogRecord(...)` templates now apply the
+  `Enabled` filter chain when a `Severity` is in args. v1 behavior is
+  unchanged.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
+* [API/SDK] (ABI v2) Add `Logger::CreateLogRecord` virtual taking
+  `const nostd::variant<trace::SpanContext, context::Context> &`
+  for explicit-context record creation. `Logger::EmitLogRecord(args...)`
+  also detects a `Context`, `SpanContext`
+  or `TraceId` + `SpanId` [+ `TraceFlags`] in args and routes filtering.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
+* [SDK] Add `LogRecordProcessor::HasEnabledFilter()` so the SDK Logger can
+  include processor-level filtering in its extended-enabled cache. Defaults
+  to `true`. Built-in `SimpleLogRecordProcessor` and
+  `BatchLogRecordProcessor` override to `false` since they use the default
+  Enabled.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
+* [API/SDK] Replace `Context`-only signatures on
+  `LogRecordProcessor::Enabled`,
+  `LogRecordProcessor::EnabledImplementation`,
+  `Logger::EnabledImplementation` (v2), and `Logger::CreateLogRecord` (v2)
+  with `nostd::variant<trace::SpanContext, context::Context>`.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
