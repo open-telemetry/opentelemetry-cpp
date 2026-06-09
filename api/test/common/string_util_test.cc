@@ -50,3 +50,8 @@ TEST(StringUtilTest, TrimString)
     EXPECT_EQ(StringUtil::Trim(testcase.input), testcase.expected);
   }
 }
+
+TEST(StringUtilTest, TrimStringOutOfRange)
+{
+  EXPECT_EQ(StringUtil::Trim("x", 2, 1), "");
+}
