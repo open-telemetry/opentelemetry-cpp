@@ -766,17 +766,21 @@ sdk::common::ExportResult OtlpHttpClient::Export(
         &&result_callback,
     std::size_t max_running_requests) noexcept
 {
-  auto session_result =
-      std::make_shared<sdk::common::ExportResult>(sdk::common::ExportResult::kSuccess);
-  auto result_capturing_callback = [session_result, cb = std::move(result_callback)](
-                                       sdk::common::ExportResult result,
-                                       google::protobuf::Message *resp) {
-    *session_result = result;
-    return cb(result, resp);
-  };
+  // Only a sync export (max_running_requests == 0) needs to capture the result of the callback.
+  std::shared_ptr<sdk::common::ExportResult> session_result;
+  auto callback = std::move(result_callback);
+  if (max_running_requests == 0)
+  {
+    session_result =
+        std::make_shared<sdk::common::ExportResult>(sdk::common::ExportResult::kSuccess);
+    callback = [session_result, cb = std::move(callback)](sdk::common::ExportResult result,
+                                                          google::protobuf::Message *resp) {
+      *session_result = result;
+      return cb(result, resp);
+    };
+  }
 
-  auto session =
-      createSession(message, std::move(arena), response, std::move(result_capturing_callback));
+  auto session = createSession(message, std::move(arena), response, std::move(callback));
   if (auto *result = opentelemetry::nostd::get_if<sdk::common::ExportResult>(&session))
   {
     return *result;
