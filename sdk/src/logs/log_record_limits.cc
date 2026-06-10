@@ -36,6 +36,18 @@ std::size_t GetAttributeValueLengthLimitFromEnv()
 }
 
 }  // namespace log_record_limits_env
+
+const LogRecordLimits &GetDefaultLogRecordLimits() noexcept
+{
+  static const LogRecordLimits default_limits = [] {
+    LogRecordLimits limits;
+    limits.attribute_value_length_limit =
+        log_record_limits_env::GetAttributeValueLengthLimitFromEnv();
+    return limits;
+  }();
+  return default_limits;
+}
+
 }  // namespace logs
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

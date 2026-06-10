@@ -8,6 +8,7 @@
 #include <limits>
 #include <string>
 #include <utility>
+#include <vector>
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -27,6 +28,20 @@ namespace logs_api              = opentelemetry::logs;
 
 /** Test to verify the basic behavior of logs_sdk::LoggerConfig */
 
+TEST(LoggerConfig, CheckDefaultConfigWorksAccToSpec)
+{
+#ifndef NO_GETENV
+  unsetenv("OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT");
+#endif
+
+  logs_sdk::LoggerConfig default_config = logs_sdk::LoggerConfig::Default();
+  ASSERT_TRUE(default_config.IsEnabled());
+  ASSERT_EQ(default_config.GetMinimumSeverity(), logs_api::Severity::kInvalid);
+  ASSERT_FALSE(default_config.IsTraceBased());
+  ASSERT_EQ(default_config.GetLogRecordLimits().attribute_value_length_limit,
+            (std::numeric_limits<std::size_t>::max)());
+}
+
 TEST(LoggerConfig, CheckDisabledWorksAsExpected)
 {
   logs_sdk::LoggerConfig disabled_config = logs_sdk::LoggerConfig::Disabled();
@@ -41,20 +56,6 @@ TEST(LoggerConfig, CheckEnabledWorksAsExpected)
   ASSERT_TRUE(enabled_config.IsEnabled());
   ASSERT_EQ(enabled_config.GetMinimumSeverity(), logs_api::Severity::kInvalid);
   ASSERT_FALSE(enabled_config.IsTraceBased());
-}
-
-TEST(LoggerConfig, CheckDefaultConfigWorksAccToSpec)
-{
-#ifndef NO_GETENV
-  unsetenv("OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT");
-#endif
-
-  logs_sdk::LoggerConfig default_config = logs_sdk::LoggerConfig::Default();
-  ASSERT_TRUE(default_config.IsEnabled());
-  ASSERT_EQ(default_config.GetMinimumSeverity(), logs_api::Severity::kInvalid);
-  ASSERT_FALSE(default_config.IsTraceBased());
-  ASSERT_EQ(default_config.GetLogRecordLimits().attribute_value_length_limit,
-            (std::numeric_limits<std::size_t>::max)());
 }
 
 TEST(LoggerConfig, CheckCreateWorksAsExpected)
@@ -77,13 +78,28 @@ TEST(LoggerConfig, CheckCreateAcceptsLogRecordLimits)
   ASSERT_EQ(custom_config.GetLogRecordLimits().attribute_value_length_limit, 42);
 }
 
+TEST(LoggerConfig, CheckLogRecordLimitsDefaultIsUnlimited)
+{
+  logs_sdk::LogRecordLimits limits;
+  ASSERT_EQ(limits.attribute_value_length_limit, (std::numeric_limits<std::size_t>::max)());
+}
+
 #ifndef NO_GETENV
-TEST(LoggerConfig, CheckDefaultReadsLogRecordAttributeValueLengthLimitFromEnv)
+TEST(LoggerConfig, CheckLogRecordLimitsDefaultDoesNotReadEnv)
 {
   setenv("OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT", "12", 1);
 
-  logs_sdk::LoggerConfig default_config = logs_sdk::LoggerConfig::Default();
-  ASSERT_EQ(default_config.GetLogRecordLimits().attribute_value_length_limit, 12);
+  logs_sdk::LogRecordLimits limits;
+  ASSERT_EQ(limits.attribute_value_length_limit, (std::numeric_limits<std::size_t>::max)());
+
+  unsetenv("OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT");
+}
+
+TEST(LoggerConfig, CheckLogRecordAttributeValueLengthLimitCanBeReadFromEnv)
+{
+  setenv("OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT", "12", 1);
+
+  ASSERT_EQ(logs_sdk::log_record_limits_env::GetAttributeValueLengthLimitFromEnv(), 12);
 
   unsetenv("OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT");
 }
