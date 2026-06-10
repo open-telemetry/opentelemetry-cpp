@@ -14,16 +14,13 @@
 #include <string>
 #include <utility>
 
-#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/semconv/incubating/rpc_attributes.h"
 #include "opentelemetry/semconv/network_attributes.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
-#include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/span_startoptions.h"

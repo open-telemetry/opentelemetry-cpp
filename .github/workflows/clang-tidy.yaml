@@ -23,7 +23,6 @@ jobs:
     env:
       CC: /usr/bin/clang-22
       CXX: /usr/bin/clang++-22
-      CXX_STANDARD: '14' # Run clang-tidy on the minimum supported c++ standard
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
@@ -42,16 +41,7 @@ jobs:
           cmake \
           zlib1g-dev \
           libssl-dev \
-          libcurl4-openssl-dev \
-          nlohmann-json3-dev \
-          libabsl-dev \
-          libprotobuf-dev \
-          libgrpc++-dev \
-          protobuf-compiler \
-          protobuf-compiler-grpc \
-          libgmock-dev \
-          libgtest-dev \
-          libbenchmark-dev
+          libcurl4-openssl-dev
 
       - name: Install clang-22 toolchain
         run: |
@@ -62,15 +52,20 @@ jobs:
           echo "Using clang-tidy version: $(clang-tidy --version)"
           echo "clang-tidy installed at: $(which clang-tidy)"
 
-      - name: Install rapidyaml
+      - name: Install pinned third-party
+        env:
+          # benchmark v1.9.4 trips clang-22's new -Wc2y-extensions on __COUNTER__
+          # and its CMakeLists uses -Werror -pedantic; silence the warning.
+          CXXFLAGS: -Wno-c2y-extensions
         run: |
-          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
+          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
 
       - name: Build and run clang-tidy
         id: build
         env:
           OTELCPP_CMAKE_CACHE_FILE: ${{ matrix.cmake_options }}.cmake
           BUILD_DIR: build-${{ matrix.cmake_options }}
+          CXX_STANDARD: '14' # Run clang-tidy on the minimum supported c++ standard
         run: |
           ./ci/do_ci.sh cmake.clang_tidy.test
           echo "build_log=${BUILD_DIR}/opentelemetry-cpp-clang-tidy.log" >> "$GITHUB_OUTPUT"
