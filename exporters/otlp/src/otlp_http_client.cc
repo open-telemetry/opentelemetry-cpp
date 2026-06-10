@@ -134,7 +134,6 @@ public:
         {
           log_message = BuildResponseLogMessage(response, body_);
         }
-        OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export success, " << log_message);
       }
     }
 
@@ -154,6 +153,11 @@ public:
         OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Failed to parse response body");
         result = sdk::common::ExportResult::kFailure;
       }
+    }
+
+    if (console_debug_ && result == sdk::common::ExportResult::kSuccess)
+    {
+      OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export success, " << log_message);
     }
 
     {
