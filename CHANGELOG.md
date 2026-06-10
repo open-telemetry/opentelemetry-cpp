@@ -90,6 +90,9 @@ Increment the:
 * [CI] iwyu and clang-tidy: use install_thirdparty.sh for third-party
   [#4136](https://github.com/open-telemetry/opentelemetry-cpp/pull/4136)
 
+* [EXPORTER] Handle OTLP partial success response
+  [#4104](https://github.com/open-telemetry/opentelemetry-cpp/pull/4104)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev

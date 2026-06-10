@@ -28,12 +28,26 @@
 #  include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
 #  include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
 
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#  include "opentelemetry/sdk/metrics/data/metric_data.h"
+#  include "opentelemetry/sdk/metrics/data/point_data.h"
+#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/resource/resource.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
+#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 #  include "opentelemetry/trace/provider.h"
 
 #  include <grpcpp/grpcpp.h>
 #  include <gtest/gtest.h>
+#  include <algorithm>
+#  include <functional>
+#  include <utility>
+#  include <vector>
 
 #  if defined(_MSC_VER)
 #    include "opentelemetry/sdk/common/env_variables.h"
@@ -48,6 +62,75 @@ namespace exporter
 {
 namespace otlp
 {
+
+namespace
+{
+class OtlpMockMetricsServiceStub : public proto::collector::metrics::v1::MockMetricsServiceStub
+{
+public:
+// Some old toolchains can only use gRPC 1.33 and it's experimental.
+#  if defined(GRPC_CPP_VERSION_MAJOR) && \
+      (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+  using async_interface_base =
+      proto::collector::metrics::v1::MetricsService::StubInterface::async_interface;
+#  else
+  using async_interface_base =
+      proto::collector::metrics::v1::MetricsService::StubInterface::experimental_async_interface;
+#  endif
+
+  OtlpMockMetricsServiceStub() : async_interface_(this) {}
+
+  class async_interface : public async_interface_base
+  {
+  public:
+    async_interface(OtlpMockMetricsServiceStub *owner) : stub_(owner) {}
+
+    void Export(
+        ::grpc::ClientContext *context,
+        const ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest *request,
+        ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceResponse *response,
+        std::function<void(::grpc::Status)> callback) override
+    {
+      stub_->last_async_status_ = stub_->Export(context, *request, response);
+      callback(stub_->last_async_status_);
+    }
+
+// Some old toolchains can only use gRPC 1.33 and it's experimental.
+#  if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
+          (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
+      defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
+    void Export(
+        ::grpc::ClientContext * /*context*/,
+        const ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest
+            * /*request*/,
+        ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceResponse * /*response*/,
+        ::grpc::ClientUnaryReactor * /*reactor*/) override
+    {}
+#  else
+    void Export(
+        ::grpc::ClientContext * /*context*/,
+        const ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest
+            * /*request*/,
+        ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceResponse * /*response*/,
+        ::grpc::experimental::ClientUnaryReactor * /*reactor*/)
+    {}
+#  endif
+
+  private:
+    OtlpMockMetricsServiceStub *stub_;
+  };
+
+  async_interface_base *async() override { return &async_interface_; }
+
+  ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
+
+private:
+  ::grpc::Status last_async_status_;
+  async_interface async_interface_;
+};
+
+using opentelemetry::test_common::ScopedTestLogHandler;
+}  // namespace
 
 class OtlpGrpcMetricExporterTestPeer : public ::testing::Test
 {
@@ -298,6 +381,61 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, CheckGetAggregationTemporality)
   EXPECT_EQ(
       opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
       exporter3->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
+}
+
+// Exporter logs the rejection on partial_success.
+TEST_F(OtlpGrpcMetricExporterTestPeer, ExportPartialSuccess)
+{
+  ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
+
+  auto mock_stub = new OtlpMockMetricsServiceStub();
+  std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(std::move(stub_interface));
+
+  opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+  sum_point_data.value_ = 10.0;
+  opentelemetry::sdk::metrics::ResourceMetrics data;
+  auto resource = opentelemetry::sdk::resource::Resource::Create(
+      opentelemetry::sdk::resource::ResourceAttributes{});
+  data.resource_ = &resource;
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+      "library_name", "1.5.0");
+  opentelemetry::sdk::metrics::MetricData metric_data{
+      opentelemetry::sdk::metrics::InstrumentDescriptor{
+          "metrics_name", "description", "unit",
+          opentelemetry::sdk::metrics::InstrumentType::kCounter,
+          opentelemetry::sdk::metrics::InstrumentValueType::kDouble},
+      opentelemetry::sdk::metrics::AggregationTemporality::kDelta,
+      opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
+      std::vector<opentelemetry::sdk::metrics::PointDataAttributes>{
+          {opentelemetry::sdk::metrics::PointAttributes{}, sum_point_data}}};
+  data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
+      {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+
+  EXPECT_CALL(*mock_stub, Export(_, _, _))
+      .Times(Exactly(1))
+      .WillOnce(Invoke([](grpc::ClientContext *,
+                          const proto::collector::metrics::v1::ExportMetricsServiceRequest &,
+                          proto::collector::metrics::v1::ExportMetricsServiceResponse *response)
+                           -> grpc::Status {
+        response->mutable_partial_success()->set_rejected_data_points(21);
+        response->mutable_partial_success()->set_error_message("too many data points!!");
+        return grpc::Status::OK;
+      }));
+
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, exporter->Export(data));
+  exporter->ForceFlush();
+
+  auto entries  = log.Drain();
+  auto contains = [&](const std::string &needle) {
+    return std::any_of(entries.begin(), entries.end(), [&](const ScopedTestLogHandler::Entry &e) {
+      return e.msg.find(needle) != std::string::npos;
+    });
+  };
+  EXPECT_TRUE(contains("partial success"));
+  EXPECT_TRUE(contains("21 data point(s) rejected"));
+  EXPECT_TRUE(contains("too many data points!!"));
 }
 
 }  // namespace otlp
