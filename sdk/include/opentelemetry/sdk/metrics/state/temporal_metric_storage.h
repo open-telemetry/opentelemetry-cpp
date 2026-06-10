@@ -63,7 +63,7 @@ private:
   // the creation time of the instrument, NOT the MeterProvider creation time.
   // See https://github.com/open-telemetry/opentelemetry-specification (logs/metrics
   // SDK specs) and issue #4062.
-  opentelemetry::common::SystemTimestamp instrument_creation_ts_;
+  const opentelemetry::common::SystemTimestamp instrument_creation_ts_;
 };
 }  // namespace metrics
 }  // namespace sdk
