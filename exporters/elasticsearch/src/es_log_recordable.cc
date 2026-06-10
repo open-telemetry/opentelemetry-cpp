@@ -188,7 +188,7 @@ void ElasticSearchRecordable::SetTraceFlags(
   json_["traceflags"] = std::string(flag_buf, sizeof(flag_buf));
 }
 
-void ElasticSearchRecordable::SetAttribute(
+void ElasticSearchRecordable::SetAttributeImpl(
     nostd::string_view key,
     const opentelemetry::common::AttributeValue &value) noexcept
 {

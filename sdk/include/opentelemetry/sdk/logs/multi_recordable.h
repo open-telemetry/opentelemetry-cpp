@@ -87,14 +87,6 @@ public:
   void SetTraceFlags(const opentelemetry::trace::TraceFlags &trace_flags) noexcept override;
 
   /**
-   * Set an attribute of a log.
-   * @param key the name of the attribute
-   * @param value the attribute value
-   */
-  void SetAttribute(nostd::string_view key,
-                    const opentelemetry::common::AttributeValue &value) noexcept override;
-
-  /**
    * Set Resource of this log
    * @param resource the resource to set
    */
@@ -106,6 +98,15 @@ public:
    */
   void SetInstrumentationScope(const opentelemetry::sdk::instrumentationscope::InstrumentationScope
                                    &instrumentation_scope) noexcept override;
+
+protected:
+  /**
+   * Set an attribute of a log.
+   * @param key the name of the attribute
+   * @param value the attribute value
+   */
+  void SetAttributeImpl(nostd::string_view key,
+                        const opentelemetry::common::AttributeValue &value) noexcept override;
 
 private:
   std::unordered_map<std::size_t, std::unique_ptr<Recordable>> recordables_;

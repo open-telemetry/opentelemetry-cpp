@@ -148,14 +148,14 @@ void MultiRecordable::SetTraceFlags(const opentelemetry::trace::TraceFlags &trac
   }
 }
 
-void MultiRecordable::SetAttribute(nostd::string_view key,
-                                   const opentelemetry::common::AttributeValue &value) noexcept
+void MultiRecordable::SetAttributeImpl(nostd::string_view key,
+                                       const opentelemetry::common::AttributeValue &value) noexcept
 {
   for (auto &recordable : recordables_)
   {
     if (recordable.second)
     {
-      recordable.second->SetAttribute(key, value);
+      recordable.second->SetAttributeImpl(key, value);
     }
   }
 }

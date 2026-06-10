@@ -146,14 +146,6 @@ public:
   const opentelemetry::trace::TraceFlags &GetTraceFlags() const noexcept override;
 
   /**
-   * Set an attribute of a log.
-   * @param key the name of the attribute
-   * @param value the attribute value
-   */
-  void SetAttribute(nostd::string_view key,
-                    const opentelemetry::common::AttributeValue &value) noexcept override;
-
-  /**
    * Get attributes of this log.
    * @return the body field of this log
    */
@@ -185,6 +177,15 @@ public:
    */
   void SetInstrumentationScope(const opentelemetry::sdk::instrumentationscope::InstrumentationScope
                                    &instrumentation_scope) noexcept override;
+
+protected:
+  /**
+   * Set an attribute of a log.
+   * @param key the name of the attribute
+   * @param value the attribute value
+   */
+  void SetAttributeImpl(nostd::string_view key,
+                        const opentelemetry::common::AttributeValue &value) noexcept override;
 
 private:
   opentelemetry::logs::Severity severity_{opentelemetry::logs::Severity::kInvalid};

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "opentelemetry/logs/severity.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -41,15 +42,23 @@ public:
   bool IsTraceBased() const noexcept;
 
   /**
+   * Returns the configured LogRecord limits.
+   * @return the LogRecord limits.
+   */
+  const LogRecordLimits &GetLogRecordLimits() const noexcept;
+
+  /**
    * Returns a LoggerConfig with the provided settings.
    * @param enabled if false, the Logger behaves like a no-op logger.
    * @param minimum_severity the minimum severity required for filtering.
    * @param trace_based if true, trace-based filtering is enabled.
+   * @param log_record_limits the limits applied to log records created by the Logger.
    * @return a LoggerConfig with the provided settings.
    */
   static LoggerConfig Create(bool enabled,
                              opentelemetry::logs::Severity minimum_severity,
-                             bool trace_based) noexcept;
+                             bool trace_based,
+                             const LogRecordLimits &log_record_limits = LogRecordLimits{}) noexcept;
 
   /**
    * Returns a LoggerConfig that represents an enabled Logger.
@@ -76,13 +85,18 @@ private:
   explicit LoggerConfig(
       bool enabled                                   = true,
       opentelemetry::logs::Severity minimum_severity = opentelemetry::logs::Severity::kInvalid,
-      bool trace_based                               = false) noexcept
-      : enabled_(enabled), minimum_severity_(minimum_severity), trace_based_(trace_based)
+      bool trace_based                               = false,
+      const LogRecordLimits &log_record_limits       = LogRecordLimits{}) noexcept
+      : enabled_(enabled),
+        minimum_severity_(minimum_severity),
+        trace_based_(trace_based),
+        log_record_limits_(log_record_limits)
   {}
 
   bool enabled_;
   opentelemetry::logs::Severity minimum_severity_;
   bool trace_based_;
+  LogRecordLimits log_record_limits_;
 };
 }  // namespace logs
 }  // namespace sdk

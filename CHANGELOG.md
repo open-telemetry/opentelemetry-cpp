@@ -90,6 +90,15 @@ Increment the:
 * [CI] iwyu and clang-tidy: use install_thirdparty.sh for third-party
   [#4136](https://github.com/open-telemetry/opentelemetry-cpp/pull/4136)
 
+* [LOGS SDK] Add log record attribute value length limit configuration
+
+  * Introduces support for the `OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT`
+    environment variable.
+  * Wires declarative configuration
+    `logger_provider.limits.attribute_value_length_limit` into created loggers.
+  * The configured limit is applied to log record attributes before SDK
+    `Recordable` implementations store or export the attribute value.
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
