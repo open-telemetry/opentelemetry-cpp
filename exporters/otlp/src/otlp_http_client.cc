@@ -48,6 +48,8 @@
 #include <string_view>
 // IWYU pragma: no_include <google/protobuf/stubs/status.h>
 // IWYU pragma: no_include <google/protobuf/stubs/stringpiece.h>
+// IWYU pragma: no_include <google/protobuf/json/json.h>
+// IWYU pragma: no_include <absl/status/status.h>
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
