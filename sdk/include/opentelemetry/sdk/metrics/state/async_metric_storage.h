@@ -52,7 +52,7 @@ public:
         exemplar_filter_type_(exempler_filter_type),
         exemplar_reservoir_(std::move(exemplar_reservoir)),
 #endif
-        temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
+        temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config, true)
   {}
 
   template <class T>
@@ -130,6 +130,24 @@ public:
       delta_metrics = std::move(delta_hash_map_);
       delta_hash_map_ =
           std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_);
+
+      // Drop entries from cumulative_hash_map_ that were not observed this cycle.
+      // This prevents memory growth and ensures correct delta computation if an
+      // attribute set reappears after being absent.
+      auto new_cumulative =
+          std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_);
+      cumulative_hash_map_->GetAllEntries(
+          [&new_cumulative, &delta_metrics, this](const MetricAttributes &attributes,
+                                                  Aggregation &aggregation) {
+            if (delta_metrics->Has(attributes))
+            {
+              new_cumulative->Set(attributes,
+                                  DefaultAggregation::CloneAggregation(
+                                      aggregation_type_, instrument_descriptor_, aggregation));
+            }
+            return true;
+          });
+      cumulative_hash_map_ = std::move(new_cumulative);
     }
 
     auto status =
