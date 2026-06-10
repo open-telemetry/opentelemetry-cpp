@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <google/protobuf/repeated_ptr_field.h>
 #include <gtest/gtest.h>
 #include <chrono>
 #include <cstdint>

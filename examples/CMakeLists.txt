@@ -28,6 +28,7 @@ add_subdirectory(metrics_simple)
 add_subdirectory(multithreaded)
 add_subdirectory(multi_processor)
 add_subdirectory(environment_carrier)
+add_subdirectory(tracer_configurator)
 add_subdirectory(explicit_parent)
 
 if(WITH_EXAMPLES_HTTP)

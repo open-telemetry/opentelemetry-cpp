@@ -6,7 +6,6 @@
 #include <atomic>
 #include <chrono>
 #include <memory>
-#include <new>
 #include <ostream>
 #include <string>
 #include <utility>

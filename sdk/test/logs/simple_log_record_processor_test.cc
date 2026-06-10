@@ -24,6 +24,7 @@
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
+#include "opentelemetry/trace/span_context.h"
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;
@@ -296,14 +297,22 @@ public:
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 
 protected:
-  bool EnabledImplementation(const context::Context &context,
-                             const instrumentation_scope::InstrumentationScope &scope,
-                             logs_api::Severity severity,
-                             nostd::string_view event_name) const noexcept override
+  bool EnabledImplementation(
+      const nostd::variant<opentelemetry::trace::SpanContext, context::Context> &context_or_span,
+      const instrumentation_scope::InstrumentationScope &scope,
+      logs_api::Severity severity,
+      nostd::string_view event_name) const noexcept override
   {
     if (call_state_ != nullptr)
     {
-      call_state_->context    = context;
+      if (const context::Context *ctx = nostd::get_if<context::Context>(&context_or_span))
+      {
+        call_state_->context = *ctx;
+      }
+      else
+      {
+        call_state_->context = context::Context{};
+      }
       call_state_->scope_name = scope.GetName();
       call_state_->severity   = severity;
       call_state_->event_name = std::string(event_name);

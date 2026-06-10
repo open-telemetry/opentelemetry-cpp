@@ -61,9 +61,9 @@ namespace context = opentelemetry::context;
 namespace logs_api = opentelemetry::logs;
 namespace nostd    = opentelemetry::nostd;
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 namespace
 {
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 nostd::shared_ptr<opentelemetry::trace::Span> MakeTestSpan(bool sampled)
 {
   const uint8_t trace_id_bytes[opentelemetry::trace::TraceId::kSize] = {
@@ -95,8 +95,8 @@ context::Context MakeContextWithUnsampledSpanAndInvalidTraceId()
                                        nostd::shared_ptr<opentelemetry::trace::Span>(
                                            new opentelemetry::trace::DefaultSpan(span_context)));
 }
-}  // namespace
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+}  // namespace
 
 TEST(LoggerSDK, LogToNullProcessor)
 {
@@ -282,6 +282,9 @@ public:
 };
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
+namespace
+{
+
 struct EnabledProcessorCallState
 {
   logs_api::Severity severity = logs_api::Severity::kInvalid;
@@ -315,21 +318,30 @@ public:
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 
 protected:
-  bool EnabledImplementation(const context::Context &context,
-                             const InstrumentationScope &instrumentation_scope,
-                             logs_api::Severity severity,
-                             nostd::string_view event_name) const noexcept override
+  bool EnabledImplementation(
+      const nostd::variant<opentelemetry::trace::SpanContext, context::Context> &context_or_span,
+      const InstrumentationScope &instrumentation_scope,
+      logs_api::Severity severity,
+      nostd::string_view event_name) const noexcept override
   {
     call_state_->severity   = severity;
     call_state_->event_name = std::string(event_name);
     call_state_->scope_name = instrumentation_scope.GetName();
     call_state_->call_count++;
 
-    auto value = context.GetValue("test-key");
-    if (const bool *maybe_value = nostd::get_if<bool>(&value))
+    if (const context::Context *ctx = nostd::get_if<context::Context>(&context_or_span))
     {
-      call_state_->context_has_test_key   = true;
-      call_state_->context_test_key_value = *maybe_value;
+      auto value = ctx->GetValue("test-key");
+      if (const bool *maybe_value = nostd::get_if<bool>(&value))
+      {
+        call_state_->context_has_test_key   = true;
+        call_state_->context_test_key_value = *maybe_value;
+      }
+      else
+      {
+        call_state_->context_has_test_key   = false;
+        call_state_->context_test_key_value = false;
+      }
     }
     else
     {
@@ -344,6 +356,8 @@ private:
   bool enabled_;
   std::shared_ptr<EnabledProcessorCallState> call_state_;
 };
+
+}  // namespace
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 TEST(LoggerSDK, LogToAProcessor)
@@ -687,6 +701,76 @@ TEST(LoggerSDK, LoggerTraceBasedConfigAllowsSampledExplicitContextWithNamedEvent
   EXPECT_TRUE(call_state->context_has_test_key);
   EXPECT_TRUE(call_state->context_test_key_value);
   EXPECT_EQ(call_state->call_count, 1U);
+}
+
+class LoggerEmitWithExplicitTraceTest : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
+    api_lp_ = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
+    logger_ = api_lp_->GetLogger("logger", "opentelemetry_library", "",
+                                 "https://opentelemetry.io/schemas/1.11.0");
+
+    shared_recordable_ = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+    auto *sdk_lp       = static_cast<LoggerProvider *>(api_lp_.get());
+    sdk_lp->AddProcessor(
+        std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable_)));
+
+    {
+      std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> sp;
+      auto tp       = opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sp));
+      runtime_span_ = tp->GetTracer("runtime")->StartSpan("runtime");
+    }
+    runtime_scope_.reset(new opentelemetry::trace::Scope(runtime_span_));
+  }
+
+  std::shared_ptr<logs_api::LoggerProvider> api_lp_;
+  nostd::shared_ptr<logs_api::Logger> logger_;
+  std::shared_ptr<MockLogRecordable> shared_recordable_;
+  nostd::shared_ptr<opentelemetry::trace::Span> runtime_span_;
+  std::unique_ptr<opentelemetry::trace::Scope> runtime_scope_;
+};
+
+TEST_F(LoggerEmitWithExplicitTraceTest, ExplicitContextStampsTraceFieldsFromContext)
+{
+  auto explicit_span = MakeTestSpan(/*sampled=*/true);
+  context::Context explicit_context;
+  explicit_context             = opentelemetry::trace::SetSpan(explicit_context, explicit_span);
+  const auto explicit_span_ctx = explicit_span->GetContext();
+
+  logger_->EmitLogRecord(logs_api::Severity::kInfo, nostd::string_view{"msg"}, explicit_context);
+
+  EXPECT_EQ(shared_recordable_->GetTraceId(), explicit_span_ctx.trace_id());
+  EXPECT_EQ(shared_recordable_->GetSpanId(), explicit_span_ctx.span_id());
+  EXPECT_EQ(shared_recordable_->GetTraceFlags(), explicit_span_ctx.trace_flags());
+  EXPECT_NE(shared_recordable_->GetTraceId(), runtime_span_->GetContext().trace_id());
+}
+
+TEST_F(LoggerEmitWithExplicitTraceTest, ExplicitSpanContextStampsTraceFields)
+{
+  const auto explicit_span_ctx = MakeTestSpan(true)->GetContext();
+
+  logger_->EmitLogRecord(logs_api::Severity::kInfo, nostd::string_view{"msg"}, explicit_span_ctx);
+
+  EXPECT_EQ(shared_recordable_->GetTraceId(), explicit_span_ctx.trace_id());
+  EXPECT_EQ(shared_recordable_->GetSpanId(), explicit_span_ctx.span_id());
+  EXPECT_EQ(shared_recordable_->GetTraceFlags(), explicit_span_ctx.trace_flags());
+  EXPECT_NE(shared_recordable_->GetTraceId(), runtime_span_->GetContext().trace_id());
+}
+
+TEST_F(LoggerEmitWithExplicitTraceTest, ExplicitTracePartsStampsTraceFields)
+{
+  const auto explicit_span_ctx = MakeTestSpan(true)->GetContext();
+
+  logger_->EmitLogRecord(logs_api::Severity::kInfo, nostd::string_view{"msg"},
+                         explicit_span_ctx.trace_id(), explicit_span_ctx.span_id(),
+                         explicit_span_ctx.trace_flags());
+
+  EXPECT_EQ(shared_recordable_->GetTraceId(), explicit_span_ctx.trace_id());
+  EXPECT_EQ(shared_recordable_->GetSpanId(), explicit_span_ctx.span_id());
+  EXPECT_EQ(shared_recordable_->GetTraceFlags(), explicit_span_ctx.trace_flags());
+  EXPECT_NE(shared_recordable_->GetTraceId(), runtime_span_->GetContext().trace_id());
 }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 

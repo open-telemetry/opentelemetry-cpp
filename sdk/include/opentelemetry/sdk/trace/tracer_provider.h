@@ -110,6 +110,21 @@ public:
   void AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
 
   /**
+   * Update the TracerConfigurator for this provider, recreate and propagate the resulting
+   * TracerConfig to all existing Tracers while new Tracers will use the updated configuration.
+   *
+   * @param tracer_configurator The new configurator.
+   *
+   * @note Calling the TracerProvider::GetTracer from within
+   * the ScopeConfigurator<TracerConfig>::ComputeConfig
+   * function (as a scope_matcher callback set with ScopeConfigurator<TracerConfig>::AddCondition)
+   * is not supported and will result in a deadlock.
+   */
+  void UpdateTracerConfigurator(
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
+          tracer_configurator) noexcept;
+
+  /**
    * Obtain the resource associated with this tracer provider.
    * @return The resource for this tracer provider.
    */

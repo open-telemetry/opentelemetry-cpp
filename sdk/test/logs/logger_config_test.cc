@@ -8,7 +8,6 @@
 #include <limits>
 #include <string>
 #include <utility>
-#include <vector>
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"

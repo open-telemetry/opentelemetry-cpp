@@ -8,7 +8,6 @@
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
-#include "opentelemetry/sdk/logs/processor.h"
 
 #include "custom_log_record_processor.h"
 #include "custom_log_record_processor_builder.h"
