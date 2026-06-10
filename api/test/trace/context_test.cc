@@ -9,7 +9,6 @@
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/span.h"
