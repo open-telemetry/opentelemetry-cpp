@@ -87,6 +87,9 @@ Increment the:
   with `nostd::variant<trace::SpanContext, context::Context>`.
   [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
 
+* [CI] iwyu and clang-tidy: use install_thirdparty.sh for third-party
+  [#4136](https://github.com/open-telemetry/opentelemetry-cpp/pull/4136)
+
 * [SDK] Per-instrument creation time as delta first-interval start_ts
   [#4144](https://github.com/open-telemetry/opentelemetry-cpp/pull/4144)
 
