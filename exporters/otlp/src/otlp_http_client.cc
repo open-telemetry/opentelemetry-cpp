@@ -44,8 +44,8 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/stubs/port.h>
-#include <string_view>
 #include <google/protobuf/util/json_util.h>
+#include <string_view>
 // IWYU pragma: no_include <google/protobuf/stubs/status.h>
 // IWYU pragma: no_include <google/protobuf/stubs/stringpiece.h>
 // clang-format off
