@@ -174,14 +174,16 @@ public:
   OtlpHttpClient &operator=(OtlpHttpClient &&)      = delete;
 
   /**
-   * Async export with typed response
+   * Export message with typed response. Synchronous when max_running_requests is 0,
+   * asynchronous otherwise.
    * @param message message to export, it should be ExportTraceServiceRequest,
    * ExportMetricsServiceRequest or ExportLogsServiceRequest
    * @param arena protobuf arena that owns response
    * @param response the parsed body is written here on 2xx
    * @param result_callback callback to call when the exporting is done
    * @param max_running_requests wait for at most max_running_requests running requests
-   * @return return the status of this operation
+   * @return the export result; kSuccess for asynchronous exports (final result via
+   * result_callback)
    */
   sdk::common::ExportResult Export(
       const google::protobuf::Message &message,
