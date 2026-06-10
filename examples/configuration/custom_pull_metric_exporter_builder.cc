@@ -8,7 +8,6 @@
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
-#include "opentelemetry/sdk/metrics/metric_reader.h"
 
 #include "custom_pull_metric_exporter.h"
 #include "custom_pull_metric_exporter_builder.h"
