@@ -89,7 +89,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetStartTime(NowOr(options.start_system_time));
   start_steady_time = NowOr(options.start_steady_time);
   recordable_->SetResource(tracer_->GetResource());
-  tracer_->GetProcessor().OnStart(*recordable_, parent_span_context);
+
+  // store the span processor, this is important to use the same processor even
+  // in case the tracer changes from single processor to a MultiSpanProcessor
+  span_processor_ = &tracer_->GetProcessor();
+  span_processor_->OnStart(*recordable_, parent_span_context);
 }
 
 Span::~Span()
@@ -203,6 +207,8 @@ void Span::End(const opentelemetry::trace::EndSpanOptions &options) noexcept
 {
   std::lock_guard<std::mutex> lock_guard{mu_};
 
+  // has_ended_ could be removed and instead rely on span_processor_,
+  // resetting it after calling OnEnd. it would save 8 bytes in each Span object.
   if (has_ended_ == true)
   {
     return;
@@ -218,7 +224,7 @@ void Span::End(const opentelemetry::trace::EndSpanOptions &options) noexcept
   recordable_->SetDuration(std::chrono::steady_clock::time_point(end_steady_time) -
                            std::chrono::steady_clock::time_point(start_steady_time));
 
-  tracer_->GetProcessor().OnEnd(std::move(recordable_));
+  span_processor_->OnEnd(std::move(recordable_));
   recordable_.reset();
 }
 
