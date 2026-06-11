@@ -9,3 +9,8 @@ add_executable(example_custom_http_client main.cc)
 target_link_libraries(
   example_custom_http_client PRIVATE custom_http_client_stub
                                      opentelemetry-cpp::otlp_http_exporter)
+
+if(BUILD_TESTING)
+  add_test(NAME examples.custom_http_client
+           COMMAND "$<TARGET_FILE:example_custom_http_client>")
+endif()
