@@ -207,12 +207,69 @@ opentelemetry::sdk::logs::LogRecordLimits CreateLogRecordLimits(
   return limits;
 }
 
+opentelemetry::logs::Severity ToLogSeverity(SeverityNumber model_severity)
+{
+  switch (model_severity)
+  {
+    case SeverityNumber::trace:
+      return opentelemetry::logs::Severity::kTrace;
+    case SeverityNumber::trace2:
+      return opentelemetry::logs::Severity::kTrace2;
+    case SeverityNumber::trace3:
+      return opentelemetry::logs::Severity::kTrace3;
+    case SeverityNumber::trace4:
+      return opentelemetry::logs::Severity::kTrace4;
+    case SeverityNumber::debug:
+      return opentelemetry::logs::Severity::kDebug;
+    case SeverityNumber::debug2:
+      return opentelemetry::logs::Severity::kDebug2;
+    case SeverityNumber::debug3:
+      return opentelemetry::logs::Severity::kDebug3;
+    case SeverityNumber::debug4:
+      return opentelemetry::logs::Severity::kDebug4;
+    case SeverityNumber::info:
+      return opentelemetry::logs::Severity::kInfo;
+    case SeverityNumber::info2:
+      return opentelemetry::logs::Severity::kInfo2;
+    case SeverityNumber::info3:
+      return opentelemetry::logs::Severity::kInfo3;
+    case SeverityNumber::info4:
+      return opentelemetry::logs::Severity::kInfo4;
+    case SeverityNumber::warn:
+      return opentelemetry::logs::Severity::kWarn;
+    case SeverityNumber::warn2:
+      return opentelemetry::logs::Severity::kWarn2;
+    case SeverityNumber::warn3:
+      return opentelemetry::logs::Severity::kWarn3;
+    case SeverityNumber::warn4:
+      return opentelemetry::logs::Severity::kWarn4;
+    case SeverityNumber::error:
+      return opentelemetry::logs::Severity::kError;
+    case SeverityNumber::error2:
+      return opentelemetry::logs::Severity::kError2;
+    case SeverityNumber::error3:
+      return opentelemetry::logs::Severity::kError3;
+    case SeverityNumber::error4:
+      return opentelemetry::logs::Severity::kError4;
+    case SeverityNumber::fatal:
+      return opentelemetry::logs::Severity::kFatal;
+    case SeverityNumber::fatal2:
+      return opentelemetry::logs::Severity::kFatal2;
+    case SeverityNumber::fatal3:
+      return opentelemetry::logs::Severity::kFatal3;
+    case SeverityNumber::fatal4:
+      return opentelemetry::logs::Severity::kFatal4;
+  }
+
+  return opentelemetry::logs::Severity::kInvalid;
+}
+
 opentelemetry::sdk::logs::LoggerConfig CreateLoggerConfig(
     const LoggerConfigConfiguration &model,
     const opentelemetry::sdk::logs::LogRecordLimits &log_record_limits)
 {
   return opentelemetry::sdk::logs::LoggerConfig::Create(
-      model.enabled, opentelemetry::logs::Severity::kInvalid, false, log_record_limits);
+      model.enabled, ToLogSeverity(model.minimum_severity), model.trace_based, log_record_limits);
 }
 
 std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<

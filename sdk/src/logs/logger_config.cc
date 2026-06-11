@@ -8,7 +8,6 @@ namespace sdk
 {
 namespace logs
 {
-
 OPENTELEMETRY_EXPORT bool LoggerConfig::operator==(const LoggerConfig &other) const noexcept
 {
   return enabled_ == other.enabled_ && minimum_severity_ == other.minimum_severity_ &&
@@ -53,12 +52,16 @@ OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Enabled()
 
 OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Disabled()
 {
-  return Create(false, opentelemetry::logs::Severity::kInvalid, false);
+  static const LoggerConfig disabled_config =
+      Create(false, opentelemetry::logs::Severity::kInvalid, false, GetDefaultLogRecordLimits());
+  return disabled_config;
 }
 
 OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Default()
 {
-  return Create(true, opentelemetry::logs::Severity::kInvalid, false);
+  static const LoggerConfig default_config =
+      Create(true, opentelemetry::logs::Severity::kInvalid, false, GetDefaultLogRecordLimits());
+  return default_config;
 }
 
 }  // namespace logs

@@ -27,9 +27,11 @@ OPENTELEMETRY_EXPORT std::size_t GetAttributeValueLengthLimitFromEnv();
  */
 struct OPENTELEMETRY_EXPORT LogRecordLimits
 {
-  std::size_t attribute_value_length_limit =
-      log_record_limits_env::GetAttributeValueLengthLimitFromEnv();
+  std::size_t attribute_value_length_limit = (std::numeric_limits<std::size_t>::max)();
 };
+
+/// @brief Returns default LogRecordLimits initialized from environment variables.
+OPENTELEMETRY_EXPORT const LogRecordLimits &GetDefaultLogRecordLimits() noexcept;
 
 }  // namespace logs
 }  // namespace sdk
