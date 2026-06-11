@@ -103,6 +103,14 @@ set(CMAKE_OPTIONS
     "-DCMAKE_CXX_EXTENSIONS=OFF"
     "-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
 
+# Forward CMAKE_CXX_FLAGS (set via CXXFLAGS env var or -DCMAKE_CXX_FLAGS=) to
+# inner ExternalProject builds so callers can suppress compiler warnings that
+# upstream packages can't tolerate (e.g., benchmark v1.9.4 vs clang-22's new
+# -Wc2y-extensions on __COUNTER__).
+if(CMAKE_CXX_FLAGS)
+  list(APPEND CMAKE_OPTIONS "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
+endif()
+
 message(STATUS "Installing third-party packages....")
 message(STATUS "  opentelemetry-cpp_SOURCE_DIR = ${OTELCPP_SOURCE_DIR}")
 message(STATUS "  third-party packages = ${_THIRDPARTY_PACKAGE_LIST}")

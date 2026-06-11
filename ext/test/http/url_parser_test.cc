@@ -6,6 +6,7 @@
 #include <ostream>
 #include <string>
 #include <tuple>
+#include <variant>
 
 #include "opentelemetry/ext/http/common/url_parser.h"
 
