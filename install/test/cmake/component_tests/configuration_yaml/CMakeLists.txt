@@ -16,7 +16,7 @@ include(GoogleTest)
 add_executable(configuration_yaml_test
                ${INSTALL_TEST_SRC_DIR}/test_configuration_yaml.cc)
 target_link_libraries(
-  configuration_yaml_test
-  PRIVATE opentelemetry-cpp::configuration_yaml GTest::gtest GTest::gtest_main)
+  configuration_yaml_test PRIVATE opentelemetry-cpp::configuration_yaml
+                                  GTest::gtest GTest::gtest_main)
 
 gtest_discover_tests(configuration_yaml_test)
