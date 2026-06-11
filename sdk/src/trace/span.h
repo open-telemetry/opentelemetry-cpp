@@ -12,6 +12,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable.h"
