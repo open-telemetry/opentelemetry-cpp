@@ -1,12 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <chrono>
+#include <cstddef>
 #include <iostream>
+#include <memory>
 #include <string>
 
 #include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/ext/http/client/http_client_factory.h"
-#include "opentelemetry/sdk/common/thread_instrumentation.h"
+#include "opentelemetry/nostd/string_view.h"
 
 #include "custom_http_client.h"
 

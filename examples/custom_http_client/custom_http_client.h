@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/version.h"
 

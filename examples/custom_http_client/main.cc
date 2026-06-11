@@ -2,12 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <memory>
+#include <string>
+#include <utility>
 
 #include "custom_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/tracer.h"
 
 namespace trace_sdk   = opentelemetry::sdk::trace;
 namespace otlp        = opentelemetry::exporter::otlp;
