@@ -274,15 +274,13 @@ include(GNUInstallDirs)
 # Do we need HTTP CLIENT CURL ?
 #
 
-if(WITH_OTLP_HTTP
-   OR WITH_ELASTICSEARCH
-   OR WITH_ZIPKIN
-   OR BUILD_W3CTRACECONTEXT_TEST
-   OR WITH_EXAMPLES_HTTP)
-  set(WITH_HTTP_CLIENT_CURL ON)
-else()
-  set(WITH_HTTP_CLIENT_CURL OFF)
-endif()
+include(CMakeDependentOption)
+cmake_dependent_option(
+  WITH_HTTP_CLIENT_CURL
+  "Use the curl HTTP client backend. Defaults to ON when any HTTP exporter is enabled; set OFF to supply a custom transport."
+  ON
+  "WITH_OTLP_HTTP OR WITH_ELASTICSEARCH OR WITH_ZIPKIN OR BUILD_W3CTRACECONTEXT_TEST OR WITH_EXAMPLES_HTTP"
+  OFF)
 
 #
 # Do we need ZLIB ?
