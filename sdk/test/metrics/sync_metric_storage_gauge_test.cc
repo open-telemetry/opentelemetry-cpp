@@ -224,8 +224,8 @@ TEST(GaugeDeltaWindowTest, NoRecordWindowEmitsNothing)
   // Window 1: record then collect.
   storage.RecordLong(42, KeyValueIterableView<std::map<std::string, std::string>>(attrs),
                      opentelemetry::context::Context{});
-  auto ts1            = std::chrono::system_clock::now();
-  size_t count_w1     = 0;
+  auto ts1        = std::chrono::system_clock::now();
+  size_t count_w1 = 0;
   storage.Collect(collector.get(), collectors, sdk_start_ts, ts1,
                   [&](const MetricData &metric_data) {
                     count_w1 += metric_data.point_data_attr_.size();
@@ -282,8 +282,8 @@ TEST(GaugeDeltaWindowTest, StaleAttributeNotReemitted)
   // Window 2: record only Rack A; Rack B must not appear in the output.
   storage.RecordLong(43, KeyValueIterableView<std::map<std::string, std::string>>(attrs_a),
                      opentelemetry::context::Context{});
-  auto ts2          = std::chrono::system_clock::now();
-  size_t count_w2   = 0;
+  auto ts2           = std::chrono::system_clock::now();
+  size_t count_w2    = 0;
   int64_t val_rack_a = 0;
   storage.Collect(
       collector.get(), collectors, sdk_start_ts, ts2, [&](const MetricData &metric_data) {
@@ -344,19 +344,19 @@ TEST(GaugeDeltaWindowTest, RecordAfterEmptyWindowEmitsNewValue)
   // Window 3: new recording must be exported.
   storage.RecordLong(99, KeyValueIterableView<std::map<std::string, std::string>>(attrs),
                      opentelemetry::context::Context{});
-  auto ts3          = std::chrono::system_clock::now();
-  size_t count_w3   = 0;
-  int64_t val_w3    = 0;
-  storage.Collect(
-      collector.get(), collectors, sdk_start_ts, ts3, [&](const MetricData &metric_data) {
-        for (const auto &pt : metric_data.point_data_attr_)
-        {
-          val_w3 = opentelemetry::nostd::get<int64_t>(
-              opentelemetry::nostd::get<LastValuePointData>(pt.point_data).value_);
-          count_w3++;
-        }
-        return true;
-      });
+  auto ts3        = std::chrono::system_clock::now();
+  size_t count_w3 = 0;
+  int64_t val_w3  = 0;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, ts3,
+                  [&](const MetricData &metric_data) {
+                    for (const auto &pt : metric_data.point_data_attr_)
+                    {
+                      val_w3 = opentelemetry::nostd::get<int64_t>(
+                          opentelemetry::nostd::get<LastValuePointData>(pt.point_data).value_);
+                      count_w3++;
+                    }
+                    return true;
+                  });
   EXPECT_EQ(count_w3, 1u);
   EXPECT_EQ(val_w3, 99);
 }
