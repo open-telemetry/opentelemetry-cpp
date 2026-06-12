@@ -49,9 +49,11 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   AggregationTemporality aggregation_temporarily =
       collector->GetAggregationTemporality(instrument_descriptor_.type_);
 
-  // Fast path for single collector with delta temporality and counter, updown-counter, histogram
+  // Fast path for single collector with delta temporality.
   // This path doesn't need to aggregated-with/contribute-to the unreported_metric_, as there is
   // no other reader configured to collect those data.
+  // For synchronous gauge this provides window-scoped last-value semantics: only values recorded
+  // since the previous collection are emitted; stale values are not re-exported.
   if (collectors.size() == 1 && aggregation_temporarily == AggregationTemporality::kDelta)
   {
     if (!has_last_delta_collection_ts_)

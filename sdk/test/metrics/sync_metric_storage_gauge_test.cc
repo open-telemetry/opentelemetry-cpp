@@ -93,21 +93,15 @@ TEST_P(WritableMetricStorageTestFixture, LongGaugeLastValueAggregation)
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("Room.id")->second) == "Rack A")
           {
-            if (temporality == AggregationTemporality::kCumulative)
-            {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(lastvalue_data.value_),
-                        bg_noise_level_2_roomA);
-            }
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(lastvalue_data.value_),
+                      bg_noise_level_2_roomA);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("Room.id")->second) == "Rack B")
           {
-            if (temporality == AggregationTemporality::kCumulative)
-            {
-              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(lastvalue_data.value_),
-                        bg_noise_level_2_roomB);
-            }
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(lastvalue_data.value_),
+                      bg_noise_level_2_roomB);
             count_attributes++;
           }
         }
@@ -121,7 +115,8 @@ TEST_P(WritableMetricStorageTestFixture, LongGaugeLastValueAggregation)
 
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLong,
                          WritableMetricStorageTestFixture,
-                         ::testing::Values(AggregationTemporality::kCumulative));
+                         ::testing::Values(AggregationTemporality::kCumulative,
+                                           AggregationTemporality::kDelta));
 
 TEST_P(WritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
 {
@@ -177,21 +172,15 @@ TEST_P(WritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("Room.id")->second) == "Rack A")
           {
-            if (temporality == AggregationTemporality::kCumulative)
-            {
-              EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lastvalue_data.value_),
-                               bg_noise_level_2_roomA);
-            }
+            EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lastvalue_data.value_),
+                             bg_noise_level_2_roomA);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("Room.id")->second) == "Rack B")
           {
-            if (temporality == AggregationTemporality::kCumulative)
-            {
-              EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lastvalue_data.value_),
-                               bg_noise_level_2_roomB);
-            }
+            EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lastvalue_data.value_),
+                             bg_noise_level_2_roomB);
             count_attributes++;
           }
         }
@@ -205,4 +194,171 @@ TEST_P(WritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
 
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestDouble,
                          WritableMetricStorageTestFixture,
-                         ::testing::Values(AggregationTemporality::kCumulative));
+                         ::testing::Values(AggregationTemporality::kCumulative,
+                                           AggregationTemporality::kDelta));
+
+// Tests for delta gauge: window isolation and stale-value suppression.
+// These only apply to ABI v2+ where SyncMetricStorage is available.
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+TEST(GaugeDeltaWindowTest, NoRecordWindowEmitsNothing)
+{
+  // record -> collect -> no record -> collect: second collection must emit nothing.
+  auto sdk_start_ts = std::chrono::system_clock::now();
+  InstrumentDescriptor instr_desc{"name", "desc", "1", InstrumentType::kGauge,
+                                  InstrumentValueType::kLong};
+  std::map<std::string, std::string> attrs{{"k", "v"}};
+
+  std::shared_ptr<DefaultAttributesProcessor> proc{new DefaultAttributesProcessor{}};
+  opentelemetry::sdk::metrics::SyncMetricStorage storage(
+      instr_desc, AggregationType::kLastValue, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      nullptr);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+
+  // Window 1: record then collect.
+  storage.RecordLong(42, KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+                     opentelemetry::context::Context{});
+  auto ts1            = std::chrono::system_clock::now();
+  size_t count_w1     = 0;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, ts1,
+                  [&](const MetricData &metric_data) {
+                    count_w1 += metric_data.point_data_attr_.size();
+                    return true;
+                  });
+  EXPECT_EQ(count_w1, 1u);
+
+  // Window 2: no recording, collect must emit nothing.
+  auto ts2        = std::chrono::system_clock::now();
+  size_t count_w2 = 0;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, ts2,
+                  [&](const MetricData &metric_data) {
+                    count_w2 += metric_data.point_data_attr_.size();
+                    return true;
+                  });
+  EXPECT_EQ(count_w2, 0u);
+}
+
+TEST(GaugeDeltaWindowTest, StaleAttributeNotReemitted)
+{
+  // record A+B -> collect -> record A only -> collect: second collection must not re-emit B.
+  auto sdk_start_ts = std::chrono::system_clock::now();
+  InstrumentDescriptor instr_desc{"name", "desc", "1", InstrumentType::kGauge,
+                                  InstrumentValueType::kLong};
+  std::map<std::string, std::string> attrs_a{{"Room.id", "Rack A"}};
+  std::map<std::string, std::string> attrs_b{{"Room.id", "Rack B"}};
+
+  std::shared_ptr<DefaultAttributesProcessor> proc{new DefaultAttributesProcessor{}};
+  opentelemetry::sdk::metrics::SyncMetricStorage storage(
+      instr_desc, AggregationType::kLastValue, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      nullptr);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+
+  // Window 1: record both rooms, collect.
+  storage.RecordLong(10, KeyValueIterableView<std::map<std::string, std::string>>(attrs_a),
+                     opentelemetry::context::Context{});
+  storage.RecordLong(20, KeyValueIterableView<std::map<std::string, std::string>>(attrs_b),
+                     opentelemetry::context::Context{});
+  auto ts1        = std::chrono::system_clock::now();
+  size_t count_w1 = 0;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, ts1,
+                  [&](const MetricData &metric_data) {
+                    count_w1 += metric_data.point_data_attr_.size();
+                    return true;
+                  });
+  EXPECT_EQ(count_w1, 2u);
+
+  // Window 2: record only Rack A; Rack B must not appear in the output.
+  storage.RecordLong(43, KeyValueIterableView<std::map<std::string, std::string>>(attrs_a),
+                     opentelemetry::context::Context{});
+  auto ts2          = std::chrono::system_clock::now();
+  size_t count_w2   = 0;
+  int64_t val_rack_a = 0;
+  storage.Collect(
+      collector.get(), collectors, sdk_start_ts, ts2, [&](const MetricData &metric_data) {
+        for (const auto &pt : metric_data.point_data_attr_)
+        {
+          auto lv = opentelemetry::nostd::get<LastValuePointData>(pt.point_data);
+          if (opentelemetry::nostd::get<std::string>(pt.attributes.find("Room.id")->second) ==
+              "Rack A")
+          {
+            val_rack_a = opentelemetry::nostd::get<int64_t>(lv.value_);
+          }
+          count_w2++;
+        }
+        return true;
+      });
+  // Only Rack A should be emitted; Rack B value from W1 must not be re-exported.
+  EXPECT_EQ(count_w2, 1u);
+  EXPECT_EQ(val_rack_a, 43);
+}
+
+TEST(GaugeDeltaWindowTest, RecordAfterEmptyWindowEmitsNewValue)
+{
+  // record -> collect -> no record -> collect -> record -> collect: third window emits new value.
+  auto sdk_start_ts = std::chrono::system_clock::now();
+  InstrumentDescriptor instr_desc{"name", "desc", "1", InstrumentType::kGauge,
+                                  InstrumentValueType::kLong};
+  std::map<std::string, std::string> attrs{{"k", "v"}};
+
+  std::shared_ptr<DefaultAttributesProcessor> proc{new DefaultAttributesProcessor{}};
+  opentelemetry::sdk::metrics::SyncMetricStorage storage(
+      instr_desc, AggregationType::kLastValue, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      nullptr);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+
+  // Window 1.
+  storage.RecordLong(10, KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+                     opentelemetry::context::Context{});
+  auto ts1 = std::chrono::system_clock::now();
+  storage.Collect(collector.get(), collectors, sdk_start_ts, ts1,
+                  [&](const MetricData &) { return true; });
+
+  // Window 2: empty.
+  auto ts2        = std::chrono::system_clock::now();
+  size_t count_w2 = 0;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, ts2,
+                  [&](const MetricData &metric_data) {
+                    count_w2 += metric_data.point_data_attr_.size();
+                    return true;
+                  });
+  EXPECT_EQ(count_w2, 0u);
+
+  // Window 3: new recording must be exported.
+  storage.RecordLong(99, KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+                     opentelemetry::context::Context{});
+  auto ts3          = std::chrono::system_clock::now();
+  size_t count_w3   = 0;
+  int64_t val_w3    = 0;
+  storage.Collect(
+      collector.get(), collectors, sdk_start_ts, ts3, [&](const MetricData &metric_data) {
+        for (const auto &pt : metric_data.point_data_attr_)
+        {
+          val_w3 = opentelemetry::nostd::get<int64_t>(
+              opentelemetry::nostd::get<LastValuePointData>(pt.point_data).value_);
+          count_w3++;
+        }
+        return true;
+      });
+  EXPECT_EQ(count_w3, 1u);
+  EXPECT_EQ(val_w3, 99);
+}
+
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
