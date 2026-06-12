@@ -59,9 +59,13 @@ OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Disabled()
 
 OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Default()
 {
-  static const LoggerConfig default_config =
-      Create(true, opentelemetry::logs::Severity::kInvalid, false, GetDefaultLogRecordLimits());
+  static const LoggerConfig default_config = Default(GetDefaultLogRecordLimits());
   return default_config;
+}
+
+OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Default(const LogRecordLimits &log_record_limits)
+{
+  return Create(true, opentelemetry::logs::Severity::kInvalid, false, log_record_limits);
 }
 
 }  // namespace logs

@@ -202,6 +202,7 @@ opentelemetry::sdk::logs::LogRecordLimits CreateLogRecordLimits(
   if (model)
   {
     limits.attribute_value_length_limit = model->attribute_value_length_limit;
+    limits.attribute_count_limit        = model->attribute_count_limit;
   }
 
   return limits;
@@ -280,10 +281,7 @@ CreateDefaultLoggerConfigurator(const opentelemetry::sdk::logs::LogRecordLimits 
   using opentelemetry::sdk::logs::LoggerConfig;
 
   return std::make_unique<ScopeConfigurator<LoggerConfig>>(
-      ScopeConfigurator<LoggerConfig>::Builder(
-          LoggerConfig::Create(true, opentelemetry::logs::Severity::kInvalid, false,
-                               log_record_limits))
-          .Build());
+      ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Default(log_record_limits)).Build());
 }
 
 class ResourceAttributeValueSetter

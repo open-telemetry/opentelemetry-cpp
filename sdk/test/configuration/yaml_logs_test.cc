@@ -717,6 +717,7 @@ logger_provider:
           console:
   limits:
     attribute_value_length_limit: 42
+    attribute_count_limit: 7
   logger_configurator/development:
     default_config:
       enabled: true
@@ -739,6 +740,7 @@ logger_provider:
   opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
   log_record_limits.attribute_value_length_limit =
       config->logger_provider->limits->attribute_value_length_limit;
+  log_record_limits.attribute_count_limit = config->logger_provider->limits->attribute_count_limit;
 
   opentelemetry::sdk::configuration::SdkBuilder builder(
       std::make_shared<opentelemetry::sdk::configuration::Registry>());
@@ -753,6 +755,7 @@ logger_provider:
   ASSERT_EQ(default_config.GetMinimumSeverity(), opentelemetry::logs::Severity::kWarn);
   ASSERT_EQ(default_config.IsTraceBased(), false);
   ASSERT_EQ(default_config.GetLogRecordLimits().attribute_value_length_limit, 42);
+  ASSERT_EQ(default_config.GetLogRecordLimits().attribute_count_limit, 7);
 
   auto matching_scope =
       opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("my.logger");
@@ -761,4 +764,5 @@ logger_provider:
   ASSERT_EQ(matching_config.GetMinimumSeverity(), opentelemetry::logs::Severity::kError);
   ASSERT_EQ(matching_config.IsTraceBased(), true);
   ASSERT_EQ(matching_config.GetLogRecordLimits().attribute_value_length_limit, 42);
+  ASSERT_EQ(matching_config.GetLogRecordLimits().attribute_count_limit, 7);
 }

@@ -23,6 +23,9 @@ static constexpr const char *kAttributeValueLengthLimitEnv =
     "OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT";
 static constexpr std::size_t kDefaultAttributeValueLengthLimit =
     (std::numeric_limits<std::size_t>::max)();
+
+static constexpr const char *kAttributeCountLimitEnv     = "OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT";
+static constexpr std::size_t kDefaultAttributeCountLimit = 128;
 }  // namespace
 
 std::size_t GetAttributeValueLengthLimitFromEnv()
@@ -35,6 +38,16 @@ std::size_t GetAttributeValueLengthLimitFromEnv()
   return static_cast<std::size_t>(value);
 }
 
+std::size_t GetAttributeCountLimitFromEnv()
+{
+  std::uint32_t value{};
+  if (!opentelemetry::sdk::common::GetUintEnvironmentVariable(kAttributeCountLimitEnv, value))
+  {
+    return kDefaultAttributeCountLimit;
+  }
+  return static_cast<std::size_t>(value);
+}
+
 }  // namespace log_record_limits_env
 
 const LogRecordLimits &GetDefaultLogRecordLimits() noexcept
@@ -43,6 +56,7 @@ const LogRecordLimits &GetDefaultLogRecordLimits() noexcept
     LogRecordLimits limits;
     limits.attribute_value_length_limit =
         log_record_limits_env::GetAttributeValueLengthLimitFromEnv();
+    limits.attribute_count_limit = log_record_limits_env::GetAttributeCountLimitFromEnv();
     return limits;
   }();
   return default_limits;

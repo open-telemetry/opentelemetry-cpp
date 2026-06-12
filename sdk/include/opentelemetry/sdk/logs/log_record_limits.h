@@ -20,6 +20,10 @@ namespace log_record_limits_env
 /// OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT environment variable or unlimited if not set.
 OPENTELEMETRY_EXPORT std::size_t GetAttributeValueLengthLimitFromEnv();
 
+/// @brief Returns the attribute count limit from the OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT
+/// environment variable, or 128 if not set.
+OPENTELEMETRY_EXPORT std::size_t GetAttributeCountLimitFromEnv();
+
 }  // namespace log_record_limits_env
 
 /**
@@ -28,6 +32,7 @@ OPENTELEMETRY_EXPORT std::size_t GetAttributeValueLengthLimitFromEnv();
 struct OPENTELEMETRY_EXPORT LogRecordLimits
 {
   std::size_t attribute_value_length_limit = (std::numeric_limits<std::size_t>::max)();
+  std::size_t attribute_count_limit        = 128;
 };
 
 /// @brief Returns default LogRecordLimits initialized from environment variables.

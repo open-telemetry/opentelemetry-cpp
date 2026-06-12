@@ -81,6 +81,15 @@ public:
    */
   static LoggerConfig Default();
 
+  /**
+   * Returns a LoggerConfig with the default behavior but the provided LogRecord limits.
+   * Identical to Default() for every other setting; use this when only the LogRecord limits are
+   * configured. Unlike Default(), the result is not cached (the limits vary per call).
+   * @param log_record_limits the limits applied to log records created by the Logger.
+   * @return a LoggerConfig with default behavior and the provided LogRecord limits.
+   */
+  static LoggerConfig Default(const LogRecordLimits &log_record_limits);
+
 private:
   explicit LoggerConfig(
       bool enabled                                   = true,
