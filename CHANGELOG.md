@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] clean up nostd::variant access in otlp exporters
+  [#3973](https://github.com/open-telemetry/opentelemetry-cpp/pull/3973)
+
 * [SDK] Add `TracerProvider::UpdateTracerConfigurator()` and example
   [#4065](https://github.com/open-telemetry/opentelemetry-cpp/issues/4065)
 
