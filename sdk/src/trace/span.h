@@ -10,6 +10,7 @@
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/trace/span.h"
@@ -79,11 +80,12 @@ public:
   }
 
 private:
-  std::shared_ptr<Tracer> tracer_;
+  std::shared_ptr<Tracer> tracer_;  // also keeps span_processor_ alive
   mutable std::mutex mu_;
   std::unique_ptr<Recordable> recordable_;
   opentelemetry::common::SteadyTimestamp start_steady_time;
   std::unique_ptr<opentelemetry::trace::SpanContext> span_context_;
+  SpanProcessor *span_processor_{nullptr};  // kept alive by tracer_
   bool has_ended_{false};
 };
 }  // namespace trace
