@@ -13,6 +13,7 @@
 #include "common.h"
 
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
@@ -379,9 +380,120 @@ TEST(SyncMetricStorageTest, DeltaCounterStartTimestampTracksEmptyCycles)
   // Check that the fast path correctly preserved the timestamp from the empty
   // collection cycle (cycle 2)
   EXPECT_EQ(metric_cycle3.start_ts, collection_ts2);
-  EXPECT_EQ(metric_cycle1.start_ts, sdk_start_ts);
+  // Per OTel spec (#4062), the first delta interval's start_ts is the
+  // instrument's creation time (captured at storage construction above), not
+  // the sdk_start_ts that the MeterProvider would otherwise pass in. Storage
+  // was constructed before sdk_start_ts was sampled, so the start_ts must be
+  // less-or-equal to sdk_start_ts. SystemTimestamp does not define ordering
+  // operators directly, so compare via time_since_epoch().
+  EXPECT_LE(metric_cycle1.start_ts.time_since_epoch(), sdk_start_ts.time_since_epoch());
   EXPECT_EQ(metric_cycle1.end_ts, collection_ts1);
   EXPECT_EQ(metric_cycle3.end_ts, collection_ts3);
+}
+
+TEST(SyncMetricStorageTest, DeltaCounterFirstIntervalUsesInstrumentCreationTime)
+{
+  // Spec-compliance test for issue #4062: the start_ts of the first delta
+  // collection interval MUST be the per-instrument creation time, NOT the
+  // MeterProvider/SDK start time. Simulate a MeterProvider that was created
+  // long before the instrument by passing an artificial sdk_start_ts that is
+  // strictly earlier than the storage's construction time.
+  InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kCounter,
+                                     InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> default_attributes_processor{
+      new DefaultAttributesProcessor{}};
+
+  auto before_creation = std::chrono::system_clock::now();
+  opentelemetry::sdk::metrics::SyncMetricStorage storage(
+      instr_desc, AggregationType::kSum, default_attributes_processor,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+      nullptr);
+  auto after_creation = std::chrono::system_clock::now();
+
+  // sdk_start_ts is intentionally well before storage construction.
+  auto sdk_start_ts  = before_creation - std::chrono::seconds(60);
+  auto collection_ts = after_creation + std::chrono::seconds(1);
+
+  std::map<std::string, std::string> attributes = {{"RequestType", "GET"}};
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors;
+  collectors.push_back(collector);
+
+  storage.RecordLong(10, KeyValueIterableView<std::map<std::string, std::string>>(attributes),
+                     opentelemetry::context::Context{});
+
+  MetricData metric_data;
+  bool collected = false;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
+                  [&](const MetricData &md) {
+                    metric_data = md;
+                    collected   = true;
+                    return true;
+                  });
+  ASSERT_TRUE(collected);
+
+  // start_ts must be the instrument creation time (between the two clock
+  // samples taken around the storage constructor), and strictly greater than
+  // the simulated MeterProvider start time. SystemTimestamp does not define
+  // ordering operators directly; compare via time_since_epoch() durations.
+  EXPECT_GE(metric_data.start_ts.time_since_epoch(), before_creation.time_since_epoch());
+  EXPECT_LE(metric_data.start_ts.time_since_epoch(), after_creation.time_since_epoch());
+  EXPECT_GT(metric_data.start_ts.time_since_epoch(), sdk_start_ts.time_since_epoch());
+  EXPECT_EQ(metric_data.end_ts, collection_ts);
+}
+
+TEST(SyncMetricStorageTest, DeltaCounterMultiCollectorFirstIntervalUsesInstrumentCreationTime)
+{
+  // Slow-path counterpart of DeltaCounterFirstIntervalUsesInstrumentCreationTime.
+  // With more than one collector, buildMetrics takes the slow path; that path
+  // must also use instrument_creation_ts_ as the start_ts for the first delta
+  // collection interval (issue #4062 explicitly mentions both paths).
+  InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kCounter,
+                                     InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> default_attributes_processor{
+      new DefaultAttributesProcessor{}};
+
+  auto before_creation = std::chrono::system_clock::now();
+  opentelemetry::sdk::metrics::SyncMetricStorage storage(
+      instr_desc, AggregationType::kSum, default_attributes_processor,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+      nullptr);
+  auto after_creation = std::chrono::system_clock::now();
+
+  auto sdk_start_ts  = before_creation - std::chrono::seconds(60);
+  auto collection_ts = after_creation + std::chrono::seconds(1);
+
+  std::map<std::string, std::string> attributes = {{"RequestType", "GET"}};
+  // Two collectors force collectors.size() > 1, which bypasses the fast path.
+  std::shared_ptr<CollectorHandle> collector_a(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::shared_ptr<CollectorHandle> collector_b(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector_a, collector_b};
+
+  storage.RecordLong(10, KeyValueIterableView<std::map<std::string, std::string>>(attributes),
+                     opentelemetry::context::Context{});
+
+  MetricData metric_data;
+  bool collected = false;
+  storage.Collect(collector_a.get(), collectors, sdk_start_ts, collection_ts,
+                  [&](const MetricData &md) {
+                    metric_data = md;
+                    collected   = true;
+                    return true;
+                  });
+  ASSERT_TRUE(collected);
+
+  // Same assertion shape as the fast-path test.
+  EXPECT_GE(metric_data.start_ts.time_since_epoch(), before_creation.time_since_epoch());
+  EXPECT_LE(metric_data.start_ts.time_since_epoch(), after_creation.time_since_epoch());
+  EXPECT_GT(metric_data.start_ts.time_since_epoch(), sdk_start_ts.time_since_epoch());
+  EXPECT_EQ(metric_data.end_ts, collection_ts);
 }
 INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestDouble,
                          WritableMetricStorageTestFixture,
