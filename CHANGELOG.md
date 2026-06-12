@@ -93,6 +93,11 @@ Increment the:
 * [SDK] Per-instrument creation time as delta first-interval start_ts
   [#4144](https://github.com/open-telemetry/opentelemetry-cpp/pull/4144)
 
+* [SDK] Add ComposableSampler and CompositeSampler with the consistent
+  probability sampling variants (AlwaysOn, AlwaysOff, TraceIdRatioBased,
+  ParentThreshold, RuleBased)
+  [#4028](https://github.com/open-telemetry/opentelemetry-cpp/issues/4028)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
