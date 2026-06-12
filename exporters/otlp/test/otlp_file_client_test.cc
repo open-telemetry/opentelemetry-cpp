@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <google/protobuf/message_lite.h>  // IWYU pragma: keep
+#include <google/protobuf/stubs/common.h>  // IWYU pragma: keep
 #include <gtest/gtest.h>
 #include <chrono>
 #include <cstdint>
@@ -24,7 +26,6 @@
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
@@ -41,7 +42,6 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
-#include <google/protobuf/message_lite.h>
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 #include "opentelemetry/proto/trace/v1/trace.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep

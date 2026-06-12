@@ -490,6 +490,7 @@ elif [[ "$1" == "cmake.install.test" ]]; then
     "configuration"
     "configuration_yaml"
     "ext_common"
+    "ext_http"
     "ext_http_curl"
     "exporters_in_memory"
     "exporters_ostream"

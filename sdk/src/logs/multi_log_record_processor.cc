@@ -75,7 +75,8 @@ void MultiLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
 }
 
 bool MultiLogRecordProcessor::EnabledImplementation(
-    const opentelemetry::context::Context &context,
+    const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
+                                        opentelemetry::context::Context> &context_or_span,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope,
     opentelemetry::logs::Severity severity,
     opentelemetry::nostd::string_view event_name) const noexcept
@@ -88,12 +89,24 @@ bool MultiLogRecordProcessor::EnabledImplementation(
   for (const auto &processor : processors_)
   {
     if (processor != nullptr &&
-        processor->Enabled(context, instrumentation_scope, severity, event_name))
+        processor->Enabled(context_or_span, instrumentation_scope, severity, event_name))
     {
       return true;
     }
   }
 
+  return false;
+}
+
+bool MultiLogRecordProcessor::HasEnabledFilter() const noexcept
+{
+  for (const auto &processor : processors_)
+  {
+    if (processor != nullptr && processor->HasEnabledFilter())
+    {
+      return true;
+    }
+  }
   return false;
 }
 

@@ -126,6 +126,7 @@
 // which exports opentelemetry/common/macros.h
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
 #  include <exception>
+#  include <string_view>
 #endif
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW

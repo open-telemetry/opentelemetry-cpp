@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <google/protobuf/repeated_ptr_field.h>
+#include <google/protobuf/stubs/common.h>
 #include <gtest/gtest.h>
 #include <chrono>
 #include <cstdint>
@@ -39,7 +41,6 @@
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 // IWYU pragma: no_include "net/proto2/public/repeated_field.h"
-#include <google/protobuf/message_lite.h>
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/metrics/v1/metrics.pb.h"

@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
 
 static std::string CreateVeryLargeString(size_t multiple)

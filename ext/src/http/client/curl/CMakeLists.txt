@@ -21,6 +21,9 @@ if(WITH_CURL_LOGGING)
                              PRIVATE ENABLE_CURL_LOGGING)
 endif()
 
+target_compile_definitions(opentelemetry_http_client_curl
+                           PUBLIC ENABLE_HTTP_CLIENT_CURL)
+
 if(WITH_OTLP_HTTP_COMPRESSION)
   target_link_libraries(
     opentelemetry_http_client_curl
