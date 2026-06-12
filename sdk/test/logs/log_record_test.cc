@@ -132,6 +132,34 @@ TEST(ReadWriteLogRecord, SetAttributeAppliesZeroAttributeValueLengthLimit)
   ASSERT_TRUE(nostd::get<std::vector<uint8_t>>(record.GetAttributes().at("bytes")).empty());
 }
 
+TEST(ReadWriteLogRecord, SetAttributeTruncatesUtf8ByCodePoint)
+{
+  logs_sdk::LogRecordLimits limits;
+  limits.attribute_value_length_limit = 3;
+
+  ReadWriteLogRecord record;
+  record.SetLogRecordLimits(limits);
+
+  const std::string ga    = "\xEA\xB0\x80";               // '가' is 1 code point, 3 bytes
+  const std::string na    = "\xEB\x82\x98";               // '나' is 1 code point, 3 bytes
+  const std::string da    = "\xEB\x8B\xA4";               // '다' is 1 code point, 3 bytes
+  const std::string three = ga + na + da;                 // 3 code points, 9 bytes
+  const std::string six   = ga + na + da + ga + na + da;  // 6 code points, 18 bytes
+
+  record.SetAttribute("sv", nostd::string_view(six));
+  record.SetAttribute("cstr", six.c_str());
+
+  nostd::string_view strings[] = {nostd::string_view(six), nostd::string_view(ga)};
+  record.SetAttribute("strings", nostd::span<const nostd::string_view>(strings));
+
+  ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("sv")), three);
+  ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("cstr")), three);
+
+  const auto strings_output =
+      nostd::get<std::vector<std::string>>(record.GetAttributes().at("strings"));
+  ASSERT_EQ(strings_output, std::vector<std::string>({three, ga}));
+}
+
 // Define a basic Logger class
 class TestBodyLogger : public opentelemetry::logs::Logger
 {

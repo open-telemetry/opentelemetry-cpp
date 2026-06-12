@@ -133,7 +133,9 @@ private:
         return value;
       }
 
-      return opentelemetry::nostd::string_view(value, limit_);
+      const auto truncated =
+          Utf8PrefixLength(opentelemetry::nostd::string_view(value, value_length), limit_);
+      return opentelemetry::nostd::string_view(value, truncated);
     }
 
     opentelemetry::common::AttributeValue operator()(
@@ -144,7 +146,7 @@ private:
         return value;
       }
 
-      return opentelemetry::nostd::string_view(value.data(), limit_);
+      return opentelemetry::nostd::string_view(value.data(), Utf8PrefixLength(value, limit_));
     }
 
     opentelemetry::common::AttributeValue operator()(
@@ -206,7 +208,33 @@ private:
         return value;
       }
 
-      return opentelemetry::nostd::string_view(value.data(), limit_);
+      return opentelemetry::nostd::string_view(value.data(), Utf8PrefixLength(value, limit_));
+    }
+
+    // Byte length of the longest prefix of `value` holding at most `limit` UTF-8 code points,
+    // never splitting a multi-byte sequence. Malformed lead/continuation bytes are counted as
+    // one byte each (we do not validate or repair user-supplied invalid UTF-8).
+    static std::size_t Utf8PrefixLength(opentelemetry::nostd::string_view value,
+                                        std::size_t limit) noexcept
+    {
+      std::size_t i = 0, codepoints = 0;
+      while (i < value.size() && codepoints < limit)
+      {
+        const auto lead = static_cast<unsigned char>(value[i]);
+        std::size_t seq = (lead < 0x80)   ? 1  // ASCII
+                          : (lead < 0xC0) ? 1  // stray continuation -> pass 1 byte
+                          : (lead < 0xE0) ? 2
+                          : (lead < 0xF0) ? 3
+                          : (lead < 0xF8) ? 4
+                                          : 1;  // invalid lead -> pass 1 byte
+        if (i + seq > value.size())
+        {
+          break;  // incomplete sequence at end of input: stop before it
+        }
+        i += seq;
+        ++codepoints;
+      }
+      return i;
     }
 
     std::size_t limit_;
