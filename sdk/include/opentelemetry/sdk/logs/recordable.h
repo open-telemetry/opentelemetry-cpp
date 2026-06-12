@@ -10,12 +10,20 @@
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/logs/log_record.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/version.h"
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  include <exception>
+#  include <new>
+
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -56,9 +64,28 @@ public:
       return;
     }
 
-    AttributeValueLengthLimiter limiter(limits_.attribute_value_length_limit);
-    auto limited_value = opentelemetry::nostd::visit(limiter, value);
-    SetAttributeImpl(key, limited_value);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+    {
+#endif
+      AttributeValueLengthLimiter limiter(limits_.attribute_value_length_limit);
+      auto limited_value = opentelemetry::nostd::visit(limiter, value);
+      SetAttributeImpl(key, limited_value);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    }
+    catch (const std::bad_alloc &)
+    {
+      // Out of memory while limiting the value: drop the attribute instead of terminating
+      // (SetAttribute is noexcept). Deliberately no logging here
+      return;
+    }
+    catch (const std::exception &e)
+    {
+      // Should not happen for AttributeValue (never valueless); surface it if it ever does.
+      OTEL_INTERNAL_LOG_ERROR("Recordable::SetAttribute dropped attribute: " << e.what());
+      return;
+    }
+#endif
   }
 
   /**
