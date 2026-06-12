@@ -4,10 +4,8 @@
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include <gtest/gtest.h>
 #include <array>
-#include <memory>
 #include <string>
 #include <utility>
-#include <vector>
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"

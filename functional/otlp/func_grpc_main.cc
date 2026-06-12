@@ -13,7 +13,6 @@
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -56,6 +55,9 @@ static std::string opt_endpoint = "https://127.0.0.1:4317";
 static std::string opt_cert_dir;
 static std::string opt_test_name;
 static TestMode opt_mode = TestMode::kNone;
+
+namespace
+{
 
 /*
   Log parsing
@@ -319,6 +321,8 @@ struct test_case
   std::string m_name;
   test_func_t m_func;
 };
+
+}  // namespace
 
 static int test_basic();
 

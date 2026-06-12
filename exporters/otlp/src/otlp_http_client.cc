@@ -8,10 +8,8 @@
 #include <functional>
 #include <iostream>
 #include <list>
-#include <map>
 #include <memory>
 #include <mutex>
-#include <ratio>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -45,6 +43,7 @@
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/stubs/port.h>
+#include <string_view>
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on

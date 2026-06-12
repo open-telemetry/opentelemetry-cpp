@@ -9,6 +9,7 @@
 #include <chrono>
 #include <initializer_list>  // IWYU pragma: keep
 #include <random>
+#include <string>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -18,7 +19,6 @@
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"

@@ -19,7 +19,6 @@
 #  include "common.h"
 
 #  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/nostd/function_ref.h"
 #  include "opentelemetry/nostd/span.h"
@@ -35,7 +34,6 @@
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
-namespace nostd = opentelemetry::nostd;
 
 class WritableMetricStorageTestFixture : public ::testing::TestWithParam<AggregationTemporality>
 {};

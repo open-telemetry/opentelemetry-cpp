@@ -18,19 +18,19 @@ jobs:
       matrix:
         include:
           - cmake_options: all-options-abiv1
-            warning_limit: 161
+            warning_limit: 0
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 190
+            warning_limit: 0
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 187
+            warning_limit: 0
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@ab7a9404c0f3da075243ca237b5fac12c98deaa5 # v2.19.3
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           submodules: 'recursive'
 
@@ -43,23 +43,19 @@ jobs:
             ninja-build \
             libssl-dev \
             libcurl4-openssl-dev \
-            libabsl-dev \
-            libprotobuf-dev \
-            libgrpc++-dev \
-            protobuf-compiler \
-            protobuf-compiler-grpc \
-            libgmock-dev \
-            libgtest-dev \
-            libbenchmark-dev \
             llvm-22-dev \
             libclang-22-dev \
             clang-22 \
             cmake
           sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-22 200
 
-      - name: Install rapidyaml
+      - name: Install pinned third-party
+        env:
+          # benchmark v1.9.4 trips clang-22's new -Wc2y-extensions on __COUNTER__
+          # and its CMakeLists uses -Werror -pedantic; silence the warning.
+          CXXFLAGS: -Wno-c2y-extensions
         run: |
-          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
+          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
 
       - name: Install include-what-you-use
         run: |

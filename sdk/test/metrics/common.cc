@@ -4,6 +4,7 @@
 #include "common.h"
 #include <utility>
 
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 
 using namespace opentelemetry::sdk::instrumentationscope;

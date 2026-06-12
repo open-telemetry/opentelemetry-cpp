@@ -4,7 +4,6 @@
 #include <chrono>
 #include <cstddef>
 #include <memory>
-#include <new>
 #include <ostream>
 #include <vector>
 
@@ -18,7 +17,6 @@
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/version.h"
 
 // clang-format off

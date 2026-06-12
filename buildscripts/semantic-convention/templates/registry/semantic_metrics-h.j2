@@ -162,10 +162,16 @@ OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<{{sync_int64_type-}}>
 CreateSyncInt64{{f_metric_name-}}(metrics::Meter *meter)
 {
+        {% if metric is deprecated %}
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
+        {% endif %}
   return meter->{{sync_int64_factory}}(
     {{v_metric_name}},
     {{descr}},
     {{unit}});
+        {% if metric is deprecated %}
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
+        {% endif %}
 }
 
         {% if metric is deprecated %}
@@ -174,10 +180,16 @@ OPENTELEMETRY_DEPRECATED
 static inline nostd::unique_ptr<{{sync_double_type-}}>
 CreateSyncDouble{{f_metric_name-}}(metrics::Meter *meter)
 {
+        {% if metric is deprecated %}
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
+        {% endif %}
   return meter->{{sync_double_factory}}(
     {{v_metric_name}},
     {{descr}},
     {{unit}});
+        {% if metric is deprecated %}
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
+        {% endif %}
 }
         {% if sync_min_abi_version|trim != "1" %}
 #endif /* OPENTELEMETRY_ABI_VERSION_NO */
@@ -194,10 +206,16 @@ OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<{{async_type-}}>
 CreateAsyncInt64{{f_metric_name-}}(metrics::Meter *meter)
 {
+        {% if metric is deprecated %}
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
+        {% endif %}
   return meter->{{async_int64_factory}}(
     {{v_metric_name}},
     {{descr}},
     {{unit}});
+        {% if metric is deprecated %}
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
+        {% endif %}
 }
 
         {% if metric is deprecated %}
@@ -206,10 +224,16 @@ OPENTELEMETRY_DEPRECATED
 static inline nostd::shared_ptr<{{async_type-}}>
 CreateAsyncDouble{{f_metric_name-}}(metrics::Meter *meter)
 {
+        {% if metric is deprecated %}
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
+        {% endif %}
   return meter->{{async_double_factory}}(
     {{v_metric_name}},
     {{descr}},
     {{unit}});
+        {% if metric is deprecated %}
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
+        {% endif %}
 }
         {% if async_min_abi_version|trim != "1" %}
 #endif /* OPENTELEMETRY_ABI_VERSION_NO */

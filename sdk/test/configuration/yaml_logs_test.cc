@@ -13,7 +13,6 @@
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
-#include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
@@ -22,6 +21,7 @@
 #include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
 #include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 
@@ -590,4 +590,108 @@ logger_provider:
   ASSERT_EQ(configurator->loggers.size(), 1);
   ASSERT_EQ(configurator->loggers[0].name, "noisy.library");
   ASSERT_EQ(configurator->loggers[0].config.enabled, false);
+}
+
+TEST(YamlLogs, logger_config_with_minimum_severity)
+{
+  std::string yaml = R"YAML(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  logger_configurator/development:
+    default_config:
+      enabled: true
+      minimum_severity: warn
+      trace_based: false
+    loggers:
+      - name: my.logger
+        config:
+          enabled: true
+          minimum_severity: error
+          trace_based: true
+)YAML";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
+
+  auto &configurator = config->logger_provider->logger_configurator;
+  ASSERT_EQ(configurator->default_config.enabled, true);
+  ASSERT_EQ(configurator->default_config.minimum_severity,
+            opentelemetry::sdk::configuration::SeverityNumber::warn);
+  ASSERT_EQ(configurator->default_config.trace_based, false);
+  ASSERT_EQ(configurator->loggers.size(), 1);
+
+  ASSERT_EQ(configurator->loggers[0].name, "my.logger");
+  ASSERT_EQ(configurator->loggers[0].config.enabled, true);
+  ASSERT_EQ(configurator->loggers[0].config.minimum_severity,
+            opentelemetry::sdk::configuration::SeverityNumber::error);
+  ASSERT_EQ(configurator->loggers[0].config.trace_based, true);
+}
+
+TEST(YamlLogs, logger_config_with_default_minimum_severity)
+{
+  std::string yaml = R"YAML(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  logger_configurator/development:
+    default_config:
+      enabled: true
+    loggers:
+      - name: my.logger
+        config:
+          enabled: false
+)YAML";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
+
+  auto &configurator = config->logger_provider->logger_configurator;
+  ASSERT_EQ(configurator->default_config.enabled, true);
+  ASSERT_EQ(configurator->default_config.minimum_severity,
+            opentelemetry::sdk::configuration::SeverityNumber::trace);
+  ASSERT_EQ(configurator->default_config.trace_based, false);
+
+  ASSERT_EQ(configurator->loggers[0].config.enabled, false);
+  ASSERT_EQ(configurator->loggers[0].config.minimum_severity,
+            opentelemetry::sdk::configuration::SeverityNumber::trace);
+  ASSERT_EQ(configurator->loggers[0].config.trace_based, false);
+}
+
+TEST(YamlLogs, logger_config_trace_based_true)
+{
+  std::string yaml = R"YAML(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  logger_configurator/development:
+    default_config:
+      enabled: true
+      minimum_severity: info
+      trace_based: true
+)YAML";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
+
+  auto &configurator = config->logger_provider->logger_configurator;
+  ASSERT_EQ(configurator->default_config.enabled, true);
+  ASSERT_EQ(configurator->default_config.minimum_severity,
+            opentelemetry::sdk::configuration::SeverityNumber::info);
+  ASSERT_EQ(configurator->default_config.trace_based, true);
 }

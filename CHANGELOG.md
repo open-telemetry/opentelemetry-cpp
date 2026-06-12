@@ -18,8 +18,83 @@ Increment the:
 * [CODE HEALTH] clean up nostd::variant access in otlp exporters
   [#3973](https://github.com/open-telemetry/opentelemetry-cpp/pull/3973)
 
+* [SDK] Add `TracerProvider::UpdateTracerConfigurator()` and example
+  [#4065](https://github.com/open-telemetry/opentelemetry-cpp/issues/4065)
+
 * [RELEASE] Bump main branch to 1.28.0-dev
   [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)
+
+* [CODE HEALTH] Fix IWYU Clang22 warnings
+  [#4083](https://github.com/open-telemetry/opentelemetry-cpp/pull/4083)
+
+* [EXPORTER] Spec-compliant uint64_t attribute encoding in OTLP
+  [#4090](https://github.com/open-telemetry/opentelemetry-cpp/pull/4090)
+
+* [CODE HEALTH] Remove unused alias declarations
+  [#4091](https://github.com/open-telemetry/opentelemetry-cpp/pull/4091)
+
+* [SDK] MeterProvider: do not warn in destructor after explicit Shutdown
+  [#4085](https://github.com/open-telemetry/opentelemetry-cpp/pull/4085)
+
+* [CODE HEALTH] Remove last unused nostd namespace alias in otlp_populate
+  [#4114](https://github.com/open-telemetry/opentelemetry-cpp/pull/4114)
+
+* [CODE HEALTH] Move curl_http_test classes into anonymous namespace
+  [#4115](https://github.com/open-telemetry/opentelemetry-cpp/pull/4115)
+
+* [CODE HEALTH] Move simple_log_record_processor_test into anonymous namespace
+  [#4116](https://github.com/open-telemetry/opentelemetry-cpp/pull/4116)
+
+* [CODE HEALTH] Move registry.cc propagator builders into anonymous namespace
+  [#4121](https://github.com/open-telemetry/opentelemetry-cpp/pull/4121)
+
+* [CODE HEALTH] Move sdk_builder.cc builders into anonymous namespace
+  [#4122](https://github.com/open-telemetry/opentelemetry-cpp/pull/4122)
+
+* [CODE HEALTH] Move logger_sdk_test classes into anonymous namespace
+  [#4124](https://github.com/open-telemetry/opentelemetry-cpp/pull/4124)
+
+* [CODE HEALTH] Move func_http_main classes into anonymous namespace
+  [#4128](https://github.com/open-telemetry/opentelemetry-cpp/pull/4128)
+
+* [CODE HEALTH] Move func_grpc_main classes into anonymous namespace
+  [#4129](https://github.com/open-telemetry/opentelemetry-cpp/pull/4129)
+
+* [CONFIGURATION] Implement missing minimum_severity and trace_based for
+  LoggerConfig declarative configuration
+  [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
+
+* [API] (ABI v2) `Logger::EmitLogRecord(...)` templates now apply the
+  `Enabled` filter chain when a `Severity` is in args. v1 behavior is
+  unchanged.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
+* [API/SDK] (ABI v2) Add `Logger::CreateLogRecord` virtual taking
+  `const nostd::variant<trace::SpanContext, context::Context> &`
+  for explicit-context record creation. `Logger::EmitLogRecord(args...)`
+  also detects a `Context`, `SpanContext`
+  or `TraceId` + `SpanId` [+ `TraceFlags`] in args and routes filtering.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
+* [SDK] Add `LogRecordProcessor::HasEnabledFilter()` so the SDK Logger can
+  include processor-level filtering in its extended-enabled cache. Defaults
+  to `true`. Built-in `SimpleLogRecordProcessor` and
+  `BatchLogRecordProcessor` override to `false` since they use the default
+  Enabled.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
+* [API/SDK] Replace `Context`-only signatures on
+  `LogRecordProcessor::Enabled`,
+  `LogRecordProcessor::EnabledImplementation`,
+  `Logger::EnabledImplementation` (v2), and `Logger::CreateLogRecord` (v2)
+  with `nostd::variant<trace::SpanContext, context::Context>`.
+  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+
+* [CI] iwyu and clang-tidy: use install_thirdparty.sh for third-party
+  [#4136](https://github.com/open-telemetry/opentelemetry-cpp/pull/4136)
+
+* [SDK] Per-instrument creation time as delta first-interval start_ts
+  [#4144](https://github.com/open-telemetry/opentelemetry-cpp/pull/4144)
 
 ## [1.27.0] 2026-05-13
 

@@ -9,7 +9,6 @@
 #include <map>
 #include <string>
 #include <thread>
-#include <utility>
 #include <vector>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
@@ -19,7 +18,7 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"

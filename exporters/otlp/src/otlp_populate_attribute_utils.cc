@@ -31,8 +31,6 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
-namespace nostd = opentelemetry::nostd;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {

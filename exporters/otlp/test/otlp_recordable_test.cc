@@ -1,10 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <google/protobuf/repeated_ptr_field.h>
 #include <gtest/gtest.h>
 #include <chrono>
 #include <cstdint>
 #include <cstring>
+#include <limits>
 #include <map>
 #include <string>
 #include <utility>
@@ -18,6 +20,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -55,8 +58,6 @@ namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace resource  = opentelemetry::sdk::resource;
 namespace proto     = opentelemetry::proto;
-
-namespace trace_sdk_2 = opentelemetry::sdk::trace;
 
 TEST(OtlpRecordable, SetIdentity)
 {
@@ -610,6 +611,50 @@ TYPED_TEST(IntAttributeTest, SetIntArrayAttribute)
   {
     EXPECT_EQ(rec.span().attributes(0).value().array_value().values(i).int_value(), int_span[i]);
   }
+}
+
+// Per OpenTelemetry spec, uint64_t attribute values exceeding INT64_MAX must be
+// encoded as a decimal string rather than wrapping to a negative int64.
+// https://opentelemetry.io/docs/specs/otel/common/attribute-type-mapping/#integer-values
+TEST(OtlpRecordable, SetUint64OverflowAsStringPerSpec)
+{
+  const uint64_t overflow_val = static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1U;
+  common::AttributeValue val(overflow_val);
+  OtlpRecordable rec;
+  rec.SetAttribute("u64_overflow", val);
+  EXPECT_EQ(rec.span().attributes(0).value().value_case(),
+            opentelemetry::proto::common::v1::AnyValue::kStringValue);
+  EXPECT_EQ(rec.span().attributes(0).value().string_value(), std::to_string(overflow_val));
+}
+
+TEST(OtlpRecordable, SetUint64BoundaryAsIntPerSpec)
+{
+  // INT64_MAX boundary still fits int_value (encoding split is val > INT64_MAX).
+  const uint64_t boundary = static_cast<uint64_t>(std::numeric_limits<int64_t>::max());
+  common::AttributeValue val(boundary);
+  OtlpRecordable rec;
+  rec.SetAttribute("u64_boundary", val);
+  EXPECT_EQ(rec.span().attributes(0).value().value_case(),
+            opentelemetry::proto::common::v1::AnyValue::kIntValue);
+  EXPECT_EQ(rec.span().attributes(0).value().int_value(), std::numeric_limits<int64_t>::max());
+}
+
+TEST(OtlpRecordable, SetUint64ArrayOverflowAsStringPerSpec)
+{
+  const uint64_t overflow_val = static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1U;
+  const uint64_t in_range_val = 42;
+  const uint64_t arr[]        = {in_range_val, overflow_val};
+  nostd::span<const uint64_t> arr_span(arr, 2);
+  common::AttributeValue val(arr_span);
+  OtlpRecordable rec;
+  rec.SetAttribute("u64_arr_mixed", val);
+  const auto &array_v = rec.span().attributes(0).value().array_value();
+  ASSERT_EQ(array_v.values_size(), 2);
+  EXPECT_EQ(array_v.values(0).value_case(), opentelemetry::proto::common::v1::AnyValue::kIntValue);
+  EXPECT_EQ(array_v.values(0).int_value(), static_cast<int64_t>(in_range_val));
+  EXPECT_EQ(array_v.values(1).value_case(),
+            opentelemetry::proto::common::v1::AnyValue::kStringValue);
+  EXPECT_EQ(array_v.values(1).string_value(), std::to_string(overflow_val));
 }
 
 TEST(OtlpRecordableTest, TestCollectionLimits)

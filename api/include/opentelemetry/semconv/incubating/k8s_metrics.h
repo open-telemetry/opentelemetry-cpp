@@ -38,29 +38,37 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sContainerCpuL
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sContainerCpuLimit(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(
       kMetricK8sContainerCpuLimit, descrMetricK8sContainerCpuLimit, unitMetricK8sContainerCpuLimit);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sContainerCpuLimit(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(
       kMetricK8sContainerCpuLimit, descrMetricK8sContainerCpuLimit, unitMetricK8sContainerCpuLimit);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sContainerCpuLimit(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(
       kMetricK8sContainerCpuLimit, descrMetricK8sContainerCpuLimit, unitMetricK8sContainerCpuLimit);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sContainerCpuLimit(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(
       kMetricK8sContainerCpuLimit, descrMetricK8sContainerCpuLimit, unitMetricK8sContainerCpuLimit);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -231,33 +239,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sContainerCpuR
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sContainerCpuRequest(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sContainerCpuRequest,
                                          descrMetricK8sContainerCpuRequest,
                                          unitMetricK8sContainerCpuRequest);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sContainerCpuRequest(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sContainerCpuRequest,
                                           descrMetricK8sContainerCpuRequest,
                                           unitMetricK8sContainerCpuRequest);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sContainerCpuRequest(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sContainerCpuRequest,
                                                    descrMetricK8sContainerCpuRequest,
                                                    unitMetricK8sContainerCpuRequest);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sContainerCpuRequest(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sContainerCpuRequest,
                                                     descrMetricK8sContainerCpuRequest,
                                                     unitMetricK8sContainerCpuRequest);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -520,33 +536,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sContainerMemo
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sContainerMemoryLimit(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sContainerMemoryLimit,
                                          descrMetricK8sContainerMemoryLimit,
                                          unitMetricK8sContainerMemoryLimit);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sContainerMemoryLimit(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sContainerMemoryLimit,
                                           descrMetricK8sContainerMemoryLimit,
                                           unitMetricK8sContainerMemoryLimit);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sContainerMemoryLimit(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sContainerMemoryLimit,
                                                    descrMetricK8sContainerMemoryLimit,
                                                    unitMetricK8sContainerMemoryLimit);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sContainerMemoryLimit(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sContainerMemoryLimit,
                                                     descrMetricK8sContainerMemoryLimit,
                                                     unitMetricK8sContainerMemoryLimit);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -668,33 +692,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sContainerMemo
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sContainerMemoryRequest(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sContainerMemoryRequest,
                                          descrMetricK8sContainerMemoryRequest,
                                          unitMetricK8sContainerMemoryRequest);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sContainerMemoryRequest(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sContainerMemoryRequest,
                                           descrMetricK8sContainerMemoryRequest,
                                           unitMetricK8sContainerMemoryRequest);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sContainerMemoryRequest(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sContainerMemoryRequest,
                                                    descrMetricK8sContainerMemoryRequest,
                                                    unitMetricK8sContainerMemoryRequest);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sContainerMemoryRequest(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sContainerMemoryRequest,
                                                     descrMetricK8sContainerMemoryRequest,
                                                     unitMetricK8sContainerMemoryRequest);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -1081,29 +1113,37 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sCronjobActive
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sCronjobActiveJobs(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(
       kMetricK8sCronjobActiveJobs, descrMetricK8sCronjobActiveJobs, unitMetricK8sCronjobActiveJobs);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sCronjobActiveJobs(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(
       kMetricK8sCronjobActiveJobs, descrMetricK8sCronjobActiveJobs, unitMetricK8sCronjobActiveJobs);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sCronjobActiveJobs(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(
       kMetricK8sCronjobActiveJobs, descrMetricK8sCronjobActiveJobs, unitMetricK8sCronjobActiveJobs);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sCronjobActiveJobs(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(
       kMetricK8sCronjobActiveJobs, descrMetricK8sCronjobActiveJobs, unitMetricK8sCronjobActiveJobs);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -1167,33 +1207,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sDaemonsetCurr
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sDaemonsetCurrentScheduledNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sDaemonsetCurrentScheduledNodes,
                                          descrMetricK8sDaemonsetCurrentScheduledNodes,
                                          unitMetricK8sDaemonsetCurrentScheduledNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sDaemonsetCurrentScheduledNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sDaemonsetCurrentScheduledNodes,
                                           descrMetricK8sDaemonsetCurrentScheduledNodes,
                                           unitMetricK8sDaemonsetCurrentScheduledNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sDaemonsetCurrentScheduledNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sDaemonsetCurrentScheduledNodes,
                                                    descrMetricK8sDaemonsetCurrentScheduledNodes,
                                                    unitMetricK8sDaemonsetCurrentScheduledNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sDaemonsetCurrentScheduledNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sDaemonsetCurrentScheduledNodes,
                                                     descrMetricK8sDaemonsetCurrentScheduledNodes,
                                                     unitMetricK8sDaemonsetCurrentScheduledNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -1216,33 +1264,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sDaemonsetDesi
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sDaemonsetDesiredScheduledNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sDaemonsetDesiredScheduledNodes,
                                          descrMetricK8sDaemonsetDesiredScheduledNodes,
                                          unitMetricK8sDaemonsetDesiredScheduledNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sDaemonsetDesiredScheduledNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sDaemonsetDesiredScheduledNodes,
                                           descrMetricK8sDaemonsetDesiredScheduledNodes,
                                           unitMetricK8sDaemonsetDesiredScheduledNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sDaemonsetDesiredScheduledNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sDaemonsetDesiredScheduledNodes,
                                                    descrMetricK8sDaemonsetDesiredScheduledNodes,
                                                    unitMetricK8sDaemonsetDesiredScheduledNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sDaemonsetDesiredScheduledNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sDaemonsetDesiredScheduledNodes,
                                                     descrMetricK8sDaemonsetDesiredScheduledNodes,
                                                     unitMetricK8sDaemonsetDesiredScheduledNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -1265,33 +1321,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sDaemonsetMiss
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sDaemonsetMisscheduledNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sDaemonsetMisscheduledNodes,
                                          descrMetricK8sDaemonsetMisscheduledNodes,
                                          unitMetricK8sDaemonsetMisscheduledNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sDaemonsetMisscheduledNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sDaemonsetMisscheduledNodes,
                                           descrMetricK8sDaemonsetMisscheduledNodes,
                                           unitMetricK8sDaemonsetMisscheduledNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sDaemonsetMisscheduledNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sDaemonsetMisscheduledNodes,
                                                    descrMetricK8sDaemonsetMisscheduledNodes,
                                                    unitMetricK8sDaemonsetMisscheduledNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sDaemonsetMisscheduledNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sDaemonsetMisscheduledNodes,
                                                     descrMetricK8sDaemonsetMisscheduledNodes,
                                                     unitMetricK8sDaemonsetMisscheduledNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -1495,33 +1559,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sDaemonsetRead
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sDaemonsetReadyNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sDaemonsetReadyNodes,
                                          descrMetricK8sDaemonsetReadyNodes,
                                          unitMetricK8sDaemonsetReadyNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sDaemonsetReadyNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sDaemonsetReadyNodes,
                                           descrMetricK8sDaemonsetReadyNodes,
                                           unitMetricK8sDaemonsetReadyNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sDaemonsetReadyNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sDaemonsetReadyNodes,
                                                    descrMetricK8sDaemonsetReadyNodes,
                                                    unitMetricK8sDaemonsetReadyNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sDaemonsetReadyNodes(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sDaemonsetReadyNodes,
                                                     descrMetricK8sDaemonsetReadyNodes,
                                                     unitMetricK8sDaemonsetReadyNodes);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -1544,33 +1616,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sDeploymentAva
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sDeploymentAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sDeploymentAvailablePods,
                                          descrMetricK8sDeploymentAvailablePods,
                                          unitMetricK8sDeploymentAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sDeploymentAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sDeploymentAvailablePods,
                                           descrMetricK8sDeploymentAvailablePods,
                                           unitMetricK8sDeploymentAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sDeploymentAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sDeploymentAvailablePods,
                                                    descrMetricK8sDeploymentAvailablePods,
                                                    unitMetricK8sDeploymentAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sDeploymentAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sDeploymentAvailablePods,
                                                     descrMetricK8sDeploymentAvailablePods,
                                                     unitMetricK8sDeploymentAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -1592,33 +1672,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sDeploymentDes
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sDeploymentDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sDeploymentDesiredPods,
                                          descrMetricK8sDeploymentDesiredPods,
                                          unitMetricK8sDeploymentDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sDeploymentDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sDeploymentDesiredPods,
                                           descrMetricK8sDeploymentDesiredPods,
                                           unitMetricK8sDeploymentDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sDeploymentDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sDeploymentDesiredPods,
                                                    descrMetricK8sDeploymentDesiredPods,
                                                    unitMetricK8sDeploymentDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sDeploymentDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sDeploymentDesiredPods,
                                                     descrMetricK8sDeploymentDesiredPods,
                                                     unitMetricK8sDeploymentDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -1729,29 +1817,37 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sHpaCurrentPod
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sHpaCurrentPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sHpaCurrentPods, descrMetricK8sHpaCurrentPods,
                                          unitMetricK8sHpaCurrentPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sHpaCurrentPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sHpaCurrentPods, descrMetricK8sHpaCurrentPods,
                                           unitMetricK8sHpaCurrentPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sHpaCurrentPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(
       kMetricK8sHpaCurrentPods, descrMetricK8sHpaCurrentPods, unitMetricK8sHpaCurrentPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sHpaCurrentPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(
       kMetricK8sHpaCurrentPods, descrMetricK8sHpaCurrentPods, unitMetricK8sHpaCurrentPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -1773,29 +1869,37 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sHpaDesiredPod
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sHpaDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sHpaDesiredPods, descrMetricK8sHpaDesiredPods,
                                          unitMetricK8sHpaDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sHpaDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sHpaDesiredPods, descrMetricK8sHpaDesiredPods,
                                           unitMetricK8sHpaDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sHpaDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(
       kMetricK8sHpaDesiredPods, descrMetricK8sHpaDesiredPods, unitMetricK8sHpaDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sHpaDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(
       kMetricK8sHpaDesiredPods, descrMetricK8sHpaDesiredPods, unitMetricK8sHpaDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -1815,29 +1919,37 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sHpaMaxPods = 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sHpaMaxPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sHpaMaxPods, descrMetricK8sHpaMaxPods,
                                          unitMetricK8sHpaMaxPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sHpaMaxPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sHpaMaxPods, descrMetricK8sHpaMaxPods,
                                           unitMetricK8sHpaMaxPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sHpaMaxPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sHpaMaxPods, descrMetricK8sHpaMaxPods,
                                                    unitMetricK8sHpaMaxPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sHpaMaxPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sHpaMaxPods, descrMetricK8sHpaMaxPods,
                                                     unitMetricK8sHpaMaxPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -2012,29 +2124,37 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sHpaMinPods = 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sHpaMinPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sHpaMinPods, descrMetricK8sHpaMinPods,
                                          unitMetricK8sHpaMinPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sHpaMinPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sHpaMinPods, descrMetricK8sHpaMinPods,
                                           unitMetricK8sHpaMinPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sHpaMinPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sHpaMinPods, descrMetricK8sHpaMinPods,
                                                    unitMetricK8sHpaMinPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sHpaMinPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sHpaMinPods, descrMetricK8sHpaMinPods,
                                                     unitMetricK8sHpaMinPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -2217,29 +2337,37 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sJobActivePods
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sJobActivePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sJobActivePods, descrMetricK8sJobActivePods,
                                          unitMetricK8sJobActivePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sJobActivePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sJobActivePods, descrMetricK8sJobActivePods,
                                           unitMetricK8sJobActivePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sJobActivePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(
       kMetricK8sJobActivePods, descrMetricK8sJobActivePods, unitMetricK8sJobActivePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sJobActivePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(
       kMetricK8sJobActivePods, descrMetricK8sJobActivePods, unitMetricK8sJobActivePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -2262,33 +2390,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sJobDesiredSuc
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sJobDesiredSuccessfulPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sJobDesiredSuccessfulPods,
                                          descrMetricK8sJobDesiredSuccessfulPods,
                                          unitMetricK8sJobDesiredSuccessfulPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sJobDesiredSuccessfulPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sJobDesiredSuccessfulPods,
                                           descrMetricK8sJobDesiredSuccessfulPods,
                                           unitMetricK8sJobDesiredSuccessfulPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sJobDesiredSuccessfulPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sJobDesiredSuccessfulPods,
                                                    descrMetricK8sJobDesiredSuccessfulPods,
                                                    unitMetricK8sJobDesiredSuccessfulPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sJobDesiredSuccessfulPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sJobDesiredSuccessfulPods,
                                                     descrMetricK8sJobDesiredSuccessfulPods,
                                                     unitMetricK8sJobDesiredSuccessfulPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -2309,29 +2445,37 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sJobFailedPods
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sJobFailedPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sJobFailedPods, descrMetricK8sJobFailedPods,
                                          unitMetricK8sJobFailedPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sJobFailedPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sJobFailedPods, descrMetricK8sJobFailedPods,
                                           unitMetricK8sJobFailedPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sJobFailedPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(
       kMetricK8sJobFailedPods, descrMetricK8sJobFailedPods, unitMetricK8sJobFailedPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sJobFailedPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(
       kMetricK8sJobFailedPods, descrMetricK8sJobFailedPods, unitMetricK8sJobFailedPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -2353,33 +2497,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sJobMaxParalle
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sJobMaxParallelPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sJobMaxParallelPods,
                                          descrMetricK8sJobMaxParallelPods,
                                          unitMetricK8sJobMaxParallelPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sJobMaxParallelPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sJobMaxParallelPods,
                                           descrMetricK8sJobMaxParallelPods,
                                           unitMetricK8sJobMaxParallelPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sJobMaxParallelPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sJobMaxParallelPods,
                                                    descrMetricK8sJobMaxParallelPods,
                                                    unitMetricK8sJobMaxParallelPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sJobMaxParallelPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sJobMaxParallelPods,
                                                     descrMetricK8sJobMaxParallelPods,
                                                     unitMetricK8sJobMaxParallelPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -2609,29 +2761,37 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sJobSuccessful
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sJobSuccessfulPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(
       kMetricK8sJobSuccessfulPods, descrMetricK8sJobSuccessfulPods, unitMetricK8sJobSuccessfulPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sJobSuccessfulPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(
       kMetricK8sJobSuccessfulPods, descrMetricK8sJobSuccessfulPods, unitMetricK8sJobSuccessfulPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sJobSuccessfulPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(
       kMetricK8sJobSuccessfulPods, descrMetricK8sJobSuccessfulPods, unitMetricK8sJobSuccessfulPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sJobSuccessfulPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(
       kMetricK8sJobSuccessfulPods, descrMetricK8sJobSuccessfulPods, unitMetricK8sJobSuccessfulPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -2688,33 +2848,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sNodeAllocatab
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sNodeAllocatableCpu(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sNodeAllocatableCpu,
                                          descrMetricK8sNodeAllocatableCpu,
                                          unitMetricK8sNodeAllocatableCpu);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sNodeAllocatableCpu(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sNodeAllocatableCpu,
                                           descrMetricK8sNodeAllocatableCpu,
                                           unitMetricK8sNodeAllocatableCpu);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sNodeAllocatableCpu(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sNodeAllocatableCpu,
                                                    descrMetricK8sNodeAllocatableCpu,
                                                    unitMetricK8sNodeAllocatableCpu);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sNodeAllocatableCpu(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sNodeAllocatableCpu,
                                                     descrMetricK8sNodeAllocatableCpu,
                                                     unitMetricK8sNodeAllocatableCpu);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -2735,33 +2903,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sNodeAllocatab
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sNodeAllocatableEphemeralStorage(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sNodeAllocatableEphemeralStorage,
                                          descrMetricK8sNodeAllocatableEphemeralStorage,
                                          unitMetricK8sNodeAllocatableEphemeralStorage);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sNodeAllocatableEphemeralStorage(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sNodeAllocatableEphemeralStorage,
                                           descrMetricK8sNodeAllocatableEphemeralStorage,
                                           unitMetricK8sNodeAllocatableEphemeralStorage);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sNodeAllocatableEphemeralStorage(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sNodeAllocatableEphemeralStorage,
                                                    descrMetricK8sNodeAllocatableEphemeralStorage,
                                                    unitMetricK8sNodeAllocatableEphemeralStorage);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sNodeAllocatableEphemeralStorage(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sNodeAllocatableEphemeralStorage,
                                                     descrMetricK8sNodeAllocatableEphemeralStorage,
                                                     unitMetricK8sNodeAllocatableEphemeralStorage);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -2780,33 +2956,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sNodeAllocatab
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sNodeAllocatableMemory(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sNodeAllocatableMemory,
                                          descrMetricK8sNodeAllocatableMemory,
                                          unitMetricK8sNodeAllocatableMemory);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sNodeAllocatableMemory(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sNodeAllocatableMemory,
                                           descrMetricK8sNodeAllocatableMemory,
                                           unitMetricK8sNodeAllocatableMemory);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sNodeAllocatableMemory(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sNodeAllocatableMemory,
                                                    descrMetricK8sNodeAllocatableMemory,
                                                    unitMetricK8sNodeAllocatableMemory);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sNodeAllocatableMemory(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sNodeAllocatableMemory,
                                                     descrMetricK8sNodeAllocatableMemory,
                                                     unitMetricK8sNodeAllocatableMemory);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -2825,33 +3009,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sNodeAllocatab
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sNodeAllocatablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sNodeAllocatablePods,
                                          descrMetricK8sNodeAllocatablePods,
                                          unitMetricK8sNodeAllocatablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sNodeAllocatablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sNodeAllocatablePods,
                                           descrMetricK8sNodeAllocatablePods,
                                           unitMetricK8sNodeAllocatablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sNodeAllocatablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sNodeAllocatablePods,
                                                    descrMetricK8sNodeAllocatablePods,
                                                    unitMetricK8sNodeAllocatablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sNodeAllocatablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sNodeAllocatablePods,
                                                     descrMetricK8sNodeAllocatablePods,
                                                     unitMetricK8sNodeAllocatablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -5018,33 +5210,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sReplicasetAva
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sReplicasetAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sReplicasetAvailablePods,
                                          descrMetricK8sReplicasetAvailablePods,
                                          unitMetricK8sReplicasetAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sReplicasetAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sReplicasetAvailablePods,
                                           descrMetricK8sReplicasetAvailablePods,
                                           unitMetricK8sReplicasetAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sReplicasetAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sReplicasetAvailablePods,
                                                    descrMetricK8sReplicasetAvailablePods,
                                                    unitMetricK8sReplicasetAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sReplicasetAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sReplicasetAvailablePods,
                                                     descrMetricK8sReplicasetAvailablePods,
                                                     unitMetricK8sReplicasetAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -5066,33 +5266,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sReplicasetDes
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sReplicasetDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sReplicasetDesiredPods,
                                          descrMetricK8sReplicasetDesiredPods,
                                          unitMetricK8sReplicasetDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sReplicasetDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sReplicasetDesiredPods,
                                           descrMetricK8sReplicasetDesiredPods,
                                           unitMetricK8sReplicasetDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sReplicasetDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sReplicasetDesiredPods,
                                                    descrMetricK8sReplicasetDesiredPods,
                                                    unitMetricK8sReplicasetDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sReplicasetDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sReplicasetDesiredPods,
                                                     descrMetricK8sReplicasetDesiredPods,
                                                     unitMetricK8sReplicasetDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -5202,34 +5410,42 @@ OPENTELEMETRY_DEPRECATED static constexpr const char
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sReplicationControllerAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sReplicationControllerAvailablePods,
                                          descrMetricK8sReplicationControllerAvailablePods,
                                          unitMetricK8sReplicationControllerAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sReplicationControllerAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sReplicationControllerAvailablePods,
                                           descrMetricK8sReplicationControllerAvailablePods,
                                           unitMetricK8sReplicationControllerAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sReplicationControllerAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sReplicationControllerAvailablePods,
                                                    descrMetricK8sReplicationControllerAvailablePods,
                                                    unitMetricK8sReplicationControllerAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sReplicationControllerAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(
       kMetricK8sReplicationControllerAvailablePods,
       descrMetricK8sReplicationControllerAvailablePods,
       unitMetricK8sReplicationControllerAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -5250,33 +5466,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sReplicationControllerDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sReplicationControllerDesiredPods,
                                          descrMetricK8sReplicationControllerDesiredPods,
                                          unitMetricK8sReplicationControllerDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sReplicationControllerDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sReplicationControllerDesiredPods,
                                           descrMetricK8sReplicationControllerDesiredPods,
                                           unitMetricK8sReplicationControllerDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sReplicationControllerDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sReplicationControllerDesiredPods,
                                                    descrMetricK8sReplicationControllerDesiredPods,
                                                    unitMetricK8sReplicationControllerDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sReplicationControllerDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sReplicationControllerDesiredPods,
                                                     descrMetricK8sReplicationControllerDesiredPods,
                                                     unitMetricK8sReplicationControllerDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -5297,34 +5521,42 @@ OPENTELEMETRY_DEPRECATED static constexpr const char
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sReplicationcontrollerAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sReplicationcontrollerAvailablePods,
                                          descrMetricK8sReplicationcontrollerAvailablePods,
                                          unitMetricK8sReplicationcontrollerAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sReplicationcontrollerAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sReplicationcontrollerAvailablePods,
                                           descrMetricK8sReplicationcontrollerAvailablePods,
                                           unitMetricK8sReplicationcontrollerAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sReplicationcontrollerAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sReplicationcontrollerAvailablePods,
                                                    descrMetricK8sReplicationcontrollerAvailablePods,
                                                    unitMetricK8sReplicationcontrollerAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sReplicationcontrollerAvailablePods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(
       kMetricK8sReplicationcontrollerAvailablePods,
       descrMetricK8sReplicationcontrollerAvailablePods,
       unitMetricK8sReplicationcontrollerAvailablePods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -5345,33 +5577,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sReplicationcontrollerDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sReplicationcontrollerDesiredPods,
                                          descrMetricK8sReplicationcontrollerDesiredPods,
                                          unitMetricK8sReplicationcontrollerDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sReplicationcontrollerDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sReplicationcontrollerDesiredPods,
                                           descrMetricK8sReplicationcontrollerDesiredPods,
                                           unitMetricK8sReplicationcontrollerDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sReplicationcontrollerDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sReplicationcontrollerDesiredPods,
                                                    descrMetricK8sReplicationcontrollerDesiredPods,
                                                    unitMetricK8sReplicationcontrollerDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sReplicationcontrollerDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sReplicationcontrollerDesiredPods,
                                                     descrMetricK8sReplicationcontrollerDesiredPods,
                                                     unitMetricK8sReplicationcontrollerDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -6589,33 +6829,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sStatefulsetCu
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sStatefulsetCurrentPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sStatefulsetCurrentPods,
                                          descrMetricK8sStatefulsetCurrentPods,
                                          unitMetricK8sStatefulsetCurrentPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sStatefulsetCurrentPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sStatefulsetCurrentPods,
                                           descrMetricK8sStatefulsetCurrentPods,
                                           unitMetricK8sStatefulsetCurrentPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sStatefulsetCurrentPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sStatefulsetCurrentPods,
                                                    descrMetricK8sStatefulsetCurrentPods,
                                                    unitMetricK8sStatefulsetCurrentPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sStatefulsetCurrentPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sStatefulsetCurrentPods,
                                                     descrMetricK8sStatefulsetCurrentPods,
                                                     unitMetricK8sStatefulsetCurrentPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -6637,33 +6885,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sStatefulsetDe
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sStatefulsetDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sStatefulsetDesiredPods,
                                          descrMetricK8sStatefulsetDesiredPods,
                                          unitMetricK8sStatefulsetDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sStatefulsetDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sStatefulsetDesiredPods,
                                           descrMetricK8sStatefulsetDesiredPods,
                                           unitMetricK8sStatefulsetDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sStatefulsetDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sStatefulsetDesiredPods,
                                                    descrMetricK8sStatefulsetDesiredPods,
                                                    unitMetricK8sStatefulsetDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sStatefulsetDesiredPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sStatefulsetDesiredPods,
                                                     descrMetricK8sStatefulsetDesiredPods,
                                                     unitMetricK8sStatefulsetDesiredPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -6865,33 +7121,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sStatefulsetRe
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sStatefulsetReadyPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sStatefulsetReadyPods,
                                          descrMetricK8sStatefulsetReadyPods,
                                          unitMetricK8sStatefulsetReadyPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sStatefulsetReadyPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sStatefulsetReadyPods,
                                           descrMetricK8sStatefulsetReadyPods,
                                           unitMetricK8sStatefulsetReadyPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sStatefulsetReadyPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sStatefulsetReadyPods,
                                                    descrMetricK8sStatefulsetReadyPods,
                                                    unitMetricK8sStatefulsetReadyPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sStatefulsetReadyPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sStatefulsetReadyPods,
                                                     descrMetricK8sStatefulsetReadyPods,
                                                     unitMetricK8sStatefulsetReadyPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 /**
@@ -6913,33 +7177,41 @@ OPENTELEMETRY_DEPRECATED static constexpr const char *unitMetricK8sStatefulsetUp
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricK8sStatefulsetUpdatedPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64UpDownCounter(kMetricK8sStatefulsetUpdatedPods,
                                          descrMetricK8sStatefulsetUpdatedPods,
                                          unitMetricK8sStatefulsetUpdatedPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
 CreateSyncDoubleMetricK8sStatefulsetUpdatedPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleUpDownCounter(kMetricK8sStatefulsetUpdatedPods,
                                           descrMetricK8sStatefulsetUpdatedPods,
                                           unitMetricK8sStatefulsetUpdatedPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncInt64MetricK8sStatefulsetUpdatedPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateInt64ObservableUpDownCounter(kMetricK8sStatefulsetUpdatedPods,
                                                    descrMetricK8sStatefulsetUpdatedPods,
                                                    unitMetricK8sStatefulsetUpdatedPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 OPENTELEMETRY_DEPRECATED static inline nostd::shared_ptr<metrics::ObservableInstrument>
 CreateAsyncDoubleMetricK8sStatefulsetUpdatedPods(metrics::Meter *meter)
 {
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_BEGIN
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sStatefulsetUpdatedPods,
                                                     descrMetricK8sStatefulsetUpdatedPods,
                                                     unitMetricK8sStatefulsetUpdatedPods);
+  OPENTELEMETRY_SUPPRESS_DEPRECATED_END
 }
 
 }  // namespace k8s
