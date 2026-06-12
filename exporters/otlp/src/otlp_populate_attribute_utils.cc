@@ -6,12 +6,14 @@
 #endif
 
 #include <cstdint>
+#include <cstring>
 #include <limits>
 #include <string>
 #include <type_traits>
-#include <unordered_map>
 #include <utility>
 #include <vector>
+
+#include <google/protobuf/repeated_ptr_field.h>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
@@ -46,6 +48,21 @@ namespace
 const int kAttributeValueSize      = 16;
 const int kOwnedAttributeValueSize = 15;
 
+// Per OpenTelemetry spec, uint64_t attribute values exceeding INT64_MAX must be
+// encoded as a decimal string rather than wrapping to a negative int64 via narrowing.
+// https://opentelemetry.io/docs/specs/otel/common/attribute-type-mapping/#integer-values
+inline void SetUint64Value(opentelemetry::proto::common::v1::AnyValue *proto_value, uint64_t val)
+{
+  if (val <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
+  {
+    proto_value->set_int_value(static_cast<int64_t>(val));
+  }
+  else
+  {
+    proto_value->set_string_value(std::to_string(val));
+  }
+}
+
 template <class T>
 struct IsSupportedAttributeValue : std::false_type
 {};
@@ -71,6 +88,10 @@ struct AttributeValueVisitor
   {
     proto_value_->set_int_value(uint32_value);
   }
+  void operator()(uint64_t uint64_value) const noexcept
+  {
+    SetUint64Value(proto_value_, uint64_value);
+  }
   void operator()(double double_value) const noexcept
   {
     proto_value_->set_double_value(double_value);
@@ -84,7 +105,7 @@ struct AttributeValueVisitor
     }
     else
     {
-      proto_value_->set_bytes_value(str_value, strlen(str_value));
+      proto_value_->set_bytes_value(str_value, std::strlen(str_value));
     }
 #else
     proto_value_->set_string_value(str_value);
@@ -170,35 +191,13 @@ struct AttributeValueVisitor
 #endif
     }
   }
-  void operator()(uint64_t uint64_value) const noexcept
-  {
-    // Values within int64_t range map to int_value and string if out of range per the `Mapping
-    // Arbitrary Data to OTLP AnyValue` specification.
-    if (uint64_value <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
-    {
-      proto_value_->set_int_value(static_cast<int64_t>(uint64_value));
-    }
-    else
-    {
-      proto_value_->set_string_value(std::to_string(uint64_value));
-    }
-  }
   void operator()(nostd::span<const uint64_t> span_uint64_value) const noexcept
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(span_uint64_value.size()));
     for (const auto &uint64_value : span_uint64_value)
     {
-      // Values within int64_t range map to int_value and string if out of range per the `Mapping
-      // Arbitrary Data to OTLP AnyValue` specification.
-      if (uint64_value <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
-      {
-        array_value->add_values()->set_int_value(static_cast<int64_t>(uint64_value));
-      }
-      else
-      {
-        array_value->add_values()->set_string_value(std::to_string(uint64_value));
-      }
+      SetUint64Value(array_value->add_values(), uint64_value);
     }
   }
   void operator()(nostd::span<const uint8_t> span_uint8_value) const noexcept
@@ -224,7 +223,7 @@ struct AttributeValueVisitor
 struct OwnedAttributeValueVisitor
 {
   opentelemetry::proto::common::v1::AnyValue *proto_value_;
-  bool allow_bytes_;
+  bool allow_bytes_{true};
 
   template <class T>
   void operator()(T &&) const noexcept
@@ -242,6 +241,10 @@ struct OwnedAttributeValueVisitor
     proto_value_->set_int_value(uint32_value);
   }
   void operator()(int64_t int64_value) const noexcept { proto_value_->set_int_value(int64_value); }
+  void operator()(uint64_t uint64_value) const noexcept
+  {
+    SetUint64Value(proto_value_, uint64_value);
+  }
   void operator()(double double_value) const noexcept
   {
     proto_value_->set_double_value(double_value);
@@ -315,28 +318,13 @@ struct OwnedAttributeValueVisitor
 #endif
     }
   }
-  void operator()(uint64_t uint64_value) const noexcept
-  {
-    // Values within int64_t range map to int_value and string if out of range per the `Mapping
-    // Arbitrary Data to OTLP AnyValue` specification.
-    if (uint64_value <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
-    {
-      proto_value_->set_int_value(static_cast<int64_t>(uint64_value));
-    }
-    else
-    {
-      proto_value_->set_string_value(std::to_string(uint64_value));
-    }
-  }
   void operator()(const std::vector<uint64_t> &vector_uint64_value) const noexcept
   {
-    // TODO: need to handle uint64_t values above int64_t range per the `Mapping Arbitrary Data to
-    // OTLP AnyValue` specification. A homogeneous array MUST NOT contain values of different types.
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(vector_uint64_value.size()));
     for (const auto &uint64_value : vector_uint64_value)
     {
-      array_value->add_values()->set_int_value(static_cast<int64_t>(uint64_value));
+      SetUint64Value(array_value->add_values(), uint64_value);
     }
   }
   void operator()(const std::vector<uint8_t> &vector_uint8_value) const noexcept
