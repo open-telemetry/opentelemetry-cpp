@@ -8,11 +8,12 @@ namespace sdk
 {
 namespace logs
 {
-
 OPENTELEMETRY_EXPORT bool LoggerConfig::operator==(const LoggerConfig &other) const noexcept
 {
   return enabled_ == other.enabled_ && minimum_severity_ == other.minimum_severity_ &&
-         trace_based_ == other.trace_based_;
+         trace_based_ == other.trace_based_ &&
+         log_record_limits_.attribute_value_length_limit ==
+             other.log_record_limits_.attribute_value_length_limit;
 }
 
 OPENTELEMETRY_EXPORT bool LoggerConfig::IsEnabled() const noexcept
@@ -30,12 +31,18 @@ OPENTELEMETRY_EXPORT bool LoggerConfig::IsTraceBased() const noexcept
   return trace_based_;
 }
 
+OPENTELEMETRY_EXPORT const LogRecordLimits &LoggerConfig::GetLogRecordLimits() const noexcept
+{
+  return log_record_limits_;
+}
+
 OPENTELEMETRY_EXPORT LoggerConfig
 LoggerConfig::Create(bool enabled,
                      opentelemetry::logs::Severity minimum_severity,
-                     bool trace_based) noexcept
+                     bool trace_based,
+                     const LogRecordLimits &log_record_limits) noexcept
 {
-  return LoggerConfig(enabled, minimum_severity, trace_based);
+  return LoggerConfig(enabled, minimum_severity, trace_based, log_record_limits);
 }
 
 OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Enabled()
@@ -45,14 +52,16 @@ OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Enabled()
 
 OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Disabled()
 {
-  static const auto kDisabledConfig = Create(false, opentelemetry::logs::Severity::kInvalid, false);
-  return kDisabledConfig;
+  static const LoggerConfig disabled_config =
+      Create(false, opentelemetry::logs::Severity::kInvalid, false, GetDefaultLogRecordLimits());
+  return disabled_config;
 }
 
 OPENTELEMETRY_EXPORT LoggerConfig LoggerConfig::Default()
 {
-  static const auto kDefaultConfig = Create(true, opentelemetry::logs::Severity::kInvalid, false);
-  return kDefaultConfig;
+  static const LoggerConfig default_config =
+      Create(true, opentelemetry::logs::Severity::kInvalid, false, GetDefaultLogRecordLimits());
+  return default_config;
 }
 
 }  // namespace logs

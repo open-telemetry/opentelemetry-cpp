@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <cstddef>
 #include <fstream>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
@@ -613,8 +614,9 @@ ConfigurationParser::ParseLogRecordLimitsConfiguration(
 {
   auto model = std::make_unique<LogRecordLimitsConfiguration>();
 
-  model->attribute_value_length_limit = node->GetInteger("attribute_value_length_limit", 4096);
-  model->attribute_count_limit        = node->GetInteger("attribute_count_limit", 128);
+  model->attribute_value_length_limit =
+      node->GetInteger("attribute_value_length_limit", (std::numeric_limits<size_t>::max)());
+  model->attribute_count_limit = node->GetInteger("attribute_count_limit", 128);
 
   return model;
 }

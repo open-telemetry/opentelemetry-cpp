@@ -23,6 +23,7 @@
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/trace/span_id.h"
@@ -32,6 +33,7 @@
 using opentelemetry::sdk::logs::ReadWriteLogRecord;
 namespace trace_api = opentelemetry::trace;
 namespace logs_api  = opentelemetry::logs;
+namespace logs_sdk  = opentelemetry::sdk::logs;
 namespace nostd     = opentelemetry::nostd;
 
 // Test what a default ReadWriteLogRecord with no fields set holds
@@ -83,6 +85,79 @@ TEST(ReadWriteLogRecord, SetAndGet)
   ASSERT_EQ(record.GetSpanId(), span_id);
   ASSERT_EQ(record.GetTraceFlags(), trace_flags);
   ASSERT_EQ(record.GetTimestamp().time_since_epoch(), now.time_since_epoch());
+}
+
+TEST(ReadWriteLogRecord, SetAttributeAppliesAttributeValueLengthLimit)
+{
+  logs_sdk::LogRecordLimits limits;
+  limits.attribute_value_length_limit = 3;
+
+  ReadWriteLogRecord record;
+  record.SetLogRecordLimits(limits);
+  record.SetAttribute("string", nostd::string_view("abcdef"));
+  record.SetAttribute("cstring", "ghijkl");
+  record.SetAttribute("int", static_cast<int64_t>(314159));
+
+  uint8_t byte_values[] = {1, 2, 3, 4, 5};
+  record.SetAttribute("bytes", nostd::span<const uint8_t>(byte_values));
+
+  nostd::string_view string_values[] = {"abcdef", "xy", "1234"};
+  record.SetAttribute("strings", nostd::span<const nostd::string_view>(string_values));
+
+  ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("string")), "abc");
+  ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("cstring")), "ghi");
+  ASSERT_EQ(nostd::get<int64_t>(record.GetAttributes().at("int")), 314159);
+
+  const auto byte_output = nostd::get<std::vector<uint8_t>>(record.GetAttributes().at("bytes"));
+  ASSERT_EQ(byte_output, std::vector<uint8_t>({1, 2, 3}));
+
+  const auto string_output =
+      nostd::get<std::vector<std::string>>(record.GetAttributes().at("strings"));
+  ASSERT_EQ(string_output, std::vector<std::string>({"abc", "xy", "123"}));
+}
+
+TEST(ReadWriteLogRecord, SetAttributeAppliesZeroAttributeValueLengthLimit)
+{
+  logs_sdk::LogRecordLimits limits;
+  limits.attribute_value_length_limit = 0;
+
+  ReadWriteLogRecord record;
+  record.SetLogRecordLimits(limits);
+  record.SetAttribute("string", nostd::string_view("abcdef"));
+
+  uint8_t byte_values[] = {1, 2, 3};
+  record.SetAttribute("bytes", nostd::span<const uint8_t>(byte_values));
+
+  ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("string")), "");
+  ASSERT_TRUE(nostd::get<std::vector<uint8_t>>(record.GetAttributes().at("bytes")).empty());
+}
+
+TEST(ReadWriteLogRecord, SetAttributeTruncatesUtf8ByCodePoint)
+{
+  logs_sdk::LogRecordLimits limits;
+  limits.attribute_value_length_limit = 3;
+
+  ReadWriteLogRecord record;
+  record.SetLogRecordLimits(limits);
+
+  const std::string ga    = "\xEA\xB0\x80";               // '가' is 1 code point, 3 bytes
+  const std::string na    = "\xEB\x82\x98";               // '나' is 1 code point, 3 bytes
+  const std::string da    = "\xEB\x8B\xA4";               // '다' is 1 code point, 3 bytes
+  const std::string three = ga + na + da;                 // 3 code points, 9 bytes
+  const std::string six   = ga + na + da + ga + na + da;  // 6 code points, 18 bytes
+
+  record.SetAttribute("sv", nostd::string_view(six));
+  record.SetAttribute("cstr", six.c_str());
+
+  nostd::string_view strings[] = {nostd::string_view(six), nostd::string_view(ga)};
+  record.SetAttribute("strings", nostd::span<const nostd::string_view>(strings));
+
+  ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("sv")), three);
+  ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("cstr")), three);
+
+  const auto strings_output =
+      nostd::get<std::vector<std::string>>(record.GetAttributes().at("strings"));
+  ASSERT_EQ(strings_output, std::vector<std::string>({three, ga}));
 }
 
 // Define a basic Logger class

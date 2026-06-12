@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stddef.h>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
@@ -21,9 +24,15 @@
 #include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
 #include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
+#include "opentelemetry/sdk/logs/logger_config.h"
 
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
     const std::string &yaml)
@@ -460,7 +469,8 @@ logger_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->logger_provider, nullptr);
   ASSERT_NE(config->logger_provider->limits, nullptr);
-  ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit, 4096);
+  ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit,
+            (std::numeric_limits<size_t>::max)());
   ASSERT_EQ(config->logger_provider->limits->attribute_count_limit, 128);
 }
 
@@ -694,4 +704,61 @@ logger_provider:
   ASSERT_EQ(configurator->default_config.minimum_severity,
             opentelemetry::sdk::configuration::SeverityNumber::info);
   ASSERT_EQ(configurator->default_config.trace_based, true);
+}
+
+TEST(YamlLogs, logger_configurator_builds_sdk_logger_config_from_model)
+{
+  std::string yaml = R"YAML(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: 42
+  logger_configurator/development:
+    default_config:
+      enabled: true
+      minimum_severity: warn
+      trace_based: false
+    loggers:
+      - name: my.logger
+        config:
+          enabled: true
+          minimum_severity: error
+          trace_based: true
+)YAML";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->limits, nullptr);
+  ASSERT_NE(config->logger_provider->logger_configurator, nullptr);
+
+  opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
+  log_record_limits.attribute_value_length_limit =
+      config->logger_provider->limits->attribute_value_length_limit;
+
+  opentelemetry::sdk::configuration::SdkBuilder builder(
+      std::make_shared<opentelemetry::sdk::configuration::Registry>());
+  auto sdk_configurator = builder.CreateLoggerConfigurator(
+      config->logger_provider->logger_configurator, log_record_limits);
+  ASSERT_NE(sdk_configurator, nullptr);
+
+  auto default_scope =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("other.logger");
+  auto default_config = sdk_configurator->ComputeConfig(*default_scope);
+  ASSERT_TRUE(default_config.IsEnabled());
+  ASSERT_EQ(default_config.GetMinimumSeverity(), opentelemetry::logs::Severity::kWarn);
+  ASSERT_EQ(default_config.IsTraceBased(), false);
+  ASSERT_EQ(default_config.GetLogRecordLimits().attribute_value_length_limit, 42);
+
+  auto matching_scope =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("my.logger");
+  auto matching_config = sdk_configurator->ComputeConfig(*matching_scope);
+  ASSERT_TRUE(matching_config.IsEnabled());
+  ASSERT_EQ(matching_config.GetMinimumSeverity(), opentelemetry::logs::Severity::kError);
+  ASSERT_EQ(matching_config.IsTraceBased(), true);
+  ASSERT_EQ(matching_config.GetLogRecordLimits().attribute_value_length_limit, 42);
 }
