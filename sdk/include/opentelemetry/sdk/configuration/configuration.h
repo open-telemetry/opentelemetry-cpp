@@ -58,6 +58,7 @@ namespace configuration
 class Configuration
 {
 public:
+  Configuration() = default;
   Configuration(std::unique_ptr<Document> doc) : doc_(std::move(doc)) {}
   Configuration(Configuration &&)                      = delete;
   Configuration(const Configuration &)                 = delete;
