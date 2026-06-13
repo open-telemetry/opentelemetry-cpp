@@ -98,6 +98,9 @@ Increment the:
   ParentThreshold, RuleBased)
   [#4028](https://github.com/open-telemetry/opentelemetry-cpp/issues/4028)
 
+* [BUILD] Fix protobuf build failure
+  [#4154](https://github.com/open-telemetry/opentelemetry-cpp/pull/4154)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
