@@ -6,6 +6,7 @@
 #endif
 
 #include <stdint.h>
+#include <string.h>
 #include <limits>
 #include <string>
 #include <utility>

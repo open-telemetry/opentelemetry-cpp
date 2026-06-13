@@ -3,7 +3,6 @@
 
 #include <benchmark/benchmark.h>
 #include <random>
-#include <string>
 
 #include "src/common/random.h"
 

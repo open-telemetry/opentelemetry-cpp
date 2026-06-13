@@ -12,7 +12,10 @@ cc_library(
         "http_client_factory_curl.cc",
         "http_operation_curl.cc",
     ],
-    defines = ["ENABLE_OTLP_RETRY_PREVIEW"],
+    defines = [
+        "ENABLE_HTTP_CLIENT_CURL",
+        "ENABLE_OTLP_RETRY_PREVIEW",
+    ],
     include_prefix = "src/http/client/curl",
     linkopts = select({
         "//bazel:windows": [
