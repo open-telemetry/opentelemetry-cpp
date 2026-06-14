@@ -90,6 +90,9 @@ Increment the:
 * [CI] iwyu and clang-tidy: use install_thirdparty.sh for third-party
   [#4136](https://github.com/open-telemetry/opentelemetry-cpp/pull/4136)
 
+* [CONFIGURATION] File configuration: declarative resource detection types
+  [#4148](https://github.com/open-telemetry/opentelemetry-cpp/pull/4148)
+
 * [SDK] Per-instrument creation time as delta first-interval start_ts
   [#4144](https://github.com/open-telemetry/opentelemetry-cpp/pull/4144)
 
@@ -97,6 +100,9 @@ Increment the:
   probability sampling variants (AlwaysOn, AlwaysOff, TraceIdRatioBased,
   ParentThreshold, RuleBased)
   [#4028](https://github.com/open-telemetry/opentelemetry-cpp/issues/4028)
+
+* [BUILD] Fix protobuf build failure
+  [#4154](https://github.com/open-telemetry/opentelemetry-cpp/pull/4154)
 
 ## [1.27.0] 2026-05-13
 
