@@ -9,6 +9,7 @@
 
 #include "logger_config.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
@@ -43,7 +44,8 @@ public:
           std::make_unique<instrumentationscope::ScopeConfigurator<LoggerConfig>>(
               instrumentationscope::ScopeConfigurator<LoggerConfig>::Builder(
                   LoggerConfig::Default())
-                  .Build())) noexcept;
+                  .Build()),
+      LogRecordLimits log_record_limits = LogRecordLimits()) noexcept;
 
   /**
    * Attaches a log processor to list of configured processors to this logger context.
@@ -77,6 +79,12 @@ public:
       const noexcept;
 
   /**
+   * Obtain the LogRecord limits applied by this context.
+   * @return The LogRecordLimits for this logger context.
+   */
+  const LogRecordLimits &GetLogRecordLimits() const noexcept;
+
+  /**
    * Force all active LogProcessors to flush any buffered logs
    * within the given timeout.
    */
@@ -93,6 +101,8 @@ private:
   std::unique_ptr<LogRecordProcessor> processor_;
 
   std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator_;
+
+  LogRecordLimits log_record_limits_;
 };
 }  // namespace logs
 }  // namespace sdk

@@ -7,6 +7,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
@@ -97,6 +98,14 @@ public:
                     const opentelemetry::common::AttributeValue &value) noexcept override;
 
   /**
+   * Apply attribute count and value length limits. Must be called before any
+   * SetAttribute call to take effect. The referenced limits object must
+   * outlive this recordable.
+   */
+  void SetLogRecordLimits(
+      const opentelemetry::sdk::logs::LogRecordLimits &limits) noexcept override;
+
+  /**
    * Set Resource of this log
    * @param Resource the resource to set
    */
@@ -114,6 +123,7 @@ private:
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
       nullptr;
+  const opentelemetry::sdk::logs::LogRecordLimits *limits_ = nullptr;
 };
 
 }  // namespace otlp

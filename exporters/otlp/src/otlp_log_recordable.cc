@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
+#include <cstddef>
+#include <limits>
+#include <string>
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
@@ -9,6 +12,7 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/readable_log_record.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/trace/span_id.h"
@@ -18,6 +22,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/logs/v1/logs.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
@@ -233,10 +238,59 @@ void OtlpLogRecordable::SetTraceFlags(const opentelemetry::trace::TraceFlags &tr
   proto_record_.set_flags(trace_flags.flags());
 }
 
+namespace
+{
+
+void TruncateProtoStringValue(proto::common::v1::AnyValue *value, std::size_t max_length) noexcept
+{
+  if (value == nullptr)
+  {
+    return;
+  }
+  if (value->value_case() == proto::common::v1::AnyValue::kStringValue)
+  {
+    if (value->string_value().size() > max_length)
+    {
+      value->mutable_string_value()->resize(max_length);
+    }
+    return;
+  }
+  if (value->value_case() == proto::common::v1::AnyValue::kArrayValue)
+  {
+    auto *array = value->mutable_array_value();
+    for (int i = 0; i < array->values_size(); ++i)
+    {
+      TruncateProtoStringValue(array->mutable_values(i), max_length);
+    }
+  }
+}
+
+}  // namespace
+
 void OtlpLogRecordable::SetAttribute(opentelemetry::nostd::string_view key,
                                      const opentelemetry::common::AttributeValue &value) noexcept
 {
-  OtlpPopulateAttributeUtils::PopulateAttribute(proto_record_.add_attributes(), key, value, true);
+  if (limits_ != nullptr &&
+      static_cast<std::size_t>(proto_record_.attributes_size()) >= limits_->attribute_count_limit)
+  {
+    proto_record_.set_dropped_attributes_count(proto_record_.dropped_attributes_count() + 1);
+    return;
+  }
+
+  auto *kv = proto_record_.add_attributes();
+  OtlpPopulateAttributeUtils::PopulateAttribute(kv, key, value, true);
+
+  if (limits_ != nullptr &&
+      limits_->attribute_value_length_limit != (std::numeric_limits<std::size_t>::max)())
+  {
+    TruncateProtoStringValue(kv->mutable_value(), limits_->attribute_value_length_limit);
+  }
+}
+
+void OtlpLogRecordable::SetLogRecordLimits(
+    const opentelemetry::sdk::logs::LogRecordLimits &limits) noexcept
+{
+  limits_ = &limits;
 }
 
 void OtlpLogRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept

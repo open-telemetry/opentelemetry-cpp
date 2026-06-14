@@ -3,15 +3,19 @@
 
 #include <stdint.h>
 #include <chrono>
+#include <cstddef>
+#include <limits>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
@@ -151,12 +155,66 @@ const opentelemetry::trace::TraceFlags &ReadWriteLogRecord::GetTraceFlags() cons
   return empty;
 }
 
+namespace
+{
+
+void TruncateStringValue(opentelemetry::sdk::common::OwnedAttributeValue &value,
+                         std::size_t max_length) noexcept
+{
+  if (nostd::holds_alternative<std::string>(value))
+  {
+    auto &s = nostd::get<std::string>(value);
+    if (s.size() > max_length)
+    {
+      s.resize(max_length);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<std::string>>(value))
+  {
+    auto &vec = nostd::get<std::vector<std::string>>(value);
+    for (auto &s : vec)
+    {
+      if (s.size() > max_length)
+      {
+        s.resize(max_length);
+      }
+    }
+  }
+}
+
+}  // namespace
+
 void ReadWriteLogRecord::SetAttribute(nostd::string_view key,
                                       const opentelemetry::common::AttributeValue &value) noexcept
 {
   std::string safe_key(key);
+
+  if (limits_ != nullptr && attributes_map_.size() >= limits_->attribute_count_limit &&
+      attributes_map_.find(safe_key) == attributes_map_.end())
+  {
+    ++dropped_attributes_count_;
+    return;
+  }
+
   opentelemetry::sdk::common::AttributeConverter converter;
-  attributes_map_[safe_key] = nostd::visit(converter, value);
+  auto &stored = attributes_map_[safe_key];
+  stored       = nostd::visit(converter, value);
+
+  if (limits_ != nullptr &&
+      limits_->attribute_value_length_limit != (std::numeric_limits<std::size_t>::max)())
+  {
+    TruncateStringValue(stored, limits_->attribute_value_length_limit);
+  }
+}
+
+void ReadWriteLogRecord::SetLogRecordLimits(const LogRecordLimits &limits) noexcept
+{
+  limits_ = &limits;
+}
+
+uint32_t ReadWriteLogRecord::GetDroppedAttributesCount() const noexcept
+{
+  return dropped_attributes_count_;
 }
 
 const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &

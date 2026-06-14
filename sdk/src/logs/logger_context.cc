@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/multi_log_record_processor.h"
@@ -20,14 +21,16 @@ namespace sdk
 namespace logs
 {
 
-LoggerContext::LoggerContext(std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
-                             const opentelemetry::sdk::resource::Resource &resource,
-                             std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
-                                 logger_configurator) noexcept
+LoggerContext::LoggerContext(
+    std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
+    const opentelemetry::sdk::resource::Resource &resource,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator,
+    LogRecordLimits log_record_limits) noexcept
     : resource_(resource),
       processor_(
           std::unique_ptr<LogRecordProcessor>(new MultiLogRecordProcessor(std::move(processors)))),
-      logger_configurator_(std::move(logger_configurator))
+      logger_configurator_(std::move(logger_configurator)),
+      log_record_limits_(log_record_limits)
 {}
 
 void LoggerContext::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept
@@ -50,6 +53,11 @@ const instrumentationscope::ScopeConfigurator<LoggerConfig> &LoggerContext::GetL
     const noexcept
 {
   return *logger_configurator_;
+}
+
+const LogRecordLimits &LoggerContext::GetLogRecordLimits() const noexcept
+{
+  return log_record_limits_;
 }
 
 bool LoggerContext::ForceFlush(std::chrono::microseconds timeout) noexcept
