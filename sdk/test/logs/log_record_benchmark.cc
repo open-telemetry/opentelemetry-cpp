@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <limits>
 #include <string>
+#include <vector>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -154,6 +155,52 @@ static void BM_SetStringArrayAttributeLongArrayLimitHit(benchmark::State &state)
   BenchmarkStringArrayAttributeLimitHit(state, values);
 }
 BENCHMARK(BM_SetStringArrayAttributeLongArrayLimitHit);
+
+std::vector<std::string> MakeDistinctKeys(std::size_t count)
+{
+  std::vector<std::string> keys;
+  keys.reserve(count);
+  for (std::size_t i = 0; i < count; ++i)
+  {
+    const std::string v(i, 'a');
+    keys.push_back(v);
+  }
+  return keys;
+}
+
+void BenchmarkDistinctAttributes(benchmark::State &state, std::size_t attribute_count_limit)
+{
+  const std::vector<std::string> keys = MakeDistinctKeys(static_cast<std::size_t>(state.range(0)));
+  const std::string value(8, 'v');
+
+  for (auto _ : state)
+  {
+    logs_sdk::ReadWriteLogRecord record;
+    logs_sdk::LogRecordLimits limits;
+    limits.attribute_count_limit = attribute_count_limit;
+    record.SetLogRecordLimits(limits);
+    for (const auto &key : keys)
+    {
+      record.SetAttribute(key, nostd::string_view(value));
+    }
+    benchmark::ClobberMemory();
+  }
+
+  state.SetItemsProcessed(static_cast<int64_t>(state.iterations()) *
+                          static_cast<int64_t>(keys.size()));
+}
+
+static void BM_SetDistinctAttributesUnderLimit(benchmark::State &state)
+{
+  BenchmarkDistinctAttributes(state, kLargeLimit);
+}
+BENCHMARK(BM_SetDistinctAttributesUnderLimit)->RangeMultiplier(2)->Range(8, 128);
+
+static void BM_SetDistinctAttributesOverLimit(benchmark::State &state)
+{
+  BenchmarkDistinctAttributes(state, kSmallLimit);
+}
+BENCHMARK(BM_SetDistinctAttributesOverLimit)->RangeMultiplier(2)->Range(8, 128);
 
 }  // namespace
 

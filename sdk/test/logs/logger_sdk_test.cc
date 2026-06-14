@@ -530,6 +530,32 @@ TEST(LoggerSDK, CreateLogRecordSetsLogRecordLimits)
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
+TEST(LoggerSDK, CreateLogRecordWithContextSetsLogRecordLimits)
+{
+  LogRecordLimits limits;
+  limits.attribute_value_length_limit = 42;
+  ScopeConfigurator<LoggerConfig> custom_limits =
+      ScopeConfigurator<LoggerConfig>::Builder(
+          LoggerConfig::Create(true, logs_api::Severity::kInvalid, false, limits))
+          .Build();
+
+  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+  auto log_processor = std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable));
+
+  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(
+      new LoggerProvider(std::move(log_processor), resource,
+                         std::make_unique<ScopeConfigurator<LoggerConfig>>(custom_limits)));
+  auto logger = api_lp->GetLogger("test-logger", "opentelemetry_library", "", schema_url);
+
+  const nostd::variant<opentelemetry::trace::SpanContext, context::Context> context_or_span =
+      opentelemetry::trace::SpanContext::GetInvalid();
+  auto log_record       = logger->CreateLogRecord(context_or_span);
+  auto *mock_log_record = static_cast<MockLogRecordable *>(log_record.get());
+  ASSERT_EQ(mock_log_record->GetAttributeValueLengthLimit(), limits.attribute_value_length_limit);
+}
+
 TEST(LoggerSDK, LoggerWithMinimumSeverityConfig)
 {
   ScopeConfigurator<LoggerConfig> warn_and_above =

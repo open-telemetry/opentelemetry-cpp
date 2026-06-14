@@ -13,7 +13,8 @@ OPENTELEMETRY_EXPORT bool LoggerConfig::operator==(const LoggerConfig &other) co
   return enabled_ == other.enabled_ && minimum_severity_ == other.minimum_severity_ &&
          trace_based_ == other.trace_based_ &&
          log_record_limits_.attribute_value_length_limit ==
-             other.log_record_limits_.attribute_value_length_limit;
+             other.log_record_limits_.attribute_value_length_limit &&
+         log_record_limits_.attribute_count_limit == other.log_record_limits_.attribute_count_limit;
 }
 
 OPENTELEMETRY_EXPORT bool LoggerConfig::IsEnabled() const noexcept
