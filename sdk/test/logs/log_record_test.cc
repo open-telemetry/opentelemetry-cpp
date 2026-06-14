@@ -163,6 +163,29 @@ TEST(ReadWriteLogRecord, SetAttributeTruncatesUtf8ByCodePoint)
   ASSERT_EQ(strings_output, std::vector<std::string>({three, ga}));
 }
 
+TEST(ReadWriteLogRecord, SetAttributeTruncatesInvalidUtf8ByByte)
+{
+  logs_sdk::LogRecordLimits limits;
+  limits.attribute_value_length_limit = 1;
+
+  ReadWriteLogRecord record;
+  record.SetLogRecordLimits(limits);
+
+  // A 3-byte lead (0xE0) followed by ASCII is not valid UTF-8 (no continuation bytes), so it must
+  // degrade to byte truncation: a 1-character limit keeps exactly the lead byte, not the trailing
+  // ASCII swallowed as fake continuations.
+  const std::string bad_lead = std::string("\xE0", 1) + "AB";  // 0xE0 'A' 'B'
+  // 0xE0 with the sequence running past the end must also keep 1 byte (not truncate to empty).
+  const std::string truncated_lead = std::string("\xE0", 1) + "A";  // 0xE0 'A'
+
+  record.SetAttribute("bad_lead", nostd::string_view(bad_lead));
+  record.SetAttribute("truncated_lead", nostd::string_view(truncated_lead));
+
+  ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("bad_lead")), std::string("\xE0", 1));
+  ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("truncated_lead")),
+            std::string("\xE0", 1));
+}
+
 TEST(ReadWriteLogRecord, SetAttributeAppliesAttributeCountLimit)
 {
   logs_sdk::LogRecordLimits limits;

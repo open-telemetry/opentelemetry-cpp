@@ -230,8 +230,12 @@ private:
     }
 
     // Byte length of the longest prefix of `value` holding at most `limit` UTF-8 code points,
-    // never splitting a multi-byte sequence. Malformed lead/continuation bytes are counted as
-    // one byte each (we do not validate or repair user-supplied invalid UTF-8).
+    // never splitting a well-formed multi-byte sequence. A lead byte's declared length is only
+    // honored when its continuation bytes are present and in range (0x80-0xBF); otherwise the lead
+    // is counted as a single byte, so malformed / non-UTF-8 input degrades to plain byte
+    // truncation. This is deliberately NOT full UTF-8 validation (overlong, surrogate, and
+    // out-of-range sequences pass through as one character each) -- the exporter decides real
+    // UTF-8 validity when it routes invalid strings to a bytes value.
     static std::size_t Utf8PrefixLength(opentelemetry::nostd::string_view value,
                                         std::size_t limit) noexcept
     {
@@ -239,16 +243,43 @@ private:
       while (i < value.size() && codepoints < limit)
       {
         const auto lead = static_cast<unsigned char>(value[i]);
-        std::size_t seq = (lead < 0x80)   ? 1  // ASCII
-                          : (lead < 0xC0) ? 1  // stray continuation -> pass 1 byte
+        // Bytes in this character, decoded from the lead byte. UTF-8 byte layout
+        // (https://en.wikipedia.org/wiki/UTF-8#Description):
+        //   0x00-0x7F  0xxxxxxx  ASCII, 1 byte
+        //   0x80-0xBF  10xxxxxx  continuation byte (never a valid lead)
+        //   0xC0-0xDF  110xxxxx  lead of a 2-byte sequence
+        //   0xE0-0xEF  1110xxxx  lead of a 3-byte sequence
+        //   0xF0-0xF7  11110xxx  lead of a 4-byte sequence
+        //   0xF8-0xFF            not a valid lead byte
+        std::size_t seq = (lead < 0x80)   ? 1
+                          : (lead < 0xC0) ? 1
                           : (lead < 0xE0) ? 2
                           : (lead < 0xF0) ? 3
                           : (lead < 0xF8) ? 4
-                                          : 1;  // invalid lead -> pass 1 byte
-        if (i + seq > value.size())
+                                          : 1;
+
+        // Honor the multi-byte length only if the continuation bytes are present and valid;
+        // otherwise the lead is a lone invalid byte and counts as one character.
+        if (seq > 1)
         {
-          break;  // incomplete sequence at end of input: stop before it
+          if (i + seq > value.size())
+          {
+            seq = 1;
+          }
+          else
+          {
+            for (std::size_t k = 1; k < seq; ++k)
+            {
+              const auto continuation = static_cast<unsigned char>(value[i + k]);
+              if (continuation < 0x80 || continuation > 0xBF)
+              {
+                seq = 1;
+                break;
+              }
+            }
+          }
         }
+
         i += seq;
         ++codepoints;
       }
