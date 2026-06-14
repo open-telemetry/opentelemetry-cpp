@@ -514,6 +514,47 @@ CreateAsyncDoubleMetricSystemFilesystemLimit(metrics::Meter *meter)
 }
 
 /**
+  Filesystem lock counts.
+  <p>
+  updowncounter
+ */
+static constexpr const char *kMetricSystemFilesystemLockCount     = "system.filesystem.lock.count";
+static constexpr const char *descrMetricSystemFilesystemLockCount = "Filesystem lock counts.";
+static constexpr const char *unitMetricSystemFilesystemLockCount  = "{lock}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemFilesystemLockCount(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricSystemFilesystemLockCount,
+                                         descrMetricSystemFilesystemLockCount,
+                                         unitMetricSystemFilesystemLockCount);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemFilesystemLockCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemFilesystemLockCount,
+                                          descrMetricSystemFilesystemLockCount,
+                                          unitMetricSystemFilesystemLockCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemFilesystemLockCount(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricSystemFilesystemLockCount,
+                                                   descrMetricSystemFilesystemLockCount,
+                                                   unitMetricSystemFilesystemLockCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemFilesystemLockCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricSystemFilesystemLockCount,
+                                                    descrMetricSystemFilesystemLockCount,
+                                                    unitMetricSystemFilesystemLockCount);
+}
+
+/**
   Reports a filesystem's space usage across different states.
   <p>
   The sum of all @code system.filesystem.usage @endcode values over the different @code
