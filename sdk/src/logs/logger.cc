@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <chrono>
+#include <ostream>
 #include <string>
 #include <utility>
 
@@ -18,8 +19,10 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_context.h"
@@ -210,6 +213,15 @@ void Logger::EmitLogRecord(
       std::unique_ptr<Recordable>(static_cast<Recordable *>(log_record.release()));
   recordable->SetResource(context_->GetResource());
   recordable->SetInstrumentationScope(GetInstrumentationScope());
+
+  const auto dropped_attributes_count = recordable->GetAttributeDroppedCount();
+  if (dropped_attributes_count > 0)
+  {
+    OTEL_INTERNAL_LOG_WARN("Logger '"
+                           << logger_name_ << "' discarded " << dropped_attributes_count
+                           << " log record attribute(s) exceeding the configured limit of "
+                           << logger_config_.GetLogRecordLimits().attribute_count_limit);
+  }
 
   auto &processor = context_->GetProcessor();
 

@@ -24,7 +24,10 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/logs/log_record_limits.h"
+#include "opentelemetry/sdk/logs/multi_recordable.h"
+#include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
@@ -158,6 +161,77 @@ TEST(ReadWriteLogRecord, SetAttributeTruncatesUtf8ByCodePoint)
   const auto strings_output =
       nostd::get<std::vector<std::string>>(record.GetAttributes().at("strings"));
   ASSERT_EQ(strings_output, std::vector<std::string>({three, ga}));
+}
+
+TEST(ReadWriteLogRecord, SetAttributeAppliesAttributeCountLimit)
+{
+  logs_sdk::LogRecordLimits limits;
+  limits.attribute_count_limit = 3;
+
+  ReadWriteLogRecord record;
+  record.SetLogRecordLimits(limits);
+
+  record.SetAttribute("a", static_cast<int64_t>(1));
+  record.SetAttribute("b", static_cast<int64_t>(2));
+  record.SetAttribute("c", static_cast<int64_t>(3));
+  record.SetAttribute("d", static_cast<int64_t>(4));  // 4th distinct key -> discarded
+  record.SetAttribute("e", static_cast<int64_t>(5));  // 5th distinct key -> discarded
+
+  ASSERT_EQ(record.GetAttributes().size(), 3u);
+  ASSERT_EQ(record.GetAttributeDroppedCount(), 2u);
+  ASSERT_EQ(record.GetAttributes().count("d"), 0u);
+  ASSERT_EQ(record.GetAttributes().count("e"), 0u);
+
+  // Re-setting an existing key overwrites its value and does NOT count toward the limit or drop.
+  record.SetAttribute("a", static_cast<int64_t>(99));
+  ASSERT_EQ(record.GetAttributes().size(), 3u);
+  ASSERT_EQ(record.GetAttributeDroppedCount(), 2u);
+  ASSERT_EQ(nostd::get<int64_t>(record.GetAttributes().at("a")), 99);
+}
+
+namespace
+{
+class CountLimitStubProcessor final : public logs_sdk::LogRecordProcessor
+{
+public:
+  std::unique_ptr<logs_sdk::Recordable> MakeRecordable() noexcept override
+  {
+    return std::unique_ptr<logs_sdk::Recordable>(new ReadWriteLogRecord());
+  }
+  void OnEmit(std::unique_ptr<logs_sdk::Recordable> &&record) noexcept override
+  {
+    auto record_ptr = std::move(record);
+  }
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+};
+}  // namespace
+
+TEST(MultiRecordable, ReleaseRecordablePropagatesDroppedAttributeCount)
+{
+  CountLimitStubProcessor processor_a;
+  CountLimitStubProcessor processor_b;
+
+  logs_sdk::MultiRecordable multi;
+  multi.AddRecordable(processor_a, std::unique_ptr<logs_sdk::Recordable>(new ReadWriteLogRecord()));
+  multi.AddRecordable(processor_b, std::unique_ptr<logs_sdk::Recordable>(new ReadWriteLogRecord()));
+
+  logs_sdk::LogRecordLimits limits;
+  limits.attribute_count_limit = 2;
+  multi.SetLogRecordLimits(limits);
+
+  multi.SetAttribute("a", static_cast<int64_t>(1));
+  multi.SetAttribute("b", static_cast<int64_t>(2));
+  multi.SetAttribute("c", static_cast<int64_t>(3));  // 3rd distinct key -> dropped
+  multi.SetAttribute("d", static_cast<int64_t>(4));  // 4th distinct key -> dropped
+  ASSERT_EQ(multi.GetAttributeDroppedCount(), 2u);
+
+  auto sub_a = multi.ReleaseRecordable(processor_a);
+  auto sub_b = multi.ReleaseRecordable(processor_b);
+  ASSERT_TRUE(sub_a);
+  ASSERT_TRUE(sub_b);
+  EXPECT_EQ(sub_a->GetAttributeDroppedCount(), 2u);
+  EXPECT_EQ(sub_b->GetAttributeDroppedCount(), 2u);
 }
 
 // Define a basic Logger class

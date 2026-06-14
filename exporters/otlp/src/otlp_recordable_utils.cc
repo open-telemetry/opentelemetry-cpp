@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <unordered_map>
 
@@ -192,7 +193,10 @@ void OtlpRecordableUtils::PopulateRequest(
     }
 
     // The recordable log can only be copied here since the request message is Arena allocated.
-    scope_logs->add_log_records()->CopyFrom(otlp_recordable->log_record());
+    auto *proto_log_record = scope_logs->add_log_records();
+    proto_log_record->CopyFrom(otlp_recordable->log_record());
+    proto_log_record->set_dropped_attributes_count(
+        static_cast<uint32_t>(otlp_recordable->GetAttributeDroppedCount()));
   }
 }
 }  // namespace otlp

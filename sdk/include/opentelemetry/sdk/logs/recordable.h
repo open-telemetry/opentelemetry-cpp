@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <cstring>
 #include <limits>
+#include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
@@ -58,25 +60,37 @@ public:
   void SetAttribute(opentelemetry::nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value) noexcept final
   {
-    if (limits_.attribute_value_length_limit == (std::numeric_limits<std::size_t>::max)())
-    {
-      SetAttributeImpl(key, value);
-      return;
-    }
-
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
     try
     {
 #endif
-      AttributeValueLengthLimiter limiter(limits_.attribute_value_length_limit);
-      auto limited_value = opentelemetry::nostd::visit(limiter, value);
-      SetAttributeImpl(key, limited_value);
+      std::string attribute_key(key);
+      if (attribute_keys_.find(attribute_key) == attribute_keys_.end())
+      {
+        if (attribute_keys_.size() >= limits_.attribute_count_limit)
+        {
+          ++dropped_attributes_count_;
+          return;
+        }
+        attribute_keys_.insert(std::move(attribute_key));
+      }
+
+      if (limits_.attribute_value_length_limit == (std::numeric_limits<std::size_t>::max)())
+      {
+        SetAttributeImpl(key, value);
+      }
+      else
+      {
+        AttributeValueLengthLimiter limiter(limits_.attribute_value_length_limit);
+        auto limited_value = opentelemetry::nostd::visit(limiter, value);
+        SetAttributeImpl(key, limited_value);
+      }
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
     }
     catch (const std::bad_alloc &)
     {
-      // Out of memory while limiting the value: drop the attribute instead of terminating
-      // (SetAttribute is noexcept). Deliberately no logging here
+      // Out of memory while applying limits: drop the attribute instead of terminating
+      // (SetAttribute is noexcept). Deliberately no logging here -- the log path allocates.
       return;
     }
     catch (const std::exception &e)
@@ -87,6 +101,11 @@ public:
     }
 #endif
   }
+
+  /**
+   * Returns the number of attributes discarded because the attribute count limit was reached.
+   */
+  std::size_t GetAttributeDroppedCount() const noexcept { return dropped_attributes_count_; }
 
   /**
    * Set Resource of this log
@@ -242,6 +261,8 @@ private:
   };
 
   LogRecordLimits limits_;
+  std::unordered_set<std::string> attribute_keys_;
+  std::size_t dropped_attributes_count_ = 0;
 };
 
 }  // namespace logs

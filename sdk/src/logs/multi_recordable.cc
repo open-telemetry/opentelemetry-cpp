@@ -54,6 +54,14 @@ std::unique_ptr<Recordable> MultiRecordable::ReleaseRecordable(
   {
     std::unique_ptr<Recordable> result(i->second.release());
     recordables_.erase(MakeKey(processor));
+    // The attribute count limit is enforced once at the MultiRecordable level;
+    // each sub-recordable saw only the survivors via SetAttributeImpl and never counted
+    // the drops. Propagate the dropped count to the sub here -- this emit-time hand-off is the
+    // first point where the final count is known -- so the sub's exporter can report it.
+    if (result)
+    {
+      result->dropped_attributes_count_ = GetAttributeDroppedCount();
+    }
     return result;
   }
   return std::unique_ptr<Recordable>(nullptr);

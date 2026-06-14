@@ -20,6 +20,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/readable_log_record.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -341,6 +342,37 @@ TEST(OtlpLogRecordable, PopulateRequest)
       EXPECT_EQ(scope_logs_size, 2);
     }
   }
+}
+
+TEST(OtlpLogRecordable, PopulateRequestSetsDroppedAttributesCount)
+{
+  auto rec      = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  auto resource = resource::Resource::Create({{"service.name", "svc"}});
+  auto inst_lib =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("scope", "1");
+  rec->SetResource(resource);
+  rec->SetInstrumentationScope(*inst_lib);
+
+  sdk::logs::LogRecordLimits limits;
+  limits.attribute_count_limit = 2;
+  rec->SetLogRecordLimits(limits);
+
+  rec->SetAttribute("a", static_cast<int64_t>(1));
+  rec->SetAttribute("b", static_cast<int64_t>(2));
+  rec->SetAttribute("c", static_cast<int64_t>(3));  // 3rd distinct key -> discarded
+
+  proto::collector::logs::v1::ExportLogsServiceRequest req;
+  std::vector<std::unique_ptr<sdk::logs::Recordable>> logs;
+  logs.push_back(std::move(rec));
+  const nostd::span<std::unique_ptr<sdk::logs::Recordable>, 1> logs_span(logs.data(), 1);
+  OtlpRecordableUtils::PopulateRequest(logs_span, &req);
+
+  ASSERT_EQ(req.resource_logs_size(), 1);
+  ASSERT_EQ(req.resource_logs(0).scope_logs_size(), 1);
+  ASSERT_EQ(req.resource_logs(0).scope_logs(0).log_records_size(), 1);
+  const auto &proto_log = req.resource_logs(0).scope_logs(0).log_records(0);
+  EXPECT_EQ(proto_log.attributes_size(), 2);
+  EXPECT_EQ(proto_log.dropped_attributes_count(), 1u);
 }
 
 // Test logs PopulateRequest handles missing resource and scope gracefully
