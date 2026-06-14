@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <chrono>
 #include <list>
 #include <memory>
 #include <mutex>
@@ -34,7 +35,8 @@ TemporalMetricStorage::TemporalMetricStorage(InstrumentDescriptor instrument_des
                                              const AggregationConfig *aggregation_config)
     : instrument_descriptor_(std::move(instrument_descriptor)),
       aggregation_type_(aggregation_type),
-      aggregation_config_(aggregation_config)
+      aggregation_config_(aggregation_config),
+      instrument_creation_ts_(std::chrono::system_clock::now())
 {}
 
 bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
@@ -45,9 +47,16 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
                                          nostd::function_ref<bool(MetricData)> callback) noexcept
 {
   std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
-  opentelemetry::common::SystemTimestamp last_collection_ts = sdk_start_ts;
   AggregationTemporality aggregation_temporarily =
       collector->GetAggregationTemporality(instrument_descriptor_.type_);
+  // Per OTel spec (issue #4062): the start_ts for the first delta collection
+  // interval must be the instrument creation time, not the MeterProvider
+  // start time (which is what sdk_start_ts carries). For cumulative, sdk_start_ts
+  // is acceptable per spec ("creation of the instrument or the timestamp from
+  // when the SDK was started, whichever happened first").
+  opentelemetry::common::SystemTimestamp last_collection_ts =
+      (aggregation_temporarily == AggregationTemporality::kDelta) ? instrument_creation_ts_
+                                                                  : sdk_start_ts;
 
   // Fast path for single collector with delta temporality and counter, updown-counter, histogram
   // This path doesn't need to aggregated-with/contribute-to the unreported_metric_, as there is
@@ -56,7 +65,7 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   {
     if (!has_last_delta_collection_ts_)
     {
-      last_delta_collection_ts_     = sdk_start_ts;
+      last_delta_collection_ts_     = instrument_creation_ts_;
       has_last_delta_collection_ts_ = true;
     }
     // If no metrics, early return
