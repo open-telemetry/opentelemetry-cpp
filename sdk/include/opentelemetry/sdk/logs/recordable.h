@@ -64,15 +64,14 @@ public:
     try
     {
 #endif
-      std::string attribute_key(key);
-      if (attribute_keys_.find(attribute_key) == attribute_keys_.end())
+      if (attribute_keys_.size() < limits_.attribute_count_limit)
       {
-        if (attribute_keys_.size() >= limits_.attribute_count_limit)
-        {
-          ++dropped_attributes_count_;
-          return;
-        }
-        attribute_keys_.insert(std::move(attribute_key));
+        attribute_keys_.insert(std::string(key));
+      }
+      else if (attribute_keys_.find(std::string(key)) == attribute_keys_.end())
+      {
+        ++dropped_attributes_count_;
+        return;
       }
 
       if (limits_.attribute_value_length_limit == (std::numeric_limits<std::size_t>::max)())
