@@ -1974,7 +1974,7 @@ void SdkBuilder::SetResource(
       }
     }
 
-    if (opt_model->detectors != nullptr)
+    if (opt_model->detection != nullptr)
     {
       // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3548
       // FIXME-SDK: Implement resource detectors
