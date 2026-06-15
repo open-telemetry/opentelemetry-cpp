@@ -110,6 +110,11 @@ if(WITH_THREAD_INSTRUMENTATION_PREVIEW)
                              INTERFACE ENABLE_THREAD_INSTRUMENTATION_PREVIEW)
 endif()
 
+if(WITH_LOG_FILTERING_PREVIEW)
+  target_compile_definitions(opentelemetry_api
+                             INTERFACE ENABLE_LOG_FILTERING_PREVIEW)
+endif()
+
 if(WITH_OTLP_HTTP_COMPRESSION)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_OTLP_COMPRESSION_PREVIEW)

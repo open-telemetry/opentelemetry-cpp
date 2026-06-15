@@ -224,6 +224,14 @@ option(WITH_METRICS_EXEMPLAR_PREVIEW
 option(WITH_THREAD_INSTRUMENTATION_PREVIEW
        "Whether to enable thread instrumentation" OFF)
 
+# Experimental: enable log filtering in EmitLogRecord(args...). With this flag,
+# records are dropped before emit if the severity is below the logger minimum.
+# In ABI v2, when the SDK configures trace-based filtering or a processor with
+# an Enabled filter, records are also dropped based on the active trace context
+# and processor.Enabled.
+option(WITH_LOG_FILTERING_PREVIEW
+       "Whether to enable log filtering in EmitLogRecord" OFF)
+
 option(WITH_RESOURCE_DETECTORS_PREVIEW
        "Whether to enable inbuilt resource detectors" OFF)
 
@@ -523,6 +531,7 @@ message(
   STATUS
     "WITH_OTLP_GRPC_CREDENTIAL_PREVIEW: ${WITH_OTLP_GRPC_CREDENTIAL_PREVIEW}")
 message(STATUS "WITH_OTLP_RETRY_PREVIEW: ${WITH_OTLP_RETRY_PREVIEW}")
+message(STATUS "WITH_LOG_FILTERING_PREVIEW: ${WITH_LOG_FILTERING_PREVIEW}")
 message(STATUS "---------------------------------------------")
 message(STATUS "third-party options")
 message(STATUS "---------------------------------------------")
