@@ -9,6 +9,7 @@
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_runtime_options.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/logs/exporter.h"
@@ -45,6 +46,44 @@ public:
    */
   OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options,
                             const OtlpHttpLogRecordExporterRuntimeOptions &runtime_options);
+
+  /**
+   * Create an OtlpHttpLogRecordExporter with user specified options and HTTP client factory.
+   * @param options An object containing the user's configuration options.
+   * @param factory the HTTP client factory used to create the underlying HTTP client
+   */
+  OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options,
+                            const std::shared_ptr<ext::http::client::HttpClientFactory> &factory);
+
+  /**
+   * Create an OtlpHttpLogRecordExporter with user specified options, runtime options, and HTTP
+   * client factory.
+   * @param options An object containing the user's configuration options.
+   * @param runtime_options An object containing the user's runtime options.
+   * @param factory the HTTP client factory used to create the underlying HTTP client
+   */
+  OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options,
+                            const OtlpHttpLogRecordExporterRuntimeOptions &runtime_options,
+                            const std::shared_ptr<ext::http::client::HttpClientFactory> &factory);
+
+  /**
+   * Create an OtlpHttpLogRecordExporter with user specified options and HTTP client.
+   * @param options An object containing the user's configuration options.
+   * @param http_client the HTTP client to be used for exporting
+   */
+  OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options,
+                            std::shared_ptr<ext::http::client::HttpClient> http_client);
+
+  /**
+   * Create an OtlpHttpLogRecordExporter with user specified options, runtime options, and HTTP
+   * client.
+   * @param options An object containing the user's configuration options.
+   * @param runtime_options An object containing the user's runtime options.
+   * @param http_client the HTTP client to be used for exporting
+   */
+  OtlpHttpLogRecordExporter(const OtlpHttpLogRecordExporterOptions &options,
+                            const OtlpHttpLogRecordExporterRuntimeOptions &runtime_options,
+                            std::shared_ptr<ext::http::client::HttpClient> http_client);
 
   /**
    * Creates a recordable that stores the data in a JSON object

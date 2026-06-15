@@ -17,6 +17,7 @@
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
@@ -155,8 +156,17 @@ class OtlpHttpClient
 public:
   /**
    * Create an OtlpHttpClient using the given options.
+   * Uses the default HTTP client factory (curl when available).
    */
   explicit OtlpHttpClient(OtlpHttpClientOptions &&options);
+
+  /**
+   * Create an OtlpHttpClient using the given options and HTTP client factory.
+   * @param options the Otlp http client options to be used for exporting
+   * @param factory the HTTP client factory used to create the underlying HTTP client
+   */
+  OtlpHttpClient(OtlpHttpClientOptions &&options,
+                 const std::shared_ptr<ext::http::client::HttpClientFactory> &factory);
 
   /**
    * Create an OtlpHttpClient using the specified http client.

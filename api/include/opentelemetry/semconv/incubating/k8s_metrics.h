@@ -432,7 +432,7 @@ CreateAsyncDoubleMetricK8sContainerCpuRequestUtilization(metrics::Meter *meter)
   Maximum ephemeral storage resource limit set for the container.
   <p>
   See
-  https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core
+  https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core
   for details. <p> updowncounter
  */
 static constexpr const char *kMetricK8sContainerEphemeralStorageLimit =
@@ -477,7 +477,7 @@ CreateAsyncDoubleMetricK8sContainerEphemeralStorageLimit(metrics::Meter *meter)
   Ephemeral storage resource requested for the container.
   <p>
   See
-  https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core
+  https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core
   for details. <p> updowncounter
  */
 static constexpr const char *kMetricK8sContainerEphemeralStorageRequest =
@@ -516,6 +516,51 @@ CreateAsyncDoubleMetricK8sContainerEphemeralStorageRequest(metrics::Meter *meter
   return meter->CreateDoubleObservableUpDownCounter(kMetricK8sContainerEphemeralStorageRequest,
                                                     descrMetricK8sContainerEphemeralStorageRequest,
                                                     unitMetricK8sContainerEphemeralStorageRequest);
+}
+
+/**
+  The ephemeral storage used by a container.
+  <p>
+  The value for this metric can be compared against @code
+  metric.k8s.container.ephemeral_storage.request @endcode and @code
+  metric.k8s.container.ephemeral_storage.limit @endcode. <p> updowncounter
+ */
+static constexpr const char *kMetricK8sContainerEphemeralStorageUsage =
+    "k8s.container.ephemeral_storage.usage";
+static constexpr const char *descrMetricK8sContainerEphemeralStorageUsage =
+    "The ephemeral storage used by a container.";
+static constexpr const char *unitMetricK8sContainerEphemeralStorageUsage = "By";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricK8sContainerEphemeralStorageUsage(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricK8sContainerEphemeralStorageUsage,
+                                         descrMetricK8sContainerEphemeralStorageUsage,
+                                         unitMetricK8sContainerEphemeralStorageUsage);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricK8sContainerEphemeralStorageUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricK8sContainerEphemeralStorageUsage,
+                                          descrMetricK8sContainerEphemeralStorageUsage,
+                                          unitMetricK8sContainerEphemeralStorageUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricK8sContainerEphemeralStorageUsage(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricK8sContainerEphemeralStorageUsage,
+                                                   descrMetricK8sContainerEphemeralStorageUsage,
+                                                   unitMetricK8sContainerEphemeralStorageUsage);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricK8sContainerEphemeralStorageUsage(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricK8sContainerEphemeralStorageUsage,
+                                                    descrMetricK8sContainerEphemeralStorageUsage,
+                                                    unitMetricK8sContainerEphemeralStorageUsage);
 }
 
 /**
@@ -834,7 +879,7 @@ CreateAsyncDoubleMetricK8sContainerMemoryRequestDesired(metrics::Meter *meter)
   Indicates whether the container is currently marked as ready to accept traffic, based on its
   readiness probe (1 = ready, 0 = not ready). <p> This metric SHOULD reflect the value of the @code
   ready @endcode field in the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#containerstatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#containerstatus-v1-core">K8s
   ContainerStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sContainerReady = "k8s.container.ready";
@@ -1011,7 +1056,7 @@ CreateAsyncDoubleMetricK8sContainerStatusState(metrics::Meter *meter)
   Maximum storage resource limit set for the container.
   <p>
   See
-  https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core
+  https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core
   for details. <p> updowncounter
  */
 static constexpr const char *kMetricK8sContainerStorageLimit = "k8s.container.storage.limit";
@@ -1055,7 +1100,7 @@ CreateAsyncDoubleMetricK8sContainerStorageLimit(metrics::Meter *meter)
   Storage resource requested for the container.
   <p>
   See
-  https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#resourcerequirements-v1-core
+  https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcerequirements-v1-core
   for details. <p> updowncounter
  */
 static constexpr const char *kMetricK8sContainerStorageRequest = "k8s.container.storage.request";
@@ -1101,7 +1146,7 @@ CreateAsyncDoubleMetricK8sContainerStorageRequest(metrics::Meter *meter)
   @deprecated
   {"note": "Replaced by @code k8s.cronjob.job.active @endcode.", "reason": "renamed", "renamed_to":
   "k8s.cronjob.job.active"} <p> This metric aligns with the @code active @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#cronjobstatus-v1-batch">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#cronjobstatus-v1-batch">K8s
   CronJobStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sCronjobActiveJobs =
@@ -1151,7 +1196,7 @@ CreateAsyncDoubleMetricK8sCronjobActiveJobs(metrics::Meter *meter)
   <p>
   This metric aligns with the @code active @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#cronjobstatus-v1-batch">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#cronjobstatus-v1-batch">K8s
   CronJobStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sCronjobJobActive = "k8s.cronjob.job.active";
@@ -1194,7 +1239,7 @@ CreateAsyncDoubleMetricK8sCronjobJobActive(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.daemonset.node.current_scheduled @endcode.", "reason": "renamed",
   "renamed_to": "k8s.daemonset.node.current_scheduled"} <p> This metric aligns with the @code
   currentNumberScheduled @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps">K8s
   DaemonSetStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sDaemonsetCurrentScheduledNodes =
@@ -1251,7 +1296,7 @@ CreateAsyncDoubleMetricK8sDaemonsetCurrentScheduledNodes(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.daemonset.node.desired_scheduled @endcode.", "reason": "renamed",
   "renamed_to": "k8s.daemonset.node.desired_scheduled"} <p> This metric aligns with the @code
   desiredNumberScheduled @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps">K8s
   DaemonSetStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sDaemonsetDesiredScheduledNodes =
@@ -1308,7 +1353,7 @@ CreateAsyncDoubleMetricK8sDaemonsetDesiredScheduledNodes(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.daemonset.node.misscheduled @endcode.", "reason": "renamed",
   "renamed_to": "k8s.daemonset.node.misscheduled"} <p> This metric aligns with the @code
   numberMisscheduled @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps">K8s
   DaemonSetStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sDaemonsetMisscheduledNodes =
@@ -1363,7 +1408,7 @@ CreateAsyncDoubleMetricK8sDaemonsetMisscheduledNodes(metrics::Meter *meter)
   <p>
   This metric aligns with the @code currentNumberScheduled @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps">K8s
   DaemonSetStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDaemonsetNodeCurrentScheduled =
@@ -1408,7 +1453,7 @@ CreateAsyncDoubleMetricK8sDaemonsetNodeCurrentScheduled(metrics::Meter *meter)
 /**
   Number of nodes that should be running the daemon pod (including nodes currently running the
   daemon pod). <p> This metric aligns with the @code desiredNumberScheduled @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps">K8s
   DaemonSetStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDaemonsetNodeDesiredScheduled =
@@ -1455,7 +1500,7 @@ CreateAsyncDoubleMetricK8sDaemonsetNodeDesiredScheduled(metrics::Meter *meter)
   <p>
   This metric aligns with the @code numberMisscheduled @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps">K8s
   DaemonSetStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDaemonsetNodeMisscheduled =
@@ -1499,7 +1544,7 @@ CreateAsyncDoubleMetricK8sDaemonsetNodeMisscheduled(metrics::Meter *meter)
 /**
   Number of nodes that should be running the daemon pod and have one or more of the daemon pod
   running and ready. <p> This metric aligns with the @code numberReady @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps">K8s
   DaemonSetStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDaemonsetNodeReady = "k8s.daemonset.node.ready";
@@ -1547,7 +1592,7 @@ CreateAsyncDoubleMetricK8sDaemonsetNodeReady(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.daemonset.node.ready @endcode.", "reason": "renamed",
   "renamed_to": "k8s.daemonset.node.ready"} <p> This metric aligns with the @code numberReady
   @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#daemonsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#daemonsetstatus-v1-apps">K8s
   DaemonSetStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sDaemonsetReadyNodes =
@@ -1603,7 +1648,7 @@ CreateAsyncDoubleMetricK8sDaemonsetReadyNodes(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.deployment.pod.available @endcode.", "reason": "renamed",
   "renamed_to": "k8s.deployment.pod.available"} <p> This metric aligns with the @code
   availableReplicas @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#deploymentstatus-v1-apps">K8s
   DeploymentStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sDeploymentAvailablePods =
@@ -1660,7 +1705,7 @@ CreateAsyncDoubleMetricK8sDeploymentAvailablePods(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.deployment.pod.desired @endcode.", "reason": "renamed",
   "renamed_to": "k8s.deployment.pod.desired"} <p> This metric aligns with the @code replicas
   @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentspec-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#deploymentspec-v1-apps">K8s
   DeploymentSpec</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sDeploymentDesiredPods =
@@ -1712,7 +1757,7 @@ CreateAsyncDoubleMetricK8sDeploymentDesiredPods(metrics::Meter *meter)
 /**
   Total number of available replica pods (ready for at least minReadySeconds) targeted by this
   deployment. <p> This metric aligns with the @code availableReplicas @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#deploymentstatus-v1-apps">K8s
   DeploymentStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDeploymentPodAvailable = "k8s.deployment.pod.available";
@@ -1758,7 +1803,7 @@ CreateAsyncDoubleMetricK8sDeploymentPodAvailable(metrics::Meter *meter)
   <p>
   This metric aligns with the @code replicas @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#deploymentspec-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#deploymentspec-v1-apps">K8s
   DeploymentSpec</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sDeploymentPodDesired = "k8s.deployment.pod.desired";
@@ -1805,7 +1850,7 @@ CreateAsyncDoubleMetricK8sDeploymentPodDesired(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.hpa.pod.current @endcode.", "reason": "renamed", "renamed_to":
   "k8s.hpa.pod.current"} <p> This metric aligns with the @code currentReplicas @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
   HorizontalPodAutoscalerStatus</a> <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sHpaCurrentPods =
@@ -1857,7 +1902,7 @@ CreateAsyncDoubleMetricK8sHpaCurrentPods(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.hpa.pod.desired @endcode.", "reason": "renamed", "renamed_to":
   "k8s.hpa.pod.desired"} <p> This metric aligns with the @code desiredReplicas @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
   HorizontalPodAutoscalerStatus</a> <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sHpaDesiredPods =
@@ -1908,7 +1953,7 @@ CreateAsyncDoubleMetricK8sHpaDesiredPods(metrics::Meter *meter)
   @deprecated
   {"note": "Replaced by @code k8s.hpa.pod.max @endcode.", "reason": "renamed", "renamed_to":
   "k8s.hpa.pod.max"} <p> This metric aligns with the @code maxReplicas @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerspec-v2-autoscaling">K8s
   HorizontalPodAutoscalerSpec</a> <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sHpaMaxPods = "k8s.hpa.max_pods";
@@ -1957,7 +2002,7 @@ CreateAsyncDoubleMetricK8sHpaMaxPods(metrics::Meter *meter)
   <p>
   This metric aligns with the @code averageUtilization @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#metrictarget-v2-autoscaling">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#metrictarget-v2-autoscaling">K8s
   HPA MetricTarget</a>. If the type of the metric is <a
   href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#support-for-metrics-apis">@code
   ContainerResource @endcode</a>, the @code k8s.container.name @endcode attribute MUST be set to
@@ -2009,7 +2054,7 @@ CreateAsyncDoubleMetricK8sHpaMetricTargetCpuAverageUtilization(metrics::Meter *m
   <p>
   This metric aligns with the @code averageValue @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#metrictarget-v2-autoscaling">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#metrictarget-v2-autoscaling">K8s
   HPA MetricTarget</a>. If the type of the metric is <a
   href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#support-for-metrics-apis">@code
   ContainerResource @endcode</a>, the @code k8s.container.name @endcode attribute MUST be set to
@@ -2061,7 +2106,7 @@ CreateAsyncDoubleMetricK8sHpaMetricTargetCpuAverageValue(metrics::Meter *meter)
   <p>
   This metric aligns with the @code value @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#metrictarget-v2-autoscaling">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#metrictarget-v2-autoscaling">K8s
   HPA MetricTarget</a>. If the type of the metric is <a
   href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#support-for-metrics-apis">@code
   ContainerResource @endcode</a>, the @code k8s.container.name @endcode attribute MUST be set to
@@ -2113,7 +2158,7 @@ CreateAsyncDoubleMetricK8sHpaMetricTargetCpuValue(metrics::Meter *meter)
   @deprecated
   {"note": "Replaced by @code k8s.hpa.pod.min @endcode.", "reason": "renamed", "renamed_to":
   "k8s.hpa.pod.min"} <p> This metric aligns with the @code minReplicas @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerspec-v2-autoscaling">K8s
   HorizontalPodAutoscalerSpec</a> <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sHpaMinPods = "k8s.hpa.min_pods";
@@ -2160,7 +2205,7 @@ CreateAsyncDoubleMetricK8sHpaMinPods(metrics::Meter *meter)
 /**
   Current number of replica pods managed by this horizontal pod autoscaler, as last seen by the
   autoscaler. <p> This metric aligns with the @code currentReplicas @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
   HorizontalPodAutoscalerStatus</a> <p> updowncounter
  */
 static constexpr const char *kMetricK8sHpaPodCurrent = "k8s.hpa.pod.current";
@@ -2200,7 +2245,7 @@ CreateAsyncDoubleMetricK8sHpaPodCurrent(metrics::Meter *meter)
 /**
   Desired number of replica pods managed by this horizontal pod autoscaler, as last calculated by
   the autoscaler. <p> This metric aligns with the @code desiredReplicas @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerstatus-v2-autoscaling">K8s
   HorizontalPodAutoscalerStatus</a> <p> updowncounter
  */
 static constexpr const char *kMetricK8sHpaPodDesired = "k8s.hpa.pod.desired";
@@ -2242,7 +2287,7 @@ CreateAsyncDoubleMetricK8sHpaPodDesired(metrics::Meter *meter)
   <p>
   This metric aligns with the @code maxReplicas @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerspec-v2-autoscaling">K8s
   HorizontalPodAutoscalerSpec</a> <p> updowncounter
  */
 static constexpr const char *kMetricK8sHpaPodMax = "k8s.hpa.pod.max";
@@ -2283,7 +2328,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
   <p>
   This metric aligns with the @code minReplicas @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#horizontalpodautoscalerspec-v2-autoscaling">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#horizontalpodautoscalerspec-v2-autoscaling">K8s
   HorizontalPodAutoscalerSpec</a> <p> updowncounter
  */
 static constexpr const char *kMetricK8sHpaPodMin = "k8s.hpa.pod.min";
@@ -2325,7 +2370,7 @@ static inline nostd::shared_ptr<metrics::ObservableInstrument> CreateAsyncDouble
   @deprecated
   {"note": "Replaced by @code k8s.job.pod.active @endcode.", "reason": "renamed", "renamed_to":
   "k8s.job.pod.active"} <p> This metric aligns with the @code active @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobstatus-v1-batch">K8s
   JobStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sJobActivePods =
@@ -2377,7 +2422,7 @@ CreateAsyncDoubleMetricK8sJobActivePods(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.job.pod.desired_successful @endcode.", "reason": "renamed",
   "renamed_to": "k8s.job.pod.desired_successful"} <p> This metric aligns with the @code completions
   @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobspec-v1-batch">K8s
   JobSpec</a>.. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sJobDesiredSuccessfulPods =
@@ -2433,7 +2478,7 @@ CreateAsyncDoubleMetricK8sJobDesiredSuccessfulPods(metrics::Meter *meter)
   @deprecated
   {"note": "Replaced by @code k8s.job.pod.failed @endcode.", "reason": "renamed", "renamed_to":
   "k8s.job.pod.failed"} <p> This metric aligns with the @code failed @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobstatus-v1-batch">K8s
   JobStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sJobFailedPods =
@@ -2485,7 +2530,7 @@ CreateAsyncDoubleMetricK8sJobFailedPods(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.job.pod.max_parallel @endcode.", "reason": "renamed",
   "renamed_to": "k8s.job.pod.max_parallel"} <p> This metric aligns with the @code parallelism
   @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobspec-v1-batch">K8s
   JobSpec</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sJobMaxParallelPods =
@@ -2539,7 +2584,7 @@ CreateAsyncDoubleMetricK8sJobMaxParallelPods(metrics::Meter *meter)
   <p>
   This metric aligns with the @code active @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobstatus-v1-batch">K8s
   JobStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sJobPodActive = "k8s.job.pod.active";
@@ -2580,7 +2625,7 @@ CreateAsyncDoubleMetricK8sJobPodActive(metrics::Meter *meter)
   <p>
   This metric aligns with the @code completions @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobspec-v1-batch">K8s
   JobSpec</a>.. <p> updowncounter
  */
 static constexpr const char *kMetricK8sJobPodDesiredSuccessful = "k8s.job.pod.desired_successful";
@@ -2625,7 +2670,7 @@ CreateAsyncDoubleMetricK8sJobPodDesiredSuccessful(metrics::Meter *meter)
   <p>
   This metric aligns with the @code failed @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobstatus-v1-batch">K8s
   JobStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sJobPodFailed = "k8s.job.pod.failed";
@@ -2666,7 +2711,7 @@ CreateAsyncDoubleMetricK8sJobPodFailed(metrics::Meter *meter)
   <p>
   This metric aligns with the @code parallelism @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobspec-v1-batch">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobspec-v1-batch">K8s
   JobSpec</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sJobPodMaxParallel = "k8s.job.pod.max_parallel";
@@ -2707,7 +2752,7 @@ CreateAsyncDoubleMetricK8sJobPodMaxParallel(metrics::Meter *meter)
   <p>
   This metric aligns with the @code succeeded @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobstatus-v1-batch">K8s
   JobStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sJobPodSuccessful = "k8s.job.pod.successful";
@@ -2749,7 +2794,7 @@ CreateAsyncDoubleMetricK8sJobPodSuccessful(metrics::Meter *meter)
   @deprecated
   {"note": "Replaced by @code k8s.job.pod.successful @endcode.", "reason": "renamed", "renamed_to":
   "k8s.job.pod.successful"} <p> This metric aligns with the @code succeeded @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#jobstatus-v1-batch">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#jobstatus-v1-batch">K8s
   JobStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sJobSuccessfulPods =
@@ -5197,7 +5242,7 @@ CreateAsyncDoubleMetricK8sPodVolumeUsage(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.replicaset.pod.available @endcode.", "reason": "renamed",
   "renamed_to": "k8s.replicaset.pod.available"} <p> This metric aligns with the @code
   availableReplicas @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#replicasetstatus-v1-apps">K8s
   ReplicaSetStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sReplicasetAvailablePods =
@@ -5254,7 +5299,7 @@ CreateAsyncDoubleMetricK8sReplicasetAvailablePods(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.replicaset.pod.desired @endcode.", "reason": "renamed",
   "renamed_to": "k8s.replicaset.pod.desired"} <p> This metric aligns with the @code replicas
   @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetspec-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#replicasetspec-v1-apps">K8s
   ReplicaSetSpec</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sReplicasetDesiredPods =
@@ -5306,7 +5351,7 @@ CreateAsyncDoubleMetricK8sReplicasetDesiredPods(metrics::Meter *meter)
 /**
   Total number of available replica pods (ready for at least minReadySeconds) targeted by this
   replicaset. <p> This metric aligns with the @code availableReplicas @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#replicasetstatus-v1-apps">K8s
   ReplicaSetStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sReplicasetPodAvailable = "k8s.replicaset.pod.available";
@@ -5352,7 +5397,7 @@ CreateAsyncDoubleMetricK8sReplicasetPodAvailable(metrics::Meter *meter)
   <p>
   This metric aligns with the @code replicas @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicasetspec-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#replicasetspec-v1-apps">K8s
   ReplicaSetSpec</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sReplicasetPodDesired = "k8s.replicaset.pod.desired";
@@ -5618,7 +5663,7 @@ CreateAsyncDoubleMetricK8sReplicationcontrollerDesiredPods(metrics::Meter *meter
   Total number of available replica pods (ready for at least minReadySeconds) targeted by this
   replication controller. <p> This metric aligns with the @code availableReplicas @endcode field of
   the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerstatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#replicationcontrollerstatus-v1-core">K8s
   ReplicationControllerStatus</a> <p> updowncounter
  */
 static constexpr const char *kMetricK8sReplicationcontrollerPodAvailable =
@@ -5665,7 +5710,7 @@ CreateAsyncDoubleMetricK8sReplicationcontrollerPodAvailable(metrics::Meter *mete
   <p>
   This metric aligns with the @code replicas @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#replicationcontrollerspec-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#replicationcontrollerspec-v1-core">K8s
   ReplicationControllerSpec</a> <p> updowncounter
  */
 static constexpr const char *kMetricK8sReplicationcontrollerPodDesired =
@@ -5712,7 +5757,7 @@ CreateAsyncDoubleMetricK8sReplicationcontrollerPodDesired(metrics::Meter *meter)
   <p>
   This metric is retrieved from the @code hard @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaCpuLimitHard =
@@ -5760,7 +5805,7 @@ CreateAsyncDoubleMetricK8sResourcequotaCpuLimitHard(metrics::Meter *meter)
   <p>
   This metric is retrieved from the @code used @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaCpuLimitUsed =
@@ -5808,7 +5853,7 @@ CreateAsyncDoubleMetricK8sResourcequotaCpuLimitUsed(metrics::Meter *meter)
   <p>
   This metric is retrieved from the @code hard @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaCpuRequestHard =
@@ -5856,7 +5901,7 @@ CreateAsyncDoubleMetricK8sResourcequotaCpuRequestHard(metrics::Meter *meter)
   <p>
   This metric is retrieved from the @code used @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaCpuRequestUsed =
@@ -5904,7 +5949,7 @@ CreateAsyncDoubleMetricK8sResourcequotaCpuRequestUsed(metrics::Meter *meter)
   <p>
   This metric is retrieved from the @code hard @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaEphemeralStorageLimitHard =
@@ -5954,7 +5999,7 @@ CreateAsyncDoubleMetricK8sResourcequotaEphemeralStorageLimitHard(metrics::Meter 
   <p>
   This metric is retrieved from the @code used @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaEphemeralStorageLimitUsed =
@@ -6004,7 +6049,7 @@ CreateAsyncDoubleMetricK8sResourcequotaEphemeralStorageLimitUsed(metrics::Meter 
   <p>
   This metric is retrieved from the @code hard @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaEphemeralStorageRequestHard =
@@ -6054,7 +6099,7 @@ CreateAsyncDoubleMetricK8sResourcequotaEphemeralStorageRequestHard(metrics::Mete
   <p>
   This metric is retrieved from the @code used @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaEphemeralStorageRequestUsed =
@@ -6104,7 +6149,7 @@ CreateAsyncDoubleMetricK8sResourcequotaEphemeralStorageRequestUsed(metrics::Mete
   <p>
   This metric is retrieved from the @code hard @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaHugepageCountRequestHard =
@@ -6154,7 +6199,7 @@ CreateAsyncDoubleMetricK8sResourcequotaHugepageCountRequestHard(metrics::Meter *
   <p>
   This metric is retrieved from the @code used @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaHugepageCountRequestUsed =
@@ -6204,7 +6249,7 @@ CreateAsyncDoubleMetricK8sResourcequotaHugepageCountRequestUsed(metrics::Meter *
   <p>
   This metric is retrieved from the @code hard @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaMemoryLimitHard =
@@ -6252,7 +6297,7 @@ CreateAsyncDoubleMetricK8sResourcequotaMemoryLimitHard(metrics::Meter *meter)
   <p>
   This metric is retrieved from the @code used @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaMemoryLimitUsed =
@@ -6300,7 +6345,7 @@ CreateAsyncDoubleMetricK8sResourcequotaMemoryLimitUsed(metrics::Meter *meter)
   <p>
   This metric is retrieved from the @code hard @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaMemoryRequestHard =
@@ -6348,7 +6393,7 @@ CreateAsyncDoubleMetricK8sResourcequotaMemoryRequestHard(metrics::Meter *meter)
   <p>
   This metric is retrieved from the @code used @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaMemoryRequestUsed =
@@ -6396,7 +6441,7 @@ CreateAsyncDoubleMetricK8sResourcequotaMemoryRequestUsed(metrics::Meter *meter)
   <p>
   This metric is retrieved from the @code hard @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaObjectCountHard =
@@ -6444,7 +6489,7 @@ CreateAsyncDoubleMetricK8sResourcequotaObjectCountHard(metrics::Meter *meter)
   <p>
   This metric is retrieved from the @code used @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sResourcequotaObjectCountUsed =
@@ -6492,7 +6537,7 @@ CreateAsyncDoubleMetricK8sResourcequotaObjectCountUsed(metrics::Meter *meter)
   <p>
   This metric is retrieved from the @code hard @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> The @code k8s.storageclass.name @endcode should be required when a
   resource quota is defined for a specific storage class. <p> updowncounter
  */
@@ -6544,7 +6589,7 @@ CreateAsyncDoubleMetricK8sResourcequotaPersistentvolumeclaimCountHard(metrics::M
   <p>
   This metric is retrieved from the @code used @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> The @code k8s.storageclass.name @endcode should be required when a
   resource quota is defined for a specific storage class. <p> updowncounter
  */
@@ -6596,7 +6641,7 @@ CreateAsyncDoubleMetricK8sResourcequotaPersistentvolumeclaimCountUsed(metrics::M
   <p>
   This metric is retrieved from the @code hard @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> The @code k8s.storageclass.name @endcode should be required when a
   resource quota is defined for a specific storage class. <p> updowncounter
  */
@@ -6645,7 +6690,7 @@ CreateAsyncDoubleMetricK8sResourcequotaStorageRequestHard(metrics::Meter *meter)
   <p>
   This metric is retrieved from the @code used @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.32/#resourcequotastatus-v1-core">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#resourcequotastatus-v1-core">K8s
   ResourceQuotaStatus</a>. <p> The @code k8s.storageclass.name @endcode should be required when a
   resource quota is defined for a specific storage class. <p> updowncounter
  */
@@ -6817,7 +6862,7 @@ CreateAsyncDoubleMetricK8sServiceLoadBalancerIngressCount(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.statefulset.pod.current @endcode.", "reason": "renamed",
   "renamed_to": "k8s.statefulset.pod.current"} <p> This metric aligns with the @code currentReplicas
   @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps">K8s
   StatefulSetStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sStatefulsetCurrentPods =
@@ -6873,7 +6918,7 @@ CreateAsyncDoubleMetricK8sStatefulsetCurrentPods(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.statefulset.pod.desired @endcode.", "reason": "renamed",
   "renamed_to": "k8s.statefulset.pod.desired"} <p> This metric aligns with the @code replicas
   @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetspec-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetspec-v1-apps">K8s
   StatefulSetSpec</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sStatefulsetDesiredPods =
@@ -6926,7 +6971,7 @@ CreateAsyncDoubleMetricK8sStatefulsetDesiredPods(metrics::Meter *meter)
   The number of replica pods created by the statefulset controller from the statefulset version
   indicated by currentRevision. <p> This metric aligns with the @code currentReplicas @endcode field
   of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps">K8s
   StatefulSetStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sStatefulsetPodCurrent = "k8s.statefulset.pod.current";
@@ -6972,7 +7017,7 @@ CreateAsyncDoubleMetricK8sStatefulsetPodCurrent(metrics::Meter *meter)
   <p>
   This metric aligns with the @code replicas @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetspec-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetspec-v1-apps">K8s
   StatefulSetSpec</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sStatefulsetPodDesired = "k8s.statefulset.pod.desired";
@@ -7017,7 +7062,7 @@ CreateAsyncDoubleMetricK8sStatefulsetPodDesired(metrics::Meter *meter)
   <p>
   This metric aligns with the @code readyReplicas @endcode field of the
   <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps">K8s
   StatefulSetStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sStatefulsetPodReady = "k8s.statefulset.pod.ready";
@@ -7061,7 +7106,7 @@ CreateAsyncDoubleMetricK8sStatefulsetPodReady(metrics::Meter *meter)
   Number of replica pods created by the statefulset controller from the statefulset version
   indicated by updateRevision. <p> This metric aligns with the @code updatedReplicas @endcode field
   of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps">K8s
   StatefulSetStatus</a>. <p> updowncounter
  */
 static constexpr const char *kMetricK8sStatefulsetPodUpdated = "k8s.statefulset.pod.updated";
@@ -7109,7 +7154,7 @@ CreateAsyncDoubleMetricK8sStatefulsetPodUpdated(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.statefulset.pod.ready @endcode.", "reason": "renamed",
   "renamed_to": "k8s.statefulset.pod.ready"} <p> This metric aligns with the @code readyReplicas
   @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps">K8s
   StatefulSetStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sStatefulsetReadyPods =
@@ -7165,7 +7210,7 @@ CreateAsyncDoubleMetricK8sStatefulsetReadyPods(metrics::Meter *meter)
   {"note": "Replaced by @code k8s.statefulset.pod.updated @endcode.", "reason": "renamed",
   "renamed_to": "k8s.statefulset.pod.updated"} <p> This metric aligns with the @code updatedReplicas
   @endcode field of the <a
-  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#statefulsetstatus-v1-apps">K8s
+  href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.34/#statefulsetstatus-v1-apps">K8s
   StatefulSetStatus</a>. <p> updowncounter
  */
 OPENTELEMETRY_DEPRECATED static constexpr const char *kMetricK8sStatefulsetUpdatedPods =
