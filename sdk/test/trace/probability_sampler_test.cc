@@ -131,7 +131,9 @@ TEST(ProbabilitySampler, ShouldSampleNever)
 
   ASSERT_EQ(Decision::DROP, sampling_result.decision);
   ASSERT_EQ(nullptr, sampling_result.attributes);
-  ASSERT_EQ(nullptr, sampling_result.trace_state);
+  ASSERT_NE(nullptr, sampling_result.trace_state);
+  std::string ot_value;
+  ASSERT_FALSE(sampling_result.trace_state->Get("ot", ot_value));
 }
 
 TEST(ProbabilitySampler, ShouldSampleAtThreshold)
@@ -152,7 +154,9 @@ TEST(ProbabilitySampler, ShouldSampleAtThreshold)
                                       TraceIdWithRandomness(0x7fffffffffffff));
 
   ASSERT_EQ(Decision::DROP, sampling_result.decision);
-  ASSERT_EQ(nullptr, sampling_result.trace_state);
+  ASSERT_NE(nullptr, sampling_result.trace_state);
+  std::string dropped_ot;
+  ASSERT_FALSE(sampling_result.trace_state->Get("ot", dropped_ot));
 }
 
 TEST(ProbabilitySampler, ExplicitRandomnessTakesPrecedence)
@@ -229,6 +233,60 @@ TEST(ProbabilitySampler, ThresholdReplacesExistingValue)
   std::string ot_value;
   ASSERT_TRUE(sampling_result.trace_state->Get("ot", ot_value));
   ASSERT_EQ("th:c;rv:ffffffffffffff", ot_value);
+
+  std::string foo_value;
+  ASSERT_TRUE(sampling_result.trace_state->Get("foo", foo_value));
+  ASSERT_EQ("bar", foo_value);
+}
+
+TEST(ProbabilitySampler, DropClearsStaleThreshold)
+{
+  ProbabilitySampler s1(0.5);
+
+  uint8_t trace_id_buffer[trace_api::TraceId::kSize] = {1};
+  trace_api::TraceId trace_id{trace_id_buffer};
+  uint8_t span_id_buffer[trace_api::SpanId::kSize] = {1};
+  trace_api::SpanId span_id{span_id_buffer};
+
+  // rv of zero is below the 0.5 threshold, so the span is dropped.
+  auto trace_state =
+      trace_api::TraceState::FromHeader("ot=th:8;rv:00000000000000;vendor:xyz,foo=bar");
+  trace_api::SpanContext context(trace_id, span_id, trace_api::TraceFlags{0}, false, trace_state);
+
+  auto sampling_result = SampleWithContext(s1, context, TraceIdWithRandomness(0));
+
+  ASSERT_EQ(Decision::DROP, sampling_result.decision);
+  ASSERT_NE(nullptr, sampling_result.trace_state);
+
+  std::string ot_value;
+  ASSERT_TRUE(sampling_result.trace_state->Get("ot", ot_value));
+  ASSERT_EQ("rv:00000000000000;vendor:xyz", ot_value);
+
+  std::string foo_value;
+  ASSERT_TRUE(sampling_result.trace_state->Get("foo", foo_value));
+  ASSERT_EQ("bar", foo_value);
+}
+
+TEST(ProbabilitySampler, DropDeletesOtWhenOnlyThreshold)
+{
+  // ot=th:8 with no other sub-keys: stripping th leaves an empty value, so the ot key is deleted.
+  ProbabilitySampler s1(0.0);
+
+  uint8_t trace_id_buffer[trace_api::TraceId::kSize] = {1};
+  trace_api::TraceId trace_id{trace_id_buffer};
+  uint8_t span_id_buffer[trace_api::SpanId::kSize] = {1};
+  trace_api::SpanId span_id{span_id_buffer};
+
+  auto trace_state = trace_api::TraceState::FromHeader("ot=th:8,foo=bar");
+  trace_api::SpanContext context(trace_id, span_id, trace_api::TraceFlags{0}, false, trace_state);
+
+  auto sampling_result = SampleWithContext(s1, context, TraceIdWithRandomness(0));
+
+  ASSERT_EQ(Decision::DROP, sampling_result.decision);
+  ASSERT_NE(nullptr, sampling_result.trace_state);
+
+  std::string ot_value;
+  ASSERT_FALSE(sampling_result.trace_state->Get("ot", ot_value));
 
   std::string foo_value;
   ASSERT_TRUE(sampling_result.trace_state->Get("foo", foo_value));

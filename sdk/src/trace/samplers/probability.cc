@@ -3,7 +3,6 @@
 
 #include <stddef.h>
 #include <atomic>
-#include <cmath>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -21,28 +20,21 @@
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
 
+#include "ot_trace_state.h"
+
 namespace trace_api = opentelemetry::trace;
 namespace nostd     = opentelemetry::nostd;
 
 namespace
 {
-constexpr char kOtTraceStateKey[] = "ot";
-
-// Rejection threshold for a ratio of zero, 2^56: drops every span.
-constexpr uint64_t kMaxThreshold = 1ULL << 56;
-
-/**
- * Converts a ratio in [0, 1] to a 56-bit rejection threshold.
- */
-uint64_t CalculateRejectionThreshold(double ratio) noexcept
+// Clamps ratio to [0, 1]. NaN and negatives map to 0 (never-sample).
+double ClampProbability(double ratio) noexcept
 {
-  // The negated comparison also routes NaN to the never-sample threshold.
   if (!(ratio > 0.0))
-    return kMaxThreshold;
-  if (ratio >= 1.0)
-    return 0;
-  return kMaxThreshold -
-         static_cast<uint64_t>(std::llround(ratio * static_cast<double>(kMaxThreshold)));
+    return 0.0;
+  if (ratio > 1.0)
+    return 1.0;
+  return ratio;
 }
 
 bool ParseHex56(nostd::string_view hex, uint64_t *value) noexcept
@@ -81,19 +73,6 @@ std::string EncodeThreshold(uint64_t threshold)
   }
   hex.erase(hex.find_last_not_of('0') + 1);
   return hex;
-}
-
-uint64_t RandomnessFromTraceId(const trace_api::TraceId &trace_id) noexcept
-{
-  static_assert(trace_api::TraceId::kSize >= 7, "TraceID must be at least 7 bytes long.");
-
-  const uint8_t *data = trace_id.Id().data();
-  uint64_t result     = 0;
-  for (size_t i = trace_api::TraceId::kSize - 7; i < trace_api::TraceId::kSize; ++i)
-  {
-    result = (result << 8) | data[i];
-  }
-  return result;
 }
 
 // Returns true when the ot value carries a valid rv sub-key.
@@ -154,14 +133,9 @@ namespace sdk
 namespace trace
 {
 ProbabilitySampler::ProbabilitySampler(double ratio)
-    : threshold_(CalculateRejectionThreshold(ratio))
-{
-  if (!(ratio > 0.0))
-    ratio = 0.0;
-  if (ratio > 1.0)
-    ratio = 1.0;
-  description_ = "ProbabilitySampler{" + std::to_string(ratio) + "}";
-}
+    : description_("ProbabilitySampler{" + std::to_string(ClampProbability(ratio)) + "}"),
+      threshold_(CalculateThreshold(ClampProbability(ratio)))
+{}
 
 SamplingResult ProbabilitySampler::ShouldSample(
     const trace_api::SpanContext &parent_context,
@@ -171,31 +145,41 @@ SamplingResult ProbabilitySampler::ShouldSample(
     const opentelemetry::common::KeyValueIterable & /*attributes*/,
     const trace_api::SpanContextKeyValueIterable & /*links*/) noexcept
 {
-  if (threshold_ == kMaxThreshold)
-    return {Decision::DROP, nullptr, {}};
-
   auto parent_trace_state = parent_context.trace_state();
   std::string ot_value;
   bool has_ot = parent_trace_state->Get(kOtTraceStateKey, ot_value);
 
-  uint64_t randomness = 0;
-  if (!ExplicitRandomness(ot_value, &randomness))
+  bool drop = threshold_ == kMaxThreshold;
+  if (!drop)
   {
-    if (parent_context.IsValid() && !parent_context.trace_flags().IsRandom())
+    uint64_t randomness = 0;
+    if (!ExplicitRandomness(ot_value, &randomness))
     {
-      static std::atomic<bool> warned{false};
-      if (!warned.exchange(true))
+      if (parent_context.IsValid() && !parent_context.trace_flags().IsRandom())
       {
-        OTEL_INTERNAL_LOG_WARN(
-            "ProbabilitySampler presumes TraceID randomness, but the W3C random trace flag is "
-            "not set. Upgrade the caller to W3C Trace Context Level 2.");
+        static std::atomic<bool> warned{false};
+        if (!warned.exchange(true))
+        {
+          OTEL_INTERNAL_LOG_WARN(
+              "ProbabilitySampler presumes TraceID randomness, but the W3C random trace flag is "
+              "not set. Upgrade the caller to W3C Trace Context Level 2.");
+        }
       }
+      randomness = GetRandomnessFromTraceId(trace_id);
     }
-    randomness = RandomnessFromTraceId(trace_id);
+    drop = randomness < threshold_;
   }
 
-  if (randomness < threshold_)
-    return {Decision::DROP, nullptr, {}};
+  if (drop)
+  {
+    OtelTraceState ot_state = OtelTraceState::Parse(ot_value);
+    ot_state.has_threshold  = false;
+    std::string dropped_ot  = ot_state.Serialize();
+    auto trace_state        = parent_trace_state->Delete(kOtTraceStateKey);
+    if (!dropped_ot.empty())
+      trace_state = trace_state->Set(kOtTraceStateKey, dropped_ot);
+    return {Decision::DROP, nullptr, trace_state};
+  }
 
   std::string new_ot_value = SetThresholdSubKey(ot_value, EncodeThreshold(threshold_));
   if (!trace_api::TraceState::IsValidValue(new_ot_value))
