@@ -21,6 +21,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
@@ -73,7 +74,7 @@ struct AttributeValueVisitor
   bool allow_bytes_;
 
   template <class T>
-  void operator()(T &&) const noexcept
+  void operator()(T &&) const
   {
     static_assert(
         IsSupportedAttributeValue<T>::value,
@@ -81,22 +82,13 @@ struct AttributeValueVisitor
         "an overload operator implemented in this visitor OR implicit conversion attempted!");
   }
 
-  void operator()(bool bool_value) const noexcept { proto_value_->set_bool_value(bool_value); }
-  void operator()(int32_t int32_value) const noexcept { proto_value_->set_int_value(int32_value); }
-  void operator()(int64_t int64_value) const noexcept { proto_value_->set_int_value(int64_value); }
-  void operator()(uint32_t uint32_value) const noexcept
-  {
-    proto_value_->set_int_value(uint32_value);
-  }
-  void operator()(uint64_t uint64_value) const noexcept
-  {
-    SetUint64Value(proto_value_, uint64_value);
-  }
-  void operator()(double double_value) const noexcept
-  {
-    proto_value_->set_double_value(double_value);
-  }
-  void operator()(const char *str_value) const noexcept
+  void operator()(bool bool_value) const { proto_value_->set_bool_value(bool_value); }
+  void operator()(int32_t int32_value) const { proto_value_->set_int_value(int32_value); }
+  void operator()(int64_t int64_value) const { proto_value_->set_int_value(int64_value); }
+  void operator()(uint32_t uint32_value) const { proto_value_->set_int_value(uint32_value); }
+  void operator()(uint64_t uint64_value) const { SetUint64Value(proto_value_, uint64_value); }
+  void operator()(double double_value) const { proto_value_->set_double_value(double_value); }
+  void operator()(const char *str_value) const
   {
 #if defined(ENABLE_OTLP_UTF8_VALIDITY)
     if (utf8_range::IsStructurallyValid(str_value))
@@ -111,7 +103,7 @@ struct AttributeValueVisitor
     proto_value_->set_string_value(str_value);
 #endif
   }
-  void operator()(nostd::string_view str_value) const noexcept
+  void operator()(nostd::string_view str_value) const
   {
 #if defined(ENABLE_OTLP_UTF8_VALIDITY)
     if (utf8_range::IsStructurallyValid({str_value.data(), str_value.size()}))
@@ -126,7 +118,7 @@ struct AttributeValueVisitor
     proto_value_->set_string_value(str_value.data(), str_value.size());
 #endif
   }
-  void operator()(nostd::span<const bool> span_bool_value) const noexcept
+  void operator()(nostd::span<const bool> span_bool_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(span_bool_value.size()));
@@ -135,7 +127,7 @@ struct AttributeValueVisitor
       array_value->add_values()->set_bool_value(val);
     }
   }
-  void operator()(nostd::span<const int32_t> span_int32_value) const noexcept
+  void operator()(nostd::span<const int32_t> span_int32_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(span_int32_value.size()));
@@ -144,7 +136,7 @@ struct AttributeValueVisitor
       array_value->add_values()->set_int_value(val);
     }
   }
-  void operator()(nostd::span<const int64_t> span_int64_value) const noexcept
+  void operator()(nostd::span<const int64_t> span_int64_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(span_int64_value.size()));
@@ -153,7 +145,7 @@ struct AttributeValueVisitor
       array_value->add_values()->set_int_value(val);
     }
   }
-  void operator()(nostd::span<const uint32_t> span_uint32_value) const noexcept
+  void operator()(nostd::span<const uint32_t> span_uint32_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(span_uint32_value.size()));
@@ -162,7 +154,7 @@ struct AttributeValueVisitor
       array_value->add_values()->set_int_value(uint32_value);
     }
   }
-  void operator()(nostd::span<const double> span_double_value) const noexcept
+  void operator()(nostd::span<const double> span_double_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(span_double_value.size()));
@@ -171,7 +163,7 @@ struct AttributeValueVisitor
       array_value->add_values()->set_double_value(double_value);
     }
   }
-  void operator()(nostd::span<const nostd::string_view> span_string_value) const noexcept
+  void operator()(nostd::span<const nostd::string_view> span_string_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(span_string_value.size()));
@@ -191,7 +183,7 @@ struct AttributeValueVisitor
 #endif
     }
   }
-  void operator()(nostd::span<const uint64_t> span_uint64_value) const noexcept
+  void operator()(nostd::span<const uint64_t> span_uint64_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(span_uint64_value.size()));
@@ -200,7 +192,7 @@ struct AttributeValueVisitor
       SetUint64Value(array_value->add_values(), uint64_value);
     }
   }
-  void operator()(nostd::span<const uint8_t> span_uint8_value) const noexcept
+  void operator()(nostd::span<const uint8_t> span_uint8_value) const
   {
     if (allow_bytes_)
     {
@@ -226,7 +218,7 @@ struct OwnedAttributeValueVisitor
   bool allow_bytes_{true};
 
   template <class T>
-  void operator()(T &&) const noexcept
+  void operator()(T &&) const
   {
     static_assert(IsSupportedAttributeValue<T>::value,
                   "OwnedAttributeValueVisitor: Value type in "
@@ -234,26 +226,17 @@ struct OwnedAttributeValueVisitor
                   "operator implemented in this visitor OR implicit conversion attempted!");
   }
 
-  void operator()(bool bool_value) const noexcept { proto_value_->set_bool_value(bool_value); }
-  void operator()(int32_t int32_value) const noexcept { proto_value_->set_int_value(int32_value); }
-  void operator()(uint32_t uint32_value) const noexcept
-  {
-    proto_value_->set_int_value(uint32_value);
-  }
-  void operator()(int64_t int64_value) const noexcept { proto_value_->set_int_value(int64_value); }
-  void operator()(uint64_t uint64_value) const noexcept
-  {
-    SetUint64Value(proto_value_, uint64_value);
-  }
-  void operator()(double double_value) const noexcept
-  {
-    proto_value_->set_double_value(double_value);
-  }
-  void operator()(const std::string &string_value) const noexcept
+  void operator()(bool bool_value) const { proto_value_->set_bool_value(bool_value); }
+  void operator()(int32_t int32_value) const { proto_value_->set_int_value(int32_value); }
+  void operator()(uint32_t uint32_value) const { proto_value_->set_int_value(uint32_value); }
+  void operator()(int64_t int64_value) const { proto_value_->set_int_value(int64_value); }
+  void operator()(uint64_t uint64_value) const { SetUint64Value(proto_value_, uint64_value); }
+  void operator()(double double_value) const { proto_value_->set_double_value(double_value); }
+  void operator()(const std::string &string_value) const
   {
     proto_value_->set_string_value(string_value);
   }
-  void operator()(const std::vector<bool> &vector_bool_value) const noexcept
+  void operator()(const std::vector<bool> &vector_bool_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(vector_bool_value.size()));
@@ -262,7 +245,7 @@ struct OwnedAttributeValueVisitor
       array_value->add_values()->set_bool_value(bool_value);
     }
   }
-  void operator()(const std::vector<int32_t> &vector_int32_value) const noexcept
+  void operator()(const std::vector<int32_t> &vector_int32_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(vector_int32_value.size()));
@@ -271,7 +254,7 @@ struct OwnedAttributeValueVisitor
       array_value->add_values()->set_int_value(int32_value);
     }
   }
-  void operator()(const std::vector<uint32_t> &vector_uint32_value) const noexcept
+  void operator()(const std::vector<uint32_t> &vector_uint32_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(vector_uint32_value.size()));
@@ -280,7 +263,7 @@ struct OwnedAttributeValueVisitor
       array_value->add_values()->set_int_value(static_cast<int64_t>(uint32_value));
     }
   }
-  void operator()(const std::vector<int64_t> &vector_int64_value) const noexcept
+  void operator()(const std::vector<int64_t> &vector_int64_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(vector_int64_value.size()));
@@ -289,7 +272,7 @@ struct OwnedAttributeValueVisitor
       array_value->add_values()->set_int_value(int64_value);
     }
   }
-  void operator()(const std::vector<double> &vector_double_value) const noexcept
+  void operator()(const std::vector<double> &vector_double_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(vector_double_value.size()));
@@ -298,7 +281,7 @@ struct OwnedAttributeValueVisitor
       array_value->add_values()->set_double_value(double_value);
     }
   }
-  void operator()(const std::vector<std::string> &vector_string_value) const noexcept
+  void operator()(const std::vector<std::string> &vector_string_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(vector_string_value.size()));
@@ -318,7 +301,7 @@ struct OwnedAttributeValueVisitor
 #endif
     }
   }
-  void operator()(const std::vector<uint64_t> &vector_uint64_value) const noexcept
+  void operator()(const std::vector<uint64_t> &vector_uint64_value) const
   {
     opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
     array_value->mutable_values()->Reserve(static_cast<int>(vector_uint64_value.size()));
@@ -327,7 +310,7 @@ struct OwnedAttributeValueVisitor
       SetUint64Value(array_value->add_values(), uint64_value);
     }
   }
-  void operator()(const std::vector<uint8_t> &vector_uint8_value) const noexcept
+  void operator()(const std::vector<uint8_t> &vector_uint8_value) const
   {
     if (allow_bytes_)
     {
@@ -349,24 +332,62 @@ struct OwnedAttributeValueVisitor
 
 }  // namespace
 
-// NOLINTNEXTLINE(bugprone-exception-escape)
 void OtlpPopulateAttributeUtils::PopulateAnyValue(
     opentelemetry::proto::common::v1::AnyValue *proto_value,
     const opentelemetry::common::AttributeValue &value,
     bool allow_bytes) noexcept
 {
-  // AttributeValueVisitor is noexcept and nostd::visit should never throw.
-  nostd::visit(AttributeValueVisitor{proto_value, allow_bytes}, value);
+#if defined(OPENTELEMETRY_HAVE_EXCEPTIONS)
+  try
+  {
+#endif
+    nostd::visit(AttributeValueVisitor{proto_value, allow_bytes}, value);
+#if defined(OPENTELEMETRY_HAVE_EXCEPTIONS)
+  }
+#  if defined(OPENTELEMETRY_HAVE_STD_VARIANT)
+  catch (const std::bad_variant_access &e)
+#  else
+  catch (const opentelemetry::nostd::bad_variant_access &e)
+#  endif
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[OTLP Populate Attribute] bad_variant_access in PopulateAnyValue: " << e.what());
+  }
+  catch (const std::bad_alloc &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[OTLP Populate Attribute] std::bad_alloc in PopulateAnyValue: " << e.what());
+  }
+#endif
 }
 
-// NOLINTNEXTLINE(bugprone-exception-escape)
 void OtlpPopulateAttributeUtils::PopulateAnyValue(
     opentelemetry::proto::common::v1::AnyValue *proto_value,
     const opentelemetry::sdk::common::OwnedAttributeValue &value,
     bool allow_bytes) noexcept
 {
-  // OwnedAttributeValueVisitor is noexcept and nostd::visit should never throw.
-  nostd::visit(OwnedAttributeValueVisitor{proto_value, allow_bytes}, value);
+#if defined(OPENTELEMETRY_HAVE_EXCEPTIONS)
+  try
+  {
+#endif
+    nostd::visit(OwnedAttributeValueVisitor{proto_value, allow_bytes}, value);
+#if defined(OPENTELEMETRY_HAVE_EXCEPTIONS)
+  }
+#  if defined(OPENTELEMETRY_HAVE_STD_VARIANT)
+  catch (const std::bad_variant_access &e)
+#  else
+  catch (const opentelemetry::nostd::bad_variant_access &e)
+#  endif
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[OTLP Populate Attribute] bad_variant_access in PopulateAnyValue: " << e.what());
+  }
+  catch (const std::bad_alloc &e)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[OTLP Populate Attribute] std::bad_alloc in PopulateAnyValue: " << e.what());
+  }
+#endif
 }
 
 void OtlpPopulateAttributeUtils::PopulateAttribute(
