@@ -56,22 +56,20 @@ public:
                                     &instrumentation_scope) noexcept;
 
   static void PopulateAnyValue(opentelemetry::proto::common::v1::AnyValue *proto_value,
-                               const opentelemetry::common::AttributeValue &value,
-                               bool allow_bytes) noexcept;
+                               const opentelemetry::common::AttributeValue &value) noexcept;
 
-  static void PopulateAnyValue(opentelemetry::proto::common::v1::AnyValue *proto_value,
-                               const opentelemetry::sdk::common::OwnedAttributeValue &value,
-                               bool allow_bytes) noexcept;
-
-  static void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
-                                nostd::string_view key,
-                                const opentelemetry::common::AttributeValue &value,
-                                bool allow_bytes) noexcept;
+  static void PopulateAnyValue(
+      opentelemetry::proto::common::v1::AnyValue *proto_value,
+      const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept;
 
   static void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
                                 nostd::string_view key,
-                                const opentelemetry::sdk::common::OwnedAttributeValue &value,
-                                bool allow_bytes) noexcept;
+                                const opentelemetry::common::AttributeValue &value) noexcept;
+
+  static void PopulateAttribute(
+      opentelemetry::proto::common::v1::KeyValue *attribute,
+      nostd::string_view key,
+      const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept;
 };
 
 }  // namespace otlp

@@ -871,6 +871,21 @@ if(WITH_OTLP_FILE)
 endif()
 
 if(BUILD_TESTING)
+  add_executable(otlp_populate_attribute_utils_test
+                 test/otlp_populate_attribute_utils_test.cc)
+  target_link_libraries(
+    otlp_populate_attribute_utils_test ${GTEST_BOTH_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable
+    protobuf::libprotobuf)
+  gtest_add_tests(
+    TARGET otlp_populate_attribute_utils_test
+    TEST_PREFIX exporter.otlp.
+    TEST_LIST otlp_populate_attribute_utils_test)
+  if(WITH_OTLP_UTF8_VALIDITY AND TARGET utf8_range::utf8_validity)
+    target_compile_definitions(otlp_populate_attribute_utils_test
+                               PRIVATE ENABLE_OTLP_UTF8_VALIDITY)
+  endif()
+
   add_executable(otlp_recordable_test test/otlp_recordable_test.cc)
   target_link_libraries(
     otlp_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
