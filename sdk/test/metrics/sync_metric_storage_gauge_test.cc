@@ -210,7 +210,8 @@ INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestDouble,
                          WritableMetricStorageTestFixture,
                          ::testing::Values(AggregationTemporality::kCumulative));
 
-TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture, LongGaugeLastValueAggregationDeltaTemporalityMultiReader)
+TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
+       LongGaugeLastValueAggregationDeltaTemporalityMultiReader)
 {
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   // Slow-path (collectors.size() > 1) delta temporality for gauge instruments.
@@ -222,7 +223,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture, LongGaugeLastValueAggre
   //      advance the per-collector start timestamp, so the next interval is
   //      correctly bounded (mirrors fast-path behaviour).
 
-  auto sdk_start_ts = std::chrono::system_clock::now();
+  auto sdk_start_ts    = std::chrono::system_clock::now();
   auto before_creation = std::chrono::system_clock::now();
   InstrumentDescriptor instr_desc{"name", "desc", "1unit", InstrumentType::kGauge,
                                   InstrumentValueType::kLong};
@@ -262,8 +263,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture, LongGaugeLastValueAggre
                     metric_a_cycle1 = metric_data;
                     for (const auto &data_attr : metric_data.point_data_attr_)
                     {
-                      auto lv =
-                          opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
+                      auto lv = opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
                       const auto &room_id = opentelemetry::nostd::get<std::string>(
                           data_attr.attributes.find("Room.id")->second);
                       if (room_id == "Rack A")
@@ -288,8 +288,8 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture, LongGaugeLastValueAggre
 
   // --- Empty interval for collector_a (no new records) ---
   // The callback must NOT be invoked; the interval timestamp must be updated.
-  auto collection2_ts     = std::chrono::system_clock::now();
-  count_a = 0;
+  auto collection2_ts = std::chrono::system_clock::now();
+  count_a             = 0;
   storage.Collect(collector_a.get(), collectors, sdk_start_ts, collection2_ts,
                   [&](const MetricData &metric_data) {
                     count_a += metric_data.point_data_attr_.size();
@@ -315,8 +315,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture, LongGaugeLastValueAggre
                     metric_a_cycle3 = metric_data;
                     for (const auto &data_attr : metric_data.point_data_attr_)
                     {
-                      auto lv =
-                          opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
+                      auto lv = opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
                       const auto &room_id = opentelemetry::nostd::get<std::string>(
                           data_attr.attributes.find("Room.id")->second);
                       if (room_id == "Rack A")
@@ -349,8 +348,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture, LongGaugeLastValueAggre
                     metric_b_cycle1 = metric_data;
                     for (const auto &data_attr : metric_data.point_data_attr_)
                     {
-                      auto lv =
-                          opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
+                      auto lv = opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
                       const auto &room_id = opentelemetry::nostd::get<std::string>(
                           data_attr.attributes.find("Room.id")->second);
                       if (room_id == "Rack A")
@@ -392,7 +390,8 @@ INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestLongDeltaMultiReader,
                          WritableMetricStorageDeltaMultiReaderTestFixture,
                          ::testing::Values(AggregationTemporality::kDelta));
 
-TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture, DoubleGaugeLastValueAggregationDeltaTemporalityMultiReader)
+TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
+       DoubleGaugeLastValueAggregationDeltaTemporalityMultiReader)
 {
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   // Slow-path (collectors.size() > 1) delta temporality for gauge instruments (double).
@@ -433,30 +432,28 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture, DoubleGaugeLastValueAgg
   auto collection1_ts = std::chrono::system_clock::now();
   size_t count_a      = 0;
   MetricData metric_a_cycle1;
-  storage.Collect(collector_a.get(), collectors, sdk_start_ts, collection1_ts,
-                  [&](const MetricData &metric_data) {
-                    metric_a_cycle1 = metric_data;
-                    for (const auto &data_attr : metric_data.point_data_attr_)
-                    {
-                      auto lv =
-                          opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
-                      const auto &room_id = opentelemetry::nostd::get<std::string>(
-                          data_attr.attributes.find("Room.id")->second);
-                      if (room_id == "Rack A")
-                      {
-                        EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lv.value_),
-                                         level1_roomA);
-                        count_a++;
-                      }
-                      else if (room_id == "Rack B")
-                      {
-                        EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lv.value_),
-                                         level1_roomB);
-                        count_a++;
-                      }
-                    }
-                    return true;
-                  });
+  storage.Collect(
+      collector_a.get(), collectors, sdk_start_ts, collection1_ts,
+      [&](const MetricData &metric_data) {
+        metric_a_cycle1 = metric_data;
+        for (const auto &data_attr : metric_data.point_data_attr_)
+        {
+          auto lv = opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
+          const auto &room_id =
+              opentelemetry::nostd::get<std::string>(data_attr.attributes.find("Room.id")->second);
+          if (room_id == "Rack A")
+          {
+            EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lv.value_), level1_roomA);
+            count_a++;
+          }
+          else if (room_id == "Rack B")
+          {
+            EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lv.value_), level1_roomB);
+            count_a++;
+          }
+        }
+        return true;
+      });
   EXPECT_EQ(count_a, 2);
   // Per spec (#4062): first delta interval start_ts must be instrument creation time.
   EXPECT_GE(metric_a_cycle1.start_ts.time_since_epoch(), before_creation.time_since_epoch());
@@ -487,30 +484,28 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture, DoubleGaugeLastValueAgg
   auto collection3_ts = std::chrono::system_clock::now();
   count_a             = 0;
   MetricData metric_a_cycle3;
-  storage.Collect(collector_a.get(), collectors, sdk_start_ts, collection3_ts,
-                  [&](const MetricData &metric_data) {
-                    metric_a_cycle3 = metric_data;
-                    for (const auto &data_attr : metric_data.point_data_attr_)
-                    {
-                      auto lv =
-                          opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
-                      const auto &room_id = opentelemetry::nostd::get<std::string>(
-                          data_attr.attributes.find("Room.id")->second);
-                      if (room_id == "Rack A")
-                      {
-                        EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lv.value_),
-                                         level2_roomA);
-                        count_a++;
-                      }
-                      else if (room_id == "Rack B")
-                      {
-                        EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lv.value_),
-                                         level2_roomB);
-                        count_a++;
-                      }
-                    }
-                    return true;
-                  });
+  storage.Collect(
+      collector_a.get(), collectors, sdk_start_ts, collection3_ts,
+      [&](const MetricData &metric_data) {
+        metric_a_cycle3 = metric_data;
+        for (const auto &data_attr : metric_data.point_data_attr_)
+        {
+          auto lv = opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
+          const auto &room_id =
+              opentelemetry::nostd::get<std::string>(data_attr.attributes.find("Room.id")->second);
+          if (room_id == "Rack A")
+          {
+            EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lv.value_), level2_roomA);
+            count_a++;
+          }
+          else if (room_id == "Rack B")
+          {
+            EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lv.value_), level2_roomB);
+            count_a++;
+          }
+        }
+        return true;
+      });
   EXPECT_EQ(count_a, 2);
   // start_ts must be collection2_ts: the empty cycle advanced the interval boundary.
   EXPECT_EQ(metric_a_cycle3.start_ts, collection2_ts);
@@ -523,31 +518,29 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture, DoubleGaugeLastValueAgg
   // start_ts must be instrument creation time.
   size_t count_b = 0;
   MetricData metric_b_cycle1;
-  storage.Collect(collector_b.get(), collectors, sdk_start_ts, collection3_ts,
-                  [&](const MetricData &metric_data) {
-                    metric_b_cycle1 = metric_data;
-                    for (const auto &data_attr : metric_data.point_data_attr_)
-                    {
-                      auto lv =
-                          opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
-                      const auto &room_id = opentelemetry::nostd::get<std::string>(
-                          data_attr.attributes.find("Room.id")->second);
-                      if (room_id == "Rack A")
-                      {
-                        // LastValue merge selects the most recently sampled value.
-                        EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lv.value_),
-                                         level2_roomA);
-                        count_b++;
-                      }
-                      else if (room_id == "Rack B")
-                      {
-                        EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lv.value_),
-                                         level2_roomB);
-                        count_b++;
-                      }
-                    }
-                    return true;
-                  });
+  storage.Collect(
+      collector_b.get(), collectors, sdk_start_ts, collection3_ts,
+      [&](const MetricData &metric_data) {
+        metric_b_cycle1 = metric_data;
+        for (const auto &data_attr : metric_data.point_data_attr_)
+        {
+          auto lv = opentelemetry::nostd::get<LastValuePointData>(data_attr.point_data);
+          const auto &room_id =
+              opentelemetry::nostd::get<std::string>(data_attr.attributes.find("Room.id")->second);
+          if (room_id == "Rack A")
+          {
+            // LastValue merge selects the most recently sampled value.
+            EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lv.value_), level2_roomA);
+            count_b++;
+          }
+          else if (room_id == "Rack B")
+          {
+            EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(lv.value_), level2_roomB);
+            count_b++;
+          }
+        }
+        return true;
+      });
   EXPECT_EQ(count_b, 2);
   // collector_b's first interval: start_ts must be instrument creation time.
   EXPECT_GE(metric_b_cycle1.start_ts.time_since_epoch(), before_creation.time_since_epoch());
