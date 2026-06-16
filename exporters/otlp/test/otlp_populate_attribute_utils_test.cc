@@ -26,6 +26,8 @@ namespace exporter
 namespace otlp
 {
 
+namespace
+{
 class PopulateAnyValueTest : public ::testing::Test
 {
 protected:
@@ -37,7 +39,7 @@ class PopulateAttributeTest : public ::testing::Test
 protected:
   opentelemetry::proto::common::v1::KeyValue proto_keyvalue_;
 };
-
+}  // namespace
 // ============================================================
 // PopulateAnyValue with common::AttributeValue Tests
 // ============================================================

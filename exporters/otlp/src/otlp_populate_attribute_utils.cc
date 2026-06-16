@@ -15,8 +15,6 @@
 #include <utility>
 #include <vector>
 
-#include <google/protobuf/repeated_ptr_field.h>
-
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 #include "opentelemetry/nostd/span.h"
@@ -30,6 +28,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include <google/protobuf/repeated_ptr_field.h>
 // IWYU pragma: no_include "net/proto2/public/repeated_field.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
@@ -321,7 +320,7 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     OTEL_INTERNAL_LOG_ERROR(
         "[OTLP Populate Attribute] bad_variant_access in PopulateAnyValue: " << e.what());
   }
-  catch (const std::bad_alloc &e)
+  catch (const std::bad_alloc &)  // NOLINT(bugprone-empty-catch)
   {
     // TODO: Log an error once the logger doesn't require dynamic memory allocation.
     // OTEL_INTERNAL_LOG_ERROR(
@@ -350,7 +349,7 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     OTEL_INTERNAL_LOG_ERROR(
         "[OTLP Populate Attribute] bad_variant_access in PopulateAnyValue: " << e.what());
   }
-  catch (const std::bad_alloc &e)
+  catch (const std::bad_alloc &)  // NOLINT(bugprone-empty-catch)
   {
     // TODO: Log an error once the logger doesn't require dynamic memory allocation.
     // OTEL_INTERNAL_LOG_ERROR(
