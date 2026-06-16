@@ -1016,6 +1016,7 @@ otel_cc_benchmark(
     ],
     deps = [
         ":otlp_recordable",
+        "//sdk/src/metrics",
         "//sdk/src/resource",
         "//sdk/src/trace",
         "@com_github_opentelemetry_proto//:trace_service_proto_cc",
