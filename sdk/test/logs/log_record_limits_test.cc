@@ -32,15 +32,19 @@ using opentelemetry::sdk::logs::LogRecordLimits;
 using opentelemetry::sdk::logs::ReadWriteLogRecord;
 namespace nostd = opentelemetry::nostd;
 
-TEST(LogRecordLimits, DefaultsPassThroughWithoutLimitsObject)
+TEST(LogRecordLimits, DefaultRecordEnforcesSpecCountCap)
 {
+  // A ReadWriteLogRecord that never receives an explicit SetLogRecordLimits()
+  // call still carries the spec-default LogRecordLimits{} value (count=128,
+  // length=unlimited). The spec says implementations SHOULD apply that count
+  // cap, so the 129th distinct key is dropped.
   ReadWriteLogRecord record;
   for (int i = 0; i < 200; ++i)
   {
     record.SetAttribute("attr_" + std::to_string(i), static_cast<int64_t>(i));
   }
-  ASSERT_EQ(record.GetAttributes().size(), 200u);
-  ASSERT_EQ(record.GetDroppedAttributesCount(), 0u);
+  ASSERT_EQ(record.GetAttributes().size(), 128u);
+  ASSERT_EQ(record.GetDroppedAttributesCount(), 200u - 128u);
 }
 
 TEST(LogRecordLimits, CountLimitDropsExcessAttributes)
@@ -157,6 +161,23 @@ TEST(LogRecordLimits, CountAndLengthCombined)
   ASSERT_EQ(record.GetDroppedAttributesCount(), 1u);
   ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("k1")), "abcd");
   ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("k2")), "1234");
+}
+
+TEST(LogRecordLimits, LengthLimitTruncatesBytesAttribute)
+{
+  LogRecordLimits limits;
+  limits.attribute_value_length_limit = 3;
+  ReadWriteLogRecord record;
+  record.SetLogRecordLimits(limits);
+
+  const uint8_t bytes_in[] = {0x01, 0x02, 0x03, 0x04, 0x05};
+  record.SetAttribute("k", nostd::span<const uint8_t>(bytes_in, 5));
+
+  const auto &stored = nostd::get<std::vector<uint8_t>>(record.GetAttributes().at("k"));
+  ASSERT_EQ(stored.size(), 3u);
+  ASSERT_EQ(stored[0], 0x01);
+  ASSERT_EQ(stored[1], 0x02);
+  ASSERT_EQ(stored[2], 0x03);
 }
 
 namespace

@@ -487,6 +487,68 @@ TEST(OtlpLogRecordable, AttributeValueLengthLimitLeavesNonStringTypesUnchanged)
   EXPECT_EQ(rec.log_record().attributes(2).value().bool_value(), true);
 }
 
+TEST(OtlpLogRecordable, AttributeValueLengthLimitPreservesUtf8MultiByte)
+{
+  // "h\xC3\xA9llo" is "héllo" in UTF-8; 'é' occupies bytes 1-2. With a 2-byte
+  // budget the truncator keeps 'h' alone and drops the partial 'é', so the
+  // resulting protobuf string_value stays valid UTF-8.
+  opentelemetry::sdk::logs::LogRecordLimits limits;
+  limits.attribute_value_length_limit = 2;
+
+  OtlpLogRecordable rec;
+  rec.SetLogRecordLimits(limits);
+  rec.SetAttribute("k", nostd::string_view("h\xC3\xA9llo"));
+
+  ASSERT_EQ(rec.log_record().attributes_size(), 1);
+  EXPECT_EQ(rec.log_record().attributes(0).value().string_value(), "h");
+}
+
+TEST(OtlpLogRecordable, AttributeValueLengthLimitKeepsCompletedUtf8Sequence)
+{
+  // Same input as above, with a 3-byte budget that exactly fits 'h' + 'é'.
+  opentelemetry::sdk::logs::LogRecordLimits limits;
+  limits.attribute_value_length_limit = 3;
+
+  OtlpLogRecordable rec;
+  rec.SetLogRecordLimits(limits);
+  rec.SetAttribute("k", nostd::string_view("h\xC3\xA9llo"));
+
+  ASSERT_EQ(rec.log_record().attributes_size(), 1);
+  EXPECT_EQ(rec.log_record().attributes(0).value().string_value(), "h\xC3\xA9");
+}
+
+TEST(OtlpLogRecordable, AttributeValueLengthLimitTruncatesBytesAttribute)
+{
+  opentelemetry::sdk::logs::LogRecordLimits limits;
+  limits.attribute_value_length_limit = 3;
+
+  OtlpLogRecordable rec;
+  rec.SetLogRecordLimits(limits);
+  const uint8_t bytes_in[] = {0x01, 0x02, 0x03, 0x04, 0x05};
+  rec.SetAttribute("k", nostd::span<const uint8_t>(bytes_in, 5));
+
+  ASSERT_EQ(rec.log_record().attributes_size(), 1);
+  const auto &b = rec.log_record().attributes(0).value().bytes_value();
+  ASSERT_EQ(b.size(), 3u);
+  EXPECT_EQ(static_cast<uint8_t>(b[0]), 0x01);
+  EXPECT_EQ(static_cast<uint8_t>(b[1]), 0x02);
+  EXPECT_EQ(static_cast<uint8_t>(b[2]), 0x03);
+}
+
+TEST(OtlpLogRecordable, DefaultRecordEnforcesSpecCountCap)
+{
+  // No SetLogRecordLimits() call: the default-constructed LogRecordLimits{}
+  // carries the spec defaults (count=128, length=unlimited), so the 129th
+  // distinct key is dropped instead of stored.
+  OtlpLogRecordable rec;
+  for (int i = 0; i < 200; ++i)
+  {
+    rec.SetAttribute("attr_" + std::to_string(i), static_cast<int64_t>(i));
+  }
+  EXPECT_EQ(rec.log_record().attributes_size(), 128);
+  EXPECT_EQ(rec.log_record().dropped_attributes_count(), 200u - 128u);
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

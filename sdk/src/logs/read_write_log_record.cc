@@ -158,6 +158,11 @@ const opentelemetry::trace::TraceFlags &ReadWriteLogRecord::GetTraceFlags() cons
 namespace
 {
 
+// Byte-length truncation. The SDK in-memory std::string variant may carry
+// raw bytes when constructed from a non-UTF-8 source, so forcing UTF-8
+// boundary semantics here would over-truncate that case. Exporters that
+// require a valid-UTF-8 wire format (OTLP protobuf, ES JSON) apply their
+// own UTF-8-aware truncation at the recordable boundary.
 void TruncateStringValue(opentelemetry::sdk::common::OwnedAttributeValue &value,
                          std::size_t max_length) noexcept
 {
@@ -180,6 +185,14 @@ void TruncateStringValue(opentelemetry::sdk::common::OwnedAttributeValue &value,
       }
     }
   }
+  else if (nostd::holds_alternative<std::vector<uint8_t>>(value))
+  {
+    auto &bytes = nostd::get<std::vector<uint8_t>>(value);
+    if (bytes.size() > max_length)
+    {
+      bytes.resize(max_length);
+    }
+  }
 }
 
 }  // namespace
@@ -189,7 +202,7 @@ void ReadWriteLogRecord::SetAttribute(nostd::string_view key,
 {
   std::string safe_key(key);
 
-  if (limits_ != nullptr && attributes_map_.size() >= limits_->attribute_count_limit &&
+  if (attributes_map_.size() >= limits_.attribute_count_limit &&
       attributes_map_.find(safe_key) == attributes_map_.end())
   {
     ++dropped_attributes_count_;
@@ -200,16 +213,15 @@ void ReadWriteLogRecord::SetAttribute(nostd::string_view key,
   auto &stored = attributes_map_[safe_key];
   stored       = nostd::visit(converter, value);
 
-  if (limits_ != nullptr &&
-      limits_->attribute_value_length_limit != (std::numeric_limits<std::size_t>::max)())
+  if (limits_.attribute_value_length_limit != (std::numeric_limits<std::size_t>::max)())
   {
-    TruncateStringValue(stored, limits_->attribute_value_length_limit);
+    TruncateStringValue(stored, limits_.attribute_value_length_limit);
   }
 }
 
 void ReadWriteLogRecord::SetLogRecordLimits(const LogRecordLimits &limits) noexcept
 {
-  limits_ = &limits;
+  limits_ = limits;
 }
 
 uint32_t ReadWriteLogRecord::GetDroppedAttributesCount() const noexcept

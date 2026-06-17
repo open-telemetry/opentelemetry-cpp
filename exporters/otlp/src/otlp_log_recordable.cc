@@ -241,6 +241,52 @@ void OtlpLogRecordable::SetTraceFlags(const opentelemetry::trace::TraceFlags &tr
 namespace
 {
 
+// Byte length of the longest prefix of `value` that fits within `max_bytes`
+// without splitting a well-formed UTF-8 multi-byte sequence. A lead byte's
+// declared length is only honored when its continuation bytes are present and
+// in range (0x80-0xBF); otherwise the lead is treated as a one-byte unit, so
+// malformed input degrades to plain byte truncation. This keeps the resulting
+// protobuf `string_value` valid UTF-8 when the input was valid UTF-8.
+std::size_t Utf8SafePrefixLength(const std::string &value, std::size_t max_bytes) noexcept
+{
+  std::size_t i = 0;
+  while (i < value.size())
+  {
+    const auto lead = static_cast<unsigned char>(value[i]);
+    std::size_t seq = (lead < 0x80)   ? 1
+                      : (lead < 0xC0) ? 1
+                      : (lead < 0xE0) ? 2
+                      : (lead < 0xF0) ? 3
+                      : (lead < 0xF8) ? 4
+                                      : 1;
+    if (seq > 1)
+    {
+      if (i + seq > value.size())
+      {
+        seq = 1;
+      }
+      else
+      {
+        for (std::size_t k = 1; k < seq; ++k)
+        {
+          const auto continuation = static_cast<unsigned char>(value[i + k]);
+          if (continuation < 0x80 || continuation > 0xBF)
+          {
+            seq = 1;
+            break;
+          }
+        }
+      }
+    }
+    if (i + seq > max_bytes)
+    {
+      break;
+    }
+    i += seq;
+  }
+  return i;
+}
+
 void TruncateProtoStringValue(proto::common::v1::AnyValue *value, std::size_t max_length) noexcept
 {
   if (value == nullptr)
@@ -251,7 +297,17 @@ void TruncateProtoStringValue(proto::common::v1::AnyValue *value, std::size_t ma
   {
     if (value->string_value().size() > max_length)
     {
-      value->mutable_string_value()->resize(max_length);
+      value->mutable_string_value()->resize(
+          Utf8SafePrefixLength(value->string_value(), max_length));
+    }
+    return;
+  }
+  if (value->value_case() == proto::common::v1::AnyValue::kBytesValue)
+  {
+    // Raw bytes are not UTF-8 text, so the byte-length cap applies verbatim.
+    if (value->bytes_value().size() > max_length)
+    {
+      value->mutable_bytes_value()->resize(max_length);
     }
     return;
   }
@@ -270,8 +326,7 @@ void TruncateProtoStringValue(proto::common::v1::AnyValue *value, std::size_t ma
 void OtlpLogRecordable::SetAttribute(opentelemetry::nostd::string_view key,
                                      const opentelemetry::common::AttributeValue &value) noexcept
 {
-  if (limits_ != nullptr &&
-      static_cast<std::size_t>(proto_record_.attributes_size()) >= limits_->attribute_count_limit)
+  if (static_cast<std::size_t>(proto_record_.attributes_size()) >= limits_.attribute_count_limit)
   {
     proto_record_.set_dropped_attributes_count(proto_record_.dropped_attributes_count() + 1);
     return;
@@ -280,17 +335,16 @@ void OtlpLogRecordable::SetAttribute(opentelemetry::nostd::string_view key,
   auto *kv = proto_record_.add_attributes();
   OtlpPopulateAttributeUtils::PopulateAttribute(kv, key, value, true);
 
-  if (limits_ != nullptr &&
-      limits_->attribute_value_length_limit != (std::numeric_limits<std::size_t>::max)())
+  if (limits_.attribute_value_length_limit != (std::numeric_limits<std::size_t>::max)())
   {
-    TruncateProtoStringValue(kv->mutable_value(), limits_->attribute_value_length_limit);
+    TruncateProtoStringValue(kv->mutable_value(), limits_.attribute_value_length_limit);
   }
 }
 
 void OtlpLogRecordable::SetLogRecordLimits(
     const opentelemetry::sdk::logs::LogRecordLimits &limits) noexcept
 {
-  limits_ = &limits;
+  limits_ = limits;
 }
 
 void OtlpLogRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept

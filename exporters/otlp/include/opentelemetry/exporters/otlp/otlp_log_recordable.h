@@ -123,7 +123,10 @@ private:
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
       nullptr;
-  const opentelemetry::sdk::logs::LogRecordLimits *limits_ = nullptr;
+  // Stored by value so the recordable does not depend on the limits object
+  // outliving the LoggerContext that supplied it. The default-constructed
+  // value carries the spec defaults (count=128, length=unlimited).
+  opentelemetry::sdk::logs::LogRecordLimits limits_{};
 };
 
 }  // namespace otlp

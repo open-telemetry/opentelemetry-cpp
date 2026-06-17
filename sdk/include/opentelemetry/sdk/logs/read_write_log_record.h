@@ -214,7 +214,10 @@ private:
   int64_t event_id_{0};
   std::string event_name_;
 
-  const LogRecordLimits *limits_{nullptr};
+  // Stored by value so the recordable does not depend on the limits object
+  // outliving the LoggerContext that supplied it. The default-constructed
+  // value carries the spec defaults (count=128, length=unlimited).
+  LogRecordLimits limits_{};
   uint32_t dropped_attributes_count_{0};
 
   // We do not pay for trace state when not necessary
