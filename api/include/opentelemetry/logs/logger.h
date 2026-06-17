@@ -89,7 +89,7 @@ public:
    *       filtering to be honored. The no-record overload @c EmitLogRecord(args...)
    *       below applies filtering automatically when @c ENABLE_LOG_FILTERING_PREVIEW
    *       is defined: severity, trace based, and processor based filtering are supported in ABI v2,
-   *       only severity filtering is supported ABI v1.
+   *       only severity filtering is supported in ABI v1.
    *
    * @param log_record Log record
    * @param args Arguments which can be used to set data of log record by type.
