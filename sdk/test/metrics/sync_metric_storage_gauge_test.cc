@@ -288,14 +288,17 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
 
   // --- Empty interval for collector_a (no new records) ---
   // The callback must NOT be invoked; the interval timestamp must be updated.
-  auto collection2_ts = std::chrono::system_clock::now();
-  count_a             = 0;
+  auto collection2_ts   = std::chrono::system_clock::now();
+  bool callback_invoked = false;
+  count_a               = 0;
   storage.Collect(collector_a.get(), collectors, sdk_start_ts, collection2_ts,
                   [&](const MetricData &metric_data) {
+                    callback_invoked = true;
                     count_a += metric_data.point_data_attr_.size();
                     return true;
                   });
-  EXPECT_EQ(count_a, 0);  // callback not invoked
+  EXPECT_FALSE(callback_invoked);  // callback must not be invoked for empty interval
+  EXPECT_EQ(count_a, 0);
 
   // --- Interval 3: record new values and collect from collector_a ---
   int64_t level2_roomA = 43;
@@ -374,14 +377,17 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
 
   // --- Empty interval for collector_b (no new records) ---
   // Stale gauge values must not be re-emitted on the shared unreported_metrics_ path.
-  auto collection4_ts = std::chrono::system_clock::now();
-  count_b             = 0;
+  auto collection4_ts     = std::chrono::system_clock::now();
+  bool callback_invoked_b = false;
+  count_b                 = 0;
   storage.Collect(collector_b.get(), collectors, sdk_start_ts, collection4_ts,
                   [&](const MetricData &metric_data) {
+                    callback_invoked_b = true;
                     count_b += metric_data.point_data_attr_.size();
                     return true;
                   });
-  EXPECT_EQ(count_b, 0);  // stale values must not be re-emitted
+  EXPECT_FALSE(callback_invoked_b);  // callback must not be invoked for empty interval
+  EXPECT_EQ(count_b, 0);             // stale values must not be re-emitted
 #else
   EXPECT_TRUE(true);
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -462,14 +468,17 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
   EXPECT_EQ(metric_a_cycle1.end_ts, collection1_ts);
 
   // --- Empty interval for collector_a (no new records) ---
-  auto collection2_ts = std::chrono::system_clock::now();
-  count_a             = 0;
+  auto collection2_ts   = std::chrono::system_clock::now();
+  bool callback_invoked = false;
+  count_a               = 0;
   storage.Collect(collector_a.get(), collectors, sdk_start_ts, collection2_ts,
                   [&](const MetricData &metric_data) {
+                    callback_invoked = true;
                     count_a += metric_data.point_data_attr_.size();
                     return true;
                   });
-  EXPECT_EQ(count_a, 0);  // callback not invoked
+  EXPECT_FALSE(callback_invoked);  // callback must not be invoked for empty interval
+  EXPECT_EQ(count_a, 0);
 
   // --- Interval 3: record new values and collect from collector_a ---
   double level2_roomA = 4.3;
@@ -550,14 +559,17 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
 
   // --- Empty interval for collector_b (no new records) ---
   // Stale gauge values must not be re-emitted on the shared unreported_metrics_ path.
-  auto collection4_ts = std::chrono::system_clock::now();
-  count_b             = 0;
+  auto collection4_ts     = std::chrono::system_clock::now();
+  bool callback_invoked_b = false;
+  count_b                 = 0;
   storage.Collect(collector_b.get(), collectors, sdk_start_ts, collection4_ts,
                   [&](const MetricData &metric_data) {
+                    callback_invoked_b = true;
                     count_b += metric_data.point_data_attr_.size();
                     return true;
                   });
-  EXPECT_EQ(count_b, 0);  // stale values must not be re-emitted
+  EXPECT_FALSE(callback_invoked_b);  // callback must not be invoked for empty interval
+  EXPECT_EQ(count_b, 0);             // stale values must not be re-emitted
 #else
   EXPECT_TRUE(true);
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
