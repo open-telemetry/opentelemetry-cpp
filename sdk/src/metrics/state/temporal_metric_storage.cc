@@ -184,6 +184,10 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   // Generate the MetricData from the final merged_metrics, and invoke callback over it.
 
   AttributesHashMap *result_to_export = (last_reported_metrics_[collector]).attributes_map.get();
+  if (result_to_export->Size() == 0)
+  {
+    return true;
+  }
   MetricData metric_data;
   metric_data.instrument_descriptor   = instrument_descriptor_;
   metric_data.aggregation_temporality = aggregation_temporarily;
