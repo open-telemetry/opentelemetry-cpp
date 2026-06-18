@@ -161,7 +161,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
       // use_count == 1 means no other thread can be calling RecordLong/Double
       // on this entry, so reading dirty_ is race-free here. Lock anyway to
       // satisfy the documented invariant on dirty_.
-      bool entry_dirty;
+      bool entry_dirty = false;
       {
         std::lock_guard<opentelemetry::common::SpinLockMutex> g(it->second->lock_);
         entry_dirty = it->second->dirty_;

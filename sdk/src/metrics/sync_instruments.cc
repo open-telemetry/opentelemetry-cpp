@@ -58,7 +58,7 @@ void LongCounter::Add(uint64_t value,
                            << instrument_descriptor_.name_);
     return;
   }
-  int64_t converted;
+  int64_t converted = 0;
   if (ToInt64Value(value, "[LongCounter::Add(V,A)]", converted))
   {
     return storage_->RecordLong(converted, attributes, context);
@@ -75,7 +75,7 @@ void LongCounter::Add(uint64_t value,
                            << instrument_descriptor_.name_);
     return;
   }
-  int64_t converted;
+  int64_t converted = 0;
   if (ToInt64Value(value, "[LongCounter::Add(V,A,C)]", converted))
   {
     return storage_->RecordLong(converted, attributes, context);
@@ -91,7 +91,7 @@ void LongCounter::Add(uint64_t value) noexcept
                            << instrument_descriptor_.name_);
     return;
   }
-  int64_t converted;
+  int64_t converted = 0;
   if (ToInt64Value(value, "[LongCounter::Add(V)]", converted))
   {
     return storage_->RecordLong(converted, context);
@@ -106,7 +106,7 @@ void LongCounter::Add(uint64_t value, const opentelemetry::context::Context &con
                            << instrument_descriptor_.name_);
     return;
   }
-  int64_t converted;
+  int64_t converted = 0;
   if (ToInt64Value(value, "[LongCounter::Add(V,C)]", converted))
   {
     return storage_->RecordLong(converted, context);
@@ -468,7 +468,7 @@ void LongHistogram::Record(uint64_t value,
         << instrument_descriptor_.name_);
     return;
   }
-  int64_t converted;
+  int64_t converted = 0;
   if (ToInt64Value(value, "[LongHistogram::Record(V,A,C)]", converted))
   {
     return storage_->RecordLong(converted, attributes, context);
@@ -483,7 +483,7 @@ void LongHistogram::Record(uint64_t value, const opentelemetry::context::Context
                            << instrument_descriptor_.name_);
     return;
   }
-  int64_t converted;
+  int64_t converted = 0;
   if (ToInt64Value(value, "[LongHistogram::Record(V,C)]", converted))
   {
     return storage_->RecordLong(converted, context);
@@ -501,7 +501,7 @@ void LongHistogram::Record(uint64_t value,
     return;
   }
   auto context = opentelemetry::context::Context{};
-  int64_t converted;
+  int64_t converted = 0;
   if (ToInt64Value(value, "[LongHistogram::Record(V,A)]", converted))
   {
     return storage_->RecordLong(converted, attributes, context);
@@ -517,7 +517,7 @@ void LongHistogram::Record(uint64_t value) noexcept
     return;
   }
   auto context = opentelemetry::context::Context{};
-  int64_t converted;
+  int64_t converted = 0;
   if (ToInt64Value(value, "[LongHistogram::Record(V)]", converted))
   {
     return storage_->RecordLong(converted, context);
@@ -632,7 +632,7 @@ public:
   {
     if (storage_)
     {
-      int64_t converted;
+      int64_t converted = 0;
       if (ToInt64Value(value, "[BoundLongCounter::Add(V)]", converted))
       {
         storage_->RecordLong(converted);
@@ -677,7 +677,7 @@ public:
   {
     if (storage_)
     {
-      int64_t converted;
+      int64_t converted = 0;
       if (ToInt64Value(value, "[BoundLongHistogram::Record(V)]", converted))
       {
         storage_->RecordLong(converted);

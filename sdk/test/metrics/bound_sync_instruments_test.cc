@@ -174,6 +174,30 @@ TEST(BoundSyncInstruments, BoundCounterMatchesUnbound)
   EXPECT_EQ(CollectAndCountPoints(*holder, AggregationTemporality::kDelta), 0u);
 }
 
+TEST(BoundSyncInstruments, BoundCounterBindInitializerList)
+{
+  InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kCounter,
+                            InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
+  AggregationConfig cfg;
+  std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
+      desc, AggregationType::kSum, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  SyncMetricStorage *storage_ptr = storage.get();
+  LongCounter counter(desc, std::move(storage));
+  opentelemetry::metrics::Counter<uint64_t> &api_counter = counter;
+
+  auto bound = api_counter.Bind({{"key", "v"}});
+  ASSERT_NE(bound, nullptr);
+  bound->Add(5);
+
+  M attrs = {{"key", "v"}};
+  EXPECT_EQ(SumLongFor(*storage_ptr, AggregationTemporality::kDelta, attrs), 5);
+}
+
 TEST(BoundSyncInstruments, UnboundCounterDropsValueAboveInt64Max)
 {
   InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kCounter,
@@ -309,6 +333,45 @@ TEST(BoundSyncInstruments, BoundHistogramDropsValueAboveInt64Max)
   ASSERT_NE(bound, nullptr);
 
   bound->Record(static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1);
+  bound->Record(9);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+  bool seen = false;
+  storage_ptr->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
+                       std::chrono::system_clock::now(), [&](const MetricData &md) {
+                         for (const auto &p : md.point_data_attr_)
+                         {
+                           const auto &h =
+                               opentelemetry::nostd::get<HistogramPointData>(p.point_data);
+                           EXPECT_EQ(h.count_, 1u);
+                           EXPECT_EQ(opentelemetry::nostd::get<int64_t>(h.sum_), 9);
+                           seen = true;
+                         }
+                         return true;
+                       });
+  EXPECT_TRUE(seen);
+}
+
+TEST(BoundSyncInstruments, BoundHistogramBindInitializerList)
+{
+  InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kHistogram,
+                            InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
+  HistogramAggregationConfig cfg;
+  std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
+      desc, AggregationType::kHistogram, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  SyncMetricStorage *storage_ptr = storage.get();
+  LongHistogram histogram(desc, std::move(storage));
+  opentelemetry::metrics::Histogram<uint64_t> &api_histogram = histogram;
+
+  auto bound = api_histogram.Bind({{"key", "v"}});
+  ASSERT_NE(bound, nullptr);
   bound->Record(9);
 
   std::shared_ptr<CollectorHandle> collector(
