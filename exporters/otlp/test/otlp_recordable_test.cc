@@ -814,6 +814,16 @@ TEST(OtlpRecordable, SetAttributeDeduplicateChangesType)
   EXPECT_EQ(rec.span().attributes(0).value().string_value(), "hello");
 }
 
+// Test that an empty key is rejected and not stored.
+TEST(OtlpRecordable, SetAttributeEmptyKeyIsRejected)
+{
+  OtlpRecordable rec;
+  rec.SetAttribute("", common::AttributeValue{int64_t(1)});
+
+  EXPECT_EQ(rec.span().attributes_size(), 0);
+  EXPECT_EQ(rec.span().dropped_attributes_count(), 0u);
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

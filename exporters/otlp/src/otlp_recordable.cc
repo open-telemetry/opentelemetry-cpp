@@ -117,23 +117,28 @@ void OtlpRecordable::SetResource(const sdk::resource::Resource &resource) noexce
 void OtlpRecordable::SetAttribute(nostd::string_view key,
                                   const common::AttributeValue &value) noexcept
 {
-  // Check for an existing attribute with the same key and overwrite it (spec requires unique keys).
-  for (auto &attr : *span_.mutable_attributes())
+  if (key.empty())
   {
-    if (attr.key() == key)
-    {
-      OtlpPopulateAttributeUtils::PopulateAttribute(&attr, key, value);
-      return;
-    }
+    return;
   }
-
-  if (static_cast<uint32_t>(span_.attributes_size()) >= max_attributes_)
+  const std::string key_str(key);
+  auto it = attributes_map_.find(key_str);
+  if (it != attributes_map_.end())
+  {
+    // Update an existing attribute value
+    OtlpPopulateAttributeUtils::PopulateAnyValue(it->second, value);
+    return;
+  }
+  if (static_cast<uint32_t>(attributes_map_.size()) >= max_attributes_)
   {
     span_.set_dropped_attributes_count(span_.dropped_attributes_count() + 1);
     return;
   }
-
-  OtlpPopulateAttributeUtils::PopulateAttribute(span_.add_attributes(), key, value);
+  auto *attribute = span_.add_attributes();
+  attribute->set_key(key_str);
+  auto *any_value = attribute->mutable_value();
+  OtlpPopulateAttributeUtils::PopulateAnyValue(any_value, value);
+  attributes_map_.emplace(std::move(key_str), any_value);
 }
 
 void OtlpRecordable::AddEvent(nostd::string_view name,

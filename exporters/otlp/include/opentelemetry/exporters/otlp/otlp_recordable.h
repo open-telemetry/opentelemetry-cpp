@@ -7,6 +7,7 @@
 #include <cstdint>  // For std::uint32_t
 #include <limits>   // For std::numeric_limits
 #include <string>
+#include <unordered_map>
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
@@ -97,6 +98,7 @@ public:
 
 private:
   proto::trace::v1::Span span_;
+  std::unordered_map<std::string, proto::common::v1::AnyValue *> attributes_map_;
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
       nullptr;

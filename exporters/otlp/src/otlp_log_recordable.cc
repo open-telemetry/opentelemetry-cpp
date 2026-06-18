@@ -241,15 +241,23 @@ void OtlpLogRecordable::SetTraceFlags(const opentelemetry::trace::TraceFlags &tr
 void OtlpLogRecordable::SetAttribute(opentelemetry::nostd::string_view key,
                                      const opentelemetry::common::AttributeValue &value) noexcept
 {
-  for (auto &attr : *proto_record_.mutable_attributes())
+  if (key.empty())
   {
-    if (attr.key() == key)
-    {
-      OtlpPopulateAttributeUtils::PopulateAttribute(&attr, key, value);
-      return;
-    }
+    return;
   }
-  OtlpPopulateAttributeUtils::PopulateAttribute(proto_record_.add_attributes(), key, value);
+  const std::string key_str(key);
+  auto it = attributes_map_.find(key_str);
+  if (it != attributes_map_.end())
+  {
+    // Update an existing attribute value
+    OtlpPopulateAttributeUtils::PopulateAnyValue(it->second, value);
+    return;
+  }
+  auto *kv = proto_record_.add_attributes();
+  kv->set_key(key_str);
+  auto *any = kv->mutable_value();
+  OtlpPopulateAttributeUtils::PopulateAnyValue(any, value);
+  attributes_map_.emplace(std::move(key_str), any);
 }
 
 void OtlpLogRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept

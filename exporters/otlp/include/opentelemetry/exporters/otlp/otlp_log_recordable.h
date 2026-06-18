@@ -4,6 +4,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <unordered_map>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -13,6 +14,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/logs/v1/logs.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
@@ -111,6 +113,7 @@ public:
 
 private:
   proto::logs::v1::LogRecord proto_record_;
+  std::unordered_map<std::string, proto::common::v1::AnyValue *> attributes_map_;
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
       nullptr;
