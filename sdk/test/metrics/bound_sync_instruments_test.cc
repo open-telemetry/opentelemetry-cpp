@@ -212,8 +212,8 @@ TEST(BoundSyncInstruments, UnboundCounterDropsValueAboveInt64Max)
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
   LongCounter counter(desc, std::move(storage));
-  M attrs    = {{"key", "v"}};
-  auto kv    = KeyValueIterableView<M>(attrs);
+  M attrs = {{"key", "v"}};
+  auto kv = KeyValueIterableView<M>(attrs);
 
   counter.Add(static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1, kv);
   counter.Add(7, kv);
@@ -289,8 +289,8 @@ TEST(BoundSyncInstruments, UnboundHistogramDropsValueAboveInt64Max)
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
   LongHistogram histogram(desc, std::move(storage));
-  M attrs    = {{"key", "v"}};
-  auto kv    = KeyValueIterableView<M>(attrs);
+  M attrs = {{"key", "v"}};
+  auto kv = KeyValueIterableView<M>(attrs);
 
   histogram.Record(static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1, kv);
   histogram.Record(9, kv);

@@ -500,7 +500,7 @@ void LongHistogram::Record(uint64_t value,
                            << instrument_descriptor_.name_);
     return;
   }
-  auto context = opentelemetry::context::Context{};
+  auto context      = opentelemetry::context::Context{};
   int64_t converted = 0;
   if (ToInt64Value(value, "[LongHistogram::Record(V,A)]", converted))
   {
@@ -516,7 +516,7 @@ void LongHistogram::Record(uint64_t value) noexcept
                            << instrument_descriptor_.name_);
     return;
   }
-  auto context = opentelemetry::context::Context{};
+  auto context      = opentelemetry::context::Context{};
   int64_t converted = 0;
   if (ToInt64Value(value, "[LongHistogram::Record(V)]", converted))
   {
