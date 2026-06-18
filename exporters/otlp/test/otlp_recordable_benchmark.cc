@@ -1,6 +1,43 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+// clang-format off
+//
+// 2026-06-18T21:05:11+00:00
+// Running /home/devuser/build/exporters/otlp/otlp_recordable_benchmark
+// Run on (32 X 5175.97 MHz CPU s)
+// CPU Caches:
+//   L1 Data 48 KiB (x16)
+//   L1 Instruction 32 KiB (x16)
+//   L2 Unified 2048 KiB (x16)
+//   L3 Unified 36864 KiB (x1)
+// Load Average: 0.61, 1.30, 1.33
+// -----------------------------------------------------------------------------------
+// Benchmark                                         Time             CPU   Iterations
+// -----------------------------------------------------------------------------------
+// OtlpSpanFixture/Minimal_mean                    355 ns          357 ns            5
+// OtlpSpanFixture/Minimal_median                  355 ns          358 ns            5
+// OtlpSpanFixture/Minimal_stddev                0.489 ns        0.790 ns            5
+// OtlpSpanFixture/Minimal_cv                     0.14 %          0.22 %             5
+// OtlpSpanFixture/Nominal_mean                    617 ns          619 ns            5
+// OtlpSpanFixture/Nominal_median                  617 ns          620 ns            5
+// OtlpSpanFixture/Nominal_stddev                0.960 ns         1.25 ns            5
+// OtlpSpanFixture/Nominal_cv                     0.16 %          0.20 %             5
+// OtlpSpanFixture/MaxAttributes_mean             8014 ns         8016 ns            5 items_per_second=16.0018M/s
+// OtlpSpanFixture/MaxAttributes_median           7737 ns         7739 ns            5 items_per_second=16.5389M/s
+// OtlpSpanFixture/MaxAttributes_stddev            419 ns          418 ns            5 items_per_second=819.876k/s
+// OtlpSpanFixture/MaxAttributes_cv               5.23 %          5.22 %             5 items_per_second=5.12%
+// BM_PopulateRequest/span_count:1_mean          0.398 us        0.398 us            5 items_per_second=2.51517M/s
+// BM_PopulateRequest/span_count:1_median        0.397 us        0.397 us            5 items_per_second=2.52167M/s
+// BM_PopulateRequest/span_count:1_stddev        0.002 us        0.002 us            5 items_per_second=12.1068k/s
+// BM_PopulateRequest/span_count:1_cv             0.48 %          0.48 %             5 items_per_second=0.48%
+// BM_PopulateRequest/span_count:512_mean         26.3 us         26.3 us            5 items_per_second=19.4714M/s
+// BM_PopulateRequest/span_count:512_median       26.3 us         26.3 us            5 items_per_second=19.4746M/s
+// BM_PopulateRequest/span_count:512_stddev      0.078 us        0.077 us            5 items_per_second=56.7323k/s
+// BM_PopulateRequest/span_count:512_cv           0.30 %          0.29 %             5 items_per_second=0.29%
+//
+// clang-format on
+
 #include <benchmark/benchmark.h>
 
 #include <chrono>
