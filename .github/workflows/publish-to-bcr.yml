@@ -25,7 +25,7 @@ jobs:
       contents: write
       id-token: write
       attestations: write
-    uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@a79b826cac4afe17e5a0a91e822e192fa181c62b # v1.3.0
+    uses: bazel-contrib/publish-to-bcr/.github/workflows/publish.yaml@c316f1611511a40423572303f66c80bb30bfe2f8 # v1.4.1
     with:
       tag_name: ${{ inputs.tag_name || github.event.release.tag_name }}
       registry_fork: ${{ inputs.registry_fork || 'open-telemetry/bazel-central-registry' }}
