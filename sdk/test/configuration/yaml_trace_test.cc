@@ -522,7 +522,16 @@ tracer_provider:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
-  ASSERT_EQ(config->tracer_provider->sampler, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+  auto *sampler = config->tracer_provider->sampler.get();
+  auto *parent =
+      reinterpret_cast<opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *>(
+          sampler);
+  ASSERT_NE(parent->root, nullptr);
+  ASSERT_EQ(parent->remote_parent_sampled, nullptr);
+  ASSERT_EQ(parent->remote_parent_not_sampled, nullptr);
+  ASSERT_EQ(parent->local_parent_sampled, nullptr);
+  ASSERT_EQ(parent->local_parent_not_sampled, nullptr);
 }
 
 TEST(YamlTrace, empty_sampler)

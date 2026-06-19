@@ -2297,6 +2297,12 @@ std::unique_ptr<TracerProviderConfiguration> ConfigurationParser::ParseTracerPro
   {
     model->sampler = ParseSamplerConfiguration(child, 0);
   }
+  else
+  {
+    auto parent_based  = std::make_unique<ParentBasedSamplerConfiguration>();
+    parent_based->root = std::make_unique<AlwaysOnSamplerConfiguration>();
+    model->sampler     = std::move(parent_based);
+  }
 
   child = node->GetChildNode("tracer_configurator/development");
   if (child)
