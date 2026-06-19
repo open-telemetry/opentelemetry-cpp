@@ -203,6 +203,34 @@ TEST(BoundSyncInstruments, BoundCounterBindInitializerList)
   EXPECT_EQ(SumLongFor(*storage_ptr, AggregationTemporality::kDelta, attrs), 5);
 }
 
+TEST(BoundSyncInstruments, BoundCounterBindEmptyAttributes)
+{
+  StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong);
+  M attrs;
+  KeyValueIterableView<M> kv(attrs);
+
+  auto bound = holder->Bind(kv);
+  ASSERT_NE(bound, nullptr);
+  bound->RecordLong(5);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+  bool seen = false;
+  holder->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
+                  std::chrono::system_clock::now(), [&](const MetricData &md) {
+                    for (const auto &p : md.point_data_attr_)
+                    {
+                      EXPECT_TRUE(p.attributes.empty());
+                      const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
+                      EXPECT_EQ(opentelemetry::nostd::get<int64_t>(sp.value_), 5);
+                      seen = true;
+                    }
+                    return true;
+                  });
+  EXPECT_TRUE(seen);
+}
+
 TEST(BoundSyncInstruments, UnboundCounterDropsValueAboveInt64Max)
 {
   InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kCounter,
