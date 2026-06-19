@@ -69,7 +69,7 @@ if(DEFINED OPENTELEMETRY_BUILD_DLL)
 else()
   target_link_libraries(
     example_yaml
-    PRIVATE opentelemetry-cpp::configuration opentelemetry-cpp::common
+    PRIVATE opentelemetry-cpp::configuration_yaml opentelemetry-cpp::common
             opentelemetry-cpp::trace opentelemetry-cpp::logs)
 endif()
 

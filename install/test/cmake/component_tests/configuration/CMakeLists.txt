@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(opentelemetry-cpp-configuration-install-test LANGUAGES CXX)
 
-find_package(opentelemetry-cpp REQUIRED COMPONENTS configuration
+find_package(opentelemetry-cpp REQUIRED COMPONENTS configuration_yaml
                                                    exporters_ostream_builder)
 
 if(NOT TARGET Threads::Threads)
@@ -17,7 +17,7 @@ include(GoogleTest)
 add_executable(configuration_test ${INSTALL_TEST_SRC_DIR}/test_configuration.cc)
 target_link_libraries(
   configuration_test
-  PRIVATE opentelemetry-cpp::configuration
+  PRIVATE opentelemetry-cpp::configuration_yaml
           opentelemetry-cpp::ostream_log_record_exporter_builder
           opentelemetry-cpp::ostream_metrics_exporter_builder
           opentelemetry-cpp::ostream_span_exporter_builder
