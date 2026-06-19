@@ -1,45 +1,34 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef OPENTELEMETRY_STL_VERSION
-// Unfortunately as of 04/27/2021 the fix is NOT in the vcpkg snapshot of Google Test.
-// Remove above `#ifdef` once the GMock fix for C++20 is in the mainline.
-//
-// Please refer to this GitHub issue for additional details:
-// https://github.com/google/googletest/issues/2914
-// https://github.com/google/googletest/commit/61f010d703b32de9bfb20ab90ece38ab2f25977f
-//
-// If we compile using Visual Studio 2019 with `c++latest` (C++20) without the GMock fix,
-// then the compilation here fails in `gmock-actions.h` from:
-//   .\tools\vcpkg\installed\x64-windows\include\gmock\gmock-actions.h(819):
-//   error C2653: 'result_of': is not a class or namespace name
-//
-// That is because `std::result_of` has been removed in C++20.
+#include <gtest/gtest.h>
+#include <stdlib.h>
+#include <chrono>
+#include <map>
+#include <memory>
+#include <string>
+#include <utility>
 
-#  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/version.h"
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+// clang-format off
+#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#  include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
+#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
 
-// Problematic code that pulls in Gmock and breaks with vs2019/c++latest :
-#  include "opentelemetry/proto/collector/metrics/v1/metrics_service_mock.grpc.pb.h"
-
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-
-#  include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
-
-#  include "opentelemetry/sdk/trace/simple_processor.h"
-#  include "opentelemetry/sdk/trace/tracer_provider.h"
-#  include "opentelemetry/trace/provider.h"
-
-#  include <grpcpp/grpcpp.h>
-#  include <gtest/gtest.h>
-
-#  if defined(_MSC_VER)
-#    include "opentelemetry/sdk/common/env_variables.h"
+#if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
-#  endif
+#endif
 
 using namespace testing;
 
@@ -109,7 +98,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigSslCredentialsTest)
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
 }
 
-#  ifndef NO_GETENV
+#ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigFromEnv)
 {
@@ -269,7 +258,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
 }
-#  endif  // NO_GETENV
+#endif  // NO_GETENV
 
 TEST_F(OtlpGrpcMetricExporterTestPeer, CheckGetAggregationTemporality)
 {
@@ -303,4 +292,3 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, CheckGetAggregationTemporality)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif /* OPENTELEMETRY_STL_VERSION */
