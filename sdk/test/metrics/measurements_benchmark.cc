@@ -26,6 +26,10 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 
+#ifdef ENABLE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+#  include "opentelemetry/version.h"
+#endif
+
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
