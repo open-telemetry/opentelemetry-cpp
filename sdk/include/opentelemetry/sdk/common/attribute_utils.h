@@ -81,18 +81,16 @@ enum OwnedAttributeType : std::uint8_t
 inline void TruncateAttributeValueByteLength(OwnedAttributeValue &value,
                                              std::size_t max_length) noexcept
 {
-  if (nostd::holds_alternative<std::string>(value))
+  if (auto *s = nostd::get_if<std::string>(&value))
   {
-    auto &s = nostd::get<std::string>(value);
-    if (s.size() > max_length)
+    if (s->size() > max_length)
     {
-      s.resize(max_length);
+      s->resize(max_length);
     }
   }
-  else if (nostd::holds_alternative<std::vector<std::string>>(value))
+  else if (auto *vec = nostd::get_if<std::vector<std::string>>(&value))
   {
-    auto &vec = nostd::get<std::vector<std::string>>(value);
-    for (auto &s : vec)
+    for (auto &s : *vec)
     {
       if (s.size() > max_length)
       {
@@ -100,12 +98,11 @@ inline void TruncateAttributeValueByteLength(OwnedAttributeValue &value,
       }
     }
   }
-  else if (nostd::holds_alternative<std::vector<uint8_t>>(value))
+  else if (auto *bytes = nostd::get_if<std::vector<uint8_t>>(&value))
   {
-    auto &bytes = nostd::get<std::vector<uint8_t>>(value);
-    if (bytes.size() > max_length)
+    if (bytes->size() > max_length)
     {
-      bytes.resize(max_length);
+      bytes->resize(max_length);
     }
   }
 }

@@ -676,6 +676,7 @@ cc_test(
     ],
     deps = [
         ":otlp_recordable",
+        "//sdk/src/metrics",
         "@com_github_opentelemetry_proto//:common_proto_cc",
         "@com_google_googletest//:gtest_main",
     ],
