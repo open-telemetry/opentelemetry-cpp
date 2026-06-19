@@ -104,6 +104,9 @@ Increment the:
 * [BUILD] Fix protobuf build failure
   [#4154](https://github.com/open-telemetry/opentelemetry-cpp/pull/4154)
 
+* [SEMANTIC CONVENTIONS] Generate event name constants (e.g. `semconv::exception::kException`)
+  [#4171](https://github.com/open-telemetry/opentelemetry-cpp/pull/4171)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
