@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
