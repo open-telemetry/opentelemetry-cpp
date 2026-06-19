@@ -156,6 +156,11 @@ bool HasOverflowPoint(SyncMetricStorage &storage, AggregationTemporality tempora
                   });
   return found;
 }
+
+uint64_t ValueAboveInt64Max() noexcept
+{
+  return static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()) + 1;
+}
 }  // namespace
 
 // 1) Bound counter records and exports same datapoint as unbound counter with same attributes.
@@ -215,7 +220,7 @@ TEST(BoundSyncInstruments, UnboundCounterDropsValueAboveInt64Max)
   M attrs = {{"key", "v"}};
   auto kv = KeyValueIterableView<M>(attrs);
 
-  counter.Add(static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1, kv);
+  counter.Add(ValueAboveInt64Max(), kv);
   counter.Add(7, kv);
 
   EXPECT_EQ(SumLongFor(*storage_ptr, AggregationTemporality::kDelta, attrs), 7);
@@ -239,7 +244,7 @@ TEST(BoundSyncInstruments, BoundCounterDropsValueAboveInt64Max)
   auto bound = counter.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(bound, nullptr);
 
-  bound->Add(static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1);
+  bound->Add(ValueAboveInt64Max());
   bound->Add(7);
 
   EXPECT_EQ(SumLongFor(*storage_ptr, AggregationTemporality::kDelta, attrs), 7);
@@ -292,7 +297,7 @@ TEST(BoundSyncInstruments, UnboundHistogramDropsValueAboveInt64Max)
   M attrs = {{"key", "v"}};
   auto kv = KeyValueIterableView<M>(attrs);
 
-  histogram.Record(static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1, kv);
+  histogram.Record(ValueAboveInt64Max(), kv);
   histogram.Record(9, kv);
 
   std::shared_ptr<CollectorHandle> collector(
@@ -332,7 +337,7 @@ TEST(BoundSyncInstruments, BoundHistogramDropsValueAboveInt64Max)
   auto bound = histogram.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(bound, nullptr);
 
-  bound->Record(static_cast<uint64_t>(std::numeric_limits<int64_t>::max()) + 1);
+  bound->Record(ValueAboveInt64Max());
   bound->Record(9);
 
   std::shared_ptr<CollectorHandle> collector(
