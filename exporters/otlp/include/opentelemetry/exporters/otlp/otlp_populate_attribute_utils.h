@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <cstddef>
+#include <string>
+
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
@@ -72,6 +75,28 @@ public:
                                 nostd::string_view key,
                                 const opentelemetry::sdk::common::OwnedAttributeValue &value,
                                 bool allow_bytes) noexcept;
+
+  /**
+   * Byte length of the longest prefix of `value` that fits within `max_bytes`
+   * without splitting a well-formed UTF-8 multi-byte sequence. A lead byte's
+   * declared length is only honored when its continuation bytes are present
+   * and in range (0x80-0xBF); otherwise the lead is treated as a one-byte
+   * unit, so malformed input degrades to plain byte truncation. The protobuf
+   * `string` field type requires valid UTF-8, so this utility lets callers
+   * truncate at a code-point boundary instead of cutting through a multi-byte
+   * sequence.
+   */
+  static std::size_t Utf8SafePrefixLength(const std::string &value, std::size_t max_bytes) noexcept;
+
+  /**
+   * Truncate the `string_value` and `bytes_value` (and recursively into
+   * `array_value` elements) of an OTLP `AnyValue` to at most `max_length`
+   * bytes each. `string_value` uses Utf8SafePrefixLength so the resulting
+   * protobuf string stays valid UTF-8 when the input was. `bytes_value` is
+   * cut at the raw byte boundary since it is not UTF-8 text.
+   */
+  static void TruncateProtoAttributeValue(opentelemetry::proto::common::v1::AnyValue *value,
+                                          std::size_t max_length) noexcept;
 };
 
 }  // namespace otlp

@@ -69,6 +69,48 @@ enum OwnedAttributeType : std::uint8_t
 };
 
 /**
+ * Truncate the string, string-array, and bytes variants of an
+ * OwnedAttributeValue to at most `max_length` bytes each. Other variants
+ * are left untouched. This is plain byte-length truncation: the in-memory
+ * std::string variant may legitimately carry raw bytes when constructed
+ * from a non-UTF-8 source, so forcing UTF-8 boundary semantics here would
+ * over-truncate that case. Exporters that require a valid-UTF-8 wire format
+ * (OTLP protobuf, ES JSON) apply their own UTF-8-aware truncation at the
+ * recordable boundary.
+ */
+inline void TruncateAttributeValueByteLength(OwnedAttributeValue &value,
+                                             std::size_t max_length) noexcept
+{
+  if (nostd::holds_alternative<std::string>(value))
+  {
+    auto &s = nostd::get<std::string>(value);
+    if (s.size() > max_length)
+    {
+      s.resize(max_length);
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<std::string>>(value))
+  {
+    auto &vec = nostd::get<std::vector<std::string>>(value);
+    for (auto &s : vec)
+    {
+      if (s.size() > max_length)
+      {
+        s.resize(max_length);
+      }
+    }
+  }
+  else if (nostd::holds_alternative<std::vector<uint8_t>>(value))
+  {
+    auto &bytes = nostd::get<std::vector<uint8_t>>(value);
+    if (bytes.size() > max_length)
+    {
+      bytes.resize(max_length);
+    }
+  }
+}
+
+/**
  * Creates an owned copy (OwnedAttributeValue) of a non-owning AttributeValue.
  */
 struct AttributeConverter

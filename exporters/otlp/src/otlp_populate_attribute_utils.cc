@@ -431,6 +431,89 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
   }
 }
 
+// UTF-8 byte layout (https://en.wikipedia.org/wiki/UTF-8#Description):
+//   0x00-0x7F  0xxxxxxx  ASCII, 1 byte
+//   0x80-0xBF  10xxxxxx  continuation byte (never a valid lead)
+//   0xC0-0xDF  110xxxxx  lead of a 2-byte sequence
+//   0xE0-0xEF  1110xxxx  lead of a 3-byte sequence
+//   0xF0-0xF7  11110xxx  lead of a 4-byte sequence
+//   0xF8-0xFF            not a valid lead byte
+std::size_t OtlpPopulateAttributeUtils::Utf8SafePrefixLength(const std::string &value,
+                                                             std::size_t max_bytes) noexcept
+{
+  std::size_t i = 0;
+  while (i < value.size())
+  {
+    const auto lead = static_cast<unsigned char>(value[i]);
+    std::size_t seq = (lead < 0x80)   ? 1
+                      : (lead < 0xC0) ? 1
+                      : (lead < 0xE0) ? 2
+                      : (lead < 0xF0) ? 3
+                      : (lead < 0xF8) ? 4
+                                      : 1;
+    if (seq > 1)
+    {
+      if (i + seq > value.size())
+      {
+        seq = 1;
+      }
+      else
+      {
+        for (std::size_t k = 1; k < seq; ++k)
+        {
+          const auto continuation = static_cast<unsigned char>(value[i + k]);
+          if (continuation < 0x80 || continuation > 0xBF)
+          {
+            seq = 1;
+            break;
+          }
+        }
+      }
+    }
+    if (i + seq > max_bytes)
+    {
+      break;
+    }
+    i += seq;
+  }
+  return i;
+}
+
+void OtlpPopulateAttributeUtils::TruncateProtoAttributeValue(
+    opentelemetry::proto::common::v1::AnyValue *value,
+    std::size_t max_length) noexcept
+{
+  if (value == nullptr)
+  {
+    return;
+  }
+  if (value->value_case() == proto::common::v1::AnyValue::kStringValue)
+  {
+    if (value->string_value().size() > max_length)
+    {
+      value->mutable_string_value()->resize(
+          Utf8SafePrefixLength(value->string_value(), max_length));
+    }
+    return;
+  }
+  if (value->value_case() == proto::common::v1::AnyValue::kBytesValue)
+  {
+    if (value->bytes_value().size() > max_length)
+    {
+      value->mutable_bytes_value()->resize(max_length);
+    }
+    return;
+  }
+  if (value->value_case() == proto::common::v1::AnyValue::kArrayValue)
+  {
+    auto *array = value->mutable_array_value();
+    for (int i = 0; i < array->values_size(); ++i)
+    {
+      TruncateProtoAttributeValue(array->mutable_values(i), max_length);
+    }
+  }
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
