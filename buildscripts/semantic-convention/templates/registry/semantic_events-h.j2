@@ -35,7 +35,7 @@
 
 {% set debug = false %}
 
-{% set file_name = ctx.output + (ctx.root_namespace | snake_case) ~ ".h" %}
+{% set file_name = ctx.output + (ctx.root_namespace | snake_case) ~ "_events.h" %}
 {{ template.set_file_name(file_name) }}
 
 {% set events = ctx.events | list %}
