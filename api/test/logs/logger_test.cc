@@ -260,9 +260,13 @@ TEST(Logger, EventLogMethodOverloads)
 
 #endif
 
+namespace
+{
+
 // Define a basic Logger class
 class TestLogger : public Logger
 {
+public:
   const nostd::string_view GetName() noexcept override { return "test logger"; }
 
   using Logger::CreateLogRecord;
@@ -280,9 +284,6 @@ class TestLogger : public Logger
     auto log_record_ptr = std::move(log_record);
   }
 };
-
-namespace
-{
 
 class EnablementAwareTestLogRecord : public opentelemetry::logs::LogRecord
 {
@@ -325,6 +326,8 @@ public:
 class EnablementAwareTestLogger : public Logger
 {
 public:
+  EnablementAwareTestLogger() = default;
+
   explicit EnablementAwareTestLogger(Severity minimum_severity,
                                      bool enabled_impl_result = false) noexcept
       : enabled_impl_result_(enabled_impl_result)
@@ -451,14 +454,13 @@ protected:
   }
 
 private:
-  bool enabled_impl_result_;
+  bool enabled_impl_result_{false};
 };
-
-}  // namespace
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
 class TestProvider : public LoggerProvider
 {
+public:
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
                                       nostd::string_view /* library_name */,
                                       nostd::string_view /* library_version */,
@@ -468,6 +470,8 @@ class TestProvider : public LoggerProvider
     return nostd::shared_ptr<Logger>(new TestLogger());
   }
 };
+
+}  // namespace
 
 TEST(Logger, PushLoggerImplementation)
 {
@@ -483,22 +487,40 @@ TEST(Logger, PushLoggerImplementation)
   ASSERT_EQ("test logger", logger->GetName());
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-TEST(Logger, EnabledWithExplicitContextUsesContextAwareImplementation)
+#if !defined(ENABLE_LOG_FILTERING_PREVIEW)
+
+TEST(Logger, EmitLogRecordTemplateEmitsWithDefaultMinimumSeverity)
 {
-  EnablementAwareTestLogger logger(Severity::kTrace, true);
+  // TODO: Remove this test case when ENABLE_LOG_FILTERING_PREVIEW is removed.
 
-  context::Context test_context{"test-key", true};
+  // Do not set a minimum severity for the logger. Use the default.
+  EnablementAwareTestLogger logger{};
 
-  EXPECT_TRUE(logger.Enabled(test_context, Severity::kInfo));
-  EXPECT_EQ(logger.enabled_calls_, 1u);
-  EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
-  EXPECT_TRUE(logger.last_enabled_context_has_test_key_);
-  EXPECT_TRUE(logger.last_enabled_context_test_key_value_);
+  logger.Info(nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
 }
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+TEST(Logger, EmitLogRecordTemplateEmitsRegardlessOfMinimumSeverity)
+{
+  // TODO: Remove this test case when ENABLE_LOG_FILTERING_PREVIEW is removed.
+
+  // Set a high minimum severity and verify the log record is still emitted.
+  EnablementAwareTestLogger logger(Severity::kFatal);
+
+  logger.Info(nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
+}
+
+#endif  // !defined(ENABLE_LOG_FILTERING_PREVIEW)
+
+#if defined(ENABLE_LOG_FILTERING_PREVIEW)
+
 TEST(Logger, EmitLogRecordTemplateShortCircuitsBelowMinimumSeverity)
 {
   EnablementAwareTestLogger logger(Severity::kWarn);
@@ -508,6 +530,61 @@ TEST(Logger, EmitLogRecordTemplateShortCircuitsBelowMinimumSeverity)
   EXPECT_EQ(logger.create_log_record_calls_, 0u);
   EXPECT_EQ(logger.emit_log_record_calls_, 0u);
   EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
+}
+
+TEST(Logger, EmitLogRecordTemplateEmitsWhenSeverityPasses)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+
+  logger.Info(nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+}
+
+TEST(Logger, EmitLogRecordWithRecordBypassesFiltering)
+{
+  // EmitLogRecord(unique_ptr<LogRecord>&&, args...) intentionally does NOT
+  // route through Enabled() — caller built the record themselves and is
+  // responsible for any filtering. Lock the contract documented on the
+  // overload.
+  EnablementAwareTestLogger logger(Severity::kTrace, false);
+
+  auto record = logger.CreateLogRecord();
+  logger.EmitLogRecord(std::move(record), Severity::kInfo, nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+}
+
+#  if OPENTELEMETRY_ABI_VERSION_NO >= 2
+// --- Filtering tests: ABI v2 only (context routing, ExtendedEnabledRequired) ---
+
+TEST(Logger, EmitLogRecordTemplateShortCircuitsWhenEventIdDisabled)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, false);
+  logger.SetExtendedEnabledRequired(true);
+
+  logger.EmitLogRecord(Severity::kInfo, EventId{0x42, "test"}, nostd::string_view{"filtered"});
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.create_log_record_calls_, 0u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
+}
+
+TEST(Logger, EmitLogRecordTemplateEmitsWhenEventIdPasses)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+  logger.SetExtendedEnabledRequired(true);
+
+  logger.EmitLogRecord(Severity::kInfo, EventId{0x42, "test"}, nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
+  EXPECT_EQ(logger.last_enabled_event_id_, 0x42);
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
 }
 
 TEST(Logger, EmitLogRecordTemplateInvokesEnabledImplementationAndEmitsWhenAllowed)
@@ -534,25 +611,7 @@ TEST(Logger, EmitLogRecordTemplateShortCircuitsWhenEnabledImplementationReturnsF
   EXPECT_EQ(logger.create_log_record_calls_, 0u);
   EXPECT_EQ(logger.emit_log_record_calls_, 0u);
 }
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
-TEST(Logger, EmitLogRecordWithRecordBypassesFiltering)
-{
-  // EmitLogRecord(unique_ptr<LogRecord>&&, args...) intentionally does NOT
-  // route through Enabled() — caller built the record themselves and is
-  // responsible for any filtering. Lock the contract documented on the
-  // overload.
-  EnablementAwareTestLogger logger(Severity::kTrace, false);
-
-  auto record = logger.CreateLogRecord();
-  logger.EmitLogRecord(std::move(record), Severity::kInfo, nostd::string_view{"emitted"});
-
-  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
-  EXPECT_EQ(logger.create_log_record_calls_, 1u);
-  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
-}
-
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(Logger, EmitLogRecordTemplateSkipsEnabledImplementationWhenExtendedEnabledNotRequired)
 {
   EnablementAwareTestLogger logger(Severity::kTrace, false);
@@ -674,5 +733,38 @@ TEST(Logger, EmitLogRecordWithTracePartsInArgsRoutesSpanContextVariantToEnabled)
   EXPECT_EQ(logger.last_span_context_.trace_id(), trace_id);
   EXPECT_EQ(logger.last_span_context_.span_id(), span_id);
   EXPECT_EQ(logger.last_span_context_.trace_flags(), trace_flags);
+}
+#  endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+#endif    // defined(ENABLE_LOG_FILTERING_PREVIEW)
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+// Test explicit context overloads route to context-aware EnabledImplementation
+TEST(Logger, EnabledWithExplicitContextUsesContextAwareImplementation)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+
+  context::Context test_context{"test-key", true};
+
+  EXPECT_TRUE(logger.Enabled(test_context, Severity::kInfo));
+  EXPECT_EQ(logger.enabled_calls_, 1u);
+  EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
+  EXPECT_TRUE(logger.last_enabled_context_has_test_key_);
+  EXPECT_TRUE(logger.last_enabled_context_test_key_value_);
+}
+
+TEST(Logger, EnabledWithExplicitContextAndEventIdUsesContextAwareImplementation)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+
+  context::Context test_context{"test-key", true};
+  const EventId event_id{0x42, "test"};
+
+  EXPECT_TRUE(logger.Enabled(test_context, Severity::kInfo, event_id));
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.enabled_calls_, 0u);
+  EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
+  EXPECT_EQ(logger.last_enabled_event_id_, 0x42);
+  EXPECT_TRUE(logger.last_enabled_context_has_test_key_);
+  EXPECT_TRUE(logger.last_enabled_context_test_key_value_);
 }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
