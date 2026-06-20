@@ -1005,3 +1005,20 @@ otel_cc_benchmark(
         "//sdk/src/metrics",
     ],
 )
+
+otel_cc_benchmark(
+    name = "otlp_recordable_benchmark",
+    srcs = ["test/otlp_recordable_benchmark.cc"],
+    tags = [
+        "benchmark",
+        "otlp",
+        "test",
+    ],
+    deps = [
+        ":otlp_recordable",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+    ],
+)
