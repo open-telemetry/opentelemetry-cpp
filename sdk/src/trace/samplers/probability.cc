@@ -9,7 +9,6 @@
 #include <string>
 
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/trace/sampler.h"
