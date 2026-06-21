@@ -90,11 +90,11 @@ inline void TruncateAttributeValueByteLength(OwnedAttributeValue &value,
   }
   else if (auto *vec = nostd::get_if<std::vector<std::string>>(&value))
   {
-    for (auto &s : *vec)
+    for (auto &element : *vec)
     {
-      if (s.size() > max_length)
+      if (element.size() > max_length)
       {
-        s.resize(max_length);
+        element.resize(max_length);
       }
     }
   }

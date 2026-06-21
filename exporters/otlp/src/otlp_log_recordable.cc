@@ -4,7 +4,6 @@
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include <cstddef>
 #include <limits>
-#include <string>
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"

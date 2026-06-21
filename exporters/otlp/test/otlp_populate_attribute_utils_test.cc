@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <cstddef>
 #include <cstdint>
-#include <limits>
 #include <string>
 
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"

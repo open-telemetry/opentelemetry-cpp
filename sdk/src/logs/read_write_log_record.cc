@@ -8,7 +8,6 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"

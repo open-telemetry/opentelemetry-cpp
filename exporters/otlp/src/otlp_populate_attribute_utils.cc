@@ -479,6 +479,11 @@ std::size_t OtlpPopulateAttributeUtils::Utf8SafePrefixLength(const std::string &
   return i;
 }
 
+// NOLINTBEGIN(misc-no-recursion)
+// The recursion is intentional and bounded by the depth of the AnyValue
+// array_value tree, which is constructed by the SDK from a fixed-depth
+// AttributeValue variant. The codebase precedent for this NOLINT is in
+// sdk/src/configuration/configuration_parser.cc.
 void OtlpPopulateAttributeUtils::TruncateProtoAttributeValue(
     opentelemetry::proto::common::v1::AnyValue *value,
     std::size_t max_length) noexcept
@@ -513,6 +518,7 @@ void OtlpPopulateAttributeUtils::TruncateProtoAttributeValue(
     }
   }
 }
+// NOLINTEND(misc-no-recursion)
 
 }  // namespace otlp
 }  // namespace exporter
