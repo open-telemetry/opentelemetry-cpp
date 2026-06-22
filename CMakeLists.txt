@@ -60,6 +60,24 @@ endif()
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
 
+if(DEFINED WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+   AND WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+   AND NOT WITH_ABI_VERSION_2)
+  message(
+    FATAL_ERROR
+      "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW requires WITH_ABI_VERSION_2")
+endif()
+
+include(CMakeDependentOption)
+
+# Experimental: bound synchronous metric instruments (Counter, Histogram).
+# Requires WITH_ABI_VERSION_2. Context-bearing bound operations, exemplar
+# parity, Gauge, and UpDownCounter bound support are follow-ups.
+cmake_dependent_option(
+  WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  "EXPERIMENTAL: bound synchronous metric instruments preview" OFF
+  "WITH_ABI_VERSION_2" OFF)
+
 option(WITH_CONFIGURATION "EXPERIMENTAL: YAML configuration file" OFF)
 
 #
@@ -92,6 +110,12 @@ elseif(WITH_ABI_VERSION_1)
   set(OPENTELEMETRY_ABI_VERSION_NO "1")
 else()
   set(OPENTELEMETRY_ABI_VERSION_NO "${OPENTELEMETRY_ABI_VERSION_DEFAULT}")
+endif()
+
+if(WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW AND NOT WITH_ABI_VERSION_2)
+  message(
+    FATAL_ERROR
+      "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW requires WITH_ABI_VERSION_2")
 endif()
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
@@ -223,6 +247,14 @@ option(WITH_METRICS_EXEMPLAR_PREVIEW
 # Experimental, so behind feature flag by default
 option(WITH_THREAD_INSTRUMENTATION_PREVIEW
        "Whether to enable thread instrumentation" OFF)
+
+# Experimental: enable log filtering in EmitLogRecord(args...). With this flag,
+# records are dropped before emit if the severity is below the logger minimum.
+# In ABI v2, when the SDK configures trace-based filtering or a processor with
+# an Enabled filter, records are also dropped based on the active trace context
+# and processor.Enabled.
+option(WITH_LOG_FILTERING_PREVIEW
+       "Whether to enable log filtering in EmitLogRecord" OFF)
 
 option(WITH_RESOURCE_DETECTORS_PREVIEW
        "Whether to enable inbuilt resource detectors" OFF)
@@ -523,6 +555,11 @@ message(
   STATUS
     "WITH_OTLP_GRPC_CREDENTIAL_PREVIEW: ${WITH_OTLP_GRPC_CREDENTIAL_PREVIEW}")
 message(STATUS "WITH_OTLP_RETRY_PREVIEW: ${WITH_OTLP_RETRY_PREVIEW}")
+message(STATUS "WITH_LOG_FILTERING_PREVIEW: ${WITH_LOG_FILTERING_PREVIEW}")
+message(
+  STATUS
+    "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW: ${WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW}"
+)
 message(STATUS "---------------------------------------------")
 message(STATUS "third-party options")
 message(STATUS "---------------------------------------------")

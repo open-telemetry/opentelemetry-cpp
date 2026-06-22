@@ -28,16 +28,21 @@
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 #  include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 #  include "opentelemetry/trace/provider.h"
 #  include "opentelemetry/trace/tracer_provider.h"
 
 #  include <grpcpp/grpcpp.h>
 #  include <gtest/gtest.h>
+#  include <algorithm>
 #  include <future>
+#  include <utility>
+#  include <vector>
 
 #  if defined(_MSC_VER)
 #    include "opentelemetry/sdk/common/env_variables.h"
@@ -117,6 +122,8 @@ private:
   ::grpc::Status last_async_status_;
   async_interface async_interface_;
 };
+
+using opentelemetry::test_common::ScopedTestLogHandler;
 }  // namespace
 
 class OtlpGrpcExporterTestPeer : public ::testing::Test
@@ -194,6 +201,47 @@ TEST_F(OtlpGrpcExporterTestPeer, ExportUnitTest)
 #  else
   EXPECT_EQ(sdk::common::ExportResult::kFailure, result);
 #  endif
+}
+
+// Exporter logs the rejection on partial_success.
+TEST_F(OtlpGrpcExporterTestPeer, ExportPartialSuccess)
+{
+  ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
+
+  auto mock_stub = new OtlpMockTraceServiceStub();
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(stub_interface);
+
+  auto recordable = exporter->MakeRecordable();
+  recordable->SetName("Test span");
+
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
+  EXPECT_CALL(*mock_stub, Export(_, _, _))
+      .Times(Exactly(1))
+      .WillOnce(Invoke(
+          [](::grpc::ClientContext *,
+             const proto::collector::trace::v1::ExportTraceServiceRequest &,
+             proto::collector::trace::v1::ExportTraceServiceResponse *response) -> ::grpc::Status {
+            response->mutable_partial_success()->set_rejected_spans(21);
+            response->mutable_partial_success()->set_error_message("too many spans!!");
+            return ::grpc::Status::OK;
+          }));
+
+  auto result = exporter->Export(batch);
+  exporter->ForceFlush();
+
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, result);
+
+  auto entries  = log.Drain();
+  auto contains = [&](const std::string &needle) {
+    return std::any_of(entries.begin(), entries.end(), [&](const ScopedTestLogHandler::Entry &e) {
+      return e.msg.find(needle) != std::string::npos;
+    });
+  };
+  EXPECT_TRUE(contains("partial success"));
+  EXPECT_TRUE(contains("21 span(s) rejected"));
+  EXPECT_TRUE(contains("too many spans!!"));
 }
 
 // Create spans, let processor call Export()
