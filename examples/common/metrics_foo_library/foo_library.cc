@@ -32,9 +32,6 @@ namespace metrics_api = opentelemetry::metrics;
 namespace
 {
 
-static opentelemetry::nostd::shared_ptr<metrics_api::ObservableInstrument>
-    double_observable_counter;
-
 std::map<std::string, std::string> get_random_attr()
 {
   const std::vector<std::pair<std::string, std::string>> labels = {{"key1", "value1"},
@@ -49,24 +46,24 @@ std::map<std::string, std::string> get_random_attr()
 class MeasurementFetcher
 {
 public:
-  static void Fetcher(opentelemetry::metrics::ObserverResult observer_result, void * /* state */)
+  static void Fetcher(opentelemetry::metrics::ObserverResult observer_result, void *state)
   {
     if (opentelemetry::nostd::holds_alternative<
             opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(
             observer_result))
     {
+      auto *self         = static_cast<MeasurementFetcher *>(state);
       double random_incr = (rand() % 5) + 1.1;
-      value_ += random_incr;
+      self->value_ += random_incr;
       std::map<std::string, std::string> labels = get_random_attr();
       opentelemetry::nostd::get<
           opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(
           observer_result)
-          ->Observe(value_, labels);
+          ->Observe(self->value_, labels);
     }
   }
-  static double value_;
+  double value_ = 0.0;
 };
-double MeasurementFetcher::value_ = 0.0;
 }  // namespace
 
 void foo_library::counter_example(const std::string &name)
@@ -89,8 +86,9 @@ void foo_library::observable_counter_example(const std::string &name)
   std::string counter_name = name + "_observable_counter";
   auto provider            = metrics_api::Provider::GetMeterProvider();
   opentelemetry::nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter(name, "1.2.0");
-  double_observable_counter = meter->CreateDoubleObservableCounter(counter_name);
-  double_observable_counter->AddCallback(MeasurementFetcher::Fetcher, nullptr);
+  MeasurementFetcher fetcher;
+  auto observable_counter = meter->CreateDoubleObservableCounter(counter_name);
+  observable_counter->AddCallback(MeasurementFetcher::Fetcher, &fetcher);
   for (uint32_t i = 0; i < 20; ++i)
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -169,9 +167,10 @@ void foo_library::semconv_observable_counter_example()
 {
   auto provider = metrics_api::Provider::GetMeterProvider();
   opentelemetry::nostd::shared_ptr<metrics_api::Meter> meter = provider->GetMeter("demo", "1.2.0");
-  double_observable_counter =
+  MeasurementFetcher fetcher;
+  auto observable_counter =
       opentelemetry::semconv::system::CreateAsyncDoubleMetricSystemDiskIo(meter.get());
-  double_observable_counter->AddCallback(MeasurementFetcher::Fetcher, nullptr);
+  observable_counter->AddCallback(MeasurementFetcher::Fetcher, &fetcher);
   for (uint32_t i = 0; i < 20; ++i)
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
