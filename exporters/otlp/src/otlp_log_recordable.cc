@@ -3,7 +3,6 @@
 
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include <cstddef>
-#include <limits>
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
@@ -21,7 +20,6 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
-#include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/logs/v1/logs.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
@@ -246,14 +244,8 @@ void OtlpLogRecordable::SetAttribute(opentelemetry::nostd::string_view key,
     return;
   }
 
-  auto *kv = proto_record_.add_attributes();
-  OtlpPopulateAttributeUtils::PopulateAttribute(kv, key, value, true);
-
-  if (limits_.attribute_value_length_limit != (std::numeric_limits<std::size_t>::max)())
-  {
-    OtlpPopulateAttributeUtils::TruncateProtoAttributeValue(kv->mutable_value(),
-                                                            limits_.attribute_value_length_limit);
-  }
+  OtlpPopulateAttributeUtils::PopulateAttribute(proto_record_.add_attributes(), key, value, true,
+                                                limits_.attribute_value_length_limit);
 }
 
 void OtlpLogRecordable::SetLogRecordLimits(

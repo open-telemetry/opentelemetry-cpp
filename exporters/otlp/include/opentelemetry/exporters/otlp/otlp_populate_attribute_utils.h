@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cstddef>
+#include <limits>
 #include <string>
 
 #include "opentelemetry/common/attribute_value.h"
@@ -58,23 +59,41 @@ public:
                                 const opentelemetry::sdk::instrumentationscope::InstrumentationScope
                                     &instrumentation_scope) noexcept;
 
-  static void PopulateAnyValue(opentelemetry::proto::common::v1::AnyValue *proto_value,
-                               const opentelemetry::common::AttributeValue &value,
-                               bool allow_bytes) noexcept;
+  /**
+   * Populate a proto AnyValue from a non-owning AttributeValue.
+   * When `max_length` is less than `std::numeric_limits<std::size_t>::max()`,
+   * string alternatives are truncated to at most `max_length` bytes using
+   * UTF-8-safe truncation (Utf8SafePrefixLength) so the resulting proto
+   * `string_value` stays valid UTF-8 when the input was. Raw bytes
+   * (`span<const uint8_t>` when `allow_bytes` is true) are cut at the raw
+   * byte boundary since they are not UTF-8 text. Non-string alternatives
+   * are unaffected.
+   */
+  static void PopulateAnyValue(
+      opentelemetry::proto::common::v1::AnyValue *proto_value,
+      const opentelemetry::common::AttributeValue &value,
+      bool allow_bytes,
+      std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept;
 
-  static void PopulateAnyValue(opentelemetry::proto::common::v1::AnyValue *proto_value,
-                               const opentelemetry::sdk::common::OwnedAttributeValue &value,
-                               bool allow_bytes) noexcept;
+  static void PopulateAnyValue(
+      opentelemetry::proto::common::v1::AnyValue *proto_value,
+      const opentelemetry::sdk::common::OwnedAttributeValue &value,
+      bool allow_bytes,
+      std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept;
 
-  static void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
-                                nostd::string_view key,
-                                const opentelemetry::common::AttributeValue &value,
-                                bool allow_bytes) noexcept;
+  static void PopulateAttribute(
+      opentelemetry::proto::common::v1::KeyValue *attribute,
+      nostd::string_view key,
+      const opentelemetry::common::AttributeValue &value,
+      bool allow_bytes,
+      std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept;
 
-  static void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
-                                nostd::string_view key,
-                                const opentelemetry::sdk::common::OwnedAttributeValue &value,
-                                bool allow_bytes) noexcept;
+  static void PopulateAttribute(
+      opentelemetry::proto::common::v1::KeyValue *attribute,
+      nostd::string_view key,
+      const opentelemetry::sdk::common::OwnedAttributeValue &value,
+      bool allow_bytes,
+      std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept;
 
   /**
    * Byte length of the longest prefix of `value` that fits within `max_bytes`
@@ -86,17 +105,15 @@ public:
    * truncate at a code-point boundary instead of cutting through a multi-byte
    * sequence.
    */
-  static std::size_t Utf8SafePrefixLength(const std::string &value, std::size_t max_bytes) noexcept;
+  static std::size_t Utf8SafePrefixLength(const char *data,
+                                          std::size_t size,
+                                          std::size_t max_bytes) noexcept;
 
-  /**
-   * Truncate the `string_value` and `bytes_value` (and recursively into
-   * `array_value` elements) of an OTLP `AnyValue` to at most `max_length`
-   * bytes each. `string_value` uses Utf8SafePrefixLength so the resulting
-   * protobuf string stays valid UTF-8 when the input was. `bytes_value` is
-   * cut at the raw byte boundary since it is not UTF-8 text.
-   */
-  static void TruncateProtoAttributeValue(opentelemetry::proto::common::v1::AnyValue *value,
-                                          std::size_t max_length) noexcept;
+  /// Convenience overload that delegates to the pointer + size variant.
+  static std::size_t Utf8SafePrefixLength(const std::string &value, std::size_t max_bytes) noexcept
+  {
+    return Utf8SafePrefixLength(value.data(), value.size(), max_bytes);
+  }
 };
 
 }  // namespace otlp

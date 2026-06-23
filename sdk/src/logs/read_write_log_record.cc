@@ -3,11 +3,10 @@
 
 #include <stdint.h>
 #include <chrono>
-#include <cstddef>
-#include <limits>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
@@ -167,19 +166,13 @@ void ReadWriteLogRecord::SetAttribute(nostd::string_view key,
       ++dropped_attributes_count_;
       return;
     }
-    it = attributes_map_
-             .emplace(std::move(safe_key), opentelemetry::sdk::common::OwnedAttributeValue{})
-             .first;
+    opentelemetry::sdk::common::AttributeConverter converter(limits_.attribute_value_length_limit);
+    attributes_map_.emplace(std::move(safe_key), nostd::visit(converter, value));
+    return;
   }
 
-  opentelemetry::sdk::common::AttributeConverter converter;
+  opentelemetry::sdk::common::AttributeConverter converter(limits_.attribute_value_length_limit);
   it->second = nostd::visit(converter, value);
-
-  if (limits_.attribute_value_length_limit != (std::numeric_limits<std::size_t>::max)())
-  {
-    opentelemetry::sdk::common::TruncateAttributeValueByteLength(
-        it->second, limits_.attribute_value_length_limit);
-  }
 }
 
 void ReadWriteLogRecord::SetLogRecordLimits(const LogRecordLimits &limits) noexcept

@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <cstdint>
 #include <string>
 
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
-#include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -71,73 +69,6 @@ TEST(Utf8SafePrefixLength, TruncatedTailLeadByteFallsBack)
   // String ends mid-sequence (lone 0xC3 at the tail); the algorithm should
   // treat it as one byte rather than reading past the buffer.
   EXPECT_EQ(OtlpPopulateAttributeUtils::Utf8SafePrefixLength("ab\xC3", 10), 3u);
-}
-
-// ---------------------------------------------------------------------------
-// TruncateProtoAttributeValue
-// ---------------------------------------------------------------------------
-
-TEST(TruncateProtoAttributeValue, TruncatesStringValueAtUtf8Boundary)
-{
-  proto::common::v1::AnyValue value;
-  value.set_string_value("h\xC3\xA9llo");
-  OtlpPopulateAttributeUtils::TruncateProtoAttributeValue(&value, 2);
-  EXPECT_EQ(value.string_value(), "h");
-}
-
-TEST(TruncateProtoAttributeValue, KeepsStringValueWhenWithinBudget)
-{
-  proto::common::v1::AnyValue value;
-  value.set_string_value("short");
-  OtlpPopulateAttributeUtils::TruncateProtoAttributeValue(&value, 100);
-  EXPECT_EQ(value.string_value(), "short");
-}
-
-TEST(TruncateProtoAttributeValue, TruncatesBytesValueAtRawByteBoundary)
-{
-  proto::common::v1::AnyValue value;
-  value.set_bytes_value(std::string("\x01\x02\x03\x04\x05", 5));
-  OtlpPopulateAttributeUtils::TruncateProtoAttributeValue(&value, 3);
-  const auto &b = value.bytes_value();
-  ASSERT_EQ(b.size(), 3u);
-  EXPECT_EQ(static_cast<uint8_t>(b[0]), 0x01);
-  EXPECT_EQ(static_cast<uint8_t>(b[1]), 0x02);
-  EXPECT_EQ(static_cast<uint8_t>(b[2]), 0x03);
-}
-
-TEST(TruncateProtoAttributeValue, TruncatesEachStringInArray)
-{
-  proto::common::v1::AnyValue value;
-  auto *array = value.mutable_array_value();
-  array->add_values()->set_string_value("aaaaaa");
-  array->add_values()->set_string_value("bb");
-  array->add_values()->set_string_value("cccc");
-
-  OtlpPopulateAttributeUtils::TruncateProtoAttributeValue(&value, 3);
-
-  ASSERT_EQ(value.array_value().values_size(), 3);
-  EXPECT_EQ(value.array_value().values(0).string_value(), "aaa");
-  EXPECT_EQ(value.array_value().values(1).string_value(), "bb");
-  EXPECT_EQ(value.array_value().values(2).string_value(), "ccc");
-}
-
-TEST(TruncateProtoAttributeValue, LeavesNonStringTypesAlone)
-{
-  proto::common::v1::AnyValue int_value;
-  int_value.set_int_value(1234567890);
-  OtlpPopulateAttributeUtils::TruncateProtoAttributeValue(&int_value, 1);
-  EXPECT_EQ(int_value.int_value(), 1234567890);
-
-  proto::common::v1::AnyValue bool_value;
-  bool_value.set_bool_value(true);
-  OtlpPopulateAttributeUtils::TruncateProtoAttributeValue(&bool_value, 1);
-  EXPECT_EQ(bool_value.bool_value(), true);
-}
-
-TEST(TruncateProtoAttributeValue, IgnoresNullValuePointer)
-{
-  OtlpPopulateAttributeUtils::TruncateProtoAttributeValue(nullptr, 5);
-  // No crash, no observable side effect.
 }
 
 }  // namespace otlp

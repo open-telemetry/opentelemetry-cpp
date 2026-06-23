@@ -3,8 +3,11 @@
 
 #pragma once
 
+#include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <initializer_list>
+#include <limits>
 #include <map>
 #include <string>
 #include <unordered_map>
@@ -69,49 +72,27 @@ enum OwnedAttributeType : std::uint8_t
 };
 
 /**
- * Truncate the string, string-array, and bytes variants of an
- * OwnedAttributeValue to at most `max_length` bytes each. Other variants
- * are left untouched. This is plain byte-length truncation: the in-memory
- * std::string variant may legitimately carry raw bytes when constructed
- * from a non-UTF-8 source, so forcing UTF-8 boundary semantics here would
+ * Creates an owned copy (OwnedAttributeValue) of a non-owning AttributeValue.
+ *
+ * The default-constructed converter does not truncate. To apply a byte-length
+ * cap to the string, string-array, and bytes alternatives during conversion,
+ * construct with the `(std::size_t max_length)` overload. Other alternatives
+ * are unaffected. This is plain byte-length truncation: the in-memory
+ * std::string variant may legitimately carry raw bytes when a user constructs
+ * it from a non-UTF-8 source, so forcing UTF-8 boundary semantics here would
  * over-truncate that case. Exporters that require a valid-UTF-8 wire format
  * (OTLP protobuf, ES JSON) apply their own UTF-8-aware truncation at the
  * recordable boundary.
  */
-inline void TruncateAttributeValueByteLength(OwnedAttributeValue &value,
-                                             std::size_t max_length) noexcept
-{
-  if (auto *s = nostd::get_if<std::string>(&value))
-  {
-    if (s->size() > max_length)
-    {
-      s->resize(max_length);
-    }
-  }
-  else if (auto *vec = nostd::get_if<std::vector<std::string>>(&value))
-  {
-    for (auto &element : *vec)
-    {
-      if (element.size() > max_length)
-      {
-        element.resize(max_length);
-      }
-    }
-  }
-  else if (auto *bytes = nostd::get_if<std::vector<uint8_t>>(&value))
-  {
-    if (bytes->size() > max_length)
-    {
-      bytes->resize(max_length);
-    }
-  }
-}
-
-/**
- * Creates an owned copy (OwnedAttributeValue) of a non-owning AttributeValue.
- */
 struct AttributeConverter
 {
+  AttributeConverter() = default;
+
+  /// Constructs a converter that truncates string and bytes alternatives to
+  /// at most `max_length` bytes during conversion. Other alternatives are
+  /// unaffected. Used by recordables enforcing attribute_value_length_limit.
+  explicit AttributeConverter(std::size_t max_length) noexcept : max_length_(max_length) {}
+
   OwnedAttributeValue operator()(bool v) { return OwnedAttributeValue(v); }
   OwnedAttributeValue operator()(int32_t v) { return OwnedAttributeValue(v); }
   OwnedAttributeValue operator()(uint32_t v) { return OwnedAttributeValue(v); }
@@ -120,11 +101,30 @@ struct AttributeConverter
   OwnedAttributeValue operator()(double v) { return OwnedAttributeValue(v); }
   OwnedAttributeValue operator()(nostd::string_view v)
   {
-    return OwnedAttributeValue(std::string(v));
+    return OwnedAttributeValue(std::string(v.data(), (std::min)(v.size(), max_length_)));
   }
-  OwnedAttributeValue operator()(std::string v) { return OwnedAttributeValue(std::move(v)); }
-  OwnedAttributeValue operator()(const char *v) { return OwnedAttributeValue(std::string(v)); }
-  OwnedAttributeValue operator()(nostd::span<const uint8_t> v) { return convertSpan<uint8_t>(v); }
+  OwnedAttributeValue operator()(std::string v)
+  {
+    if (v.size() > max_length_)
+    {
+      v.resize(max_length_);
+    }
+    return OwnedAttributeValue(std::move(v));
+  }
+  OwnedAttributeValue operator()(const char *v)
+  {
+    std::string s(v);
+    if (s.size() > max_length_)
+    {
+      s.resize(max_length_);
+    }
+    return OwnedAttributeValue(std::move(s));
+  }
+  OwnedAttributeValue operator()(nostd::span<const uint8_t> v)
+  {
+    const auto end = v.begin() + static_cast<std::ptrdiff_t>((std::min)(v.size(), max_length_));
+    return OwnedAttributeValue(std::vector<uint8_t>(v.begin(), end));
+  }
   OwnedAttributeValue operator()(nostd::span<const bool> v) { return convertSpan<bool>(v); }
   OwnedAttributeValue operator()(nostd::span<const int32_t> v) { return convertSpan<int32_t>(v); }
   OwnedAttributeValue operator()(nostd::span<const uint32_t> v) { return convertSpan<uint32_t>(v); }
@@ -133,7 +133,13 @@ struct AttributeConverter
   OwnedAttributeValue operator()(nostd::span<const double> v) { return convertSpan<double>(v); }
   OwnedAttributeValue operator()(nostd::span<const nostd::string_view> v)
   {
-    return convertSpan<std::string>(v);
+    std::vector<std::string> result;
+    result.reserve(v.size());
+    for (const auto &sv : v)
+    {
+      result.emplace_back(sv.data(), (std::min)(sv.size(), max_length_));
+    }
+    return OwnedAttributeValue(std::move(result));
   }
 
   template <typename T, typename U = T>
@@ -141,6 +147,9 @@ struct AttributeConverter
   {
     return OwnedAttributeValue(std::vector<T>(vals.begin(), vals.end()));
   }
+
+private:
+  std::size_t max_length_ = (std::numeric_limits<std::size_t>::max)();
 };
 
 /**
