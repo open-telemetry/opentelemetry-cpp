@@ -110,6 +110,12 @@ Increment the:
   this preview will be enabled by default later, then the option will be deprecated.
   [#4160](https://github.com/open-telemetry/opentelemetry-cpp/pull/4160)
 
+* [SEMANTIC CONVENTIONS] Generate event name constants (e.g. `semconv::exception::kException`)
+  [#4171](https://github.com/open-telemetry/opentelemetry-cpp/pull/4171)
+
+* [EXPORTER] Handle OTLP partial success response
+  [#4104](https://github.com/open-telemetry/opentelemetry-cpp/pull/4104)
+
 * [BAZEL] Upgrade grpc and protobuf dependencies
   [#4164](https://github.com/open-telemetry/opentelemetry-cpp/pull/4164)
 
