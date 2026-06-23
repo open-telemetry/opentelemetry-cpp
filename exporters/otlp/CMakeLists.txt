@@ -917,7 +917,7 @@ if(BUILD_TESTING)
     add_executable(otlp_grpc_exporter_test test/otlp_grpc_exporter_test.cc)
     target_link_libraries(
       otlp_grpc_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-      ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc)
+      ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_grpc_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -952,7 +952,8 @@ if(BUILD_TESTING)
       opentelemetry_exporter_otlp_grpc
       opentelemetry_exporter_otlp_grpc_log
       opentelemetry_trace
-      opentelemetry_logs)
+      opentelemetry_logs
+      opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_grpc_log_record_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -972,9 +973,13 @@ if(BUILD_TESTING)
     add_executable(otlp_grpc_metric_exporter_test
                    test/otlp_grpc_metric_exporter_test.cc)
     target_link_libraries(
-      otlp_grpc_metric_exporter_test ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc
-      opentelemetry_exporter_otlp_grpc_metrics)
+      otlp_grpc_metric_exporter_test
+      ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${GMOCK_LIB}
+      opentelemetry_exporter_otlp_grpc
+      opentelemetry_exporter_otlp_grpc_metrics
+      opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_grpc_metric_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -1002,7 +1007,8 @@ if(BUILD_TESTING)
       opentelemetry_exporter_otlp_http
       opentelemetry_http_client_nosend
       nlohmann_json::nlohmann_json
-      protobuf::libprotobuf)
+      protobuf::libprotobuf
+      opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_http_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -1028,7 +1034,8 @@ if(BUILD_TESTING)
       opentelemetry_exporter_otlp_http_log
       opentelemetry_logs
       opentelemetry_http_client_nosend
-      nlohmann_json::nlohmann_json)
+      nlohmann_json::nlohmann_json
+      opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_http_log_record_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -1056,7 +1063,8 @@ if(BUILD_TESTING)
       opentelemetry_metrics
       opentelemetry_http_client_nosend
       nlohmann_json::nlohmann_json
-      protobuf::libprotobuf)
+      protobuf::libprotobuf
+      opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_http_metric_exporter_test
       TEST_PREFIX exporter.otlp.

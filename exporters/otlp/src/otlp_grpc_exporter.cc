@@ -5,6 +5,7 @@
 #include <grpcpp/support/status.h>
 #include <atomic>
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -30,10 +31,6 @@
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
-
-#ifdef ENABLE_ASYNC_EXPORT
-#  include <functional>
-#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -150,13 +147,22 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
             opentelemetry::sdk::common::ExportResult result,
             std::unique_ptr<google::protobuf::Arena> &&arena,
             const proto::collector::trace::v1::ExportTraceServiceRequest &request,
-            proto::collector::trace::v1::ExportTraceServiceResponse *) {
+            proto::collector::trace::v1::ExportTraceServiceResponse *response) {
           auto trace_arena = std::move(arena);
           if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
           {
             OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] ERROR: Export "
                                     << request.resource_spans_size()
                                     << " trace span(s) error: " << static_cast<int>(result));
+          }
+          else if (response->has_partial_success() &&
+                   (response->partial_success().rejected_spans() != 0 ||
+                    !response->partial_success().error_message().empty()))
+          {
+            const auto &partial = response->partial_success();
+            OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] Export partial success: "
+                                    << partial.rejected_spans() << " span(s) rejected: \""
+                                    << partial.error_message() << "\"");
           }
           else
           {
@@ -174,18 +180,31 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
         google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceResponse>(
             arena.get());
     grpc::Status status = OtlpGrpcClient::DelegateExport(
-        trace_service_stub_.get(), std::move(context), std::move(arena), request, response);
+        trace_service_stub_.get(), std::move(context), std::move(arena), request, response,
+        [resource_spans_size](std::unique_ptr<google::protobuf::Arena> &&arena,
+                              proto::collector::trace::v1::ExportTraceServiceResponse *response) {
+          auto trace_arena = std::move(arena);
+          if (response->has_partial_success() &&
+              (response->partial_success().rejected_spans() != 0 ||
+               !response->partial_success().error_message().empty()))
+          {
+            const auto &partial = response->partial_success();
+            OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] Export partial success: "
+                                    << partial.rejected_spans() << " span(s) rejected: \""
+                                    << partial.error_message() << "\"");
+          }
+          else
+          {
+            OTEL_INTERNAL_LOG_DEBUG("[OTLP TRACE GRPC Exporter] Export "
+                                    << resource_spans_size << " trace span(s) success");
+          }
+        });
     if (!status.ok())
     {
       OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE GRPC Exporter] Export() failed with status_code: \""
                               << grpc_utils::grpc_status_code_to_string(status.error_code())
                               << "\" error_message: \"" << status.error_message() << "\"");
       return sdk::common::ExportResult::kFailure;
-    }
-    else
-    {
-      OTEL_INTERNAL_LOG_DEBUG("[OTLP TRACE GRPC Exporter] Export " << resource_spans_size
-                                                                   << " trace span(s) success");
     }
 #ifdef ENABLE_ASYNC_EXPORT
   }

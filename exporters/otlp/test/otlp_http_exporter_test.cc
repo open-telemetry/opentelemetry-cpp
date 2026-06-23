@@ -17,6 +17,7 @@
 
 #  include "opentelemetry/ext/http/client/http_client_factory.h"
 #  include "opentelemetry/ext/http/server/http_server.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
@@ -25,8 +26,13 @@
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
 #  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
+#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 #  include "opentelemetry/trace/provider.h"
 #  include "opentelemetry/trace/tracer_provider.h"
+
+#  include <algorithm>
+#  include <utility>
+#  include <vector>
 
 #  include <google/protobuf/message_lite.h>
 #  include <gtest/gtest.h>
@@ -46,6 +52,20 @@ namespace exporter
 {
 namespace otlp
 {
+
+namespace
+{
+class ProtobufGlobalSymbolGuard
+{
+public:
+  ProtobufGlobalSymbolGuard() = default;
+  ~ProtobufGlobalSymbolGuard() { google::protobuf::ShutdownProtobufLibrary(); }
+  ProtobufGlobalSymbolGuard(const ProtobufGlobalSymbolGuard &)            = delete;
+  ProtobufGlobalSymbolGuard &operator=(const ProtobufGlobalSymbolGuard &) = delete;
+  ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
+  ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
+};
+}  // namespace
 
 namespace trace_api = opentelemetry::trace;
 namespace resource  = opentelemetry::sdk::resource;
@@ -564,7 +584,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestSync)
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTestAsync();
-  google::protobuf::ShutdownProtobufLibrary();
+  static ProtobufGlobalSymbolGuard global_symbol_guard;
 }
 #  endif
 
@@ -857,6 +877,119 @@ TEST_P(OtlpHttpExporterRetryIntegrationTests, StatusCodes)
   ASSERT_EQ(expected_attempts, request_count);
 }
 #  endif  // ENABLE_OTLP_RETRY_PREVIEW
+
+using opentelemetry::test_common::ScopedTestLogHandler;
+
+// Exporter logs the rejection on partial_success.
+TEST_F(OtlpHttpExporterTestPeer, ExportPartialSuccess)
+{
+  ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
+
+  proto::collector::trace::v1::ExportTraceServiceResponse partial;
+  partial.mutable_partial_success()->set_rejected_spans(21);
+  partial.mutable_partial_success()->set_error_message("too many spans!!");
+  std::string serialized = partial.SerializeAsString();
+
+  auto mock_otlp_client =
+      OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
+  auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_client.first});
+
+  auto no_send_client =
+      std::static_pointer_cast<http_client::nosend::HttpClient>(mock_otlp_client.second);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&serialized](const std::shared_ptr<http_client::EventHandler> &callback) {
+        http_client::nosend::Response response;
+        response.body_.assign(serialized.begin(), serialized.end());
+        response.Finish(*callback.get());
+      });
+
+  auto recordable = exporter->MakeRecordable();
+  recordable->SetName("Test span");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, exporter->Export(batch));
+
+  auto entries  = log.Drain();
+  auto contains = [&](const std::string &needle) {
+    return std::any_of(entries.begin(), entries.end(), [&](const ScopedTestLogHandler::Entry &e) {
+      return e.msg.find(needle) != std::string::npos;
+    });
+  };
+  EXPECT_TRUE(contains("partial success"));
+  EXPECT_TRUE(contains("21 span(s) rejected"));
+  EXPECT_TRUE(contains("too many spans!!"));
+}
+
+// Exporter logs the rejection on partial_success when the response is JSON encoded.
+TEST_F(OtlpHttpExporterTestPeer, ExportPartialSuccessJson)
+{
+  ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
+
+  std::string serialized =
+      R"({"partialSuccess":{"rejectedSpans":"21","errorMessage":"too many spans!!"}})";
+
+  auto mock_otlp_client =
+      OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_client.first});
+
+  auto no_send_client =
+      std::static_pointer_cast<http_client::nosend::HttpClient>(mock_otlp_client.second);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&serialized](const std::shared_ptr<http_client::EventHandler> &callback) {
+        http_client::nosend::Response response;
+        response.body_.assign(serialized.begin(), serialized.end());
+        response.Finish(*callback.get());
+      });
+
+  auto recordable = exporter->MakeRecordable();
+  recordable->SetName("Test span");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, exporter->Export(batch));
+
+  auto entries  = log.Drain();
+  auto contains = [&](const std::string &needle) {
+    return std::any_of(entries.begin(), entries.end(), [&](const ScopedTestLogHandler::Entry &e) {
+      return e.msg.find(needle) != std::string::npos;
+    });
+  };
+  EXPECT_TRUE(contains("partial success"));
+  EXPECT_TRUE(contains("21 span(s) rejected"));
+  EXPECT_TRUE(contains("too many spans!!"));
+}
+
+// A malformed response body on a 2xx should return as kFailure for sync exports.
+#  ifndef ENABLE_ASYNC_EXPORT
+TEST_F(OtlpHttpExporterTestPeer, ExportParseFailureReturnsFailure)
+{
+  std::string serialized = "{some bad JSON";
+
+  auto mock_otlp_client =
+      OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_client.first});
+
+  auto no_send_client =
+      std::static_pointer_cast<http_client::nosend::HttpClient>(mock_otlp_client.second);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&serialized](const std::shared_ptr<http_client::EventHandler> &callback) {
+        http_client::nosend::Response response;
+        response.body_.assign(serialized.begin(), serialized.end());
+        response.Finish(*callback.get());
+      });
+
+  auto recordable = exporter->MakeRecordable();
+  recordable->SetName("Test span");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
+  EXPECT_EQ(sdk::common::ExportResult::kFailure, exporter->Export(batch));
+}
+#  endif
 
 }  // namespace otlp
 }  // namespace exporter

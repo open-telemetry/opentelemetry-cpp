@@ -64,28 +64,28 @@ Increment the:
 * [API] (ABI v2) `Logger::EmitLogRecord(...)` templates now apply the
   `Enabled` filter chain when a `Severity` is in args. v1 behavior is
   unchanged.
-  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+  [#4079](https://github.com/open-telemetry/opentelemetry-cpp/pull/4079)
 
 * [API/SDK] (ABI v2) Add `Logger::CreateLogRecord` virtual taking
   `const nostd::variant<trace::SpanContext, context::Context> &`
   for explicit-context record creation. `Logger::EmitLogRecord(args...)`
   also detects a `Context`, `SpanContext`
   or `TraceId` + `SpanId` [+ `TraceFlags`] in args and routes filtering.
-  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+  [#4079](https://github.com/open-telemetry/opentelemetry-cpp/pull/4079)
 
 * [SDK] Add `LogRecordProcessor::HasEnabledFilter()` so the SDK Logger can
   include processor-level filtering in its extended-enabled cache. Defaults
   to `true`. Built-in `SimpleLogRecordProcessor` and
   `BatchLogRecordProcessor` override to `false` since they use the default
   Enabled.
-  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+  [#4079](https://github.com/open-telemetry/opentelemetry-cpp/pull/4079)
 
 * [API/SDK] Replace `Context`-only signatures on
   `LogRecordProcessor::Enabled`,
   `LogRecordProcessor::EnabledImplementation`,
   `Logger::EnabledImplementation` (v2), and `Logger::CreateLogRecord` (v2)
   with `nostd::variant<trace::SpanContext, context::Context>`.
-  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+  [#4079](https://github.com/open-telemetry/opentelemetry-cpp/pull/4079)
 
 * [CI] iwyu and clang-tidy: use install_thirdparty.sh for third-party
   [#4136](https://github.com/open-telemetry/opentelemetry-cpp/pull/4136)
@@ -106,6 +106,18 @@ Increment the:
 
 * [BUILD] Fix protobuf build failure
   [#4154](https://github.com/open-telemetry/opentelemetry-cpp/pull/4154)
+
+* [API/SDK] Add `WITH_LOG_FILTERING_PREVIEW` option to enable log filtering
+  implemented in [#4079](https://github.com/open-telemetry/opentelemetry-cpp/pull/4079)
+  by defining `ENABLE_LOG_FILTERING_PREVIEW` (CMake: `-DWITH_LOG_FILTERING_PREVIEW=ON`);
+  this preview will be enabled by default later, then the option will be deprecated.
+  [#4160](https://github.com/open-telemetry/opentelemetry-cpp/pull/4160)
+
+* [SEMANTIC CONVENTIONS] Generate event name constants (e.g. `semconv::exception::kException`)
+  [#4171](https://github.com/open-telemetry/opentelemetry-cpp/pull/4171)
+
+* [EXPORTER] Handle OTLP partial success response
+  [#4104](https://github.com/open-telemetry/opentelemetry-cpp/pull/4104)
 
 ## [1.27.0] 2026-05-13
 
