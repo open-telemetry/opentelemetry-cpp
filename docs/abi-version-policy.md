@@ -298,10 +298,10 @@ the given ABI is no longer available.
 
 The build files are the source of truth for which ABI version is currently
 experimental versus stable. In CMake, the experimental version is the
-`WITH_ABI_VERSION_*` option labeled `EXPERIMENTAL` in
-[CMakeLists.txt](../CMakeLists.txt), and it is off by default; any version
-without that label is stable. The Bazel equivalent is the `//api:abi_version_no`
-flag in [api/BUILD](../api/BUILD), which defaults to the stable version.
+`WITH_ABI_VERSION_*` option labeled `EXPERIMENTAL` in `CMakeLists.txt`, and it
+is off by default; any version without that label is stable. The Bazel
+equivalent is the `//api:abi_version_no` flag in `api/BUILD`, which defaults to
+the stable version.
 
 The following sections describe the migration path from one ABI (v1) to the
 next (v2).
