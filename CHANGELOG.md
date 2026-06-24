@@ -110,8 +110,8 @@ Increment the:
 * [EXPORTER] Handle OTLP partial success response
   [#4104](https://github.com/open-telemetry/opentelemetry-cpp/pull/4104)
 
-* [API] Add `Span::RecordException()` (ABI v2), recording an `exception` event per the
-  trace exceptions semantic conventions.
+* [API] Add `Span::RecordException()` (ABI v2), recording an `exception`
+  event per the trace exceptions semantic conventions.
   [#4179](https://github.com/open-telemetry/opentelemetry-cpp/pull/4179)
 
 ## [1.27.0] 2026-05-13
