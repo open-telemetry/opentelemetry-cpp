@@ -17,11 +17,78 @@
 
 #include "opentelemetry/version.h"
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include <exception>
+
+#  include "opentelemetry/semconv/exception_attributes.h"
+#  include "opentelemetry/semconv/exception_events.h"
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
 
 class Tracer;
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+namespace detail
+{
+
+/**
+ * Internal helper for Span::RecordException(): presents `exception.message` (derived from
+ * std::exception::what()) followed by the caller-provided attributes, as a single
+ * KeyValueIterable suitable for Span::AddEvent().
+ *
+ * Per the OpenTelemetry specification, caller-provided attributes take precedence: when the
+ * caller already supplies an `exception.message`, the default derived from what() is omitted.
+ */
+class ExceptionAttributes final : public common::KeyValueIterable
+{
+public:
+  ExceptionAttributes(nostd::string_view message,
+                      const common::KeyValueIterable &additional) noexcept
+      : message_{message},
+        additional_{additional},
+        caller_has_message_{CallerHasMessage(additional)}
+  {}
+
+  bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>
+                           callback) const noexcept override
+  {
+    const bool keep_going = additional_.ForEachKeyValue(callback);
+    if (keep_going && !caller_has_message_)
+    {
+      return callback(semconv::exception::kExceptionMessage, message_);
+    }
+    return keep_going;
+  }
+
+  size_t size() const noexcept override
+  {
+    return additional_.size() + (caller_has_message_ ? 0 : 1);
+  }
+
+private:
+  static bool CallerHasMessage(const common::KeyValueIterable &additional) noexcept
+  {
+    bool found = false;
+    additional.ForEachKeyValue([&found](nostd::string_view key, common::AttributeValue) noexcept {
+      if (key == semconv::exception::kExceptionMessage)
+      {
+        found = true;
+        return false;
+      }
+      return true;
+    });
+    return found;
+  }
+
+  nostd::string_view message_;
+  const common::KeyValueIterable &additional_;
+  bool caller_has_message_;
+};
+}  // namespace detail
+#endif /* OPENTELEMETRY_ABI_VERSION_NO */
 
 /**
  * A Span represents a single operation within a Trace.
@@ -226,6 +293,41 @@ public:
         view(container);
 
     return this->AddLinks(view);
+  }
+
+  /**
+   * Records an exception as an event named "exception" on the Span.
+   *
+   * `exception.message` is set from `exc.what()`. Additional attributes - such as
+   * `exception.type` and `exception.stacktrace`, keyed by the
+   * `opentelemetry::semconv::exception::*` constants - may be supplied by the caller and take
+   * precedence over the defaults on key collision.
+   *
+   * @since ABI_VERSION 2
+   */
+  void RecordException(const std::exception &exc) noexcept { this->RecordException(exc, {}); }
+
+  void RecordException(const std::exception &exc,
+                       const common::KeyValueIterable &attributes) noexcept
+  {
+    detail::ExceptionAttributes exception_attributes{exc.what(), attributes};
+    this->AddEvent(semconv::exception::kException, exception_attributes);
+  }
+
+  template <class T,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<T>::value> * = nullptr>
+  void RecordException(const std::exception &exc, const T &attributes) noexcept
+  {
+    this->RecordException(exc, common::KeyValueIterableView<T>{attributes});
+  }
+
+  void RecordException(const std::exception &exc,
+                       std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
+                           attributes) noexcept
+  {
+    this->RecordException(exc,
+                          nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+                              attributes.begin(), attributes.end()});
   }
 
 #endif /* OPENTELEMETRY_ABI_VERSION_NO */

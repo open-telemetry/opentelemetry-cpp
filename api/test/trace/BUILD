@@ -53,6 +53,22 @@ cc_test(
 )
 
 cc_test(
+    name = "record_exception_test",
+    srcs = [
+        "record_exception_test.cc",
+    ],
+    tags = [
+        "api",
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "key_value_iterable_view_test",
     srcs = [
         "key_value_iterable_view_test.cc",
