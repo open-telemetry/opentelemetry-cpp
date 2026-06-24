@@ -12,7 +12,6 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/context/context.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
@@ -45,9 +44,10 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"
 
-#include <stddef.h>
-
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include <stddef.h>
+
+#  include "opentelemetry/context/context.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/trace/context.h"
 #  include "opentelemetry/trace/default_span.h"
@@ -55,7 +55,9 @@
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::instrumentationscope;
-namespace context  = opentelemetry::context;
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+namespace context = opentelemetry::context;
+#endif
 namespace logs_api = opentelemetry::logs;
 namespace nostd    = opentelemetry::nostd;
 
@@ -273,6 +275,7 @@ public:
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 };
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
 namespace
 {
 
@@ -349,6 +352,7 @@ private:
 };
 
 }  // namespace
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 TEST(LoggerSDK, LogToAProcessor)
 {
@@ -493,27 +497,6 @@ TEST(LoggerSDK, LoggerWithEnabledConfig)
   ASSERT_FALSE(shared_recordable->GetSpanId().IsValid());
 }
 
-TEST(LoggerSDK, LoggerEnabledWithIntegerEventIdUsesProcessorEnablementWithoutEventName)
-{
-  auto call_state = std::shared_ptr<EnabledProcessorCallState>(new EnabledProcessorCallState());
-  auto log_processor =
-      std::unique_ptr<LogRecordProcessor>(new EnablementAwareProcessor(false, call_state));
-
-  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
-  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
-  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider(
-      std::move(log_processor), resource,
-      std::make_unique<ScopeConfigurator<LoggerConfig>>(
-          ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Enabled()).Build())));
-  auto logger = api_lp->GetLogger("test-logger", "opentelemetry_library", "", schema_url);
-
-  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo, 123));
-  EXPECT_EQ(call_state->severity, logs_api::Severity::kInfo);
-  EXPECT_EQ(call_state->event_name, "");
-  EXPECT_EQ(call_state->scope_name, "opentelemetry_library");
-  EXPECT_EQ(call_state->call_count, 1U);
-}
-
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 TEST(LoggerSDK, LoggerWithMinimumSeverityConfig)
 {
@@ -567,6 +550,27 @@ TEST(LoggerSDK, LoggerEnabledWithNamedEventIdUsesProcessorEnablement)
   EXPECT_EQ(call_state->scope_name, "opentelemetry_library");
   EXPECT_TRUE(call_state->context_has_test_key);
   EXPECT_TRUE(call_state->context_test_key_value);
+  EXPECT_EQ(call_state->call_count, 1U);
+}
+
+TEST(LoggerSDK, LoggerEnabledWithIntegerEventIdUsesProcessorEnablementWithoutEventName)
+{
+  auto call_state = std::shared_ptr<EnabledProcessorCallState>(new EnabledProcessorCallState());
+  auto log_processor =
+      std::unique_ptr<LogRecordProcessor>(new EnablementAwareProcessor(false, call_state));
+
+  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider(
+      std::move(log_processor), resource,
+      std::make_unique<ScopeConfigurator<LoggerConfig>>(
+          ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Enabled()).Build())));
+  auto logger = api_lp->GetLogger("test-logger", "opentelemetry_library", "", schema_url);
+
+  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo, 123));
+  EXPECT_EQ(call_state->severity, logs_api::Severity::kInfo);
+  EXPECT_EQ(call_state->event_name, "");
+  EXPECT_EQ(call_state->scope_name, "opentelemetry_library");
   EXPECT_EQ(call_state->call_count, 1U);
 }
 
