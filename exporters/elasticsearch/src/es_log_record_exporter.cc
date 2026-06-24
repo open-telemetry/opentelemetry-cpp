@@ -16,6 +16,7 @@
 
 #include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
+#include "opentelemetry/ext/http/client/detail/default_factory.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/nostd/function_ref.h"
@@ -320,8 +321,21 @@ ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter()
 
 ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
     const ElasticsearchExporterOptions &options)
+    : ElasticsearchLogRecordExporter(options,
+                                     ext::http::client::detail::GetDefaultHttpClientFactory())
+{}
+
+ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
+    const ElasticsearchExporterOptions &options,
+    const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
+    : ElasticsearchLogRecordExporter(options, factory->Create())
+{}
+
+ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
+    const ElasticsearchExporterOptions &options,
+    std::shared_ptr<ext::http::client::HttpClient> http_client)
     : options_{options},
-      http_client_{ext::http::client::HttpClientFactory::Create()}
+      http_client_{std::move(http_client)}
 #ifdef ENABLE_ASYNC_EXPORT
       ,
       synchronization_data_(new SynchronizationData())

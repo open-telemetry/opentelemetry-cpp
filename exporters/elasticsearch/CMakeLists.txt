@@ -17,7 +17,7 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_exporter_elasticsearch_logs
-  PUBLIC opentelemetry_trace opentelemetry_logs opentelemetry_http_client_curl
+  PUBLIC opentelemetry_trace opentelemetry_logs opentelemetry_http_client
          nlohmann_json::nlohmann_json)
 
 otel_add_component(
