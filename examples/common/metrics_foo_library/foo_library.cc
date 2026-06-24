@@ -6,6 +6,7 @@
 #include <chrono>
 #include <cmath>
 #include <map>
+#include <random>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -32,6 +33,12 @@ namespace metrics_api = opentelemetry::metrics;
 namespace
 {
 
+int random_int()
+{
+  static thread_local std::mt19937 rng(std::random_device{}());
+  return std::uniform_int_distribution<int>{0, RAND_MAX}(rng);
+}
+
 std::map<std::string, std::string> get_random_attr()
 {
   const std::vector<std::pair<std::string, std::string>> labels = {{"key1", "value1"},
@@ -39,8 +46,8 @@ std::map<std::string, std::string> get_random_attr()
                                                                    {"key3", "value3"},
                                                                    {"key4", "value4"},
                                                                    {"key5", "value5"}};
-  return std::map<std::string, std::string>{labels[rand() % (labels.size() - 1)],
-                                            labels[rand() % (labels.size() - 1)]};
+  return std::map<std::string, std::string>{labels[random_int() % (labels.size() - 1)],
+                                            labels[random_int() % (labels.size() - 1)]};
 }
 
 class MeasurementFetcher
@@ -53,7 +60,7 @@ public:
             observer_result))
     {
       auto *self         = static_cast<MeasurementFetcher *>(state);
-      double random_incr = (rand() % 5) + 1.1;
+      double random_incr = (random_int() % 5) + 1.1;
       self->value_ += random_incr;
       std::map<std::string, std::string> labels = get_random_attr();
       opentelemetry::nostd::get<
@@ -75,7 +82,7 @@ void foo_library::counter_example(const std::string &name)
 
   for (uint32_t i = 0; i < 20; ++i)
   {
-    double val = (rand() % 700) + 1.1;
+    double val = (random_int() % 700) + 1.1;
     double_counter->Add(val);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
@@ -104,7 +111,7 @@ void foo_library::histogram_example(const std::string &name)
   auto context           = opentelemetry::context::Context{};
   for (uint32_t i = 0; i < 20; ++i)
   {
-    double val                                = (rand() % 700) + 1.1;
+    double val                                = (random_int() % 700) + 1.1;
     std::map<std::string, std::string> labels = get_random_attr();
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
     histogram_counter->Record(val, labelkv, context);
@@ -121,7 +128,7 @@ void foo_library::histogram_exp_example(const std::string &name)
   auto context           = opentelemetry::context::Context{};
   for (uint32_t i = 0; i < 20; ++i)
   {
-    double val                                = (rand() % 700) + 1.1;
+    double val                                = (random_int() % 700) + 1.1;
     std::map<std::string, std::string> labels = get_random_attr();
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
     histogram_counter->Record(val, labelkv, context);
@@ -139,7 +146,7 @@ void foo_library::gauge_example(const std::string &name)
   auto context = opentelemetry::context::Context{};
   for (uint32_t i = 0; i < 20; ++i)
   {
-    int64_t val                               = (rand() % 100) + 100;
+    int64_t val                               = (random_int() % 100) + 100;
     std::map<std::string, std::string> labels = get_random_attr();
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
     gauge->Record(val, labelkv, context);
@@ -157,7 +164,7 @@ void foo_library::semconv_counter_example()
 
   for (uint32_t i = 0; i < 20; ++i)
   {
-    double val = (rand() % 700) + 1.1;
+    double val = (random_int() % 700) + 1.1;
     double_counter->Add(val);
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
@@ -186,7 +193,7 @@ void foo_library::semconv_histogram_example()
   auto context = opentelemetry::context::Context{};
   for (uint32_t i = 0; i < 20; ++i)
   {
-    double val                                = (rand() % 700) + 1.1;
+    double val                                = (random_int() % 700) + 1.1;
     uint64_t int_val                          = std::llround(val);
     std::map<std::string, std::string> labels = get_random_attr();
     auto labelkv = opentelemetry::common::KeyValueIterableView<decltype(labels)>{labels};
