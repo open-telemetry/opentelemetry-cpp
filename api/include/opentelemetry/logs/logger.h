@@ -86,10 +86,11 @@ public:
    * @note This overload does NOT apply the @c Enabled filter chain. Callers who
    *       constructed @p log_record themselves are responsible for calling
    *       @c Enabled(severity, ...) before invoking this overload if they want
-   *       filtering to be honored. The no-record overload @c EmitLogRecord(args...)
-   *       below applies filtering automatically when @c ENABLE_LOG_FILTERING_PREVIEW
-   *       is defined: severity, trace based, and processor based filtering are supported in ABI v2,
-   *       only severity filtering is supported in ABI v1.
+   *       the LoggerConfig filtering rules (minimum severity, trace-based,
+   *       processor.Enabled) to be honored. In ABI v2 builds, the no-record
+   *       overload @c EmitLogRecord(args...) below does call the filter chain
+   *       automatically when @c Severity is present in @p args; in ABI v1
+   *       builds neither overload applies the filter chain.
    *
    * @param log_record Log record
    * @param args Arguments which can be used to set data of log record by type.
@@ -153,32 +154,23 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    *  Context (v2 only)                       -> filter + trace stamp (recommended: pass last)
    *
-   *  In ABI v2, a @c Context or trace parts (@c SpanContext, or @c TraceId +
-   *  @c SpanId [+ @c TraceFlags]) in args are always resolved and passed to
-   *  @c CreateLogRecord(context_or_span), so trace fields on the record reflect
-   *  the explicit context rather than the implicit runtime context.
-   *
-   *  Filtering requires @c ENABLE_LOG_FILTERING_PREVIEW to be defined.
-   *  With the flag: a LogRecord severity filter is applied in both ABI versions.
-   *  With the flag and ABI v2: if @c ExtendedEnabledRequired() is set, a full
-   *  context-aware filter is also applied (event_id, trace-based,
-   *  processor.Enabled).
+   *  When a @c Context or trace parts (@c SpanContext, or @c TraceId +
+   *  @c SpanId [+ @c TraceFlags]) are in args, the filter chain uses
+   *  @c Enabled(context_or_span, severity, ...) and the record is created
+   *  via @c CreateLogRecord(context_or_span), so the filter evaluates
+   *  against the trace this record is for instead of the implicit runtime
+   *  context.
    */
   template <class... ArgumentType>
   void EmitLogRecord(ArgumentType &&...args)
   {
-#if defined(ENABLE_LOG_FILTERING_PREVIEW)
-    // Common to both ABI versions: fast severity check before any virtual
-    // dispatch or context resolution.
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
     const Severity arg_severity = detail::FindSeverityInArgs(args...);
     if (arg_severity != Severity::kInvalid && !Enabled(arg_severity))
     {
       return;
     }
-#endif  // defined(ENABLE_LOG_FILTERING_PREVIEW)
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-    // Always resolve context/span so CreateLogRecord stamps the correct trace fields.
     nostd::variant<trace::SpanContext, opentelemetry::context::Context> context_or_span =
         trace::SpanContext::GetInvalid();
 
@@ -207,7 +199,6 @@ public:
       }
     }
 
-#  if defined(ENABLE_LOG_FILTERING_PREVIEW)
     if (arg_severity != Severity::kInvalid)
     {
       const EventId *event_id_ptr = detail::FindEventIdInArgs(args...);
@@ -222,7 +213,6 @@ public:
         }
       }
     }
-#  endif  // defined(ENABLE_LOG_FILTERING_PREVIEW)
 
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord(context_or_span);
 #else
