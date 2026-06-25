@@ -47,6 +47,8 @@ public:
                     const common::AttributeValue & /*value*/) noexcept override
   {}
 
+  using trace_api::Span::AddEvent;
+
   void AddEvent(nostd::string_view /*name*/) noexcept override {}
   void AddEvent(nostd::string_view /*name*/,
                 common::SystemTimestamp /*timestamp*/) noexcept override

@@ -48,14 +48,14 @@ public:
   ExceptionAttributes(nostd::string_view message,
                       const common::KeyValueIterable &additional) noexcept
       : message_{message},
-        additional_{additional},
+        additional_{&additional},
         caller_has_message_{CallerHasMessage(additional)}
   {}
 
   bool ForEachKeyValue(nostd::function_ref<bool(nostd::string_view, common::AttributeValue)>
                            callback) const noexcept override
   {
-    const bool keep_going = additional_.ForEachKeyValue(callback);
+    const bool keep_going = additional_->ForEachKeyValue(callback);
     if (keep_going && !caller_has_message_)
     {
       return callback(semconv::exception::kExceptionMessage, message_);
@@ -65,7 +65,7 @@ public:
 
   size_t size() const noexcept override
   {
-    return additional_.size() + (caller_has_message_ ? 0 : 1);
+    return additional_->size() + (caller_has_message_ ? 0 : 1);
   }
 
 private:
@@ -84,7 +84,7 @@ private:
   }
 
   nostd::string_view message_;
-  const common::KeyValueIterable &additional_;
+  const common::KeyValueIterable *additional_;
   bool caller_has_message_;
 };
 }  // namespace detail
