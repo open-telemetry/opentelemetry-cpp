@@ -221,6 +221,8 @@ public:
 class TrackingProcessor final : public opentelemetry::sdk::logs::LogRecordProcessor
 {
 public:
+  explicit TrackingProcessor(bool enforces_limits = true) : enforces_limits_(enforces_limits) {}
+
   TrackingRecordable *last = nullptr;
 
   std::unique_ptr<opentelemetry::sdk::logs::Recordable> MakeRecordable() noexcept override
@@ -235,6 +237,11 @@ public:
   bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
 
   bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
+
+  bool RecordableEnforcesLogRecordLimits() const noexcept override { return enforces_limits_; }
+
+private:
+  bool enforces_limits_;
 };
 
 }  // namespace
@@ -251,7 +258,9 @@ TEST(LogRecordLimitsWiring, LoggerForwardsContextLimitsToRecordable)
   limits.attribute_value_length_limit = 42;
 
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
-  auto tracking_processor = std::unique_ptr<TrackingProcessor>(new TrackingProcessor());
+  // Processor advertises that its recordable enforces limits (the default), so
+  // the Logger pushes the context limits onto each record it creates.
+  auto tracking_processor = std::unique_ptr<TrackingProcessor>(new TrackingProcessor(true));
   auto *tracker_ptr       = tracking_processor.get();
   processors.push_back(std::move(tracking_processor));
 
@@ -269,4 +278,36 @@ TEST(LogRecordLimitsWiring, LoggerForwardsContextLimitsToRecordable)
   EXPECT_EQ(tracker_ptr->last->set_limits_call_count, 1);
   EXPECT_EQ(tracker_ptr->last->captured_count_limit, 7u);
   EXPECT_EQ(tracker_ptr->last->captured_value_length_limit, 42u);
+}
+
+TEST(LogRecordLimitsWiring, LoggerSkipsLimitsWhenProcessorDoesNotEnforce)
+{
+  using opentelemetry::sdk::instrumentationscope::ScopeConfigurator;
+  using opentelemetry::sdk::logs::LoggerConfig;
+  using opentelemetry::sdk::logs::LoggerProviderFactory;
+  using opentelemetry::sdk::logs::LogRecordProcessor;
+
+  LogRecordLimits limits;
+  limits.attribute_count_limit        = 7;
+  limits.attribute_value_length_limit = 42;
+
+  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
+  // Processor reports that its recordable ignores limits, so the Logger must
+  // skip the per-record SetLogRecordLimits() call on the hot path.
+  auto tracking_processor = std::unique_ptr<TrackingProcessor>(new TrackingProcessor(false));
+  auto *tracker_ptr       = tracking_processor.get();
+  processors.push_back(std::move(tracking_processor));
+
+  auto configurator = std::make_unique<ScopeConfigurator<LoggerConfig>>(
+      ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Default()).Build());
+
+  auto provider = LoggerProviderFactory::Create(std::move(processors),
+                                                opentelemetry::sdk::resource::Resource::Create({}),
+                                                std::move(configurator), limits);
+
+  auto logger = provider->GetLogger("wiring_test", "");
+  auto record = logger->CreateLogRecord();
+
+  ASSERT_NE(tracker_ptr->last, nullptr);
+  EXPECT_EQ(tracker_ptr->last->set_limits_call_count, 0);
 }

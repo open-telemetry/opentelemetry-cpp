@@ -68,6 +68,19 @@ public:
    */
   virtual bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+
+  /**
+   * Returns true when the recordable produced by MakeRecordable() enforces
+   * LogRecord attribute limits (count and value length). The default returns
+   * false so the SDK can skip the per-record SetLogRecordLimits() call for
+   * recordables that ignore limits. Exporters whose recordable applies the
+   * limits (OTLP, ostream) override this to return true.
+   *
+   * This virtual is appended at the end of the LogRecordExporter vtable to keep
+   * the change additive: exporters that do not override it inherit the default
+   * and continue to compile unchanged.
+   */
+  virtual bool RecordableEnforcesLogRecordLimits() const noexcept { return false; }
 };
 }  // namespace logs
 }  // namespace sdk

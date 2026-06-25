@@ -31,12 +31,15 @@ LoggerContext::LoggerContext(
           std::unique_ptr<LogRecordProcessor>(new MultiLogRecordProcessor(std::move(processors)))),
       logger_configurator_(std::move(logger_configurator)),
       log_record_limits_(log_record_limits)
-{}
+{
+  recordable_enforces_limits_ = processor_->RecordableEnforcesLogRecordLimits();
+}
 
 void LoggerContext::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept
 {
   auto multi_processor = static_cast<MultiLogRecordProcessor *>(processor_.get());
   multi_processor->AddProcessor(std::move(processor));
+  recordable_enforces_limits_ = processor_->RecordableEnforcesLogRecordLimits();
 }
 
 LogRecordProcessor &LoggerContext::GetProcessor() const noexcept
@@ -58,6 +61,11 @@ const instrumentationscope::ScopeConfigurator<LoggerConfig> &LoggerContext::GetL
 const LogRecordLimits &LoggerContext::GetLogRecordLimits() const noexcept
 {
   return log_record_limits_;
+}
+
+bool LoggerContext::RecordableEnforcesLogRecordLimits() const noexcept
+{
+  return recordable_enforces_limits_;
 }
 
 bool LoggerContext::ForceFlush(std::chrono::microseconds timeout) noexcept

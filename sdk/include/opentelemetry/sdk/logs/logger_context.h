@@ -85,6 +85,15 @@ public:
   const LogRecordLimits &GetLogRecordLimits() const noexcept;
 
   /**
+   * Whether any configured processor produces a recordable that enforces the
+   * LogRecord attribute limits. Computed once at construction (and refreshed by
+   * AddProcessor) so the Logger hot path can skip the per-record
+   * SetLogRecordLimits() virtual call when no processor needs it.
+   * @return true if at least one processor enforces limits.
+   */
+  bool RecordableEnforcesLogRecordLimits() const noexcept;
+
+  /**
    * Force all active LogProcessors to flush any buffered logs
    * within the given timeout.
    */
@@ -103,6 +112,11 @@ private:
   std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator_;
 
   LogRecordLimits log_record_limits_;
+
+  // Cached capability flag: true when at least one configured processor's
+  // recordable enforces the LogRecord attribute limits. Refreshed by
+  // AddProcessor so the Logger hot path reads a plain bool.
+  bool recordable_enforces_limits_{false};
 };
 }  // namespace logs
 }  // namespace sdk
