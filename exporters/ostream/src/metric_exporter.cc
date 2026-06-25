@@ -6,7 +6,6 @@
 #include <atomic>
 #include <chrono>
 #include <ctime>
-#include <exception>
 #include <iterator>
 #include <map>
 #include <memory>
@@ -16,6 +15,10 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#include <exception>
+#endif
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/ostream/common_utils.h"

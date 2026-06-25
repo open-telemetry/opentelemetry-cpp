@@ -4,13 +4,16 @@
 #include <atomic>
 #include <chrono>
 #include <cstdint>
-#include <exception>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#include <exception>
+#endif
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"

@@ -3,13 +3,16 @@
 
 #include <atomic>
 #include <chrono>
-#include <exception>
 #include <iostream>
 #include <map>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#include <exception>
+#endif
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/ostream/common_utils.h"
