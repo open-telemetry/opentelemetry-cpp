@@ -233,9 +233,16 @@ bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
 }
 
 bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
-                                   int64_t event_id) const noexcept
+                                   int64_t /*event_id*/) const noexcept
 {
-  return EnabledImplementation(severity, opentelemetry::logs::EventId{event_id});
+  const nostd::variant<trace_api::SpanContext, context::Context> current{
+      context::RuntimeContext::GetCurrent()};
+  if (!IsAllowedByTraceBasedFiltering(current, logger_config_))
+  {
+    return false;
+  }
+
+  return context_->GetProcessor().Enabled(current, GetInstrumentationScope(), severity);
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
