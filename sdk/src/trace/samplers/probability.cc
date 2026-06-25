@@ -9,6 +9,7 @@
 #include <string>
 
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/trace/sampler.h"
@@ -131,6 +132,23 @@ namespace sdk
 {
 namespace trace
 {
+namespace
+{
+// Removes the inherited (now stale) "th" sub-key, keeping the other ot sub-keys.
+nostd::shared_ptr<trace_api::TraceState> EraseThreshold(
+    const nostd::shared_ptr<trace_api::TraceState> &parent_trace_state,
+    const std::string &ot_value)
+{
+  OtelTraceState ot_state = OtelTraceState::Parse(ot_value);
+  ot_state.has_threshold  = false;
+  std::string stripped    = ot_state.Serialize();
+  auto trace_state        = parent_trace_state->Delete(kOtTraceStateKey);
+  if (!stripped.empty())
+    trace_state = trace_state->Set(kOtTraceStateKey, stripped);
+  return trace_state;
+}
+}  // namespace
+
 ProbabilitySampler::ProbabilitySampler(double ratio)
     : description_("ProbabilitySampler{" + std::to_string(ClampProbability(ratio)) + "}"),
       threshold_(CalculateThreshold(ClampProbability(ratio)))
@@ -171,18 +189,12 @@ SamplingResult ProbabilitySampler::ShouldSample(
 
   if (drop)
   {
-    OtelTraceState ot_state = OtelTraceState::Parse(ot_value);
-    ot_state.has_threshold  = false;
-    std::string dropped_ot  = ot_state.Serialize();
-    auto trace_state        = parent_trace_state->Delete(kOtTraceStateKey);
-    if (!dropped_ot.empty())
-      trace_state = trace_state->Set(kOtTraceStateKey, dropped_ot);
-    return {Decision::DROP, nullptr, trace_state};
+    return {Decision::DROP, nullptr, EraseThreshold(parent_trace_state, ot_value)};
   }
 
   std::string new_ot_value = SetThresholdSubKey(ot_value, EncodeThreshold(threshold_));
   if (!trace_api::TraceState::IsValidValue(new_ot_value))
-    return {Decision::RECORD_AND_SAMPLE, nullptr, {}};
+    return {Decision::RECORD_AND_SAMPLE, nullptr, EraseThreshold(parent_trace_state, ot_value)};
 
   if (!has_ot)
   {
