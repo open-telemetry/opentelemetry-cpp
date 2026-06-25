@@ -46,15 +46,16 @@ OtlpFileLogRecordExporter::OtlpFileLogRecordExporter(
     const OtlpFileLogRecordExporterRuntimeOptions &runtime_options)
     : options_(options),
       runtime_options_(runtime_options),
-      file_client_(new OtlpFileClient(OtlpFileClientOptions(options),
-                                      OtlpFileLogRecordExporterRuntimeOptions(runtime_options)))
+      file_client_(std::make_unique<OtlpFileClient>(
+          OtlpFileClientOptions(options),
+          OtlpFileLogRecordExporterRuntimeOptions(runtime_options)))
 {}
 // ----------------------------- Exporter methods ------------------------------
 
 std::unique_ptr<opentelemetry::sdk::logs::Recordable>
 OtlpFileLogRecordExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<opentelemetry::sdk::logs::Recordable>(new OtlpLogRecordable());
+  return std::make_unique<OtlpLogRecordable>();
 }
 
 opentelemetry::sdk::common::ExportResult OtlpFileLogRecordExporter::Export(

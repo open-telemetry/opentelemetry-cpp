@@ -116,7 +116,7 @@ For more information about the maintainer role, see the [community repository](h
 
 ### Approvers
 
-* [WenTao Ou](https://github.com/owent), Tencent
+* [WenTao Ou](https://github.com/owent)
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#approver).
 

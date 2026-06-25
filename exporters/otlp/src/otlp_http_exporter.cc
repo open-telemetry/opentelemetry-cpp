@@ -51,7 +51,7 @@ OtlpHttpExporter::OtlpHttpExporter() : OtlpHttpExporter(OtlpHttpExporterOptions(
 OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
     : options_(options),
       runtime_options_(),
-      http_client_(new OtlpHttpClient(OtlpHttpClientOptions(
+      http_client_(std::make_unique<OtlpHttpClient>(OtlpHttpClientOptions(
           options.url,
           options.ssl_insecure_skip_verify,
           options.ssl_ca_cert_path,
@@ -88,36 +88,37 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
                                    const OtlpHttpExporterRuntimeOptions &runtime_options)
     : options_(options),
       runtime_options_(runtime_options),
-      http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
-                                                            options.ssl_insecure_skip_verify,
-                                                            options.ssl_ca_cert_path,
-                                                            options.ssl_ca_cert_string,
-                                                            options.ssl_client_key_path,
-                                                            options.ssl_client_key_string,
-                                                            options.ssl_client_cert_path,
-                                                            options.ssl_client_cert_string,
-                                                            options.ssl_min_tls,
-                                                            options.ssl_max_tls,
-                                                            options.ssl_cipher,
-                                                            options.ssl_cipher_suite,
-                                                            options.content_type,
-                                                            options.json_bytes_mapping,
-                                                            options.compression,
-                                                            options.use_json_name,
-                                                            options.console_debug,
-                                                            options.timeout,
-                                                            options.http_headers,
-                                                            options.retry_policy_max_attempts,
-                                                            options.retry_policy_initial_backoff,
-                                                            options.retry_policy_max_backoff,
-                                                            options.retry_policy_backoff_multiplier,
-                                                            runtime_options.thread_instrumentation
+      http_client_(std::make_unique<OtlpHttpClient>(OtlpHttpClientOptions(
+          options.url,
+          options.ssl_insecure_skip_verify,
+          options.ssl_ca_cert_path,
+          options.ssl_ca_cert_string,
+          options.ssl_client_key_path,
+          options.ssl_client_key_string,
+          options.ssl_client_cert_path,
+          options.ssl_client_cert_string,
+          options.ssl_min_tls,
+          options.ssl_max_tls,
+          options.ssl_cipher,
+          options.ssl_cipher_suite,
+          options.content_type,
+          options.json_bytes_mapping,
+          options.compression,
+          options.use_json_name,
+          options.console_debug,
+          options.timeout,
+          options.http_headers,
+          options.retry_policy_max_attempts,
+          options.retry_policy_initial_backoff,
+          options.retry_policy_max_backoff,
+          options.retry_policy_backoff_multiplier,
+          runtime_options.thread_instrumentation
 #ifdef ENABLE_ASYNC_EXPORT
-                                                            ,
-                                                            options.max_concurrent_requests,
-                                                            options.max_requests_per_connection
+          ,
+          options.max_concurrent_requests,
+          options.max_requests_per_connection
 #endif
-                                                            )))
+          )))
 {}
 
 OtlpHttpExporter::OtlpHttpExporter(
@@ -125,7 +126,7 @@ OtlpHttpExporter::OtlpHttpExporter(
     const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
     : options_(options),
       runtime_options_(),
-      http_client_(new OtlpHttpClient(
+      http_client_(std::make_unique<OtlpHttpClient>(
           OtlpHttpClientOptions(options.url,
                                 options.ssl_insecure_skip_verify,
                                 options.ssl_ca_cert_path,
@@ -165,44 +166,45 @@ OtlpHttpExporter::OtlpHttpExporter(
     const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
     : options_(options),
       runtime_options_(runtime_options),
-      http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
-                                                            options.ssl_insecure_skip_verify,
-                                                            options.ssl_ca_cert_path,
-                                                            options.ssl_ca_cert_string,
-                                                            options.ssl_client_key_path,
-                                                            options.ssl_client_key_string,
-                                                            options.ssl_client_cert_path,
-                                                            options.ssl_client_cert_string,
-                                                            options.ssl_min_tls,
-                                                            options.ssl_max_tls,
-                                                            options.ssl_cipher,
-                                                            options.ssl_cipher_suite,
-                                                            options.content_type,
-                                                            options.json_bytes_mapping,
-                                                            options.compression,
-                                                            options.use_json_name,
-                                                            options.console_debug,
-                                                            options.timeout,
-                                                            options.http_headers,
-                                                            options.retry_policy_max_attempts,
-                                                            options.retry_policy_initial_backoff,
-                                                            options.retry_policy_max_backoff,
-                                                            options.retry_policy_backoff_multiplier,
-                                                            runtime_options.thread_instrumentation
+      http_client_(std::make_unique<OtlpHttpClient>(
+          OtlpHttpClientOptions(options.url,
+                                options.ssl_insecure_skip_verify,
+                                options.ssl_ca_cert_path,
+                                options.ssl_ca_cert_string,
+                                options.ssl_client_key_path,
+                                options.ssl_client_key_string,
+                                options.ssl_client_cert_path,
+                                options.ssl_client_cert_string,
+                                options.ssl_min_tls,
+                                options.ssl_max_tls,
+                                options.ssl_cipher,
+                                options.ssl_cipher_suite,
+                                options.content_type,
+                                options.json_bytes_mapping,
+                                options.compression,
+                                options.use_json_name,
+                                options.console_debug,
+                                options.timeout,
+                                options.http_headers,
+                                options.retry_policy_max_attempts,
+                                options.retry_policy_initial_backoff,
+                                options.retry_policy_max_backoff,
+                                options.retry_policy_backoff_multiplier,
+                                runtime_options.thread_instrumentation
 #ifdef ENABLE_ASYNC_EXPORT
-                                                            ,
-                                                            options.max_concurrent_requests,
-                                                            options.max_requests_per_connection
+                                ,
+                                options.max_concurrent_requests,
+                                options.max_requests_per_connection
 #endif
-                                                            ),
-                                      factory))
+                                ),
+          factory))
 {}
 
 OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
                                    std::shared_ptr<ext::http::client::HttpClient> http_client)
     : options_(options),
       runtime_options_(),
-      http_client_(new OtlpHttpClient(
+      http_client_(std::make_unique<OtlpHttpClient>(
           OtlpHttpClientOptions(options.url,
                                 options.ssl_insecure_skip_verify,
                                 options.ssl_ca_cert_path,
@@ -241,37 +243,38 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
                                    std::shared_ptr<ext::http::client::HttpClient> http_client)
     : options_(options),
       runtime_options_(runtime_options),
-      http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
-                                                            options.ssl_insecure_skip_verify,
-                                                            options.ssl_ca_cert_path,
-                                                            options.ssl_ca_cert_string,
-                                                            options.ssl_client_key_path,
-                                                            options.ssl_client_key_string,
-                                                            options.ssl_client_cert_path,
-                                                            options.ssl_client_cert_string,
-                                                            options.ssl_min_tls,
-                                                            options.ssl_max_tls,
-                                                            options.ssl_cipher,
-                                                            options.ssl_cipher_suite,
-                                                            options.content_type,
-                                                            options.json_bytes_mapping,
-                                                            options.compression,
-                                                            options.use_json_name,
-                                                            options.console_debug,
-                                                            options.timeout,
-                                                            options.http_headers,
-                                                            options.retry_policy_max_attempts,
-                                                            options.retry_policy_initial_backoff,
-                                                            options.retry_policy_max_backoff,
-                                                            options.retry_policy_backoff_multiplier,
-                                                            runtime_options.thread_instrumentation
+      http_client_(std::make_unique<OtlpHttpClient>(
+          OtlpHttpClientOptions(options.url,
+                                options.ssl_insecure_skip_verify,
+                                options.ssl_ca_cert_path,
+                                options.ssl_ca_cert_string,
+                                options.ssl_client_key_path,
+                                options.ssl_client_key_string,
+                                options.ssl_client_cert_path,
+                                options.ssl_client_cert_string,
+                                options.ssl_min_tls,
+                                options.ssl_max_tls,
+                                options.ssl_cipher,
+                                options.ssl_cipher_suite,
+                                options.content_type,
+                                options.json_bytes_mapping,
+                                options.compression,
+                                options.use_json_name,
+                                options.console_debug,
+                                options.timeout,
+                                options.http_headers,
+                                options.retry_policy_max_attempts,
+                                options.retry_policy_initial_backoff,
+                                options.retry_policy_max_backoff,
+                                options.retry_policy_backoff_multiplier,
+                                runtime_options.thread_instrumentation
 #ifdef ENABLE_ASYNC_EXPORT
-                                                            ,
-                                                            options.max_concurrent_requests,
-                                                            options.max_requests_per_connection
+                                ,
+                                options.max_concurrent_requests,
+                                options.max_requests_per_connection
 #endif
-                                                            ),
-                                      std::move(http_client)))
+                                ),
+          std::move(http_client)))
 {}
 
 OtlpHttpExporter::OtlpHttpExporter(std::unique_ptr<OtlpHttpClient> http_client)
@@ -299,9 +302,9 @@ OtlpHttpExporter::OtlpHttpExporter(std::unique_ptr<OtlpHttpClient> http_client)
 
 std::unique_ptr<opentelemetry::sdk::trace::Recordable> OtlpHttpExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<opentelemetry::sdk::trace::Recordable>(new exporter::otlp::OtlpRecordable(
+  return std::make_unique<exporter::otlp::OtlpRecordable>(
       options_.max_attributes, options_.max_events, options_.max_links,
-      options_.max_attributes_per_event, options_.max_attributes_per_link));
+      options_.max_attributes_per_event, options_.max_attributes_per_link);
 }
 
 opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(

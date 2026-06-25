@@ -27,7 +27,7 @@ like so:
 ```cpp
 OtlpGrpcExporterOptions options;
 options.endpoint = "localhost:12345";
-auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpGrpcExporter(options));
+auto exporter = std::make_unique<sdktrace::SpanExporter>(options);
 ```
 
 The OTLP HTTP exporter offers some configuration options. To configure the exporter,
@@ -39,7 +39,7 @@ like so:
 ```cpp
 OtlpHttpExporterOptions options;
 options.url = "localhost:12345";
-auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpHttpExporter(options));
+auto exporter = std::make_unique<sdktrace::SpanExporter>(options);
 ```
 
 The OTLP File exporter offers some configuration options. To configure the exporter,
@@ -55,7 +55,7 @@ OtlpFileExporterOptions options;
 OtlpFileClientFileSystemOptions fs_backend;
 fs_backend.file_pattern = "trace.%N.log";
 options.backend_options = fs_backend;
-auto exporter = std::unique_ptr<sdktrace::SpanExporter>(new otlp::OtlpFileExporter(options));
+auto exporter = std::make_unique<sdktrace::SpanExporter>(options);
 ```
 
 ### Configuration options ( OTLP GRPC Exporter )

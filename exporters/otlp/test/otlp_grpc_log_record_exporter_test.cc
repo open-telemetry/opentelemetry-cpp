@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <chrono>
 #include <functional>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -316,9 +317,8 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-  provider->AddProcessor(
-      std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BatchLogRecordProcessor(
-          std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
+  provider->AddProcessor(std::make_unique<sdk::logs::BatchLogRecordProcessor>(
+      std::move(exporter), 5, std::chrono::milliseconds(256), 1));
 
   EXPECT_CALL(*mock_stub, Export(_, _, _))
       .Times(AtLeast(1))
@@ -401,9 +401,8 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShareClientTest)
   opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-  provider->AddProcessor(
-      std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BatchLogRecordProcessor(
-          std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
+  provider->AddProcessor(std::make_unique<sdk::logs::BatchLogRecordProcessor>(
+      std::move(exporter), 5, std::chrono::milliseconds(256), 1));
 
   EXPECT_CALL(*mock_stub, Export(_, _, _))
       .Times(Exactly(1))
@@ -494,7 +493,8 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShareClientTest)
 #ifndef NO_GETENV
 TEST_F(OtlpGrpcLogRecordExporterTestPeer, ConfigRetryDefaultValues)
 {
-  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter(new OtlpGrpcLogRecordExporter());
+  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter =
+      std::make_unique<OtlpGrpcLogRecordExporter>();
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 5);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
@@ -509,7 +509,8 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ConfigRetryValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF", "6.7", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
 
-  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter(new OtlpGrpcLogRecordExporter());
+  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter =
+      std::make_unique<OtlpGrpcLogRecordExporter>();
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 123);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
@@ -529,7 +530,8 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
 
-  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter(new OtlpGrpcLogRecordExporter());
+  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter =
+      std::make_unique<OtlpGrpcLogRecordExporter>();
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 321);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);

@@ -459,7 +459,7 @@ void OtlpGrpcClient::PopulateChannelArguments(const OtlpGrpcClientOptions &optio
 std::unique_ptr<grpc::ClientContext> OtlpGrpcClient::MakeClientContext(
     const OtlpGrpcClientOptions &options)
 {
-  std::unique_ptr<grpc::ClientContext> context{new grpc::ClientContext()};
+  std::unique_ptr<grpc::ClientContext> context = std::make_unique<grpc::ClientContext>();
   if (!context)
   {
     return context;

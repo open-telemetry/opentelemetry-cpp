@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <memory>
 #ifndef OPENTELEMETRY_STL_VERSION
 
 #  include <algorithm>
@@ -152,9 +153,8 @@ public:
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
 
-    provider->AddProcessor(
-        std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BatchLogRecordProcessor(
-            std::move(exporter), 5, std::chrono::milliseconds(256), 5)));
+    provider->AddProcessor(std::make_unique<sdk::logs::BatchLogRecordProcessor>(
+        std::move(exporter), 5, std::chrono::milliseconds(256), 5));
 
     std::string report_trace_id;
     std::string report_span_id;
@@ -289,8 +289,8 @@ public:
     options.schedule_delay_millis = std::chrono::milliseconds(256);
     options.max_export_batch_size = 5;
 
-    provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
-        new sdk::logs::BatchLogRecordProcessor(std::move(exporter), options)));
+    provider->AddProcessor(
+        std::make_unique<sdk::logs::BatchLogRecordProcessor>(std::move(exporter), options));
 
     std::string report_trace_id;
     std::string report_span_id;
@@ -435,8 +435,8 @@ public:
     processor_options.max_export_batch_size = 5;
     processor_options.max_queue_size        = 5;
     processor_options.schedule_delay_millis = std::chrono::milliseconds(256);
-    provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
-        new sdk::logs::BatchLogRecordProcessor(std::move(exporter), processor_options)));
+    provider->AddProcessor(std::make_unique<sdk::logs::BatchLogRecordProcessor>(std::move(exporter),
+                                                                                processor_options));
 
     std::string report_trace_id;
     std::string report_span_id;
@@ -563,8 +563,8 @@ public:
     processor_options.max_export_batch_size = 5;
     processor_options.max_queue_size        = 5;
     processor_options.schedule_delay_millis = std::chrono::milliseconds(256);
-    provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
-        new sdk::logs::BatchLogRecordProcessor(std::move(exporter), processor_options)));
+    provider->AddProcessor(std::make_unique<sdk::logs::BatchLogRecordProcessor>(std::move(exporter),
+                                                                                processor_options));
 
     std::string report_trace_id;
     std::string report_span_id;
@@ -675,8 +675,8 @@ public:
 
 TEST(OtlpHttpLogRecordExporterTest, Shutdown)
 {
-  auto exporter =
-      std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>(new OtlpHttpLogRecordExporter());
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> exporter =
+      std::make_unique<OtlpHttpLogRecordExporter>();
   ASSERT_TRUE(exporter->Shutdown());
 
   nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> logs = {};
@@ -717,7 +717,8 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigTest)
 {
   OtlpHttpLogRecordExporterOptions opts;
   opts.url = "http://localhost:45456/v1/logs";
-  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter(opts));
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter =
+      std::make_unique<OtlpHttpLogRecordExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).url, "http://localhost:45456/v1/logs");
 }
 
@@ -726,7 +727,8 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigUseJsonNameTest)
 {
   OtlpHttpLogRecordExporterOptions opts;
   opts.use_json_name = true;
-  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter(opts));
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter =
+      std::make_unique<OtlpHttpLogRecordExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).use_json_name, true);
 }
 
@@ -735,7 +737,8 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigJsonBytesMappingTest)
 {
   OtlpHttpLogRecordExporterOptions opts;
   opts.json_bytes_mapping = JsonBytesMappingKind::kHex;
-  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter(opts));
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter =
+      std::make_unique<OtlpHttpLogRecordExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
 }
 
@@ -756,7 +759,8 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromEnv)
   setenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS", "k1=v3,k1=v4", 1);
   setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "http/json", 1);
 
-  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter =
+      std::make_unique<OtlpHttpLogRecordExporter>();
   EXPECT_EQ(GetOptions(exporter).url, url);
   EXPECT_EQ(
       GetOptions(exporter).timeout.count(),
@@ -799,7 +803,8 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromLogsEnv)
   setenv("OTEL_EXPORTER_OTLP_LOGS_HEADERS", "k1=v3,k1=v4", 1);
   setenv("OTEL_EXPORTER_OTLP_LOGS_PROTOCOL", "http/json", 1);
 
-  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter =
+      std::make_unique<OtlpHttpLogRecordExporter>();
   EXPECT_EQ(GetOptions(exporter).url, url);
   EXPECT_EQ(
       GetOptions(exporter).timeout.count(),
@@ -842,7 +847,8 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, DefaultEndpoint)
 
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigRetryDefaultValues)
 {
-  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter =
+      std::make_unique<OtlpHttpLogRecordExporter>();
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 5);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
@@ -857,7 +863,8 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigRetryValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF", "6.7", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
 
-  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter =
+      std::make_unique<OtlpHttpLogRecordExporter>();
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 123);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
@@ -877,7 +884,8 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
 
-  std::unique_ptr<OtlpHttpLogRecordExporter> exporter(new OtlpHttpLogRecordExporter());
+  std::unique_ptr<OtlpHttpLogRecordExporter> exporter =
+      std::make_unique<OtlpHttpLogRecordExporter>();
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 321);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);
