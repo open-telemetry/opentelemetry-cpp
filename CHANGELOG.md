@@ -107,12 +107,6 @@ Increment the:
 * [BUILD] Fix protobuf build failure
   [#4154](https://github.com/open-telemetry/opentelemetry-cpp/pull/4154)
 
-* [API/SDK] Add `WITH_LOG_FILTERING_PREVIEW` option to enable log filtering
-  implemented in [#4079](https://github.com/open-telemetry/opentelemetry-cpp/pull/4079)
-  by defining `ENABLE_LOG_FILTERING_PREVIEW` (CMake: `-DWITH_LOG_FILTERING_PREVIEW=ON`);
-  this preview will be enabled by default later, then the option will be deprecated.
-  [#4160](https://github.com/open-telemetry/opentelemetry-cpp/pull/4160)
-
 * [SEMANTIC CONVENTIONS] Generate event name constants (e.g. `semconv::exception::kException`)
   [#4171](https://github.com/open-telemetry/opentelemetry-cpp/pull/4171)
 
