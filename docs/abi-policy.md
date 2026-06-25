@@ -11,7 +11,8 @@ Many parts of the C++ standard library don't have well-defined ABIs. To ensure
 that a component compiled against one version of the C++ standard library can
 work with an application or library compiled against a different version of the
 C++ standard library, we limit a portion of the OpenTelemetry API to use ABI
-stable types by default. The `OPENTELEMETRY_STL_VERSION` build option replaces
+stable `nostd::` types by default. The `OPENTELEMETRY_STL_VERSION` preprocessor macro
+(defined by the CMake `WITH_STL` build option) can be set to replace
 these ABI stable types with their `std::` equivalents (see [building with the
 standard C++ library](./building-with-stdlib.md) for when this is appropriate).
 
@@ -22,25 +23,36 @@ ABI](https://itanium-cxx-abi.github.io/cxx-abi/abi.html#vtable)) and can be used
 across compilers, but don't rely on the ABI stability of the C++ standard
 library classes.
 
-ABI stability is not provided by the interfaces the SDK provides as
-implementation hooks to vendor implementors, like exporters, processors,
-aggregators and propagators.
+ABI stability is provided for the OTel API and is not required for
+OTel SDK-provided interfaces (e.g., resource detectors, exporters, processors, samplers).
 
-The following sections describe common cases where ABI stability is impacted
-and provide examples of how to apply changes.
-
-ABI breaking changes must target the experimental ABI version, guarded
-by the `OPENTELEMETRY_ABI_VERSION_NO` preprocessor macro (shown by the `#if
-OPENTELEMETRY_ABI_VERSION_NO >= 2` guards in the examples). See the [ABI version
-policy](./abi-version-policy.md) for which ABI versions are stable versus
-experimental.
-
-Within a stable ABI version non-breaking additive changes may be accepted, for example:
+Within a stable ABI version, non-breaking additive changes may be accepted, for example:
 
 - add new non-virtual member functions to an existing API class
 - add new overloads of an existing non-virtual function
 - add new types
 - append new values to an enum
+
+The following changes are considered breaking and must target an
+experimental ABI version:
+
+- use of non-ABI-stable types in virtual function signatures or
+  singletons of an API class
+- change the order, add, remove, or modify the signature of virtual
+  functions on an API class
+- change the memory layout of a type that crosses the ABI boundary
+- change the definition or observable behavior of an inline function,
+  template, or `inline`/`constexpr` variable in an API header
+
+The following sections describe common cases where ABI stability is broken
+and provide examples of how to apply breaking changes.
+
+For the ABI-stable OTel API, breaking changes must target the
+experimental ABI version, guarded by the `OPENTELEMETRY_ABI_VERSION_NO`
+preprocessor macro (shown by the `#if
+OPENTELEMETRY_ABI_VERSION_NO >= 2` guards in the examples). See the [ABI version
+policy](./abi-version-policy.md) for which ABI versions are stable versus
+experimental.
 
 ## Virtual function signatures
 
@@ -136,7 +148,7 @@ private:
 
 ## Definitions in API headers
 
-Entities defined in API headers (inline functions, templates, and
+Entities defined in ABI-stable API headers (inline functions, templates, and
 `inline`/`constexpr` variables) must not change their definition or observable
 behavior within a stable ABI version.
 
