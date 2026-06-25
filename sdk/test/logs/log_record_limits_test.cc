@@ -117,6 +117,21 @@ TEST(LogRecordLimits, LengthLimitTruncatesEachStringInArray)
   ASSERT_EQ(stored[2], "ccc");
 }
 
+TEST(LogRecordLimits, LengthLimitKeepsUtf8Boundary)
+{
+  LogRecordLimits limits;
+  limits.attribute_value_length_limit = 2;
+  ReadWriteLogRecord record;
+  record.SetLogRecordLimits(limits);
+
+  // "h\xC3\xA9llo" is "héllo"; 'é' occupies bytes 1-2. A budget of 2 must drop
+  // the partial multi-byte sequence and keep just "h", not a split byte that
+  // would leave the stored value as invalid UTF-8.
+  record.SetAttribute("k", nostd::string_view("h\xC3\xA9llo"));
+
+  ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("k")), "h");
+}
+
 TEST(LogRecordLimits, LengthLimitDoesNotAffectNonStringTypes)
 {
   LogRecordLimits limits;

@@ -6,9 +6,8 @@
 #endif
 
 #include <stdint.h>
-#include <string.h>
 #include <algorithm>
-#include <cstddef>
+#include <cstring>
 #include <limits>
 #include <string>
 #include <utility>
@@ -105,7 +104,7 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   else if (nostd::holds_alternative<const char *>(value))
   {
     const char *str_value      = nostd::get<const char *>(value);
-    const std::size_t str_len  = strlen(str_value);
+    const std::size_t str_len  = std::strlen(str_value);
     const std::size_t kept_len = Utf8SafePrefixLength(str_value, str_len, max_length);
 #if defined(ENABLE_OTLP_UTF8_VALIDITY)
     // Validity is decided by the original input, so truncation that happens
@@ -446,53 +445,14 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
   }
 }
 
-// UTF-8 byte layout (https://en.wikipedia.org/wiki/UTF-8#Description):
-//   0x00-0x7F  0xxxxxxx  ASCII, 1 byte
-//   0x80-0xBF  10xxxxxx  continuation byte (never a valid lead)
-//   0xC0-0xDF  110xxxxx  lead of a 2-byte sequence
-//   0xE0-0xEF  1110xxxx  lead of a 3-byte sequence
-//   0xF0-0xF7  11110xxx  lead of a 4-byte sequence
-//   0xF8-0xFF            not a valid lead byte
+// The UTF-8-safe prefix algorithm now lives in the SDK common layer so the
+// in-memory AttributeConverter can share it. This member is kept as a thin
+// forwarder for backward compatibility with existing callers and tests.
 std::size_t OtlpPopulateAttributeUtils::Utf8SafePrefixLength(const char *data,
                                                              std::size_t size,
                                                              std::size_t max_bytes) noexcept
 {
-  std::size_t i = 0;
-  while (i < size)
-  {
-    const auto lead = static_cast<unsigned char>(data[i]);
-    std::size_t seq = (lead < 0x80)   ? 1
-                      : (lead < 0xC0) ? 1
-                      : (lead < 0xE0) ? 2
-                      : (lead < 0xF0) ? 3
-                      : (lead < 0xF8) ? 4
-                                      : 1;
-    if (seq > 1)
-    {
-      if (i + seq > size)
-      {
-        seq = 1;
-      }
-      else
-      {
-        for (std::size_t k = 1; k < seq; ++k)
-        {
-          const auto continuation = static_cast<unsigned char>(data[i + k]);
-          if (continuation < 0x80 || continuation > 0xBF)
-          {
-            seq = 1;
-            break;
-          }
-        }
-      }
-    }
-    if (i + seq > max_bytes)
-    {
-      break;
-    }
-    i += seq;
-  }
-  return i;
+  return opentelemetry::sdk::common::Utf8SafePrefixLength(data, size, max_bytes);
 }
 
 }  // namespace otlp

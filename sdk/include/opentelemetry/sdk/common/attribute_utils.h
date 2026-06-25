@@ -72,17 +72,76 @@ enum OwnedAttributeType : std::uint8_t
 };
 
 /**
+ * Byte length of the longest prefix of `data[0, size)` that fits within
+ * `max_bytes` without splitting a well-formed UTF-8 multi-byte sequence. A lead
+ * byte's declared length is only honored when its continuation bytes are
+ * present and in range (0x80-0xBF); otherwise the lead is treated as a one-byte
+ * unit, so malformed input degrades to plain byte truncation. Callers that need
+ * the result to stay valid UTF-8 (string attributes, whose protobuf/JSON wire
+ * form requires it) truncate at this boundary instead of cutting through a
+ * multi-byte sequence.
+ */
+// UTF-8 lead-byte ranges used below:
+//   0x00-0x7F  0xxxxxxx  ASCII, 1 byte
+//   0x80-0xBF  10xxxxxx  continuation byte (never a valid lead)
+//   0xC0-0xDF  110xxxxx  lead of a 2-byte sequence
+//   0xE0-0xEF  1110xxxx  lead of a 3-byte sequence
+//   0xF0-0xF7  11110xxx  lead of a 4-byte sequence
+//   0xF8-0xFF            not a valid lead byte
+inline std::size_t Utf8SafePrefixLength(const char *data,
+                                        std::size_t size,
+                                        std::size_t max_bytes) noexcept
+{
+  std::size_t i = 0;
+  while (i < size)
+  {
+    const auto lead = static_cast<unsigned char>(data[i]);
+    std::size_t seq = (lead < 0x80)   ? 1
+                      : (lead < 0xC0) ? 1
+                      : (lead < 0xE0) ? 2
+                      : (lead < 0xF0) ? 3
+                      : (lead < 0xF8) ? 4
+                                      : 1;
+    if (seq > 1)
+    {
+      if (i + seq > size)
+      {
+        seq = 1;
+      }
+      else
+      {
+        for (std::size_t k = 1; k < seq; ++k)
+        {
+          const auto continuation = static_cast<unsigned char>(data[i + k]);
+          if (continuation < 0x80 || continuation > 0xBF)
+          {
+            seq = 1;
+            break;
+          }
+        }
+      }
+    }
+    if (i + seq > max_bytes)
+    {
+      break;
+    }
+    i += seq;
+  }
+  return i;
+}
+
+/**
  * Creates an owned copy (OwnedAttributeValue) of a non-owning AttributeValue.
  *
  * The default-constructed converter does not truncate. To apply a byte-length
- * cap to the string, string-array, and bytes alternatives during conversion,
- * construct with the `(std::size_t max_length)` overload. Other alternatives
- * are unaffected. This is plain byte-length truncation: the in-memory
- * std::string variant may legitimately carry raw bytes when a user constructs
- * it from a non-UTF-8 source, so forcing UTF-8 boundary semantics here would
- * over-truncate that case. Exporters that require a valid-UTF-8 wire format
- * (OTLP protobuf, ES JSON) apply their own UTF-8-aware truncation at the
- * recordable boundary.
+ * cap during conversion, construct with the `(std::size_t max_length)`
+ * overload. Only the string, string-array, and bytes alternatives are capped;
+ * other alternatives are unaffected. String alternatives (std::string,
+ * string_view, const char*, and arrays of them) are truncated at a UTF-8
+ * code-point boundary via Utf8SafePrefixLength so the kept value stays valid
+ * UTF-8 when the input was, matching the OTel convention that std::string holds
+ * UTF-8 text. The bytes alternative (span<const uint8_t>) carries raw binary
+ * data and is cut at the exact byte boundary with no encoding semantics.
  */
 struct AttributeConverter
 {
@@ -101,29 +160,30 @@ struct AttributeConverter
   OwnedAttributeValue operator()(double v) { return OwnedAttributeValue(v); }
   OwnedAttributeValue operator()(nostd::string_view v)
   {
-    return OwnedAttributeValue(std::string(v.data(), (std::min)(v.size(), max_length_)));
+    const std::size_t kept =
+        v.size() > max_length_ ? Utf8SafePrefixLength(v.data(), v.size(), max_length_) : v.size();
+    return OwnedAttributeValue(std::string(v.data(), kept));
   }
   OwnedAttributeValue operator()(std::string v)
   {
     if (v.size() > max_length_)
     {
-      v.resize(max_length_);
+      v.resize(Utf8SafePrefixLength(v.data(), v.size(), max_length_));
     }
     return OwnedAttributeValue(std::move(v));
   }
   OwnedAttributeValue operator()(const char *v)
   {
-    std::string s(v);
-    if (s.size() > max_length_)
-    {
-      s.resize(max_length_);
-    }
-    return OwnedAttributeValue(std::move(s));
+    // Delegate to the string_view overload so an oversized C string is not
+    // copied in full before being truncated, and so it shares the UTF-8-safe
+    // boundary handling.
+    return (*this)(nostd::string_view(v));
   }
   OwnedAttributeValue operator()(nostd::span<const uint8_t> v)
   {
-    const auto end = v.begin() + static_cast<std::ptrdiff_t>((std::min)(v.size(), max_length_));
-    return OwnedAttributeValue(std::vector<uint8_t>(v.begin(), end));
+    // Raw bytes carry no encoding, so cut at the exact byte boundary.
+    const std::size_t kept = (std::min)(v.size(), max_length_);
+    return OwnedAttributeValue(std::vector<uint8_t>(v.data(), v.data() + kept));
   }
   OwnedAttributeValue operator()(nostd::span<const bool> v) { return convertSpan<bool>(v); }
   OwnedAttributeValue operator()(nostd::span<const int32_t> v) { return convertSpan<int32_t>(v); }
@@ -137,7 +197,10 @@ struct AttributeConverter
     result.reserve(v.size());
     for (const auto &sv : v)
     {
-      result.emplace_back(sv.data(), (std::min)(sv.size(), max_length_));
+      const std::size_t kept = sv.size() > max_length_
+                                   ? Utf8SafePrefixLength(sv.data(), sv.size(), max_length_)
+                                   : sv.size();
+      result.emplace_back(sv.data(), kept);
     }
     return OwnedAttributeValue(std::move(result));
   }
