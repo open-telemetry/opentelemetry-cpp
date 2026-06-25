@@ -85,9 +85,8 @@ public:
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
 
-    provider->AddProcessor(std::unique_ptr<sdk::logs::LogRecordProcessor>(
-        std::make_unique<sdk::logs::BatchLogRecordProcessor>(std::move(exporter), 5,
-                                                             std::chrono::milliseconds(256), 5)));
+    provider->AddProcessor(std::make_unique<sdk::logs::BatchLogRecordProcessor>(
+        std::move(exporter), 5, std::chrono::milliseconds(256), 5));
 
     std::string report_trace_id;
     std::string report_span_id;

@@ -188,7 +188,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigSslCredentialsTest)
   opts.use_ssl_credentials                         = true;
   opts.ssl_credentials_cacert_as_string            = cacert_str;
   std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>(opts);
-  ;
+
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
 }
@@ -207,7 +207,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigFromEnv)
   setenv("OTEL_EXPORTER_OTLP_METRICS_HEADERS", "k1=v3,k1=v4", 1);
 
   std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
-  ;
+
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
@@ -252,7 +252,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigHttpsSecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE", "true", 1);
 
   std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
-  ;
+
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -269,7 +269,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigHttpInsecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE", "false", 1);
 
   std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
-  ;
+
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, false);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -285,7 +285,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownSecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE", "false", 1);
 
   std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
-  ;
+
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -301,7 +301,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownInsecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE", "true", 1);
 
   std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
-  ;
+
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, false);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -312,7 +312,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownInsecureFromEnv)
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryDefaultValues)
 {
   std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
-  ;
+
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 5);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
@@ -328,7 +328,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
 
   std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
-  ;
+
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 123);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
@@ -349,7 +349,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
 
   std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
-  ;
+
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 321);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);

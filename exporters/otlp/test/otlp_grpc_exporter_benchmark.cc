@@ -138,8 +138,7 @@ class OtlpGrpcExporterTestPeer
 public:
   std::unique_ptr<sdk::trace::SpanExporter> GetExporter()
   {
-    std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface =
-        std::make_unique<FakeServiceStub>();
+    auto stub_interface = std::make_unique<FakeServiceStub>();
     return std::unique_ptr<sdk::trace::SpanExporter>(
         new exporter::otlp::OtlpGrpcExporter(std::move(stub_interface)));
   }

@@ -20,7 +20,6 @@
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"

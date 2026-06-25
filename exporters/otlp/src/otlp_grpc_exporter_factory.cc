@@ -28,9 +28,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory::Create(
     const OtlpGrpcExporterOptions &options)
 {
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter =
-      std::make_unique<OtlpGrpcExporter>(options);
-  return exporter;
+  return std::make_unique<OtlpGrpcExporter>(options);
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcExporterFactory::Create(

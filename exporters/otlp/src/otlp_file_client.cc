@@ -1458,6 +1458,7 @@ private:
       std::shared_ptr<FileStats> concurrency_file = file_;
       std::chrono::microseconds flush_interval    = options_.flush_interval;
       auto thread_instrumentation                 = runtime_options_.thread_instrumentation;
+
       file_->background_flush_thread = std::make_unique<std::thread>([concurrency_file,
                                                                       flush_interval,
                                                                       thread_instrumentation]() {
