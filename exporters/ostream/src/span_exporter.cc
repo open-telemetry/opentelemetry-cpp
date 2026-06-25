@@ -10,10 +10,6 @@
 #include <utility>
 #include <vector>
 
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-#include <exception>
-#endif
-
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/ostream/common_utils.h"
 #include "opentelemetry/exporters/ostream/span_exporter.h"
@@ -33,6 +29,12 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
+
+// Must be included after opentelemetry/version.h,
+// (for opentelemetry/common/macros.h)
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  include <exception>
+#endif
 
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace trace_api = opentelemetry::trace;

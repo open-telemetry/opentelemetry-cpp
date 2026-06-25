@@ -11,10 +11,6 @@
 #include <unordered_map>
 #include <utility>
 
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-#include <exception>
-#endif
-
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/ostream/common_utils.h"
@@ -33,6 +29,12 @@
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
+
+// Must be included after opentelemetry/version.h,
+// (for opentelemetry/common/macros.h)
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  include <exception>
+#endif
 
 namespace sdklogs   = opentelemetry::sdk::logs;
 namespace sdkcommon = opentelemetry::sdk::common;
