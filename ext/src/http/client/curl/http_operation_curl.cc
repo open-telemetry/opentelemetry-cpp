@@ -8,13 +8,18 @@
 #  include <array>
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
+#include <stdint.h>
 #include <algorithm>
 #include <atomic>
+#include <cctype>
 #include <chrono>
 #include <cmath>
 #include <cstring>
+#include <ctime>
 #include <functional>
 #include <future>
+#include <iomanip>
+#include <limits>
 #include <memory>
 #include <random>
 #include <sstream>
@@ -23,6 +28,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/common/string_util.h"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
@@ -34,6 +40,157 @@
 #ifndef CURL_VERSION_BITS
 #  define CURL_VERSION_BITS(x, y, z) ((x) << 16 | (y) << 8 | (z))
 #endif
+
+namespace
+{
+
+std::time_t PortableTimegm(std::tm *tm)
+{
+  int year  = tm->tm_year + 1900;
+  int month = tm->tm_mon + 1;
+
+  if (month <= 2)
+  {
+    year -= 1;
+    month += 12;
+  }
+
+  int day  = tm->tm_mday;
+  int days = 365 * year + year / 4 - year / 100 + year / 400 + 367 * month / 12 - 30 + day - 719530;
+
+  return static_cast<std::time_t>(days) * 86400 + tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec;
+}
+
+bool ParseRetryAfterDelay(opentelemetry::nostd::string_view value,
+                          std::chrono::seconds &delay) noexcept
+{
+  value = opentelemetry::common::StringUtil::Trim(value);
+
+  if (value.empty())
+  {
+    return false;
+  }
+
+  std::chrono::seconds::rep result = 0;
+
+  for (const char c : value)
+  {
+    if (!std::isdigit(static_cast<unsigned char>(c)))
+    {
+      return false;
+    }
+
+    auto digit = c - '0';
+
+    if (result > (std::numeric_limits<std::chrono::seconds::rep>::max() - digit) / 10)
+    {
+      return false;
+    }
+
+    result = result * 10 + digit;
+  }
+
+  if (result == 0)
+  {
+    return false;
+  }
+
+  delay = std::chrono::seconds(result);
+  return true;
+}
+
+bool ParseRetryAfterDate(opentelemetry::nostd::string_view value,
+                         std::chrono::system_clock::time_point &date)
+{
+  value = opentelemetry::common::StringUtil::Trim(value);
+
+  std::string str(value.data(), value.size());
+  std::tm tm = {};
+  std::istringstream ss(str);
+
+  ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S");
+  if (!ss.fail())
+  {
+    date = std::chrono::system_clock::from_time_t(PortableTimegm(&tm));
+    return true;
+  }
+
+  ss.clear();
+  ss.str(str);
+  tm = {};
+  ss >> std::get_time(&tm, "%A, %d-%b-%y %H:%M:%S");
+  if (!ss.fail())
+  {
+    std::time_t now_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    int current_year  = 1970 + static_cast<int>(now_t / 31556952);
+    int full_year     = 1900 + tm.tm_year;
+    if (full_year - current_year > 50)
+    {
+      full_year -= 100;
+    }
+    tm.tm_year = full_year - 1900;
+    date       = std::chrono::system_clock::from_time_t(PortableTimegm(&tm));
+    return true;
+  }
+
+  ss.clear();
+  ss.str(str);
+  tm = {};
+  ss >> std::get_time(&tm, "%a %b %d %H:%M:%S %Y");
+  if (!ss.fail())
+  {
+    date = std::chrono::system_clock::from_time_t(PortableTimegm(&tm));
+    return true;
+  }
+
+  return false;
+}
+
+bool FindRetryAfterValue(const std::vector<uint8_t> &raw_headers, std::string &value)
+{
+  if (raw_headers.empty())
+  {
+    return false;
+  }
+
+  const char *data = reinterpret_cast<const char *>(raw_headers.data());
+  const char *end  = data + raw_headers.size();
+  const char *line = data;
+
+  while (line < end)
+  {
+    const char *line_end = line;
+    while (line_end < end && *line_end != '\n')
+    {
+      ++line_end;
+    }
+
+    static const char kRetryAfterHeader[] = "retry-after:";
+    static const size_t kRetryAfterLen    = sizeof(kRetryAfterHeader) - 1;
+
+    size_t line_len = static_cast<size_t>(line_end - line);
+    if (line_len > kRetryAfterLen)
+    {
+      bool match = true;
+      for (size_t i = 0; i < kRetryAfterLen && match; ++i)
+      {
+        match = (std::tolower(static_cast<unsigned char>(line[i])) == kRetryAfterHeader[i]);
+      }
+
+      if (match)
+      {
+        value = std::string(line + kRetryAfterLen, line_end);
+        return true;
+      }
+    }
+
+    line = (line_end < end) ? line_end + 1 : end;
+  }
+
+  return false;
+}
+
+}  // namespace
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -560,6 +717,11 @@ bool HttpOperation::IsRetryable()
 
 std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
 {
+  if (retry_after_time_point_ != std::chrono::system_clock::time_point{})
+  {
+    return retry_after_time_point_;
+  }
+
   static std::random_device rd;
   static std::mt19937 gen(rd());
   static std::uniform_real_distribution<float> dis(0.8f, 1.2f);
@@ -1463,8 +1625,9 @@ void HttpOperation::Abort()
 void HttpOperation::PerformCurlMessage(CURLcode code)
 {
   ++retry_attempts_;
-  last_attempt_time_ = std::chrono::system_clock::now();
-  last_curl_result_  = code;
+  last_attempt_time_      = std::chrono::system_clock::now();
+  last_curl_result_       = code;
+  retry_after_time_point_ = std::chrono::system_clock::time_point{};
 
   if (code != CURLE_OK)
   {
@@ -1513,6 +1676,27 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
 
   if (IsRetryable())
   {
+
+    std::string retry_after;
+    if (FindRetryAfterValue(response_headers_, retry_after))
+    {
+      std::chrono::seconds delay;
+
+      if (ParseRetryAfterDelay(retry_after, delay))
+      {
+        retry_after_time_point_ = std::chrono::system_clock::now() + delay;
+      }
+      else
+      {
+        std::chrono::system_clock::time_point date;
+        if (ParseRetryAfterDate(retry_after, date))
+        {
+          auto now                = std::chrono::system_clock::now();
+          retry_after_time_point_ = (date > now) ? date : now;
+        }
+      }
+    }
+
     // Clear any response data received in previous attempt
     ReleaseResponse();
     // Rewind request data so that read callback can re-transfer the payload
