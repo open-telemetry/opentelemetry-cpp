@@ -1665,6 +1665,10 @@ ConfigurationParser::ParseParentBasedSamplerConfiguration(const std::unique_ptr<
   {
     model->root = ParseSamplerConfiguration(child, depth + 1);
   }
+  else
+  {
+    model->root = std::make_unique<AlwaysOnSamplerConfiguration>();
+  }
 
   child = node->GetChildNode("remote_parent_sampled");
   if (child)

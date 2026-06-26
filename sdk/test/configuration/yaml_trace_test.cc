@@ -747,7 +747,12 @@ tracer_provider:
   auto *parent =
       reinterpret_cast<opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *>(
           sampler);
-  ASSERT_EQ(parent->root, nullptr);
+  ASSERT_NE(parent->root, nullptr);
+
+  TestSamplerVisitor visitor;
+  parent->root->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kAlwaysOn);
+
   ASSERT_EQ(parent->remote_parent_sampled, nullptr);
   ASSERT_EQ(parent->remote_parent_not_sampled, nullptr);
   ASSERT_EQ(parent->local_parent_sampled, nullptr);
