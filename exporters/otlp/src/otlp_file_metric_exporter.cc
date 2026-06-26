@@ -4,7 +4,6 @@
 #include <chrono>
 #include <cstddef>
 #include <memory>
-#include <new>
 #include <ostream>
 #include <vector>
 
@@ -48,7 +47,7 @@ OtlpFileMetricExporter::OtlpFileMetricExporter(
       runtime_options_(runtime_options),
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
-      file_client_(new OtlpFileClient(
+      file_client_(std::make_unique<OtlpFileClient>(
           OtlpFileClientOptions(static_cast<const OtlpFileClientOptions &>(options)),
           OtlpFileClientRuntimeOptions(runtime_options)))
 {}

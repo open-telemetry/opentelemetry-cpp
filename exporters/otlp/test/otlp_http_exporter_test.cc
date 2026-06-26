@@ -17,6 +17,7 @@
 
 #  include "opentelemetry/ext/http/client/http_client_factory.h"
 #  include "opentelemetry/ext/http/server/http_server.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor.h"
 #  include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
@@ -25,8 +26,13 @@
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #  include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
 #  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
+#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 #  include "opentelemetry/trace/provider.h"
 #  include "opentelemetry/trace/tracer_provider.h"
+
+#  include <algorithm>
+#  include <utility>
+#  include <vector>
 
 #  include <google/protobuf/message_lite.h>
 #  include <gtest/gtest.h>
@@ -46,6 +52,20 @@ namespace exporter
 {
 namespace otlp
 {
+
+namespace
+{
+class ProtobufGlobalSymbolGuard
+{
+public:
+  ProtobufGlobalSymbolGuard() = default;
+  ~ProtobufGlobalSymbolGuard() { google::protobuf::ShutdownProtobufLibrary(); }
+  ProtobufGlobalSymbolGuard(const ProtobufGlobalSymbolGuard &)            = delete;
+  ProtobufGlobalSymbolGuard &operator=(const ProtobufGlobalSymbolGuard &) = delete;
+  ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
+  ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
+};
+}  // namespace
 
 namespace trace_api = opentelemetry::trace;
 namespace resource  = opentelemetry::sdk::resource;
@@ -146,8 +166,8 @@ public:
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
 
-    auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-        new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
+    std::unique_ptr<sdk::trace::SpanProcessor> processor =
+        std::make_unique<sdk::trace::BatchSpanProcessor>(std::move(exporter), processor_opts);
     auto provider = nostd::shared_ptr<sdk::trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
@@ -258,8 +278,8 @@ public:
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
 
-    auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-        new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
+    std::unique_ptr<sdk::trace::SpanProcessor> processor =
+        std::make_unique<sdk::trace::BatchSpanProcessor>(std::move(exporter), processor_opts);
     auto provider = nostd::shared_ptr<sdk::trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
@@ -374,8 +394,8 @@ public:
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
 
-    auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-        new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
+    std::unique_ptr<sdk::trace::SpanProcessor> processor =
+        std::make_unique<sdk::trace::BatchSpanProcessor>(std::move(exporter), processor_opts);
     auto provider = nostd::shared_ptr<sdk::trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
@@ -471,8 +491,8 @@ public:
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
 
-    auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-        new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
+    std::unique_ptr<sdk::trace::SpanProcessor> processor =
+        std::make_unique<sdk::trace::BatchSpanProcessor>(std::move(exporter), processor_opts);
     auto provider = nostd::shared_ptr<sdk::trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
@@ -545,7 +565,8 @@ public:
 
 TEST(OtlpHttpExporterTest, Shutdown)
 {
-  auto exporter = std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(new OtlpHttpExporter());
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter =
+      std::make_unique<OtlpHttpExporter>();
   ASSERT_TRUE(exporter->Shutdown());
 
   nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> spans = {};
@@ -564,7 +585,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestSync)
 TEST_F(OtlpHttpExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTestAsync();
-  google::protobuf::ShutdownProtobufLibrary();
+  static ProtobufGlobalSymbolGuard global_symbol_guard;
 }
 #  endif
 
@@ -585,8 +606,8 @@ TEST_F(OtlpHttpExporterTestPeer, ExportBinaryIntegrationTestAsync)
 TEST_F(OtlpHttpExporterTestPeer, ConfigTest)
 {
   OtlpHttpExporterOptions opts;
-  opts.url = "http://localhost:45455/v1/traces";
-  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter(opts));
+  opts.url                                   = "http://localhost:45455/v1/traces";
+  std::unique_ptr<OtlpHttpExporter> exporter = std::make_unique<OtlpHttpExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).url, "http://localhost:45455/v1/traces");
 }
 
@@ -594,8 +615,8 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigTest)
 TEST_F(OtlpHttpExporterTestPeer, ConfigUseJsonNameTest)
 {
   OtlpHttpExporterOptions opts;
-  opts.use_json_name = true;
-  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter(opts));
+  opts.use_json_name                         = true;
+  std::unique_ptr<OtlpHttpExporter> exporter = std::make_unique<OtlpHttpExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).use_json_name, true);
 }
 
@@ -603,8 +624,8 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigUseJsonNameTest)
 TEST_F(OtlpHttpExporterTestPeer, ConfigJsonBytesMappingTest)
 {
   OtlpHttpExporterOptions opts;
-  opts.json_bytes_mapping = JsonBytesMappingKind::kHex;
-  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter(opts));
+  opts.json_bytes_mapping                    = JsonBytesMappingKind::kHex;
+  std::unique_ptr<OtlpHttpExporter> exporter = std::make_unique<OtlpHttpExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
 }
 
@@ -625,7 +646,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromEnv)
   setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
   setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "http/json", 1);
 
-  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
+  std::unique_ptr<OtlpHttpExporter> exporter = std::make_unique<OtlpHttpExporter>();
   EXPECT_EQ(GetOptions(exporter).url, url);
   EXPECT_EQ(
       GetOptions(exporter).timeout.count(),
@@ -668,7 +689,7 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
   setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL", "http/json", 1);
 
-  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
+  std::unique_ptr<OtlpHttpExporter> exporter = std::make_unique<OtlpHttpExporter>();
   EXPECT_EQ(GetOptions(exporter).url, url);
   EXPECT_EQ(
       GetOptions(exporter).timeout.count(),
@@ -704,8 +725,8 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigFromTracesEnv)
 
 TEST_F(OtlpHttpExporterTestPeer, ConfigRetryDefaultValues)
 {
-  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
-  const auto options = GetOptions(exporter);
+  std::unique_ptr<OtlpHttpExporter> exporter = std::make_unique<OtlpHttpExporter>();
+  const auto options                         = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 5);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
   ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5.0f);
@@ -719,8 +740,8 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigRetryValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF", "6.7", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
 
-  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
-  const auto options = GetOptions(exporter);
+  std::unique_ptr<OtlpHttpExporter> exporter = std::make_unique<OtlpHttpExporter>();
+  const auto options                         = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 123);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
   ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7f);
@@ -739,8 +760,8 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
 
-  std::unique_ptr<OtlpHttpExporter> exporter(new OtlpHttpExporter());
-  const auto options = GetOptions(exporter);
+  std::unique_ptr<OtlpHttpExporter> exporter = std::make_unique<OtlpHttpExporter>();
+  const auto options                         = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 321);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);
   ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6f);
@@ -857,6 +878,119 @@ TEST_P(OtlpHttpExporterRetryIntegrationTests, StatusCodes)
   ASSERT_EQ(expected_attempts, request_count);
 }
 #  endif  // ENABLE_OTLP_RETRY_PREVIEW
+
+using opentelemetry::test_common::ScopedTestLogHandler;
+
+// Exporter logs the rejection on partial_success.
+TEST_F(OtlpHttpExporterTestPeer, ExportPartialSuccess)
+{
+  ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
+
+  proto::collector::trace::v1::ExportTraceServiceResponse partial;
+  partial.mutable_partial_success()->set_rejected_spans(21);
+  partial.mutable_partial_success()->set_error_message("too many spans!!");
+  std::string serialized = partial.SerializeAsString();
+
+  auto mock_otlp_client =
+      OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kBinary);
+  auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_client.first});
+
+  auto no_send_client =
+      std::static_pointer_cast<http_client::nosend::HttpClient>(mock_otlp_client.second);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&serialized](const std::shared_ptr<http_client::EventHandler> &callback) {
+        http_client::nosend::Response response;
+        response.body_.assign(serialized.begin(), serialized.end());
+        response.Finish(*callback.get());
+      });
+
+  auto recordable = exporter->MakeRecordable();
+  recordable->SetName("Test span");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, exporter->Export(batch));
+
+  auto entries  = log.Drain();
+  auto contains = [&](const std::string &needle) {
+    return std::any_of(entries.begin(), entries.end(), [&](const ScopedTestLogHandler::Entry &e) {
+      return e.msg.find(needle) != std::string::npos;
+    });
+  };
+  EXPECT_TRUE(contains("partial success"));
+  EXPECT_TRUE(contains("21 span(s) rejected"));
+  EXPECT_TRUE(contains("too many spans!!"));
+}
+
+// Exporter logs the rejection on partial_success when the response is JSON encoded.
+TEST_F(OtlpHttpExporterTestPeer, ExportPartialSuccessJson)
+{
+  ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
+
+  std::string serialized =
+      R"({"partialSuccess":{"rejectedSpans":"21","errorMessage":"too many spans!!"}})";
+
+  auto mock_otlp_client =
+      OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_client.first});
+
+  auto no_send_client =
+      std::static_pointer_cast<http_client::nosend::HttpClient>(mock_otlp_client.second);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&serialized](const std::shared_ptr<http_client::EventHandler> &callback) {
+        http_client::nosend::Response response;
+        response.body_.assign(serialized.begin(), serialized.end());
+        response.Finish(*callback.get());
+      });
+
+  auto recordable = exporter->MakeRecordable();
+  recordable->SetName("Test span");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, exporter->Export(batch));
+
+  auto entries  = log.Drain();
+  auto contains = [&](const std::string &needle) {
+    return std::any_of(entries.begin(), entries.end(), [&](const ScopedTestLogHandler::Entry &e) {
+      return e.msg.find(needle) != std::string::npos;
+    });
+  };
+  EXPECT_TRUE(contains("partial success"));
+  EXPECT_TRUE(contains("21 span(s) rejected"));
+  EXPECT_TRUE(contains("too many spans!!"));
+}
+
+// A malformed response body on a 2xx should return as kFailure for sync exports.
+#  ifndef ENABLE_ASYNC_EXPORT
+TEST_F(OtlpHttpExporterTestPeer, ExportParseFailureReturnsFailure)
+{
+  std::string serialized = "{some bad JSON";
+
+  auto mock_otlp_client =
+      OtlpHttpExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_client.first});
+
+  auto no_send_client =
+      std::static_pointer_cast<http_client::nosend::HttpClient>(mock_otlp_client.second);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  EXPECT_CALL(*mock_session, SendRequest)
+      .WillOnce([&serialized](const std::shared_ptr<http_client::EventHandler> &callback) {
+        http_client::nosend::Response response;
+        response.body_.assign(serialized.begin(), serialized.end());
+        response.Finish(*callback.get());
+      });
+
+  auto recordable = exporter->MakeRecordable();
+  recordable->SetName("Test span");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
+  EXPECT_EQ(sdk::common::ExportResult::kFailure, exporter->Export(batch));
+}
+#  endif
 
 }  // namespace otlp
 }  // namespace exporter

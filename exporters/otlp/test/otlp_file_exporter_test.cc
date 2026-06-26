@@ -19,7 +19,6 @@
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -112,8 +111,8 @@ public:
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
 
-    auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-        new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
+    std::unique_ptr<sdk::trace::SpanProcessor> processor =
+        std::make_unique<sdk::trace::BatchSpanProcessor>(std::move(exporter), processor_opts);
     auto provider = nostd::shared_ptr<sdk::trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
@@ -187,7 +186,8 @@ public:
 
 TEST(OtlpFileExporterTest, Shutdown)
 {
-  auto exporter = std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(new OtlpFileExporter());
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter =
+      std::make_unique<OtlpFileExporter>();
   ASSERT_TRUE(exporter->Shutdown());
 
   nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> spans = {};

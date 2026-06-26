@@ -30,7 +30,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           submodules: 'recursive'
 
@@ -43,23 +43,19 @@ jobs:
             ninja-build \
             libssl-dev \
             libcurl4-openssl-dev \
-            libabsl-dev \
-            libprotobuf-dev \
-            libgrpc++-dev \
-            protobuf-compiler \
-            protobuf-compiler-grpc \
-            libgmock-dev \
-            libgtest-dev \
-            libbenchmark-dev \
             llvm-22-dev \
             libclang-22-dev \
             clang-22 \
             cmake
           sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-22 200
 
-      - name: Install rapidyaml
+      - name: Install pinned third-party
+        env:
+          # benchmark v1.9.4 trips clang-22's new -Wc2y-extensions on __COUNTER__
+          # and its CMakeLists uses -Werror -pedantic; silence the warning.
+          CXXFLAGS: -Wno-c2y-extensions
         run: |
-          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
+          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
 
       - name: Install include-what-you-use
         run: |

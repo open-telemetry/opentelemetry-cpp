@@ -6,6 +6,8 @@
 #endif
 
 #include <stdint.h>
+#include <string.h>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -27,8 +29,6 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
-namespace nostd = opentelemetry::nostd;
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -40,6 +40,24 @@ namespace otlp
 //
 const int kAttributeValueSize      = 16;
 const int kOwnedAttributeValueSize = 15;
+
+namespace
+{
+// Per OpenTelemetry spec, uint64_t attribute values exceeding INT64_MAX must be
+// encoded as a decimal string rather than wrapping to a negative int64 via narrowing.
+// https://opentelemetry.io/docs/specs/otel/common/attribute-type-mapping/#integer-values
+inline void SetUint64Value(opentelemetry::proto::common::v1::AnyValue *proto_value, uint64_t val)
+{
+  if (val <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()))
+  {
+    proto_value->set_int_value(static_cast<int64_t>(val));
+  }
+  else
+  {
+    proto_value->set_string_value(std::to_string(val));
+  }
+}
+}  // namespace
 
 void OtlpPopulateAttributeUtils::PopulateAnyValue(
     opentelemetry::proto::common::v1::AnyValue *proto_value,
@@ -75,8 +93,7 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<uint64_t>(value))
   {
-    proto_value->set_int_value(
-        nostd::get<uint64_t>(value));  // NOLINT(cppcoreguidelines-narrowing-conversions)
+    SetUint64Value(proto_value, nostd::get<uint64_t>(value));
   }
   else if (nostd::holds_alternative<double>(value))
   {
@@ -168,8 +185,7 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<nostd::span<const uint64_t>>(value))
     {
-      array_value->add_values()->set_int_value(
-          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
+      SetUint64Value(array_value->add_values(), val);
     }
   }
   else if (nostd::holds_alternative<nostd::span<const double>>(value))
@@ -235,8 +251,7 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
   }
   else if (nostd::holds_alternative<uint64_t>(value))
   {
-    proto_value->set_int_value(
-        nostd::get<uint64_t>(value));  // NOLINT(cppcoreguidelines-narrowing-conversions)
+    SetUint64Value(proto_value, nostd::get<uint64_t>(value));
   }
   else if (nostd::holds_alternative<double>(value))
   {
@@ -313,8 +328,7 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
     auto array_value = proto_value->mutable_array_value();
     for (const auto &val : nostd::get<std::vector<uint64_t>>(value))
     {
-      array_value->add_values()->set_int_value(
-          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
+      SetUint64Value(array_value->add_values(), val);
     }
   }
   else if (nostd::holds_alternative<std::vector<double>>(value))
