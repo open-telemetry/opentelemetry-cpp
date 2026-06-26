@@ -30,10 +30,9 @@ LoggerContext::LoggerContext(
       processor_(
           std::unique_ptr<LogRecordProcessor>(new MultiLogRecordProcessor(std::move(processors)))),
       logger_configurator_(std::move(logger_configurator)),
-      log_record_limits_(log_record_limits)
-{
-  recordable_enforces_limits_ = processor_->RecordableEnforcesLogRecordLimits();
-}
+      log_record_limits_(log_record_limits),
+      recordable_enforces_limits_(processor_->RecordableEnforcesLogRecordLimits())
+{}
 
 void LoggerContext::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept
 {

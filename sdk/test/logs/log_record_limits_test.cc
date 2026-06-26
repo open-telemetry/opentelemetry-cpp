@@ -247,7 +247,10 @@ public:
     return recordable;
   }
 
-  void OnEmit(std::unique_ptr<opentelemetry::sdk::logs::Recordable> &&) noexcept override {}
+  void OnEmit(std::unique_ptr<opentelemetry::sdk::logs::Recordable> &&record) noexcept override
+  {
+    auto dropped = std::move(record);
+  }
 
   bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
 
