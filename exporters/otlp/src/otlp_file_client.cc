@@ -1458,8 +1458,10 @@ private:
       std::shared_ptr<FileStats> concurrency_file = file_;
       std::chrono::microseconds flush_interval    = options_.flush_interval;
       auto thread_instrumentation                 = runtime_options_.thread_instrumentation;
-      file_->background_flush_thread.reset(new std::thread([concurrency_file, flush_interval,
-                                                            thread_instrumentation]() {
+
+      file_->background_flush_thread = std::make_unique<std::thread>([concurrency_file,
+                                                                      flush_interval,
+                                                                      thread_instrumentation]() {
         std::chrono::system_clock::time_point last_free_job_timepoint =
             std::chrono::system_clock::now();
         std::size_t last_record_count = 0;
@@ -1544,7 +1546,7 @@ private:
         {
           background_flush_thread->detach();
         }
-      }));
+      });
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
     }
     catch (std::exception &e)
