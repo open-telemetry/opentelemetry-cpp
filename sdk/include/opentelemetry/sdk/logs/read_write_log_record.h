@@ -215,9 +215,10 @@ private:
   std::string event_name_;
 
   // Stored by value so the recordable does not depend on the limits object
-  // outliving the LoggerContext that supplied it. The default-constructed
-  // value carries the spec defaults (count=128, length=unlimited).
-  LogRecordLimits limits_{};
+  // outliving the LoggerContext that supplied it. Defaults to no limits; the
+  // LoggerProvider wiring injects the configured limits via SetLogRecordLimits,
+  // so a recordable used outside a provider does not cap attributes on its own.
+  LogRecordLimits limits_ = LogRecordLimits::NoLimits();
   uint32_t dropped_attributes_count_{0};
 
   // We do not pay for trace state when not necessary

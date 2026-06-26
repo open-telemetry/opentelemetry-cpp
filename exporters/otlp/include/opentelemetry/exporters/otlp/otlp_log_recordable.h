@@ -124,9 +124,11 @@ private:
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
       nullptr;
   // Stored by value so the recordable does not depend on the limits object
-  // outliving the LoggerContext that supplied it. The default-constructed
-  // value carries the spec defaults (count=128, length=unlimited).
-  opentelemetry::sdk::logs::LogRecordLimits limits_{};
+  // outliving the LoggerContext that supplied it. Defaults to no limits; the
+  // LoggerProvider wiring injects the configured limits via SetLogRecordLimits,
+  // so a recordable used outside a provider does not cap attributes on its own.
+  opentelemetry::sdk::logs::LogRecordLimits limits_ =
+      opentelemetry::sdk::logs::LogRecordLimits::NoLimits();
 };
 
 }  // namespace otlp

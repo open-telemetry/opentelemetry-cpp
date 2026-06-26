@@ -30,6 +30,17 @@ struct LogRecordLimits
 
   std::size_t attribute_count_limit        = kDefaultAttributeCountLimit;
   std::size_t attribute_value_length_limit = kDefaultAttributeValueLengthLimit;
+
+  /**
+   * Limits that impose no cap. A recordable uses these until a LoggerProvider
+   * injects the configured limits, so a recordable created outside a provider
+   * does not enforce any limit on its own.
+   */
+  static constexpr LogRecordLimits NoLimits() noexcept
+  {
+    return LogRecordLimits{(std::numeric_limits<std::size_t>::max)(),
+                           (std::numeric_limits<std::size_t>::max)()};
+  }
 };
 
 }  // namespace logs

@@ -535,18 +535,18 @@ TEST(OtlpLogRecordable, AttributeValueLengthLimitTruncatesBytesAttribute)
   EXPECT_EQ(static_cast<uint8_t>(b[2]), 0x03);
 }
 
-TEST(OtlpLogRecordable, DefaultRecordEnforcesSpecCountCap)
+TEST(OtlpLogRecordable, DefaultRecordAppliesNoLimitUntilConfigured)
 {
-  // No SetLogRecordLimits() call: the default-constructed LogRecordLimits{}
-  // carries the spec defaults (count=128, length=unlimited), so the 129th
-  // distinct key is dropped instead of stored.
+  // No SetLogRecordLimits() call: a bare recordable applies no cap. The
+  // spec-default count limit is injected by the LoggerProvider wiring, not by
+  // the recordable itself, so every attribute is kept.
   OtlpLogRecordable rec;
   for (int i = 0; i < 200; ++i)
   {
     rec.SetAttribute("attr_" + std::to_string(i), static_cast<int64_t>(i));
   }
-  EXPECT_EQ(rec.log_record().attributes_size(), 128);
-  EXPECT_EQ(rec.log_record().dropped_attributes_count(), 200u - 128u);
+  EXPECT_EQ(rec.log_record().attributes_size(), 200);
+  EXPECT_EQ(rec.log_record().dropped_attributes_count(), 0u);
 }
 
 }  // namespace otlp

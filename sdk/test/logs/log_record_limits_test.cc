@@ -32,19 +32,19 @@ using opentelemetry::sdk::logs::LogRecordLimits;
 using opentelemetry::sdk::logs::ReadWriteLogRecord;
 namespace nostd = opentelemetry::nostd;
 
-TEST(LogRecordLimits, DefaultRecordEnforcesSpecCountCap)
+TEST(LogRecordLimits, DefaultRecordAppliesNoLimitUntilConfigured)
 {
   // A ReadWriteLogRecord that never receives an explicit SetLogRecordLimits()
-  // call still carries the spec-default LogRecordLimits{} value (count=128,
-  // length=unlimited). The spec says implementations SHOULD apply that count
-  // cap, so the 129th distinct key is dropped.
+  // call applies no cap. The spec-default count limit is injected by the
+  // LoggerProvider wiring, not by a bare recordable, so a recordable used
+  // outside a provider keeps every attribute (matching pre-limits behavior).
   ReadWriteLogRecord record;
   for (int i = 0; i < 200; ++i)
   {
     record.SetAttribute("attr_" + std::to_string(i), static_cast<int64_t>(i));
   }
-  ASSERT_EQ(record.GetAttributes().size(), 128u);
-  ASSERT_EQ(record.GetDroppedAttributesCount(), 200u - 128u);
+  ASSERT_EQ(record.GetAttributes().size(), 200u);
+  ASSERT_EQ(record.GetDroppedAttributesCount(), 0u);
 }
 
 TEST(LogRecordLimits, CountLimitDropsExcessAttributes)
