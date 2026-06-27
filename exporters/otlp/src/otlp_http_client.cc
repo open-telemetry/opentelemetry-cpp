@@ -1043,8 +1043,9 @@ OtlpHttpClient::createSession(
 
   return HttpSessionData{
       std::move(session),
-      std::shared_ptr<opentelemetry::ext::http::client::EventHandler>{new ResponseHandler(
-          std::move(result_callback), response, options_.content_type, options_.console_debug)},
+      std::shared_ptr<opentelemetry::ext::http::client::EventHandler>{
+          std::make_shared<ResponseHandler>(std::move(result_callback), response,
+                                            options_.content_type, options_.console_debug)},
       std::move(arena), response};
 }
 
