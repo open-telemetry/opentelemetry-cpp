@@ -138,7 +138,8 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
   // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
   // block to reduce memory fragments.
   arena_options.max_block_size = 65536;
-  std::unique_ptr<google::protobuf::Arena> arena{new google::protobuf::Arena{arena_options}};
+  std::unique_ptr<google::protobuf::Arena> arena =
+      std::make_unique<google::protobuf::Arena>(arena_options);
 
   proto::collector::metrics::v1::ExportMetricsServiceRequest *request =
       google::protobuf::Arena::Create<proto::collector::metrics::v1::ExportMetricsServiceRequest>(

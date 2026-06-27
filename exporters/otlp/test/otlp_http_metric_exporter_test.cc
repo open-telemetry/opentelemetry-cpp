@@ -882,8 +882,8 @@ public:
 
 TEST(OtlpHttpMetricExporterTest, Shutdown)
 {
-  auto exporter = std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>(
-      new OtlpHttpMetricExporter());
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter =
+      std::make_unique<OtlpHttpMetricExporter>();
   ASSERT_TRUE(exporter->Shutdown());
   auto result = exporter->Export(opentelemetry::sdk::metrics::ResourceMetrics{});
   EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
@@ -974,8 +974,8 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportBinaryIntegrationTestHistogramPoint
 TEST_F(OtlpHttpMetricExporterTestPeer, ConfigTest)
 {
   OtlpHttpMetricExporterOptions opts;
-  opts.url = "http://localhost:45456/v1/metrics";
-  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter(opts));
+  opts.url                                         = "http://localhost:45456/v1/metrics";
+  std::unique_ptr<OtlpHttpMetricExporter> exporter = std::make_unique<OtlpHttpMetricExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).url, "http://localhost:45456/v1/metrics");
 }
 
@@ -983,8 +983,8 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigTest)
 TEST_F(OtlpHttpMetricExporterTestPeer, ConfigUseJsonNameTest)
 {
   OtlpHttpMetricExporterOptions opts;
-  opts.use_json_name = true;
-  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter(opts));
+  opts.use_json_name                               = true;
+  std::unique_ptr<OtlpHttpMetricExporter> exporter = std::make_unique<OtlpHttpMetricExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).use_json_name, true);
 }
 
@@ -992,8 +992,8 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigUseJsonNameTest)
 TEST_F(OtlpHttpMetricExporterTestPeer, ConfigJsonBytesMappingTest)
 {
   OtlpHttpMetricExporterOptions opts;
-  opts.json_bytes_mapping = JsonBytesMappingKind::kHex;
-  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter(opts));
+  opts.json_bytes_mapping                          = JsonBytesMappingKind::kHex;
+  std::unique_ptr<OtlpHttpMetricExporter> exporter = std::make_unique<OtlpHttpMetricExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).json_bytes_mapping, JsonBytesMappingKind::kHex);
   static ProtobufGlobalSymbolGuard global_symbol_guard;
 }
@@ -1015,7 +1015,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigFromEnv)
   setenv("OTEL_EXPORTER_OTLP_METRICS_HEADERS", "k1=v3,k1=v4", 1);
   setenv("OTEL_EXPORTER_OTLP_PROTOCOL", "http/json", 1);
 
-  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
+  std::unique_ptr<OtlpHttpMetricExporter> exporter = std::make_unique<OtlpHttpMetricExporter>();
   EXPECT_EQ(GetOptions(exporter).url, url);
   EXPECT_EQ(
       GetOptions(exporter).timeout.count(),
@@ -1058,7 +1058,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigFromMetricsEnv)
   setenv("OTEL_EXPORTER_OTLP_METRICS_HEADERS", "k1=v3,k1=v4", 1);
   setenv("OTEL_EXPORTER_OTLP_METRICS_PROTOCOL", "http/json", 1);
 
-  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
+  std::unique_ptr<OtlpHttpMetricExporter> exporter = std::make_unique<OtlpHttpMetricExporter>();
   EXPECT_EQ(GetOptions(exporter).url, url);
   EXPECT_EQ(
       GetOptions(exporter).timeout.count(),
@@ -1099,7 +1099,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, DefaultEndpoint)
 
 TEST_F(OtlpHttpMetricExporterTestPeer, CheckDefaultTemporality)
 {
-  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
+  std::unique_ptr<OtlpHttpMetricExporter> exporter = std::make_unique<OtlpHttpMetricExporter>();
   EXPECT_EQ(
       opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
       exporter->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
@@ -1122,8 +1122,8 @@ TEST_F(OtlpHttpMetricExporterTestPeer, CheckDefaultTemporality)
 
 TEST_F(OtlpHttpMetricExporterTestPeer, ConfigRetryDefaultValues)
 {
-  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
-  const auto options = GetOptions(exporter);
+  std::unique_ptr<OtlpHttpMetricExporter> exporter = std::make_unique<OtlpHttpMetricExporter>();
+  const auto options                               = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 5);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
   ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5.0f);
@@ -1137,8 +1137,8 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigRetryValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_BACKOFF", "6.7", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
 
-  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
-  const auto options = GetOptions(exporter);
+  std::unique_ptr<OtlpHttpMetricExporter> exporter = std::make_unique<OtlpHttpMetricExporter>();
+  const auto options                               = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 123);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
   ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7f);
@@ -1157,8 +1157,8 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
 
-  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
-  const auto options = GetOptions(exporter);
+  std::unique_ptr<OtlpHttpMetricExporter> exporter = std::make_unique<OtlpHttpMetricExporter>();
+  const auto options                               = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 321);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);
   ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6f);
@@ -1175,7 +1175,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ConfigRetryGenericValuesFromEnv)
 TEST_F(OtlpHttpMetricExporterTestPeer, PreferredAggergationTemporality)
 {
   // Cummulative aggregation selector : use cummulative aggregation for all instruments.
-  std::unique_ptr<OtlpHttpMetricExporter> exporter(new OtlpHttpMetricExporter());
+  std::unique_ptr<OtlpHttpMetricExporter> exporter = std::make_unique<OtlpHttpMetricExporter>();
   EXPECT_EQ(GetOptions(exporter).aggregation_temporality,
             PreferredAggregationTemporality::kCumulative);
   auto cumm_selector =
@@ -1199,7 +1199,8 @@ TEST_F(OtlpHttpMetricExporterTestPeer, PreferredAggergationTemporality)
   //   up-down counter
   OtlpHttpMetricExporterOptions opts2;
   opts2.aggregation_temporality = PreferredAggregationTemporality::kLowMemory;
-  std::unique_ptr<OtlpHttpMetricExporter> exporter2(new OtlpHttpMetricExporter(opts2));
+  std::unique_ptr<OtlpHttpMetricExporter> exporter2 =
+      std::make_unique<OtlpHttpMetricExporter>(opts2);
   EXPECT_EQ(GetOptions(exporter2).aggregation_temporality,
             PreferredAggregationTemporality::kLowMemory);
   auto lowmemory_selector =
@@ -1224,7 +1225,8 @@ TEST_F(OtlpHttpMetricExporterTestPeer, PreferredAggergationTemporality)
   //   - cummulative aggregation for up-down counter, observable up-down counter
   OtlpHttpMetricExporterOptions opts3;
   opts3.aggregation_temporality = PreferredAggregationTemporality::kDelta;
-  std::unique_ptr<OtlpHttpMetricExporter> exporter3(new OtlpHttpMetricExporter(opts3));
+  std::unique_ptr<OtlpHttpMetricExporter> exporter3 =
+      std::make_unique<OtlpHttpMetricExporter>(opts3);
   EXPECT_EQ(GetOptions(exporter3).aggregation_temporality, PreferredAggregationTemporality::kDelta);
   auto delta_selector =
       OtlpMetricUtils::ChooseTemporalitySelector(GetOptions(exporter3).aggregation_temporality);
