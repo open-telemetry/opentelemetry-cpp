@@ -92,6 +92,13 @@ inline std::size_t Utf8SafePrefixLength(const char *data,
                                         std::size_t size,
                                         std::size_t max_bytes) noexcept
 {
+  // When the whole value fits within the budget (including the common
+  // unbounded case where max_bytes is SIZE_MAX), no truncation is possible,
+  // so skip the per-byte scan.
+  if (max_bytes >= size)
+  {
+    return size;
+  }
   std::size_t i = 0;
   while (i < size)
   {

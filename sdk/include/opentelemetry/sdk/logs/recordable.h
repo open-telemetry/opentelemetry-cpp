@@ -50,9 +50,9 @@ public:
   /**
    * Apply attribute count and value length limits to this log. The default
    * implementation is a no-op; concrete recordables that wish to enforce
-   * limits override this and store the supplied limits before any
-   * SetAttribute call is observed. The referenced object must outlive the
-   * recordable.
+   * limits override this and copy the supplied limits before any
+   * SetAttribute call is observed, so the caller does not need to keep the
+   * supplied object alive.
    *
    * This virtual is appended at the end of the Recordable vtable to keep
    * the change additive: recordable implementations that do not override

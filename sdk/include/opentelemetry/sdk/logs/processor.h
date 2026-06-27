@@ -119,11 +119,6 @@ public:
    * Processors backed by an exporter delegate to the exporter; composite
    * processors return true if any child does. The SDK Logger consults this once
    * per context to decide whether to push limits onto each recordable.
-   *
-   * Declared after every other virtual so its slot is appended at the end of
-   * the LogRecordProcessor vtable, keeping the change additive: subclasses that
-   * do not override it inherit the default and their existing slots are
-   * unchanged.
    */
   virtual bool RecordableEnforcesLogRecordLimits() const noexcept { return false; }
 };

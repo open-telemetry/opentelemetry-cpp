@@ -99,8 +99,8 @@ public:
 
   /**
    * Apply attribute count and value length limits. Must be called before any
-   * SetAttribute call to take effect. The referenced limits object must
-   * outlive this recordable.
+   * SetAttribute call to take effect. The limits are copied into this
+   * recordable.
    */
   void SetLogRecordLimits(
       const opentelemetry::sdk::logs::LogRecordLimits &limits) noexcept override;

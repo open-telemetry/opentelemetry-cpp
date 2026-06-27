@@ -99,6 +99,23 @@ TEST(LogRecordLimits, LengthLimitTruncatesString)
   ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("k")), "01234");
 }
 
+TEST(LogRecordLimits, LengthLimitTruncatesConstCharPtr)
+{
+  LogRecordLimits limits;
+  limits.attribute_value_length_limit = 5;
+  ReadWriteLogRecord record;
+  record.SetLogRecordLimits(limits);
+
+  // A const char* attribute value goes through the AttributeConverter
+  // const char* overload (which delegates to the string_view path) and must
+  // be truncated the same way.
+  const char *value = "0123456789";
+  record.SetAttribute("k", value);
+
+  ASSERT_EQ(record.GetDroppedAttributesCount(), 0u);
+  ASSERT_EQ(nostd::get<std::string>(record.GetAttributes().at("k")), "01234");
+}
+
 TEST(LogRecordLimits, LengthLimitTruncatesEachStringInArray)
 {
   LogRecordLimits limits;

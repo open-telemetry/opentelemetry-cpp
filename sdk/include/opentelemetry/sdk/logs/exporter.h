@@ -75,10 +75,6 @@ public:
    * false so the SDK can skip the per-record SetLogRecordLimits() call for
    * recordables that ignore limits. Exporters whose recordable applies the
    * limits (OTLP, ostream) override this to return true.
-   *
-   * This virtual is appended at the end of the LogRecordExporter vtable to keep
-   * the change additive: exporters that do not override it inherit the default
-   * and continue to compile unchanged.
    */
   virtual bool RecordableEnforcesLogRecordLimits() const noexcept { return false; }
 };
