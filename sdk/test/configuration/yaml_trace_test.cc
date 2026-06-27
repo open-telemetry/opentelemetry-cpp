@@ -608,13 +608,17 @@ tracer_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
   ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kParentBased);
+
   auto *sampler = config->tracer_provider->sampler.get();
   auto *parent =
       reinterpret_cast<opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *>(
           sampler);
   ASSERT_NE(parent->root, nullptr);
 
-  TestSamplerVisitor visitor;
   parent->root->Accept(&visitor);
   EXPECT_EQ(visitor.type_matched, SamplerType::kAlwaysOn);
 
@@ -743,13 +747,17 @@ tracer_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
   ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kParentBased);
+
   auto *sampler = config->tracer_provider->sampler.get();
   auto *parent =
       reinterpret_cast<opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *>(
           sampler);
   ASSERT_NE(parent->root, nullptr);
 
-  TestSamplerVisitor visitor;
   parent->root->Accept(&visitor);
   EXPECT_EQ(visitor.type_matched, SamplerType::kAlwaysOn);
 
