@@ -61,6 +61,9 @@ Increment the:
   LoggerConfig declarative configuration
   [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
 
+* [CODE HEALTH] Fix clang-tidy bugprone-exception-escape in ostream exporters
+  [#4137](https://github.com/open-telemetry/opentelemetry-cpp/pull/4137)
+
 * [API] (ABI v2) `Logger::EmitLogRecord(...)` templates now apply the
   `Enabled` filter chain when a `Severity` is in args. v1 behavior is
   unchanged.
@@ -109,6 +112,9 @@ Increment the:
 
 * [EXPORTER] Handle OTLP partial success response
   [#4104](https://github.com/open-telemetry/opentelemetry-cpp/pull/4104)
+
+* [CONFIGURATION] Apply default sampler when none is specified
+  [#4170](https://github.com/open-telemetry/opentelemetry-cpp/pull/4170)
 
 ## [1.27.0] 2026-05-13
 
