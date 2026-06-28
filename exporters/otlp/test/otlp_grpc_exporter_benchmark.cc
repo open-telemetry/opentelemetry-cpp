@@ -5,6 +5,7 @@
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 
 #include <benchmark/benchmark.h>
+#include <memory>
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
@@ -137,9 +138,7 @@ class OtlpGrpcExporterTestPeer
 public:
   std::unique_ptr<sdk::trace::SpanExporter> GetExporter()
   {
-    auto mock_stub = new FakeServiceStub();
-    std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
-        mock_stub);
+    auto stub_interface = std::make_unique<FakeServiceStub>();
     return std::unique_ptr<sdk::trace::SpanExporter>(
         new exporter::otlp::OtlpGrpcExporter(std::move(stub_interface)));
   }
@@ -150,8 +149,8 @@ void CreateEmptySpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
 {
   for (int i = 0; i < kBatchSize; i++)
   {
-    auto recordable = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
-    recordables[i]  = std::move(recordable);
+    std::unique_ptr<sdk::trace::Recordable> recordable = std::make_unique<OtlpRecordable>();
+    recordables[i]                                     = std::move(recordable);
   }
 }
 
@@ -160,7 +159,7 @@ void CreateSparseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatc
 {
   for (int i = 0; i < kBatchSize; i++)
   {
-    auto recordable = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
+    std::unique_ptr<sdk::trace::Recordable> recordable = std::make_unique<OtlpRecordable>();
 
     recordable->SetIdentity(kSpanContext, kParentSpanId);
     recordable->SetName("TestSpan");
@@ -176,7 +175,7 @@ void CreateDenseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
 {
   for (int i = 0; i < kBatchSize; i++)
   {
-    auto recordable = std::unique_ptr<sdk::trace::Recordable>(new OtlpRecordable);
+    std::unique_ptr<sdk::trace::Recordable> recordable = std::make_unique<OtlpRecordable>();
 
     recordable->SetIdentity(kSpanContext, kParentSpanId);
     recordable->SetName("TestSpan");
@@ -199,8 +198,8 @@ void CreateDenseSpans(std::array<std::unique_ptr<sdk::trace::Recordable>, kBatch
 // Benchmark Export() with empty spans
 void BM_OtlpExporterEmptySpans(benchmark::State &state)
 {
-  std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer(new OtlpGrpcExporterTestPeer());
-  auto exporter = testpeer->GetExporter();
+  std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer = std::make_unique<OtlpGrpcExporterTestPeer>();
+  auto exporter                                      = testpeer->GetExporter();
 
   while (state.KeepRunningBatch(kNumIterations))
   {
@@ -214,8 +213,8 @@ BENCHMARK(BM_OtlpExporterEmptySpans);
 // Benchmark Export() with sparse spans
 void BM_OtlpExporterSparseSpans(benchmark::State &state)
 {
-  std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer(new OtlpGrpcExporterTestPeer());
-  auto exporter = testpeer->GetExporter();
+  std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer = std::make_unique<OtlpGrpcExporterTestPeer>();
+  auto exporter                                      = testpeer->GetExporter();
 
   while (state.KeepRunningBatch(kNumIterations))
   {
@@ -229,8 +228,8 @@ BENCHMARK(BM_OtlpExporterSparseSpans);
 // Benchmark Export() with dense spans
 void BM_OtlpExporterDenseSpans(benchmark::State &state)
 {
-  std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer(new OtlpGrpcExporterTestPeer());
-  auto exporter = testpeer->GetExporter();
+  std::unique_ptr<OtlpGrpcExporterTestPeer> testpeer = std::make_unique<OtlpGrpcExporterTestPeer>();
+  auto exporter                                      = testpeer->GetExporter();
 
   while (state.KeepRunningBatch(kNumIterations))
   {
@@ -255,9 +254,10 @@ opentelemetry::exporter::otlp::OtlpGrpcExporterOptions opts;
 void InitTracer()
 {
   // Create OTLP exporter instance
-  auto exporter  = std::unique_ptr<trace_sdk::SpanExporter>(new otlp::OtlpGrpcExporter(opts));
-  auto processor = std::unique_ptr<trace_sdk::SpanProcessor>(
-      new trace_sdk::SimpleSpanProcessor(std::move(exporter)));
+  std::unique_ptr<trace_sdk::SpanExporter> exporter =
+      std::make_unique<otlp::OtlpGrpcExporter>(opts);
+  std::unique_ptr<trace_sdk::SpanProcessor> processor =
+      std::make_unique<trace_sdk::SimpleSpanProcessor>(std::move(exporter));
   auto provider =
       nostd::shared_ptr<trace::TracerProvider>(new trace_sdk::TracerProvider(std::move(processor)));
   // Set the global trace provider

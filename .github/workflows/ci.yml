@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       CXX_STANDARD: '17'
-      CMAKE_VERSION: '3.16.0'
+      CMAKE_VERSION: '3.18.0' # CMake version 3.18+ is required by curl 8.21.0+
       BUILD_TYPE: 'Release'
     steps:
     - name: Harden the runner (Audit all outbound calls)
