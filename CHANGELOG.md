@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [OTLP/HTTP] Honor `Retry-After` response header when retrying exports,
+  supporting both delay-seconds and HTTP-date formats per RFC 7231 §7.1.3.
+  [#4172](https://github.com/open-telemetry/opentelemetry-cpp/issues/4172)
+
 * [SDK] Add `TracerProvider::UpdateTracerConfigurator()` and example
   [#4065](https://github.com/open-telemetry/opentelemetry-cpp/issues/4065)
 

@@ -10,11 +10,14 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cctype>
 #include <chrono>
 #include <cmath>
 #include <cstring>
+#include <ctime>
 #include <functional>
 #include <future>
+#include <iomanip>
 #include <memory>
 #include <random>
 #include <sstream>
@@ -34,6 +37,69 @@
 #ifndef CURL_VERSION_BITS
 #  define CURL_VERSION_BITS(x, y, z) ((x) << 16 | (y) << 8 | (z))
 #endif
+
+namespace
+{
+std::time_t PortableTimegm(std::tm *tm)
+{
+  int year  = tm->tm_year + 1900;
+  int month = tm->tm_mon + 1;
+
+  if (month <= 2)
+  {
+    year -= 1;
+    month += 12;
+  }
+
+  int day  = tm->tm_mday;
+  int days = 365 * year + year / 4 - year / 100 + year / 400 + 367 * month / 12 - 30 + day - 719530;
+
+  return static_cast<std::time_t>(days) * 86400 + tm->tm_hour * 3600 + tm->tm_min * 60 + tm->tm_sec;
+}
+
+bool ParseRetryAfterDelay(std::string value, std::chrono::seconds &delay)
+{
+  value.erase(0, value.find_first_not_of(" \t\r\n"));
+  value.erase(value.find_last_not_of(" \t\r\n") + 1);
+
+  if (value.empty())
+  {
+    return false;
+  }
+
+  if (std::all_of(value.begin(), value.end(), [](unsigned char c) { return std::isdigit(c); }))
+  {
+    try
+    {
+      delay = std::chrono::seconds(std::stoull(value));
+      return true;
+    }
+    catch (...)
+    {
+      return false;
+    }
+  }
+  return false;
+}
+
+bool ParseRetryAfterDate(std::string value, std::chrono::system_clock::time_point &date)
+{
+  value.erase(0, value.find_first_not_of(" \t\r\n"));
+  value.erase(value.find_last_not_of(" \t\r\n") + 1);
+
+  std::tm tm = {};
+  std::istringstream ss(value);
+
+  ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S");
+  if (!ss.fail())
+  {
+    std::time_t epoch = PortableTimegm(&tm);
+    date              = std::chrono::system_clock::from_time_t(epoch);
+    return true;
+  }
+  return false;
+}
+}  // namespace
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -560,6 +626,11 @@ bool HttpOperation::IsRetryable()
 
 std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
 {
+  if (retry_after_time_point_ != std::chrono::system_clock::time_point{})
+  {
+    return retry_after_time_point_;
+  }
+
   static std::random_device rd;
   static std::mt19937 gen(rd());
   static std::uniform_real_distribution<float> dis(0.8f, 1.2f);
@@ -1463,8 +1534,9 @@ void HttpOperation::Abort()
 void HttpOperation::PerformCurlMessage(CURLcode code)
 {
   ++retry_attempts_;
-  last_attempt_time_ = std::chrono::system_clock::now();
-  last_curl_result_  = code;
+  last_attempt_time_      = std::chrono::system_clock::now();
+  last_curl_result_       = code;
+  retry_after_time_point_ = std::chrono::system_clock::time_point{};
 
   if (code != CURLE_OK)
   {
@@ -1513,6 +1585,29 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
 
   if (IsRetryable())
   {
+    auto headers = GetResponseHeaders();
+    auto it      = headers.find("Retry-After");
+
+    if (it != headers.end())
+    {
+      std::string retry_after = it->second;
+      std::chrono::seconds delay;
+
+      if (ParseRetryAfterDelay(retry_after, delay))
+      {
+        retry_after_time_point_ = std::chrono::system_clock::now() + delay;
+      }
+      else
+      {
+        std::chrono::system_clock::time_point date;
+        if (ParseRetryAfterDate(retry_after, date))
+        {
+          auto now                = std::chrono::system_clock::now();
+          retry_after_time_point_ = (date > now) ? date : now;
+        }
+      }
+    }
+
     // Clear any response data received in previous attempt
     ReleaseResponse();
     // Rewind request data so that read callback can re-transfer the payload
