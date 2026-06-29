@@ -296,14 +296,14 @@ TYPED_TEST(OtlpLogRecordableIntAttributeTest, SetIntArrayAttribute)
 // Test logs PopulateRequest groups records by resource and instrumentation scope
 TEST(OtlpLogRecordable, PopulateRequest)
 {
-  auto rec1      = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  std::unique_ptr<sdk::logs::Recordable> rec1 = std::make_unique<OtlpLogRecordable>();
   auto resource1 = resource::Resource::Create({{"service.name", "one"}});
   auto inst_lib1 =
       opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("one", "1");
   rec1->SetResource(resource1);
   rec1->SetInstrumentationScope(*inst_lib1);
 
-  auto rec2      = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  std::unique_ptr<sdk::logs::Recordable> rec2 = std::make_unique<OtlpLogRecordable>();
   auto resource2 = resource::Resource::Create({{"service.name", "two"}});
   auto inst_lib2 =
       opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("two", "2");
@@ -311,7 +311,7 @@ TEST(OtlpLogRecordable, PopulateRequest)
   rec2->SetInstrumentationScope(*inst_lib2);
 
   // Same resource as rec2, different scope
-  auto rec3 = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  std::unique_ptr<sdk::logs::Recordable> rec3 = std::make_unique<OtlpLogRecordable>();
   auto inst_lib3 =
       opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("three", "3");
   rec3->SetResource(resource2);
@@ -347,12 +347,12 @@ TEST(OtlpLogRecordable, PopulateRequest)
 TEST(OtlpLogRecordable, PopulateRequestMissing)
 {
   // Missing scope (no SetInstrumentationScope call)
-  auto rec1      = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  std::unique_ptr<sdk::logs::Recordable> rec1 = std::make_unique<OtlpLogRecordable>();
   auto resource1 = resource::Resource::Create({{"service.name", "one"}});
   rec1->SetResource(resource1);
 
   // Missing resource (no SetResource call)
-  auto rec2 = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  std::unique_ptr<sdk::logs::Recordable> rec2 = std::make_unique<OtlpLogRecordable>();
   auto inst_lib2 =
       opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("two", "2");
   rec2->SetInstrumentationScope(*inst_lib2);
@@ -375,7 +375,7 @@ TEST(OtlpLogRecordable, PopulateRequestMissing)
 // Test logs PopulateRequest ignores a null request pointer
 TEST(OtlpLogRecordable, PopulateRequestNullRequest)
 {
-  auto rec1      = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  std::unique_ptr<sdk::logs::Recordable> rec1 = std::make_unique<OtlpLogRecordable>();
   auto resource1 = resource::Resource::Create({{"service.name", "one"}});
   rec1->SetResource(resource1);
 
@@ -398,11 +398,11 @@ TEST(OtlpLogRecordable, PopulateRequestSameScope)
   auto inst_lib_b =
       opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("lib", "1.0");
 
-  auto rec1 = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  std::unique_ptr<sdk::logs::Recordable> rec1 = std::make_unique<OtlpLogRecordable>();
   rec1->SetResource(resource);
   rec1->SetInstrumentationScope(*inst_lib_a);
 
-  auto rec2 = std::unique_ptr<sdk::logs::Recordable>(new OtlpLogRecordable);
+  std::unique_ptr<sdk::logs::Recordable> rec2 = std::make_unique<OtlpLogRecordable>();
   rec2->SetResource(resource);
   rec2->SetInstrumentationScope(*inst_lib_b);
 

@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <c4/yml/version.hpp>
+
+#if RYML_VERSION_MINOR >= 15
+#  include <c4/yml/parse_options.hpp>
+#endif
+
 #include <exception>
 #include <memory>
 #include <ostream>

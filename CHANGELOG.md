@@ -61,6 +61,9 @@ Increment the:
   LoggerConfig declarative configuration
   [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
 
+* [CODE HEALTH] Fix clang-tidy bugprone-exception-escape in ostream exporters
+  [#4137](https://github.com/open-telemetry/opentelemetry-cpp/pull/4137)
+
 * [API] (ABI v2) `Logger::EmitLogRecord(...)` templates now apply the
   `Enabled` filter chain when a `Severity` is in args. v1 behavior is
   unchanged.
@@ -104,17 +107,14 @@ Increment the:
 * [BUILD] Fix protobuf build failure
   [#4154](https://github.com/open-telemetry/opentelemetry-cpp/pull/4154)
 
-* [API/SDK] Add `WITH_LOG_FILTERING_PREVIEW` option to enable log filtering
-  implemented in [#4079](https://github.com/open-telemetry/opentelemetry-cpp/pull/4079)
-  by defining `ENABLE_LOG_FILTERING_PREVIEW` (CMake: `-DWITH_LOG_FILTERING_PREVIEW=ON`);
-  this preview will be enabled by default later, then the option will be deprecated.
-  [#4160](https://github.com/open-telemetry/opentelemetry-cpp/pull/4160)
-
 * [SEMANTIC CONVENTIONS] Generate event name constants (e.g. `semconv::exception::kException`)
   [#4171](https://github.com/open-telemetry/opentelemetry-cpp/pull/4171)
 
 * [EXPORTER] Handle OTLP partial success response
   [#4104](https://github.com/open-telemetry/opentelemetry-cpp/pull/4104)
+
+* [CONFIGURATION] Apply default sampler when none is specified
+  [#4170](https://github.com/open-telemetry/opentelemetry-cpp/pull/4170)
 
 * [BAZEL] Upgrade grpc and protobuf dependencies
   [#4164](https://github.com/open-telemetry/opentelemetry-cpp/pull/4164)
