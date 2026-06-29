@@ -6,7 +6,7 @@
 
 abseil=20250512.1
 zlib=v1.3.2
-curl=curl-8_19_0
+curl=curl-8_21_0
 protobuf=v33.6
 grpc=v1.81.1
 benchmark=v1.9.4
@@ -16,4 +16,4 @@ nlohmann-json=v3.12.0
 opentelemetry-proto=v1.10.0
 opentracing-cpp=v1.6.0
 prometheus-cpp=v1.3.0
-ryml=v0.12.1
+ryml=v0.15.2
