@@ -16,8 +16,6 @@
 #  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
-#  include "opentelemetry/sdk/metrics/exemplar/simple_fixed_size_exemplar_reservoir.h"
 #  include "opentelemetry/trace/context.h"
 #  include "opentelemetry/trace/default_span.h"
 #  include "opentelemetry/trace/span.h"
@@ -33,15 +31,33 @@ namespace trace_api   = opentelemetry::trace;
 namespace context_api = opentelemetry::context;
 namespace nostd       = opentelemetry::nostd;
 
-nostd::shared_ptr<metrics_sdk::ExemplarReservoir> MakeFiltered(
-    metrics_sdk::ExemplarFilterType filter_type,
-    metrics_sdk::MapAndResetCellType map_and_reset = &metrics_sdk::ReservoirCell::GetAndResetDouble)
+class CountingReservoir : public metrics_sdk::ExemplarReservoir
 {
-  auto inner = metrics_sdk::ExemplarReservoir::GetSimpleFixedSizeExemplarReservoir(
-      1, metrics_sdk::SimpleFixedSizeExemplarReservoir::GetSimpleFixedSizeCellSelector(),
-      map_and_reset);
-  return metrics_sdk::ExemplarReservoir::GetSimpleFilteredExemplarReservoir(filter_type, inner);
-}
+public:
+  void OfferMeasurement(int64_t,
+                        const metrics_sdk::MetricAttributes &,
+                        const context_api::Context &,
+                        const opentelemetry::common::SystemTimestamp &) noexcept override
+  {
+    ++offered;
+  }
+
+  void OfferMeasurement(double,
+                        const metrics_sdk::MetricAttributes &,
+                        const context_api::Context &,
+                        const opentelemetry::common::SystemTimestamp &) noexcept override
+  {
+    ++offered;
+  }
+
+  std::vector<std::shared_ptr<metrics_sdk::ExemplarData>> CollectAndReset(
+      const metrics_sdk::MetricAttributes &) noexcept override
+  {
+    return {};
+  }
+
+  int offered = 0;
+};
 
 context_api::Context ContextWithSpan(bool sampled)
 {
@@ -57,52 +73,53 @@ context_api::Context ContextWithSpan(bool sampled)
   return trace_api::SetSpan(context, span);
 }
 
-bool OffersDouble(const nostd::shared_ptr<metrics_sdk::ExemplarReservoir> &reservoir,
-                  const context_api::Context &context)
+int ForwardedCount(metrics_sdk::ExemplarFilterType filter_type, const context_api::Context &context)
 {
-  reservoir->OfferMeasurement(1.0, metrics_sdk::MetricAttributes{}, context,
-                              std::chrono::system_clock::now());
-  return !reservoir->CollectAndReset(metrics_sdk::MetricAttributes{}).empty();
+  auto *spy     = new CountingReservoir();
+  auto filtered = metrics_sdk::ExemplarReservoir::GetSimpleFilteredExemplarReservoir(
+      filter_type, nostd::shared_ptr<metrics_sdk::ExemplarReservoir>(spy));
+  filtered->OfferMeasurement(1.0, metrics_sdk::MetricAttributes{}, context,
+                             std::chrono::system_clock::now());
+  return spy->offered;
 }
 }  // namespace
 
 TEST(FilteredExemplarReservoir, AlwaysOnOffersMeasurement)
 {
-  EXPECT_TRUE(OffersDouble(MakeFiltered(metrics_sdk::ExemplarFilterType::kAlwaysOn),
-                           context_api::Context{}));
+  EXPECT_EQ(ForwardedCount(metrics_sdk::ExemplarFilterType::kAlwaysOn, context_api::Context{}), 1);
 }
 
 TEST(FilteredExemplarReservoir, AlwaysOnOffersLongMeasurement)
 {
-  auto reservoir = MakeFiltered(metrics_sdk::ExemplarFilterType::kAlwaysOn,
-                                &metrics_sdk::ReservoirCell::GetAndResetLong);
-  reservoir->OfferMeasurement(static_cast<int64_t>(1), metrics_sdk::MetricAttributes{},
-                              context_api::Context{}, std::chrono::system_clock::now());
-  EXPECT_FALSE(reservoir->CollectAndReset(metrics_sdk::MetricAttributes{}).empty());
+  auto *spy     = new CountingReservoir();
+  auto filtered = metrics_sdk::ExemplarReservoir::GetSimpleFilteredExemplarReservoir(
+      metrics_sdk::ExemplarFilterType::kAlwaysOn,
+      nostd::shared_ptr<metrics_sdk::ExemplarReservoir>(spy));
+  filtered->OfferMeasurement(static_cast<int64_t>(1), metrics_sdk::MetricAttributes{},
+                             context_api::Context{}, std::chrono::system_clock::now());
+  EXPECT_EQ(spy->offered, 1);
 }
 
 TEST(FilteredExemplarReservoir, AlwaysOffDropsMeasurement)
 {
-  EXPECT_FALSE(OffersDouble(MakeFiltered(metrics_sdk::ExemplarFilterType::kAlwaysOff),
-                            context_api::Context{}));
+  EXPECT_EQ(ForwardedCount(metrics_sdk::ExemplarFilterType::kAlwaysOff, context_api::Context{}), 0);
 }
 
 TEST(FilteredExemplarReservoir, TraceBasedDropsWithoutSpan)
 {
-  EXPECT_FALSE(OffersDouble(MakeFiltered(metrics_sdk::ExemplarFilterType::kTraceBased),
-                            context_api::Context{}));
+  EXPECT_EQ(ForwardedCount(metrics_sdk::ExemplarFilterType::kTraceBased, context_api::Context{}),
+            0);
 }
 
 TEST(FilteredExemplarReservoir, TraceBasedOffersWithSampledSpan)
 {
-  EXPECT_TRUE(OffersDouble(MakeFiltered(metrics_sdk::ExemplarFilterType::kTraceBased),
-                           ContextWithSpan(true)));
+  EXPECT_EQ(ForwardedCount(metrics_sdk::ExemplarFilterType::kTraceBased, ContextWithSpan(true)), 1);
 }
 
 TEST(FilteredExemplarReservoir, TraceBasedDropsUnsampledSpan)
 {
-  EXPECT_FALSE(OffersDouble(MakeFiltered(metrics_sdk::ExemplarFilterType::kTraceBased),
-                            ContextWithSpan(false)));
+  EXPECT_EQ(ForwardedCount(metrics_sdk::ExemplarFilterType::kTraceBased, ContextWithSpan(false)),
+            0);
 }
 
 #endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
