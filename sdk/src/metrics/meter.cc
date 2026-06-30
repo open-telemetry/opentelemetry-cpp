@@ -545,25 +545,6 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         {
           WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_, view_instr_desc);
 
-          // Determine effective aggregation config with reader-level fallback
-          const AggregationConfig *effective_config = view.GetAggregationConfig();
-          std::shared_ptr<AggregationConfig> reader_config;
-
-          // If the view does not specify a cardinality limit, use the MetricReader-level default
-          if (!effective_config)
-          {
-            auto ctx_ptr = meter_context_.lock();
-            if (ctx_ptr)
-            {
-              size_t reader_limit = ctx_ptr->GetReaderCardinalityLimit(instrument_descriptor.type_);
-              if (reader_limit != 0)
-              {
-                reader_config    = std::make_shared<AggregationConfig>(reader_limit);
-                effective_config = reader_config.get();
-              }
-            }
-          }
-
           sync_storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
               view_instr_desc, view.GetAggregationType(), view.GetAttributesProcessor(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -571,7 +552,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
                                    view_instr_desc),
 #endif
-              effective_config, std::move(reader_config)));
+              view.GetAggregationConfig()));
           storage_registry_.insert({view_instr_desc, sync_storage});
         }
         auto sync_multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
@@ -638,25 +619,6 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         {
           WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_, view_instr_desc);
 
-          // Determine effective aggregation config with reader-level fallback
-          const AggregationConfig *effective_config = view.GetAggregationConfig();
-          std::shared_ptr<AggregationConfig> reader_config;
-
-          // If the view does not specify a cardinality limit, use the MetricReader-level default
-          if (!effective_config)
-          {
-            auto ctx_ptr = meter_context_.lock();
-            if (ctx_ptr)
-            {
-              size_t reader_limit = ctx_ptr->GetReaderCardinalityLimit(instrument_descriptor.type_);
-              if (reader_limit != 0)
-              {
-                reader_config    = std::make_shared<AggregationConfig>(reader_limit);
-                effective_config = reader_config.get();
-              }
-            }
-          }
-
           async_storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
               view_instr_desc, view.GetAggregationType(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -664,7 +626,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
                                    view_instr_desc),
 #endif
-              effective_config, std::move(reader_config)));
+              view.GetAggregationConfig()));
           storage_registry_.insert({view_instr_desc, async_storage});
         }
         auto async_multi_storage = static_cast<AsyncMultiMetricStorage *>(storages.get());
