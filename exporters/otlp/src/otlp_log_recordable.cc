@@ -1,9 +1,12 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
+#include <cstdint>
+#include <string>
+
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
@@ -18,6 +21,8 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include <google/protobuf/repeated_ptr_field.h>
+#include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/logs/v1/logs.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
@@ -194,7 +199,7 @@ void OtlpLogRecordable::SetSeverity(opentelemetry::logs::Severity severity) noex
 
 void OtlpLogRecordable::SetBody(const opentelemetry::common::AttributeValue &message) noexcept
 {
-  OtlpPopulateAttributeUtils::PopulateAnyValue(proto_record_.mutable_body(), message, true);
+  OtlpPopulateAttributeUtils::PopulateAnyValue(proto_record_.mutable_body(), message);
 }
 
 void OtlpLogRecordable::SetEventId(int64_t /* id */, nostd::string_view event_name) noexcept
@@ -236,7 +241,23 @@ void OtlpLogRecordable::SetTraceFlags(const opentelemetry::trace::TraceFlags &tr
 void OtlpLogRecordable::SetAttribute(opentelemetry::nostd::string_view key,
                                      const opentelemetry::common::AttributeValue &value) noexcept
 {
-  OtlpPopulateAttributeUtils::PopulateAttribute(proto_record_.add_attributes(), key, value, true);
+  if (key.empty())
+  {
+    return;
+  }
+  const std::string key_str(key);
+  auto it = attributes_map_.find(key_str);
+  if (it != attributes_map_.end())
+  {
+    // Update an existing attribute value
+    OtlpPopulateAttributeUtils::PopulateAnyValue(it->second, value);
+    return;
+  }
+  auto *kv = proto_record_.add_attributes();
+  kv->set_key(key_str);
+  auto *any = kv->mutable_value();
+  OtlpPopulateAttributeUtils::PopulateAnyValue(any, value);
+  attributes_map_.emplace(std::move(key_str), any);
 }
 
 void OtlpLogRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept

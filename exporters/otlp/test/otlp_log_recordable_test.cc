@@ -419,6 +419,41 @@ TEST(OtlpLogRecordable, PopulateRequestSameScope)
   EXPECT_EQ(req.resource_logs(0).scope_logs(0).log_records_size(), 2);
   EXPECT_EQ(req.resource_logs(0).scope_logs(0).scope().name(), "lib");
 }
+// Test that setting an attribute with an existing key overwrites the value in place
+// without creating a duplicate entry (spec: attribute keys MUST be unique).
+TEST(OtlpLogRecordable, SetAttributeDeduplicatesKey)
+{
+  OtlpLogRecordable rec;
+  rec.SetAttribute("key", opentelemetry::common::AttributeValue{int64_t(1)});
+  rec.SetAttribute("key", opentelemetry::common::AttributeValue{int64_t(2)});
+
+  // Only one attribute; the second call must overwrite, not append.
+  ASSERT_EQ(rec.log_record().attributes_size(), 1);
+  EXPECT_EQ(rec.log_record().attributes(0).key(), "key");
+  EXPECT_EQ(rec.log_record().attributes(0).value().int_value(), 2);
+}
+
+// Test that updating a duplicate key changes the type as well as the value.
+TEST(OtlpLogRecordable, SetAttributeDeduplicateChangesType)
+{
+  OtlpLogRecordable rec;
+  rec.SetAttribute("type_change_attribute", opentelemetry::common::AttributeValue{int64_t(42)});
+  rec.SetAttribute("type_change_attribute",
+                   opentelemetry::common::AttributeValue{nostd::string_view("hello")});
+
+  ASSERT_EQ(rec.log_record().attributes_size(), 1);
+  EXPECT_EQ(rec.log_record().attributes(0).value().string_value(), "hello");
+}
+
+// Test that an empty key is rejected and not stored.
+TEST(OtlpLogRecordable, SetAttributeEmptyKeyIsRejected)
+{
+  OtlpLogRecordable rec;
+  rec.SetAttribute("", opentelemetry::common::AttributeValue{int64_t(1)});
+
+  EXPECT_EQ(rec.log_record().attributes_size(), 0);
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

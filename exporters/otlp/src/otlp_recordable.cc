@@ -117,14 +117,28 @@ void OtlpRecordable::SetResource(const sdk::resource::Resource &resource) noexce
 void OtlpRecordable::SetAttribute(nostd::string_view key,
                                   const common::AttributeValue &value) noexcept
 {
-  if (static_cast<uint32_t>(span_.attributes_size()) >= max_attributes_)
+  if (key.empty())
+  {
+    return;
+  }
+  const std::string key_str(key);
+  auto it = attributes_map_.find(key_str);
+  if (it != attributes_map_.end())
+  {
+    // Update an existing attribute value
+    OtlpPopulateAttributeUtils::PopulateAnyValue(it->second, value);
+    return;
+  }
+  if (static_cast<uint32_t>(attributes_map_.size()) >= max_attributes_)
   {
     span_.set_dropped_attributes_count(span_.dropped_attributes_count() + 1);
     return;
   }
-
   auto *attribute = span_.add_attributes();
-  OtlpPopulateAttributeUtils::PopulateAttribute(attribute, key, value, false);
+  attribute->set_key(key_str);
+  auto *any_value = attribute->mutable_value();
+  OtlpPopulateAttributeUtils::PopulateAnyValue(any_value, value);
+  attributes_map_.emplace(std::move(key_str), any_value);
 }
 
 void OtlpRecordable::AddEvent(nostd::string_view name,
@@ -147,7 +161,7 @@ void OtlpRecordable::AddEvent(nostd::string_view name,
       event->set_dropped_attributes_count(event->dropped_attributes_count() + 1);
       return true;
     }
-    OtlpPopulateAttributeUtils::PopulateAttribute(event->add_attributes(), key, value, false);
+    OtlpPopulateAttributeUtils::PopulateAttribute(event->add_attributes(), key, value);
     return true;
   });
 }
@@ -172,7 +186,7 @@ void OtlpRecordable::AddLink(const trace::SpanContext &span_context,
       link->set_dropped_attributes_count(link->dropped_attributes_count() + 1);
       return true;
     }
-    OtlpPopulateAttributeUtils::PopulateAttribute(link->add_attributes(), key, value, false);
+    OtlpPopulateAttributeUtils::PopulateAttribute(link->add_attributes(), key, value);
     return true;
   });
 }

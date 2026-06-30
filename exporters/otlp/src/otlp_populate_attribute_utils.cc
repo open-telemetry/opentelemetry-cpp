@@ -5,10 +5,13 @@
 #  include <utf8_validity.h>
 #endif
 
-#include <stdint.h>
-#include <string.h>
+#include <cstdint>
+#include <cstring>
 #include <limits>
+#include <new>
+#include <ostream>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -18,12 +21,15 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/version.h"
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include <google/protobuf/repeated_ptr_field.h>
+// IWYU pragma: no_include "net/proto2/public/repeated_field.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
@@ -35,14 +41,15 @@ namespace exporter
 namespace otlp
 {
 
+namespace
+{
+
 //
 // See `attribute_value.h` for details.
 //
 const int kAttributeValueSize      = 16;
 const int kOwnedAttributeValueSize = 15;
 
-namespace
-{
 // Per OpenTelemetry spec, uint64_t attribute values exceeding INT64_MAX must be
 // encoded as a decimal string rather than wrapping to a negative int64 via narrowing.
 // https://opentelemetry.io/docs/specs/otel/common/attribute-type-mapping/#integer-values
@@ -57,149 +64,110 @@ inline void SetUint64Value(opentelemetry::proto::common::v1::AnyValue *proto_val
     proto_value->set_string_value(std::to_string(val));
   }
 }
-}  // namespace
 
-void OtlpPopulateAttributeUtils::PopulateAnyValue(
-    opentelemetry::proto::common::v1::AnyValue *proto_value,
-    const opentelemetry::common::AttributeValue &value,
-    bool allow_bytes) noexcept
+template <class T>
+struct IsSupportedAttributeValue : std::false_type
+{};
+
+struct AttributeValueVisitor
 {
-  if (nullptr == proto_value)
+  opentelemetry::proto::common::v1::AnyValue *proto_value_;
+
+  template <class T>
+  void operator()(T &&) const
   {
-    return;
+    static_assert(
+        IsSupportedAttributeValue<T>::value,
+        "AttributeValueVisitor: Value type in opentelemetry::common::AttributeValue does not have "
+        "an overload operator implemented in this visitor OR implicit conversion attempted!");
   }
 
-  // Assert size of variant to ensure that this method gets updated if the variant
-  // definition changes
-  static_assert(
-      nostd::variant_size<opentelemetry::common::AttributeValue>::value == kAttributeValueSize,
-      "AttributeValue contains unknown type");
-
-  if (nostd::holds_alternative<bool>(value))
+  void operator()(bool value) const { proto_value_->set_bool_value(value); }
+  void operator()(int32_t value) const { proto_value_->set_int_value(value); }
+  void operator()(int64_t value) const { proto_value_->set_int_value(value); }
+  void operator()(uint32_t value) const { proto_value_->set_int_value(value); }
+  void operator()(uint64_t value) const { SetUint64Value(proto_value_, value); }
+  void operator()(double value) const { proto_value_->set_double_value(value); }
+  void operator()(const char *value) const
   {
-    proto_value->set_bool_value(nostd::get<bool>(value));
-  }
-  else if (nostd::holds_alternative<int>(value))
-  {
-    proto_value->set_int_value(nostd::get<int>(value));
-  }
-  else if (nostd::holds_alternative<int64_t>(value))
-  {
-    proto_value->set_int_value(nostd::get<int64_t>(value));
-  }
-  else if (nostd::holds_alternative<unsigned int>(value))
-  {
-    proto_value->set_int_value(nostd::get<unsigned int>(value));
-  }
-  else if (nostd::holds_alternative<uint64_t>(value))
-  {
-    SetUint64Value(proto_value, nostd::get<uint64_t>(value));
-  }
-  else if (nostd::holds_alternative<double>(value))
-  {
-    proto_value->set_double_value(nostd::get<double>(value));
-  }
-  else if (nostd::holds_alternative<const char *>(value))
-  {
-    const char *str_value = nostd::get<const char *>(value);
 #if defined(ENABLE_OTLP_UTF8_VALIDITY)
-    if (utf8_range::IsStructurallyValid(str_value))
+    if (utf8_range::IsStructurallyValid(value))
     {
-      proto_value->set_string_value(str_value);
+      proto_value_->set_string_value(value);
     }
     else
     {
-      proto_value->set_bytes_value(str_value, strlen(str_value));
+      proto_value_->set_bytes_value(value, std::strlen(value));
     }
 #else
-    proto_value->set_string_value(str_value);
+    proto_value_->set_string_value(value);
 #endif
   }
-  else if (nostd::holds_alternative<nostd::string_view>(value))
+  void operator()(nostd::string_view value) const
   {
-    nostd::string_view str_value = nostd::get<nostd::string_view>(value);
 #if defined(ENABLE_OTLP_UTF8_VALIDITY)
-    if (utf8_range::IsStructurallyValid({str_value.data(), str_value.size()}))
+    if (utf8_range::IsStructurallyValid({value.data(), value.size()}))
     {
-      proto_value->set_string_value(str_value.data(), str_value.size());
+      proto_value_->set_string_value(value.data(), value.size());
     }
     else
     {
-      proto_value->set_bytes_value(str_value.data(), str_value.size());
+      proto_value_->set_bytes_value(value.data(), value.size());
     }
 #else
-    proto_value->set_string_value(str_value.data(), str_value.size());
+    proto_value_->set_string_value(value.data(), value.size());
 #endif
   }
-  else if (nostd::holds_alternative<nostd::span<const uint8_t>>(value))
+  void operator()(nostd::span<const bool> values) const
   {
-    if (allow_bytes)
-    {
-      proto_value->set_bytes_value(
-          reinterpret_cast<const void *>(nostd::get<nostd::span<const uint8_t>>(value).data()),
-          nostd::get<nostd::span<const uint8_t>>(value).size());
-    }
-    else
-    {
-      auto array_value = proto_value->mutable_array_value();
-      for (const auto &val : nostd::get<nostd::span<const uint8_t>>(value))
-      {
-        array_value->add_values()->set_int_value(val);
-      }
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const bool>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const bool>>(value))
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
     {
       array_value->add_values()->set_bool_value(val);
     }
   }
-  else if (nostd::holds_alternative<nostd::span<const int>>(value))
+  void operator()(nostd::span<const int32_t> values) const
   {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const int>>(value))
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
     {
       array_value->add_values()->set_int_value(val);
     }
   }
-  else if (nostd::holds_alternative<nostd::span<const int64_t>>(value))
+  void operator()(nostd::span<const int64_t> values) const
   {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const int64_t>>(value))
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
     {
       array_value->add_values()->set_int_value(val);
     }
   }
-  else if (nostd::holds_alternative<nostd::span<const unsigned int>>(value))
+  void operator()(nostd::span<const uint32_t> values) const
   {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const unsigned int>>(value))
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
     {
       array_value->add_values()->set_int_value(val);
     }
   }
-  else if (nostd::holds_alternative<nostd::span<const uint64_t>>(value))
+  void operator()(nostd::span<const double> values) const
   {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const uint64_t>>(value))
-    {
-      SetUint64Value(array_value->add_values(), val);
-    }
-  }
-  else if (nostd::holds_alternative<nostd::span<const double>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const double>>(value))
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
     {
       array_value->add_values()->set_double_value(val);
     }
   }
-  else if (nostd::holds_alternative<nostd::span<const nostd::string_view>>(value))
+  void operator()(nostd::span<const nostd::string_view> values) const
   {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<nostd::span<const nostd::string_view>>(value))
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
     {
 #if defined(ENABLE_OTLP_UTF8_VALIDITY)
       if (utf8_range::IsStructurallyValid({val.data(), val.size()}))
@@ -215,156 +183,185 @@ void OtlpPopulateAttributeUtils::PopulateAnyValue(
 #endif
     }
   }
-}
-
-void OtlpPopulateAttributeUtils::PopulateAnyValue(
-    opentelemetry::proto::common::v1::AnyValue *proto_value,
-    const opentelemetry::sdk::common::OwnedAttributeValue &value,
-    bool allow_bytes) noexcept
-{
-  if (nullptr == proto_value)
+  void operator()(nostd::span<const uint64_t> values) const
   {
-    return;
-  }
-
-  // Assert size of variant to ensure that this method gets updated if the variant
-  // definition changes
-  static_assert(nostd::variant_size<opentelemetry::sdk::common::OwnedAttributeValue>::value ==
-                    kOwnedAttributeValueSize,
-                "OwnedAttributeValue contains unknown type");
-
-  if (nostd::holds_alternative<bool>(value))
-  {
-    proto_value->set_bool_value(nostd::get<bool>(value));
-  }
-  else if (nostd::holds_alternative<int32_t>(value))
-  {
-    proto_value->set_int_value(nostd::get<int32_t>(value));
-  }
-  else if (nostd::holds_alternative<int64_t>(value))
-  {
-    proto_value->set_int_value(nostd::get<int64_t>(value));
-  }
-  else if (nostd::holds_alternative<uint32_t>(value))
-  {
-    proto_value->set_int_value(nostd::get<uint32_t>(value));
-  }
-  else if (nostd::holds_alternative<uint64_t>(value))
-  {
-    SetUint64Value(proto_value, nostd::get<uint64_t>(value));
-  }
-  else if (nostd::holds_alternative<double>(value))
-  {
-    proto_value->set_double_value(nostd::get<double>(value));
-  }
-  else if (nostd::holds_alternative<std::vector<uint8_t>>(value))
-  {
-    if (allow_bytes)
-    {
-      const std::vector<uint8_t> &byte_array = nostd::get<std::vector<uint8_t>>(value);
-      proto_value->set_bytes_value(reinterpret_cast<const void *>(byte_array.data()),
-                                   byte_array.size());
-    }
-    else
-    {
-      auto array_value = proto_value->mutable_array_value();
-      for (const auto &val : nostd::get<std::vector<uint8_t>>(value))
-      {
-        array_value->add_values()->set_int_value(val);
-      }
-    }
-  }
-  else if (nostd::holds_alternative<std::string>(value))
-  {
-    const std::string &str_value = nostd::get<std::string>(value);
-#if defined(ENABLE_OTLP_UTF8_VALIDITY)
-    if (utf8_range::IsStructurallyValid(str_value))
-    {
-      proto_value->set_string_value(str_value);
-    }
-    else
-    {
-      proto_value->set_bytes_value(str_value);
-    }
-#else
-    proto_value->set_string_value(str_value);
-#endif
-  }
-  else if (nostd::holds_alternative<std::vector<bool>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto val : nostd::get<std::vector<bool>>(value))
-    {
-      array_value->add_values()->set_bool_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<int32_t>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<std::vector<int32_t>>(value))
-    {
-      array_value->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<uint32_t>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<std::vector<uint32_t>>(value))
-    {
-      array_value->add_values()->set_int_value(
-          val);  // NOLINT(cppcoreguidelines-narrowing-conversions)
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<int64_t>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<std::vector<int64_t>>(value))
-    {
-      array_value->add_values()->set_int_value(val);
-    }
-  }
-  else if (nostd::holds_alternative<std::vector<uint64_t>>(value))
-  {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<std::vector<uint64_t>>(value))
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
     {
       SetUint64Value(array_value->add_values(), val);
     }
   }
-  else if (nostd::holds_alternative<std::vector<double>>(value))
+  void operator()(nostd::span<const uint8_t> values) const
   {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<std::vector<double>>(value))
+    proto_value_->set_bytes_value(reinterpret_cast<const void *>(values.data()), values.size());
+  }
+};
+
+struct OwnedAttributeValueVisitor
+{
+  opentelemetry::proto::common::v1::AnyValue *proto_value_;
+
+  template <class T>
+  void operator()(T &&) const
+  {
+    static_assert(IsSupportedAttributeValue<T>::value,
+                  "OwnedAttributeValueVisitor: Value type in "
+                  "opentelemetry::sdk::common::OwnedAttributeValue does not have an overload "
+                  "operator implemented in this visitor OR implicit conversion attempted!");
+  }
+
+  void operator()(bool value) const { proto_value_->set_bool_value(value); }
+  void operator()(int32_t value) const { proto_value_->set_int_value(value); }
+  void operator()(uint32_t value) const { proto_value_->set_int_value(value); }
+  void operator()(int64_t value) const { proto_value_->set_int_value(value); }
+  void operator()(uint64_t value) const { SetUint64Value(proto_value_, value); }
+  void operator()(double value) const { proto_value_->set_double_value(value); }
+  void operator()(const std::string &value) const { proto_value_->set_string_value(value); }
+  void operator()(const std::vector<bool> &values) const
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto val : values)
+    {
+      array_value->add_values()->set_bool_value(val);
+    }
+  }
+  void operator()(const std::vector<int32_t> &values) const
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
+    {
+      array_value->add_values()->set_int_value(val);
+    }
+  }
+  void operator()(const std::vector<uint32_t> &values) const
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
+    {
+      array_value->add_values()->set_int_value(static_cast<int64_t>(val));
+    }
+  }
+  void operator()(const std::vector<int64_t> &values) const
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
+    {
+      array_value->add_values()->set_int_value(val);
+    }
+  }
+  void operator()(const std::vector<double> &values) const
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
     {
       array_value->add_values()->set_double_value(val);
     }
   }
-  else if (nostd::holds_alternative<std::vector<std::string>>(value))
+  void operator()(const std::vector<std::string> &values) const
   {
-    auto array_value = proto_value->mutable_array_value();
-    for (const auto &val : nostd::get<std::vector<std::string>>(value))
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
     {
 #if defined(ENABLE_OTLP_UTF8_VALIDITY)
-      if (utf8_range::IsStructurallyValid(val))
+      if (utf8_range::IsStructurallyValid({val.data(), val.size()}))
       {
-        array_value->add_values()->set_string_value(val);
+        array_value->add_values()->set_string_value(val.data(), val.size());
       }
       else
       {
-        array_value->add_values()->set_bytes_value(val);
+        array_value->add_values()->set_bytes_value(val.data(), val.size());
       }
 #else
-      array_value->add_values()->set_string_value(val);
+      array_value->add_values()->set_string_value(val.data(), val.size());
 #endif
     }
   }
+  void operator()(const std::vector<uint64_t> &values) const
+  {
+    opentelemetry::proto::common::v1::ArrayValue *array_value = proto_value_->mutable_array_value();
+    array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
+    for (const auto &val : values)
+    {
+      SetUint64Value(array_value->add_values(), val);
+    }
+  }
+  void operator()(const std::vector<uint8_t> &values) const
+  {
+    proto_value_->set_bytes_value(reinterpret_cast<const void *>(values.data()), values.size());
+  }
+};
+
+}  // namespace
+
+void OtlpPopulateAttributeUtils::PopulateAnyValue(
+    opentelemetry::proto::common::v1::AnyValue *proto_value,
+    const opentelemetry::common::AttributeValue &value) noexcept
+{
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    nostd::visit(AttributeValueVisitor{proto_value}, value);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+#  if defined(OPENTELEMETRY_HAVE_STD_VARIANT)
+  catch (const std::bad_variant_access &e)
+#  else
+  catch (const opentelemetry::nostd::bad_variant_access &e)
+#  endif
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[OTLP Populate Attribute] bad_variant_access in PopulateAnyValue: " << e.what());
+  }
+  catch (const std::bad_alloc &)  // NOLINT(bugprone-empty-catch)
+  {
+    // TODO: Log an error once the logger doesn't require dynamic memory allocation.
+    // OTEL_INTERNAL_LOG_ERROR(
+    //     "[OTLP Populate Attribute] std::bad_alloc in PopulateAnyValue: " << e.what());
+  }
+#endif
+}
+
+void OtlpPopulateAttributeUtils::PopulateAnyValue(
+    opentelemetry::proto::common::v1::AnyValue *proto_value,
+    const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept
+{
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    nostd::visit(OwnedAttributeValueVisitor{proto_value}, value);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+#  if defined(OPENTELEMETRY_HAVE_STD_VARIANT)
+  catch (const std::bad_variant_access &e)
+#  else
+  catch (const opentelemetry::nostd::bad_variant_access &e)
+#  endif
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[OTLP Populate Attribute] bad_variant_access in PopulateAnyValue: " << e.what());
+  }
+  catch (const std::bad_alloc &)  // NOLINT(bugprone-empty-catch)
+  {
+    // TODO: Log an error once the logger doesn't require dynamic memory allocation.
+    // OTEL_INTERNAL_LOG_ERROR(
+    //     "[OTLP Populate Attribute] std::bad_alloc in PopulateAnyValue: " << e.what());
+  }
+#endif
 }
 
 void OtlpPopulateAttributeUtils::PopulateAttribute(
     opentelemetry::proto::common::v1::KeyValue *attribute,
     nostd::string_view key,
-    const opentelemetry::common::AttributeValue &value,
-    bool allow_bytes) noexcept
+    const opentelemetry::common::AttributeValue &value) noexcept
 {
   if (nullptr == attribute)
   {
@@ -378,15 +375,14 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
       "AttributeValue contains unknown type");
 
   attribute->set_key(key.data(), key.size());
-  PopulateAnyValue(attribute->mutable_value(), value, allow_bytes);
+  PopulateAnyValue(attribute->mutable_value(), value);
 }
 
 /** Maps from C++ attribute into OTLP proto attribute. */
 void OtlpPopulateAttributeUtils::PopulateAttribute(
     opentelemetry::proto::common::v1::KeyValue *attribute,
     nostd::string_view key,
-    const opentelemetry::sdk::common::OwnedAttributeValue &value,
-    bool allow_bytes) noexcept
+    const opentelemetry::sdk::common::OwnedAttributeValue &value) noexcept
 {
   if (nullptr == attribute)
   {
@@ -400,7 +396,7 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
                 "OwnedAttributeValue contains unknown type");
 
   attribute->set_key(key.data(), key.size());
-  PopulateAnyValue(attribute->mutable_value(), value, allow_bytes);
+  PopulateAnyValue(attribute->mutable_value(), value);
 }
 
 void OtlpPopulateAttributeUtils::PopulateAttribute(
@@ -414,8 +410,7 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
 
   for (const auto &kv : resource.GetAttributes())
   {
-    OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second,
-                                                  false);
+    OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second);
   }
 }
 
@@ -426,8 +421,7 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
 {
   for (const auto &kv : instrumentation_scope.GetAttributes())
   {
-    OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second,
-                                                  false);
+    OtlpPopulateAttributeUtils::PopulateAttribute(proto->add_attributes(), kv.first, kv.second);
   }
 }
 
