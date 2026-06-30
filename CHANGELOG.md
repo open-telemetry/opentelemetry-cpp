@@ -116,6 +116,14 @@ Increment the:
 * [CONFIGURATION] Apply default sampler when none is specified
   [#4170](https://github.com/open-telemetry/opentelemetry-cpp/pull/4170)
 
+* [API] Add `trace::GetSpanContext()` to read the active span's `SpanContext`
+  from a `Context`; reuse it in the logs SDK to remove a duplicated helper.
+  [#4191](https://github.com/open-telemetry/opentelemetry-cpp/pull/4191)
+
+* [SDK] Apply the `ExemplarFilter` (AlwaysOn/AlwaysOff/TraceBased) via
+  `ExemplarReservoir::GetSimpleFilteredExemplarReservoir()`.
+  [#4191](https://github.com/open-telemetry/opentelemetry-cpp/pull/4191)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
