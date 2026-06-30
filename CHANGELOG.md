@@ -117,7 +117,7 @@ Increment the:
   [#4170](https://github.com/open-telemetry/opentelemetry-cpp/pull/4170)
 
 * [CODE HEALTH] Move trace and baggage propagation test classes into anonymous namespace
-  [#XXXX](https://github.com/open-telemetry/opentelemetry-cpp/pull/XXXX)
+  [#4199](https://github.com/open-telemetry/opentelemetry-cpp/pull/4199)
 
 ## [1.27.0] 2026-05-13
 
