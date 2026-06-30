@@ -53,6 +53,28 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.test
 
+  cmake_api_only_test:
+    name: CMake API only test
+    runs-on: ubuntu-24.04
+    env:
+      CXX_STANDARD: '17'
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+      with:
+        egress-policy: audit
+
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E apt-get install -y zlib1g-dev
+    - name: run cmake API only test
+      run: |
+        ./ci/do_ci.sh cmake.api_only.test
+
   cmake_fetch_content_test:
     name: CMake FetchContent usage with opentelemetry-cpp
     runs-on: ubuntu-24.04
