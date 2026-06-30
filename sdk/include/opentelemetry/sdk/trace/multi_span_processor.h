@@ -194,6 +194,9 @@ private:
   ProcessorNode *head_{nullptr};
   ProcessorNode *tail_{nullptr};
   size_t count_{0};
+
+  // For testing
+  friend class MultiSpanProcessorTestPeer;
 };
 }  // namespace trace
 }  // namespace sdk
