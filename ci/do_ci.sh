@@ -542,6 +542,7 @@ elif [[ "$1" == "cmake.api_only.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
+        -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
         -DOPENTELEMETRY_INSTALL=OFF \
         -DOPENTELEMETRY_CPP_SRC_DIR="${SRC_DIR}" \
         "${SRC_DIR}/install/test/cmake/api_only_test"

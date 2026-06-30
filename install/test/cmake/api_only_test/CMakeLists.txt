@@ -16,30 +16,50 @@ if(NOT OPENTELEMETRY_CPP_SRC_DIR)
   )
 endif()
 
+set(EXPECTED_OPTIONS_IN_CACHE
+    WITH_EXAMPLES
+    WITH_EXAMPLES_HTTP
+    BUILD_TESTING
+    WITH_FUNC_TESTS
+    WITH_BENCHMARK
+    WITH_OTLP_GRPC
+    WITH_OTLP_HTTP
+    WITH_OTLP_FILE
+    WITH_OTLP_HTTP_COMPRESSION
+    WITH_PROMETHEUS
+    WITH_ZIPKIN
+    WITH_ELASTICSEARCH
+    WITH_OPENTRACING
+    WITH_CONFIGURATION)
+
+function(check_options_in_cache)
+  foreach(component IN LISTS EXPECTED_OPTIONS_IN_CACHE)
+    if(NOT ${component})
+      message(
+        FATAL_ERROR
+          "Expected component ${component} to be ON in the cache, but it is OFF."
+      )
+    endif()
+  endforeach()
+endfunction()
+
+# Verify that all options which may bring in a third-party dependency are ON in
+# the cache.
+check_options_in_cache()
+
 # Turn on the WITH_API_ONLY build option and disable GSL. This must override any
 # other options and not import third party targets.
 set(WITH_API_ONLY ON)
 set(WITH_GSL OFF)
 
-# Turn on all options that should be overridden by WITH_API_ONLY.
-set(WITH_OTLP_FILE ON)
-set(WITH_OTLP_HTTP ON)
-set(WITH_OTLP_GRPC ON)
-set(WITH_OTLP_HTTP_COMPRESSION ON)
-set(WITH_PROMETHEUS ON)
-set(WITH_ZIPKIN ON)
-set(WITH_ETW ON)
-set(WITH_ELASTICSEARCH ON)
-set(WITH_OPENTRACING ON)
-set(WITH_CONFIGURATION ON)
-set(WITH_EXAMPLES ON)
-set(BUILD_TESTING ON)
-set(WITH_BENCHMARK ON)
-
 # Add the opentelemetry-cpp source directory as a subdirectory to mimic
 # vendoring the library.
 add_subdirectory(${OPENTELEMETRY_CPP_SRC_DIR}
                  ${CMAKE_BINARY_DIR}/opentelemetry-cpp)
+
+# Verify that all options which may bring in a third-party dependency are still
+# ON in the cache.
+check_options_in_cache()
 
 set(UNEXPECTED_TARGETS
     opentelemetry-cpp::sdk
