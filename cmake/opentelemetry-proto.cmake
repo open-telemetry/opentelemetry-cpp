@@ -440,5 +440,5 @@ if(OPENTELEMETRY_INSTALL)
       "Protocols for spans, metrics, and logs over gRPC."
       "opentelemetry_proto grpc++ protobuf"
     )
-  endif()  
+  endif()
 endif()
