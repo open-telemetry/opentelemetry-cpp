@@ -395,15 +395,6 @@ endif()
 set_target_properties(opentelemetry_proto PROPERTIES EXPORT_NAME proto)
 patch_protobuf_targets(opentelemetry_proto)
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    DIRECTORY ${GENERATED_PROTOBUF_PATH}/opentelemetry
-    DESTINATION include
-    COMPONENT exporters_otlp_common
-    FILES_MATCHING
-    PATTERN "*.h")
-endif()
-
 if(TARGET protobuf::libprotobuf)
   target_link_libraries(opentelemetry_proto PUBLIC protobuf::libprotobuf)
 else() # cmake 3.8 or lower
@@ -423,4 +414,31 @@ if(BUILD_SHARED_LIBS)
   foreach(proto_target ${OPENTELEMETRY_PROTO_TARGETS})
     set_property(TARGET ${proto_target} PROPERTY POSITION_INDEPENDENT_CODE ON)
   endforeach()
+endif()
+
+if(OPENTELEMETRY_INSTALL)
+  install(
+    DIRECTORY ${GENERATED_PROTOBUF_PATH}/opentelemetry
+    DESTINATION include
+    COMPONENT exporters_otlp_common
+    FILES_MATCHING
+    PATTERN "*.h")
+
+  include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
+
+  opentelemetry_add_pkgconfig(
+    proto
+    "OpenTelemetry - Protocol"
+    "Protocols for spans, metrics, and logs."
+    "protobuf"
+  )
+
+  if(WITH_OTLP_GRPC)
+    opentelemetry_add_pkgconfig(
+      proto_grpc
+      "OpenTelemetry - Protocol (gRPC)"
+      "Protocols for spans, metrics, and logs over gRPC."
+      "opentelemetry_proto grpc++ protobuf"
+    )
+  endif()  
 endif()
