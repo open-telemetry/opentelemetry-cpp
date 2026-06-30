@@ -31,6 +31,27 @@
 #include <opentelemetry/context/propagation/global_propagator.h>
 #include <opentelemetry/context/propagation/text_map_propagator.h>
 
+#include <opentelemetry/semconv/client_attributes.h>
+#include <opentelemetry/semconv/code_attributes.h>
+#include <opentelemetry/semconv/container_attributes.h>
+#include <opentelemetry/semconv/db_attributes.h>
+#include <opentelemetry/semconv/db_metrics.h>
+#include <opentelemetry/semconv/deployment_attributes.h>
+#include <opentelemetry/semconv/error_attributes.h>
+#include <opentelemetry/semconv/exception_attributes.h>
+#include <opentelemetry/semconv/exception_events.h>
+#include <opentelemetry/semconv/http_attributes.h>
+#include <opentelemetry/semconv/http_metrics.h>
+#include <opentelemetry/semconv/k8s_attributes.h>
+#include <opentelemetry/semconv/network_attributes.h>
+#include <opentelemetry/semconv/otel_attributes.h>
+#include <opentelemetry/semconv/schema_url.h>
+#include <opentelemetry/semconv/server_attributes.h>
+#include <opentelemetry/semconv/service_attributes.h>
+#include <opentelemetry/semconv/telemetry_attributes.h>
+#include <opentelemetry/semconv/url_attributes.h>
+#include <opentelemetry/semconv/user_agent_attributes.h>
+
 TEST(ApiInstallTest, VersionCheck)
 {
   EXPECT_GE(OPENTELEMETRY_VERSION_MAJOR, 0);
@@ -157,4 +178,40 @@ TEST(ApiInstallTest, ContextPropagationApiCheck)
   auto extracted = propagator->Extract(carrier, context);
   EXPECT_EQ(extracted, context);
   EXPECT_TRUE(extracted.HasKey("test-key"));
+}
+
+TEST(SemconvInstallTest, SchemaUrl)
+{
+  EXPECT_NE(opentelemetry::semconv::kSchemaUrl, nullptr);
+  EXPECT_STRNE(opentelemetry::semconv::kSchemaUrl, "");
+}
+
+TEST(SemconvInstallTest, HttpMetrics)
+{
+  auto provider = opentelemetry::metrics::Provider::GetMeterProvider();
+  ASSERT_TRUE(provider != nullptr);
+
+  auto meter = provider->GetMeter("test-semconv-meter");
+  ASSERT_TRUE(meter != nullptr);
+
+  auto http_client_duration =
+      opentelemetry::semconv::http::CreateSyncDoubleMetricHttpClientRequestDuration(meter.get());
+  ASSERT_TRUE(http_client_duration != nullptr);
+
+  auto http_server_duration =
+      opentelemetry::semconv::http::CreateSyncInt64MetricHttpServerRequestDuration(meter.get());
+  ASSERT_TRUE(http_server_duration != nullptr);
+}
+
+TEST(SemconvInstallTest, DbMetrics)
+{
+  auto provider = opentelemetry::metrics::Provider::GetMeterProvider();
+  ASSERT_TRUE(provider != nullptr);
+
+  auto meter = provider->GetMeter("test-semconv-meter");
+  ASSERT_TRUE(meter != nullptr);
+
+  auto db_client_duration =
+      opentelemetry::semconv::db::CreateSyncDoubleMetricDbClientOperationDuration(meter.get());
+  ASSERT_TRUE(db_client_duration != nullptr);
 }
