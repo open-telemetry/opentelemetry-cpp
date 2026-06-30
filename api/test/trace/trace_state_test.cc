@@ -74,6 +74,12 @@ TEST(TraceStateTest, ValidateHeaderParsing)
   {
     EXPECT_EQ(create_ts_return_header(testcase.input), testcase.expected);
   }
+  // Key length boundaries: 256-char key valid, 257-char invalid
+  EXPECT_NE(create_ts_return_header(std::string(256, 'z') + "=1"), "");
+  EXPECT_EQ(create_ts_return_header(std::string(257, 'z') + "=1"), "");
+  // Old vendor-section limits (241 before @, 14 after) are gone; only total length matters
+  EXPECT_NE(create_ts_return_header(std::string(242, 't') + "@v=1"), "");  // 244-char key with @
+  EXPECT_NE(create_ts_return_header("t@" + std::string(15, 'v') + "=1"), "");  // 15 chars after @
 }
 
 TEST(TraceStateTest, ExceedsMaxKeyValuePairs)
@@ -185,13 +191,6 @@ TEST(TraceStateTest, IsValidKey)
       TraceState::IsValidKey(std::string(241, 't') + "@" + std::string(14, 'v')));  // 256 chars
   EXPECT_TRUE(TraceState::IsValidKey(std::string(242, 't') + "@v"));                // 244 chars
   EXPECT_TRUE(TraceState::IsValidKey("t@" + std::string(15, 'v')));                 // 17 chars
-  // Verify FromHeader accepts/rejects the same boundary keys
-  EXPECT_NE(create_ts_return_header(std::string(256, 'z') + "=1"), "");  // 256-char key: valid
-  EXPECT_EQ(create_ts_return_header(std::string(257, 'z') + "=1"), "");  // 257-char key: invalid
-  EXPECT_NE(create_ts_return_header(std::string(242, 't') + "@v=1"),
-            "");  // 244-char key with @: valid
-  EXPECT_NE(create_ts_return_header("t@" + std::string(15, 'v') + "=1"),
-            "");  // 17-char key, 15 after @: valid
 }
 
 TEST(TraceStateTest, IsValidValue)
