@@ -40,8 +40,10 @@ public:
                      ExemplarFilterType exempler_filter_type,
                      nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
-                     const AggregationConfig *aggregation_config)
-      : instrument_descriptor_(instrument_descriptor),
+                     const AggregationConfig *aggregation_config,
+                     std::shared_ptr<AggregationConfig> owned_aggregation_config = nullptr)
+      : owned_aggregation_config_(std::move(owned_aggregation_config)),
+        instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         aggregation_config_{AggregationConfig::GetOrDefault(aggregation_config)},
         cumulative_hash_map_(
@@ -139,6 +141,8 @@ public:
   }
 
 private:
+  // Keep owned config alive if created from reader-level defaults
+  std::shared_ptr<AggregationConfig> owned_aggregation_config_;
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
   const AggregationConfig *aggregation_config_;

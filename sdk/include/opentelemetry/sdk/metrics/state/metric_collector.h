@@ -4,6 +4,7 @@
 #pragma once
 
 #include <chrono>
+#include <cstddef>
 #include <memory>
 
 #include "opentelemetry/nostd/function_ref.h"
@@ -36,6 +37,19 @@ public:
 
   virtual AggregationTemporality GetAggregationTemporality(
       InstrumentType instrument_type) noexcept = 0;
+
+  /**
+   * Get the cardinality limit for a given instrument type.
+   * Returns 0 if no limit is configured.
+   *
+   * @param instrument_type The instrument type to get the limit for
+   * @return The cardinality limit, or 0 if not configured
+   */
+  virtual size_t GetCardinalityLimit(InstrumentType instrument_type) noexcept
+  {
+    (void)instrument_type;
+    return 0;
+  }
 };
 
 /**
@@ -60,6 +74,8 @@ public:
 
   AggregationTemporality GetAggregationTemporality(
       InstrumentType instrument_type) noexcept override;
+
+  size_t GetCardinalityLimit(InstrumentType instrument_type) noexcept override;
 
   /**
    * The callback to be called for each metric exporter. This will only be those

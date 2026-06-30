@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstddef>
 #include <memory>
 #include <vector>
 
@@ -107,6 +108,15 @@ public:
    *
    */
   nostd::span<std::shared_ptr<CollectorHandle>> GetCollectors() noexcept;
+
+  /**
+   * Get the cardinality limit for a given instrument type from configured readers.
+   * Returns the maximum limit across all readers, or 0 if no reader specifies a limit.
+   *
+   * @param instrument_type The instrument type to get the limit for
+   * @return The maximum cardinality limit, or 0 if not configured
+   */
+  size_t GetReaderCardinalityLimit(InstrumentType instrument_type) noexcept;
 
   /**
    * GET SDK Start time

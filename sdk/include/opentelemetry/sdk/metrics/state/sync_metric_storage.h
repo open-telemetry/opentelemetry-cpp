@@ -69,8 +69,10 @@ public:
                     ExemplarFilterType exempler_filter_type,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
-                    const AggregationConfig *aggregation_config)
-      : instrument_descriptor_(instrument_descriptor),
+                    const AggregationConfig *aggregation_config,
+                    std::shared_ptr<AggregationConfig> owned_aggregation_config = nullptr)
+      : owned_aggregation_config_(std::move(owned_aggregation_config)),
+        instrument_descriptor_(instrument_descriptor),
         aggregation_config_(AggregationConfig::GetOrDefault(aggregation_config)),
         attributes_hashmap_(
             std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
@@ -291,6 +293,8 @@ private:
   }
 #endif
 
+  // Keep owned config alive if created from reader-level defaults
+  std::shared_ptr<AggregationConfig> owned_aggregation_config_;
   InstrumentDescriptor instrument_descriptor_;
   // hashmap to maintain the metrics for delta collection (i.e, collection since last Collect call)
   const AggregationConfig *aggregation_config_;

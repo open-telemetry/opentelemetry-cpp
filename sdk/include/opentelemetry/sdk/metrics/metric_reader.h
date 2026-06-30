@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstddef>
 
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -16,6 +17,22 @@ namespace sdk
 {
 namespace metrics
 {
+/**
+ * Configuration options for cardinality limits per instrument type.
+ * A value of 0 means use the SDK default (2000).
+ */
+struct CardinalityLimitOptions
+{
+  size_t default_limit              = 0;  // 0 means use SDK default (2000)
+  size_t counter                    = 0;
+  size_t gauge                      = 0;
+  size_t histogram                  = 0;
+  size_t observable_counter         = 0;
+  size_t observable_gauge           = 0;
+  size_t observable_up_down_counter = 0;
+  size_t up_down_counter            = 0;
+};
+
 /**
  * MetricReader defines the interface to collect metrics from SDK
  */
@@ -46,6 +63,22 @@ public:
       InstrumentType instrument_type) const noexcept = 0;
 
   /**
+   * Get the cardinality limit for a given instrument type.
+   * Returns 0 if no limit is configured for this instrument type.
+   *
+   * @param instrument_type The instrument type to get the limit for
+   * @return The cardinality limit, or 0 if not configured
+   */
+  size_t GetCardinalityLimit(InstrumentType instrument_type) const noexcept;
+
+  /**
+   * Set cardinality limit options for this reader.
+   *
+   * @param options The cardinality limit options
+   */
+  void SetCardinalityLimitOptions(const CardinalityLimitOptions &options) noexcept;
+
+  /**
    * Shutdown the metric reader.
    */
   bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
@@ -73,6 +106,7 @@ protected:
 private:
   MetricProducer *metric_producer_{nullptr};
   std::atomic<bool> shutdown_{false};
+  CardinalityLimitOptions cardinality_limit_options_;
 };
 }  // namespace metrics
 }  // namespace sdk
