@@ -32,7 +32,6 @@
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
@@ -116,7 +115,6 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
       new DefaultAttributesProcessor{}};
   SyncMetricStorage storage(instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                            ExemplarFilterType::kAlwaysOff,
                             ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
                             &aggConfig);

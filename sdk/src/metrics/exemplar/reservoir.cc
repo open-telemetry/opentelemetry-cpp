@@ -4,9 +4,12 @@
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 #  include <stddef.h>
+#  include <utility>
 
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/exemplar/aligned_histogram_bucket_exemplar_reservoir.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filtered_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/exemplar/no_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
@@ -19,6 +22,14 @@ namespace sdk
 {
 namespace metrics
 {
+
+nostd::shared_ptr<ExemplarReservoir> ExemplarReservoir::GetSimpleFilteredExemplarReservoir(
+    ExemplarFilterType filter_type,
+    nostd::shared_ptr<ExemplarReservoir> reservoir)
+{
+  return nostd::shared_ptr<ExemplarReservoir>{
+      new FilteredExemplarReservoir{filter_type, std::move(reservoir)}};
+}
 
 nostd::shared_ptr<ExemplarReservoir> ExemplarReservoir::GetSimpleFixedSizeExemplarReservoir(
     size_t size,
