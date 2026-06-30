@@ -269,7 +269,9 @@ if(WITH_GSL)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/ms-gsl.cmake")
 endif()
 
-find_package(Threads)
+if(NOT WITH_API_ONLY)
+  find_package(Threads)
+endif()
 
 function(set_target_version target_name)
   if(OTELCPP_VERSIONED_LIBS)
@@ -307,12 +309,33 @@ cmake_dependent_option(
   OFF)
 
 #
+# Locally override options if WITH_API_ONLY is set to prevent third party
+# dependencies from being imported
+#
+
+if(WITH_API_ONLY)
+  set(WITH_EXAMPLES OFF)
+  set(WITH_EXAMPLES_HTTP OFF)
+  set(WITH_OTLP_GRPC OFF)
+  set(WITH_OTLP_HTTP OFF)
+  set(WITH_OTLP_FILE OFF)
+  set(WITH_ZIPKIN OFF)
+  set(WITH_PROMETHEUS OFF)
+  set(WITH_ELASTICSEARCH OFF)
+  set(WITH_OPENTRACING OFF)
+  set(WITH_ETW OFF)
+  set(WITH_CONFIGURATION OFF)
+  set(WITH_HTTP_CLIENT_CURL OFF)
+  set(WITH_OTLP_HTTP_COMPRESSION OFF)
+  set(WITH_BENCHMARK OFF)
+  set(BUILD_TESTING OFF)
+endif()
+
+#
 # Do we need ZLIB ?
 #
 
-if((NOT WITH_API_ONLY)
-   AND WITH_HTTP_CLIENT_CURL
-   AND WITH_OTLP_HTTP_COMPRESSION)
+if(WITH_HTTP_CLIENT_CURL AND WITH_OTLP_HTTP_COMPRESSION)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/zlib.cmake")
 endif()
 
@@ -320,7 +343,7 @@ endif()
 # Do we need CURL ?
 #
 
-if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
+if(WITH_HTTP_CLIENT_CURL)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/curl.cmake")
 endif()
 
@@ -366,7 +389,7 @@ else()
   set(USE_NLOHMANN_JSON OFF)
 endif()
 
-if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
+if(USE_NLOHMANN_JSON)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/nlohmann-json.cmake")
 endif()
 
@@ -374,7 +397,7 @@ endif()
 # Do we need RapidYaml ?
 #
 
-if((NOT WITH_API_ONLY) AND WITH_CONFIGURATION)
+if(WITH_CONFIGURATION)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/ryml.cmake")
 endif()
 
@@ -640,11 +663,11 @@ endif()
 
 add_subdirectory(api)
 
-if(WITH_OPENTRACING)
-  add_subdirectory(opentracing-shim)
-endif()
-
 if(NOT WITH_API_ONLY)
+  if(WITH_OPENTRACING)
+    add_subdirectory(opentracing-shim)
+  endif()
+
   set(BUILD_TESTING ${BUILD_TESTING})
 
   add_subdirectory(sdk)
@@ -663,11 +686,12 @@ if(NOT WITH_API_ONLY)
   if(WITH_FUNC_TESTS)
     add_subdirectory(functional)
   endif()
+
+  include(
+    "${opentelemetry-cpp_SOURCE_DIR}/cmake/opentelemetry-build-external-component.cmake"
+  )
 endif()
 
-include(
-  "${opentelemetry-cpp_SOURCE_DIR}/cmake/opentelemetry-build-external-component.cmake"
-)
 include("${opentelemetry-cpp_SOURCE_DIR}/cmake/patch-imported-config.cmake")
 
 if(OPENTELEMETRY_INSTALL)

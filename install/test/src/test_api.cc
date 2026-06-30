@@ -3,6 +3,9 @@
 
 #include <gtest/gtest.h>
 
+#include <string>
+#include <unordered_map>
+
 #include <opentelemetry/version.h>
 
 #include <opentelemetry/logs/provider.h>
@@ -19,6 +22,14 @@
 #include <opentelemetry/metrics/async_instruments.h>
 #include <opentelemetry/metrics/meter.h>
 #include <opentelemetry/metrics/sync_instruments.h>
+
+#include <opentelemetry/metrics/multi_observer_result.h>
+
+#include <opentelemetry/baggage/baggage.h>
+#include <opentelemetry/baggage/baggage_context.h>
+
+#include <opentelemetry/context/propagation/global_propagator.h>
+#include <opentelemetry/context/propagation/text_map_propagator.h>
 
 TEST(ApiInstallTest, VersionCheck)
 {
@@ -88,4 +99,62 @@ TEST(ApiInstallTest, MetricsApiCheck)
   auto async_updown_counter =
       meter->CreateInt64ObservableUpDownCounter("test-async-updown-counter");
   ASSERT_TRUE(async_updown_counter != nullptr);
+}
+
+TEST(ApiInstallTest, BaggageApiCheck)
+{
+  auto baggage = opentelemetry::baggage::Baggage::GetDefault();
+  ASSERT_TRUE(baggage != nullptr);
+
+  auto baggage_with_entry = baggage->Set("key", "value");
+  ASSERT_TRUE(baggage_with_entry != nullptr);
+
+  std::string retrieved_value;
+  EXPECT_TRUE(baggage_with_entry->GetValue("key", retrieved_value));
+  EXPECT_EQ(retrieved_value, "value");
+
+  auto context           = opentelemetry::context::RuntimeContext::GetCurrent();
+  auto ctx_with_baggage  = opentelemetry::baggage::SetBaggage(context, baggage_with_entry);
+  auto retrieved_baggage = opentelemetry::baggage::GetBaggage(ctx_with_baggage);
+  ASSERT_TRUE(retrieved_baggage != nullptr);
+
+  retrieved_value.clear();
+  EXPECT_TRUE(retrieved_baggage->GetValue("key", retrieved_value));
+  EXPECT_EQ(retrieved_value, "value");
+}
+
+TEST(ApiInstallTest, ContextPropagationApiCheck)
+{
+  struct MapCarrier : public opentelemetry::context::propagation::TextMapCarrier
+  {
+    std::unordered_map<std::string, std::string> headers;
+
+    opentelemetry::nostd::string_view Get(
+        opentelemetry::nostd::string_view key) const noexcept override
+    {
+      auto it = headers.find(std::string(key));
+      if (it != headers.end())
+      {
+        return it->second;
+      }
+      return "";
+    }
+    void Set(opentelemetry::nostd::string_view key,
+             opentelemetry::nostd::string_view value) noexcept override
+    {
+      headers[std::string(key)] = std::string(value);
+    }
+  };
+
+  auto propagator =
+      opentelemetry::context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+  ASSERT_TRUE(propagator != nullptr);
+
+  MapCarrier carrier;
+  auto context =
+      opentelemetry::context::RuntimeContext::GetCurrent().SetValue("test-key", "test-value");
+  propagator->Inject(carrier, context);
+  auto extracted = propagator->Extract(carrier, context);
+  EXPECT_EQ(extracted, context);
+  EXPECT_TRUE(extracted.HasKey("test-key"));
 }
