@@ -53,10 +53,6 @@ public:
    * limits override this and copy the supplied limits before any
    * SetAttribute call is observed, so the caller does not need to keep the
    * supplied object alive.
-   *
-   * This virtual is appended at the end of the Recordable vtable to keep
-   * the change additive: recordable implementations that do not override
-   * it inherit the no-op default and continue to compile unchanged.
    */
   virtual void SetLogRecordLimits(const LogRecordLimits & /* limits */) noexcept {}
 };
