@@ -344,6 +344,33 @@ elif [[ "$1" == "cmake.c++23.stl.test" ]]; then
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
   exit 0
+elif [[ "$1" == "cmake.different_std.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DBUILD_SHARED_LIBS=ON \
+        -DWITH_STL=CXX23 \
+        -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
+        "${SRC_DIR}"
+  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
+  ctest --output-on-failure
+  exit 0
+elif [[ "$1" == "cmake.legacy.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  export BUILD_ROOT="${BUILD_DIR}"
+  ${SRC_DIR}/tools/build-benchmark.sh
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
+        "${SRC_DIR}"
+  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
+  ctest --output-on-failure
+  exit 0
 elif [[ "$1" == "cmake.clang_tidy.test" ]]; then
   rm -rf "${BUILD_DIR}"
   mkdir -p "${BUILD_DIR}"
