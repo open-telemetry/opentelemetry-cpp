@@ -392,7 +392,7 @@ TEST(ETWTracer, GlobalSingletonTracer)
 }
 */
 
-  // Obtain a different tracer withs its own trace-id.
+  // Obtain the same tracer instance with the same trace-id as before.
   auto localTracer = GetGlobalTracerProvider().GetTracer(kGlobalProviderName);
   auto s2 = localTracer->StartSpan("Span2");
   auto traceId2 = s2->GetContext().trace_id();
@@ -455,7 +455,7 @@ TEST(ETWTracer, GlobalSingletonTracer)
   }
 }
 */
-  EXPECT_NE(traceId1, traceId2);
+  EXPECT_EQ(traceId1, traceId2);
   EXPECT_EQ(traceId1, traceId3);
 
 #  if OPENTELEMETRY_ABI_VERSION_NO == 1
@@ -501,6 +501,17 @@ TEST(ETWTracer, AlwayOffTailSampler)
      std::unique_ptr<sdk::trace::IdGenerator>(id_generator),
      std::move(always_off_tail));
   auto tracer = tp.GetTracer(providerName);
+}
+
+TEST(ETWTracer, SpanSurvivesTracerReassignment)
+{
+  exporter::etw::TracerProvider tp;
+  auto tracer = tp.GetTracer("Geneva-Tracer-Foo");
+  auto spanFoo = tracer->StartSpan("Span-Foo");
+  tracer = tp.GetTracer("Geneva-Tracer-Bar");
+  auto spanBar = tracer->StartSpan("Span-Bar");
+  EXPECT_NO_THROW(spanFoo->End());
+  EXPECT_NO_THROW(spanBar->End());
 }
 
 TEST(ETWTracer, CustomIdGenerator)

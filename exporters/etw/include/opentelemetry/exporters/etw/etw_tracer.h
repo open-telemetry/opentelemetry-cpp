@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <algorithm>
 #include <atomic>
 
 #include <cstdint>
@@ -17,6 +16,7 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
+#include <unordered_map>
 #include <vector>
 
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -159,8 +159,7 @@ void UpdateStatus(T &t, Properties &props)
 /**
  * @brief Tracer class that allows to send spans to ETW Provider.
  */
-class Tracer : public opentelemetry::trace::Tracer,
-               public std::enable_shared_from_this<opentelemetry::trace::Tracer>
+class Tracer : public opentelemetry::trace::Tracer
 {
 public:
   /**
@@ -169,6 +168,8 @@ public:
   bool IsClosed() const noexcept { return isClosed_.load(); }
 
 private:
+  friend class TracerProvider;
+
   /**
    * @brief Parent provider of this Tracer
    */
@@ -510,7 +511,7 @@ public:
     {
       auto noopSpan = nostd::shared_ptr<opentelemetry::trace::Span>{
           new (std::nothrow)
-              opentelemetry::trace::NoopSpan(this->shared_from_this(), std::move(spanContext))};
+              opentelemetry::trace::NoopSpan(std::shared_ptr<Tracer>{}, std::move(spanContext))};
       return noopSpan;
     }
 
@@ -1106,6 +1107,8 @@ public:
         id_generator_{std::move(id_generator)},
         tail_sampler_{std::move(tail_sampler)}
   {
+    (void)Tracer::etwProvider().is_registered(std::string{});
+
     // By default we ensure that all events carry their with TraceId and SpanId
     GetOption(options, "enableTraceId", config_.enableTraceId, true);
     GetOption(options, "enableSpanId", config_.enableSpanId, true);
@@ -1143,6 +1146,8 @@ public:
         tail_sampler_{
             std::unique_ptr<opentelemetry::exporter::etw::TailSampler>(new AlwaysOnTailSampler())}
   {
+    (void)Tracer::etwProvider().is_registered(std::string{});
+
     config_.enableTraceId           = true;
     config_.enableSpanId            = true;
     config_.enableActivityId        = false;
@@ -1156,11 +1161,12 @@ public:
    * @brief Obtain ETW Tracer.
    * @param name ProviderId (instrumentation name) - Name or GUID
    *
-   * @param args Additional arguments that controls `codec` of the provider.
-   * Possible values are:
-   * - "ETW"            - 'classic' Trace Logging Dynamic manifest ETW events.
-   * - "MSGPACK"        - MessagePack-encoded binary payload ETW events.
-   * - "XML"            - XML events (reserved for future use)
+   * @param args Instrumentation version (unused by ETW).
+   * @param schema_url Schema URL (unused by ETW).
+   *
+   * Encoding is controlled via TelemetryProviderOptions["encoding"] passed
+   * to the TracerProvider constructor. Valid values: "ETW"/"TLD" (default),
+   * "MSGPACK", "XML".
    * @return
    */
   nostd::shared_ptr<opentelemetry::trace::Tracer> GetTracer(
@@ -1177,10 +1183,54 @@ public:
     UNREFERENCED_PARAMETER(args);
     UNREFERENCED_PARAMETER(schema_url);
     ETWProvider::EventFormat evtFmt = config_.encoding;
-    std::shared_ptr<opentelemetry::trace::Tracer> tracer{new (std::nothrow)
-                                                             Tracer(*this, name, evtFmt)};
-    return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracer};
+    TracerCacheKey key{name.data(), name.size(), evtFmt};
+
+    std::lock_guard<std::mutex> lock(tracers_mu_);
+    auto it = tracers_.find(key);
+    if (it != tracers_.end())
+    {
+      return nostd::shared_ptr<opentelemetry::trace::Tracer>{
+          std::static_pointer_cast<opentelemetry::trace::Tracer>(it->second)};
+    }
+
+    std::shared_ptr<Tracer> tracer{new (std::nothrow) Tracer(*this, name, evtFmt)};
+    tracers_.emplace(std::move(key), tracer);
+    return nostd::shared_ptr<opentelemetry::trace::Tracer>{
+        std::static_pointer_cast<opentelemetry::trace::Tracer>(tracer)};
   }
+
+private:
+  struct TracerCacheKey
+  {
+    std::string name;
+    ETWProvider::EventFormat encoding;
+
+    TracerCacheKey(std::string value, ETWProvider::EventFormat format)
+        : name(std::move(value)), encoding(format)
+    {}
+
+    TracerCacheKey(const char *value, size_t size, ETWProvider::EventFormat format)
+        : name(value, size), encoding(format)
+    {}
+
+    bool operator==(const TracerCacheKey &other) const
+    {
+      return encoding == other.encoding && name == other.name;
+    }
+  };
+
+  struct TracerCacheKeyHash
+  {
+    size_t operator()(const TracerCacheKey &key) const noexcept
+    {
+      size_t name_hash = std::hash<std::string>{}(key.name);
+      size_t fmt_hash  = static_cast<size_t>(key.encoding);
+      return name_hash ^ (fmt_hash + 0x9e3779b97f4a7c15ULL + (name_hash << 6) + (name_hash >> 2));
+    }
+  };
+
+  std::mutex tracers_mu_;
+  std::unordered_map<TracerCacheKey, std::shared_ptr<Tracer>, TracerCacheKeyHash> tracers_;
 };
 
 }  // namespace etw
