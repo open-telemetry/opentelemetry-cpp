@@ -100,15 +100,13 @@ void SpanData::AddEvent(nostd::string_view name,
                         opentelemetry::common::SystemTimestamp timestamp,
                         const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  SpanDataEvent event(std::string(name), timestamp, attributes);
-  events_.push_back(event);
+  events_.emplace_back(std::string(name), timestamp, attributes);
 }
 
 void SpanData::AddLink(const opentelemetry::trace::SpanContext &span_context,
                        const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  SpanDataLink link(span_context, attributes);
-  links_.push_back(link);
+  links_.emplace_back(span_context, attributes);
 }
 
 void SpanData::SetStatus(opentelemetry::trace::StatusCode code,
