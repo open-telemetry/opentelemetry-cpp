@@ -128,6 +128,9 @@ Increment the:
 * [CODE HEALTH] Move trace and baggage propagation test classes into anonymous namespace
   [#4199](https://github.com/open-telemetry/opentelemetry-cpp/pull/4199)
 
+* [CODE HEALTH] Fix clang-tidy bugprone-unused-local-non-trivial-variable warnings
+  [#4202](https://github.com/open-telemetry/opentelemetry-cpp/pull/4202)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
