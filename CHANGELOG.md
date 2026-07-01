@@ -113,6 +113,9 @@ Increment the:
   ParentThreshold, RuleBased)
   [#4028](https://github.com/open-telemetry/opentelemetry-cpp/issues/4028)
 
+* [SDK] Implement the ProbabilitySampler
+  [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
+
 * [BUILD] Fix protobuf build failure
   [#4154](https://github.com/open-telemetry/opentelemetry-cpp/pull/4154)
 
