@@ -1,9 +1,15 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/metrics/metric_reader.h"
+#include <atomic>
+#include <chrono>
+#include <cstddef>
+
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -82,6 +88,45 @@ bool MetricReader::ForceFlush(std::chrono::microseconds timeout) noexcept
 bool MetricReader::IsShutdown() const noexcept
 {
   return shutdown_.load(std::memory_order_acquire);
+}
+
+size_t MetricReader::GetCardinalityLimit(InstrumentType instrument_type) const noexcept
+{
+  switch (instrument_type)
+  {
+    case InstrumentType::kCounter:
+      return cardinality_limit_options_.counter != 0 ? cardinality_limit_options_.counter
+                                                     : cardinality_limit_options_.default_limit;
+    case InstrumentType::kHistogram:
+      return cardinality_limit_options_.histogram != 0 ? cardinality_limit_options_.histogram
+                                                       : cardinality_limit_options_.default_limit;
+    case InstrumentType::kUpDownCounter:
+      return cardinality_limit_options_.up_down_counter != 0
+                 ? cardinality_limit_options_.up_down_counter
+                 : cardinality_limit_options_.default_limit;
+    case InstrumentType::kObservableCounter:
+      return cardinality_limit_options_.observable_counter != 0
+                 ? cardinality_limit_options_.observable_counter
+                 : cardinality_limit_options_.default_limit;
+    case InstrumentType::kObservableGauge:
+      return cardinality_limit_options_.observable_gauge != 0
+                 ? cardinality_limit_options_.observable_gauge
+                 : cardinality_limit_options_.default_limit;
+    case InstrumentType::kObservableUpDownCounter:
+      return cardinality_limit_options_.observable_up_down_counter != 0
+                 ? cardinality_limit_options_.observable_up_down_counter
+                 : cardinality_limit_options_.default_limit;
+    case InstrumentType::kGauge:
+      return cardinality_limit_options_.gauge != 0 ? cardinality_limit_options_.gauge
+                                                   : cardinality_limit_options_.default_limit;
+    default:
+      return cardinality_limit_options_.default_limit;
+  }
+}
+
+void MetricReader::SetCardinalityLimitOptions(const CardinalityLimitOptions &options) noexcept
+{
+  cardinality_limit_options_ = options;
 }
 
 }  // namespace metrics

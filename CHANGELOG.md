@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Implement configurable cardinality limit at three priority levels
+  [#3292](https://github.com/open-telemetry/opentelemetry-cpp/issues/3292)
+
 * [SDK] Add `TracerProvider::UpdateTracerConfigurator()` and example
   [#4065](https://github.com/open-telemetry/opentelemetry-cpp/issues/4065)
 

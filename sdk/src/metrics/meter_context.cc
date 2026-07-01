@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstddef>
 #include <memory>
 #include <mutex>
 #include <ostream>
@@ -18,6 +19,7 @@
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/metrics/export/metric_filter.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
@@ -89,6 +91,20 @@ nostd::span<std::shared_ptr<Meter>> MeterContext::GetMeters() noexcept
 nostd::span<std::shared_ptr<CollectorHandle>> MeterContext::GetCollectors() noexcept
 {
   return nostd::span<std::shared_ptr<CollectorHandle>>(collectors_.data(), collectors_.size());
+}
+
+size_t MeterContext::GetReaderCardinalityLimit(InstrumentType instrument_type) noexcept
+{
+  size_t max_limit = 0;
+  for (const auto &collector : collectors_)
+  {
+    size_t limit = collector->GetCardinalityLimit(instrument_type);
+    if (limit > max_limit)
+    {
+      max_limit = limit;
+    }
+  }
+  return max_limit;
 }
 
 opentelemetry::common::SystemTimestamp MeterContext::GetSDKStartTime() noexcept

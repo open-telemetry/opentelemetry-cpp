@@ -402,6 +402,95 @@ TEST_F(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest2)
   }
 }
 
+TEST_F(MetricCollectorTest, CardinalityLimitDelegation)
+{
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+
+  // Create reader with cardinality limits
+  auto reader = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimitOptions options;
+  options.default_limit = 1000;
+  options.counter       = 100;
+  options.histogram     = 200;
+  reader->SetCardinalityLimitOptions(options);
+
+  auto collector = AddMetricReaderToMeterContext(context, reader).lock();
+
+  // Test that MetricCollector delegates to MetricReader
+  EXPECT_EQ(collector->GetCardinalityLimit(InstrumentType::kCounter), 100);
+  EXPECT_EQ(collector->GetCardinalityLimit(InstrumentType::kHistogram), 200);
+  EXPECT_EQ(collector->GetCardinalityLimit(InstrumentType::kUpDownCounter), 1000);
+  EXPECT_EQ(collector->GetCardinalityLimit(InstrumentType::kObservableCounter), 1000);
+}
+
+TEST_F(MetricCollectorTest, MeterContextMaxCardinalityLimit)
+{
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+
+  // Test with no readers - should return 0
+  EXPECT_EQ(context->GetReaderCardinalityLimit(InstrumentType::kCounter), 0);
+
+  // Add first reader with limits
+  auto reader1 = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimitOptions options1;
+  options1.counter   = 100;
+  options1.histogram = 500;
+  reader1->SetCardinalityLimitOptions(options1);
+  AddMetricReaderToMeterContext(context, reader1);
+
+  // Should return reader1's limits
+  EXPECT_EQ(context->GetReaderCardinalityLimit(InstrumentType::kCounter), 100);
+  EXPECT_EQ(context->GetReaderCardinalityLimit(InstrumentType::kHistogram), 500);
+
+  // Add second reader with different limits
+  auto reader2 = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimitOptions options2;
+  options2.counter   = 1000;  // Higher than reader1
+  options2.histogram = 200;   // Lower than reader1
+  reader2->SetCardinalityLimitOptions(options2);
+  AddMetricReaderToMeterContext(context, reader2);
+
+  // Should return the max across both readers
+  EXPECT_EQ(context->GetReaderCardinalityLimit(InstrumentType::kCounter), 1000);   // max(100, 1000)
+  EXPECT_EQ(context->GetReaderCardinalityLimit(InstrumentType::kHistogram), 500);  // max(500, 200)
+}
+
+TEST_F(MetricCollectorTest, MeterContextCardinalityLimitWithMultipleReaders)
+{
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+
+  // Add three readers with different configurations
+  auto reader1 = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimitOptions options1;
+  options1.default_limit = 500;
+  options1.counter       = 100;
+  reader1->SetCardinalityLimitOptions(options1);
+  AddMetricReaderToMeterContext(context, reader1);
+
+  auto reader2 = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimitOptions options2;
+  options2.default_limit = 1000;
+  options2.histogram     = 300;
+  reader2->SetCardinalityLimitOptions(options2);
+  AddMetricReaderToMeterContext(context, reader2);
+
+  auto reader3 = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimitOptions options3;
+  options3.counter   = 200;
+  options3.histogram = 400;
+  reader3->SetCardinalityLimitOptions(options3);
+  AddMetricReaderToMeterContext(context, reader3);
+
+  // Counter: max(100, 1000 (default), 200) = 1000
+  EXPECT_EQ(context->GetReaderCardinalityLimit(InstrumentType::kCounter), 1000);
+
+  // Histogram: max(500 (default), 300, 400) = 500
+  EXPECT_EQ(context->GetReaderCardinalityLimit(InstrumentType::kHistogram), 500);
+
+  // UpDownCounter: max(500 (default), 1000 (default), 0) = 1000
+  EXPECT_EQ(context->GetReaderCardinalityLimit(InstrumentType::kUpDownCounter), 1000);
+}
+
 #if defined(__GNUC__) || defined(__clang__) || defined(__apple_build_version__)
 #  pragma GCC diagnostic pop
 #endif

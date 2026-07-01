@@ -31,6 +31,7 @@
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
@@ -1471,13 +1472,23 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
     OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
   }
 
-  if (model->cardinality_limits != nullptr)
-  {
-    OTEL_INTERNAL_LOG_WARN("cardinality limits not supported, ignoring");
-  }
-
   sdk = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
       std::move(exporter_sdk), options);
+
+  if (model->cardinality_limits != nullptr)
+  {
+    opentelemetry::sdk::metrics::CardinalityLimitOptions cardinality_options;
+    cardinality_options.default_limit      = model->cardinality_limits->default_limit;
+    cardinality_options.counter            = model->cardinality_limits->counter;
+    cardinality_options.gauge              = model->cardinality_limits->gauge;
+    cardinality_options.histogram          = model->cardinality_limits->histogram;
+    cardinality_options.observable_counter = model->cardinality_limits->observable_counter;
+    cardinality_options.observable_gauge   = model->cardinality_limits->observable_gauge;
+    cardinality_options.observable_up_down_counter =
+        model->cardinality_limits->observable_up_down_counter;
+    cardinality_options.up_down_counter = model->cardinality_limits->up_down_counter;
+    sdk->SetCardinalityLimitOptions(cardinality_options);
+  }
 
   return sdk;
 }
@@ -1496,7 +1507,17 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePul
 
   if (model->cardinality_limits != nullptr)
   {
-    OTEL_INTERNAL_LOG_WARN("cardinality limits not supported, ignoring");
+    opentelemetry::sdk::metrics::CardinalityLimitOptions cardinality_options;
+    cardinality_options.default_limit      = model->cardinality_limits->default_limit;
+    cardinality_options.counter            = model->cardinality_limits->counter;
+    cardinality_options.gauge              = model->cardinality_limits->gauge;
+    cardinality_options.histogram          = model->cardinality_limits->histogram;
+    cardinality_options.observable_counter = model->cardinality_limits->observable_counter;
+    cardinality_options.observable_gauge   = model->cardinality_limits->observable_gauge;
+    cardinality_options.observable_up_down_counter =
+        model->cardinality_limits->observable_up_down_counter;
+    cardinality_options.up_down_counter = model->cardinality_limits->up_down_counter;
+    sdk->SetCardinalityLimitOptions(cardinality_options);
   }
 
   return sdk;
@@ -1599,6 +1620,20 @@ void SdkBuilder::AddView(
   std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> sdk_aggregation_config;
 
   sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
+
+  // Apply aggregation_cardinality_limit from the view stream configuration
+  if (stream->aggregation_cardinality_limit != 0)
+  {
+    if (sdk_aggregation_config)
+    {
+      sdk_aggregation_config->cardinality_limit_ = stream->aggregation_cardinality_limit;
+    }
+    else
+    {
+      sdk_aggregation_config = std::make_shared<opentelemetry::sdk::metrics::AggregationConfig>(
+          stream->aggregation_cardinality_limit);
+    }
+  }
 
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk_attribute_processor;
 
