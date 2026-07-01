@@ -177,7 +177,7 @@ TEST(ProbabilitySampler, ExplicitRandomnessTakesPrecedence)
 
   std::string ot_value;
   ASSERT_TRUE(sampling_result.trace_state->Get("ot", ot_value));
-  ASSERT_EQ("rv:ffffffffffffff;th:8", ot_value);
+  ASSERT_EQ("th:8;rv:ffffffffffffff", ot_value);
 
   // An rv of zero drops even when the trace id randomness would sample.
   trace_state = trace_api::TraceState::FromHeader("ot=rv:00000000000000");
@@ -302,7 +302,7 @@ TEST(ProbabilitySampler, MalformedSubKeysAreDropped)
   trace_api::SpanId span_id{span_id_buffer};
 
   // Empty, key-only, and duplicate th sub-keys are dropped from the output.
-  for (auto p : {std::make_pair("ot=a:1;;rv:ffffffffffffff", "a:1;rv:ffffffffffffff;th:8"),
+  for (auto p : {std::make_pair("ot=a:1;;rv:ffffffffffffff", "th:8;rv:ffffffffffffff;a:1"),
                  std::make_pair("ot=foo", "th:8"), std::make_pair("ot=th:1;th:2", "th:8")})
   {
     auto trace_state = trace_api::TraceState::FromHeader(p.first);
@@ -328,7 +328,7 @@ TEST(ProbabilitySampler, FullTraceStateKeepsParentTraceState)
   trace_api::SpanId span_id{span_id_buffer};
 
   // 32 entries and no ot entry: there is no room to add th, so the span is
-  // sampled but the trace state is left untouched.
+  // sampled and the parent entries are preserved without an ot entry.
   std::string header = "k0=0";
   for (int i = 1; i < 32; ++i)
   {
@@ -340,10 +340,17 @@ TEST(ProbabilitySampler, FullTraceStateKeepsParentTraceState)
   auto sampling_result = SampleWithContext(s1, context, TraceIdWithRandomness(0xffffffffffffff));
 
   ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
-  ASSERT_EQ(nullptr, sampling_result.trace_state);
+  ASSERT_NE(nullptr, sampling_result.trace_state);
+
+  std::string ot_value;
+  ASSERT_FALSE(sampling_result.trace_state->Get("ot", ot_value));
+
+  std::string k0_value;
+  ASSERT_TRUE(sampling_result.trace_state->Get("k0", k0_value));
+  ASSERT_EQ("0", k0_value);
 }
 
-TEST(ProbabilitySampler, OversizedValueKeepsParentTraceState)
+TEST(ProbabilitySampler, OversizedSubKeyDroppedToRecordThreshold)
 {
   ProbabilitySampler s1(0.5);
 
@@ -352,7 +359,8 @@ TEST(ProbabilitySampler, OversizedValueKeepsParentTraceState)
   uint8_t span_id_buffer[trace_api::SpanId::kSize] = {1};
   trace_api::SpanId span_id{span_id_buffer};
 
-  // The oversized ot value is re-emitted unchanged because it has no th to erase.
+  // A sampled span must record th; the foreign sub-key would push the ot value
+  // past the 256 char limit, so it is dropped to make room for th.
   std::string ot_value = "a:" + std::string(253, 'b');
   auto trace_state     = trace_api::TraceState::FromHeader("ot=" + ot_value);
   trace_api::SpanContext context(trace_id, span_id, trace_api::TraceFlags{0}, false, trace_state);
@@ -364,12 +372,11 @@ TEST(ProbabilitySampler, OversizedValueKeepsParentTraceState)
 
   std::string result_ot;
   ASSERT_TRUE(sampling_result.trace_state->Get("ot", result_ot));
-  ASSERT_EQ(ot_value, result_ot);
+  ASSERT_EQ("th:8", result_ot);
 }
 
-TEST(ProbabilitySampler, OversizedValueErasesStaleThreshold)
+TEST(ProbabilitySampler, OversizedSubKeyDroppedReplacesStaleThreshold)
 {
-  // ratio 0.1's 17-char th overflows the 256-char limit, so the stale th is erased.
   ProbabilitySampler s1(0.1);
 
   uint8_t trace_id_buffer[trace_api::TraceId::kSize] = {1};
@@ -377,6 +384,8 @@ TEST(ProbabilitySampler, OversizedValueErasesStaleThreshold)
   uint8_t span_id_buffer[trace_api::SpanId::kSize] = {1};
   trace_api::SpanId span_id{span_id_buffer};
 
+  // The inherited th is replaced by this sampler's th; the foreign sub-key
+  // overflows the 256 char limit and is dropped, keeping the fresh th.
   std::string rest = "x:" + std::string(245, 'b');
   auto trace_state = trace_api::TraceState::FromHeader("ot=th:8;" + rest);
   trace_api::SpanContext context(trace_id, span_id, trace_api::TraceFlags{0}, false, trace_state);
@@ -388,8 +397,8 @@ TEST(ProbabilitySampler, OversizedValueErasesStaleThreshold)
 
   std::string result_ot;
   ASSERT_TRUE(sampling_result.trace_state->Get("ot", result_ot));
-  ASSERT_EQ(rest, result_ot);
-  ASSERT_EQ(std::string::npos, result_ot.find("th:"));
+  ASSERT_NE(std::string::npos, result_ot.find("th:"));
+  ASSERT_EQ(std::string::npos, result_ot.find("x:"));
 }
 
 TEST(ProbabilitySampler, IgnoresParentSampledFlag)
