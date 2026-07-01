@@ -217,9 +217,6 @@ void InitMetrics()
   auto exporter =
       opentelemetry::exporter::otlp::OtlpHttpMetricExporterFactory::Create(meter_opts, exp_rt_opts);
 
-  std::string version{"1.2.0"};
-  std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
-
   // Initialize and set the global MeterProvider
   opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions reader_options;
   reader_options.export_interval_millis = std::chrono::milliseconds(1000);
