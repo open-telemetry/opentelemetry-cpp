@@ -109,9 +109,9 @@ inline const std::vector<std::string> &AttributeKeys()
 
 // A representative mix of attribute types used by the nominal span benchmark.
 using SpanAttribute = std::pair<nostd::string_view, common::AttributeValue>;
-inline const std::vector<SpanAttribute> &NominalSpanAttributes()
+inline const std::vector<SpanAttribute> &NominalAttributes()
 {
-  static const std::vector<SpanAttribute> kNominalSpanAttributes = {
+  static const std::vector<SpanAttribute> kNominalAttributes = {
       {"benchmark.string.short", nostd::string_view{"abcdefgh"}},
       {"benchmark.string.medium", nostd::string_view{"abcdefghijklmnopqrstuvwxyz012345"}},
       {"benchmark.string.long",
@@ -120,22 +120,17 @@ inline const std::vector<SpanAttribute> &NominalSpanAttributes()
       {"benchmark.double", common::AttributeValue{3.14159265358979}},
       {"benchmark.bool", common::AttributeValue{true}},
   };
-  return kNominalSpanAttributes;
+  return kNominalAttributes;
 }
 
 inline std::vector<SpanAttribute> MakeAttributes(std::size_t count)
 {
-  if (count > kSpanAttributeLimit)
-  {
-    throw std::invalid_argument("count exceeds kSpanAttributeLimit");
-  }
-
   const auto &keys = AttributeKeys();
   std::vector<SpanAttribute> attributes;
   attributes.reserve(count);
   for (std::size_t i = 0; i < count; ++i)
   {
-    attributes.emplace_back(keys[i], nostd::string_view{"value-string-attribute"});
+    attributes.emplace_back(keys.at(i), nostd::string_view{"value-string-attribute"});
   }
   return attributes;
 }
@@ -187,7 +182,7 @@ inline nostd::shared_ptr<trace::Span> StartMinimalSpan(trace::Tracer &tracer)
 // Starts a span with a representative mix of attributes
 inline nostd::shared_ptr<trace::Span> StartNominalSpan(trace::Tracer &tracer)
 {
-  return tracer.StartSpan("benchmark_span", NominalSpanAttributes());
+  return tracer.StartSpan("benchmark_span", NominalAttributes());
 }
 
 // Starts a span with pre-built attributes
@@ -223,7 +218,7 @@ inline void InitializeSpanTestData()
   TestResource();
   TestScope();
   AttributeKeys();
-  NominalSpanAttributes();
+  NominalAttributes();
   SpanEventAttributes();
   SpanLinkAttributes();
   TestSpanContext();

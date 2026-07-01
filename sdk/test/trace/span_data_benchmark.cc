@@ -66,21 +66,22 @@
 
 #include <benchmark/benchmark.h>
 
-#include <memory>
+#include <cstddef>
+#include <cstdint>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/test_common/sdk/trace/test_utils.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
 
 namespace trace_sdk  = opentelemetry::sdk::trace;
-namespace trace_api  = opentelemetry::trace;
 namespace test_utils = opentelemetry::test_common;
 
 namespace
@@ -89,7 +90,7 @@ namespace
 class SpanDataFixture : public benchmark::Fixture
 {
 public:
-  void SetUp(benchmark::State &) override
+  void SetUp(const benchmark::State &) override
   {
     auto exporter  = std::make_unique<opentelemetry::exporter::memory::InMemorySpanExporter>();
     auto processor = std::make_unique<test_utils::BufferingSpanProcessor>(std::move(exporter));
@@ -137,7 +138,7 @@ BENCHMARK_REGISTER_F(SpanDataFixture, RecordNominalSpan)->Unit(benchmark::kNanos
 
 BENCHMARK_DEFINE_F(SpanDataFixture, RecordSpanWithAttributes)(benchmark::State &state)
 {
-  const std::size_t attribute_count = static_cast<std::size_t>(state.range(0));
+  const int64_t attribute_count = state.range(0);
   const std::vector<test_utils::SpanAttribute> attributes =
       test_utils::MakeAttributes(attribute_count);
   for (auto _ : state)
@@ -159,11 +160,11 @@ BENCHMARK_REGISTER_F(SpanDataFixture, RecordSpanWithAttributes)
 
 BENCHMARK_DEFINE_F(SpanDataFixture, RecordSpanWithEvents)(benchmark::State &state)
 {
-  const std::size_t event_count = static_cast<std::size_t>(state.range(0));
+  const int64_t event_count = state.range(0);
 
   for (auto _ : state)
   {
-    auto span = test_utils::StartSpanWithEvents(*tracer_, event_count);
+    auto span = test_utils::StartSpanWithEvents(*tracer_, static_cast<std::size_t>(event_count));
     span->End();
     state.PauseTiming();
     provider_->ForceFlush();
@@ -180,8 +181,9 @@ BENCHMARK_REGISTER_F(SpanDataFixture, RecordSpanWithEvents)
 
 BENCHMARK_DEFINE_F(SpanDataFixture, RecordSpanWithLinks)(benchmark::State &state)
 {
-  const std::size_t link_count                          = static_cast<std::size_t>(state.range(0));
-  const std::vector<test_utils::LinkEntry> link_entries = test_utils::MakeLinkEntries(link_count);
+  const int64_t link_count = state.range(0);
+  const std::vector<test_utils::LinkEntry> link_entries =
+      test_utils::MakeLinkEntries(static_cast<std::size_t>(link_count));
 
   for (auto _ : state)
   {

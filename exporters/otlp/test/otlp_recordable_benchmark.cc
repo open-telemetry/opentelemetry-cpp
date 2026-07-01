@@ -76,11 +76,11 @@
 
 #include <chrono>
 #include <cstddef>
-#include <memory>
+#include <cstdint>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
@@ -88,19 +88,15 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/test_common/sdk/trace/test_utils.h"
 #include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_metadata.h"
-#include "opentelemetry/trace/trace_flags.h"
-#include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"
 
 // clang-format off
@@ -144,7 +140,7 @@ public:
 class OtlpRecordableFixture : public benchmark::Fixture
 {
 public:
-  void SetUp(benchmark::State &) override
+  void SetUp(const benchmark::State &) override
   {
     auto processor =
         std::make_unique<test_utils::BufferingSpanProcessor>(std::make_unique<NullSpanExporter>());
@@ -229,9 +225,9 @@ BENCHMARK_REGISTER_F(OtlpRecordableFixture, RecordNominalSpan)->Unit(benchmark::
 // RecordSpanWithAttributes: starts a span with N attributes (all string values) then ends the span.
 BENCHMARK_DEFINE_F(OtlpRecordableFixture, RecordSpanWithAttributes)(benchmark::State &state)
 {
-  const std::size_t attribute_count = static_cast<std::size_t>(state.range(0));
+  const int64_t attribute_count = state.range(0);
   const std::vector<test_utils::SpanAttribute> attributes =
-      test_utils::MakeAttributes(attribute_count);
+      test_utils::MakeAttributes(static_cast<std::size_t>(attribute_count));
   for (auto _ : state)
   {
     auto span = test_utils::StartSpanWithAttributes(*tracer_, attributes);
@@ -256,7 +252,7 @@ BENCHMARK_DEFINE_F(OtlpRecordableFixture, RecordSpanWithEvents)(benchmark::State
 
   for (auto _ : state)
   {
-    auto span = test_utils::StartSpanWithEvents(*tracer_, event_count);
+    auto span = test_utils::StartSpanWithEvents(*tracer_, static_cast<std::size_t>(event_count));
     span->End();
     state.PauseTiming();
     provider_->ForceFlush();
@@ -274,8 +270,9 @@ BENCHMARK_REGISTER_F(OtlpRecordableFixture, RecordSpanWithEvents)
 // RecordSpanWithLinks: starts a span via the tracer API with N links, then ends the span.
 BENCHMARK_DEFINE_F(OtlpRecordableFixture, RecordSpanWithLinks)(benchmark::State &state)
 {
-  const std::size_t link_count                          = static_cast<std::size_t>(state.range(0));
-  const std::vector<test_utils::LinkEntry> link_entries = test_utils::MakeLinkEntries(link_count);
+  const int64_t link_count = state.range(0);
+  const std::vector<test_utils::LinkEntry> link_entries =
+      test_utils::MakeLinkEntries(static_cast<std::size_t>(link_count));
 
   for (auto _ : state)
   {
@@ -298,8 +295,8 @@ BENCHMARK_REGISTER_F(OtlpRecordableFixture, RecordSpanWithLinks)
 // batch of N spans. This mirrors the path in OtlpGrpcExporter::Export.
 static void BM_OtlpPopulateRequest(benchmark::State &state)
 {
-  const std::size_t span_count = static_cast<std::size_t>(state.range(0));
-  auto batch                   = MakeSpanBatch(span_count);
+  const int64_t span_count = state.range(0);
+  auto batch               = MakeSpanBatch(static_cast<std::size_t>(span_count));
   for (auto _ : state)
   {
     auto arena    = CreateArena();
@@ -312,7 +309,7 @@ static void BM_OtlpPopulateRequest(benchmark::State &state)
         request);
     benchmark::DoNotOptimize(request);
   }
-  state.SetItemsProcessed(state.iterations() * state.range(0));
+  state.SetItemsProcessed(state.iterations() * span_count);
 }
 BENCHMARK(BM_OtlpPopulateRequest)
     ->ArgName("span_count")
