@@ -62,6 +62,9 @@ TEST(TraceStateTest, ValidateHeaderParsing)
                    {"k1=v1,k2=v2,invalidmember", ""},
                    {"1a-2f@foo=bar1,a*/foo-_/bar=bar4", "1a-2f@foo=bar1,a*/foo-_/bar=bar4"},
                    {"1a-2f@foo=bar1,*/foo-_/bar=bar4", ""},
+                   {"foo@@bar=1,baz=2", "foo@@bar=1,baz=2"},
+                   {"foo@bar@baz=1", "foo@bar@baz=1"},
+                   {"@foo=1", ""},
                    {",k1=v1", "k1=v1"},
                    {",", ""},
                    {",=,", ""},
@@ -71,6 +74,12 @@ TEST(TraceStateTest, ValidateHeaderParsing)
   {
     EXPECT_EQ(create_ts_return_header(testcase.input), testcase.expected);
   }
+  // Key length boundaries: 256-char key valid, 257-char invalid
+  EXPECT_NE(create_ts_return_header(std::string(256, 'z') + "=1"), "");
+  EXPECT_EQ(create_ts_return_header(std::string(257, 'z') + "=1"), "");
+  // Old vendor-section limits (241 before @, 14 after) are gone; only total length matters
+  EXPECT_NE(create_ts_return_header(std::string(242, 't') + "@v=1"), "");  // 244-char key with @
+  EXPECT_NE(create_ts_return_header("t@" + std::string(15, 'v') + "=1"), "");  // 15 chars after @
 }
 
 TEST(TraceStateTest, ExceedsMaxKeyValuePairs)
@@ -165,10 +174,23 @@ TEST(TraceStateTest, GetAllEntries)
 TEST(TraceStateTest, IsValidKey)
 {
   EXPECT_TRUE(TraceState::IsValidKey("valid-key23/*"));
+  // @ is a regular keychar per W3C Trace Context Level 2
+  EXPECT_TRUE(TraceState::IsValidKey("foo@"));
+  EXPECT_TRUE(TraceState::IsValidKey("foo@@bar"));
+  EXPECT_TRUE(TraceState::IsValidKey("foo@bar@baz"));
+  EXPECT_FALSE(TraceState::IsValidKey("@foo"));  // must start with lcalpha or DIGIT
   EXPECT_FALSE(TraceState::IsValidKey("Invalid_key"));
   EXPECT_FALSE(TraceState::IsValidKey("invalid$Key&"));
   EXPECT_FALSE(TraceState::IsValidKey(""));
   EXPECT_FALSE(TraceState::IsValidKey(kLongString));
+  // Key length boundary: exactly 256 chars valid, 257 invalid
+  EXPECT_TRUE(TraceState::IsValidKey(std::string(256, 'z')));
+  EXPECT_FALSE(TraceState::IsValidKey(std::string(257, 'z')));
+  // Old vendor-section limits (241 before @, 14 after) are gone; only total length matters
+  EXPECT_TRUE(
+      TraceState::IsValidKey(std::string(241, 't') + "@" + std::string(14, 'v')));  // 256 chars
+  EXPECT_TRUE(TraceState::IsValidKey(std::string(242, 't') + "@v"));                // 244 chars
+  EXPECT_TRUE(TraceState::IsValidKey("t@" + std::string(15, 'v')));                 // 17 chars
 }
 
 TEST(TraceStateTest, IsValidValue)
