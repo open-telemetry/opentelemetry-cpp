@@ -26,7 +26,6 @@
 #  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/sdk/metrics/data/point_data.h"
-#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
@@ -58,7 +57,7 @@ TEST_P(WritableMetricStorageTestFixture, LongGaugeLastValueAggregation)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       nullptr);
 
@@ -142,7 +141,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       nullptr);
 
@@ -236,7 +235,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       nullptr);
   auto after_creation = std::chrono::system_clock::now();
@@ -417,7 +416,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       nullptr);
   auto after_creation = std::chrono::system_clock::now();
