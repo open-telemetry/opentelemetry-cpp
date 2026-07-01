@@ -64,6 +64,7 @@
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
@@ -133,6 +134,7 @@
 #include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
@@ -1907,19 +1909,33 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
     sdk_processors.push_back(CreateLogRecordProcessor(processor_model));
   }
 
-  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3303
-  // FIXME-SDK: use limits
+  opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
+  if (model->limits)
+  {
+    log_record_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
+    log_record_limits.attribute_count_limit        = model->limits->attribute_count_limit;
+  }
+
+  std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+      opentelemetry::sdk::logs::LoggerConfig>>
+      logger_configurator;
   if (model->logger_configurator)
   {
-    auto logger_configurator = CreateLoggerConfigurator(model->logger_configurator);
-    sdk                      = opentelemetry::sdk::logs::LoggerProviderFactory::Create(
-        std::move(sdk_processors), resource, std::move(logger_configurator));
+    logger_configurator = CreateLoggerConfigurator(model->logger_configurator);
   }
   else
   {
-    sdk = opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(sdk_processors),
-                                                                  resource);
+    logger_configurator =
+        std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+            opentelemetry::sdk::logs::LoggerConfig>>(
+            opentelemetry::sdk::instrumentationscope::
+                ScopeConfigurator<opentelemetry::sdk::logs::LoggerConfig>::Builder(
+                    opentelemetry::sdk::logs::LoggerConfig::Default())
+                    .Build());
   }
+
+  sdk = opentelemetry::sdk::logs::LoggerProviderFactory::Create(
+      std::move(sdk_processors), resource, std::move(logger_configurator), log_record_limits);
 
   return sdk;
 }

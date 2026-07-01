@@ -892,6 +892,16 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.otlp.
     TEST_LIST otlp_log_recordable_test)
 
+  add_executable(otlp_populate_attribute_utils_test
+                 test/otlp_populate_attribute_utils_test.cc)
+  target_link_libraries(
+    otlp_populate_attribute_utils_test ${GTEST_BOTH_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
+  gtest_add_tests(
+    TARGET otlp_populate_attribute_utils_test
+    TEST_PREFIX exporter.otlp.
+    TEST_LIST otlp_populate_attribute_utils_test)
+
   add_executable(otlp_metrics_serialization_test
                  test/otlp_metrics_serialization_test.cc)
   target_link_libraries(
