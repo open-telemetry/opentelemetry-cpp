@@ -140,7 +140,9 @@ public:
 class OtlpRecordableFixture : public benchmark::Fixture
 {
 public:
-  void SetUp(const benchmark::State &) override
+  using benchmark::Fixture::SetUp;
+
+  void SetUp(benchmark::State &) override
   {
     auto processor =
         std::make_unique<test_utils::BufferingSpanProcessor>(std::make_unique<NullSpanExporter>());

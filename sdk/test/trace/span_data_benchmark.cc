@@ -90,7 +90,9 @@ namespace
 class SpanDataFixture : public benchmark::Fixture
 {
 public:
-  void SetUp(const benchmark::State &) override
+  using benchmark::Fixture::SetUp;
+
+  void SetUp(benchmark::State &) override
   {
     auto exporter  = std::make_unique<opentelemetry::exporter::memory::InMemorySpanExporter>();
     auto processor = std::make_unique<test_utils::BufferingSpanProcessor>(std::move(exporter));
