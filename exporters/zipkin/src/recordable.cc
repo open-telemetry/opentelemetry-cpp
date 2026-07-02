@@ -39,14 +39,6 @@ namespace trace_api = opentelemetry::trace;
 namespace common    = opentelemetry::common;
 namespace sdk       = opentelemetry::sdk;
 
-// constexpr needs keys to be constexpr, const is next best to use.
-static const std::map<trace_api::SpanKind, std::string> kSpanKindMap = {
-    {trace_api::SpanKind::kClient, "CLIENT"},
-    {trace_api::SpanKind::kServer, "SERVER"},
-    {trace_api::SpanKind::kConsumer, "CONSUMER"},
-    {trace_api::SpanKind::kProducer, "PRODUCER"},
-};
-
 //
 // See `attribute_value.h` for details.
 //
@@ -262,6 +254,14 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 
 void Recordable::SetSpanKind(trace_api::SpanKind span_kind) noexcept
 {
+  // constexpr needs keys to be constexpr, const is next best to use.
+  static const std::map<trace_api::SpanKind, std::string> kSpanKindMap = {
+      {trace_api::SpanKind::kClient, "CLIENT"},
+      {trace_api::SpanKind::kServer, "SERVER"},
+      {trace_api::SpanKind::kConsumer, "CONSUMER"},
+      {trace_api::SpanKind::kProducer, "PRODUCER"},
+  };
+
   auto span_iter = kSpanKindMap.find(span_kind);
   if (span_iter != kSpanKindMap.end())
   {
