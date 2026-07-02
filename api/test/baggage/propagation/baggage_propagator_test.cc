@@ -101,7 +101,7 @@ TEST(BaggagePropagatorTest, InjectEmptyHeader)
   BaggageCarrierTest carrier;
   context::Context ctx = context::Context{};
   format.Inject(carrier, ctx);
-  EXPECT_EQ(carrier.headers_.find(baggage::kBaggageHeader), carrier.headers_.end());
+  EXPECT_EQ(carrier.headers_.find(std::string(baggage::kBaggageHeader)), carrier.headers_.end());
 
   {
     // Test empty baggage in context
@@ -110,7 +110,7 @@ TEST(BaggagePropagatorTest, InjectEmptyHeader)
     context::Context ctx1                             = context::Context{};
     context::Context ctx2                             = format.Extract(carrier1, ctx1);
     format.Inject(carrier, ctx2);
-    EXPECT_EQ(carrier.headers_.find(baggage::kBaggageHeader), carrier.headers_.end());
+    EXPECT_EQ(carrier.headers_.find(std::string(baggage::kBaggageHeader)), carrier.headers_.end());
   }
   {
     // Invalid baggage in context
@@ -120,7 +120,7 @@ TEST(BaggagePropagatorTest, InjectEmptyHeader)
     context::Context ctx2                             = format.Extract(carrier1, ctx1);
 
     format.Inject(carrier, ctx2);
-    EXPECT_EQ(carrier.headers_.find(baggage::kBaggageHeader), carrier.headers_.end());
+    EXPECT_EQ(carrier.headers_.find(std::string(baggage::kBaggageHeader)), carrier.headers_.end());
   }
 }
 
