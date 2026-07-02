@@ -50,7 +50,11 @@ static bool opt_list   = false;
 static bool opt_debug  = false;
 static bool opt_secure = false;
 // HTTPS by default
-static std::string opt_endpoint = "https://localhost:4318/v1/traces";
+static std::string &opt_endpoint()
+{
+  static std::string endpoint = "https://localhost:4318/v1/traces";
+  return endpoint;
+}
 static std::string opt_cert_dir;
 static std::string opt_test_name;
 static test_mode opt_mode = MODE_NONE;
@@ -281,7 +285,7 @@ static int parse_args(int argc, char *argv[])
       {
         remaining_argc--;
         remaining_argv++;
-        opt_endpoint = *remaining_argv;
+        opt_endpoint() = *remaining_argv;
         remaining_argc--;
         remaining_argv++;
         continue;
@@ -335,7 +339,7 @@ typedef int (*test_func_t)();
 
 struct test_case
 {
-  std::string m_name;
+  const char *m_name;
   test_func_t m_func;
 };
 
@@ -482,7 +486,7 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-  if (opt_endpoint.find("https:") != std::string::npos)
+  if (opt_endpoint().find("https:") != std::string::npos)
   {
     opt_secure = true;
   }
@@ -502,7 +506,7 @@ int main(int argc, char *argv[])
 
 static void set_common_opts(otlp::OtlpHttpExporterOptions &opts)
 {
-  opts.url = opt_endpoint;
+  opts.url = opt_endpoint();
 
   if (opt_debug)
   {
