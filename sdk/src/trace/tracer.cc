@@ -37,9 +37,6 @@ namespace sdk
 {
 namespace trace
 {
-const std::shared_ptr<opentelemetry::trace::NoopTracer> Tracer::kNoopTracer =
-    std::make_shared<opentelemetry::trace::NoopTracer>();
-
 Tracer::Tracer(std::shared_ptr<TracerContext> context,
                std::unique_ptr<InstrumentationScope> instrumentation_scope) noexcept
     : instrumentation_scope_{std::move(instrumentation_scope)},
@@ -58,6 +55,8 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   // Check if the tracer is enabled using the API Tracer::Enabled() accessor if available.
   if (!Enabled())
   {
+    static const std::shared_ptr<opentelemetry::trace::NoopTracer> kNoopTracer =
+        std::make_shared<opentelemetry::trace::NoopTracer>();
     return kNoopTracer->StartSpan(name, attributes, links, options);
   }
 

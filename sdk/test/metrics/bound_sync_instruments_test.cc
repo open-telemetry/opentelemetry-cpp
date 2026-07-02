@@ -148,7 +148,7 @@ bool HasOverflowPoint(SyncMetricStorage &storage, AggregationTemporality tempora
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find(kAttributesLimitOverflowKey) != p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey()) != p.attributes.end())
                       {
                         found = true;
                       }
@@ -668,7 +668,7 @@ TEST(BoundSyncInstruments, BindingAtOverflowGoesToOverflowBucket)
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find(kAttributesLimitOverflowKey) != p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey()) != p.attributes.end())
                       {
                         seen           = true;
                         const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
@@ -797,7 +797,7 @@ TEST(BoundSyncInstruments, BindOnExistingUnboundKeyDoesNotOverflow)
       std::chrono::system_clock::now(), [&](const MetricData &md) {
         for (const auto &p : md.point_data_attr_)
         {
-          if (p.attributes.find(kAttributesLimitOverflowKey) != p.attributes.end())
+          if (p.attributes.find(kAttributesLimitOverflowKey()) != p.attributes.end())
             overflow_seen = true;
           auto it = p.attributes.find("k");
           if (it != p.attributes.end() && opentelemetry::nostd::get<std::string>(it->second) == "1")
@@ -838,7 +838,7 @@ TEST(BoundSyncInstruments, UnboundOnExistingBoundKeyDoesNotOverflow)
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find(kAttributesLimitOverflowKey) != p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey()) != p.attributes.end())
                         overflow_seen = true;
                       auto it = p.attributes.find("k");
                       if (it == p.attributes.end())
@@ -906,7 +906,7 @@ TEST(BoundSyncInstruments, RetainedBoundEntriesOverflowValue)
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find(kAttributesLimitOverflowKey) == p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey()) == p.attributes.end())
                         continue;
                       const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
                       overflow_sum += opentelemetry::nostd::get<int64_t>(sp.value_);
@@ -941,7 +941,7 @@ TEST(BoundSyncInstruments, NoAttributeUnboundFollowsUnifiedPolicyLong)
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find(kAttributesLimitOverflowKey) == p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey()) == p.attributes.end())
                         continue;
                       const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
                       overflow_sum += opentelemetry::nostd::get<int64_t>(sp.value_);
@@ -972,7 +972,7 @@ TEST(BoundSyncInstruments, NoAttributeUnboundFollowsUnifiedPolicyDouble)
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find(kAttributesLimitOverflowKey) == p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey()) == p.attributes.end())
                         continue;
                       const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
                       overflow_sum += opentelemetry::nostd::get<double>(sp.value_);
@@ -1110,7 +1110,7 @@ TEST(BoundSyncInstruments, OverflowParityAllowsFillingRemainingSlot)
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
                     {
-                      if (p.attributes.find(kAttributesLimitOverflowKey) != p.attributes.end())
+                      if (p.attributes.find(kAttributesLimitOverflowKey()) != p.attributes.end())
                       {
                         overflow_seen = true;
                       }

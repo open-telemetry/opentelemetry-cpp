@@ -76,7 +76,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   EXPECT_EQ(hash_map.Size(), 10);  // no new metric point added
 
   // get the overflow metric point
-  auto agg1 = hash_map.GetOrSetDefault(kOverflowAttributes, aggregation_callback);
+  auto agg1 = hash_map.GetOrSetDefault(kOverflowAttributes(), aggregation_callback);
   EXPECT_NE(agg1, nullptr);
   auto sum_agg1 = static_cast<LongSumAggregation *>(agg1);
   EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg1->ToPoint()).value_),
@@ -147,7 +147,7 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
         {
           const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
           count_attributes++;
-          if (data_attr.attributes.begin()->first == kAttributesLimitOverflowKey)
+          if (data_attr.attributes.begin()->first == kAttributesLimitOverflowKey())
           {
             // Per the spec, the overflow data point MUST contain exactly one
             // attribute, with the key `otel.metric.overflow` and the boolean
@@ -177,12 +177,12 @@ INSTANTIATE_TEST_SUITE_P(All,
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#cardinality-limits
 TEST(CardinalityLimitOverflowAttribute, MatchesSpecLiteral)
 {
-  EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowKey, "otel.metric.overflow");
+  EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowKey(), "otel.metric.overflow");
   EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowValue, true);
   // The precomputed overflow attribute set MUST contain exactly the spec key
   // mapped to the boolean value `true`.
-  ASSERT_EQ(opentelemetry::sdk::metrics::kOverflowAttributes.size(), 1u);
-  const auto &entry = *opentelemetry::sdk::metrics::kOverflowAttributes.begin();
+  ASSERT_EQ(opentelemetry::sdk::metrics::kOverflowAttributes().size(), 1u);
+  const auto &entry = *opentelemetry::sdk::metrics::kOverflowAttributes().begin();
   EXPECT_EQ(entry.first, "otel.metric.overflow");
   EXPECT_EQ(nostd::get<bool>(entry.second), true);
 }

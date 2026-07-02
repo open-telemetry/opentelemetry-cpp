@@ -20,9 +20,9 @@ namespace metrics
 {
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
 // instrument-name = ALPHA 0*254 ("_" / "." / "-" / "/" / ALPHA / DIGIT)
-const std::string kInstrumentNamePattern = "[a-zA-Z][-_./a-zA-Z0-9]{0,254}";
+constexpr const char *kInstrumentNamePattern = "[a-zA-Z][-_./a-zA-Z0-9]{0,254}";
 //
-const std::string kInstrumentUnitPattern = "[\x01-\x7F]{0,63}";
+constexpr const char *kInstrumentUnitPattern = "[\x01-\x7F]{0,63}";
 // instrument-unit = It can have a maximum length of 63 ASCII chars
 #endif
 
