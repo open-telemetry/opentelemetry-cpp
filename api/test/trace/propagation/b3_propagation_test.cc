@@ -27,6 +27,9 @@
 
 using namespace opentelemetry;
 
+namespace
+{
+
 class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
 public:
@@ -219,3 +222,5 @@ TEST(B3PropagationTest, GetCurrentSpanMultiHeader)
   EXPECT_EQ(carrier.headers_["X-B3-SpanId"], "0102030405060708");
   EXPECT_EQ(carrier.headers_["X-B3-Sampled"], "1");
 }
+
+}  // namespace
