@@ -209,6 +209,7 @@ cc_library(
         "//sdk/src/common:base64",
         "@com_github_opentelemetry_proto//:common_proto_cc",
         "@com_google_absl//absl/strings",
+        "@com_google_protobuf//:protobuf",
         "@github_nlohmann_json//:json",
     ],
 )
@@ -695,6 +696,7 @@ cc_test(
         ":otlp_grpc_exporter",
         "//api",
         "//sdk/src/metrics",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -876,6 +878,7 @@ cc_test(
         "//api",
         "//sdk/src/logs",
         "//sdk/src/metrics",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -909,6 +912,7 @@ cc_test(
         ":otlp_grpc_metric_exporter",
         "//api",
         "//sdk/src/metrics",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -1003,5 +1007,22 @@ otel_cc_benchmark(
         ":otlp_grpc_exporter",
         "//examples/common/foo_library:common_foo_library",
         "//sdk/src/metrics",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "otlp_recordable_benchmark",
+    srcs = ["test/otlp_recordable_benchmark.cc"],
+    tags = [
+        "benchmark",
+        "otlp",
+        "test",
+    ],
+    deps = [
+        ":otlp_recordable",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
     ],
 )

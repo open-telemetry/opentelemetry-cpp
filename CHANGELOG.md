@@ -15,8 +15,20 @@ Increment the:
 
 ## [Unreleased]
 
+* [CMAKE] Fix and test WITH_API_ONLY option
+  [#4201](https://github.com/open-telemetry/opentelemetry-cpp/pull/4201)
+
+* [API] Fix `TraceState::IsValidKey()` to comply with the W3C Trace Context
+  Level 2, where keys containing `@` and keys with more than 241 characters
+  before `@` or more than 14 characters after `@` are now accepted.
+  Only the total 256-character key length limit is enforced.
+  **Note**: this is a correctness fix to an inline API header; the observable
+  behavior of `IsValidKey`, `IsValidKeyRegEx`, and `IsValidKeyNonRegEx`
+  changes (see `docs/abi-policy.md`).
+  [#4194](https://github.com/open-telemetry/opentelemetry-cpp/pull/4194)
+
 * [SDK] Add `TracerProvider::UpdateTracerConfigurator()` and example
-  [#4065](https://github.com/open-telemetry/opentelemetry-cpp/issues/4065)
+  [#4065](https://github.com/open-telemetry/opentelemetry-cpp/pull/4065)
 
 * [RELEASE] Bump main branch to 1.28.0-dev
   [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)
@@ -61,37 +73,63 @@ Increment the:
   LoggerConfig declarative configuration
   [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
 
+* [CODE HEALTH] Fix clang-tidy bugprone-exception-escape in ostream exporters
+  [#4137](https://github.com/open-telemetry/opentelemetry-cpp/pull/4137)
+
 * [API] (ABI v2) `Logger::EmitLogRecord(...)` templates now apply the
   `Enabled` filter chain when a `Severity` is in args. v1 behavior is
   unchanged.
-  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+  [#4079](https://github.com/open-telemetry/opentelemetry-cpp/pull/4079)
 
 * [API/SDK] (ABI v2) Add `Logger::CreateLogRecord` virtual taking
   `const nostd::variant<trace::SpanContext, context::Context> &`
   for explicit-context record creation. `Logger::EmitLogRecord(args...)`
   also detects a `Context`, `SpanContext`
   or `TraceId` + `SpanId` [+ `TraceFlags`] in args and routes filtering.
-  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+  [#4079](https://github.com/open-telemetry/opentelemetry-cpp/pull/4079)
 
 * [SDK] Add `LogRecordProcessor::HasEnabledFilter()` so the SDK Logger can
   include processor-level filtering in its extended-enabled cache. Defaults
   to `true`. Built-in `SimpleLogRecordProcessor` and
   `BatchLogRecordProcessor` override to `false` since they use the default
   Enabled.
-  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+  [#4079](https://github.com/open-telemetry/opentelemetry-cpp/pull/4079)
 
 * [API/SDK] Replace `Context`-only signatures on
   `LogRecordProcessor::Enabled`,
   `LogRecordProcessor::EnabledImplementation`,
   `Logger::EnabledImplementation` (v2), and `Logger::CreateLogRecord` (v2)
   with `nostd::variant<trace::SpanContext, context::Context>`.
-  [#2667](https://github.com/open-telemetry/opentelemetry-cpp/issues/2667)
+  [#4079](https://github.com/open-telemetry/opentelemetry-cpp/pull/4079)
 
 * [CI] iwyu and clang-tidy: use install_thirdparty.sh for third-party
   [#4136](https://github.com/open-telemetry/opentelemetry-cpp/pull/4136)
 
+* [CONFIGURATION] File configuration: declarative resource detection types
+  [#4148](https://github.com/open-telemetry/opentelemetry-cpp/pull/4148)
+
 * [SDK] Per-instrument creation time as delta first-interval start_ts
   [#4144](https://github.com/open-telemetry/opentelemetry-cpp/pull/4144)
+
+* [SDK] Add ComposableSampler and CompositeSampler with the consistent
+  probability sampling variants (AlwaysOn, AlwaysOff, TraceIdRatioBased,
+  ParentThreshold, RuleBased)
+  [#4028](https://github.com/open-telemetry/opentelemetry-cpp/issues/4028)
+
+* [BUILD] Fix protobuf build failure
+  [#4154](https://github.com/open-telemetry/opentelemetry-cpp/pull/4154)
+
+* [SEMANTIC CONVENTIONS] Generate event name constants (e.g. `semconv::exception::kException`)
+  [#4171](https://github.com/open-telemetry/opentelemetry-cpp/pull/4171)
+
+* [EXPORTER] Handle OTLP partial success response
+  [#4104](https://github.com/open-telemetry/opentelemetry-cpp/pull/4104)
+
+* [CONFIGURATION] Apply default sampler when none is specified
+  [#4170](https://github.com/open-telemetry/opentelemetry-cpp/pull/4170)
+
+* [CODE HEALTH] Move trace and baggage propagation test classes into anonymous namespace
+  [#4199](https://github.com/open-telemetry/opentelemetry-cpp/pull/4199)
 
 ## [1.27.0] 2026-05-13
 

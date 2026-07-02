@@ -60,6 +60,24 @@ endif()
 option(WITH_ABI_VERSION_1 "ABI version 1" ON)
 option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
 
+if(DEFINED WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+   AND WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+   AND NOT WITH_ABI_VERSION_2)
+  message(
+    FATAL_ERROR
+      "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW requires WITH_ABI_VERSION_2")
+endif()
+
+include(CMakeDependentOption)
+
+# Experimental: bound synchronous metric instruments (Counter, Histogram).
+# Requires WITH_ABI_VERSION_2. Context-bearing bound operations, exemplar
+# parity, Gauge, and UpDownCounter bound support are follow-ups.
+cmake_dependent_option(
+  WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  "EXPERIMENTAL: bound synchronous metric instruments preview" OFF
+  "WITH_ABI_VERSION_2" OFF)
+
 option(WITH_CONFIGURATION "EXPERIMENTAL: YAML configuration file" OFF)
 
 #
@@ -92,6 +110,12 @@ elseif(WITH_ABI_VERSION_1)
   set(OPENTELEMETRY_ABI_VERSION_NO "1")
 else()
   set(OPENTELEMETRY_ABI_VERSION_NO "${OPENTELEMETRY_ABI_VERSION_DEFAULT}")
+endif()
+
+if(WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW AND NOT WITH_ABI_VERSION_2)
+  message(
+    FATAL_ERROR
+      "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW requires WITH_ABI_VERSION_2")
 endif()
 
 option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
@@ -245,7 +269,9 @@ if(WITH_GSL)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/ms-gsl.cmake")
 endif()
 
-find_package(Threads)
+if(NOT WITH_API_ONLY)
+  find_package(Threads)
+endif()
 
 function(set_target_version target_name)
   if(OTELCPP_VERSIONED_LIBS)
@@ -274,23 +300,44 @@ include(GNUInstallDirs)
 # Do we need HTTP CLIENT CURL ?
 #
 
-if(WITH_OTLP_HTTP
-   OR WITH_ELASTICSEARCH
-   OR WITH_ZIPKIN
-   OR BUILD_W3CTRACECONTEXT_TEST
-   OR WITH_EXAMPLES_HTTP)
-  set(WITH_HTTP_CLIENT_CURL ON)
-else()
+include(CMakeDependentOption)
+cmake_dependent_option(
+  WITH_HTTP_CLIENT_CURL
+  "Use the curl HTTP client backend. Defaults to ON when any HTTP exporter is enabled; set OFF to supply a custom transport."
+  ON
+  "WITH_OTLP_HTTP OR WITH_ELASTICSEARCH OR WITH_ZIPKIN OR BUILD_W3CTRACECONTEXT_TEST OR WITH_EXAMPLES_HTTP"
+  OFF)
+
+#
+# Locally override options if WITH_API_ONLY is set to prevent third party
+# dependencies from being imported
+#
+
+if(WITH_API_ONLY)
+  set(WITH_EXAMPLES OFF)
+  set(WITH_EXAMPLES_HTTP OFF)
+  set(WITH_OTLP_GRPC OFF)
+  set(WITH_OTLP_HTTP OFF)
+  set(WITH_OTLP_FILE OFF)
+  set(WITH_ZIPKIN OFF)
+  set(WITH_PROMETHEUS OFF)
+  set(WITH_ELASTICSEARCH OFF)
+  set(WITH_OPENTRACING OFF)
+  set(WITH_ETW OFF)
+  set(WITH_CONFIGURATION OFF)
   set(WITH_HTTP_CLIENT_CURL OFF)
+  set(WITH_OTLP_HTTP_COMPRESSION OFF)
+  set(WITH_BENCHMARK OFF)
+  set(WITH_FUNC_TESTS OFF)
+  set(BUILD_TESTING OFF)
+  set(BUILD_W3CTRACECONTEXT_TEST OFF)
 endif()
 
 #
 # Do we need ZLIB ?
 #
 
-if((NOT WITH_API_ONLY)
-   AND WITH_HTTP_CLIENT_CURL
-   AND WITH_OTLP_HTTP_COMPRESSION)
+if(WITH_HTTP_CLIENT_CURL AND WITH_OTLP_HTTP_COMPRESSION)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/zlib.cmake")
 endif()
 
@@ -298,7 +345,7 @@ endif()
 # Do we need CURL ?
 #
 
-if((NOT WITH_API_ONLY) AND WITH_HTTP_CLIENT_CURL)
+if(WITH_HTTP_CLIENT_CURL)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/curl.cmake")
 endif()
 
@@ -344,7 +391,7 @@ else()
   set(USE_NLOHMANN_JSON OFF)
 endif()
 
-if((NOT WITH_API_ONLY) AND USE_NLOHMANN_JSON)
+if(USE_NLOHMANN_JSON)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/nlohmann-json.cmake")
 endif()
 
@@ -352,7 +399,7 @@ endif()
 # Do we need RapidYaml ?
 #
 
-if((NOT WITH_API_ONLY) AND WITH_CONFIGURATION)
+if(WITH_CONFIGURATION)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/ryml.cmake")
 endif()
 
@@ -525,6 +572,10 @@ message(
   STATUS
     "WITH_OTLP_GRPC_CREDENTIAL_PREVIEW: ${WITH_OTLP_GRPC_CREDENTIAL_PREVIEW}")
 message(STATUS "WITH_OTLP_RETRY_PREVIEW: ${WITH_OTLP_RETRY_PREVIEW}")
+message(
+  STATUS
+    "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW: ${WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW}"
+)
 message(STATUS "---------------------------------------------")
 message(STATUS "third-party options")
 message(STATUS "---------------------------------------------")
@@ -614,11 +665,11 @@ endif()
 
 add_subdirectory(api)
 
-if(WITH_OPENTRACING)
-  add_subdirectory(opentracing-shim)
-endif()
-
 if(NOT WITH_API_ONLY)
+  if(WITH_OPENTRACING)
+    add_subdirectory(opentracing-shim)
+  endif()
+
   set(BUILD_TESTING ${BUILD_TESTING})
 
   add_subdirectory(sdk)
@@ -637,11 +688,12 @@ if(NOT WITH_API_ONLY)
   if(WITH_FUNC_TESTS)
     add_subdirectory(functional)
   endif()
+
+  include(
+    "${opentelemetry-cpp_SOURCE_DIR}/cmake/opentelemetry-build-external-component.cmake"
+  )
 endif()
 
-include(
-  "${opentelemetry-cpp_SOURCE_DIR}/cmake/opentelemetry-build-external-component.cmake"
-)
 include("${opentelemetry-cpp_SOURCE_DIR}/cmake/patch-imported-config.cmake")
 
 if(OPENTELEMETRY_INSTALL)

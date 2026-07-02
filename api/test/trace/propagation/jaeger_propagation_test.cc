@@ -30,6 +30,9 @@
 
 using namespace opentelemetry;
 
+namespace
+{
+
 class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
 public:
@@ -204,3 +207,5 @@ TEST(JaegerPropagatorTest, DoNotInjectInvalidContext)
   format.Inject(carrier, ctx);
   EXPECT_TRUE(carrier.headers_.count("uber-trace-id") == 0);
 }
+
+}  // namespace

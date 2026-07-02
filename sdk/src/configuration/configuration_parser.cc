@@ -39,6 +39,7 @@
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/container_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/default_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/distribution_configuration.h"
@@ -55,11 +56,13 @@
 #include "opentelemetry/sdk/configuration/extension_metric_producer_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
+#include "opentelemetry/sdk/configuration/host_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
 #include "opentelemetry/sdk/configuration/instrument_type.h"
@@ -94,13 +97,17 @@
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/service_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
@@ -1658,6 +1665,10 @@ ConfigurationParser::ParseParentBasedSamplerConfiguration(const std::unique_ptr<
   {
     model->root = ParseSamplerConfiguration(child, depth + 1);
   }
+  else
+  {
+    model->root = std::make_unique<AlwaysOnSamplerConfiguration>();
+  }
 
   child = node->GetChildNode("remote_parent_sampled");
   if (child)
@@ -2290,6 +2301,12 @@ std::unique_ptr<TracerProviderConfiguration> ConfigurationParser::ParseTracerPro
   {
     model->sampler = ParseSamplerConfiguration(child, 0);
   }
+  else
+  {
+    auto parent_based  = std::make_unique<ParentBasedSamplerConfiguration>();
+    parent_based->root = std::make_unique<AlwaysOnSamplerConfiguration>();
+    model->sampler     = std::move(parent_based);
+  }
 
   child = node->GetChildNode("tracer_configurator/development");
   if (child)
@@ -2504,6 +2521,121 @@ std::unique_ptr<AttributesConfiguration> ConfigurationParser::ParseAttributesCon
   return model;
 }
 
+std::unique_ptr<ContainerResourceDetectorConfiguration>
+ConfigurationParser::ParseContainerResourceDetectorConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */) const
+{
+  return std::make_unique<ContainerResourceDetectorConfiguration>();
+}
+
+std::unique_ptr<HostResourceDetectorConfiguration>
+ConfigurationParser::ParseHostResourceDetectorConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */) const
+{
+  return std::make_unique<HostResourceDetectorConfiguration>();
+}
+
+std::unique_ptr<ProcessResourceDetectorConfiguration>
+ConfigurationParser::ParseProcessResourceDetectorConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */) const
+{
+  return std::make_unique<ProcessResourceDetectorConfiguration>();
+}
+
+std::unique_ptr<ServiceResourceDetectorConfiguration>
+ConfigurationParser::ParseServiceResourceDetectorConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */) const
+{
+  return std::make_unique<ServiceResourceDetectorConfiguration>();
+}
+
+std::unique_ptr<ExtensionResourceDetectorConfiguration>
+ConfigurationParser::ParseResourceDetectorExtensionConfiguration(
+    const std::string &name,
+    std::unique_ptr<DocumentNode> node) const
+{
+  auto model = std::make_unique<ExtensionResourceDetectorConfiguration>();
+
+  model->name = name;
+  model->node = std::move(node);
+
+  return model;
+}
+
+std::unique_ptr<ResourceDetectorConfiguration>
+ConfigurationParser::ParseResourceDetectorConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  std::unique_ptr<ResourceDetectorConfiguration> model;
+
+  std::string name;
+  std::unique_ptr<DocumentNode> child;
+  size_t count = 0;
+
+  for (auto it = node->begin_properties(); it != node->end_properties(); ++it)
+  {
+    name  = it.Name();
+    child = it.Value();
+    count++;
+  }
+
+  if (count != 1)
+  {
+    std::string message("Illegal resource detector, properties count: ");
+    message.append(std::to_string(count));
+    throw InvalidSchemaException(node->Location(), message);
+  }
+
+  if (name == "container")
+  {
+    model = ParseContainerResourceDetectorConfiguration(child);
+  }
+  else if (name == "host")
+  {
+    model = ParseHostResourceDetectorConfiguration(child);
+  }
+  else if (name == "process")
+  {
+    model = ParseProcessResourceDetectorConfiguration(child);
+  }
+  else if (name == "service")
+  {
+    model = ParseServiceResourceDetectorConfiguration(child);
+  }
+  else
+  {
+    model = ParseResourceDetectorExtensionConfiguration(name, std::move(child));
+  }
+
+  return model;
+}
+
+std::unique_ptr<ResourceDetectionConfiguration>
+ConfigurationParser::ParseResourceDetectionConfiguration(
+    const std::unique_ptr<DocumentNode> &node) const
+{
+  auto model = std::make_unique<ResourceDetectionConfiguration>();
+  std::unique_ptr<DocumentNode> child;
+
+  child = node->GetChildNode("attributes");
+  if (child)
+  {
+    model->attributes = ParseIncludeExcludeConfiguration(child);
+  }
+
+  child = node->GetChildNode("detectors");
+  if (child)
+  {
+    for (auto it = child->begin(); it != child->end(); ++it)
+    {
+      std::unique_ptr<DocumentNode> detector_node(*it);
+      model->detectors.push_back(ParseResourceDetectorConfiguration(detector_node));
+    }
+  }
+
+  return model;
+}
+
 std::unique_ptr<ResourceConfiguration> ConfigurationParser::ParseResourceConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
@@ -2519,10 +2651,10 @@ std::unique_ptr<ResourceConfiguration> ConfigurationParser::ParseResourceConfigu
     model->attributes = ParseAttributesConfiguration(child);
   }
 
-  child = node->GetChildNode("detectors");
+  child = node->GetChildNode("detection/development");
   if (child)
   {
-    model->detectors = ParseIncludeExcludeConfiguration(child);
+    model->detection = ParseResourceDetectionConfiguration(child);
   }
 
   return model;
