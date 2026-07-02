@@ -125,6 +125,9 @@ Increment the:
 * [CONFIGURATION] Apply default sampler when none is specified
   [#4170](https://github.com/open-telemetry/opentelemetry-cpp/pull/4170)
 
+* [CODE HEALTH] Move trace and baggage propagation test classes into anonymous namespace
+  [#4199](https://github.com/open-telemetry/opentelemetry-cpp/pull/4199)
+
 * [CODE HEALTH] Move context propagation test classes into anonymous namespace
   [#4200](https://github.com/open-telemetry/opentelemetry-cpp/pull/4200)
 
