@@ -205,9 +205,9 @@ public:
   /** Returns whether key is a valid key. See https://www.w3.org/TR/trace-context/#key
    * Identifiers MUST begin with a lowercase letter or a digit, and can only contain
    * lowercase letters (a-z), digits (0-9), underscores (_), dashes (-), asterisks (*),
-   * and forward slashes (/).
-   * For multi-tenant vendor scenarios, an at sign (@) can be used to prefix the vendor name.
-   *
+   * forward slashes (/), and at signs (@).
+   * An at sign (@) is treated as a regular character (keychar) with no structural meaning.
+   * Total key length must not exceed 256 characters.
    */
   static bool IsValidKey(nostd::string_view key) noexcept
   {
@@ -255,15 +255,9 @@ private:
     try
     {
 #  endif
-      static std::regex reg_key("^[a-z0-9][a-z0-9*_\\-/]{0,255}$");
-      static std::regex reg_key_multitenant(
-          "^[a-z0-9][a-z0-9*_\\-/]{0,240}(@)[a-z0-9][a-z0-9*_\\-/]{0,13}$");
+      static std::regex reg_key("^[a-z0-9][a-z0-9*_\\-/@]{0,255}$");
       std::string key_s(key.data(), key.size());
-      if (std::regex_match(key_s, reg_key) || std::regex_match(key_s, reg_key_multitenant))
-      {
-        return true;
-      }
-      return false;
+      return std::regex_match(key_s, reg_key);
 #  if OPENTELEMETRY_HAVE_EXCEPTIONS
     }
     catch (const std::regex_error &)
@@ -300,15 +294,9 @@ private:
       return false;
     }
 
-    int ats = 0;
-
     for (const char c : key)
     {
       if (!IsLowerCaseAlphaOrDigit(c) && c != '_' && c != '-' && c != '@' && c != '*' && c != '/')
-      {
-        return false;
-      }
-      if ((c == '@') && (++ats > 1))
       {
         return false;
       }

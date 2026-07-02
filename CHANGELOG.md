@@ -15,6 +15,15 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Fix `TraceState::IsValidKey()` to comply with the W3C Trace Context
+  Level 2, where keys containing `@` and keys with more than 241 characters
+  before `@` or more than 14 characters after `@` are now accepted.
+  Only the total 256-character key length limit is enforced.
+  **Note**: this is a correctness fix to an inline API header; the observable
+  behavior of `IsValidKey`, `IsValidKeyRegEx`, and `IsValidKeyNonRegEx`
+  changes (see `docs/abi-policy.md`).
+  [#4194](https://github.com/open-telemetry/opentelemetry-cpp/pull/4194)
+
 * [SDK] Add `TracerProvider::UpdateTracerConfigurator()` and example
   [#4065](https://github.com/open-telemetry/opentelemetry-cpp/issues/4065)
 
@@ -115,6 +124,9 @@ Increment the:
 
 * [CONFIGURATION] Apply default sampler when none is specified
   [#4170](https://github.com/open-telemetry/opentelemetry-cpp/pull/4170)
+
+* [CODE HEALTH] Move trace and baggage propagation test classes into anonymous namespace
+  [#4199](https://github.com/open-telemetry/opentelemetry-cpp/pull/4199)
 
 ## [1.27.0] 2026-05-13
 
