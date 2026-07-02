@@ -58,7 +58,7 @@ static bool opt_help              = false;
 static bool opt_debug             = false;
 static bool opt_test              = false;
 static bool opt_no_registry       = false;
-static std::string yaml_file_path = "";
+static std::string yaml_file_path;
 
 static std::unique_ptr<opentelemetry::sdk::configuration::ConfiguredSdk> sdk;
 
