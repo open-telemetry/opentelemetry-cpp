@@ -773,62 +773,117 @@ public:
 
 // constants used in VerifyCustomConfiguratorBehavior test
 static auto noop_logger = logs_api::NoopLogger();
-const std::string schema{"https://opentelemetry.io/schemas/1.11.0"};
+static const std::string &schema()
+{
+  static const std::string value{"https://opentelemetry.io/schemas/1.11.0"};
+  return value;
+}
 
 // Generate test case data
 // Test Case 1
-static auto instrumentation_scope_1 =
-    *InstrumentationScope::Create("opentelemetry_library", "1.0.0", schema);
-static auto test_log_recordable_1 =
-    create_mock_log_recordable("Log Message", opentelemetry::logs::Severity::kWarn);
-static auto expected_log_recordable_1 =
-    create_mock_log_recordable("Log Message", opentelemetry::logs::Severity::kWarn);
-static auto custom_log_configurator_test_data_1 =
-    CustomLogConfiguratorTestData(instrumentation_scope_1,
-                                  *test_log_recordable_1,
-                                  *expected_log_recordable_1,
-                                  false);
+static InstrumentationScope &instrumentation_scope_1()
+{
+  static auto value = *InstrumentationScope::Create("opentelemetry_library", "1.0.0", schema());
+  return value;
+}
+static std::unique_ptr<MockLogRecordable> &test_log_recordable_1()
+{
+  static auto value =
+      create_mock_log_recordable("Log Message", opentelemetry::logs::Severity::kWarn);
+  return value;
+}
+static std::unique_ptr<MockLogRecordable> &expected_log_recordable_1()
+{
+  static auto value =
+      create_mock_log_recordable("Log Message", opentelemetry::logs::Severity::kWarn);
+  return value;
+}
+static CustomLogConfiguratorTestData &custom_log_configurator_test_data_1()
+{
+  static auto value = CustomLogConfiguratorTestData(
+      instrumentation_scope_1(), *test_log_recordable_1(), *expected_log_recordable_1(), false);
+  return value;
+}
 // Test Case 2
-static auto instrumentation_scope_2 = *InstrumentationScope::Create("bar_library", "1.0.0", schema);
-static auto test_log_recordable_2 =
-    create_mock_log_recordable("", opentelemetry::logs::Severity::kDebug);
-static auto expected_log_recordable_2 =
-    create_mock_log_recordable("", opentelemetry::logs::Severity::kDebug);
-static auto custom_log_configurator_test_data_2 =
-    CustomLogConfiguratorTestData(instrumentation_scope_2,
-                                  *test_log_recordable_2,
-                                  *expected_log_recordable_2,
-                                  false);
+static InstrumentationScope &instrumentation_scope_2()
+{
+  static auto value = *InstrumentationScope::Create("bar_library", "1.0.0", schema());
+  return value;
+}
+static std::unique_ptr<MockLogRecordable> &test_log_recordable_2()
+{
+  static auto value = create_mock_log_recordable("", opentelemetry::logs::Severity::kDebug);
+  return value;
+}
+static std::unique_ptr<MockLogRecordable> &expected_log_recordable_2()
+{
+  static auto value = create_mock_log_recordable("", opentelemetry::logs::Severity::kDebug);
+  return value;
+}
+static CustomLogConfiguratorTestData &custom_log_configurator_test_data_2()
+{
+  static auto value = CustomLogConfiguratorTestData(
+      instrumentation_scope_2(), *test_log_recordable_2(), *expected_log_recordable_2(), false);
+  return value;
+}
 // Test Case 3
-static auto instrumentation_scope_3 = *InstrumentationScope::Create("foo_library", "", schema);
-static auto test_log_recordable_3 =
-    create_mock_log_recordable("Info message", opentelemetry::logs::Severity::kInfo);
-static auto expected_log_recordable_3 =
-    create_mock_log_recordable("", opentelemetry::logs::Severity::kInvalid);
-static auto custom_log_configurator_test_data_3 =
-    CustomLogConfiguratorTestData(instrumentation_scope_3,
-                                  *test_log_recordable_3,
-                                  *expected_log_recordable_3,
-                                  true);
+static InstrumentationScope &instrumentation_scope_3()
+{
+  static auto value = *InstrumentationScope::Create("foo_library", "", schema());
+  return value;
+}
+static std::unique_ptr<MockLogRecordable> &test_log_recordable_3()
+{
+  static auto value =
+      create_mock_log_recordable("Info message", opentelemetry::logs::Severity::kInfo);
+  return value;
+}
+static std::unique_ptr<MockLogRecordable> &expected_log_recordable_3()
+{
+  static auto value = create_mock_log_recordable("", opentelemetry::logs::Severity::kInvalid);
+  return value;
+}
+static CustomLogConfiguratorTestData &custom_log_configurator_test_data_3()
+{
+  static auto value = CustomLogConfiguratorTestData(
+      instrumentation_scope_3(), *test_log_recordable_3(), *expected_log_recordable_3(), true);
+  return value;
+}
 // Test Case 4
-static auto instrumentation_scope_4 = *InstrumentationScope::Create("allowed_library", "", schema);
-static auto test_log_recordable_4 =
-    create_mock_log_recordable("Scope version missing", opentelemetry::logs::Severity::kInfo);
-static auto expected_log_recordable_4 =
-    create_mock_log_recordable("", opentelemetry::logs::Severity::kInvalid);
-static auto custom_log_configurator_test_data_4 =
-    CustomLogConfiguratorTestData(instrumentation_scope_4,
-                                  *test_log_recordable_4,
-                                  *expected_log_recordable_4,
-                                  true);
+static InstrumentationScope &instrumentation_scope_4()
+{
+  static auto value = *InstrumentationScope::Create("allowed_library", "", schema());
+  return value;
+}
+static std::unique_ptr<MockLogRecordable> &test_log_recordable_4()
+{
+  static auto value =
+      create_mock_log_recordable("Scope version missing", opentelemetry::logs::Severity::kInfo);
+  return value;
+}
+static std::unique_ptr<MockLogRecordable> &expected_log_recordable_4()
+{
+  static auto value = create_mock_log_recordable("", opentelemetry::logs::Severity::kInvalid);
+  return value;
+}
+static CustomLogConfiguratorTestData &custom_log_configurator_test_data_4()
+{
+  static auto value = CustomLogConfiguratorTestData(
+      instrumentation_scope_4(), *test_log_recordable_4(), *expected_log_recordable_4(), true);
+  return value;
+}
 
 // This array could also directly contain the reference types, but that  leads to 'uninitialized
 // value was created by heap allocation' errors in Valgrind memcheck. This is a bug in Googletest
 // library, see https://github.com/google/googletest/issues/3805#issuecomment-1397301790 for more
 // details. Using pointers is a workaround to prevent the Valgrind warnings.
-constexpr std::array<CustomLogConfiguratorTestData *, 4> log_configurator_test_cases = {
-    &custom_log_configurator_test_data_1, &custom_log_configurator_test_data_2,
-    &custom_log_configurator_test_data_3, &custom_log_configurator_test_data_4};
+static const std::array<CustomLogConfiguratorTestData *, 4> &log_configurator_test_cases()
+{
+  static const std::array<CustomLogConfiguratorTestData *, 4> value = {
+      &custom_log_configurator_test_data_1(), &custom_log_configurator_test_data_2(),
+      &custom_log_configurator_test_data_3(), &custom_log_configurator_test_data_4()};
+  return value;
+}
 
 // Test fixture for VerifyCustomConfiguratorBehavior
 class CustomLoggerConfiguratorTestFixture
@@ -899,7 +954,7 @@ TEST_P(CustomLoggerConfiguratorTestFixture, VerifyCustomConfiguratorBehavior)
 
 INSTANTIATE_TEST_SUITE_P(CustomLogConfiguratorTestData,
                          CustomLoggerConfiguratorTestFixture,
-                         ::testing::ValuesIn(log_configurator_test_cases));
+                         ::testing::ValuesIn(log_configurator_test_cases()));
 
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
 TEST(LoggerSDK, EventLog)
