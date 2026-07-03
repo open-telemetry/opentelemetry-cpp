@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <chrono>
-#include <map>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -254,18 +253,22 @@ void Recordable::SetDuration(std::chrono::nanoseconds duration) noexcept
 
 void Recordable::SetSpanKind(trace_api::SpanKind span_kind) noexcept
 {
-  // constexpr needs keys to be constexpr, const is next best to use.
-  static const std::map<trace_api::SpanKind, std::string> kSpanKindMap = {
-      {trace_api::SpanKind::kClient, "CLIENT"},
-      {trace_api::SpanKind::kServer, "SERVER"},
-      {trace_api::SpanKind::kConsumer, "CONSUMER"},
-      {trace_api::SpanKind::kProducer, "PRODUCER"},
-  };
-
-  auto span_iter = kSpanKindMap.find(span_kind);
-  if (span_iter != kSpanKindMap.end())
+  switch (span_kind)
   {
-    span_["kind"] = span_iter->second;
+    case trace_api::SpanKind::kClient:
+      span_["kind"] = "CLIENT";
+      break;
+    case trace_api::SpanKind::kServer:
+      span_["kind"] = "SERVER";
+      break;
+    case trace_api::SpanKind::kConsumer:
+      span_["kind"] = "CONSUMER";
+      break;
+    case trace_api::SpanKind::kProducer:
+      span_["kind"] = "PRODUCER";
+      break;
+    default:
+      break;
   }
 }
 
