@@ -51,6 +51,11 @@ public:
 
   bool HasEnabledFilter() const noexcept override { return false; }
 
+  bool RecordableEnforcesLogRecordLimits() const noexcept override
+  {
+    return exporter_ != nullptr && exporter_->RecordableEnforcesLogRecordLimits();
+  }
+
   bool IsShutdown() const noexcept;
 
 private:

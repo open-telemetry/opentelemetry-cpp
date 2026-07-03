@@ -64,6 +64,8 @@ public:
 
   bool HasEnabledFilter() const noexcept override;
 
+  bool RecordableEnforcesLogRecordLimits() const noexcept override;
+
 protected:
   /**
    * Exports all log records that have not yet been exported to the configured Exporter.
