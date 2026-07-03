@@ -184,6 +184,17 @@ void MultiRecordable::SetInstrumentationScope(
   }
 }
 
+void MultiRecordable::SetLogRecordLimits(const LogRecordLimits &limits) noexcept
+{
+  for (auto &recordable : recordables_)
+  {
+    if (recordable.second)
+    {
+      recordable.second->SetLogRecordLimits(limits);
+    }
+  }
+}
+
 }  // namespace logs
 }  // namespace sdk
 
