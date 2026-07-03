@@ -143,8 +143,6 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   {
     for (const auto &metric_data : instrumentation_info.metric_data_)
     {
-      auto origin_name = metric_data.instrument_descriptor.name_;
-      auto unit        = metric_data.instrument_descriptor.unit_;
       prometheus_client::MetricFamily metric_family;
       metric_family.help = metric_data.instrument_descriptor.description_;
       auto front         = metric_data.point_data_attr_.front();
