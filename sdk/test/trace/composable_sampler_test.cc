@@ -20,9 +20,9 @@
 #include "opentelemetry/sdk/trace/samplers/composable_always_off.h"
 #include "opentelemetry/sdk/trace/samplers/composable_always_on.h"
 #include "opentelemetry/sdk/trace/samplers/composable_parent_threshold.h"
+#include "opentelemetry/sdk/trace/samplers/composable_probability.h"
 #include "opentelemetry/sdk/trace/samplers/composable_rule_based.h"
 #include "opentelemetry/sdk/trace/samplers/composable_sampler.h"
-#include "opentelemetry/sdk/trace/samplers/composable_trace_id_ratio.h"
 #include "opentelemetry/sdk/trace/samplers/composite_sampler.h"
 #include "opentelemetry/sdk/trace/samplers/composite_sampler_factory.h"
 #include "opentelemetry/sdk/trace/samplers/predicate.h"
@@ -40,9 +40,9 @@ namespace common    = opentelemetry::common;
 using opentelemetry::sdk::trace::ComposableAlwaysOffSampler;
 using opentelemetry::sdk::trace::ComposableAlwaysOnSampler;
 using opentelemetry::sdk::trace::ComposableParentThresholdSampler;
+using opentelemetry::sdk::trace::ComposableProbabilitySampler;
 using opentelemetry::sdk::trace::ComposableRuleBasedSampler;
 using opentelemetry::sdk::trace::ComposableSampler;
-using opentelemetry::sdk::trace::ComposableTraceIdRatioBasedSampler;
 using opentelemetry::sdk::trace::CompositeSampler;
 using opentelemetry::sdk::trace::CompositeSamplerFactory;
 using opentelemetry::sdk::trace::Decision;
@@ -207,12 +207,11 @@ TEST(ComposableSampler, AlwaysOffDrops)
 TEST(ComposableSampler, TraceIdRatioBoundaries)
 {
   auto always =
-      CompositeSamplerFactory::Create(std::make_shared<ComposableTraceIdRatioBasedSampler>(1.0));
+      CompositeSamplerFactory::Create(std::make_shared<ComposableProbabilitySampler>(1.0));
   EXPECT_EQ(Decision::RECORD_AND_SAMPLE,
             Sample(*always, trace_api::SpanContext::GetInvalid(), MakeTraceId(0x00)));
 
-  auto never =
-      CompositeSamplerFactory::Create(std::make_shared<ComposableTraceIdRatioBasedSampler>(0.0));
+  auto never = CompositeSamplerFactory::Create(std::make_shared<ComposableProbabilitySampler>(0.0));
   EXPECT_EQ(Decision::DROP,
             Sample(*never, trace_api::SpanContext::GetInvalid(), MakeTraceId(0xFF)));
 }
@@ -220,7 +219,7 @@ TEST(ComposableSampler, TraceIdRatioBoundaries)
 TEST(ComposableSampler, TraceIdRatioUsesTraceRandomness)
 {
   auto sampler =
-      CompositeSamplerFactory::Create(std::make_shared<ComposableTraceIdRatioBasedSampler>(0.5));
+      CompositeSamplerFactory::Create(std::make_shared<ComposableProbabilitySampler>(0.5));
 
   // Threshold for p=0.5 is 2^55, encoded as th:8. Maximum randomness keeps.
   opentelemetry::sdk::trace::SamplingResult kept;
@@ -236,7 +235,7 @@ TEST(ComposableSampler, TraceIdRatioUsesTraceRandomness)
 TEST(ComposableSampler, ExplicitRandomnessOverridesTraceId)
 {
   auto sampler =
-      CompositeSamplerFactory::Create(std::make_shared<ComposableTraceIdRatioBasedSampler>(0.5));
+      CompositeSamplerFactory::Create(std::make_shared<ComposableProbabilitySampler>(0.5));
 
   // rv present and at maximum: keep regardless of the (zero) trace id bits, and
   // the explicit randomness must be preserved in the outgoing tracestate.
@@ -315,8 +314,8 @@ TEST(ComposableSampler, RuleBasedNoMatchDrops)
 
 TEST(ComposableSampler, Descriptions)
 {
-  ComposableTraceIdRatioBasedSampler ratio(0.5);
-  EXPECT_EQ("ComposableTraceIdRatioBasedSampler{0.500000}", std::string(ratio.GetDescription()));
+  ComposableProbabilitySampler ratio(0.5);
+  EXPECT_EQ("ComposableProbabilitySampler{0.500000}", std::string(ratio.GetDescription()));
 
   CompositeSampler composite(std::make_shared<ComposableAlwaysOnSampler>());
   EXPECT_EQ("CompositeSampler{ComposableAlwaysOnSampler}", std::string(composite.GetDescription()));
@@ -365,13 +364,12 @@ TEST(ComposableSampler, DropsTrailingSubkeysOverSizeLimit)
 
 TEST(ComposableSampler, RatioClampedToValidRange)
 {
-  auto over =
-      CompositeSamplerFactory::Create(std::make_shared<ComposableTraceIdRatioBasedSampler>(2.0));
+  auto over = CompositeSamplerFactory::Create(std::make_shared<ComposableProbabilitySampler>(2.0));
   EXPECT_EQ(Decision::RECORD_AND_SAMPLE,
             Sample(*over, trace_api::SpanContext::GetInvalid(), MakeTraceId(0x00)));
 
   auto under =
-      CompositeSamplerFactory::Create(std::make_shared<ComposableTraceIdRatioBasedSampler>(-1.0));
+      CompositeSamplerFactory::Create(std::make_shared<ComposableProbabilitySampler>(-1.0));
   EXPECT_EQ(Decision::DROP,
             Sample(*under, trace_api::SpanContext::GetInvalid(), MakeTraceId(0xFF)));
 }

@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include "opentelemetry/sdk/trace/samplers/composable_trace_id_ratio.h"
+#include "opentelemetry/sdk/trace/samplers/composable_probability.h"
 
 #include <cstdint>
 #include <string>
@@ -18,7 +18,7 @@ namespace sdk
 namespace trace
 {
 
-ComposableTraceIdRatioBasedSampler::ComposableTraceIdRatioBasedSampler(double ratio)
+ComposableProbabilitySampler::ComposableProbabilitySampler(double ratio)
 {
   if (ratio > 1.0)
   {
@@ -33,10 +33,10 @@ ComposableTraceIdRatioBasedSampler::ComposableTraceIdRatioBasedSampler(double ra
   // this to behave like ComposableAlwaysOff: a non-probabilistic drop.
   has_threshold_ = threshold < kMaxThreshold;
   threshold_     = has_threshold_ ? threshold : 0;
-  description_   = "ComposableTraceIdRatioBasedSampler{" + std::to_string(ratio) + "}";
+  description_   = "ComposableProbabilitySampler{" + std::to_string(ratio) + "}";
 }
 
-SamplingIntent ComposableTraceIdRatioBasedSampler::GetSamplingIntent(
+SamplingIntent ComposableProbabilitySampler::GetSamplingIntent(
     const opentelemetry::trace::SpanContext & /* parent_context */,
     opentelemetry::trace::TraceId /* trace_id */,
     nostd::string_view /* name */,
@@ -51,7 +51,7 @@ SamplingIntent ComposableTraceIdRatioBasedSampler::GetSamplingIntent(
   return intent;
 }
 
-nostd::string_view ComposableTraceIdRatioBasedSampler::GetDescription() const noexcept
+nostd::string_view ComposableProbabilitySampler::GetDescription() const noexcept
 {
   return description_;
 }

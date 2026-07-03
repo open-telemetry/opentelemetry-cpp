@@ -16,7 +16,7 @@ namespace trace
 {
 
 /**
- * ComposableTraceIdRatioBasedSampler samples a configurable fraction of traces
+ * ComposableProbabilitySampler samples a configurable fraction of traces
  * using consistent probability sampling. It corresponds to the specification's
  * ComposableProbability sampler and the ComposableProbabilitySamplerConfiguration
  * config model.
@@ -24,10 +24,10 @@ namespace trace
  * The ratio maps to a 56-bit rejection threshold. A ratio of 0 drops every span
  * (an unreliable, non-probabilistic intent, equivalent to ComposableAlwaysOff).
  */
-class ComposableTraceIdRatioBasedSampler : public ComposableSampler
+class ComposableProbabilitySampler : public ComposableSampler
 {
 public:
-  explicit ComposableTraceIdRatioBasedSampler(double ratio);
+  explicit ComposableProbabilitySampler(double ratio);
 
   SamplingIntent GetSamplingIntent(
       const opentelemetry::trace::SpanContext &parent_context,
