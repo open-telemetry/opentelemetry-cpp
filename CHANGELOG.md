@@ -115,9 +115,13 @@ Increment the:
   [#4144](https://github.com/open-telemetry/opentelemetry-cpp/pull/4144)
 
 * [SDK] Add ComposableSampler and CompositeSampler with the consistent
-  probability sampling variants (AlwaysOn, AlwaysOff, TraceIdRatioBased,
+  probability sampling variants (AlwaysOn, AlwaysOff, ComposableProbability,
   ParentThreshold, RuleBased)
   [#4028](https://github.com/open-telemetry/opentelemetry-cpp/issues/4028)
+
+* [SDK] Rename ComposableTraceIdRatioBasedSampler to ComposableProbabilitySampler
+  to align with the OpenTelemetry specification
+  [#4161](https://github.com/open-telemetry/opentelemetry-cpp/issues/4161)
 
 * [BUILD] Fix protobuf build failure
   [#4154](https://github.com/open-telemetry/opentelemetry-cpp/pull/4154)
