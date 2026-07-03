@@ -773,17 +773,13 @@ public:
 
 // constants used in VerifyCustomConfiguratorBehavior test
 static auto noop_logger = logs_api::NoopLogger();
-static const std::string &schema()
-{
-  static const std::string value{"https://opentelemetry.io/schemas/1.11.0"};
-  return value;
-}
+constexpr char schema[] = "https://opentelemetry.io/schemas/1.11.0";
 
 // Generate test case data
 // Test Case 1
 static InstrumentationScope &instrumentation_scope_1()
 {
-  static auto value = *InstrumentationScope::Create("opentelemetry_library", "1.0.0", schema());
+  static auto value = *InstrumentationScope::Create("opentelemetry_library", "1.0.0", schema);
   return value;
 }
 static std::unique_ptr<MockLogRecordable> &test_log_recordable_1()
@@ -807,7 +803,7 @@ static CustomLogConfiguratorTestData &custom_log_configurator_test_data_1()
 // Test Case 2
 static InstrumentationScope &instrumentation_scope_2()
 {
-  static auto value = *InstrumentationScope::Create("bar_library", "1.0.0", schema());
+  static auto value = *InstrumentationScope::Create("bar_library", "1.0.0", schema);
   return value;
 }
 static std::unique_ptr<MockLogRecordable> &test_log_recordable_2()
@@ -829,7 +825,7 @@ static CustomLogConfiguratorTestData &custom_log_configurator_test_data_2()
 // Test Case 3
 static InstrumentationScope &instrumentation_scope_3()
 {
-  static auto value = *InstrumentationScope::Create("foo_library", "", schema());
+  static auto value = *InstrumentationScope::Create("foo_library", "", schema);
   return value;
 }
 static std::unique_ptr<MockLogRecordable> &test_log_recordable_3()
@@ -852,7 +848,7 @@ static CustomLogConfiguratorTestData &custom_log_configurator_test_data_3()
 // Test Case 4
 static InstrumentationScope &instrumentation_scope_4()
 {
-  static auto value = *InstrumentationScope::Create("allowed_library", "", schema());
+  static auto value = *InstrumentationScope::Create("allowed_library", "", schema);
   return value;
 }
 static std::unique_ptr<MockLogRecordable> &test_log_recordable_4()

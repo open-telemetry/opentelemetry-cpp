@@ -147,7 +147,7 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
         {
           const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
           count_attributes++;
-          if (data_attr.attributes.begin()->first == kAttributesLimitOverflowKey())
+          if (data_attr.attributes.begin()->first == kAttributesLimitOverflowKey)
           {
             // Per the spec, the overflow data point MUST contain exactly one
             // attribute, with the key `otel.metric.overflow` and the boolean
@@ -177,7 +177,7 @@ INSTANTIATE_TEST_SUITE_P(All,
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#cardinality-limits
 TEST(CardinalityLimitOverflowAttribute, MatchesSpecLiteral)
 {
-  EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowKey(), "otel.metric.overflow");
+  EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowKey, "otel.metric.overflow");
   EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowValue, true);
   // The precomputed overflow attribute set MUST contain exactly the spec key
   // mapped to the boolean value `true`.

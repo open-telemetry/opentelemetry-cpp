@@ -208,8 +208,8 @@ TEST(HistogramToSumFilterAttributesWithCardinalityLimit, Double)
             }
             else
             {
-              const auto overflow_it = md.point_data_attr_[i].attributes.find(
-                  sdk::metrics::kAttributesLimitOverflowKey());
+              const auto overflow_it =
+                  md.point_data_attr_[i].attributes.find(sdk::metrics::kAttributesLimitOverflowKey);
               EXPECT_NE(md.point_data_attr_[i].attributes.end(), overflow_it);
               if (overflow_it != md.point_data_attr_[i].attributes.end())
               {
@@ -396,8 +396,8 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
             }
             else
             {
-              const auto overflow_it = md.point_data_attr_[i].attributes.find(
-                  sdk::metrics::kAttributesLimitOverflowKey());
+              const auto overflow_it =
+                  md.point_data_attr_[i].attributes.find(sdk::metrics::kAttributesLimitOverflowKey);
               EXPECT_NE(md.point_data_attr_[i].attributes.end(), overflow_it);
               if (overflow_it != md.point_data_attr_[i].attributes.end())
               {
