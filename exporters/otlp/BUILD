@@ -667,6 +667,23 @@ cc_test(
 )
 
 cc_test(
+    name = "otlp_populate_attribute_utils_test",
+    srcs = [
+        "test/otlp_populate_attribute_utils_test.cc",
+    ],
+    tags = [
+        "otlp",
+        "test",
+    ],
+    deps = [
+        ":otlp_recordable",
+        "//sdk/src/metrics",
+        "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "otlp_file_client_test",
     srcs = ["test/otlp_file_client_test.cc"],
     tags = [

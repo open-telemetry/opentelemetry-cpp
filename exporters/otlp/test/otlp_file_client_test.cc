@@ -267,8 +267,6 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateIndexTest)
   opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request;
   OtlpRecordableUtils::PopulateRequest(MakeSpan(recordable), &request);
 
-  std::stringstream output_stream;
-
   // Clear old files
   {
     std::fstream clear_file1("otlp_file_client_test_dir/trace-1.jsonl",
@@ -397,8 +395,6 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateByTimeTest)
 
   opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request;
   OtlpRecordableUtils::PopulateRequest(MakeSpan(recordable), &request);
-
-  std::stringstream output_stream;
 
   opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions backend_opts;
   backend_opts.file_pattern  = "otlp_file_client_test_dir/trace-%Y-%m-%d-%H-%M-%S.jsonl";

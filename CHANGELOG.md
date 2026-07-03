@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CMAKE] Fix and test WITH_API_ONLY option
+  [#4201](https://github.com/open-telemetry/opentelemetry-cpp/pull/4201)
+
 * [API] Fix `TraceState::IsValidKey()` to comply with the W3C Trace Context
   Level 2, where keys containing `@` and keys with more than 241 characters
   before `@` or more than 14 characters after `@` are now accepted.
@@ -25,7 +28,7 @@ Increment the:
   [#4194](https://github.com/open-telemetry/opentelemetry-cpp/pull/4194)
 
 * [SDK] Add `TracerProvider::UpdateTracerConfigurator()` and example
-  [#4065](https://github.com/open-telemetry/opentelemetry-cpp/issues/4065)
+  [#4065](https://github.com/open-telemetry/opentelemetry-cpp/pull/4065)
 
 * [RELEASE] Bump main branch to 1.28.0-dev
   [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)
@@ -102,6 +105,9 @@ Increment the:
 * [CI] iwyu and clang-tidy: use install_thirdparty.sh for third-party
   [#4136](https://github.com/open-telemetry/opentelemetry-cpp/pull/4136)
 
+* [SDK] LogRecord attribute limits enforcement
+  [#4157](https://github.com/open-telemetry/opentelemetry-cpp/pull/4157)
+
 * [CONFIGURATION] File configuration: declarative resource detection types
   [#4148](https://github.com/open-telemetry/opentelemetry-cpp/pull/4148)
 
@@ -124,6 +130,15 @@ Increment the:
 
 * [CONFIGURATION] Apply default sampler when none is specified
   [#4170](https://github.com/open-telemetry/opentelemetry-cpp/pull/4170)
+
+* [CODE HEALTH] Move trace and baggage propagation test classes into anonymous namespace
+  [#4199](https://github.com/open-telemetry/opentelemetry-cpp/pull/4199)
+
+* [CODE HEALTH] Move context propagation test classes into anonymous namespace
+  [#4200](https://github.com/open-telemetry/opentelemetry-cpp/pull/4200)
+
+* [CODE HEALTH] Fix clang-tidy bugprone-unused-local-non-trivial-variable warnings
+  [#4202](https://github.com/open-telemetry/opentelemetry-cpp/pull/4202)
 
 ## [1.27.0] 2026-05-13
 
