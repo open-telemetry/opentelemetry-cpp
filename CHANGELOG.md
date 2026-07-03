@@ -153,6 +153,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy misc-override-with-different-visibility warnings
   [#4215](https://github.com/open-telemetry/opentelemetry-cpp/pull/4215)
 
+* [CODE HEALTH] Fix clang-tidy `bugprone-throwing-static-initialization` warnings
+  [#4206](https://github.com/open-telemetry/opentelemetry-cpp/pull/4206)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
