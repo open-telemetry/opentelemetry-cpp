@@ -177,7 +177,7 @@ INSTANTIATE_TEST_SUITE_P(All,
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#cardinality-limits
 TEST(CardinalityLimitOverflowAttribute, MatchesSpecLiteral)
 {
-  EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowKey, "otel.metric.overflow");
+  EXPECT_STREQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowKey, "otel.metric.overflow");
   EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowValue, true);
   // The precomputed overflow attribute set MUST contain exactly the spec key
   // mapped to the boolean value `true`.
