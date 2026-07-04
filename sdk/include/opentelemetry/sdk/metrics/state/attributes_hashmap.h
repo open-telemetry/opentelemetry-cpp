@@ -30,7 +30,7 @@ const bool kAttributesLimitOverflowValue      = true;
 
 constexpr char kAttributesLimitOverflowKey[] = "otel.metric.overflow";
 
-inline const MetricAttributes &kOverflowAttributes()
+inline const MetricAttributes &GetOverflowAttributes()
 {
   static const MetricAttributes value = {
       {kAttributesLimitOverflowKey,
@@ -133,7 +133,7 @@ public:
     }
     else if (IsOverflowAttributes(attributes))
     {
-      hash_map_[kOverflowAttributes()] = std::move(aggr);
+      hash_map_[GetOverflowAttributes()] = std::move(aggr);
     }
     else
     {
@@ -150,7 +150,7 @@ public:
     }
     else if (IsOverflowAttributes(attributes))
     {
-      hash_map_[kOverflowAttributes()] = std::move(aggr);
+      hash_map_[GetOverflowAttributes()] = std::move(aggr);
     }
     else
     {
@@ -197,13 +197,13 @@ private:
 
   Aggregation *GetOrSetOveflowAttributes(std::unique_ptr<Aggregation> agg)
   {
-    auto it = hash_map_.find(kOverflowAttributes());
+    auto it = hash_map_.find(GetOverflowAttributes());
     if (it != hash_map_.end())
     {
       return it->second.get();
     }
 
-    auto result = hash_map_.emplace(kOverflowAttributes(), std::move(agg));
+    auto result = hash_map_.emplace(GetOverflowAttributes(), std::move(agg));
     return result.first->second.get();
   }
 
@@ -211,12 +211,12 @@ private:
   {
     // If the incoming attributes are exactly the overflow sentinel, route
     // directly to the overflow entry.
-    if (attributes == kOverflowAttributes())
+    if (attributes == GetOverflowAttributes())
     {
       return true;
     }
     // Determine if overflow entry already exists.
-    bool has_overflow = (hash_map_.find(kOverflowAttributes()) != hash_map_.end());
+    bool has_overflow = (hash_map_.find(GetOverflowAttributes()) != hash_map_.end());
     // If overflow already present, total size already includes it; trigger overflow
     // when current size (including overflow) is >= limit.
     if (has_overflow)

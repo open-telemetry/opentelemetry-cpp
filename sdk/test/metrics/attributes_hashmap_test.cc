@@ -203,7 +203,7 @@ TEST(AttributesHashMap, OverflowCardinalityLimitBehavior)
   EXPECT_EQ(map.Size(), limit);
 
   // Ensure overflow key was actually created and accessible via Get
-  EXPECT_NE(map.Get(kOverflowAttributes()), nullptr);
+  EXPECT_NE(map.Get(GetOverflowAttributes()), nullptr);
 
   // Ensure original real attributes still present
   for (size_t i = 0; i < limit - 1; ++i)
@@ -219,7 +219,7 @@ TEST(AttributesHashMap, OverflowCardinalityLimitBehavior)
     return true;
   });
   EXPECT_EQ(map_copy.Size(), map.Size());
-  EXPECT_NE(map_copy.Get(kOverflowAttributes()), nullptr);
+  EXPECT_NE(map_copy.Get(GetOverflowAttributes()), nullptr);
   for (size_t i = 0; i < limit - 1; ++i)
   {
     MetricAttributes attr = {{"k", std::to_string(i)}};
