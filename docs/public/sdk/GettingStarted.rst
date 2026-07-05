@@ -135,6 +135,10 @@ OpenTelemetry C++ SDK  offers five samplers out of the box:
     auto always_off_sampler = std::unique_ptr<sdktrace::TraceIdRatioBasedSampler>
         (new sdktrace::TraceIdRatioBasedSampler(ratio));
 
+    //ProbabilitySampler - Sample 50% generated spans using consistent probability sampling
+    auto probability_sampler = std::unique_ptr<sdktrace::ProbabilitySampler>
+        (new sdktrace::ProbabilitySampler(ratio));
+
 TracerContext
 ^^^^^^^^^^^^^
 
