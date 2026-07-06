@@ -6,8 +6,6 @@
 #include <chrono>
 #include <memory>
 
-#include "opentelemetry/sdk/common/exporter_utils.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
@@ -17,6 +15,8 @@ class MockMetricExporter : public opentelemetry::sdk::metrics::PushMetricExporte
 {
 public:
   MockMetricExporter() = default;
+  explicit MockMetricExporter(opentelemetry::sdk::metrics::AggregationTemporality temporality);
+
   opentelemetry::sdk::common::ExportResult Export(
       const opentelemetry::sdk::metrics::ResourceMetrics &) noexcept override;
 
@@ -26,6 +26,10 @@ public:
   bool ForceFlush(std::chrono::microseconds) noexcept override;
 
   bool Shutdown(std::chrono::microseconds) noexcept override;
+
+private:
+  opentelemetry::sdk::metrics::AggregationTemporality temporality_ =
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative;
 };
 
 class MockMetricReader : public opentelemetry::sdk::metrics::MetricReader

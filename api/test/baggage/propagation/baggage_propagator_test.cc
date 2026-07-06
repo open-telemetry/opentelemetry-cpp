@@ -15,11 +15,13 @@
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::baggage::propagation;
+
+namespace
+{
 
 class BaggageCarrierTest : public context::propagation::TextMapCarrier
 {
@@ -121,3 +123,5 @@ TEST(BaggagePropagatorTest, InjectEmptyHeader)
     EXPECT_EQ(carrier.headers_.find(baggage::kBaggageHeader), carrier.headers_.end());
   }
 }
+
+}  // namespace

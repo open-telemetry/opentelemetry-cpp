@@ -3,12 +3,8 @@
 
 #pragma once
 
-#include <memory>
-
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
-#include "opentelemetry/sdk/logs/exporter.h"
 
 class CustomLogRecordExporterBuilder
     : public opentelemetry::sdk::configuration::ExtensionLogRecordExporterBuilder

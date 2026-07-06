@@ -285,6 +285,10 @@ This status is meant as a preview, until the ABI is declared STABLE.
 
 In the STABLE status,
 changes to the ABI are forbidden, to guarantee stability.
+See the [ABI policy](./abi-policy.md) for the types of non-breaking
+changes that may be allowed within a
+stable ABI version and those that must target an experimental ABI
+version.
 
 In the DEPRECATED status, the ABI is still functional and supported,
 but instrumented applications are encouraged to migrate to a newer ABI.
@@ -292,21 +296,24 @@ but instrumented applications are encouraged to migrate to a newer ABI.
 In the REMOVED status,
 the given ABI is no longer available.
 
+The build files are the source of truth for which ABI version is currently
+experimental versus stable. In CMake, the experimental version is the
+`WITH_ABI_VERSION_*` option labeled `EXPERIMENTAL` in `CMakeLists.txt`, and it
+is off by default; any version without that label is stable.
+
 The following sections describe the migration path from one ABI (v1) to the
 next (v2).
 
 ### STABLE V1
 
 In this state, only one ABI version is available, and it is closed to
-changes.
+breaking changes.
 
 Instrumented applications are built against ABI v1 by default.
 
 opentelemetry-cpp produces a library for ABI v1 by default.
 
 Fixes introducing breaking changes can __not__ be delivered.
-
-This is the current status as of opentelemetry-cpp version 1.11.0
 
 ### STABLE V1, EXPERIMENTAL V2
 

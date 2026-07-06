@@ -2,14 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
@@ -23,6 +25,16 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/utility.h"
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/context/context.h"
+#  include "opentelemetry/nostd/variant.h"
+#  include "opentelemetry/trace/span_context.h"
+#  include "opentelemetry/trace/span_id.h"
+#  include "opentelemetry/trace/trace_flags.h"
+#  include "opentelemetry/trace/trace_id.h"
+#endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
 using opentelemetry::logs::NoopEventLogger;
@@ -37,8 +49,11 @@ using opentelemetry::logs::Severity;
 using opentelemetry::nostd::shared_ptr;
 using opentelemetry::nostd::string_view;
 namespace common = opentelemetry::common;
-namespace nostd  = opentelemetry::nostd;
-namespace trace  = opentelemetry::trace;
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+namespace context = opentelemetry::context;
+#endif
+namespace nostd = opentelemetry::nostd;
+namespace trace = opentelemetry::trace;
 
 // Check that the default logger is a noop logger instance
 TEST(Logger, GetLoggerDefault)
@@ -250,6 +265,8 @@ class TestLogger : public Logger
 {
   const nostd::string_view GetName() noexcept override { return "test logger"; }
 
+  using Logger::CreateLogRecord;
+
   nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override
   {
     return nullptr;
@@ -263,6 +280,181 @@ class TestLogger : public Logger
     auto log_record_ptr = std::move(log_record);
   }
 };
+
+namespace
+{
+
+class EnablementAwareTestLogRecord : public opentelemetry::logs::LogRecord
+{
+public:
+  void SetTimestamp(common::SystemTimestamp /*timestamp*/) noexcept override {}
+
+  void SetObservedTimestamp(common::SystemTimestamp /*timestamp*/) noexcept override {}
+
+  void SetSeverity(Severity severity) noexcept override { severity_ = severity; }
+
+  void SetBody(const common::AttributeValue & /*message*/) noexcept override
+  {
+    body_was_set_ = true;
+  }
+
+  void SetAttribute(nostd::string_view /*key*/,
+                    const common::AttributeValue & /*value*/) noexcept override
+  {}
+
+  void SetEventId(int64_t id, nostd::string_view name = {}) noexcept override
+  {
+    event_id_           = id;
+    event_id_was_set_   = true;
+    event_name_was_set_ = !name.empty();
+  }
+
+  void SetTraceId(const trace::TraceId & /*trace_id*/) noexcept override {}
+
+  void SetSpanId(const trace::SpanId & /*span_id*/) noexcept override {}
+
+  void SetTraceFlags(const trace::TraceFlags & /*trace_flags*/) noexcept override {}
+
+  Severity severity_{Severity::kInvalid};
+  int64_t event_id_{-1};
+  bool body_was_set_{false};
+  bool event_id_was_set_{false};
+  bool event_name_was_set_{false};
+};
+
+class EnablementAwareTestLogger : public Logger
+{
+public:
+  explicit EnablementAwareTestLogger(Severity minimum_severity,
+                                     bool enabled_impl_result = false) noexcept
+      : enabled_impl_result_(enabled_impl_result)
+  {
+    SetMinimumSeverity(static_cast<uint8_t>(minimum_severity));
+  }
+
+  const nostd::string_view GetName() noexcept override { return "enablement-aware logger"; }
+
+  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept override
+  {
+    ++create_log_record_calls_;
+    return nostd::unique_ptr<opentelemetry::logs::LogRecord>(new EnablementAwareTestLogRecord());
+  }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord(
+      const nostd::variant<trace::SpanContext, context::Context> & /*context_or_span*/) noexcept
+      override
+  {
+    ++create_log_record_context_calls_;
+    return CreateLogRecord();
+  }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+  using Logger::EmitLogRecord;
+
+  void EmitLogRecord(
+      nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override
+  {
+    auto owned_log_record = std::move(log_record);
+    if (owned_log_record)
+    {
+      ++emit_log_record_calls_;
+      last_emitted_record_.reset(
+          static_cast<EnablementAwareTestLogRecord *>(owned_log_record.release()));
+    }
+  }
+
+  void SetEnabledImplResult(bool enabled) noexcept { enabled_impl_result_ = enabled; }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  using Logger::SetExtendedEnabledRequired;
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+  size_t create_log_record_calls_{0};
+  size_t emit_log_record_calls_{0};
+  mutable size_t enabled_calls_{0};
+  mutable size_t enabled_with_event_id_calls_{0};
+  mutable Severity last_enabled_severity_{Severity::kInvalid};
+  mutable int64_t last_enabled_event_id_{-1};
+  mutable bool last_enabled_context_has_test_key_{false};
+  mutable bool last_enabled_context_test_key_value_{false};
+  nostd::unique_ptr<EnablementAwareTestLogRecord> last_emitted_record_;
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  size_t create_log_record_context_calls_{0};
+  mutable bool last_variant_holds_span_context_{false};
+  mutable bool last_variant_holds_context_{false};
+  mutable trace::SpanContext last_span_context_{trace::SpanContext::GetInvalid()};
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+protected:
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  void CaptureContextOrSpan(
+      const nostd::variant<trace::SpanContext, context::Context> &context_or_span) const noexcept
+  {
+    last_variant_holds_span_context_     = false;
+    last_variant_holds_context_          = false;
+    last_span_context_                   = trace::SpanContext::GetInvalid();
+    last_enabled_context_has_test_key_   = false;
+    last_enabled_context_test_key_value_ = false;
+
+    if (const trace::SpanContext *sc = nostd::get_if<trace::SpanContext>(&context_or_span))
+    {
+      last_variant_holds_span_context_ = true;
+      last_span_context_               = *sc;
+    }
+    else if (const context::Context *ctx = nostd::get_if<context::Context>(&context_or_span))
+    {
+      last_variant_holds_context_ = true;
+      auto value                  = ctx->GetValue("test-key");
+      if (const bool *maybe_value = nostd::get_if<bool>(&value))
+      {
+        last_enabled_context_has_test_key_   = true;
+        last_enabled_context_test_key_value_ = *maybe_value;
+      }
+    }
+  }
+
+  bool EnabledImplementation(
+      const nostd::variant<trace::SpanContext, context::Context> &context_or_span,
+      Severity severity) const noexcept override
+  {
+    ++enabled_calls_;
+    last_enabled_severity_ = severity;
+    CaptureContextOrSpan(context_or_span);
+    return enabled_impl_result_;
+  }
+
+  bool EnabledImplementation(
+      const nostd::variant<trace::SpanContext, context::Context> &context_or_span,
+      Severity severity,
+      const EventId &event_id) const noexcept override
+  {
+    ++enabled_with_event_id_calls_;
+    last_enabled_severity_ = severity;
+    last_enabled_event_id_ = event_id.id_;
+    CaptureContextOrSpan(context_or_span);
+    return enabled_impl_result_;
+  }
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+  bool EnabledImplementation(Severity severity, const EventId &event_id) const noexcept override
+  {
+    ++enabled_with_event_id_calls_;
+    last_enabled_severity_ = severity;
+    last_enabled_event_id_ = event_id.id_;
+    return enabled_impl_result_;
+  }
+
+  bool EnabledImplementation(Severity severity, int64_t event_id) const noexcept override
+  {
+    return EnabledImplementation(severity, EventId{event_id});
+  }
+
+private:
+  bool enabled_impl_result_;
+};
+
+}  // namespace
 
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
 class TestProvider : public LoggerProvider
@@ -290,3 +482,197 @@ TEST(Logger, PushLoggerImplementation)
   auto logger = lp->GetLogger("TestLogger", "opentelelemtry_library", "", schema_url);
   ASSERT_EQ("test logger", logger->GetName());
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+TEST(Logger, EnabledWithExplicitContextUsesContextAwareImplementation)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+
+  context::Context test_context{"test-key", true};
+
+  EXPECT_TRUE(logger.Enabled(test_context, Severity::kInfo));
+  EXPECT_EQ(logger.enabled_calls_, 1u);
+  EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
+  EXPECT_TRUE(logger.last_enabled_context_has_test_key_);
+  EXPECT_TRUE(logger.last_enabled_context_test_key_value_);
+}
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+TEST(Logger, EmitLogRecordTemplateShortCircuitsBelowMinimumSeverity)
+{
+  EnablementAwareTestLogger logger(Severity::kWarn);
+
+  logger.Info(nostd::string_view{"filtered"});
+
+  EXPECT_EQ(logger.create_log_record_calls_, 0u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
+}
+
+TEST(Logger, EmitLogRecordTemplateInvokesEnabledImplementationAndEmitsWhenAllowed)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+  logger.SetExtendedEnabledRequired(true);
+
+  logger.Info(nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.enabled_calls_ + logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  EXPECT_EQ(logger.last_enabled_severity_, Severity::kInfo);
+}
+
+TEST(Logger, EmitLogRecordTemplateShortCircuitsWhenEnabledImplementationReturnsFalse)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, false);
+  logger.SetExtendedEnabledRequired(true);
+
+  logger.Info(nostd::string_view{"filtered"});
+
+  EXPECT_EQ(logger.enabled_calls_ + logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.create_log_record_calls_, 0u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
+}
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+TEST(Logger, EmitLogRecordWithRecordBypassesFiltering)
+{
+  // EmitLogRecord(unique_ptr<LogRecord>&&, args...) intentionally does NOT
+  // route through Enabled() — caller built the record themselves and is
+  // responsible for any filtering. Lock the contract documented on the
+  // overload.
+  EnablementAwareTestLogger logger(Severity::kTrace, false);
+
+  auto record = logger.CreateLogRecord();
+  logger.EmitLogRecord(std::move(record), Severity::kInfo, nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+}
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+TEST(Logger, EmitLogRecordTemplateSkipsEnabledImplementationWhenExtendedEnabledNotRequired)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, false);
+  logger.SetExtendedEnabledRequired(false);
+
+  logger.Info(nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
+  EXPECT_EQ(logger.create_log_record_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+}
+
+TEST(Logger, EmitLogRecordWithContextInArgsRoutesContextVariantToEnabledAndEmits)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+  logger.SetExtendedEnabledRequired(true);
+
+  context::Context test_context{"test-key", true};
+
+  logger.EmitLogRecord(Severity::kInfo, EventId{0x42, "info"}, nostd::string_view{"emitted"},
+                       test_context);
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.create_log_record_context_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  EXPECT_TRUE(logger.last_variant_holds_context_);
+  EXPECT_FALSE(logger.last_variant_holds_span_context_);
+  EXPECT_TRUE(logger.last_enabled_context_has_test_key_);
+  EXPECT_TRUE(logger.last_enabled_context_test_key_value_);
+}
+
+TEST(Logger, EmitLogRecordWithContextInArgsShortCircuitsWhenEnabledImplementationReturnsFalse)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, false);
+  logger.SetExtendedEnabledRequired(true);
+
+  context::Context test_context{"test-key", true};
+
+  logger.EmitLogRecord(Severity::kInfo, EventId{0x42, "info"}, nostd::string_view{"filtered"},
+                       test_context);
+
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.create_log_record_context_calls_, 0u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 0u);
+}
+
+TEST(Logger, EmitLogRecordWithSpanContextInArgsRoutesSpanContextVariantToEnabled)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+  logger.SetExtendedEnabledRequired(true);
+
+  const uint8_t trace_id_bytes[trace::TraceId::kSize] = {1, 2,  3,  4,  5,  6,  7,  8,
+                                                         9, 10, 11, 12, 13, 14, 15, 16};
+  const uint8_t span_id_bytes[trace::SpanId::kSize]   = {1, 2, 3, 4, 5, 6, 7, 8};
+  const trace::SpanContext span_context(trace::TraceId(trace_id_bytes),
+                                        trace::SpanId(span_id_bytes),
+                                        trace::TraceFlags{trace::TraceFlags::kIsSampled}, false);
+
+  logger.EmitLogRecord(Severity::kInfo, span_context, nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.enabled_calls_, 1u);
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
+  EXPECT_EQ(logger.create_log_record_context_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  EXPECT_TRUE(logger.last_variant_holds_span_context_);
+  EXPECT_FALSE(logger.last_variant_holds_context_);
+  EXPECT_EQ(logger.last_span_context_.trace_id(), span_context.trace_id());
+  EXPECT_EQ(logger.last_span_context_.span_id(), span_context.span_id());
+  EXPECT_EQ(logger.last_span_context_.trace_flags(), span_context.trace_flags());
+}
+
+TEST(Logger, EmitLogRecordWithSpanContextInArgsAndEventIdRoutesVariantWithEventId)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+  logger.SetExtendedEnabledRequired(true);
+
+  const uint8_t trace_id_bytes[trace::TraceId::kSize] = {1, 2,  3,  4,  5,  6,  7,  8,
+                                                         9, 10, 11, 12, 13, 14, 15, 16};
+  const uint8_t span_id_bytes[trace::SpanId::kSize]   = {1, 2, 3, 4, 5, 6, 7, 8};
+  const trace::SpanContext span_context(trace::TraceId(trace_id_bytes),
+                                        trace::SpanId(span_id_bytes),
+                                        trace::TraceFlags{trace::TraceFlags::kIsSampled}, false);
+
+  logger.EmitLogRecord(Severity::kInfo, EventId{0x42, "info"}, span_context,
+                       nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.enabled_calls_, 0u);
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 1u);
+  EXPECT_EQ(logger.create_log_record_context_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  EXPECT_TRUE(logger.last_variant_holds_span_context_);
+  EXPECT_FALSE(logger.last_variant_holds_context_);
+  EXPECT_EQ(logger.last_span_context_.trace_id(), span_context.trace_id());
+  EXPECT_EQ(logger.last_span_context_.span_id(), span_context.span_id());
+  EXPECT_EQ(logger.last_enabled_event_id_, 0x42);
+}
+
+TEST(Logger, EmitLogRecordWithTracePartsInArgsRoutesSpanContextVariantToEnabled)
+{
+  EnablementAwareTestLogger logger(Severity::kTrace, true);
+  logger.SetExtendedEnabledRequired(true);
+
+  const uint8_t trace_id_bytes[trace::TraceId::kSize] = {1, 2,  3,  4,  5,  6,  7,  8,
+                                                         9, 10, 11, 12, 13, 14, 15, 16};
+  const uint8_t span_id_bytes[trace::SpanId::kSize]   = {1, 2, 3, 4, 5, 6, 7, 8};
+  const trace::TraceId trace_id(trace_id_bytes);
+  const trace::SpanId span_id(span_id_bytes);
+  const trace::TraceFlags trace_flags{trace::TraceFlags::kIsSampled};
+
+  logger.EmitLogRecord(Severity::kInfo, trace_id, span_id, trace_flags,
+                       nostd::string_view{"emitted"});
+
+  EXPECT_EQ(logger.enabled_calls_, 1u);
+  EXPECT_EQ(logger.enabled_with_event_id_calls_, 0u);
+  EXPECT_EQ(logger.create_log_record_context_calls_, 1u);
+  EXPECT_EQ(logger.emit_log_record_calls_, 1u);
+  EXPECT_TRUE(logger.last_variant_holds_span_context_);
+  EXPECT_FALSE(logger.last_variant_holds_context_);
+  EXPECT_EQ(logger.last_span_context_.trace_id(), trace_id);
+  EXPECT_EQ(logger.last_span_context_.span_id(), span_id);
+  EXPECT_EQ(logger.last_span_context_.trace_flags(), trace_flags);
+}
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2

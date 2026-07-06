@@ -1,10 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <google/protobuf/message_lite.h>  // IWYU pragma: keep
+#include <google/protobuf/stubs/common.h>  // IWYU pragma: keep
 #include <gtest/gtest.h>
 #include <cstdint>
 #include <cstdlib>
 #include <functional>
+#include <memory>
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
@@ -12,14 +15,11 @@
 #include <vector>
 
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
@@ -32,7 +32,6 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
-#include "google/protobuf/message_lite.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
@@ -328,8 +327,8 @@ public:
 
 TEST(OtlpFileMetricExporterTest, Shutdown)
 {
-  auto exporter = std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>(
-      new OtlpFileMetricExporter());
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter =
+      std::make_unique<OtlpFileMetricExporter>();
   ASSERT_TRUE(exporter->Shutdown());
   auto result = exporter->Export(opentelemetry::sdk::metrics::ResourceMetrics{});
   EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
@@ -354,7 +353,7 @@ TEST_F(OtlpFileMetricExporterTestPeer, ExportJsonIntegrationTestHistogramPointDa
 TEST_F(OtlpFileMetricExporterTestPeer, PreferredAggergationTemporality)
 {
   // Cummulative aggregation selector : use cummulative aggregation for all instruments.
-  std::unique_ptr<OtlpFileMetricExporter> exporter(new OtlpFileMetricExporter());
+  std::unique_ptr<OtlpFileMetricExporter> exporter = std::make_unique<OtlpFileMetricExporter>();
   EXPECT_EQ(GetOptions(exporter).aggregation_temporality,
             PreferredAggregationTemporality::kCumulative);
   auto cumm_selector =
@@ -378,7 +377,8 @@ TEST_F(OtlpFileMetricExporterTestPeer, PreferredAggergationTemporality)
   //   up-down counter
   OtlpFileMetricExporterOptions opts2;
   opts2.aggregation_temporality = PreferredAggregationTemporality::kLowMemory;
-  std::unique_ptr<OtlpFileMetricExporter> exporter2(new OtlpFileMetricExporter(opts2));
+  std::unique_ptr<OtlpFileMetricExporter> exporter2 =
+      std::make_unique<OtlpFileMetricExporter>(opts2);
   EXPECT_EQ(GetOptions(exporter2).aggregation_temporality,
             PreferredAggregationTemporality::kLowMemory);
   auto lowmemory_selector =
@@ -403,7 +403,8 @@ TEST_F(OtlpFileMetricExporterTestPeer, PreferredAggergationTemporality)
   //   - cummulative aggregation for up-down counter, observable up-down counter
   OtlpFileMetricExporterOptions opts3;
   opts3.aggregation_temporality = PreferredAggregationTemporality::kDelta;
-  std::unique_ptr<OtlpFileMetricExporter> exporter3(new OtlpFileMetricExporter(opts3));
+  std::unique_ptr<OtlpFileMetricExporter> exporter3 =
+      std::make_unique<OtlpFileMetricExporter>(opts3);
   EXPECT_EQ(GetOptions(exporter3).aggregation_temporality, PreferredAggregationTemporality::kDelta);
   auto delta_selector =
       OtlpMetricUtils::ChooseTemporalitySelector(GetOptions(exporter3).aggregation_temporality);

@@ -33,9 +33,17 @@ target_include_directories(
 
 set(OPENTELEMETRY_OTLP_TARGETS opentelemetry_otlp_recordable)
 
-target_link_libraries(opentelemetry_otlp_recordable PUBLIC opentelemetry_logs)
-target_link_libraries(opentelemetry_otlp_recordable
-                      PUBLIC opentelemetry_metrics)
+if(WITH_OTLP_UTF8_VALIDITY AND TARGET utf8_range::utf8_validity)
+  target_link_libraries(
+    opentelemetry_otlp_recordable
+    PUBLIC opentelemetry_logs opentelemetry_metrics
+    PRIVATE utf8_range::utf8_validity)
+  target_compile_definitions(opentelemetry_otlp_recordable
+                             PRIVATE ENABLE_OTLP_UTF8_VALIDITY)
+else()
+  target_link_libraries(opentelemetry_otlp_recordable
+                        PUBLIC opentelemetry_logs opentelemetry_metrics)
+endif()
 
 #
 # opentelemetry_exporter_otlp_builder_utils
@@ -308,15 +316,15 @@ if(WITH_OTLP_HTTP)
 
   target_link_libraries(
     opentelemetry_exporter_otlp_http_client
-    PUBLIC opentelemetry_sdk
-           opentelemetry_ext
-           # Links flags of opentelemetry_http_client_curl should be public when
-           # building internal components
+    PUBLIC opentelemetry_sdk opentelemetry_ext
            "$<BUILD_INTERFACE:opentelemetry_proto>"
     PRIVATE "$<INSTALL_INTERFACE:opentelemetry_proto>"
-            "$<BUILD_INTERFACE:opentelemetry_http_client_curl>"
-            "$<BUILD_INTERFACE:nlohmann_json::nlohmann_json>"
-            "$<INSTALL_INTERFACE:opentelemetry_http_client_curl>")
+            "$<BUILD_INTERFACE:nlohmann_json::nlohmann_json>")
+
+  target_link_libraries(
+    opentelemetry_exporter_otlp_http_client
+    PUBLIC opentelemetry_http_client
+    PRIVATE opentelemetry_common)
 
   target_include_directories(
     opentelemetry_exporter_otlp_http_client
@@ -875,10 +883,24 @@ if(BUILD_TESTING)
   add_executable(otlp_log_recordable_test test/otlp_log_recordable_test.cc)
   target_link_libraries(otlp_log_recordable_test ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
+  if(WITH_OTLP_UTF8_VALIDITY AND TARGET utf8_range::utf8_validity)
+    target_compile_definitions(otlp_log_recordable_test
+                               PRIVATE ENABLE_OTLP_UTF8_VALIDITY)
+  endif()
   gtest_add_tests(
     TARGET otlp_log_recordable_test
     TEST_PREFIX exporter.otlp.
     TEST_LIST otlp_log_recordable_test)
+
+  add_executable(otlp_populate_attribute_utils_test
+                 test/otlp_populate_attribute_utils_test.cc)
+  target_link_libraries(
+    otlp_populate_attribute_utils_test ${GTEST_BOTH_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
+  gtest_add_tests(
+    TARGET otlp_populate_attribute_utils_test
+    TEST_PREFIX exporter.otlp.
+    TEST_LIST otlp_populate_attribute_utils_test)
 
   add_executable(otlp_metrics_serialization_test
                  test/otlp_metrics_serialization_test.cc)
@@ -895,7 +917,7 @@ if(BUILD_TESTING)
     add_executable(otlp_grpc_exporter_test test/otlp_grpc_exporter_test.cc)
     target_link_libraries(
       otlp_grpc_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-      ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc)
+      ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_grpc_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -930,7 +952,8 @@ if(BUILD_TESTING)
       opentelemetry_exporter_otlp_grpc
       opentelemetry_exporter_otlp_grpc_log
       opentelemetry_trace
-      opentelemetry_logs)
+      opentelemetry_logs
+      opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_grpc_log_record_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -950,9 +973,13 @@ if(BUILD_TESTING)
     add_executable(otlp_grpc_metric_exporter_test
                    test/otlp_grpc_metric_exporter_test.cc)
     target_link_libraries(
-      otlp_grpc_metric_exporter_test ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc
-      opentelemetry_exporter_otlp_grpc_metrics)
+      otlp_grpc_metric_exporter_test
+      ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${GMOCK_LIB}
+      opentelemetry_exporter_otlp_grpc
+      opentelemetry_exporter_otlp_grpc_metrics
+      opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_grpc_metric_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -980,7 +1007,8 @@ if(BUILD_TESTING)
       opentelemetry_exporter_otlp_http
       opentelemetry_http_client_nosend
       nlohmann_json::nlohmann_json
-      protobuf::libprotobuf)
+      protobuf::libprotobuf
+      opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_http_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -1006,7 +1034,8 @@ if(BUILD_TESTING)
       opentelemetry_exporter_otlp_http_log
       opentelemetry_logs
       opentelemetry_http_client_nosend
-      nlohmann_json::nlohmann_json)
+      nlohmann_json::nlohmann_json
+      opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_http_log_record_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -1034,7 +1063,8 @@ if(BUILD_TESTING)
       opentelemetry_metrics
       opentelemetry_http_client_nosend
       nlohmann_json::nlohmann_json
-      protobuf::libprotobuf)
+      protobuf::libprotobuf
+      opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_http_metric_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -1050,6 +1080,39 @@ if(BUILD_TESTING)
       TARGET otlp_http_metric_exporter_factory_test
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_http_metric_exporter_factory_test)
+
+    add_executable(otlp_http_exporter_custom_client_test
+                   test/otlp_http_exporter_custom_client_test.cc)
+    target_link_libraries(
+      otlp_http_exporter_custom_client_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_http
+      opentelemetry_http_client_nosend)
+    gtest_add_tests(
+      TARGET otlp_http_exporter_custom_client_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_http_exporter_custom_client_test)
+
+    add_executable(otlp_http_metric_exporter_custom_client_test
+                   test/otlp_http_metric_exporter_custom_client_test.cc)
+    target_link_libraries(
+      otlp_http_metric_exporter_custom_client_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_otlp_http_metric
+      opentelemetry_metrics opentelemetry_http_client_nosend)
+    gtest_add_tests(
+      TARGET otlp_http_metric_exporter_custom_client_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_http_metric_exporter_custom_client_test)
+
+    add_executable(otlp_http_log_record_exporter_custom_client_test
+                   test/otlp_http_log_record_exporter_custom_client_test.cc)
+    target_link_libraries(
+      otlp_http_log_record_exporter_custom_client_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_otlp_http_log
+      opentelemetry_logs opentelemetry_http_client_nosend)
+    gtest_add_tests(
+      TARGET otlp_http_log_record_exporter_custom_client_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_http_log_record_exporter_custom_client_test)
   endif()
 
   if(WITH_OTLP_FILE)
@@ -1154,5 +1217,15 @@ if(WITH_BENCHMARK AND WITH_OTLP_HTTP)
     otlp_http_metric_exporter_benchmark
     PRIVATE opentelemetry_exporter_otlp_http_metric opentelemetry_metrics
             opentelemetry_resources benchmark::benchmark
+            ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
+if(WITH_BENCHMARK)
+  add_executable(otlp_recordable_benchmark test/otlp_recordable_benchmark.cc)
+
+  target_link_libraries(
+    otlp_recordable_benchmark
+    PRIVATE opentelemetry_otlp_recordable opentelemetry_trace
+            opentelemetry_metrics opentelemetry_resources benchmark::benchmark
             ${CMAKE_THREAD_LIBS_INIT})
 endif()

@@ -72,6 +72,9 @@ OTELCPP_CMAKE_BUILD_ARGS="--parallel 2 --verbose" ./ci/do_ci.sh code.coverage
 * `code.coverage`: Build with coverage flags and generate `coverage.info`.
 * `cmake.clang_tidy.test`: Build with `clang-tidy` enabled and emit a build
   log.
+* `cmake.iwyu.test`: Build with `include-what-you-use` enabled (C++14, ABI
+  variant from `OTELCPP_CMAKE_CACHE_FILE`) and emit a build log. Mirrors the
+  CI configuration when run inside the dev container.
 
 ### Maintainer CMake builds
 

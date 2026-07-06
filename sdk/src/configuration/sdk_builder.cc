@@ -31,11 +31,7 @@
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/composable_always_on_sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
@@ -68,6 +64,7 @@
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
@@ -137,6 +134,7 @@
 #include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
@@ -191,6 +189,9 @@ namespace configuration
 {
 
 using common::WildcardMatch;
+
+namespace
+{
 
 class ResourceAttributeValueSetter
     : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor
@@ -750,6 +751,8 @@ public:
 private:
   const SdkBuilder *sdk_builder_;
 };
+
+}  // namespace
 
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateAlwaysOffSampler(
     const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration * /* model */) const
@@ -1906,19 +1909,33 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
     sdk_processors.push_back(CreateLogRecordProcessor(processor_model));
   }
 
-  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3303
-  // FIXME-SDK: use limits
+  opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
+  if (model->limits)
+  {
+    log_record_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
+    log_record_limits.attribute_count_limit        = model->limits->attribute_count_limit;
+  }
+
+  std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+      opentelemetry::sdk::logs::LoggerConfig>>
+      logger_configurator;
   if (model->logger_configurator)
   {
-    auto logger_configurator = CreateLoggerConfigurator(model->logger_configurator);
-    sdk                      = opentelemetry::sdk::logs::LoggerProviderFactory::Create(
-        std::move(sdk_processors), resource, std::move(logger_configurator));
+    logger_configurator = CreateLoggerConfigurator(model->logger_configurator);
   }
   else
   {
-    sdk = opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(sdk_processors),
-                                                                  resource);
+    logger_configurator =
+        std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+            opentelemetry::sdk::logs::LoggerConfig>>(
+            opentelemetry::sdk::instrumentationscope::
+                ScopeConfigurator<opentelemetry::sdk::logs::LoggerConfig>::Builder(
+                    opentelemetry::sdk::logs::LoggerConfig::Default())
+                    .Build());
   }
+
+  sdk = opentelemetry::sdk::logs::LoggerProviderFactory::Create(
+      std::move(sdk_processors), resource, std::move(logger_configurator), log_record_limits);
 
   return sdk;
 }
@@ -1974,7 +1991,7 @@ void SdkBuilder::SetResource(
       }
     }
 
-    if (opt_model->detectors != nullptr)
+    if (opt_model->detection != nullptr)
     {
       // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3548
       // FIXME-SDK: Implement resource detectors

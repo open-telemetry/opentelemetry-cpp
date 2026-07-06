@@ -13,7 +13,9 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 
@@ -191,4 +193,90 @@ TEST(AttributeMapTest, EqualTo)
   EXPECT_FALSE(attribute_map.EqualTo(kv_iterable_different_type));
   EXPECT_FALSE(attribute_map.EqualTo(kv_iterable_different_size));
   EXPECT_FALSE(attribute_map.EqualTo(kv_iterable_different_all));
+}
+
+// ---------------------------------------------------------------------------
+// AttributeConverter truncation
+// ---------------------------------------------------------------------------
+//
+// "h\xC3\xA9llo" is "héllo" in UTF-8 (6 bytes). 'é' occupies bytes 1-2 as a
+// 2-byte sequence (0xC3 0xA9). String alternatives are truncated at a UTF-8
+// code-point boundary; the raw bytes alternative is cut at the exact byte.
+
+TEST(AttributeConverterTruncation, DefaultConverterDoesNotTruncate)
+{
+  opentelemetry::sdk::common::AttributeConverter converter;
+  auto v = converter(opentelemetry::nostd::string_view("0123456789"));
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(v), "0123456789");
+}
+
+TEST(AttributeConverterTruncation, AsciiTruncatesAtByteCount)
+{
+  opentelemetry::sdk::common::AttributeConverter converter(5);
+  auto v = converter(opentelemetry::nostd::string_view("0123456789"));
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(v), "01234");
+}
+
+TEST(AttributeConverterTruncation, KeepsCompleteMultiByteSequenceWithinBudget)
+{
+  // 'h' (1 byte) + 'é' (2 bytes) = 3 bytes exactly, still valid UTF-8.
+  opentelemetry::sdk::common::AttributeConverter converter(3);
+  auto v = converter(opentelemetry::nostd::string_view("h\xC3\xA9llo"));
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(v), std::string("h\xC3\xA9"));
+}
+
+TEST(AttributeConverterTruncation, DropsPartialMultiByteSequenceAtBoundary)
+{
+  // limit=2: 'h' fits at byte 0; 'é' would span bytes 1-2, ending past the
+  // limit, so the kept prefix stops at byte 1.
+  opentelemetry::sdk::common::AttributeConverter converter(2);
+  auto v = converter(opentelemetry::nostd::string_view("h\xC3\xA9llo"));
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(v), "h");
+}
+
+TEST(AttributeConverterTruncation, StdStringIsTruncatedUtf8Safe)
+{
+  opentelemetry::sdk::common::AttributeConverter converter(2);
+  auto v = converter(std::string("h\xC3\xA9llo"));
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(v), "h");
+}
+
+TEST(AttributeConverterTruncation, ConstCharPtrIsTruncatedUtf8Safe)
+{
+  opentelemetry::sdk::common::AttributeConverter converter(2);
+  const char *value = "h\xC3\xA9llo";
+  auto v            = converter(value);
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(v), "h");
+}
+
+TEST(AttributeConverterTruncation, BytesAreCutAtRawByteBoundary)
+{
+  // Raw bytes have no encoding, so truncation is a plain byte cut even when the
+  // leading bytes look like a multi-byte UTF-8 sequence.
+  const uint8_t bytes[] = {0xC3, 0xA9, 0x01, 0x02};
+  opentelemetry::sdk::common::AttributeConverter converter(1);
+  auto v             = converter(opentelemetry::nostd::span<const uint8_t>(bytes, 4));
+  const auto &stored = opentelemetry::nostd::get<std::vector<uint8_t>>(v);
+  ASSERT_EQ(stored.size(), 1u);
+  EXPECT_EQ(stored[0], 0xC3);
+}
+
+TEST(AttributeConverterTruncation, StringArrayTruncatedPerElementUtf8Safe)
+{
+  opentelemetry::nostd::string_view values[] = {opentelemetry::nostd::string_view("h\xC3\xA9llo"),
+                                                opentelemetry::nostd::string_view("ab")};
+  opentelemetry::sdk::common::AttributeConverter converter(2);
+  auto v =
+      converter(opentelemetry::nostd::span<const opentelemetry::nostd::string_view>(values, 2));
+  const auto &stored = opentelemetry::nostd::get<std::vector<std::string>>(v);
+  ASSERT_EQ(stored.size(), 2u);
+  EXPECT_EQ(stored[0], "h");
+  EXPECT_EQ(stored[1], "ab");
+}
+
+TEST(AttributeConverterTruncation, ShortStringUnderLimitUnchanged)
+{
+  opentelemetry::sdk::common::AttributeConverter converter(100);
+  auto v = converter(opentelemetry::nostd::string_view("short"));
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(v), "short");
 }

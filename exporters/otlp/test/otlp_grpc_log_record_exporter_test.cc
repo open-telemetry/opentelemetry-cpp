@@ -6,11 +6,13 @@
 #include <grpcpp/support/status.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <algorithm>
 #include <chrono>
 #include <functional>
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -27,6 +29,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
@@ -38,6 +41,7 @@
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
@@ -52,6 +56,7 @@
 #include "opentelemetry/proto/collector/logs/v1/logs_service_mock.grpc.pb.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service_mock.grpc.pb.h"
 #include "opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.h"
+#include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
@@ -63,40 +68,6 @@ using opentelemetry::sdk::common::unsetenv;
 #endif
 
 using namespace testing;
-
-namespace grpc
-{
-class ClientUnaryReactor;
-}
-
-namespace opentelemetry
-{
-namespace proto
-{
-namespace collector
-{
-
-namespace logs
-{
-namespace v1
-{
-class ExportLogsServiceRequest;
-class ExportLogsServiceResponse;
-}  // namespace v1
-}  // namespace logs
-
-namespace trace
-{
-namespace v1
-{
-class ExportTraceServiceRequest;
-class ExportTraceServiceResponse;
-}  // namespace v1
-}  // namespace trace
-
-}  // namespace collector
-}  // namespace proto
-}  // namespace opentelemetry
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -227,6 +198,8 @@ private:
   ::grpc::Status last_async_status_;
   async_interface async_interface_;
 };
+
+using opentelemetry::test_common::ScopedTestLogHandler;
 }  // namespace
 
 class OtlpGrpcLogRecordExporterTestPeer : public ::testing::Test
@@ -343,9 +316,8 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportIntegrationTest)
   opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-  provider->AddProcessor(
-      std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BatchLogRecordProcessor(
-          std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
+  provider->AddProcessor(std::make_unique<sdk::logs::BatchLogRecordProcessor>(
+      std::move(exporter), 5, std::chrono::milliseconds(256), 1));
 
   EXPECT_CALL(*mock_stub, Export(_, _, _))
       .Times(AtLeast(1))
@@ -428,9 +400,8 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShareClientTest)
   opentelemetry::nostd::string_view attribute_storage_string_value[] = {"vector", "string"};
 
   auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
-  provider->AddProcessor(
-      std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BatchLogRecordProcessor(
-          std::move(exporter), 5, std::chrono::milliseconds(256), 1)));
+  provider->AddProcessor(std::make_unique<sdk::logs::BatchLogRecordProcessor>(
+      std::move(exporter), 5, std::chrono::milliseconds(256), 1));
 
   EXPECT_CALL(*mock_stub, Export(_, _, _))
       .Times(Exactly(1))
@@ -521,7 +492,8 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ShareClientTest)
 #ifndef NO_GETENV
 TEST_F(OtlpGrpcLogRecordExporterTestPeer, ConfigRetryDefaultValues)
 {
-  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter(new OtlpGrpcLogRecordExporter());
+  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter =
+      std::make_unique<OtlpGrpcLogRecordExporter>();
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 5);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
@@ -536,7 +508,8 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ConfigRetryValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF", "6.7", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
 
-  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter(new OtlpGrpcLogRecordExporter());
+  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter =
+      std::make_unique<OtlpGrpcLogRecordExporter>();
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 123);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
@@ -556,7 +529,8 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
 
-  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter(new OtlpGrpcLogRecordExporter());
+  std::unique_ptr<OtlpGrpcLogRecordExporter> exporter =
+      std::make_unique<OtlpGrpcLogRecordExporter>();
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 321);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);
@@ -569,6 +543,44 @@ TEST_F(OtlpGrpcLogRecordExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
 }
 #endif  // NO_GETENV
+
+// Exporter logs the rejection on partial_success.
+TEST_F(OtlpGrpcLogRecordExporterTestPeer, ExportPartialSuccess)
+{
+  ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
+
+  auto mock_stub = new OtlpMockLogsServiceStub();
+  std::unique_ptr<proto::collector::logs::v1::LogsService::StubInterface> stub_interface(mock_stub);
+  auto exporter = GetExporter(stub_interface);
+
+  auto recordable = exporter->MakeRecordable();
+
+  nostd::span<std::unique_ptr<sdk::logs::Recordable>> batch(&recordable, 1);
+  EXPECT_CALL(*mock_stub, Export(_, _, _))
+      .Times(Exactly(1))
+      .WillOnce(Invoke(
+          [](grpc::ClientContext *, const proto::collector::logs::v1::ExportLogsServiceRequest &,
+             proto::collector::logs::v1::ExportLogsServiceResponse *response) -> grpc::Status {
+            response->mutable_partial_success()->set_rejected_log_records(21);
+            response->mutable_partial_success()->set_error_message("too many logs!!");
+            return grpc::Status::OK;
+          }));
+
+  auto result = exporter->Export(batch);
+  exporter->ForceFlush();
+
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, result);
+
+  auto entries  = log.Drain();
+  auto contains = [&](const std::string &needle) {
+    return std::any_of(entries.begin(), entries.end(), [&](const ScopedTestLogHandler::Entry &e) {
+      return e.msg.find(needle) != std::string::npos;
+    });
+  };
+  EXPECT_TRUE(contains("partial success"));
+  EXPECT_TRUE(contains("21 log record(s) rejected"));
+  EXPECT_TRUE(contains("too many logs!!"));
+}
 
 }  // namespace otlp
 }  // namespace exporter

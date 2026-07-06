@@ -14,6 +14,7 @@ cc_test(
         "trace",
     ],
     deps = [
+        "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/resource",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
@@ -155,6 +156,21 @@ cc_test(
     ],
     deps = [
         "//sdk/src/common:random",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "composable_sampler_test",
+    srcs = [
+        "composable_sampler_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
+    ],
+    deps = [
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],

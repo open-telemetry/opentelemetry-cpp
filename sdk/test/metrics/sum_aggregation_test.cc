@@ -17,7 +17,7 @@
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
@@ -208,9 +208,15 @@ TEST(HistogramToSumFilterAttributesWithCardinalityLimit, Double)
             }
             else
             {
-              EXPECT_NE(md.point_data_attr_[i].attributes.end(),
-                        md.point_data_attr_[i].attributes.find(
-                            sdk::metrics::kAttributesLimitOverflowKey));
+              const auto overflow_it =
+                  md.point_data_attr_[i].attributes.find(sdk::metrics::kAttributesLimitOverflowKey);
+              EXPECT_NE(md.point_data_attr_[i].attributes.end(), overflow_it);
+              if (overflow_it != md.point_data_attr_[i].attributes.end())
+              {
+                // Spec: overflow point MUST be tagged with the boolean value
+                // `true`.
+                EXPECT_EQ(opentelemetry::nostd::get<bool>(overflow_it->second), true);
+              }
             }
           }
         }
@@ -390,9 +396,15 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
             }
             else
             {
-              EXPECT_NE(md.point_data_attr_[i].attributes.end(),
-                        md.point_data_attr_[i].attributes.find(
-                            sdk::metrics::kAttributesLimitOverflowKey));
+              const auto overflow_it =
+                  md.point_data_attr_[i].attributes.find(sdk::metrics::kAttributesLimitOverflowKey);
+              EXPECT_NE(md.point_data_attr_[i].attributes.end(), overflow_it);
+              if (overflow_it != md.point_data_attr_[i].attributes.end())
+              {
+                // Spec: overflow point MUST be tagged with the boolean value
+                // `true`.
+                EXPECT_EQ(opentelemetry::nostd::get<bool>(overflow_it->second), true);
+              }
             }
           }
         }

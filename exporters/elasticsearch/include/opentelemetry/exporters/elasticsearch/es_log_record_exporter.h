@@ -9,11 +9,9 @@
 #include <string>
 
 #include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
 
 #ifdef ENABLE_ASYNC_EXPORT
@@ -89,6 +87,23 @@ public:
    * @param options An object containing the user's configuration options.
    */
   ElasticsearchLogRecordExporter(const ElasticsearchExporterOptions &options);
+
+  /**
+   * Create an ElasticsearchLogRecordExporter with user specified options and HTTP client factory.
+   * @param options An object containing the user's configuration options.
+   * @param factory the HTTP client factory used to create the underlying HTTP client
+   */
+  ElasticsearchLogRecordExporter(
+      const ElasticsearchExporterOptions &options,
+      const std::shared_ptr<ext::http::client::HttpClientFactory> &factory);
+
+  /**
+   * Create an ElasticsearchLogRecordExporter with user specified options and HTTP client.
+   * @param options An object containing the user's configuration options.
+   * @param http_client the HTTP client to be used for exporting
+   */
+  ElasticsearchLogRecordExporter(const ElasticsearchExporterOptions &options,
+                                 std::shared_ptr<ext::http::client::HttpClient> http_client);
 
   /**
    * Creates a recordable that stores the data in a JSON object

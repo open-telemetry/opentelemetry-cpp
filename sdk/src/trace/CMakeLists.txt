@@ -22,6 +22,12 @@ add_library(
   samplers/parent_factory.cc
   samplers/trace_id_ratio.cc
   samplers/trace_id_ratio_factory.cc
+  samplers/ot_trace_state.cc
+  samplers/composite_sampler.cc
+  samplers/composite_sampler_factory.cc
+  samplers/composable_probability.cc
+  samplers/composable_parent_threshold.cc
+  samplers/composable_rule_based.cc
   multi_recordable.cc
   random_id_generator.cc
   random_id_generator_factory.cc

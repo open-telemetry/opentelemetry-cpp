@@ -78,3 +78,32 @@ endif()
 set(PROTOBUF_PROTOC_EXECUTABLE "${Protobuf_PROTOC_EXECUTABLE}")
 
 message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
+
+# When protobuf is fetched or built as a gRPC submodule utf8_range is compiled
+# but may need the alias target created
+if(WITH_OTLP_UTF8_VALIDITY)
+  if(TARGET utf8_validity AND NOT TARGET utf8_range::utf8_validity)
+    add_library(utf8_range::utf8_validity ALIAS utf8_validity)
+    if(protobuf_SOURCE_DIR AND EXISTS
+                               "${protobuf_SOURCE_DIR}/third_party/utf8_range")
+      target_include_directories(
+        utf8_validity
+        PUBLIC
+          "$<BUILD_INTERFACE:${protobuf_SOURCE_DIR}/third_party/utf8_range>")
+    endif()
+  endif()
+
+  # For the find_package(Protobuf) path, utf8_range can also be found
+  if(NOT TARGET utf8_range::utf8_validity)
+    find_package(utf8_range CONFIG QUIET)
+  endif()
+
+  # The utf8_range target should now be available for use in otel-cpp
+  if(NOT TARGET utf8_range::utf8_validity)
+    message(
+      WARNING
+        "Target (utf8_range::utf8_validity) was not found. "
+        "We will not validate UTF-8 strings in the OTLP exporter."
+        "Which may lead to record drops when sending non UTF-8 data as string.")
+  endif()
+endif()

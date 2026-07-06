@@ -26,7 +26,7 @@ namespace metrics
 using opentelemetry::sdk::common::OrderedAttributeMap;
 
 constexpr size_t kAggregationCardinalityLimit = 2000;
-const std::string kAttributesLimitOverflowKey = "otel.metrics.overflow";
+const std::string kAttributesLimitOverflowKey = "otel.metric.overflow";
 const bool kAttributesLimitOverflowValue      = true;
 const MetricAttributes kOverflowAttributes    = {
     {kAttributesLimitOverflowKey,

@@ -8,6 +8,19 @@ load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 package(default_visibility = ["//visibility:public"])
 
+# utf8_range from protobuf source tree for UTF-8 validation in OTLP
+# value conversion. This mirrors the CMake opentelemetry_otlp_utf8_validity
+# target.
+cc_library(
+    name = "otlp_utf8_validity",
+    defines = ["ENABLE_OTLP_UTF8_VALIDITY"],
+    tags = ["otlp"],
+    deps = [
+        "@com_google_protobuf//third_party/utf8_range",
+        "@com_google_protobuf//third_party/utf8_range:utf8_validity",
+    ],
+)
+
 cc_library(
     name = "otlp_recordable",
     srcs = [
@@ -32,6 +45,7 @@ cc_library(
     strip_include_prefix = "include",
     tags = ["otlp"],
     deps = [
+        ":otlp_utf8_validity",
         "//sdk/src/logs",
         "//sdk/src/resource",
         "//sdk/src/trace",
@@ -195,6 +209,7 @@ cc_library(
         "//sdk/src/common:base64",
         "@com_github_opentelemetry_proto//:common_proto_cc",
         "@com_google_absl//absl/strings",
+        "@com_google_protobuf//:protobuf",
         "@github_nlohmann_json//:json",
     ],
 )
@@ -652,6 +667,23 @@ cc_test(
 )
 
 cc_test(
+    name = "otlp_populate_attribute_utils_test",
+    srcs = [
+        "test/otlp_populate_attribute_utils_test.cc",
+    ],
+    tags = [
+        "otlp",
+        "test",
+    ],
+    deps = [
+        ":otlp_recordable",
+        "//sdk/src/metrics",
+        "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "otlp_file_client_test",
     srcs = ["test/otlp_file_client_test.cc"],
     tags = [
@@ -681,6 +713,7 @@ cc_test(
         ":otlp_grpc_exporter",
         "//api",
         "//sdk/src/metrics",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -862,6 +895,7 @@ cc_test(
         "//api",
         "//sdk/src/logs",
         "//sdk/src/metrics",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -895,6 +929,7 @@ cc_test(
         ":otlp_grpc_metric_exporter",
         "//api",
         "//sdk/src/metrics",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -989,5 +1024,22 @@ otel_cc_benchmark(
         ":otlp_grpc_exporter",
         "//examples/common/foo_library:common_foo_library",
         "//sdk/src/metrics",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "otlp_recordable_benchmark",
+    srcs = ["test/otlp_recordable_benchmark.cc"],
+    tags = [
+        "benchmark",
+        "otlp",
+        "test",
+    ],
+    deps = [
+        ":otlp_recordable",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
     ],
 )

@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include <stddef.h>
 #include <ostream>
+#include <string>
 #include <vector>
 
 #include "opentelemetry/nostd/string_view.h"

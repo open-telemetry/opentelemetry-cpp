@@ -28,16 +28,21 @@
 #  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
 
 #  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/trace/simple_processor.h"
 #  include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 #  include "opentelemetry/trace/provider.h"
 #  include "opentelemetry/trace/tracer_provider.h"
 
 #  include <grpcpp/grpcpp.h>
 #  include <gtest/gtest.h>
+#  include <algorithm>
 #  include <future>
+#  include <utility>
+#  include <vector>
 
 #  if defined(_MSC_VER)
 #    include "opentelemetry/sdk/common/env_variables.h"
@@ -117,6 +122,8 @@ private:
   ::grpc::Status last_async_status_;
   async_interface async_interface_;
 };
+
+using opentelemetry::test_common::ScopedTestLogHandler;
 }  // namespace
 
 class OtlpGrpcExporterTestPeer : public ::testing::Test
@@ -196,6 +203,47 @@ TEST_F(OtlpGrpcExporterTestPeer, ExportUnitTest)
 #  endif
 }
 
+// Exporter logs the rejection on partial_success.
+TEST_F(OtlpGrpcExporterTestPeer, ExportPartialSuccess)
+{
+  ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
+
+  auto mock_stub = new OtlpMockTraceServiceStub();
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(stub_interface);
+
+  auto recordable = exporter->MakeRecordable();
+  recordable->SetName("Test span");
+
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
+  EXPECT_CALL(*mock_stub, Export(_, _, _))
+      .Times(Exactly(1))
+      .WillOnce(Invoke(
+          [](::grpc::ClientContext *,
+             const proto::collector::trace::v1::ExportTraceServiceRequest &,
+             proto::collector::trace::v1::ExportTraceServiceResponse *response) -> ::grpc::Status {
+            response->mutable_partial_success()->set_rejected_spans(21);
+            response->mutable_partial_success()->set_error_message("too many spans!!");
+            return ::grpc::Status::OK;
+          }));
+
+  auto result = exporter->Export(batch);
+  exporter->ForceFlush();
+
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, result);
+
+  auto entries  = log.Drain();
+  auto contains = [&](const std::string &needle) {
+    return std::any_of(entries.begin(), entries.end(), [&](const ScopedTestLogHandler::Entry &e) {
+      return e.msg.find(needle) != std::string::npos;
+    });
+  };
+  EXPECT_TRUE(contains("partial success"));
+  EXPECT_TRUE(contains("21 span(s) rejected"));
+  EXPECT_TRUE(contains("too many spans!!"));
+}
+
 // Create spans, let processor call Export()
 TEST_F(OtlpGrpcExporterTestPeer, ExportIntegrationTest)
 {
@@ -205,8 +253,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ExportIntegrationTest)
 
   auto exporter = GetExporter(stub_interface);
 
-  auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-      new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
+  std::unique_ptr<sdk::trace::SpanProcessor> processor =
+      std::make_unique<sdk::trace::SimpleSpanProcessor>(std::move(exporter));
   auto provider = nostd::shared_ptr<trace::TracerProvider>(
       new sdk::trace::TracerProvider(std::move(processor)));
   auto tracer = provider->GetTracer("test");
@@ -225,8 +273,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ExportIntegrationTest)
 TEST_F(OtlpGrpcExporterTestPeer, ConfigTest)
 {
   OtlpGrpcExporterOptions opts;
-  opts.endpoint = "localhost:45454";
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter(opts));
+  opts.endpoint                              = "localhost:45454";
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).endpoint, "localhost:45454");
 }
 
@@ -235,9 +283,9 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigSslCredentialsTest)
 {
   std::string cacert_str = "--begin and end fake cert--";
   OtlpGrpcExporterOptions opts;
-  opts.use_ssl_credentials              = true;
-  opts.ssl_credentials_cacert_as_string = cacert_str;
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter(opts));
+  opts.use_ssl_credentials                   = true;
+  opts.ssl_credentials_cacert_as_string      = cacert_str;
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
 }
@@ -255,7 +303,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
@@ -299,7 +347,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigHttpsSecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "true", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -315,7 +363,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigHttpInsecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "false", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, false);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -330,7 +378,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownSecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "false", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -345,7 +393,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownInsecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "true", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, false);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -355,8 +403,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownInsecureFromEnv)
 
 TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryDefaultValues)
 {
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
-  const auto options = GetOptions(exporter);
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
+  const auto options                         = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 5);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
   ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5.0f);
@@ -370,8 +418,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF", "6.7", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
-  const auto options = GetOptions(exporter);
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
+  const auto options                         = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 123);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
   ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7f);
@@ -390,8 +438,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
-  const auto options = GetOptions(exporter);
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
+  const auto options                         = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 321);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);
   ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6f);

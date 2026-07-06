@@ -7,7 +7,6 @@
 
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 
 using namespace opentelemetry::baggage;
@@ -103,7 +102,7 @@ void BM_BaggageToHeaderTenEntries(benchmark::State &state)
   auto baggage = Baggage::FromHeader(header_with_custom_entries(kNumEntries));
   while (state.KeepRunning())
   {
-    auto new_baggage = baggage->ToHeader();
+    benchmark::DoNotOptimize(baggage->ToHeader());
   }
 }
 BENCHMARK(BM_BaggageToHeaderTenEntries);
@@ -113,7 +112,7 @@ void BM_BaggageToHeader180Entries(benchmark::State &state)
   auto baggage = Baggage::FromHeader(header_with_custom_entries(Baggage::kMaxKeyValuePairs));
   while (state.KeepRunning())
   {
-    auto new_baggage = baggage->ToHeader();
+    benchmark::DoNotOptimize(baggage->ToHeader());
   }
 }
 BENCHMARK(BM_BaggageToHeader180Entries);

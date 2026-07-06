@@ -7,8 +7,11 @@
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/resource/resource.h"
 
 #include <gtest/gtest.h>
@@ -24,6 +27,14 @@ namespace sdklogs       = opentelemetry::sdk::logs;
 namespace logs_api      = opentelemetry::logs;
 namespace nostd         = opentelemetry::nostd;
 namespace logs_exporter = opentelemetry::exporter::logs;
+
+TEST(ElasticsearchLogsExporterTests, CustomClientConstructionSucceeds)
+{
+  logs_exporter::ElasticsearchExporterOptions opts;
+  auto exporter = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(opts));
+  ASSERT_NE(exporter, nullptr);
+}
 
 // Attempt to write a log to an invalid host/port, test that the Export() returns failure
 TEST(DISABLED_ElasticsearchLogsExporterTests, InvalidEndpoint)

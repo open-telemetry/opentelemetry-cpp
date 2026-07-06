@@ -11,26 +11,25 @@ permissions:
 
 jobs:
   clang-tidy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 31
+            warning_limit: 309
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 31
+            warning_limit: 319
     env:
-      CC: /usr/bin/clang-18
-      CXX: /usr/bin/clang++-18
-      CXX_STANDARD: '14' # Run clang-tidy on the minimum supported c++ standard
+      CC: /usr/bin/clang-22
+      CXX: /usr/bin/clang++-22
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@a5ad31d6a139d249332a2605b85202e8c0b78450 # v2.19.1
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           submodules: recursive
 
@@ -42,34 +41,31 @@ jobs:
           cmake \
           zlib1g-dev \
           libssl-dev \
-          libcurl4-openssl-dev \
-          nlohmann-json3-dev \
-          libabsl-dev \
-          libprotobuf-dev \
-          libgrpc++-dev \
-          protobuf-compiler \
-          protobuf-compiler-grpc \
-          libgmock-dev \
-          libgtest-dev \
-          libbenchmark-dev
+          libcurl4-openssl-dev
 
-      - name: Install rapidyaml
+      - name: Install clang-22 toolchain
         run: |
-          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
-
-      - name: Install clang-tidy-20
-        run: |
-          sudo apt install -y clang-tidy-20
-          sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-20 200
+          wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s -- 22
+          sudo apt install -y clang-22 clang-tidy-22
+          sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-22 200
           sudo update-alternatives --config clang-tidy
           echo "Using clang-tidy version: $(clang-tidy --version)"
           echo "clang-tidy installed at: $(which clang-tidy)"
+
+      - name: Install pinned third-party
+        env:
+          # benchmark v1.9.4 trips clang-22's new -Wc2y-extensions on __COUNTER__
+          # and its CMakeLists uses -Werror -pedantic; silence the warning.
+          CXXFLAGS: -Wno-c2y-extensions
+        run: |
+          sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release
 
       - name: Build and run clang-tidy
         id: build
         env:
           OTELCPP_CMAKE_CACHE_FILE: ${{ matrix.cmake_options }}.cmake
           BUILD_DIR: build-${{ matrix.cmake_options }}
+          CXX_STANDARD: '14' # Run clang-tidy on the minimum supported c++ standard
         run: |
           ./ci/do_ci.sh cmake.clang_tidy.test
           echo "build_log=${BUILD_DIR}/opentelemetry-cpp-clang-tidy.log" >> "$GITHUB_OUTPUT"

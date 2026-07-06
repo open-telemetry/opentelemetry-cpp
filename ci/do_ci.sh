@@ -366,6 +366,35 @@ elif [[ "$1" == "cmake.clang_tidy.test" ]]; then
   echo "To generate a clang-tidy report, use the following command:"
   echo "  python3 ./ci/create_clang_tidy_report.py --build_log $LOG_FILE"
   exit 0
+elif [[ "$1" == "cmake.iwyu.test" ]]; then
+  : "${CC:=clang-22}"
+  : "${CXX:=clang++-22}"
+  export CC CXX
+  rm -rf "${BUILD_DIR}"
+  mkdir -p "${BUILD_DIR}"
+  include-what-you-use --version
+  IWYU_LOG_VARIANT=$(basename "${OTELCPP_CMAKE_CACHE_FILE_PATH}" .cmake)
+  LOG_FILE="${BUILD_DIR}/opentelemetry-cpp-iwyu-${IWYU_LOG_VARIANT}.log"
+  cmake "${CMAKE_OPTIONS[@]}"  \
+    -S "${SRC_DIR}" \
+    -B "${BUILD_DIR}" \
+    -C "${OTELCPP_CMAKE_CACHE_FILE_PATH}" \
+    -DCMAKE_CXX_STANDARD=14 \
+    -DWITH_STL=CXX14 \
+    -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
+    -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${SRC_DIR}/.iwyu.imp;"
+  if command -v ninja >/dev/null 2>&1; then
+    IWYU_KEEP_GOING=(-k 0)
+  else
+    IWYU_KEEP_GOING=(-k)
+  fi
+  cmake --build "${BUILD_DIR}" "${CMAKE_BUILD_ARGS[@]}" -- "${IWYU_KEEP_GOING[@]}" 2>&1 | tee "$LOG_FILE"
+  if [ ! -s "$LOG_FILE" ]; then
+    echo "Error: Build log was not created at $LOG_FILE"
+    exit 1
+  fi
+  echo "Build log written to: $LOG_FILE"
+  exit 0
 elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
@@ -460,6 +489,7 @@ elif [[ "$1" == "cmake.install.test" ]]; then
     "sdk"
     "configuration"
     "ext_common"
+    "ext_http"
     "ext_http_curl"
     "exporters_in_memory"
     "exporters_ostream"
@@ -508,7 +538,17 @@ elif [[ "$1" == "cmake.fetch_content.test" ]]; then
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
   exit 0
-
+elif [[ "$1" == "cmake.api_only.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
+        -DOPENTELEMETRY_INSTALL=OFF \
+        -DOPENTELEMETRY_CPP_SRC_DIR="${SRC_DIR}" \
+        "${SRC_DIR}/install/test/cmake/api_only_test"
+  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
+  ctest --output-on-failure
+  exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"

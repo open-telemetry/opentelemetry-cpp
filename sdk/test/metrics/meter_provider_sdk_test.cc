@@ -2,14 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 #include "common.h"
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
@@ -19,6 +21,7 @@
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 #  include <stdint.h>
@@ -27,11 +30,14 @@
 #  include <unordered_map>
 
 #  include "opentelemetry/common/attribute_value.h"
+#  include "opentelemetry/nostd/utility.h"
 #  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
 using namespace opentelemetry::sdk::metrics;
+using namespace opentelemetry::sdk::common::internal_log;
+using opentelemetry::test_common::ScopedTestLogHandler;
 
 TEST(MeterProvider, GetMeter)
 {
@@ -321,3 +327,19 @@ TEST(MeterProvider, GetMeterInequalityCheckAbiv2)
 }
 
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
+
+TEST(MeterProvider, ExplicitShutdownNotWarnOnDestructionCheck)
+{
+  ScopedTestLogHandler log_handler{LogLevel::Warning};
+
+  auto provider = MeterProviderFactory::Create();
+  // Explicit shutdown
+  provider->Shutdown();
+  auto logs = log_handler.Drain();
+  EXPECT_TRUE(logs.empty());
+
+  // Implicit shutdown via destructor
+  provider = nullptr;
+  logs     = log_handler.Drain();
+  EXPECT_TRUE(logs.empty());
+}

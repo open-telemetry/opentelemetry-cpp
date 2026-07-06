@@ -13,7 +13,6 @@
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
@@ -56,6 +55,9 @@ static std::string Hex(const T &id_item)
   id_item.ToLowerBase16(buf);
   return std::string(buf, sizeof(buf));
 }
+
+namespace
+{
 
 class EnvironmentCarrierTest : public ::testing::Test
 {
@@ -134,6 +136,63 @@ TEST_F(EnvironmentCarrierTest, SetUppercaseConversion)
 
   // Original lowercase key should not be in the map
   EXPECT_EQ(env_map->count("tracestate"), 0u);
+}
+
+TEST_F(EnvironmentCarrierTest, NormalizeKeyHyphenAndDot)
+{
+  auto env_map = std::make_shared<std::map<std::string, std::string>>();
+  context::propagation::EnvironmentCarrier carrier(env_map);
+
+  // hyphens and dots become underscores
+  carrier.Set("x-b3-traceid", "abc");
+  EXPECT_EQ(env_map->count("X_B3_TRACEID"), 1u);
+  EXPECT_EQ(env_map->at("X_B3_TRACEID"), "abc");
+
+  carrier.Set("my.complex.key", "val");
+  EXPECT_EQ(env_map->count("MY_COMPLEX_KEY"), 1u);
+}
+
+TEST_F(EnvironmentCarrierTest, NormalizeKeyDigitPrefix)
+{
+  auto env_map = std::make_shared<std::map<std::string, std::string>>();
+  context::propagation::EnvironmentCarrier carrier(env_map);
+
+  // key starting with digit gets '_' prepended
+  carrier.Set("1bad-key", "v");
+  EXPECT_EQ(env_map->count("_1BAD_KEY"), 1u);
+}
+
+TEST_F(EnvironmentCarrierTest, GetNormalizedCacheKey)
+{
+  // Both "x-b3-traceid" and "X_B3_TRACEID" should normalize to the same env var
+  test_setenv("X_B3_TRACEID", "trace-value");
+
+  context::propagation::EnvironmentCarrier carrier;
+
+  auto v1 = carrier.Get("x-b3-traceid");
+  EXPECT_EQ(v1, "trace-value");
+
+  auto v2 = carrier.Get("X_B3_TRACEID");
+  EXPECT_EQ(v2, "trace-value");
+
+  test_unsetenv("X_B3_TRACEID");
+}
+
+TEST_F(EnvironmentCarrierTest, GetCacheKeyedByNormalizedName)
+{
+  // Verify cache uses the normalized key: changing env after first Get returns cached value
+  test_setenv("X_B3_TRACEID", "original");
+
+  context::propagation::EnvironmentCarrier carrier;
+  auto v1 = carrier.Get("x-b3-traceid");
+  EXPECT_EQ(v1, "original");
+
+  // Change the env var - normalized-key cache should return the original value
+  test_setenv("X_B3_TRACEID", "changed");
+  auto v2 = carrier.Get("X_B3_TRACEID");  // different original form, same normalized key
+  EXPECT_EQ(v2, "original");
+
+  test_unsetenv("X_B3_TRACEID");
 }
 
 TEST_F(EnvironmentCarrierTest, ExtractTraceContext)
@@ -250,3 +309,5 @@ TEST_F(EnvironmentCarrierTest, RoundTrip)
   EXPECT_EQ(extracted_span->GetContext().IsSampled(), span_context.IsSampled());
   EXPECT_TRUE(extracted_span->GetContext().IsRemote());
 }
+
+}  // namespace

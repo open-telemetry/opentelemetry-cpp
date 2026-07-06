@@ -13,6 +13,7 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/type_traits.h"
+#include "opentelemetry/nostd/utility.h"
 
 using namespace opentelemetry;
 

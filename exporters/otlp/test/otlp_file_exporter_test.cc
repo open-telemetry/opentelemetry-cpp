@@ -9,18 +9,16 @@
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -44,7 +42,10 @@
 // clang-format on
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include <unordered_map>
+
 #  include "opentelemetry/common/attribute_value.h"
+#  include "opentelemetry/nostd/utility.h"
 #endif
 
 using namespace testing;
@@ -110,8 +111,8 @@ public:
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
 
-    auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-        new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
+    std::unique_ptr<sdk::trace::SpanProcessor> processor =
+        std::make_unique<sdk::trace::BatchSpanProcessor>(std::move(exporter), processor_opts);
     auto provider = nostd::shared_ptr<sdk::trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
@@ -185,7 +186,8 @@ public:
 
 TEST(OtlpFileExporterTest, Shutdown)
 {
-  auto exporter = std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(new OtlpFileExporter());
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter =
+      std::make_unique<OtlpFileExporter>();
   ASSERT_TRUE(exporter->Shutdown());
 
   nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> spans = {};
