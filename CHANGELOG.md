@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Fix clang-tidy misc-override-with-different-visibility warnings
+  [#4215](https://github.com/open-telemetry/opentelemetry-cpp/pull/4215)
+
 * [CMAKE] Fix and test WITH_API_ONLY option
   [#4201](https://github.com/open-telemetry/opentelemetry-cpp/pull/4201)
 

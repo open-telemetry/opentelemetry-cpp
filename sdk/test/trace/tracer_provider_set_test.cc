@@ -26,7 +26,7 @@ namespace trace_sdk = opentelemetry::sdk::trace;
 
 class TestProvider : public TracerProvider
 {
-
+public:
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   nostd::shared_ptr<Tracer> GetTracer(
       nostd::string_view /* name */,
