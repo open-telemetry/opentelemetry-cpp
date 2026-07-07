@@ -89,6 +89,9 @@ const std::array<instrumentation_scope::InstrumentationScope *, 5> instrumentati
     &test_scope_1, &test_scope_2, &test_scope_3, &test_scope_4, &test_scope_5,
 };
 
+namespace
+{
+
 // Test fixture for VerifyDefaultConfiguratorBehavior
 class DefaultLoggerConfiguratorTestFixture
     : public ::testing::TestWithParam<instrumentation_scope::InstrumentationScope *>
@@ -125,3 +128,5 @@ TEST(LoggerConfig, ScopeConfiguratorPreservesCustomConfig)
 INSTANTIATE_TEST_SUITE_P(InstrumentationScopes,
                          DefaultLoggerConfiguratorTestFixture,
                          ::testing::ValuesIn(instrumentation_scopes));
+
+}  // namespace
