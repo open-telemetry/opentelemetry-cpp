@@ -147,6 +147,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy bugprone-unused-local-non-trivial-variable warnings
   [#4202](https://github.com/open-telemetry/opentelemetry-cpp/pull/4202)
 
+* [CODE HEALTH] Fix clang-tidy bugprone-unchecked-string-to-number-conversion warnings
+  [#4216](https://github.com/open-telemetry/opentelemetry-cpp/pull/4216)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
