@@ -49,6 +49,7 @@ cc_library(
         "//sdk/src/logs",
         "//sdk/src/resource",
         "//sdk/src/trace",
+        "//sdk/src/metrics",
         "@com_github_opentelemetry_proto//:logs_service_proto_cc",
         "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
         "@com_github_opentelemetry_proto//:trace_service_proto_cc",
