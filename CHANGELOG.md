@@ -15,8 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
-* [CODE HEALTH] Fix clang-tidy bugprone-unchecked-string-to-number-conversion warnings
-  [#4216](https://github.com/open-telemetry/opentelemetry-cpp/pull/4216)
+* [CODE HEALTH] Move api/test and sdk/test classes into anonymous namespace
+  [#4217](https://github.com/open-telemetry/opentelemetry-cpp/pull/4217)
 
 * [CMAKE] Fix and test WITH_API_ONLY option
   [#4201](https://github.com/open-telemetry/opentelemetry-cpp/pull/4201)
@@ -146,6 +146,9 @@ Increment the:
 
 * [CODE HEALTH] Fix clang-tidy bugprone-unused-local-non-trivial-variable warnings
   [#4202](https://github.com/open-telemetry/opentelemetry-cpp/pull/4202)
+
+* [CODE HEALTH] Fix clang-tidy bugprone-unchecked-string-to-number-conversion warnings
+  [#4216](https://github.com/open-telemetry/opentelemetry-cpp/pull/4216)
 
 ## [1.27.0] 2026-05-13
 
