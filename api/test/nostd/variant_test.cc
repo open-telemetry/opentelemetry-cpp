@@ -8,6 +8,9 @@
 
 namespace nostd = opentelemetry::nostd;
 
+namespace
+{
+
 class DestroyCounter
 {
 public:
@@ -120,3 +123,5 @@ TEST(VariantTest, Construction)
   nostd::variant<bool, const char *, std::string> v{"abc"};
   EXPECT_EQ(v.index(), 1);
 }
+
+}  // namespace

@@ -21,7 +21,7 @@
 #include "tracer_common.h"
 
 #include <stdint.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <map>
 #include <string>
 #include <type_traits>
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
   {
-    port = static_cast<uint16_t>(atoi(argv[1]));
+    port = static_cast<uint16_t>(std::strtol(argv[1], nullptr, 10));
   }
 
   std::string url = "http://" + std::string(default_host) + ":" + std::to_string(port) +
