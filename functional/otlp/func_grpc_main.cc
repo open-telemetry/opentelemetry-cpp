@@ -51,11 +51,8 @@ static bool opt_list   = false;
 static bool opt_debug  = false;
 static bool opt_secure = false;
 // HTTPS by default
-static std::string &GetOptEndpoint()
-{
-  static std::string endpoint = "https://127.0.0.1:4317";
-  return endpoint;
-}
+constexpr char kDefaultOptEndpoint[] = "https://127.0.0.1:4317";
+static std::string opt_endpoint;
 static std::string opt_cert_dir;
 static std::string opt_test_name;
 static TestMode opt_mode = TestMode::kNone;
@@ -268,7 +265,7 @@ static int parse_args(int argc, char *argv[])
       {
         remaining_argc--;
         remaining_argv++;
-        GetOptEndpoint() = *remaining_argv;
+        opt_endpoint = *remaining_argv;
         remaining_argc--;
         remaining_argv++;
         continue;
@@ -322,7 +319,7 @@ typedef int (*test_func_t)();
 
 struct test_case
 {
-  const char *m_name;
+  nostd::string_view m_name;
   test_func_t m_func;
 };
 
@@ -396,6 +393,8 @@ int main(int argc, char *argv[])
   argc--;
   argv++;
 
+  opt_endpoint = kDefaultOptEndpoint;
+
   int rc = parse_args(argc, argv);
 
   if (rc != 0)
@@ -416,7 +415,7 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-  if (GetOptEndpoint().find("https:") != std::string::npos)
+  if (opt_endpoint.find("https:") != std::string::npos)
   {
     opt_secure = true;
   }
@@ -436,7 +435,7 @@ int main(int argc, char *argv[])
 
 static void set_common_opts(otlp::OtlpGrpcExporterOptions &opts)
 {
-  opts.endpoint            = GetOptEndpoint();
+  opts.endpoint            = opt_endpoint;
   opts.timeout             = std::chrono::milliseconds{100};
   opts.use_ssl_credentials = (opt_mode == TestMode::kHttps);
 
