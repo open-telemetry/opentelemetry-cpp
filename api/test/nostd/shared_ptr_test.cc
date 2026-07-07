@@ -13,6 +13,9 @@
 
 using opentelemetry::nostd::shared_ptr;
 
+namespace
+{
+
 class A
 {
 public:
@@ -237,3 +240,5 @@ TEST(SharedPtrTest, Sort)
 {
   SharedPtrTest_Sort();
 }
+
+}  // namespace

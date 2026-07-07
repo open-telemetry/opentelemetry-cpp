@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Move api/test and sdk/test classes into anonymous namespace
+  [#4217](https://github.com/open-telemetry/opentelemetry-cpp/pull/4217)
+
 * [CMAKE] Fix and test WITH_API_ONLY option
   [#4201](https://github.com/open-telemetry/opentelemetry-cpp/pull/4201)
 
