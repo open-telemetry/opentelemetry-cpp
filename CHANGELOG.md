@@ -150,6 +150,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy bugprone-unchecked-string-to-number-conversion warnings
   [#4216](https://github.com/open-telemetry/opentelemetry-cpp/pull/4216)
 
+* [CODE HEALTH] Fix clang-tidy misc-override-with-different-visibility warnings
+  [#4215](https://github.com/open-telemetry/opentelemetry-cpp/pull/4215)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
