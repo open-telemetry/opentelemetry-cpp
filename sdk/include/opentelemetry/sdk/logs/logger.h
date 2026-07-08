@@ -72,7 +72,7 @@ public:
     return GetInstrumentationScope();
   }
 
-private:
+protected:
   bool EnabledImplementation(opentelemetry::logs::Severity severity,
                              const opentelemetry::logs::EventId &event_id) const noexcept override;
 
@@ -89,6 +89,8 @@ private:
                              opentelemetry::logs::Severity severity,
                              const opentelemetry::logs::EventId &event_id) const noexcept override;
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+private:
   // The name of this logger
   std::string logger_name_;
 

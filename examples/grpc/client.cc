@@ -9,7 +9,7 @@
 #include <grpcpp/support/status.h>
 
 #include <stdint.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
   uint16_t port{default_port};
   if (argc > 1)
   {
-    port = static_cast<uint16_t>(atoi(argv[1]));
+    port = static_cast<uint16_t>(std::strtol(argv[1], nullptr, 10));
   }
 
   RunClient(port);

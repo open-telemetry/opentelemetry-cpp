@@ -42,6 +42,9 @@ TEST(SimpleProcessor, ToInMemorySpanExporter)
   EXPECT_TRUE(processor.Shutdown());
 }
 
+namespace
+{
+
 // An exporter that does nothing but record (and give back ) the # of times Shutdown was called.
 class RecordShutdownExporter final : public SpanExporter
 {
@@ -141,3 +144,5 @@ TEST(SimpleSpanProcessor, ForceFlushFail)
       std::unique_ptr<SpanExporter>{new FailShutDownForceFlushExporter()});
   EXPECT_EQ(false, processor.ForceFlush());
 }
+
+}  // namespace

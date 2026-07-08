@@ -21,12 +21,12 @@ public:
   opentelemetry::sdk::metrics::AggregationTemporality GetAggregationTemporality(
       opentelemetry::sdk::metrics::InstrumentType instrument_type) const noexcept override;
 
+private:
   bool OnForceFlush(std::chrono::microseconds timeout) noexcept override;
 
   bool OnShutDown(std::chrono::microseconds timeout) noexcept override;
 
   void OnInitialized() noexcept override;
 
-private:
   std::string comment_;
 };

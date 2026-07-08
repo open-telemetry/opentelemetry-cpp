@@ -35,6 +35,9 @@ using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
 
+namespace
+{
+
 class MockMetricExporterForStress : public opentelemetry::sdk::metrics::PushMetricExporter
 {
 public:
@@ -175,3 +178,5 @@ TEST(HistogramStress, UnsignedInt64)
   ASSERT_EQ(expected_count, collected_count);
   ASSERT_EQ(*expected_sum, collected_sum);
 }
+
+}  // namespace
