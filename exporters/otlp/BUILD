@@ -47,6 +47,7 @@ cc_library(
     deps = [
         ":otlp_utf8_validity",
         "//sdk/src/logs",
+        "//sdk/src/metrics",
         "//sdk/src/resource",
         "//sdk/src/trace",
         "@com_github_opentelemetry_proto//:logs_service_proto_cc",
