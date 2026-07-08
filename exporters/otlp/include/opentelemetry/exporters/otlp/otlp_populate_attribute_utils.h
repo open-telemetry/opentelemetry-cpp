@@ -8,6 +8,7 @@
 #include <string>
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -45,8 +46,20 @@ namespace exporter
 {
 namespace otlp
 {
+
 /**
- * The OtlpCommoneUtils contains utility functions to populate attributes
+ *  Attribute Value Max Length accepted by OtlpPopulateAttributeUtils::PopulateAnyValue and
+ * OtlpPopulateAttributeUtils::PopulateAttribute. Defaults to max of size_t (no limit).
+ */
+struct AttributeValueMaxLength
+{
+  std::size_t value{(std::numeric_limits<std::size_t>::max)()};
+  AttributeValueMaxLength() noexcept = default;
+  explicit AttributeValueMaxLength(std::size_t v) noexcept : value(v) {}
+};
+
+/**
+ * The OtlpPopulateAttributeUtils contains utility functions to populate attributes
  */
 class OtlpPopulateAttributeUtils
 {
@@ -65,35 +78,59 @@ public:
    * string alternatives are truncated to at most `max_length` bytes using
    * UTF-8-safe truncation (Utf8SafePrefixLength) so the resulting proto
    * `string_value` stays valid UTF-8 when the input was. Raw bytes
-   * (`span<const uint8_t>` when `allow_bytes` is true) are cut at the raw
-   * byte boundary since they are not UTF-8 text. Non-string alternatives
-   * are unaffected.
+   * (span<const uint8_t>) are truncated at the raw byte boundary. Non-string
+   * alternatives are unaffected.
    */
   static void PopulateAnyValue(
       opentelemetry::proto::common::v1::AnyValue *proto_value,
       const opentelemetry::common::AttributeValue &value,
-      bool allow_bytes,
-      std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept;
+      AttributeValueMaxLength max_length = AttributeValueMaxLength{}) noexcept;
 
   static void PopulateAnyValue(
       opentelemetry::proto::common::v1::AnyValue *proto_value,
       const opentelemetry::sdk::common::OwnedAttributeValue &value,
-      bool allow_bytes,
-      std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept;
+      AttributeValueMaxLength max_length = AttributeValueMaxLength{}) noexcept;
 
   static void PopulateAttribute(
       opentelemetry::proto::common::v1::KeyValue *attribute,
       nostd::string_view key,
       const opentelemetry::common::AttributeValue &value,
-      bool allow_bytes,
-      std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept;
+      AttributeValueMaxLength max_length = AttributeValueMaxLength{}) noexcept;
 
   static void PopulateAttribute(
       opentelemetry::proto::common::v1::KeyValue *attribute,
       nostd::string_view key,
       const opentelemetry::sdk::common::OwnedAttributeValue &value,
-      bool allow_bytes,
-      std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept;
+      AttributeValueMaxLength max_length = AttributeValueMaxLength{}) noexcept;
+
+  // Deprecated PopulateAnyValue and PopulateAttribute overloads. `allow_bytes` is no longer
+  // meaningful because all AnyValue types support bytes. Prefer the AttributeValueMaxLength
+  // overloads above.
+  OPENTELEMETRY_DEPRECATED_MESSAGE(
+      "allow_bytes is unused; use the AttributeValueMaxLength overload instead")
+  static void PopulateAnyValue(opentelemetry::proto::common::v1::AnyValue *proto_value,
+                               const opentelemetry::common::AttributeValue &value,
+                               bool allow_bytes) noexcept;
+
+  OPENTELEMETRY_DEPRECATED_MESSAGE(
+      "allow_bytes is unused; use the AttributeValueMaxLength overload instead")
+  static void PopulateAnyValue(opentelemetry::proto::common::v1::AnyValue *proto_value,
+                               const opentelemetry::sdk::common::OwnedAttributeValue &value,
+                               bool allow_bytes) noexcept;
+
+  OPENTELEMETRY_DEPRECATED_MESSAGE(
+      "allow_bytes is unused; use the AttributeValueMaxLength overload instead")
+  static void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
+                                nostd::string_view key,
+                                const opentelemetry::common::AttributeValue &value,
+                                bool allow_bytes) noexcept;
+
+  OPENTELEMETRY_DEPRECATED_MESSAGE(
+      "allow_bytes is unused; use the AttributeValueMaxLength overload instead")
+  static void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
+                                nostd::string_view key,
+                                const opentelemetry::sdk::common::OwnedAttributeValue &value,
+                                bool allow_bytes) noexcept;
 
   /**
    * Byte length of the longest prefix of `value` that fits within `max_bytes`

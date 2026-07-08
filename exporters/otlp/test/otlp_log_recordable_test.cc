@@ -545,8 +545,19 @@ TEST(OtlpLogRecordable, DefaultRecordAppliesNoLimitUntilConfigured)
   {
     rec.SetAttribute("attr_" + std::to_string(i), static_cast<int64_t>(i));
   }
-  EXPECT_EQ(rec.log_record().attributes_size(), 200);
-  EXPECT_EQ(rec.log_record().dropped_attributes_count(), 0u);
+  const auto &proto_log_record = rec.log_record();
+  EXPECT_EQ(proto_log_record.attributes_size(), 200);
+  EXPECT_EQ(proto_log_record.dropped_attributes_count(), 0u);
+}
+
+// Test that an empty key is rejected and not stored.
+TEST(OtlpLogRecordable, SetAttributeEmptyKeyIsRejected)
+{
+  OtlpLogRecordable rec;
+  rec.SetAttribute("", opentelemetry::common::AttributeValue{int64_t(1)});
+
+  const auto &proto_log_record = rec.log_record();
+  EXPECT_EQ(proto_log_record.attributes_size(), 0);
 }
 
 }  // namespace otlp
