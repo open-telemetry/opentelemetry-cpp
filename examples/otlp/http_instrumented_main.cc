@@ -152,15 +152,11 @@ private:
 
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
-opentelemetry::exporter::otlp::OtlpHttpExporterOptions tracer_opts;
-opentelemetry::exporter::otlp::OtlpHttpMetricExporterOptions meter_opts;
-opentelemetry::exporter::otlp::OtlpHttpLogRecordExporterOptions logger_opts;
-
 std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> tracer_provider;
 std::shared_ptr<opentelemetry::sdk::metrics::MeterProvider> meter_provider;
 std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> logger_provider;
 
-void InitTracer()
+void InitTracer(const opentelemetry::exporter::otlp::OtlpHttpExporterOptions &tracer_opts)
 {
   // Create OTLP exporter instance
   opentelemetry::exporter::otlp::OtlpHttpExporterRuntimeOptions exp_rt_opts;
@@ -205,7 +201,7 @@ void CleanupTracer()
   opentelemetry::sdk::trace::Provider::SetTracerProvider(none);
 }
 
-void InitMetrics()
+void InitMetrics(const opentelemetry::exporter::otlp::OtlpHttpMetricExporterOptions &meter_opts)
 {
   // Create OTLP exporter instance
   opentelemetry::exporter::otlp::OtlpHttpMetricExporterRuntimeOptions exp_rt_opts;
@@ -254,7 +250,7 @@ void CleanupMetrics()
   opentelemetry::sdk::metrics::Provider::SetMeterProvider(none);
 }
 
-void InitLogger()
+void InitLogger(const opentelemetry::exporter::otlp::OtlpHttpLogRecordExporterOptions &logger_opts)
 {
   // Create OTLP exporter instance
   opentelemetry::exporter::otlp::OtlpHttpLogRecordExporterRuntimeOptions exp_rt_opts;
@@ -306,6 +302,9 @@ void CleanupLogger()
 */
 int main(int argc, char *argv[])
 {
+  opentelemetry::exporter::otlp::OtlpHttpExporterOptions tracer_opts;
+  opentelemetry::exporter::otlp::OtlpHttpMetricExporterOptions meter_opts;
+  opentelemetry::exporter::otlp::OtlpHttpLogRecordExporterOptions logger_opts;
   if (argc > 1)
   {
     tracer_opts.url = argv[1];
@@ -335,9 +334,9 @@ int main(int argc, char *argv[])
 
   std::cout << "Initializing opentelemetry-cpp\n" << std::flush;
 
-  InitTracer();
-  InitMetrics();
-  InitLogger();
+  InitTracer(tracer_opts);
+  InitMetrics(meter_opts);
+  InitLogger(logger_opts);
 
   std::cout << "Application payload\n" << std::flush;
 

@@ -11,17 +11,13 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/utility.h"
-#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #include "opentelemetry/sdk/metrics/sync_instruments.h"
 
 using namespace opentelemetry;
-using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
-
-static auto instrumentation_scope = InstrumentationScope::Create("opentelemetry-cpp", "0.1.0");
 
 using M = std::map<std::string, std::string>;
 

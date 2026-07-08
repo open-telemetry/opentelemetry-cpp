@@ -137,7 +137,6 @@ private:
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
   std::atomic<bool> is_enabled_{false};
 #endif
-  static const std::shared_ptr<opentelemetry::trace::NoopTracer> kNoopTracer;
 };
 }  // namespace trace
 }  // namespace sdk
