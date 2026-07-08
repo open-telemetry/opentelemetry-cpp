@@ -412,7 +412,7 @@ std::unique_ptr<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>> InfoWithOv
 }
 
 // Builds a LoggerProvider whose RecordingExporter pointer is returned via the out parameter.
-logs_sdk::LoggerProvider MakeProvider(
+std::unique_ptr<logs_sdk::LoggerProvider> MakeProvider(
     RecordingExporter *&exporter_out,
     std::unique_ptr<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>> configurator =
         EnableAll())
@@ -420,9 +420,9 @@ logs_sdk::LoggerProvider MakeProvider(
   auto exporter  = std::make_unique<RecordingExporter>();
   exporter_out   = exporter.get();
   auto processor = std::make_unique<logs_sdk::SimpleLogRecordProcessor>(std::move(exporter));
-  return logs_sdk::LoggerProvider(std::move(processor),
-                                  opentelemetry::sdk::resource::Resource::Create({}),
-                                  std::move(configurator));
+  return std::make_unique<logs_sdk::LoggerProvider>(
+      std::move(processor), opentelemetry::sdk::resource::Resource::Create({}),
+      std::move(configurator));
 }
 
 }  // namespace
@@ -433,15 +433,15 @@ TEST(LoggerProviderSDK, UpdateLoggerConfiguratorDisableByName)
   auto provider = MakeProvider(exporter);
   ASSERT_TRUE(exporter != nullptr);
 
-  auto logger_disabled_by_update = provider.GetLogger("logger.disabled", "scope.disabled");
-  auto logger_unaffected         = provider.GetLogger("logger.unaffected", "scope.unaffected");
+  auto logger_disabled_by_update = provider->GetLogger("logger.disabled", "scope.disabled");
+  auto logger_unaffected         = provider->GetLogger("logger.unaffected", "scope.unaffected");
 
   // Both loggers are initially enabled.
   ASSERT_TRUE(logger_disabled_by_update->Enabled(logs_api::Severity::kInfo));
   ASSERT_TRUE(logger_unaffected->Enabled(logs_api::Severity::kInfo));
 
   // Disable scope.disabled by name; scope.unaffected must remain enabled.
-  provider.UpdateLoggerConfigurator(DisableByName("scope.disabled"));
+  provider->UpdateLoggerConfigurator(DisableByName("scope.disabled"));
 
   EXPECT_FALSE(logger_disabled_by_update->Enabled(logs_api::Severity::kInfo));
   EXPECT_TRUE(logger_unaffected->Enabled(logs_api::Severity::kInfo));
@@ -459,18 +459,18 @@ TEST(LoggerProviderSDK, UpdateLoggerConfiguratorReEnable)
   auto provider = MakeProvider(exporter, DisableAll());
   ASSERT_TRUE(exporter != nullptr);
 
-  auto existing_logger = provider.GetLogger("existing", "scope.existing");
+  auto existing_logger = provider->GetLogger("existing", "scope.existing");
 
   ASSERT_FALSE(existing_logger->Enabled(logs_api::Severity::kInfo));
 
   // enable all loggers.
-  provider.UpdateLoggerConfigurator(EnableAll());
+  provider->UpdateLoggerConfigurator(EnableAll());
 
   // The existing logger handle must immediately reflect the updated config.
   EXPECT_TRUE(existing_logger->Enabled(logs_api::Severity::kInfo));
 
   // Loggers obtained after the update also reflect the new configurator.
-  auto logger_after = provider.GetLogger("after", "scope.after");
+  auto logger_after = provider->GetLogger("after", "scope.after");
   EXPECT_TRUE(logger_after->Enabled(logs_api::Severity::kInfo));
 }
 
@@ -482,7 +482,7 @@ TEST(LoggerProviderSDK, UpdateLoggerConfiguratorMinSeverityChange)
 
   ASSERT_TRUE(exporter != nullptr);
 
-  auto logger = provider.GetLogger("mylogger", "scope.test");
+  auto logger = provider->GetLogger("mylogger", "scope.test");
 
   // At Info threshold: Debug is suppressed, Info passes.
   EXPECT_FALSE(logger->Enabled(logs_api::Severity::kDebug));
@@ -500,7 +500,7 @@ TEST(LoggerProviderSDK, UpdateLoggerConfiguratorMinSeverityChange)
 #endif
 
   // Raise min severity to Warn.
-  provider.UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kWarn));
+  provider->UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kWarn));
 
   EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo));
   EXPECT_TRUE(logger->Enabled(logs_api::Severity::kWarn));
@@ -516,7 +516,7 @@ TEST(LoggerProviderSDK, UpdateLoggerConfiguratorMinSeverityChange)
 #endif
 
   // Drop min severity to Debug.
-  provider.UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kDebug));
+  provider->UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kDebug));
 
   EXPECT_TRUE(logger->Enabled(logs_api::Severity::kDebug));
 
@@ -538,8 +538,8 @@ TEST(LoggerProviderSDK, UpdateLoggerConfiguratorPerScopeMinSeverity)
 
   ASSERT_TRUE(exporter != nullptr);
 
-  auto logger_default = provider.GetLogger("default", "scope.default");
-  auto logger_verbose = provider.GetLogger("verbose", "scope.verbose");
+  auto logger_default = provider->GetLogger("default", "scope.default");
+  auto logger_verbose = provider->GetLogger("verbose", "scope.verbose");
 
   // scope.default filtered at Debug, passes at Info.
   EXPECT_FALSE(logger_default->Enabled(logs_api::Severity::kDebug));
@@ -549,7 +549,7 @@ TEST(LoggerProviderSDK, UpdateLoggerConfiguratorPerScopeMinSeverity)
   EXPECT_TRUE(logger_verbose->Enabled(logs_api::Severity::kDebug));
 
   // Now raise scope.verbose to Warn; everything else stays at Info.
-  provider.UpdateLoggerConfigurator(
+  provider->UpdateLoggerConfigurator(
       InfoWithOverrideSeverity("scope.verbose", logs_api::Severity::kWarn));
 
   EXPECT_FALSE(logger_verbose->Enabled(logs_api::Severity::kInfo));
@@ -564,14 +564,14 @@ TEST(LoggerProviderSDK, UpdateLoggerConfiguratorNewLoggerUsesUpdatedConfig)
   ASSERT_TRUE(exporter != nullptr);
 
   // Install a configurator that disables "scope.disabled" before any logger for that scope exists.
-  provider.UpdateLoggerConfigurator(DisableByName("scope.disabled"));
+  provider->UpdateLoggerConfigurator(DisableByName("scope.disabled"));
 
   // A logger obtained after the update must reflect the new config.
-  auto logger_for_disabled_scope = provider.GetLogger("disabled", "scope.disabled");
+  auto logger_for_disabled_scope = provider->GetLogger("disabled", "scope.disabled");
   EXPECT_FALSE(logger_for_disabled_scope->Enabled(logs_api::Severity::kInfo));
 
   // Scopes not named in the configurator remain enabled.
-  auto logger_for_unaffected_scope = provider.GetLogger("unaffected", "scope.unaffected");
+  auto logger_for_unaffected_scope = provider->GetLogger("unaffected", "scope.unaffected");
   EXPECT_TRUE(logger_for_unaffected_scope->Enabled(logs_api::Severity::kInfo));
 }
 
@@ -581,11 +581,11 @@ TEST(LoggerProviderSDK, UpdateLoggerConfiguratorNullIgnored)
   auto provider = MakeProvider(exporter, AllAtSeverity(logs_api::Severity::kInfo));
   ASSERT_TRUE(exporter != nullptr);
 
-  auto logger = provider.GetLogger("mylogger", "scope.test");
+  auto logger = provider->GetLogger("mylogger", "scope.test");
   ASSERT_TRUE(logger->Enabled(logs_api::Severity::kInfo));
 
   // Passing nullptr must be a no-op (logged as an error internally, config unchanged).
-  provider.UpdateLoggerConfigurator(nullptr);
+  provider->UpdateLoggerConfigurator(nullptr);
 
   EXPECT_TRUE(logger->Enabled(logs_api::Severity::kInfo));
 }
@@ -596,7 +596,7 @@ TEST(LoggerProviderSDK, UpdateLoggerConfiguratorConcurrentEmit)
   auto provider = MakeProvider(exporter, AllAtSeverity(logs_api::Severity::kInfo));
   ASSERT_TRUE(exporter != nullptr);
 
-  auto logger = provider.GetLogger("mylogger", "scope.concurrent");
+  auto logger = provider->GetLogger("mylogger", "scope.concurrent");
 
   std::atomic<bool> stop{false};
   std::atomic<bool> worker_saw_suppressed{false};
@@ -625,14 +625,14 @@ TEST(LoggerProviderSDK, UpdateLoggerConfiguratorConcurrentEmit)
   worker_ready_future.wait();
 
   // Raise min severity so Info is suppressed; wait for worker to observe it.
-  provider.UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kError));
+  provider->UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kError));
   while (!worker_saw_suppressed.load(std::memory_order_relaxed))
   {
     std::this_thread::yield();
   }
 
   // Lower min severity back to Info; wait for worker to observe it.
-  provider.UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kInfo));
+  provider->UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kInfo));
   while (!worker_saw_emitted.load(std::memory_order_relaxed))
   {
     std::this_thread::yield();
