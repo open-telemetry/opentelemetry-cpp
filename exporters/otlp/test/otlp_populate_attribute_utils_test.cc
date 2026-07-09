@@ -12,6 +12,7 @@
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/version.h"
 
@@ -294,6 +295,20 @@ TEST_F(PopulateAnyValueTest, AnyValueSpanStringViewInvalidUtf8)
   EXPECT_EQ(proto_anyvalue_.array_value().values(1).bytes_value(),
             std::string("\x80\x81\x82\x83", 4));
 }
+
+TEST_F(PopulateAnyValueTest, AnyValueSpanStringViewInvalidUtf8TruncatedAtMaxLength)
+{
+  // Invalid UTF-8 string that is also longer than max_length.
+  // Must store the truncated string as a byte array.
+  const std::array<char, 6> invalid_utf8       = {'\x80', '\x81', '\x82', '\x83', '\x84', '\x85'};
+  const std::array<nostd::string_view, 1> data = {
+      nostd::string_view{invalid_utf8.data(), invalid_utf8.size()}};
+  OtlpPopulateAttributeUtils::PopulateAnyValue(
+      &proto_anyvalue_, common::AttributeValue{nostd::span<const nostd::string_view>{data}},
+      AttributeValueMaxLength{3});
+  ASSERT_EQ(proto_anyvalue_.array_value().values_size(), 1);
+  EXPECT_EQ(proto_anyvalue_.array_value().values(0).bytes_value(), std::string("\x80\x81\x82", 3));
+}
 #endif  // defined(ENABLE_OTLP_UTF8_VALIDITY)
 
 // ---------------------------------------------------------------------------
@@ -409,6 +424,24 @@ TEST_F(PopulateAnyValueTest, OwnedAnyValueVectorString)
 }
 
 #if defined(ENABLE_OTLP_UTF8_VALIDITY)
+TEST_F(PopulateAnyValueTest, OwnedAnyValueStringInvalidUtf8)
+{
+  // Bare continuation bytes are structurally invalid UTF-8.
+  const std::string invalid_utf8("\x80\x81\x82\x83", 4);
+  OtlpPopulateAttributeUtils::PopulateAnyValue(&proto_anyvalue_,
+                                               sdk::common::OwnedAttributeValue{invalid_utf8});
+  EXPECT_EQ(proto_anyvalue_.bytes_value(), std::string("\x80\x81\x82\x83", 4));
+}
+
+TEST_F(PopulateAnyValueTest, OwnedAnyValueStringInvalidUtf8TruncatedAtMaxLength)
+{
+  // Invalid UTF-8 string that is also longer than max_length
+  const std::string invalid_utf8("\x80\x81\x82\x83\x84\x85", 6);
+  OtlpPopulateAttributeUtils::PopulateAnyValue(
+      &proto_anyvalue_, sdk::common::OwnedAttributeValue{invalid_utf8}, AttributeValueMaxLength{3});
+  EXPECT_EQ(proto_anyvalue_.bytes_value(), std::string("\x80\x81\x82", 3));
+}
+
 TEST_F(PopulateAnyValueTest, OwnedAnyValueVectorStringInvalidUtf8)
 {
   // Mix of valid and invalid UTF-8 entries.
@@ -557,6 +590,66 @@ TEST_F(PopulateAttributeTest, PopulateAttributeKeyValueOwned)
   EXPECT_EQ(proto_keyvalue_.key(), "my-key");
   EXPECT_EQ(proto_keyvalue_.value().string_value(), "my-value");
 }
+
+// ---------------------------------------------------------------------------
+// Deprecated bool allow_bytes overloads
+// ---------------------------------------------------------------------------
+
+/*
+ * The following overloads are deprecated.
+ * Suppress warnings in tests, to have a clean build and coverage.
+ */
+#if defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable : 4996)
+#elif defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__clang__) || defined(__apple_build_version__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+TEST_F(PopulateAnyValueTest, DeprecatedAllowBytesAttributeValue)
+{
+  OtlpPopulateAttributeUtils::PopulateAnyValue(
+      &proto_anyvalue_, common::AttributeValue{int64_t{77}}, /*allow_bytes=*/true);
+  EXPECT_EQ(proto_anyvalue_.int_value(), 77);
+}
+
+TEST_F(PopulateAnyValueTest, DeprecatedAllowBytesOwnedAttributeValue)
+{
+  OtlpPopulateAttributeUtils::PopulateAnyValue(
+      &proto_anyvalue_, sdk::common::OwnedAttributeValue{std::string{"owned"}},
+      /*allow_bytes=*/false);
+  EXPECT_EQ(proto_anyvalue_.string_value(), "owned");
+}
+
+TEST_F(PopulateAttributeTest, DeprecatedAllowBytesAttributeValue)
+{
+  OtlpPopulateAttributeUtils::PopulateAttribute(&proto_keyvalue_, nostd::string_view{"key"},
+                                                common::AttributeValue{int64_t{99}},
+                                                /*allow_bytes=*/true);
+  EXPECT_EQ(proto_keyvalue_.key(), "key");
+  EXPECT_EQ(proto_keyvalue_.value().int_value(), 99);
+}
+
+TEST_F(PopulateAttributeTest, DeprecatedAllowBytesOwnedAttributeValue)
+{
+  OtlpPopulateAttributeUtils::PopulateAttribute(
+      &proto_keyvalue_, nostd::string_view{"key"},
+      sdk::common::OwnedAttributeValue{std::string{"value"}}, /*allow_bytes=*/false);
+  EXPECT_EQ(proto_keyvalue_.key(), "key");
+  EXPECT_EQ(proto_keyvalue_.value().string_value(), "value");
+}
+
+#if defined(_MSC_VER)
+#  pragma warning(pop)
+#elif defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
+#  pragma GCC diagnostic pop
+#elif defined(__clang__) || defined(__apple_build_version__)
+#  pragma clang diagnostic pop
+#endif
 
 }  // namespace otlp
 }  // namespace exporter
