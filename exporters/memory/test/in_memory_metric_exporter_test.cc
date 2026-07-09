@@ -24,6 +24,9 @@ using opentelemetry::sdk::metrics::ResourceMetrics;
 using opentelemetry::sdk::metrics::ScopeMetrics;
 using opentelemetry::sdk::resource::Resource;
 
+namespace
+{
+
 class InMemoryMetricExporterTest : public ::testing::Test
 {
 protected:
@@ -62,3 +65,5 @@ TEST_F(InMemoryMetricExporterTest, TemporalitySelector)
   EXPECT_EQ(exporter_->GetAggregationTemporality(InstrumentType::kCounter),
             AggregationTemporality::kCumulative);
 }
+
+}  // namespace

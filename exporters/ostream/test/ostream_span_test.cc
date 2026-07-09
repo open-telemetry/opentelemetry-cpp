@@ -43,6 +43,9 @@ namespace exportertrace = opentelemetry::exporter::trace;
 
 using Attributes = std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>;
 
+namespace
+{
+
 class TestResource : public resource::Resource
 {
 public:
@@ -411,3 +414,5 @@ TEST(OStreamSpanExporter, PrintSpanToClog)
 
   EXPECT_EQ(captured, kDefaultSpanPrinted);
 }
+
+}  // namespace
