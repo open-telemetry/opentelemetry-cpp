@@ -1,47 +1,63 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef OPENTELEMETRY_STL_VERSION
+#include <gtest/gtest.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <algorithm>
+#include <chrono>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+#include "gmock/gmock.h"
+#include "nlohmann/json.hpp"
 
-#  include <algorithm>
-#  include <chrono>
-#  include <thread>
-#  include <utility>
-#  include <vector>
+#include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/exporters/otlp/otlp_http_client.h"
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
+#include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/logs/logger.h"
+#include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/proto/common/v1/common.pb.h"
+#include "opentelemetry/proto/logs/v1/logs.pb.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor.h"
+#include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
+#include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
+#include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/version.h"
 
-#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter.h"
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+// IWYU pragma: no_include <google/protobuf/repeated_ptr_field.h>
+// IWYU pragma: no_include <google/protobuf/stubs/common.h>
 
-#  include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
-
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-
-#  include "opentelemetry/common/key_value_iterable_view.h"
-#  include "opentelemetry/ext/http/client/http_client_factory.h"
-#  include "opentelemetry/ext/http/server/http_server.h"
-#  include "opentelemetry/logs/provider.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/common/global_log_handler.h"
-#  include "opentelemetry/sdk/logs/batch_log_record_processor.h"
-#  include "opentelemetry/sdk/logs/exporter.h"
-#  include "opentelemetry/sdk/logs/logger_provider.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
-#  include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
-#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
-
-#  include <google/protobuf/message_lite.h>
-#  include <gtest/gtest.h>
-#  include "gmock/gmock.h"
-
-#  include "nlohmann/json.hpp"
-
-#  if defined(_MSC_VER)
-#    include "opentelemetry/sdk/common/env_variables.h"
+#if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
-#  endif
+#endif
 
 using namespace testing;
 
@@ -265,7 +281,7 @@ public:
     EXPECT_GE(received_record_counter, 1);
   }
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
   void ExportJsonIntegrationTestAsync()
   {
     auto mock_otlp_client = OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(
@@ -411,7 +427,7 @@ public:
     // Exporting can be retried
     EXPECT_GE(received_record_counter, 1);
   }
-#  endif
+#endif
 
   void ExportBinaryIntegrationTest()
   {
@@ -539,7 +555,7 @@ public:
     EXPECT_GE(received_record_counter, 1);
   }
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
   void ExportBinaryIntegrationTestAsync()
   {
     auto mock_otlp_client = OtlpHttpLogRecordExporterTestPeer::GetMockOtlpHttpClient(
@@ -669,7 +685,7 @@ public:
     // Exporting can be retried
     EXPECT_GE(received_record_counter, 1);
   }
-#  endif
+#endif
 };
 
 TEST(OtlpHttpLogRecordExporterTest, Shutdown)
@@ -690,13 +706,13 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonIntegrationTestSync)
   ExportJsonIntegrationTest();
 }
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonIntegrationTestAsync)
 {
   ExportJsonIntegrationTestAsync();
   static ProtobufGlobalSymbolGuard global_symbol_guard;
 }
-#  endif
+#endif
 
 // Create log records, let processor call Export()
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestSync)
@@ -704,12 +720,12 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestSync)
   ExportBinaryIntegrationTest();
 }
 
-#  ifdef ENABLE_ASYNC_EXPORT
+#ifdef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportBinaryIntegrationTestAsync)
 {
   ExportBinaryIntegrationTestAsync();
 }
-#  endif
+#endif
 
 // Test exporter configuration options
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigTest)
@@ -747,7 +763,7 @@ TEST(OtlpHttpLogRecordExporterTest, ConfigDefaultProtocolTest)
   EXPECT_EQ(opts.content_type, HttpRequestContentType::kBinary);
 }
 
-#  ifndef NO_GETENV
+#ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigFromEnv)
 {
@@ -896,7 +912,7 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
 }
-#  endif  // NO_GETENV
+#endif  // NO_GETENV
 
 // Exporter logs the rejection on partial_success.
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportPartialSuccess)
@@ -979,7 +995,7 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportPartialSuccessJson)
 }
 
 // A malformed response body on a 2xx should return as kFailure for sync exports.
-#  ifndef ENABLE_ASYNC_EXPORT
+#ifndef ENABLE_ASYNC_EXPORT
 TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportParseFailureReturnsFailure)
 {
   std::string serialized = "{some bad JSON";
@@ -1004,9 +1020,8 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportParseFailureReturnsFailure)
   nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> batch(&recordable, 1);
   EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kFailure, exporter->Export(batch));
 }
-#  endif
+#endif
 
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif /* OPENTELEMETRY_STL_VERSION */
