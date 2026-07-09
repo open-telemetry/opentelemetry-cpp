@@ -638,8 +638,7 @@ TEST(BoundSyncInstruments, BoundAndUnboundShareDatapoint)
 //    multiple overflow-bound handles aggregate into the same overflow datapoint.
 TEST(BoundSyncInstruments, BindingAtOverflowGoesToOverflowBucket)
 {
-  // limit = 3: two real distinct keys are admitted; the third new distinct
-  // key overflows because the overflow attribute set itself consumes a slot.
+  // limit = 3: three real distinct keys are admitted; the fourth overflows.
   StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 3);
 
   M a1    = {{"k", "1"}};
@@ -658,7 +657,7 @@ TEST(BoundSyncInstruments, BindingAtOverflowGoesToOverflowBucket)
   auto b4 = holder->Bind(KeyValueIterableView<M>(a4));
   b4->RecordLong(50);
 
-  // Overflow datapoint must equal sum of the overflow-bound writes (100 + 50).
+  // Overflow datapoint contains only the fourth bound write.
   std::shared_ptr<CollectorHandle> collector(
       new MockCollectorHandle(AggregationTemporality::kDelta));
   std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
@@ -678,7 +677,7 @@ TEST(BoundSyncInstruments, BindingAtOverflowGoesToOverflowBucket)
                     return true;
                   });
   EXPECT_TRUE(seen);
-  EXPECT_EQ(ov_value, 150);
+  EXPECT_EQ(ov_value, 50);
 }
 
 // 7) Noop bound instruments compile and no-op.
@@ -761,7 +760,7 @@ TEST(BoundSyncInstruments, DroppedBoundEntriesAreGarbageCollected)
     h->RecordLong(1);
     handles.push_back(h);
   }
-  // Expect no overflow yet (3 + 1 < 5).
+  // Expect no overflow yet (3 < 5).
   EXPECT_FALSE(HasOverflowPoint(*holder, AggregationTemporality::kDelta));
 }
 
@@ -769,14 +768,12 @@ TEST(BoundSyncInstruments, DroppedBoundEntriesAreGarbageCollected)
 // Bind() to reuse it without consuming new cardinality.
 TEST(BoundSyncInstruments, BindOnExistingUnboundKeyDoesNotOverflow)
 {
-  // limit = 3: two real keys are admitted; a third new distinct key would
-  // overflow (overflow itself consumes a slot).
+  // limit = 3: three real keys are admitted; a fourth new distinct key would overflow.
   StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 3);
 
   M a1 = {{"k", "1"}};
   M a2 = {{"k", "2"}};
-  // Two distinct unbound keys consume the two admitted slots (limit=3 with
-  // overflow consuming a slot leaves room for two real keys).
+  // Two distinct unbound keys consume two of the three admitted slots.
   holder->RecordLong(10, KeyValueIterableView<M>(a1), opentelemetry::context::Context{});
   holder->RecordLong(20, KeyValueIterableView<M>(a2), opentelemetry::context::Context{});
 
@@ -863,9 +860,9 @@ TEST(BoundSyncInstruments, UnboundOnExistingBoundKeyDoesNotOverflow)
 // unbound keys correctly overflow.
 TEST(BoundSyncInstruments, RetainedBoundEntriesCountAfterDeltaCollect)
 {
-  StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 3);
+  StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 2);
 
-  // Two bound keys consume the two real admitted slots (overflow takes the 3rd).
+  // Two bound keys consume the two admitted slots.
   M a1    = {{"bound", "1"}};
   M a2    = {{"bound", "2"}};
   auto b1 = holder->Bind(KeyValueIterableView<M>(a1));
@@ -886,7 +883,7 @@ TEST(BoundSyncInstruments, RetainedBoundEntriesCountAfterDeltaCollect)
 // Strengthened: assert the overflow datapoint VALUE, not just its presence.
 TEST(BoundSyncInstruments, RetainedBoundEntriesOverflowValue)
 {
-  StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 3);
+  StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 2);
   M a1    = {{"bound", "1"}};
   M a2    = {{"bound", "2"}};
   auto b1 = holder->Bind(KeyValueIterableView<M>(a1));
@@ -917,12 +914,11 @@ TEST(BoundSyncInstruments, RetainedBoundEntriesOverflowValue)
 }
 
 // No-attribute unbound RecordLong must follow the unified cardinality policy.
-// With limit=3, two real distinct bound keys are admitted; the empty-attr
-// unbound write would be a third new key and routes to overflow (overflow
-// itself consumes a slot).
+// With limit=2, two real distinct bound keys are admitted; the empty-attr
+// unbound write is a third new key and routes to overflow.
 TEST(BoundSyncInstruments, NoAttributeUnboundFollowsUnifiedPolicyLong)
 {
-  StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 3);
+  StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 2);
   M a1    = {{"k", "1"}};
   M a2    = {{"k", "2"}};
   auto b1 = holder->Bind(KeyValueIterableView<M>(a1));
@@ -954,7 +950,7 @@ TEST(BoundSyncInstruments, NoAttributeUnboundFollowsUnifiedPolicyLong)
 // Same coverage for double counter no-attribute path.
 TEST(BoundSyncInstruments, NoAttributeUnboundFollowsUnifiedPolicyDouble)
 {
-  StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kDouble, 3);
+  StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kDouble, 2);
   M a1    = {{"k", "1"}};
   M a2    = {{"k", "2"}};
   auto b1 = holder->Bind(KeyValueIterableView<M>(a1));
@@ -1042,7 +1038,7 @@ TEST(BoundSyncInstruments, DirtyDroppedBoundEntriesReleaseCardinality)
 {
   StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 3);
 
-  // Bind two distinct keys (consume the two real admitted slots), record so
+  // Bind two distinct keys, record so
   // they're dirty, then drop the handles BEFORE Collect(). The pre-rotation
   // GC cannot remove them (they're dirty); rotation flushes their data; the
   // post-rotation cleanup must release their slots.
@@ -1076,36 +1072,36 @@ TEST(BoundSyncInstruments, OverflowParityAllowsFillingRemainingSlot)
 {
   StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong, 3);
 
-  // Trigger overflow first: bind k1, k2, then k3 (which routes to overflow,
-  // so bound_entries_ ends up with k1, k2, and the overflow entry).
+  // Trigger overflow first: bind k1, k2, k3, then k4, which routes to overflow.
   M a1     = {{"k", "1"}};
   M a2     = {{"k", "2"}};
   M a3     = {{"k", "3"}};
+  M a4     = {{"k", "4"}};
   auto b1  = holder->Bind(KeyValueIterableView<M>(a1));
   auto b2  = holder->Bind(KeyValueIterableView<M>(a2));
-  auto bov = holder->Bind(KeyValueIterableView<M>(a3));  // routes to overflow
+  auto b3  = holder->Bind(KeyValueIterableView<M>(a3));
+  auto bov = holder->Bind(KeyValueIterableView<M>(a4));  // routes to overflow
   b1->RecordLong(1);
   b2->RecordLong(1);
+  b3->RecordLong(1);
   bov->RecordLong(100);
 
   // Drop k1 only. After Collect(), the M1 cleanup releases its slot, leaving
-  // active_keys_ = { k2, overflow }. With limit=3, has_overflow=true and
-  // active_keys_.size()==2, the existing AttributesHashMap semantics admit
-  // one more real key. The pre-fix preview path would have routed it to
-  // overflow (off-by-one). After M2, it must be admitted.
+  // active_keys_ = { k2, k3, overflow }. With limit=3, the existing
+  // AttributesHashMap semantics admit one more real key.
   b1.reset();
-  EXPECT_EQ(CollectAndCountPoints(*holder, AggregationTemporality::kDelta), 3u);
+  EXPECT_EQ(CollectAndCountPoints(*holder, AggregationTemporality::kDelta), 4u);
 
   // Fresh real key in the next interval must be admitted, not routed to overflow.
-  M a4 = {{"fresh", "key"}};
-  holder->RecordLong(42, KeyValueIterableView<M>(a4), opentelemetry::context::Context{});
+  M a5 = {{"fresh", "key"}};
+  holder->RecordLong(42, KeyValueIterableView<M>(a5), opentelemetry::context::Context{});
 
   std::shared_ptr<CollectorHandle> collector(
       new MockCollectorHandle(AggregationTemporality::kDelta));
   std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
   bool overflow_seen = false;
-  bool a4_seen       = false;
-  int64_t a4_value   = 0;
+  bool a5_seen       = false;
+  int64_t a5_value   = 0;
   holder->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
                   std::chrono::system_clock::now(), [&](const MetricData &md) {
                     for (const auto &p : md.point_data_attr_)
@@ -1118,15 +1114,15 @@ TEST(BoundSyncInstruments, OverflowParityAllowsFillingRemainingSlot)
                       if (it != p.attributes.end() &&
                           opentelemetry::nostd::get<std::string>(it->second) == "key")
                       {
-                        a4_seen        = true;
+                        a5_seen        = true;
                         const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                        a4_value       = opentelemetry::nostd::get<int64_t>(sp.value_);
+                        a5_value       = opentelemetry::nostd::get<int64_t>(sp.value_);
                       }
                     }
                     return true;
                   });
-  EXPECT_TRUE(a4_seen);
-  EXPECT_EQ(a4_value, 42);
+  EXPECT_TRUE(a5_seen);
+  EXPECT_EQ(a5_value, 42);
   EXPECT_FALSE(overflow_seen);
 }
 
