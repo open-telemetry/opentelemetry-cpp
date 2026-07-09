@@ -67,7 +67,7 @@ opentelemetry::sdk::common::AttributeMap PopulateAttributeMap(
             map, key, std::move(convert_result.first));
         if (result.second)
         {
-          ++inserted; // A unique key was inserted.  
+          ++inserted;  // A unique key was inserted.
         }
         return true;
       });

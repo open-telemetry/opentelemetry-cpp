@@ -175,7 +175,6 @@ public:
   /**
    * Set the span limits for the span.
    * This method must be called before any SetAttribute / AddEvent / AddLink call.
-   * @param limits the span limits to set
    */
   virtual void SetSpanLimits(const SpanLimits & /* limits */) noexcept {}
 

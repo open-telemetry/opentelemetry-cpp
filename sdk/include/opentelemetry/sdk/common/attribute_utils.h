@@ -14,16 +14,16 @@
 #include <utility>
 #include <vector>
 
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-#  include <new>
-#endif
-
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/version.h"
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  include <new>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -313,8 +313,8 @@ template <typename Visitor, typename Variant>
 inline auto VisitVariant(Visitor &&visitor, const Variant &value) noexcept
     -> std::pair<decltype(opentelemetry::nostd::visit(std::forward<Visitor>(visitor), value)), bool>
 {
-  using ReturnType = decltype(opentelemetry::nostd::visit(std::forward<Visitor>(visitor), value));
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
+  using ReturnType = decltype(opentelemetry::nostd::visit(std::forward<Visitor>(visitor), value));
   try
   {
 #endif
