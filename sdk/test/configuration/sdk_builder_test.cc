@@ -28,18 +28,15 @@ TEST(SdkBuilder, SpanLimitsDefaults)
   auto provider = builder.CreateTracerProvider(model, resource);
   ASSERT_NE(provider, nullptr);
 
-  auto limits = provider->GetSpanLimits();
-  EXPECT_EQ(limits.attribute_count_limit,
-            opentelemetry::sdk::trace::SpanLimits::kDefaultAttributeCountLimit);
-  EXPECT_EQ(limits.event_count_limit,
-            opentelemetry::sdk::trace::SpanLimits::kDefaultEventCountLimit);
-  EXPECT_EQ(limits.link_count_limit, opentelemetry::sdk::trace::SpanLimits::kDefaultLinkCountLimit);
-  EXPECT_EQ(limits.event_attribute_count_limit,
-            opentelemetry::sdk::trace::SpanLimits::kDefaultEventAttributeCountLimit);
-  EXPECT_EQ(limits.link_attribute_count_limit,
-            opentelemetry::sdk::trace::SpanLimits::kDefaultLinkAttributeCountLimit);
-  EXPECT_EQ(limits.attribute_value_length_limit,
-            opentelemetry::sdk::trace::SpanLimits::kDefaultAttributeValueLengthLimit);
+  const auto limits         = provider->GetSpanLimits();
+  const auto default_limits = opentelemetry::sdk::trace::SpanLimits{};
+
+  EXPECT_EQ(limits.attribute_count_limit, default_limits.attribute_count_limit);
+  EXPECT_EQ(limits.event_count_limit, default_limits.event_count_limit);
+  EXPECT_EQ(limits.link_count_limit, default_limits.link_count_limit);
+  EXPECT_EQ(limits.event_attribute_count_limit, default_limits.event_attribute_count_limit);
+  EXPECT_EQ(limits.link_attribute_count_limit, default_limits.link_attribute_count_limit);
+  EXPECT_EQ(limits.attribute_value_length_limit, default_limits.attribute_value_length_limit);
 }
 
 TEST(SdkBuilder, SpanLimitsConfiguration)

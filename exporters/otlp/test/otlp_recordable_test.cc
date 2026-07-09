@@ -872,8 +872,6 @@ TEST(OtlpRecordable, SpanLimitsNoLimitDefault)
 // TODO: remove this test case once the deprecated otlp options span limit fields are removed.
 TEST(OtlpRecordable, SpanLimitsFieldsMerged)
 {
-  constexpr std::uint32_t kMaxCount = 10;
-
   constexpr std::uint32_t kOtlpAttributeCount      = 2;
   constexpr std::uint32_t kOtlpEventCount          = 3;
   constexpr std::uint32_t kOtlpLinkCount           = 4;
@@ -896,7 +894,8 @@ TEST(OtlpRecordable, SpanLimitsFieldsMerged)
   less_restrictive_limits.link_attribute_count_limit   = 7;
   less_restrictive_limits.attribute_value_length_limit = 6;
 
-  auto make_recordable = [&](const trace_sdk::SpanLimits &limits) {
+  auto make_recordable =
+      [&](const trace_sdk::SpanLimits &limits) -> std::unique_ptr<OtlpRecordable> {
     auto recordable =
         std::make_unique<OtlpRecordable>(kOtlpAttributeCount, kOtlpEventCount, kOtlpLinkCount,
                                          kOtlpEventAttributeCount, kOtlpLinkAttributeCount);
@@ -904,7 +903,8 @@ TEST(OtlpRecordable, SpanLimitsFieldsMerged)
     return recordable;
   };
 
-  auto make_attributes = []() {
+  auto make_attributes = []() -> std::map<std::string, int> {
+    constexpr std::uint32_t kMaxCount = 10;
     std::map<std::string, int> attributes;
     for (std::uint32_t i = 0; i < kMaxCount; ++i)
     {

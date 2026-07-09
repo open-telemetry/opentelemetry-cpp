@@ -38,7 +38,6 @@
 #include "opentelemetry/trace/tracer.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <stdint.h>
 #  include <initializer_list>
 #  include <map>
 #  include <unordered_map>
