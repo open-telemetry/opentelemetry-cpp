@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.28.0] 2026-07-10
+
 * [CODE HEALTH] Move ext and exporters test classes into anonymous namespace
   [#4225](https://github.com/open-telemetry/opentelemetry-cpp/pull/4225)
 
