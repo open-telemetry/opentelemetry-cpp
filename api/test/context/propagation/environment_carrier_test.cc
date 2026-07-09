@@ -56,6 +56,9 @@ static std::string Hex(const T &id_item)
   return std::string(buf, sizeof(buf));
 }
 
+namespace
+{
+
 class EnvironmentCarrierTest : public ::testing::Test
 {
 protected:
@@ -306,3 +309,5 @@ TEST_F(EnvironmentCarrierTest, RoundTrip)
   EXPECT_EQ(extracted_span->GetContext().IsSampled(), span_context.IsSampled());
   EXPECT_TRUE(extracted_span->GetContext().IsRemote());
 }
+
+}  // namespace

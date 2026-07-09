@@ -47,6 +47,7 @@ cc_library(
     deps = [
         ":otlp_utf8_validity",
         "//sdk/src/logs",
+        "//sdk/src/metrics",
         "//sdk/src/resource",
         "//sdk/src/trace",
         "@com_github_opentelemetry_proto//:logs_service_proto_cc",
@@ -662,6 +663,23 @@ cc_test(
         ":otlp_recordable",
         "//sdk/src/metrics",
         "@com_github_opentelemetry_proto//:logs_service_proto_cc",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_populate_attribute_utils_test",
+    srcs = [
+        "test/otlp_populate_attribute_utils_test.cc",
+    ],
+    tags = [
+        "otlp",
+        "test",
+    ],
+    deps = [
+        ":otlp_recordable",
+        "//sdk/src/metrics",
+        "@com_github_opentelemetry_proto//:common_proto_cc",
         "@com_google_googletest//:gtest_main",
     ],
 )

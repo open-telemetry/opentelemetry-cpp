@@ -76,7 +76,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
   EXPECT_EQ(hash_map.Size(), 10);  // no new metric point added
 
   // get the overflow metric point
-  auto agg1 = hash_map.GetOrSetDefault(kOverflowAttributes, aggregation_callback);
+  auto agg1 = hash_map.GetOrSetDefault(GetOverflowAttributes(), aggregation_callback);
   EXPECT_NE(agg1, nullptr);
   auto sum_agg1 = static_cast<LongSumAggregation *>(agg1);
   EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg1->ToPoint()).value_),
@@ -100,6 +100,9 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
     }
   }
 }
+
+namespace
+{
 
 class WritableMetricStorageCardinalityLimitTestFixture
     : public ::testing::TestWithParam<AggregationTemporality>
@@ -174,12 +177,14 @@ INSTANTIATE_TEST_SUITE_P(All,
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#cardinality-limits
 TEST(CardinalityLimitOverflowAttribute, MatchesSpecLiteral)
 {
-  EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowKey, "otel.metric.overflow");
+  EXPECT_STREQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowKey, "otel.metric.overflow");
   EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowValue, true);
   // The precomputed overflow attribute set MUST contain exactly the spec key
   // mapped to the boolean value `true`.
-  ASSERT_EQ(opentelemetry::sdk::metrics::kOverflowAttributes.size(), 1u);
-  const auto &entry = *opentelemetry::sdk::metrics::kOverflowAttributes.begin();
+  ASSERT_EQ(opentelemetry::sdk::metrics::GetOverflowAttributes().size(), 1u);
+  const auto &entry = *opentelemetry::sdk::metrics::GetOverflowAttributes().begin();
   EXPECT_EQ(entry.first, "otel.metric.overflow");
   EXPECT_EQ(nostd::get<bool>(entry.second), true);
 }
+
+}  // namespace

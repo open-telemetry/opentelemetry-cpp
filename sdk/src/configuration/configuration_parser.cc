@@ -1665,6 +1665,10 @@ ConfigurationParser::ParseParentBasedSamplerConfiguration(const std::unique_ptr<
   {
     model->root = ParseSamplerConfiguration(child, depth + 1);
   }
+  else
+  {
+    model->root = std::make_unique<AlwaysOnSamplerConfiguration>();
+  }
 
   child = node->GetChildNode("remote_parent_sampled");
   if (child)
@@ -2297,6 +2301,12 @@ std::unique_ptr<TracerProviderConfiguration> ConfigurationParser::ParseTracerPro
   {
     model->sampler = ParseSamplerConfiguration(child, 0);
   }
+  else
+  {
+    auto parent_based  = std::make_unique<ParentBasedSamplerConfiguration>();
+    parent_based->root = std::make_unique<AlwaysOnSamplerConfiguration>();
+    model->sampler     = std::move(parent_based);
+  }
 
   child = node->GetChildNode("tracer_configurator/development");
   if (child)
@@ -2690,6 +2700,7 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
     int major{};
     int minor{};
 
+    // NOLINTNEXTLINE(bugprone-unchecked-string-to-number-conversion): count checked below
     count = sscanf(model->file_format.c_str(), "%d.%d", &major, &minor);
     if (count != 2)
     {

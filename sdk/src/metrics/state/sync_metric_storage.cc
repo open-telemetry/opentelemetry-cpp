@@ -204,7 +204,7 @@ std::shared_ptr<BoundSyncWritableMetricStorage> SyncMetricStorage::Bind(
   MetricAttributes key = ResolveCardinality(filtered);
 
   // If we ended up at overflow, dedupe against an existing overflow entry.
-  if (key == kOverflowAttributes)
+  if (key == GetOverflowAttributes())
   {
     auto ov_it = bound_entries_.find(key);
     if (ov_it != bound_entries_.end())

@@ -72,6 +72,7 @@ public:
 
 class GetEventHandler : public CustomEventHandler
 {
+public:
   void OnResponse(http_client::Response &response) noexcept override
   {
     ASSERT_EQ(200, response.GetStatusCode());
@@ -83,6 +84,7 @@ class GetEventHandler : public CustomEventHandler
 
 class PostEventHandler : public CustomEventHandler
 {
+public:
   void OnResponse(http_client::Response &response) noexcept override
   {
     ASSERT_EQ(200, response.GetStatusCode());
@@ -120,6 +122,7 @@ private:
 
 class RetryEventHandler : public CustomEventHandler
 {
+public:
   void OnResponse(http_client::Response &response) noexcept override
   {
     ASSERT_EQ(429, response.GetStatusCode());
@@ -145,6 +148,7 @@ protected:
 public:
   BasicCurlHttpTests() : is_setup_(false), is_running_(false) {}
 
+protected:
   void SetUp() override
   {
     if (is_setup_.exchange(true))
@@ -173,6 +177,7 @@ public:
     is_running_ = false;
   }
 
+public:
   int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
                     HTTP_SERVER_NS::HttpResponse &response) override
   {
