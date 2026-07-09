@@ -167,6 +167,7 @@ TEST(SpanData, SpanLimits)
   constexpr const char *kKey2   = "two";
   constexpr const char *kValue1 = "1234";
   constexpr const char *kValue2 = "5678";
+  constexpr const char *kValue3 = "9012";
 
   std::map<std::string, std::string> attribute_collection{{kKey1, kValue1}, {kKey2, kValue2}};
 
@@ -175,10 +176,11 @@ TEST(SpanData, SpanLimits)
   // span attribute count and length limits
   recordable.SetAttribute(kKey1, kValue1);
   recordable.SetAttribute(kKey2, kValue2);
+  recordable.SetAttribute(kKey1, kValue3);  // overwrite existing attribute
 
   EXPECT_EQ(recordable.GetAttributes().size(), 1);
   EXPECT_EQ(recordable.GetDroppedAttributesCount(), 1);
-  EXPECT_EQ(opentelemetry::nostd::get<std::string>(recordable.GetAttributes().at(kKey1)), "12");
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(recordable.GetAttributes().at(kKey1)), "90");
 
   // event count and per-event attribute count limits
   recordable.AddEvent("event1", std::chrono::system_clock::now(),
