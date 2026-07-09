@@ -37,14 +37,9 @@ namespace internal_log = opentelemetry::sdk::common::internal_log;
 namespace
 {
 
-otlp_exporter::OtlpHttpMetricExporterOptions exporter_options;
-
-void InitMetrics()
+void InitMetrics(const otlp_exporter::OtlpHttpMetricExporterOptions &exporter_options)
 {
   auto exporter = otlp_exporter::OtlpHttpMetricExporterFactory::Create(exporter_options);
-
-  std::string version{"1.2.0"};
-  std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
 
   // Initialize and set the global MeterProvider
   metrics_sdk::PeriodicExportingMetricReaderOptions reader_options;
@@ -83,6 +78,7 @@ void CleanupMetrics()
 */
 int main(int argc, char *argv[])
 {
+  otlp_exporter::OtlpHttpMetricExporterOptions exporter_options;
   std::string example_type;
   if (argc > 1)
   {
@@ -115,7 +111,7 @@ int main(int argc, char *argv[])
   }
 
   // Removing this line will leave the default noop MetricProvider in place.
-  InitMetrics();
+  InitMetrics(exporter_options);
   std::string name{"otlp_http_metric_example"};
 
   if (example_type == "counter")

@@ -109,6 +109,11 @@ public:
 
   bool HasEnabledFilter() const noexcept override { return false; }
 
+  bool RecordableEnforcesLogRecordLimits() const noexcept override
+  {
+    return exporter_ != nullptr && exporter_->RecordableEnforcesLogRecordLimits();
+  }
+
   /**
    * Class destructor which invokes the Shutdown() method.
    */

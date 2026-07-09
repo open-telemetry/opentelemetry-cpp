@@ -538,7 +538,17 @@ elif [[ "$1" == "cmake.fetch_content.test" ]]; then
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
   exit 0
-
+elif [[ "$1" == "cmake.api_only.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
+        -DOPENTELEMETRY_INSTALL=OFF \
+        -DOPENTELEMETRY_CPP_SRC_DIR="${SRC_DIR}" \
+        "${SRC_DIR}/install/test/cmake/api_only_test"
+  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
+  ctest --output-on-failure
+  exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
   cd "${BUILD_DIR}"

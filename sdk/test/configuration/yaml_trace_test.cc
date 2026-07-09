@@ -42,6 +42,91 @@ static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse
   return opentelemetry::sdk::configuration::YamlConfigurationParser::ParseString(source, yaml);
 }
 
+namespace
+{
+enum class SamplerType : std::uint8_t
+{
+  kUnmatched                 = 0,
+  kAlwaysOn                  = 1,
+  kAlwaysOff                 = 2,
+  kTraceIdRatioBased         = 3,
+  kParentBased               = 4,
+  kJaegerRemote              = 5,
+  kComposableAlwaysOn        = 6,
+  kComposableProbability     = 7,
+  kComposableRuleBased       = 8,
+  kComposableAlwaysOff       = 9,
+  kComposableParentThreshold = 10
+};
+
+class TestSamplerVisitor : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
+{
+public:
+  SamplerType type_matched = SamplerType::kUnmatched;
+  double ratio             = -1.0;
+
+  void VisitAlwaysOff(
+      const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kAlwaysOff;
+  }
+  void VisitAlwaysOn(
+      const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kAlwaysOn;
+  }
+  void VisitJaegerRemote(
+      const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kJaegerRemote;
+  }
+  void VisitParentBased(
+      const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kParentBased;
+  }
+  void VisitTraceIdRatioBased(
+      const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model)
+      override
+  {
+    type_matched = SamplerType::kTraceIdRatioBased;
+    ratio        = model->ratio;
+  }
+  void VisitExtension(
+      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *) override
+  {}
+
+  void VisitComposableAlwaysOff(
+      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kComposableAlwaysOff;
+  }
+  void VisitComposableAlwaysOn(
+      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kComposableAlwaysOn;
+  }
+  void VisitComposableProbability(
+      const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
+      override
+  {
+    type_matched = SamplerType::kComposableProbability;
+    ratio        = model->ratio;
+  }
+  void VisitComposableParentThreshold(
+      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *)
+      override
+  {
+    type_matched = SamplerType::kComposableParentThreshold;
+  }
+  void VisitComposableRuleBased(
+      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kComposableRuleBased;
+  }
+};
+}  // namespace
+
 TEST(YamlTrace, no_processors)
 {
   std::string yaml = R"(
@@ -522,7 +607,25 @@ tracer_provider:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
-  ASSERT_EQ(config->tracer_provider->sampler, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kParentBased);
+
+  auto *sampler = config->tracer_provider->sampler.get();
+  auto *parent =
+      reinterpret_cast<opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *>(
+          sampler);
+  ASSERT_NE(parent->root, nullptr);
+
+  parent->root->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kAlwaysOn);
+
+  ASSERT_EQ(parent->remote_parent_sampled, nullptr);
+  ASSERT_EQ(parent->remote_parent_not_sampled, nullptr);
+  ASSERT_EQ(parent->local_parent_sampled, nullptr);
+  ASSERT_EQ(parent->local_parent_not_sampled, nullptr);
 }
 
 TEST(YamlTrace, empty_sampler)
@@ -644,11 +747,20 @@ tracer_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
   ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kParentBased);
+
   auto *sampler = config->tracer_provider->sampler.get();
   auto *parent =
       reinterpret_cast<opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *>(
           sampler);
-  ASSERT_EQ(parent->root, nullptr);
+  ASSERT_NE(parent->root, nullptr);
+
+  parent->root->Accept(&visitor);
+  EXPECT_EQ(visitor.type_matched, SamplerType::kAlwaysOn);
+
   ASSERT_EQ(parent->remote_parent_sampled, nullptr);
   ASSERT_EQ(parent->remote_parent_not_sampled, nullptr);
   ASSERT_EQ(parent->local_parent_sampled, nullptr);
@@ -847,91 +959,6 @@ tracer_provider:
   ASSERT_EQ(configurator->tracers[0].name, "noisy.library");
   ASSERT_EQ(configurator->tracers[0].config.enabled, false);
 }
-
-namespace
-{
-enum class SamplerType : std::uint8_t
-{
-  kUnmatched                 = 0,
-  kAlwaysOn                  = 1,
-  kAlwaysOff                 = 2,
-  kTraceIdRatioBased         = 3,
-  kParentBased               = 4,
-  kJaegerRemote              = 5,
-  kComposableAlwaysOn        = 6,
-  kComposableProbability     = 7,
-  kComposableRuleBased       = 8,
-  kComposableAlwaysOff       = 9,
-  kComposableParentThreshold = 10
-};
-
-class TestSamplerVisitor : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
-{
-public:
-  SamplerType type_matched = SamplerType::kUnmatched;
-  double ratio             = -1.0;
-
-  void VisitAlwaysOff(
-      const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *) override
-  {
-    type_matched = SamplerType::kAlwaysOff;
-  }
-  void VisitAlwaysOn(
-      const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration *) override
-  {
-    type_matched = SamplerType::kAlwaysOn;
-  }
-  void VisitJaegerRemote(
-      const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration *) override
-  {
-    type_matched = SamplerType::kJaegerRemote;
-  }
-  void VisitParentBased(
-      const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *) override
-  {
-    type_matched = SamplerType::kParentBased;
-  }
-  void VisitTraceIdRatioBased(
-      const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model)
-      override
-  {
-    type_matched = SamplerType::kTraceIdRatioBased;
-    ratio        = model->ratio;
-  }
-  void VisitExtension(
-      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *) override
-  {}
-
-  void VisitComposableAlwaysOff(
-      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *) override
-  {
-    type_matched = SamplerType::kComposableAlwaysOff;
-  }
-  void VisitComposableAlwaysOn(
-      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration *) override
-  {
-    type_matched = SamplerType::kComposableAlwaysOn;
-  }
-  void VisitComposableProbability(
-      const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
-      override
-  {
-    type_matched = SamplerType::kComposableProbability;
-    ratio        = model->ratio;
-  }
-  void VisitComposableParentThreshold(
-      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *)
-      override
-  {
-    type_matched = SamplerType::kComposableParentThreshold;
-  }
-  void VisitComposableRuleBased(
-      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *) override
-  {
-    type_matched = SamplerType::kComposableRuleBased;
-  }
-};
-}  // namespace
 
 TEST(YamlTrace, composable_always_on_sampler)
 {

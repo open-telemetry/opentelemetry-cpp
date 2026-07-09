@@ -1,34 +1,59 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <gtest/gtest.h>
-#include <stdlib.h>
-#include <chrono>
-#include <map>
-#include <memory>
-#include <string>
-#include <utility>
+#ifndef OPENTELEMETRY_STL_VERSION
+// Unfortunately as of 04/27/2021 the fix is NOT in the vcpkg snapshot of Google Test.
+// Remove above `#ifdef` once the GMock fix for C++20 is in the mainline.
+//
+// Please refer to this GitHub issue for additional details:
+// https://github.com/google/googletest/issues/2914
+// https://github.com/google/googletest/commit/61f010d703b32de9bfb20ab90ece38ab2f25977f
+//
+// If we compile using Visual Studio 2019 with `c++latest` (C++20) without the GMock fix,
+// then the compilation here fails in `gmock-actions.h` from:
+//   .\tools\vcpkg\installed\x64-windows\include\gmock\gmock-actions.h(819):
+//   error C2653: 'result_of': is not a class or namespace name
+//
+// That is because `std::result_of` has been removed in C++20.
 
-#include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
-#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
-#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
-#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
-#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
-#include "opentelemetry/version.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
 
-// clang-format off
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
-#  include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
-// clang-format on
+#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
 
-#if defined(_MSC_VER)
-#  include "opentelemetry/sdk/common/env_variables.h"
+// Problematic code that pulls in Gmock and breaks with vs2019/c++latest :
+#  include "opentelemetry/proto/collector/metrics/v1/metrics_service_mock.grpc.pb.h"
+
+#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
+
+#  include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
+#  include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
+
+#  include "opentelemetry/common/timestamp.h"
+#  include "opentelemetry/nostd/shared_ptr.h"
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#  include "opentelemetry/sdk/metrics/data/metric_data.h"
+#  include "opentelemetry/sdk/metrics/data/point_data.h"
+#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/resource/resource.h"
+#  include "opentelemetry/sdk/trace/simple_processor.h"
+#  include "opentelemetry/sdk/trace/tracer_provider.h"
+#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
+#  include "opentelemetry/trace/provider.h"
+
+#  include <grpcpp/grpcpp.h>
+#  include <gtest/gtest.h>
+#  include <algorithm>
+#  include <functional>
+#  include <utility>
+#  include <vector>
+
+#  if defined(_MSC_VER)
+#    include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
-#endif
+#  endif
 
 using namespace testing;
 
@@ -38,13 +63,82 @@ namespace exporter
 namespace otlp
 {
 
+namespace
+{
+class OtlpMockMetricsServiceStub : public proto::collector::metrics::v1::MockMetricsServiceStub
+{
+public:
+// Some old toolchains can only use gRPC 1.33 and it's experimental.
+#  if defined(GRPC_CPP_VERSION_MAJOR) && \
+      (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+  using async_interface_base =
+      proto::collector::metrics::v1::MetricsService::StubInterface::async_interface;
+#  else
+  using async_interface_base =
+      proto::collector::metrics::v1::MetricsService::StubInterface::experimental_async_interface;
+#  endif
+
+  OtlpMockMetricsServiceStub() : async_interface_(this) {}
+
+  class async_interface : public async_interface_base
+  {
+  public:
+    async_interface(OtlpMockMetricsServiceStub *owner) : stub_(owner) {}
+
+    void Export(
+        ::grpc::ClientContext *context,
+        const ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest *request,
+        ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceResponse *response,
+        std::function<void(::grpc::Status)> callback) override
+    {
+      stub_->last_async_status_ = stub_->Export(context, *request, response);
+      callback(stub_->last_async_status_);
+    }
+
+// Some old toolchains can only use gRPC 1.33 and it's experimental.
+#  if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
+          (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
+      defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
+    void Export(
+        ::grpc::ClientContext * /*context*/,
+        const ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest
+            * /*request*/,
+        ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceResponse * /*response*/,
+        ::grpc::ClientUnaryReactor * /*reactor*/) override
+    {}
+#  else
+    void Export(
+        ::grpc::ClientContext * /*context*/,
+        const ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest
+            * /*request*/,
+        ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceResponse * /*response*/,
+        ::grpc::experimental::ClientUnaryReactor * /*reactor*/)
+    {}
+#  endif
+
+  private:
+    OtlpMockMetricsServiceStub *stub_;
+  };
+
+  async_interface_base *async() override { return &async_interface_; }
+
+  ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
+
+private:
+  ::grpc::Status last_async_status_;
+  async_interface async_interface_;
+};
+
+using opentelemetry::test_common::ScopedTestLogHandler;
+}  // namespace
+
 class OtlpGrpcMetricExporterTestPeer : public ::testing::Test
 {
 public:
   std::unique_ptr<sdk::metrics::PushMetricExporter> GetExporter(
       const OtlpGrpcMetricExporterOptions &options)
   {
-    return std::unique_ptr<sdk::metrics::PushMetricExporter>(new OtlpGrpcMetricExporter(options));
+    return std::make_unique<OtlpGrpcMetricExporter>(options);
   }
 
   std::unique_ptr<sdk::metrics::PushMetricExporter> GetExporter(
@@ -81,8 +175,8 @@ public:
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigTest)
 {
   OtlpGrpcMetricExporterOptions opts;
-  opts.endpoint = "localhost:45454";
-  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter(opts));
+  opts.endpoint                                    = "localhost:45454";
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).endpoint, "localhost:45454");
 }
 
@@ -91,14 +185,15 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigSslCredentialsTest)
 {
   std::string cacert_str = "--begin and end fake cert--";
   OtlpGrpcMetricExporterOptions opts;
-  opts.use_ssl_credentials              = true;
-  opts.ssl_credentials_cacert_as_string = cacert_str;
-  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter(opts));
+  opts.use_ssl_credentials                         = true;
+  opts.ssl_credentials_cacert_as_string            = cacert_str;
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>(opts);
+
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
 }
 
-#ifndef NO_GETENV
+#  ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigFromEnv)
 {
@@ -111,7 +206,8 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigFromEnv)
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
   setenv("OTEL_EXPORTER_OTLP_METRICS_HEADERS", "k1=v3,k1=v4", 1);
 
-  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
+
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
@@ -155,7 +251,8 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigHttpsSecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE", "true", 1);
 
-  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
+
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -171,7 +268,8 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigHttpInsecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE", "false", 1);
 
-  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
+
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, false);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -186,7 +284,8 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownSecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE", "false", 1);
 
-  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
+
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -201,7 +300,8 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownInsecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_METRICS_INSECURE", "true", 1);
 
-  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
+
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, false);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -211,7 +311,8 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigUnknownInsecureFromEnv)
 
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryDefaultValues)
 {
-  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
+
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 5);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
@@ -226,7 +327,8 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_BACKOFF", "6.7", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
 
-  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
+
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 123);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
@@ -246,7 +348,8 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
 
-  std::unique_ptr<OtlpGrpcMetricExporter> exporter(new OtlpGrpcMetricExporter());
+  std::unique_ptr<OtlpGrpcMetricExporter> exporter = std::make_unique<OtlpGrpcMetricExporter>();
+
   const auto options = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 321);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);
@@ -258,7 +361,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
 }
-#endif  // NO_GETENV
+#  endif  // NO_GETENV
 
 TEST_F(OtlpGrpcMetricExporterTestPeer, CheckGetAggregationTemporality)
 {
@@ -289,6 +392,62 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, CheckGetAggregationTemporality)
       exporter3->GetAggregationTemporality(opentelemetry::sdk::metrics::InstrumentType::kCounter));
 }
 
+// Exporter logs the rejection on partial_success.
+TEST_F(OtlpGrpcMetricExporterTestPeer, ExportPartialSuccess)
+{
+  ScopedTestLogHandler log{sdk::common::internal_log::LogLevel::Error};
+
+  auto mock_stub = new OtlpMockMetricsServiceStub();
+  std::unique_ptr<proto::collector::metrics::v1::MetricsService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(std::move(stub_interface));
+
+  opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+  sum_point_data.value_ = 10.0;
+  opentelemetry::sdk::metrics::ResourceMetrics data;
+  auto resource = opentelemetry::sdk::resource::Resource::Create(
+      opentelemetry::sdk::resource::ResourceAttributes{});
+  data.resource_ = &resource;
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+      "library_name", "1.5.0");
+  opentelemetry::sdk::metrics::MetricData metric_data{
+      opentelemetry::sdk::metrics::InstrumentDescriptor{
+          "metrics_name", "description", "unit",
+          opentelemetry::sdk::metrics::InstrumentType::kCounter,
+          opentelemetry::sdk::metrics::InstrumentValueType::kDouble},
+      opentelemetry::sdk::metrics::AggregationTemporality::kDelta,
+      opentelemetry::common::SystemTimestamp{}, opentelemetry::common::SystemTimestamp{},
+      std::vector<opentelemetry::sdk::metrics::PointDataAttributes>{
+          {opentelemetry::sdk::metrics::PointAttributes{}, sum_point_data}}};
+  data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
+      {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{metric_data}}};
+
+  EXPECT_CALL(*mock_stub, Export(_, _, _))
+      .Times(Exactly(1))
+      .WillOnce(Invoke([](grpc::ClientContext *,
+                          const proto::collector::metrics::v1::ExportMetricsServiceRequest &,
+                          proto::collector::metrics::v1::ExportMetricsServiceResponse *response)
+                           -> grpc::Status {
+        response->mutable_partial_success()->set_rejected_data_points(21);
+        response->mutable_partial_success()->set_error_message("too many data points!!");
+        return grpc::Status::OK;
+      }));
+
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, exporter->Export(data));
+  exporter->ForceFlush();
+
+  auto entries  = log.Drain();
+  auto contains = [&](const std::string &needle) {
+    return std::any_of(entries.begin(), entries.end(), [&](const ScopedTestLogHandler::Entry &e) {
+      return e.msg.find(needle) != std::string::npos;
+    });
+  };
+  EXPECT_TRUE(contains("partial success"));
+  EXPECT_TRUE(contains("21 data point(s) rejected"));
+  EXPECT_TRUE(contains("too many data points!!"));
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+#endif /* OPENTELEMETRY_STL_VERSION */

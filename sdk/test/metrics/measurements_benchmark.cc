@@ -26,6 +26,10 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 
+#ifdef ENABLE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+#  include "opentelemetry/version.h"
+#endif
+
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
@@ -58,7 +62,7 @@ size_t GetBenchmarkThreads()
   const char *env = std::getenv("BENCHMARK_THREADS");
   if (env != nullptr && env[0] != '\0')
   {
-    int val = std::atoi(env);
+    int val = static_cast<int>(std::strtol(env, nullptr, 10));
     if (val > 0)
     {
       return static_cast<size_t>(val);
@@ -210,6 +214,57 @@ void BM_MeasurementsPerThreadCounterTest(benchmark::State &state)
   exporter->Collect([&](ResourceMetrics & /*rm*/) { return true; });
 }
 BENCHMARK(BM_MeasurementsPerThreadCounterTest);
+
+#ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+// Fixed-attribute hot path: unbound vs bound. The intent is to isolate
+// per-call attribute processing and hashmap lookup overhead, so the same
+// fixed attribute set is used for every Add() call.
+namespace
+{
+std::map<std::string, std::string> MakeFixedAttributes()
+{
+  return {{"dim1", "value1"}, {"dim2", "value2"}, {"dim3", "value3"}};
+}
+}  // namespace
+
+void BM_UnboundFixedAttrsCounter(benchmark::State &state)
+{
+  MeterProvider mp;
+  std::shared_ptr<MetricReader> exporter(new MockMetricExporter());
+  mp.AddMetricReader(exporter);
+  auto m       = mp.GetMeter("meter1", "version1", "schema1");
+  auto counter = m->CreateDoubleCounter("counter_unbound_fixed", "fixed-attrs unbound", "unit");
+  auto attrs   = MakeFixedAttributes();
+  auto context = opentelemetry::context::Context{};
+  while (state.KeepRunning())
+  {
+    counter->Add(
+        1.0, opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        context);
+  }
+  exporter->Collect([&](ResourceMetrics & /*rm*/) { return true; });
+}
+BENCHMARK(BM_UnboundFixedAttrsCounter);
+
+void BM_BoundFixedAttrsCounter(benchmark::State &state)
+{
+  MeterProvider mp;
+  std::shared_ptr<MetricReader> exporter(new MockMetricExporter());
+  mp.AddMetricReader(exporter);
+  auto m       = mp.GetMeter("meter1", "version1", "schema1");
+  auto counter = m->CreateDoubleCounter("counter_bound_fixed", "fixed-attrs bound", "unit");
+  auto attrs   = MakeFixedAttributes();
+  auto bound   = counter->Bind(
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs));
+  benchmark::DoNotOptimize(bound.get());
+  while (state.KeepRunning())
+  {
+    bound->Add(1.0);
+  }
+  exporter->Collect([&](ResourceMetrics & /*rm*/) { return true; });
+}
+BENCHMARK(BM_BoundFixedAttrsCounter);
+#endif  // OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
 
 }  // namespace
 BENCHMARK_MAIN();

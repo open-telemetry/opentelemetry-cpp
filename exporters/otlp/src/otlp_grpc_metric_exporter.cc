@@ -5,6 +5,7 @@
 #include <grpcpp/support/status.h>
 #include <atomic>
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -28,10 +29,6 @@
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
-
-#ifdef ENABLE_ASYNC_EXPORT
-#  include <functional>
-#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -141,7 +138,8 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
   // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
   // block to reduce memory fragments.
   arena_options.max_block_size = 65536;
-  std::unique_ptr<google::protobuf::Arena> arena{new google::protobuf::Arena{arena_options}};
+  std::unique_ptr<google::protobuf::Arena> arena =
+      std::make_unique<google::protobuf::Arena>(arena_options);
 
   proto::collector::metrics::v1::ExportMetricsServiceRequest *request =
       google::protobuf::Arena::Create<proto::collector::metrics::v1::ExportMetricsServiceRequest>(
@@ -160,13 +158,23 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
             opentelemetry::sdk::common::ExportResult result,
             std::unique_ptr<google::protobuf::Arena> &&arena,
             const proto::collector::metrics::v1::ExportMetricsServiceRequest &request,
-            proto::collector::metrics::v1::ExportMetricsServiceResponse *) {
+            proto::collector::metrics::v1::ExportMetricsServiceResponse *response) {
           auto metrics_arena = std::move(arena);
           if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
           {
             OTEL_INTERNAL_LOG_ERROR("[OTLP METRIC GRPC Exporter] ERROR: Export "
                                     << request.resource_metrics_size()
                                     << " metric(s) error: " << static_cast<int>(result));
+          }
+          else if (response->has_partial_success() &&
+                   (response->partial_success().rejected_data_points() != 0 ||
+                    !response->partial_success().error_message().empty()))
+          {
+            const auto &partial = response->partial_success();
+            OTEL_INTERNAL_LOG_ERROR("[OTLP METRIC GRPC Exporter] Export partial success: "
+                                    << partial.rejected_data_points()
+                                    << " data point(s) rejected: \"" << partial.error_message()
+                                    << "\"");
           }
           else
           {
@@ -184,7 +192,21 @@ opentelemetry::sdk::common::ExportResult OtlpGrpcMetricExporter::Export(
             proto::collector::metrics::v1::ExportMetricsServiceResponse>(arena.get());
 
     grpc::Status status = OtlpGrpcClient::DelegateExport(
-        metrics_service_stub_.get(), std::move(context), std::move(arena), request, response);
+        metrics_service_stub_.get(), std::move(context), std::move(arena), request, response,
+        [](std::unique_ptr<google::protobuf::Arena> &&arena,
+           proto::collector::metrics::v1::ExportMetricsServiceResponse *response) {
+          auto metrics_arena = std::move(arena);
+          if (response->has_partial_success() &&
+              (response->partial_success().rejected_data_points() != 0 ||
+               !response->partial_success().error_message().empty()))
+          {
+            const auto &partial = response->partial_success();
+            OTEL_INTERNAL_LOG_ERROR("[OTLP METRIC GRPC Exporter] Export partial success: "
+                                    << partial.rejected_data_points()
+                                    << " data point(s) rejected: \"" << partial.error_message()
+                                    << "\"");
+          }
+        });
 
     if (!status.ok())
     {

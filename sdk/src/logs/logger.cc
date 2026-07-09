@@ -162,6 +162,10 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
 
   auto recordable = context_->GetProcessor().MakeRecordable();
 
+  if (context_->RecordableEnforcesLogRecordLimits())
+  {
+    recordable->SetLogRecordLimits(context_->GetLogRecordLimits());
+  }
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
 
   StampSpanContextFromVariant(
@@ -184,6 +188,10 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
 
   auto recordable = context_->GetProcessor().MakeRecordable();
 
+  if (context_->RecordableEnforcesLogRecordLimits())
+  {
+    recordable->SetLogRecordLimits(context_->GetLogRecordLimits());
+  }
   recordable->SetObservedTimestamp(std::chrono::system_clock::now());
 
   StampSpanContextFromVariant(context_or_span, *recordable);

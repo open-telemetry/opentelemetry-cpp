@@ -16,7 +16,6 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/version.h"
 
 // clang-format off
@@ -42,16 +41,16 @@ OtlpFileExporter::OtlpFileExporter(const OtlpFileExporterOptions &options,
                                    const OtlpFileExporterRuntimeOptions &runtime_options)
     : options_(options),
       runtime_options_(runtime_options),
-      file_client_(new OtlpFileClient(OtlpFileClientOptions(options),
-                                      OtlpFileExporterRuntimeOptions(runtime_options)))
+      file_client_(
+          std::make_unique<OtlpFileClient>(OtlpFileClientOptions(options),
+                                           OtlpFileExporterRuntimeOptions(runtime_options)))
 {}
 
 // ----------------------------- Exporter methods ------------------------------
 
 std::unique_ptr<opentelemetry::sdk::trace::Recordable> OtlpFileExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<opentelemetry::sdk::trace::Recordable>(
-      new exporter::otlp::OtlpRecordable());
+  return std::make_unique<exporter::otlp::OtlpRecordable>();
 }
 
 opentelemetry::sdk::common::ExportResult OtlpFileExporter::Export(

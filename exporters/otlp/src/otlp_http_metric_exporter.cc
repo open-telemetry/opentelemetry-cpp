@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <cstddef>
+#include <functional>
 #include <memory>
 #include <ostream>
 #include <string>
@@ -30,9 +31,13 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
 
-#ifdef ENABLE_ASYNC_EXPORT
-#  include <functional>
-#endif
+namespace google
+{
+namespace protobuf
+{
+class Message;
+}  // namespace protobuf
+}  // namespace google
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -49,7 +54,7 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptio
       runtime_options_(),
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
-      http_client_(new OtlpHttpClient(OtlpHttpClientOptions(
+      http_client_(std::make_unique<OtlpHttpClient>(OtlpHttpClientOptions(
           options.url,
           options.ssl_insecure_skip_verify,
           options.ssl_ca_cert_path,
@@ -89,36 +94,37 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
       runtime_options_(runtime_options),
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
-      http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
-                                                            options.ssl_insecure_skip_verify,
-                                                            options.ssl_ca_cert_path,
-                                                            options.ssl_ca_cert_string,
-                                                            options.ssl_client_key_path,
-                                                            options.ssl_client_key_string,
-                                                            options.ssl_client_cert_path,
-                                                            options.ssl_client_cert_string,
-                                                            options.ssl_min_tls,
-                                                            options.ssl_max_tls,
-                                                            options.ssl_cipher,
-                                                            options.ssl_cipher_suite,
-                                                            options.content_type,
-                                                            options.json_bytes_mapping,
-                                                            options.compression,
-                                                            options.use_json_name,
-                                                            options.console_debug,
-                                                            options.timeout,
-                                                            options.http_headers,
-                                                            options.retry_policy_max_attempts,
-                                                            options.retry_policy_initial_backoff,
-                                                            options.retry_policy_max_backoff,
-                                                            options.retry_policy_backoff_multiplier,
-                                                            runtime_options.thread_instrumentation
+      http_client_(std::make_unique<OtlpHttpClient>(OtlpHttpClientOptions(
+          options.url,
+          options.ssl_insecure_skip_verify,
+          options.ssl_ca_cert_path,
+          options.ssl_ca_cert_string,
+          options.ssl_client_key_path,
+          options.ssl_client_key_string,
+          options.ssl_client_cert_path,
+          options.ssl_client_cert_string,
+          options.ssl_min_tls,
+          options.ssl_max_tls,
+          options.ssl_cipher,
+          options.ssl_cipher_suite,
+          options.content_type,
+          options.json_bytes_mapping,
+          options.compression,
+          options.use_json_name,
+          options.console_debug,
+          options.timeout,
+          options.http_headers,
+          options.retry_policy_max_attempts,
+          options.retry_policy_initial_backoff,
+          options.retry_policy_max_backoff,
+          options.retry_policy_backoff_multiplier,
+          runtime_options.thread_instrumentation
 #ifdef ENABLE_ASYNC_EXPORT
-                                                            ,
-                                                            options.max_concurrent_requests,
-                                                            options.max_requests_per_connection
+          ,
+          options.max_concurrent_requests,
+          options.max_requests_per_connection
 #endif
-                                                            )))
+          )))
 {}
 
 OtlpHttpMetricExporter::OtlpHttpMetricExporter(
@@ -128,7 +134,7 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
       runtime_options_(),
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
-      http_client_(new OtlpHttpClient(
+      http_client_(std::make_unique<OtlpHttpClient>(
           OtlpHttpClientOptions(options.url,
                                 options.ssl_insecure_skip_verify,
                                 options.ssl_ca_cert_path,
@@ -170,37 +176,38 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
       runtime_options_(runtime_options),
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
-      http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
-                                                            options.ssl_insecure_skip_verify,
-                                                            options.ssl_ca_cert_path,
-                                                            options.ssl_ca_cert_string,
-                                                            options.ssl_client_key_path,
-                                                            options.ssl_client_key_string,
-                                                            options.ssl_client_cert_path,
-                                                            options.ssl_client_cert_string,
-                                                            options.ssl_min_tls,
-                                                            options.ssl_max_tls,
-                                                            options.ssl_cipher,
-                                                            options.ssl_cipher_suite,
-                                                            options.content_type,
-                                                            options.json_bytes_mapping,
-                                                            options.compression,
-                                                            options.use_json_name,
-                                                            options.console_debug,
-                                                            options.timeout,
-                                                            options.http_headers,
-                                                            options.retry_policy_max_attempts,
-                                                            options.retry_policy_initial_backoff,
-                                                            options.retry_policy_max_backoff,
-                                                            options.retry_policy_backoff_multiplier,
-                                                            runtime_options.thread_instrumentation
+      http_client_(std::make_unique<OtlpHttpClient>(
+          OtlpHttpClientOptions(options.url,
+                                options.ssl_insecure_skip_verify,
+                                options.ssl_ca_cert_path,
+                                options.ssl_ca_cert_string,
+                                options.ssl_client_key_path,
+                                options.ssl_client_key_string,
+                                options.ssl_client_cert_path,
+                                options.ssl_client_cert_string,
+                                options.ssl_min_tls,
+                                options.ssl_max_tls,
+                                options.ssl_cipher,
+                                options.ssl_cipher_suite,
+                                options.content_type,
+                                options.json_bytes_mapping,
+                                options.compression,
+                                options.use_json_name,
+                                options.console_debug,
+                                options.timeout,
+                                options.http_headers,
+                                options.retry_policy_max_attempts,
+                                options.retry_policy_initial_backoff,
+                                options.retry_policy_max_backoff,
+                                options.retry_policy_backoff_multiplier,
+                                runtime_options.thread_instrumentation
 #ifdef ENABLE_ASYNC_EXPORT
-                                                            ,
-                                                            options.max_concurrent_requests,
-                                                            options.max_requests_per_connection
+                                ,
+                                options.max_concurrent_requests,
+                                options.max_requests_per_connection
 #endif
-                                                            ),
-                                      factory))
+                                ),
+          factory))
 {}
 
 OtlpHttpMetricExporter::OtlpHttpMetricExporter(
@@ -210,7 +217,7 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
       runtime_options_(),
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
-      http_client_(new OtlpHttpClient(
+      http_client_(std::make_unique<OtlpHttpClient>(
           OtlpHttpClientOptions(options.url,
                                 options.ssl_insecure_skip_verify,
                                 options.ssl_ca_cert_path,
@@ -252,37 +259,38 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
       runtime_options_(runtime_options),
       aggregation_temporality_selector_{
           OtlpMetricUtils::ChooseTemporalitySelector(options_.aggregation_temporality)},
-      http_client_(new OtlpHttpClient(OtlpHttpClientOptions(options.url,
-                                                            options.ssl_insecure_skip_verify,
-                                                            options.ssl_ca_cert_path,
-                                                            options.ssl_ca_cert_string,
-                                                            options.ssl_client_key_path,
-                                                            options.ssl_client_key_string,
-                                                            options.ssl_client_cert_path,
-                                                            options.ssl_client_cert_string,
-                                                            options.ssl_min_tls,
-                                                            options.ssl_max_tls,
-                                                            options.ssl_cipher,
-                                                            options.ssl_cipher_suite,
-                                                            options.content_type,
-                                                            options.json_bytes_mapping,
-                                                            options.compression,
-                                                            options.use_json_name,
-                                                            options.console_debug,
-                                                            options.timeout,
-                                                            options.http_headers,
-                                                            options.retry_policy_max_attempts,
-                                                            options.retry_policy_initial_backoff,
-                                                            options.retry_policy_max_backoff,
-                                                            options.retry_policy_backoff_multiplier,
-                                                            runtime_options.thread_instrumentation
+      http_client_(std::make_unique<OtlpHttpClient>(
+          OtlpHttpClientOptions(options.url,
+                                options.ssl_insecure_skip_verify,
+                                options.ssl_ca_cert_path,
+                                options.ssl_ca_cert_string,
+                                options.ssl_client_key_path,
+                                options.ssl_client_key_string,
+                                options.ssl_client_cert_path,
+                                options.ssl_client_cert_string,
+                                options.ssl_min_tls,
+                                options.ssl_max_tls,
+                                options.ssl_cipher,
+                                options.ssl_cipher_suite,
+                                options.content_type,
+                                options.json_bytes_mapping,
+                                options.compression,
+                                options.use_json_name,
+                                options.console_debug,
+                                options.timeout,
+                                options.http_headers,
+                                options.retry_policy_max_attempts,
+                                options.retry_policy_initial_backoff,
+                                options.retry_policy_max_backoff,
+                                options.retry_policy_backoff_multiplier,
+                                runtime_options.thread_instrumentation
 #ifdef ENABLE_ASYNC_EXPORT
-                                                            ,
-                                                            options.max_concurrent_requests,
-                                                            options.max_requests_per_connection
+                                ,
+                                options.max_concurrent_requests,
+                                options.max_requests_per_connection
 #endif
-                                                            ),
-                                      std::move(http_client)))
+                                ),
+          std::move(http_client)))
 {}
 
 OtlpHttpMetricExporter::OtlpHttpMetricExporter(std::unique_ptr<OtlpHttpClient> http_client)
@@ -340,20 +348,37 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
   // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
   // block to reduce memory fragments.
   arena_options.max_block_size = 65536;
-  google::protobuf::Arena arena{arena_options};
+  // Ownership transfers into HttpSessionData until the request completes
+  auto arena = std::make_unique<google::protobuf::Arena>(arena_options);
 
   proto::collector::metrics::v1::ExportMetricsServiceRequest *service_request =
       google::protobuf::Arena::Create<proto::collector::metrics::v1::ExportMetricsServiceRequest>(
-          &arena);
+          arena.get());
   OtlpMetricUtils::PopulateRequest(data, service_request);
   std::size_t metric_count = data.scope_metric_data_.size();
-#ifdef ENABLE_ASYNC_EXPORT
-  http_client_->Export(*service_request, [metric_count](
-                                             opentelemetry::sdk::common::ExportResult result) {
+
+  proto::collector::metrics::v1::ExportMetricsServiceResponse *response =
+      google::protobuf::Arena::Create<proto::collector::metrics::v1::ExportMetricsServiceResponse>(
+          arena.get());
+
+  auto handle_result = [metric_count](opentelemetry::sdk::common::ExportResult result,
+                                      google::protobuf::Message *response_msg) {
     if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
     {
       OTEL_INTERNAL_LOG_ERROR("[OTLP METRIC HTTP Exporter] ERROR: Export "
                               << metric_count << " metric(s) error: " << static_cast<int>(result));
+      return true;
+    }
+    auto *response =
+        static_cast<proto::collector::metrics::v1::ExportMetricsServiceResponse *>(response_msg);
+    if (response->has_partial_success() &&
+        (response->partial_success().rejected_data_points() != 0 ||
+         !response->partial_success().error_message().empty()))
+    {
+      const auto &partial = response->partial_success();
+      OTEL_INTERNAL_LOG_ERROR("[OTLP METRIC HTTP Exporter] Export partial success: "
+                              << partial.rejected_data_points() << " data point(s) rejected: \""
+                              << partial.error_message() << "\"");
     }
     else
     {
@@ -361,21 +386,15 @@ opentelemetry::sdk::common::ExportResult OtlpHttpMetricExporter::Export(
                                                                     << " metric(s) success");
     }
     return true;
-  });
+  };
+
+#ifdef ENABLE_ASYNC_EXPORT
+  http_client_->Export(*service_request, std::move(arena), response, std::move(handle_result),
+                       options_.max_concurrent_requests);
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 #else
-  opentelemetry::sdk::common::ExportResult result = http_client_->Export(*service_request);
-  if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[OTLP METRIC HTTP Exporter] ERROR: Export "
-                            << metric_count << " metric(s) error: " << static_cast<int>(result));
-  }
-  else
-  {
-    OTEL_INTERNAL_LOG_DEBUG("[OTLP METRIC HTTP Exporter] Export " << metric_count
-                                                                  << " metric(s) success");
-  }
-  return opentelemetry::sdk::common::ExportResult::kSuccess;
+  return http_client_->Export(*service_request, std::move(arena), response,
+                              std::move(handle_result), 0);
 #endif
 }
 

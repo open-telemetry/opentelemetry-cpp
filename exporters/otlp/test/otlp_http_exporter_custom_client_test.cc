@@ -132,8 +132,8 @@ TEST_F(OtlpHttpExporterCustomClientTestPeer, ExportCallsSendRequest)
   processor_opts.max_queue_size        = 5;
   processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
 
-  auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-      new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
+  std::unique_ptr<sdk::trace::SpanProcessor> processor =
+      std::make_unique<sdk::trace::BatchSpanProcessor>(std::move(exporter), processor_opts);
   auto provider = nostd::shared_ptr<sdk::trace::TracerProvider>(
       new sdk::trace::TracerProvider(std::move(processor)));
 
