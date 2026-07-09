@@ -17,6 +17,7 @@ Increment the:
 
 * [SDK] Apply metric cardinality limits to non-overflow attribute sets and
   reserve the overflow point separately.
+  [#4236](https://github.com/open-telemetry/opentelemetry-cpp/pull/4236)
 
 * [CODE HEALTH] Move ext and exporters test classes into anonymous namespace
   [#4225](https://github.com/open-telemetry/opentelemetry-cpp/pull/4225)
