@@ -4,6 +4,26 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
+    name = "sdk_builder_test",
+    srcs = [
+        "sdk_builder_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//sdk:headers",
+        "//sdk/src/configuration",
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "yaml_logs_test",
     srcs = [
         "yaml_logs_test.cc",

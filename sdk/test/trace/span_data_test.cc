@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
@@ -16,6 +17,7 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_metadata.h"
@@ -148,4 +150,141 @@ TEST(SpanData, Links)
     EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.GetLinks().at(0).GetAttributes().at(keys[i])),
               values[i]);
   }
+}
+
+TEST(SpanData, SpanLimits)
+{
+  SpanData recordable;
+  opentelemetry::sdk::trace::SpanLimits limits;
+  limits.attribute_count_limit        = 1;
+  limits.attribute_value_length_limit = 2;
+  limits.link_count_limit             = 1;
+  limits.link_attribute_count_limit   = 1;
+  limits.event_count_limit            = 1;
+  limits.event_attribute_count_limit  = 1;
+
+  constexpr const char *kKey1   = "one";
+  constexpr const char *kKey2   = "two";
+  constexpr const char *kValue1 = "1234";
+  constexpr const char *kValue2 = "5678";
+
+  std::map<std::string, std::string> attribute_collection{{kKey1, kValue1}, {kKey2, kValue2}};
+
+  recordable.SetSpanLimits(limits);
+
+  // span attribute count and length limits
+  recordable.SetAttribute(kKey1, kValue1);
+  recordable.SetAttribute(kKey2, kValue2);
+
+  EXPECT_EQ(recordable.GetAttributes().size(), 1);
+  EXPECT_EQ(recordable.GetDroppedAttributesCount(), 1);
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(recordable.GetAttributes().at(kKey1)), "12");
+
+  // event count and per-event attribute count limits
+  recordable.AddEvent("event1", std::chrono::system_clock::now(),
+                      common::MakeAttributes(attribute_collection));
+  recordable.AddEvent("event2", std::chrono::system_clock::now(),
+                      common::MakeAttributes(attribute_collection));
+
+  ASSERT_EQ(recordable.GetEvents().size(), 1);
+  EXPECT_EQ(recordable.GetDroppedEventsCount(), 1);
+  const auto event = recordable.GetEvents().at(0);
+  EXPECT_EQ(event.GetDroppedAttributesCount(), 1);
+  EXPECT_EQ(event.GetName(), "event1");
+  const auto &event_attributes = event.GetAttributes();
+  EXPECT_EQ(event_attributes.size(), 1);
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(event_attributes.at(kKey1)), "12");
+
+  // link count and per-link attribute count limits
+  recordable.AddLink(trace_api::SpanContext::GetInvalid(),
+                     common::MakeAttributes(attribute_collection));
+  recordable.AddLink(trace_api::SpanContext::GetInvalid(),
+                     common::MakeAttributes(attribute_collection));
+  ASSERT_EQ(recordable.GetLinks().size(), 1);
+  EXPECT_EQ(recordable.GetDroppedLinksCount(), 1);
+  const auto link = recordable.GetLinks().at(0);
+  EXPECT_EQ(link.GetDroppedAttributesCount(), 1);
+  const auto &link_attributes = link.GetAttributes();
+  EXPECT_EQ(link_attributes.size(), 1);
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(link_attributes.at(kKey1)), "12");
+}
+
+TEST(SpanData, SpanLimitsNoLimitDefault)
+{
+  constexpr std::uint32_t kMaxCount = 500;
+  SpanData recordable;
+  std::map<std::string, std::string> attributes;
+
+  for (std::uint32_t i = 0; i < kMaxCount; ++i)
+  {
+    attributes["attribute_" + std::to_string(i)] = std::to_string(i);
+  }
+
+  for (std::uint32_t i = 0; i < kMaxCount; ++i)
+  {
+    recordable.SetAttribute("attribute_" + std::to_string(i), i);
+    recordable.AddEvent("event_" + std::to_string(i), std::chrono::system_clock::now(),
+                        common::MakeAttributes(attributes));
+    recordable.AddLink(trace_api::SpanContext::GetInvalid(), common::MakeAttributes(attributes));
+  }
+
+  EXPECT_EQ(recordable.GetAttributes().size(), kMaxCount);
+  EXPECT_EQ(recordable.GetDroppedAttributesCount(), 0u);
+  EXPECT_EQ(recordable.GetEvents().size(), kMaxCount);
+  EXPECT_EQ(recordable.GetDroppedEventsCount(), 0u);
+  EXPECT_EQ(recordable.GetLinks().size(), kMaxCount);
+  EXPECT_EQ(recordable.GetDroppedLinksCount(), 0u);
+  EXPECT_EQ(recordable.GetEvents().at(0).GetDroppedAttributesCount(), 0u);
+  EXPECT_EQ(recordable.GetLinks().at(0).GetDroppedAttributesCount(), 0u);
+}
+
+TEST(SpanData, SpanLimitsDuplicateAttributeKeys)
+{
+  SpanData recordable;
+  opentelemetry::sdk::trace::SpanLimits limits;
+  limits.attribute_count_limit        = 2;
+  limits.attribute_value_length_limit = 2;
+  limits.link_count_limit             = 1;
+  limits.link_attribute_count_limit   = 2;
+  limits.event_count_limit            = 1;
+  limits.event_attribute_count_limit  = 2;
+
+  // Create three attributes. One has a duplicate key.
+  std::vector<std::pair<std::string, std::string>> attributes{
+      {"attribute_one", "AA"}, {"attribute_two", "BB"}, {"attribute_one", "CC"}};
+
+  for (const auto &keyvalue : attributes)
+  {
+    recordable.SetAttribute(keyvalue.first, keyvalue.second);
+  }
+
+  recordable.AddEvent("event", std::chrono::system_clock::now(),
+                      common::MakeAttributes(attributes));
+
+  recordable.AddLink(trace_api::SpanContext::GetInvalid(), common::MakeAttributes(attributes));
+
+  EXPECT_EQ(recordable.GetAttributes().size(), 2u);
+  EXPECT_EQ(recordable.GetDroppedAttributesCount(), 0u);
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(recordable.GetAttributes().at("attribute_one")),
+            "CC");
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(recordable.GetAttributes().at("attribute_two")),
+            "BB");
+
+  EXPECT_EQ(recordable.GetEvents().size(), 1u);
+  EXPECT_EQ(recordable.GetDroppedEventsCount(), 0u);
+  const auto &event = recordable.GetEvents().at(0);
+  EXPECT_EQ(event.GetAttributes().size(), 2u);
+  EXPECT_EQ(event.GetDroppedAttributesCount(), 0u);
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(event.GetAttributes().at("attribute_one")),
+            "CC");
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(event.GetAttributes().at("attribute_two")),
+            "BB");
+
+  EXPECT_EQ(recordable.GetLinks().size(), 1u);
+  EXPECT_EQ(recordable.GetDroppedLinksCount(), 0u);
+  const auto &link = recordable.GetLinks().at(0);
+  EXPECT_EQ(link.GetAttributes().size(), 2u);
+  EXPECT_EQ(link.GetDroppedAttributesCount(), 0u);
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(link.GetAttributes().at("attribute_one")), "CC");
+  EXPECT_EQ(opentelemetry::nostd::get<std::string>(link.GetAttributes().at("attribute_two")), "BB");
 }

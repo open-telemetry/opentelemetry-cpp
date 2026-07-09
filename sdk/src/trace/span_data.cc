@@ -1,7 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -11,11 +14,14 @@
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/trace_flags.h"
@@ -27,10 +33,66 @@ namespace sdk
 namespace trace
 {
 
+namespace
+{
+
+// Populate from attributes enforcing count and value-length limits.
+opentelemetry::sdk::common::AttributeMap PopulateAttributeMap(
+    const opentelemetry::common::KeyValueIterable &attributes,
+    std::uint32_t count_limit,
+    std::size_t value_length_limit)
+{
+  opentelemetry::sdk::common::AttributeMap map;
+  map.reserve((std::min)(static_cast<std::size_t>(count_limit), attributes.size()));
+
+  // Insert attributes until the count limit of unique keys is reached.
+  std::uint32_t inserted = 0;
+  attributes.ForEachKeyValue(
+      [count_limit, value_length_limit, &map, &inserted](
+          nostd::string_view key, const opentelemetry::common::AttributeValue &value) noexcept {
+        if (inserted >= count_limit)
+        {
+          return false;  // The attribute count limit has been reached. Stop iterating.
+        }
+
+        std::pair<opentelemetry::sdk::common::OwnedAttributeValue, bool> convert_result =
+            opentelemetry::sdk::common::VisitVariant(
+                opentelemetry::sdk::common::AttributeConverter(value_length_limit), value);
+        if (!convert_result.second)
+        {
+          return true;  // There was an exception converting. Skip this attribute and continue.
+        }
+
+        auto result = opentelemetry::sdk::common::AttributeInsertOrAssign(
+            map, key, std::move(convert_result.first));
+        if (result.second)
+        {
+          ++inserted; // A unique key was inserted.  
+        }
+        return true;
+      });
+  return map;
+}
+
+std::uint32_t CountDroppedAttributes(const opentelemetry::common::KeyValueIterable &attributes,
+                                     std::uint32_t count_limit)
+{
+  const std::size_t total = attributes.size();
+  return static_cast<std::uint32_t>(total > count_limit ? total - count_limit : 0);
+}
+
+}  // namespace
+
 SpanDataEvent::SpanDataEvent(std::string name,
                              opentelemetry::common::SystemTimestamp timestamp,
-                             const opentelemetry::common::KeyValueIterable &attributes)
-    : name_(std::move(name)), timestamp_(timestamp), attribute_map_(attributes)
+                             const opentelemetry::common::KeyValueIterable &attributes,
+                             std::uint32_t attribute_count_limit,
+                             std::size_t attribute_value_length_limit)
+    : name_(std::move(name)),
+      timestamp_(timestamp),
+      attribute_map_(
+          PopulateAttributeMap(attributes, attribute_count_limit, attribute_value_length_limit)),
+      dropped_attributes_count_(CountDroppedAttributes(attributes, attribute_count_limit))
 {}
 
 const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
@@ -40,8 +102,13 @@ SpanDataEvent::GetAttributes() const noexcept
 }
 
 SpanDataLink::SpanDataLink(opentelemetry::trace::SpanContext span_context,
-                           const opentelemetry::common::KeyValueIterable &attributes)
-    : span_context_(std::move(span_context)), attribute_map_(attributes)
+                           const opentelemetry::common::KeyValueIterable &attributes,
+                           std::uint32_t attribute_count_limit,
+                           std::size_t attribute_value_length_limit)
+    : span_context_(std::move(span_context)),
+      attribute_map_(
+          PopulateAttributeMap(attributes, attribute_count_limit, attribute_value_length_limit)),
+      dropped_attributes_count_(CountDroppedAttributes(attributes, attribute_count_limit))
 {}
 
 const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
@@ -93,22 +160,60 @@ void SpanData::SetIdentity(const opentelemetry::trace::SpanContext &span_context
 void SpanData::SetAttribute(nostd::string_view key,
                             const opentelemetry::common::AttributeValue &value) noexcept
 {
-  attribute_map_.SetAttribute(key, value);
+  if (attribute_map_.size() >= limits_.attribute_count_limit)
+  {
+    // The map is at the limit. Can only update existing keys.
+    auto it = attribute_map_.find(std::string(key));
+    if (it == attribute_map_.end())
+    {
+      ++dropped_attributes_count_;
+      return;
+    }
+    // try to convert the value.
+    std::pair<opentelemetry::sdk::common::OwnedAttributeValue, bool> convert_result =
+        opentelemetry::sdk::common::VisitVariant(
+            opentelemetry::sdk::common::AttributeConverter(limits_.attribute_value_length_limit),
+            value);
+    if (!convert_result.second)
+    {
+      return;  // There was an exception converting the value. Skip this attribute.
+    }
+    it->second = std::move(convert_result.first);
+    return;
+  }
+
+  // The map is under the limit. Set the attribute (insert or assign).
+  attribute_map_.SetAttribute(key, value, limits_.attribute_value_length_limit);
 }
 
 void SpanData::AddEvent(nostd::string_view name,
                         opentelemetry::common::SystemTimestamp timestamp,
                         const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  SpanDataEvent event(std::string(name), timestamp, attributes);
-  events_.push_back(event);
+  if (events_.size() >= limits_.event_count_limit)
+  {
+    ++dropped_events_count_;
+    return;
+  }
+  events_.emplace_back(std::string(name), timestamp, attributes,
+                       limits_.event_attribute_count_limit, limits_.attribute_value_length_limit);
 }
 
 void SpanData::AddLink(const opentelemetry::trace::SpanContext &span_context,
                        const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  SpanDataLink link(span_context, attributes);
-  links_.push_back(link);
+  if (links_.size() >= limits_.link_count_limit)
+  {
+    ++dropped_links_count_;
+    return;
+  }
+  links_.emplace_back(span_context, attributes, limits_.link_attribute_count_limit,
+                      limits_.attribute_value_length_limit);
+}
+
+void SpanData::SetSpanLimits(const SpanLimits &limits) noexcept
+{
+  limits_ = limits;
 }
 
 void SpanData::SetStatus(opentelemetry::trace::StatusCode code,

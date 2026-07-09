@@ -15,6 +15,7 @@
 #include "opentelemetry/sdk/trace/random_id_generator.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/tracer.h"
@@ -41,6 +42,7 @@ public:
    * not be a nullptr
    * @param tracer_configurator Provides access to a function that computes the TracerConfig for
    * Tracers provided by this TracerProvider.
+   * @param span_limits The span limits for this tracer provider.
    */
   explicit TracerProvider(
       std::unique_ptr<SpanProcessor> processor,
@@ -53,7 +55,8 @@ public:
           std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
               instrumentationscope::ScopeConfigurator<TracerConfig>::Builder(
                   TracerConfig::Default())
-                  .Build())) noexcept;
+                  .Build()),
+      SpanLimits span_limits = SpanLimits::NoLimits()) noexcept;
 
   explicit TracerProvider(
       std::vector<std::unique_ptr<SpanProcessor>> &&processors,
@@ -66,7 +69,8 @@ public:
           std::make_unique<instrumentationscope::ScopeConfigurator<TracerConfig>>(
               instrumentationscope::ScopeConfigurator<TracerConfig>::Builder(
                   TracerConfig::Default())
-                  .Build())) noexcept;
+                  .Build()),
+      SpanLimits span_limits = SpanLimits::NoLimits()) noexcept;
 
   /**
    * Initialize a new tracer provider with a specified context
@@ -129,6 +133,12 @@ public:
    * @return The resource for this tracer provider.
    */
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
+
+  /**
+   * Obtain the span limits configured for this tracer provider.
+   * @return The SpanLimits for this tracer provider.
+   */
+  const opentelemetry::sdk::trace::SpanLimits &GetSpanLimits() const noexcept;
 
   /**
    * Shutdown the span processor associated with this tracer provider.
