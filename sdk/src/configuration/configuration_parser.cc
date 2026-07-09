@@ -2700,6 +2700,7 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
     int major{};
     int minor{};
 
+    // NOLINTNEXTLINE(bugprone-unchecked-string-to-number-conversion): count checked below
     count = sscanf(model->file_format.c_str(), "%d.%d", &major, &minor);
     if (count != 2)
     {

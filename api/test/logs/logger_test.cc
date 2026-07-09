@@ -263,6 +263,7 @@ TEST(Logger, EventLogMethodOverloads)
 // Define a basic Logger class
 class TestLogger : public Logger
 {
+public:
   const nostd::string_view GetName() noexcept override { return "test logger"; }
 
   using Logger::CreateLogRecord;
@@ -459,6 +460,7 @@ private:
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
 class TestProvider : public LoggerProvider
 {
+public:
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
                                       nostd::string_view /* library_name */,
                                       nostd::string_view /* library_version */,

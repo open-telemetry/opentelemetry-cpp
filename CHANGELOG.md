@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Move ext and exporters test classes into anonymous namespace
+  [#4225](https://github.com/open-telemetry/opentelemetry-cpp/pull/4225)
+
+* [CODE HEALTH] Move api/test and sdk/test classes into anonymous namespace
+  [#4217](https://github.com/open-telemetry/opentelemetry-cpp/pull/4217)
+
 * [CMAKE] Fix and test WITH_API_ONLY option
   [#4201](https://github.com/open-telemetry/opentelemetry-cpp/pull/4201)
 
@@ -115,9 +121,13 @@ Increment the:
   [#4144](https://github.com/open-telemetry/opentelemetry-cpp/pull/4144)
 
 * [SDK] Add ComposableSampler and CompositeSampler with the consistent
-  probability sampling variants (AlwaysOn, AlwaysOff, TraceIdRatioBased,
+  probability sampling variants (AlwaysOn, AlwaysOff, ComposableProbability,
   ParentThreshold, RuleBased)
   [#4028](https://github.com/open-telemetry/opentelemetry-cpp/issues/4028)
+
+* [SDK] Rename ComposableTraceIdRatioBasedSampler to ComposableProbabilitySampler
+  to align with the OpenTelemetry specification
+  [#4161](https://github.com/open-telemetry/opentelemetry-cpp/issues/4161)
 
 * [BUILD] Fix protobuf build failure
   [#4154](https://github.com/open-telemetry/opentelemetry-cpp/pull/4154)
@@ -139,6 +149,15 @@ Increment the:
 
 * [CODE HEALTH] Fix clang-tidy bugprone-unused-local-non-trivial-variable warnings
   [#4202](https://github.com/open-telemetry/opentelemetry-cpp/pull/4202)
+
+* [CODE HEALTH] Fix clang-tidy bugprone-unchecked-string-to-number-conversion warnings
+  [#4216](https://github.com/open-telemetry/opentelemetry-cpp/pull/4216)
+
+* [CODE HEALTH] Fix clang-tidy misc-override-with-different-visibility warnings
+  [#4215](https://github.com/open-telemetry/opentelemetry-cpp/pull/4215)
+
+* [CODE HEALTH] Fix clang-tidy `bugprone-throwing-static-initialization` warnings
+  [#4206](https://github.com/open-telemetry/opentelemetry-cpp/pull/4206)
 
 ## [1.27.0] 2026-05-13
 

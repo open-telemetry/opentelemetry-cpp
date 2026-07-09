@@ -30,6 +30,7 @@ namespace logs_sdk = opentelemetry::sdk::logs;
 
 class TestProvider : public LoggerProvider
 {
+public:
   nostd::shared_ptr<Logger> GetLogger(
       nostd::string_view /* logger_name */,
       nostd::string_view /* library_name */,
