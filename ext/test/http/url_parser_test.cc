@@ -12,6 +12,9 @@
 
 namespace http_common = opentelemetry::ext::http::common;
 
+namespace
+{
+
 struct ParsedUrl
 {
   std::string scheme;
@@ -138,3 +141,5 @@ TEST_P(UrlDecoderTests, BasicTests)
 
   EXPECT_EQ(actual, expected);
 }
+
+}  // namespace
