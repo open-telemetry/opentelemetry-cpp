@@ -77,10 +77,12 @@ Increment the:
 * [CI] update codeql to cover all options with abiv2
   [#4106](https://github.com/open-telemetry/opentelemetry-cpp/pull/4106)
 
-* [EXPORTER] Convert uint64_t attribute values exceeding INT64_MAX to string per OTel spec
+* [EXPORTER] Convert uint64_t attribute values exceeding
+  INT64_MAX to string per OTel spec
   [#4090](https://github.com/open-telemetry/opentelemetry-cpp/pull/4090)
 
-* [CODE HEALTH] Remove last unused nostd namespace alias in otlp_populate_attribute_utils
+* [CODE HEALTH] Remove last unused nostd namespace alias
+  in otlp_populate_attribute_utils
   [#4114](https://github.com/open-telemetry/opentelemetry-cpp/pull/4114)
 
 * [CODE HEALTH] Move curl_http_test classes into anonymous namespace
@@ -116,7 +118,8 @@ Increment the:
 * [CODE HEALTH] Move func_grpc_main classes into anonymous namespace
   [#4129](https://github.com/open-telemetry/opentelemetry-cpp/pull/4129)
 
-* [CONFIGURATION] Implementing minimum_severity and trace_based attributes for LoggerConfig
+* [CONFIGURATION] Implementing minimum_severity and trace_based
+  attributes for LoggerConfig
   [#4131](https://github.com/open-telemetry/opentelemetry-cpp/pull/4131)
 
 * [SDK] Support TracerConfigurator updates
@@ -179,7 +182,8 @@ Increment the:
 * [BENCHMARK] add span otlp recordable benchmark
   [#4165](https://github.com/open-telemetry/opentelemetry-cpp/pull/4165)
 
-* [METRICS] Enable synchronous gauge delta temporality and add tests for multi reader path
+* [METRICS] Enable synchronous gauge delta temporality
+  and add tests for multi reader path
   [#4159](https://github.com/open-telemetry/opentelemetry-cpp/pull/4159)
 
 * Add preview support for bound instruments
@@ -320,7 +324,7 @@ Increment the:
 * [BENCHMARK] add SpanData recordable benchmark and unify common utils
   [#4203](https://github.com/open-telemetry/opentelemetry-cpp/pull/4203)
 
-* [RELEASE] Release opentelemetry-cpp 1.28.0 
+* [RELEASE] Release opentelemetry-cpp 1.28.0
   [#4233](https://github.com/open-telemetry/opentelemetry-cpp/pull/4233)
 
 Important changes:
