@@ -254,11 +254,14 @@ TEST(OtlpLogRecordable, SetEventName)
  * unsigned int, and uint64_t. To avoid writing test cases for each, we can
  * use a template approach to test all int types.
  */
+namespace
+{
 template <typename T>
 struct OtlpLogRecordableIntAttributeTest : public testing::Test
 {
   using IntParamType = T;
 };
+}  // namespace
 
 using IntTypes = testing::Types<int, int64_t, unsigned int, uint64_t>;
 TYPED_TEST_SUITE(OtlpLogRecordableIntAttributeTest, IntTypes);
