@@ -45,6 +45,8 @@ namespace exporter
 namespace otlp
 {
 
+namespace
+{
 class ProtobufGlobalSymbolGuard
 {
 public:
@@ -55,6 +57,7 @@ public:
   ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
   ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
 };
+}  // namespace
 
 template <class T, size_t N>
 static nostd::span<T, N> MakeSpan(T (&array)[N])
@@ -62,6 +65,8 @@ static nostd::span<T, N> MakeSpan(T (&array)[N])
   return nostd::span<T, N>(array);
 }
 
+namespace
+{
 class OtlpFileLogRecordExporterTestPeer : public ::testing::Test
 {
 public:
@@ -168,6 +173,7 @@ public:
     }
   }
 };
+}  // namespace
 
 TEST(OtlpFileLogRecordExporterTest, Shutdown)
 {

@@ -36,4 +36,14 @@ if(WITH_BENCHMARK)
     sampler_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_trace opentelemetry_resources
     opentelemetry_exporter_in_memory)
+
+  add_executable(span_data_benchmark span_data_benchmark.cc)
+  target_link_libraries(
+    span_data_benchmark
+    benchmark::benchmark
+    ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_trace
+    opentelemetry_resources
+    opentelemetry_exporter_in_memory
+    opentelemetry_test_common)
 endif()
