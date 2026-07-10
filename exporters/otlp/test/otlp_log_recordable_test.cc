@@ -557,7 +557,7 @@ TEST(OtlpLogRecordable, DefaultRecordAppliesNoLimitUntilConfigured)
 TEST(OtlpLogRecordable, SetAttributeEmptyKeyIsRejected)
 {
   OtlpLogRecordable rec;
-  rec.SetAttribute("", opentelemetry::common::AttributeValue{int64_t(1)});
+  rec.SetAttribute("", opentelemetry::common::AttributeValue{static_cast<int64_t>(1)});
 
   const auto &proto_log_record = rec.log_record();
   EXPECT_EQ(proto_log_record.attributes_size(), 0);

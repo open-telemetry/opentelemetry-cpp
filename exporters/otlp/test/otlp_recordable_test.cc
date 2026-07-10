@@ -786,8 +786,8 @@ TEST(OtlpRecordable, PopulateRequestSameScope)
 TEST(OtlpRecordable, DISABLED_SetAttributeDeduplicatesKey)
 {
   OtlpRecordable rec;
-  rec.SetAttribute("key", common::AttributeValue{int64_t(1)});
-  rec.SetAttribute("key", common::AttributeValue{int64_t(2)});
+  rec.SetAttribute("key", common::AttributeValue{static_cast<int64_t>(1)});
+  rec.SetAttribute("key", common::AttributeValue{static_cast<int64_t>(2)});
 
   const auto &proto_span = rec.span();
   // Only one attribute; the second call must overwrite, not append.
@@ -802,8 +802,8 @@ TEST(OtlpRecordable, DISABLED_SetAttributeDeduplicateDoesNotIncrementDropped)
 {
   // Limit to exactly one attribute so the slot is full after the first call.
   OtlpRecordable rec(/*max_attributes=*/1);
-  rec.SetAttribute("duplicate_attribute", common::AttributeValue{int64_t(1)});
-  rec.SetAttribute("duplicate_attribute", common::AttributeValue{int64_t(2)});
+  rec.SetAttribute("duplicate_attribute", common::AttributeValue{static_cast<int64_t>(1)});
+  rec.SetAttribute("duplicate_attribute", common::AttributeValue{static_cast<int64_t>(2)});
 
   const auto &proto_span = rec.span();
   ASSERT_EQ(proto_span.attributes_size(), 1);
@@ -815,7 +815,7 @@ TEST(OtlpRecordable, DISABLED_SetAttributeDeduplicateDoesNotIncrementDropped)
 TEST(OtlpRecordable, DISABLED_SetAttributeDeduplicateChangesType)
 {
   OtlpRecordable rec;
-  rec.SetAttribute("type_change_attribute", common::AttributeValue{int64_t(42)});
+  rec.SetAttribute("type_change_attribute", common::AttributeValue{static_cast<int64_t>(42)});
   rec.SetAttribute("type_change_attribute", common::AttributeValue{nostd::string_view("hello")});
 
   const auto &proto_span = rec.span();
@@ -827,7 +827,7 @@ TEST(OtlpRecordable, DISABLED_SetAttributeDeduplicateChangesType)
 TEST(OtlpRecordable, SetAttributeEmptyKeyIsRejected)
 {
   OtlpRecordable rec;
-  rec.SetAttribute("", common::AttributeValue{int64_t(1)});
+  rec.SetAttribute("", common::AttributeValue{static_cast<int64_t>(1)});
 
   const auto &proto_span = rec.span();
   EXPECT_EQ(proto_span.attributes_size(), 0);
