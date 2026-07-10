@@ -549,11 +549,14 @@ TEST(OtlpRecordable, PopulateRequestMissing)
   }
 }
 
+namespace
+{
 template <typename T>
 struct EmptyArrayAttributeTest : public testing::Test
 {
   using ElementType = T;
 };
+}  // namespace
 
 using ArrayElementTypes =
     testing::Types<bool, double, nostd::string_view, uint8_t, int, int64_t, unsigned int, uint64_t>;
@@ -577,11 +580,14 @@ TYPED_TEST(EmptyArrayAttributeTest, SetEmptyArrayAttribute)
  * unsigned int, and uint64_t. To avoid writing test cases for each, we can
  * use a template approach to test all int types.
  */
+namespace
+{
 template <typename T>
 struct IntAttributeTest : public testing::Test
 {
   using IntParamType = T;
 };
+}  // namespace
 
 using IntTypes = testing::Types<int, int64_t, unsigned int, uint64_t>;
 TYPED_TEST_SUITE(IntAttributeTest, IntTypes);
