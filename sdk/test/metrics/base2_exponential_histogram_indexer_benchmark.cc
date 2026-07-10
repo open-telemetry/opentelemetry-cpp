@@ -14,7 +14,7 @@ namespace
 
 void BM_NewIndexer(benchmark::State &state)
 {
-  std::array<int, 1000> batch;
+  std::array<int, 1000> batch{};
   std::default_random_engine generator;
   std::uniform_int_distribution<int> distribution(1, 32);
 
@@ -38,7 +38,7 @@ BENCHMARK(BM_NewIndexer);
 
 void BM_ComputeIndex(benchmark::State &state)
 {
-  std::array<double, 1000> batch;
+  std::array<double, 1000> batch{};
   std::default_random_engine generator;
   std::uniform_real_distribution<double> distribution(0, 1000);
   Base2ExponentialHistogramIndexer indexer(static_cast<int32_t>(state.range(0)));
