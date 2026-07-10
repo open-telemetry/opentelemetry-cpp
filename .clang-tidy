@@ -63,6 +63,6 @@ Checks: >
   -modernize-pass-by-value,
   -modernize-use-equals-default,
   -modernize-use-equals-delete,
-  -modernize-make-unique, 
+  -modernize-make-unique,
   -modernize-make-shared,
 
