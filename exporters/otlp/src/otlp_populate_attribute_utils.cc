@@ -196,9 +196,8 @@ struct AttributeValueVisitor
   }
   void operator()(nostd::span<const std::uint8_t> values) const
   {
-    const auto &bytes          = values;
-    const std::size_t kept_len = (std::min)(bytes.size(), options.attribute_value_length_limit);
-    proto_value_->set_bytes_value(reinterpret_cast<const void *>(bytes.data()), kept_len);
+    const std::size_t kept_len = (std::min)(values.size(), options.attribute_value_length_limit);
+    proto_value_->set_bytes_value(reinterpret_cast<const void *>(values.data()), kept_len);
   }
 };
 
@@ -323,7 +322,8 @@ struct OwnedAttributeValueVisitor
   }
   void operator()(const std::vector<std::uint8_t> &values) const
   {
-    proto_value_->set_bytes_value(reinterpret_cast<const void *>(values.data()), values.size());
+    const std::size_t kept_len = (std::min)(values.size(), options.attribute_value_length_limit);
+    proto_value_->set_bytes_value(reinterpret_cast<const void *>(values.data()), kept_len);
   }
 };
 

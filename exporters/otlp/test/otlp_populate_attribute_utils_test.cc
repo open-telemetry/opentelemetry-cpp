@@ -364,6 +364,18 @@ TEST_F(PopulateAnyValueTest, OwnedAnyValueVectorUint8)
   EXPECT_EQ(proto_anyvalue_.bytes_value(), std::string("\xAA\xBB", 2));
 }
 
+TEST_F(PopulateAnyValueTest, OwnedAnyValueVectorUint8TruncatedAtMaxLength)
+{
+  OtlpPopulateAttributeUtils::PopulateAnyValue(
+      &proto_anyvalue_,
+      sdk::common::OwnedAttributeValue{std::vector<uint8_t>{0x01, 0x02, 0x03, 0x04, 0x05}},
+      AttributeConverterOptions{3});
+  ASSERT_EQ(proto_anyvalue_.bytes_value().size(), 3u);
+  EXPECT_EQ(static_cast<uint8_t>(proto_anyvalue_.bytes_value()[0]), 0x01u);
+  EXPECT_EQ(static_cast<uint8_t>(proto_anyvalue_.bytes_value()[1]), 0x02u);
+  EXPECT_EQ(static_cast<uint8_t>(proto_anyvalue_.bytes_value()[2]), 0x03u);
+}
+
 TEST_F(PopulateAnyValueTest, OwnedAnyValueVectorBool)
 {
   OtlpPopulateAttributeUtils::PopulateAnyValue(
@@ -484,6 +496,21 @@ TEST_F(PopulateAnyValueTest, OwnedAnyValueVectorUint64)
   EXPECT_EQ(proto_anyvalue_.array_value().values(0).int_value(), 100);
   EXPECT_EQ(proto_anyvalue_.array_value().values(1).int_value(), 200);
   EXPECT_EQ(proto_anyvalue_.array_value().values(2).int_value(), 300);
+}
+
+// uint64_t values above INT64_MAX in a vector map to string_value per the `Mapping Arbitrary Data
+// to OTLP AnyValue` specification.
+TEST_F(PopulateAnyValueTest, OwnedAnyValueVectorUint64Overflow)
+{
+  const std::vector<uint64_t> data = {static_cast<uint64_t>(std::numeric_limits<int64_t>::max()),
+                                      std::numeric_limits<uint64_t>::max()};
+  OtlpPopulateAttributeUtils::PopulateAnyValue(&proto_anyvalue_,
+                                               sdk::common::OwnedAttributeValue{data});
+  ASSERT_EQ(proto_anyvalue_.array_value().values_size(), 2);
+  EXPECT_EQ(proto_anyvalue_.array_value().values(0).int_value(),
+            std::numeric_limits<int64_t>::max());
+  EXPECT_EQ(proto_anyvalue_.array_value().values(1).string_value(),
+            std::to_string(std::numeric_limits<uint64_t>::max()));
 }
 
 // ---------------------------------------------------------------------------
