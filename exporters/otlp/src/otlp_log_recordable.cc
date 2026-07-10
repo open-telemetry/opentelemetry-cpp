@@ -250,9 +250,10 @@ void OtlpLogRecordable::SetAttribute(opentelemetry::nostd::string_view key,
     return;
   }
 
-  OtlpPopulateAttributeUtils::PopulateAttribute(
-      proto_record_.add_attributes(), key, value,
-      AttributeValueMaxLength{limits_.attribute_value_length_limit});
+  AttributeConverterOptions options;
+  options.attribute_value_length_limit = limits_.attribute_value_length_limit;
+  OtlpPopulateAttributeUtils::PopulateAttribute(proto_record_.add_attributes(), key, value,
+                                                options);
 }
 
 void OtlpLogRecordable::SetLogRecordLimits(

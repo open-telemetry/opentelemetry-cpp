@@ -305,7 +305,7 @@ TEST_F(PopulateAnyValueTest, AnyValueSpanStringViewInvalidUtf8TruncatedAtMaxLeng
       nostd::string_view{invalid_utf8.data(), invalid_utf8.size()}};
   OtlpPopulateAttributeUtils::PopulateAnyValue(
       &proto_anyvalue_, common::AttributeValue{nostd::span<const nostd::string_view>{data}},
-      AttributeValueMaxLength{3});
+      AttributeConverterOptions{3});
   ASSERT_EQ(proto_anyvalue_.array_value().values_size(), 1);
   EXPECT_EQ(proto_anyvalue_.array_value().values(0).bytes_value(), std::string("\x80\x81\x82", 3));
 }
@@ -437,8 +437,9 @@ TEST_F(PopulateAnyValueTest, OwnedAnyValueStringInvalidUtf8TruncatedAtMaxLength)
 {
   // Invalid UTF-8 string that is also longer than max_length
   const std::string invalid_utf8("\x80\x81\x82\x83\x84\x85", 6);
-  OtlpPopulateAttributeUtils::PopulateAnyValue(
-      &proto_anyvalue_, sdk::common::OwnedAttributeValue{invalid_utf8}, AttributeValueMaxLength{3});
+  OtlpPopulateAttributeUtils::PopulateAnyValue(&proto_anyvalue_,
+                                               sdk::common::OwnedAttributeValue{invalid_utf8},
+                                               AttributeConverterOptions{3});
   EXPECT_EQ(proto_anyvalue_.bytes_value(), std::string("\x80\x81\x82", 3));
 }
 
@@ -486,13 +487,13 @@ TEST_F(PopulateAnyValueTest, OwnedAnyValueVectorUint64)
 }
 
 // ---------------------------------------------------------------------------
-// OtlpPopulateAttributeUtils::PopulateAnyValue AttributeValueMaxLength truncation
+// OtlpPopulateAttributeUtils::PopulateAnyValue AttributeConverterOptions truncation
 // ---------------------------------------------------------------------------
 
 TEST_F(PopulateAnyValueTest, CStringTruncatedAtMaxLength)
 {
   OtlpPopulateAttributeUtils::PopulateAnyValue(
-      &proto_anyvalue_, common::AttributeValue{"hello world"}, AttributeValueMaxLength{5});
+      &proto_anyvalue_, common::AttributeValue{"hello world"}, AttributeConverterOptions{5});
   EXPECT_EQ(proto_anyvalue_.string_value(), "hello");
 }
 
@@ -500,7 +501,7 @@ TEST_F(PopulateAnyValueTest, StringViewTruncatedAtMaxLength)
 {
   OtlpPopulateAttributeUtils::PopulateAnyValue(
       &proto_anyvalue_, common::AttributeValue{nostd::string_view{"hello world"}},
-      AttributeValueMaxLength{5});
+      AttributeConverterOptions{5});
   EXPECT_EQ(proto_anyvalue_.string_value(), "hello");
 }
 
@@ -508,7 +509,7 @@ TEST_F(PopulateAnyValueTest, StringViewNotTruncatedWhenWithinLimit)
 {
   OtlpPopulateAttributeUtils::PopulateAnyValue(
       &proto_anyvalue_, common::AttributeValue{nostd::string_view{"hello world"}},
-      AttributeValueMaxLength{15});
+      AttributeConverterOptions{15});
   EXPECT_EQ(proto_anyvalue_.string_value(), "hello world");
 }
 
@@ -516,7 +517,7 @@ TEST_F(PopulateAnyValueTest, OwnedStringTruncatedAtMaxLength)
 {
   OtlpPopulateAttributeUtils::PopulateAnyValue(
       &proto_anyvalue_, sdk::common::OwnedAttributeValue{std::string{"hello world"}},
-      AttributeValueMaxLength{5});
+      AttributeConverterOptions{5});
   EXPECT_EQ(proto_anyvalue_.string_value(), "hello");
 }
 
@@ -525,7 +526,7 @@ TEST_F(PopulateAnyValueTest, ByteSpanTruncatedAtMaxLength)
   const std::array<uint8_t, 5> data = {0x01, 0x02, 0x03, 0x04, 0x05};
   OtlpPopulateAttributeUtils::PopulateAnyValue(
       &proto_anyvalue_, common::AttributeValue{nostd::span<const uint8_t>{data}},
-      AttributeValueMaxLength{3});
+      AttributeConverterOptions{3});
   EXPECT_EQ(proto_anyvalue_.bytes_value().size(), 3u);
   EXPECT_EQ(static_cast<uint8_t>(proto_anyvalue_.bytes_value()[0]), 0x01);
   EXPECT_EQ(static_cast<uint8_t>(proto_anyvalue_.bytes_value()[1]), 0x02);
@@ -535,7 +536,7 @@ TEST_F(PopulateAnyValueTest, ByteSpanTruncatedAtMaxLength)
 TEST_F(PopulateAnyValueTest, NonStringNotAffectedByMaxLength)
 {
   OtlpPopulateAttributeUtils::PopulateAnyValue(
-      &proto_anyvalue_, common::AttributeValue{int64_t{42}}, AttributeValueMaxLength{1});
+      &proto_anyvalue_, common::AttributeValue{int64_t{42}}, AttributeConverterOptions{1});
   EXPECT_EQ(proto_anyvalue_.int_value(), 42);
 }
 
@@ -544,7 +545,7 @@ TEST_F(PopulateAnyValueTest, StringViewSpanElementsTruncatedAtMaxLength)
   const std::array<nostd::string_view, 2> data = {"hello", "world"};
   OtlpPopulateAttributeUtils::PopulateAnyValue(
       &proto_anyvalue_, common::AttributeValue{nostd::span<const nostd::string_view>{data}},
-      AttributeValueMaxLength{3});
+      AttributeConverterOptions{3});
   ASSERT_EQ(proto_anyvalue_.array_value().values_size(), 2);
   EXPECT_EQ(proto_anyvalue_.array_value().values(0).string_value(), "hel");
   EXPECT_EQ(proto_anyvalue_.array_value().values(1).string_value(), "wor");
@@ -555,7 +556,7 @@ TEST_F(PopulateAnyValueTest, OwnedVectorOfStringsTruncatedAtMaxLength)
   OtlpPopulateAttributeUtils::PopulateAnyValue(
       &proto_anyvalue_,
       sdk::common::OwnedAttributeValue{std::vector<std::string>{"hello", "world"}},
-      AttributeValueMaxLength{3});
+      AttributeConverterOptions{3});
   ASSERT_EQ(proto_anyvalue_.array_value().values_size(), 2);
   EXPECT_EQ(proto_anyvalue_.array_value().values(0).string_value(), "hel");
   EXPECT_EQ(proto_anyvalue_.array_value().values(1).string_value(), "wor");
