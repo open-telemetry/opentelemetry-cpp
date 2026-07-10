@@ -57,6 +57,8 @@ namespace otlp
 
 namespace resource = opentelemetry::sdk::resource;
 
+namespace
+{
 class ProtobufGlobalSymbolGuard
 {
 public:
@@ -67,6 +69,7 @@ public:
   ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
   ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
 };
+}  // namespace
 
 static std::tm GetLocalTime(std::chrono::system_clock::time_point tp)
 {
