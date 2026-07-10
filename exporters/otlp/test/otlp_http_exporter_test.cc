@@ -54,6 +54,18 @@
 
 // IWYU pragma: no_include <google/protobuf/stubs/common.h>
 
+#ifdef ENABLE_OTLP_RETRY_PREVIEW
+#  include <cstddef>
+#  include <thread>
+#  include <tuple>
+#  include <variant>
+
+#  include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
+#  include "opentelemetry/ext/http/server/http_server.h"
+#  include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#endif
+
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;

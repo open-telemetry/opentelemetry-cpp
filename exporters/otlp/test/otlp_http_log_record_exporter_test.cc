@@ -53,6 +53,10 @@
 // IWYU pragma: no_include <google/protobuf/repeated_ptr_field.h>
 // IWYU pragma: no_include <google/protobuf/stubs/common.h>
 
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <thread>
+#endif
+
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;

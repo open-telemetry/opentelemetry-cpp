@@ -41,6 +41,20 @@
 // IWYU pragma: no_include <grpc/support/port_platform.h>
 // IWYU pragma: no_include <grpcpp/support/status.h>
 
+#ifdef ENABLE_OTLP_RETRY_PREVIEW
+#  include <cstddef>
+#  include <future>
+#  include <thread>
+#  include <tuple>
+#  include <variant>
+
+// IWYU pragma: no_include <grpcpp/security/server_credentials.h>
+
+#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
+#  include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#endif
+
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
