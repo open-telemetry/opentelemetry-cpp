@@ -1225,7 +1225,11 @@ if(WITH_BENCHMARK)
 
   target_link_libraries(
     otlp_recordable_benchmark
-    PRIVATE opentelemetry_otlp_recordable opentelemetry_trace
-            opentelemetry_metrics opentelemetry_resources benchmark::benchmark
+    PRIVATE opentelemetry_otlp_recordable
+            opentelemetry_trace
+            opentelemetry_metrics
+            opentelemetry_resources
+            benchmark::benchmark
+            opentelemetry_test_common
             ${CMAKE_THREAD_LIBS_INIT})
 endif()
