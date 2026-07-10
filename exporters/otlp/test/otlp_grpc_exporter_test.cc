@@ -464,6 +464,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryGenericValuesFromEnv)
 #endif  // NO_GETENV
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
+namespace
+{
 struct TestTraceService : public opentelemetry::proto::collector::trace::v1::TraceService::Service
 {
   TestTraceService(const std::vector<grpc::StatusCode> &status_codes) : status_codes_(status_codes)
@@ -482,12 +484,16 @@ struct TestTraceService : public opentelemetry::proto::collector::trace::v1::Tra
   size_t index_         = 0UL;
   std::vector<grpc::StatusCode> status_codes_;
 };
+}  // namespace
 
 using StatusCodeVector = std::vector<grpc::StatusCode>;
 
+namespace
+{
 class OtlpGrpcExporterRetryIntegrationTests
     : public ::testing::TestWithParam<std::tuple<bool, StatusCodeVector, std::size_t>>
 {};
+}  // namespace
 
 INSTANTIATE_TEST_SUITE_P(
     StatusCodes,

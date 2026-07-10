@@ -803,9 +803,12 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigRetryGenericValuesFromEnv)
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
 using StatusCodeVector = std::vector<int>;
 
+namespace
+{
 class OtlpHttpExporterRetryIntegrationTests
     : public ::testing::TestWithParam<std::tuple<bool, StatusCodeVector, std::size_t>>
 {};
+}  // namespace
 
 INSTANTIATE_TEST_SUITE_P(StatusCodes,
                          OtlpHttpExporterRetryIntegrationTests,

@@ -59,6 +59,8 @@ namespace otlp
 namespace trace_api = opentelemetry::trace;
 namespace resource  = opentelemetry::sdk::resource;
 
+namespace
+{
 class ProtobufGlobalSymbolGuard
 {
 public:
@@ -69,6 +71,7 @@ public:
   ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
   ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
 };
+}  // namespace
 
 template <class T, size_t N>
 static nostd::span<T, N> MakeSpan(T (&array)[N])
@@ -76,6 +79,8 @@ static nostd::span<T, N> MakeSpan(T (&array)[N])
   return nostd::span<T, N>(array);
 }
 
+namespace
+{
 class OtlpFileExporterTestPeer : public ::testing::Test
 {
 public:
@@ -183,6 +188,7 @@ public:
     }
   }
 };
+}  // namespace
 
 TEST(OtlpFileExporterTest, Shutdown)
 {
