@@ -21,7 +21,7 @@ class Base2ExponentialBucketHistogramAggregationConfiguration : public Aggregati
 {
 public:
   // TODO: max_scale range is [-10, 20]. Negative values require GetSignedInteger in the parser
-  static constexpr std::size_t kDefaultMaxScale = 20;   // schema: minimum -10, maximum 20
+  static constexpr std::size_t kDefaultMaxScale = 20;  // schema: minimum -10, maximum 20
   static constexpr std::size_t kDefaultMaxSize  = 160;
   static constexpr bool kDefaultRecordMinMax    = true;
 
