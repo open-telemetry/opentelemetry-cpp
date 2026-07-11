@@ -1,5 +1,6 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
+#
 
 Checks: >
   -*,
@@ -38,4 +39,30 @@ Checks: >
   -cppcoreguidelines-macro-usage,
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -cppcoreguidelines-avoid-non-const-global-variables,
-  -cppcoreguidelines-pro-*
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-type-static-cast-downcast,
+  -cppcoreguidelines-pro-type-union-access,
+  -cppcoreguidelines-pro-type-vararg,
+  modernize-*,
+  -modernize-avoid-c-arrays,
+  -modernize-concat-nested-namespaces,
+  -modernize-macro-to-enum,
+  -modernize-raw-string-literal,
+  -modernize-return-braced-init-list,
+  -modernize-type-traits,
+  -modernize-use-auto,
+  -modernize-use-nodiscard,
+  -modernize-use-scoped-lock,
+  -modernize-use-trailing-return-type,
+  -modernize-deprecated-headers,
+  -modernize-loop-convert,
+  -modernize-pass-by-value,
+  -modernize-use-equals-default,
+  -modernize-use-equals-delete,
+  -modernize-make-unique,
+  -modernize-make-shared,
+
