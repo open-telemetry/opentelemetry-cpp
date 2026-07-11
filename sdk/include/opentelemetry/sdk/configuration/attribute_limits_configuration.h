@@ -18,9 +18,12 @@ namespace configuration
 class AttributeLimitsConfiguration
 {
 public:
-  // Zero values indicate the field is not set.
-  std::size_t attribute_value_length_limit{0};
-  std::size_t attribute_count_limit{0};
+  // TODO: spec default is no limit, using 4096 to preserve original behavior
+  static constexpr std::size_t kDefaultAttributeValueLengthLimit = 4096;
+  static constexpr std::size_t kDefaultAttributeCountLimit       = 128;
+
+  std::size_t attribute_value_length_limit{kDefaultAttributeValueLengthLimit};
+  std::size_t attribute_count_limit{kDefaultAttributeCountLimit};
 };
 
 }  // namespace configuration

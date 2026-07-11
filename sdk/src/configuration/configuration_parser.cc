@@ -356,10 +356,13 @@ std::unique_ptr<AttributeLimitsConfiguration>
 ConfigurationParser::ParseAttributeLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<AttributeLimitsConfiguration>();
+  using Config = AttributeLimitsConfiguration;
+  auto model   = std::make_unique<AttributeLimitsConfiguration>();
 
-  model->attribute_value_length_limit = node->GetInteger("attribute_value_length_limit", 4096);
-  model->attribute_count_limit        = node->GetInteger("attribute_count_limit", 128);
+  model->attribute_value_length_limit =
+      node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);
+  model->attribute_count_limit =
+      node->GetInteger("attribute_count_limit", Config::kDefaultAttributeCountLimit);
 
   return model;
 }
@@ -379,12 +382,13 @@ std::unique_ptr<HttpTlsConfiguration> ConfigurationParser::ParseHttpTlsConfigura
 std::unique_ptr<GrpcTlsConfiguration> ConfigurationParser::ParseGrpcTlsConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<GrpcTlsConfiguration>();
+  using Config = GrpcTlsConfiguration;
+  auto model   = std::make_unique<GrpcTlsConfiguration>();
 
   model->ca_file   = node->GetString("ca_file", "");
   model->key_file  = node->GetString("key_file", "");
   model->cert_file = node->GetString("cert_file", "");
-  model->insecure  = node->GetBoolean("insecure", false);
+  model->insecure  = node->GetBoolean("insecure", Config::kDefaultInsecure);
 
   return model;
 }
@@ -393,7 +397,8 @@ std::unique_ptr<OtlpHttpLogRecordExporterConfiguration>
 ConfigurationParser::ParseOtlpHttpLogRecordExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<OtlpHttpLogRecordExporterConfiguration>();
+  using Config = OtlpHttpLogRecordExporterConfiguration;
+  auto model   = std::make_unique<OtlpHttpLogRecordExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->endpoint = node->GetRequiredString("endpoint");
@@ -412,7 +417,7 @@ ConfigurationParser::ParseOtlpHttpLogRecordExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", 10000);
+  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   const std::string encoding = node->GetString("encoding", "protobuf");
   model->encoding            = ParseOtlpHttpEncoding(node, encoding);
@@ -424,7 +429,8 @@ std::unique_ptr<OtlpGrpcLogRecordExporterConfiguration>
 ConfigurationParser::ParseOtlpGrpcLogRecordExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<OtlpGrpcLogRecordExporterConfiguration>();
+  using Config = OtlpGrpcLogRecordExporterConfiguration;
+  auto model   = std::make_unique<OtlpGrpcLogRecordExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->endpoint = node->GetRequiredString("endpoint");
@@ -443,7 +449,7 @@ ConfigurationParser::ParseOtlpGrpcLogRecordExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", 10000);
+  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   return model;
 }
@@ -534,13 +540,15 @@ std::unique_ptr<BatchLogRecordProcessorConfiguration>
 ConfigurationParser::ParseBatchLogRecordProcessorConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<BatchLogRecordProcessorConfiguration>();
+  using Config = BatchLogRecordProcessorConfiguration;
+  auto model   = std::make_unique<BatchLogRecordProcessorConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->schedule_delay        = node->GetInteger("schedule_delay", 5000);
-  model->export_timeout        = node->GetInteger("export_timeout", 30000);
-  model->max_queue_size        = node->GetInteger("max_queue_size", 2048);
-  model->max_export_batch_size = node->GetInteger("max_export_batch_size", 512);
+  model->schedule_delay = node->GetInteger("schedule_delay", Config::kDefaultScheduleDelayMs);
+  model->export_timeout = node->GetInteger("export_timeout", Config::kDefaultExportTimeoutMs);
+  model->max_queue_size = node->GetInteger("max_queue_size", Config::kDefaultMaxQueueSize);
+  model->max_export_batch_size =
+      node->GetInteger("max_export_batch_size", Config::kDefaultMaxExportBatchSize);
 
   child           = node->GetRequiredChildNode("exporter");
   model->exporter = ParseLogRecordExporterConfiguration(child);
@@ -618,10 +626,13 @@ std::unique_ptr<LogRecordLimitsConfiguration>
 ConfigurationParser::ParseLogRecordLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<LogRecordLimitsConfiguration>();
+  using Config = LogRecordLimitsConfiguration;
+  auto model   = std::make_unique<LogRecordLimitsConfiguration>();
 
-  model->attribute_value_length_limit = node->GetInteger("attribute_value_length_limit", 4096);
-  model->attribute_count_limit        = node->GetInteger("attribute_count_limit", 128);
+  model->attribute_value_length_limit =
+      node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);
+  model->attribute_count_limit =
+      node->GetInteger("attribute_count_limit", Config::kDefaultAttributeCountLimit);
 
   return model;
 }
@@ -629,13 +640,14 @@ ConfigurationParser::ParseLogRecordLimitsConfiguration(
 LoggerConfigConfiguration ConfigurationParser::ParseLoggerConfigConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  LoggerConfigConfiguration model;
-  model.enabled = node->GetBoolean("enabled", true);
+  using Config = LoggerConfigConfiguration;
+  Config model;
+  model.enabled = node->GetBoolean("enabled", Config::kDefaultEnabled);
 
   const std::string minimum_severity_str = node->GetString("minimum_severity", "trace");
   model.minimum_severity                 = ParseSeverityNumber(node, minimum_severity_str);
 
-  model.trace_based = node->GetBoolean("trace_based", false);
+  model.trace_based = node->GetBoolean("trace_based", Config::kDefaultTraceBased);
 
   return model;
 }
@@ -756,7 +768,8 @@ std::unique_ptr<OtlpHttpPushMetricExporterConfiguration>
 ConfigurationParser::ParseOtlpHttpPushMetricExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<OtlpHttpPushMetricExporterConfiguration>();
+  using Config = OtlpHttpPushMetricExporterConfiguration;
+  auto model   = std::make_unique<OtlpHttpPushMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->endpoint = node->GetRequiredString("endpoint");
@@ -775,7 +788,7 @@ ConfigurationParser::ParseOtlpHttpPushMetricExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", 10000);
+  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   const std::string temporality_preference =
       node->GetString("temporality_preference", "cumulative");
@@ -796,7 +809,8 @@ std::unique_ptr<OtlpGrpcPushMetricExporterConfiguration>
 ConfigurationParser::ParseOtlpGrpcPushMetricExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<OtlpGrpcPushMetricExporterConfiguration>();
+  using Config = OtlpGrpcPushMetricExporterConfiguration;
+  auto model   = std::make_unique<OtlpGrpcPushMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->endpoint = node->GetRequiredString("endpoint");
@@ -815,7 +829,7 @@ ConfigurationParser::ParseOtlpGrpcPushMetricExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", 10000);
+  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   const std::string temporality_preference =
       node->GetString("temporality_preference", "cumulative");
@@ -901,13 +915,16 @@ std::unique_ptr<PrometheusPullMetricExporterConfiguration>
 ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<PrometheusPullMetricExporterConfiguration>();
+  using Config = PrometheusPullMetricExporterConfiguration;
+  auto model   = std::make_unique<PrometheusPullMetricExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->host                = node->GetString("host", "localhost");
-  model->port                = node->GetInteger("port", 9464);
-  model->without_scope_info  = node->GetBoolean("without_scope_info", false);
-  model->without_target_info = node->GetBoolean("without_target_info", false);
+  model->host = node->GetString("host", Config::kDefaultHost);
+  model->port = node->GetInteger("port", Config::kDefaultPort);
+  model->without_scope_info =
+      node->GetBoolean("without_scope_info", Config::kDefaultWithoutScopeInfo);
+  model->without_target_info =
+      node->GetBoolean("without_target_info", Config::kDefaultWithoutTargetInfo);
 
   child = node->GetChildNode("with_resource_constant_labels");
   if (child)
@@ -1093,16 +1110,18 @@ std::unique_ptr<CardinalityLimitsConfiguration>
 ConfigurationParser::ParseCardinalityLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<CardinalityLimitsConfiguration>();
+  using Config = CardinalityLimitsConfiguration;
+  auto model   = std::make_unique<CardinalityLimitsConfiguration>();
 
-  model->default_limit              = node->GetInteger("default", 2000);
-  model->counter                    = node->GetInteger("counter", 0);
-  model->gauge                      = node->GetInteger("gauge", 0);
-  model->histogram                  = node->GetInteger("histogram", 0);
-  model->observable_counter         = node->GetInteger("observable_counter", 0);
-  model->observable_gauge           = node->GetInteger("observable_gauge", 0);
-  model->observable_up_down_counter = node->GetInteger("observable_up_down_counter", 0);
-  model->up_down_counter            = node->GetInteger("up_down_counter", 0);
+  model->default_limit      = node->GetInteger("default", Config::kDefaultLimit);
+  model->counter            = node->GetInteger("counter", Config::kInheritDefault);
+  model->gauge              = node->GetInteger("gauge", Config::kInheritDefault);
+  model->histogram          = node->GetInteger("histogram", Config::kInheritDefault);
+  model->observable_counter = node->GetInteger("observable_counter", Config::kInheritDefault);
+  model->observable_gauge   = node->GetInteger("observable_gauge", Config::kInheritDefault);
+  model->observable_up_down_counter =
+      node->GetInteger("observable_up_down_counter", Config::kInheritDefault);
+  model->up_down_counter = node->GetInteger("up_down_counter", Config::kInheritDefault);
 
   return model;
 }
@@ -1111,11 +1130,12 @@ std::unique_ptr<PeriodicMetricReaderConfiguration>
 ConfigurationParser::ParsePeriodicMetricReaderConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<PeriodicMetricReaderConfiguration>();
+  using Config = PeriodicMetricReaderConfiguration;
+  auto model   = std::make_unique<PeriodicMetricReaderConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->interval = node->GetInteger("interval", 5000);
-  model->timeout  = node->GetInteger("timeout", 30000);
+  model->interval = node->GetInteger("interval", Config::kDefaultIntervalMs);
+  model->timeout  = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   child           = node->GetRequiredChildNode("exporter");
   model->exporter = ParsePushMetricExporterConfiguration(child);
@@ -1320,7 +1340,8 @@ std::unique_ptr<ExplicitBucketHistogramAggregationConfiguration>
 ConfigurationParser::ParseExplicitBucketHistogramAggregationConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<ExplicitBucketHistogramAggregationConfiguration>();
+  using Config = ExplicitBucketHistogramAggregationConfiguration;
+  auto model   = std::make_unique<ExplicitBucketHistogramAggregationConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   child = node->GetChildNode("boundaries");
@@ -1337,7 +1358,7 @@ ConfigurationParser::ParseExplicitBucketHistogramAggregationConfiguration(
     }
   }
 
-  model->record_min_max = node->GetBoolean("record_min_max", true);
+  model->record_min_max = node->GetBoolean("record_min_max", Config::kDefaultRecordMinMax);
 
   return model;
 }
@@ -1346,11 +1367,12 @@ std::unique_ptr<Base2ExponentialBucketHistogramAggregationConfiguration>
 ConfigurationParser::ParseBase2ExponentialBucketHistogramAggregationConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<Base2ExponentialBucketHistogramAggregationConfiguration>();
+  using Config = Base2ExponentialBucketHistogramAggregationConfiguration;
+  auto model   = std::make_unique<Base2ExponentialBucketHistogramAggregationConfiguration>();
 
-  model->max_scale      = node->GetInteger("max_scale", 20);
-  model->max_size       = node->GetInteger("max_size", 160);
-  model->record_min_max = node->GetBoolean("record_min_max", true);
+  model->max_scale      = node->GetInteger("max_scale", Config::kDefaultMaxScale);
+  model->max_size       = node->GetInteger("max_size", Config::kDefaultMaxSize);
+  model->record_min_max = node->GetBoolean("record_min_max", Config::kDefaultRecordMinMax);
 
   return model;
 }
@@ -1427,12 +1449,14 @@ std::unique_ptr<AggregationConfiguration> ConfigurationParser::ParseAggregationC
 std::unique_ptr<ViewStreamConfiguration> ConfigurationParser::ParseViewStreamConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<ViewStreamConfiguration>();
+  using Config = ViewStreamConfiguration;
+  auto model   = std::make_unique<ViewStreamConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->name                          = node->GetString("name", "");
-  model->description                   = node->GetString("description", "");
-  model->aggregation_cardinality_limit = node->GetInteger("aggregation_cardinality_limit", 0);
+  model->name        = node->GetString("name", "");
+  model->description = node->GetString("description", "");
+  model->aggregation_cardinality_limit =
+      node->GetInteger("aggregation_cardinality_limit", Config::kInheritFromReader);
 
   child = node->GetChildNode("aggregation");
   if (child)
@@ -1594,14 +1618,19 @@ std::unique_ptr<PropagatorConfiguration> ConfigurationParser::ParsePropagatorCon
 std::unique_ptr<SpanLimitsConfiguration> ConfigurationParser::ParseSpanLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<SpanLimitsConfiguration>();
+  using Config = SpanLimitsConfiguration;
+  auto model   = std::make_unique<SpanLimitsConfiguration>();
 
-  model->attribute_value_length_limit = node->GetInteger("attribute_value_length_limit", 4096);
-  model->attribute_count_limit        = node->GetInteger("attribute_count_limit", 128);
-  model->event_count_limit            = node->GetInteger("event_count_limit", 128);
-  model->link_count_limit             = node->GetInteger("link_count_limit", 128);
-  model->event_attribute_count_limit  = node->GetInteger("event_attribute_count_limit", 128);
-  model->link_attribute_count_limit   = node->GetInteger("link_attribute_count_limit", 128);
+  model->attribute_value_length_limit =
+      node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);
+  model->attribute_count_limit =
+      node->GetInteger("attribute_count_limit", Config::kDefaultAttributeCountLimit);
+  model->event_count_limit = node->GetInteger("event_count_limit", Config::kDefaultEventCountLimit);
+  model->link_count_limit  = node->GetInteger("link_count_limit", Config::kDefaultLinkCountLimit);
+  model->event_attribute_count_limit =
+      node->GetInteger("event_attribute_count_limit", Config::kDefaultEventAttributeCountLimit);
+  model->link_attribute_count_limit =
+      node->GetInteger("link_attribute_count_limit", Config::kDefaultLinkAttributeCountLimit);
 
   return model;
 }
@@ -1635,12 +1664,13 @@ ConfigurationParser::ParseJaegerRemoteSamplerConfiguration(
   auto model = std::make_unique<JaegerRemoteSamplerConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  // Unclear if endpoint and interval are required/optional
+  // endpoint and initial_sampler are required per schema; interval defaults to 60000ms
   // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/238
   OTEL_INTERNAL_LOG_ERROR("JaegerRemoteSamplerConfiguration: FIXME");
 
+  using Config    = JaegerRemoteSamplerConfiguration;
   model->endpoint = node->GetString("endpoint", "FIXME");
-  model->interval = node->GetInteger("interval", 0);
+  model->interval = node->GetInteger("interval", Config::kDefaultIntervalMs);
 
   child = node->GetChildNode("initial_sampler");
   if (child)
@@ -1703,10 +1733,11 @@ ConfigurationParser::ParseTraceIdRatioBasedSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node,
     size_t /* depth */) const
 {
-  auto model = std::make_unique<TraceIdRatioBasedSamplerConfiguration>();
+  using Config = TraceIdRatioBasedSamplerConfiguration;
+  auto model   = std::make_unique<TraceIdRatioBasedSamplerConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->ratio = node->GetDouble("ratio", 0);
+  model->ratio = node->GetDouble("ratio", Config::kDefaultRatio);
 
   return model;
 }
@@ -1732,8 +1763,9 @@ ConfigurationParser::ParseComposableProbabilitySamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node,
     size_t /* depth */) const
 {
+  using Config = ComposableProbabilitySamplerConfiguration;
   auto model   = std::make_unique<ComposableProbabilitySamplerConfiguration>();
-  model->ratio = node->GetDouble("ratio", 1.0);
+  model->ratio = node->GetDouble("ratio", Config::kDefaultRatio);
   return model;
 }
 
@@ -2009,7 +2041,8 @@ std::unique_ptr<OtlpHttpSpanExporterConfiguration>
 ConfigurationParser::ParseOtlpHttpSpanExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<OtlpHttpSpanExporterConfiguration>();
+  using Config = OtlpHttpSpanExporterConfiguration;
+  auto model   = std::make_unique<OtlpHttpSpanExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->endpoint = node->GetRequiredString("endpoint");
@@ -2028,7 +2061,7 @@ ConfigurationParser::ParseOtlpHttpSpanExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", 10000);
+  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   const std::string encoding = node->GetString("encoding", "protobuf");
   model->encoding            = ParseOtlpHttpEncoding(node, encoding);
@@ -2040,7 +2073,8 @@ std::unique_ptr<OtlpGrpcSpanExporterConfiguration>
 ConfigurationParser::ParseOtlpGrpcSpanExporterConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<OtlpGrpcSpanExporterConfiguration>();
+  using Config = OtlpGrpcSpanExporterConfiguration;
+  auto model   = std::make_unique<OtlpGrpcSpanExporterConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
   model->endpoint = node->GetRequiredString("endpoint");
@@ -2059,7 +2093,7 @@ ConfigurationParser::ParseOtlpGrpcSpanExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", 10000);
+  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   return model;
 }
@@ -2149,13 +2183,15 @@ std::unique_ptr<BatchSpanProcessorConfiguration>
 ConfigurationParser::ParseBatchSpanProcessorConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<BatchSpanProcessorConfiguration>();
+  using Config = BatchSpanProcessorConfiguration;
+  auto model   = std::make_unique<BatchSpanProcessorConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  model->schedule_delay        = node->GetInteger("schedule_delay", 5000);
-  model->export_timeout        = node->GetInteger("export_timeout", 30000);
-  model->max_queue_size        = node->GetInteger("max_queue_size", 2048);
-  model->max_export_batch_size = node->GetInteger("max_export_batch_size", 512);
+  model->schedule_delay = node->GetInteger("schedule_delay", Config::kDefaultScheduleDelayMs);
+  model->export_timeout = node->GetInteger("export_timeout", Config::kDefaultExportTimeoutMs);
+  model->max_queue_size = node->GetInteger("max_queue_size", Config::kDefaultMaxQueueSize);
+  model->max_export_batch_size =
+      node->GetInteger("max_export_batch_size", Config::kDefaultMaxExportBatchSize);
 
   child           = node->GetRequiredChildNode("exporter");
   model->exporter = ParseSpanExporterConfiguration(child);

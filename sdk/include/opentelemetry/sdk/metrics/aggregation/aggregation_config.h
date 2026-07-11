@@ -59,6 +59,14 @@ public:
 class Base2ExponentialHistogramAggregationConfig : public AggregationConfig
 {
 public:
+  // Valid range for max_scale per the OTel spec.
+  static constexpr std::int32_t kMinScale = -10;
+  static constexpr std::int32_t kMaxScale = 20;
+  // Valid range for max_buckets per the OTel spec (minimum defined; maximum is SDK-enforced).
+  static constexpr std::size_t kMinBuckets     = 2;
+  static constexpr std::size_t kMaxBuckets     = 32768;
+  static constexpr std::size_t kDefaultBuckets = 160;
+
   Base2ExponentialHistogramAggregationConfig(
       size_t cardinality_limit = kAggregationCardinalityLimit)
       : AggregationConfig(cardinality_limit)
@@ -69,8 +77,8 @@ public:
     return AggregationType::kBase2ExponentialHistogram;
   }
 
-  size_t max_buckets_  = 160;
-  int32_t max_scale_   = 20;
+  std::size_t max_buckets_{kDefaultBuckets};
+  std::int32_t max_scale_{kMaxScale};
   bool record_min_max_ = true;
 };
 

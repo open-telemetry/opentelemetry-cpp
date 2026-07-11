@@ -1054,22 +1054,10 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateBatc
   std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> sdk;
   opentelemetry::sdk::trace::BatchSpanProcessorOptions options;
 
-  if (model->schedule_delay > 0)
-  {
-    options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
-  }
-  if (model->export_timeout > 0)
-  {
-    options.export_timeout = std::chrono::milliseconds(model->export_timeout);
-  }
-  if (model->max_queue_size > 0)
-  {
-    options.max_queue_size = model->max_queue_size;
-  }
-  if (model->max_export_batch_size > 0)
-  {
-    options.max_export_batch_size = model->max_export_batch_size;
-  }
+  options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
+  options.export_timeout        = std::chrono::milliseconds(model->export_timeout);
+  options.max_queue_size        = model->max_queue_size;
+  options.max_export_batch_size = model->max_export_batch_size;
 
   auto exporter_sdk = CreateSpanExporter(model->exporter);
 
@@ -1540,14 +1528,8 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
 
   opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions options;
 
-  if (model->interval > 0)
-  {
-    options.export_interval_millis = std::chrono::milliseconds(model->interval);
-  }
-  if (model->timeout > 0)
-  {
-    options.export_timeout_millis = std::chrono::milliseconds(model->timeout);
-  }
+  options.export_interval_millis = std::chrono::milliseconds(model->interval);
+  options.export_timeout_millis  = std::chrono::milliseconds(model->timeout);
 
   auto exporter_sdk = CreatePushMetricExporter(model->exporter);
 
@@ -1608,14 +1590,8 @@ SdkBuilder::CreateBase2ExponentialBucketHistogramAggregation(
   auto sdk =
       std::make_unique<opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>();
 
-  if (model->max_size > 0)
-  {
-    sdk->max_buckets_ = model->max_size;
-  }
-  if (model->max_scale > 0)
-  {
-    sdk->max_scale_ = static_cast<int32_t>(model->max_scale);
-  }
+  sdk->max_buckets_    = model->max_size;
+  sdk->max_scale_      = static_cast<int32_t>(model->max_scale);
   sdk->record_min_max_ = model->record_min_max;
 
   return sdk;
@@ -1898,22 +1874,10 @@ SdkBuilder::CreateBatchLogRecordProcessor(
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> sdk;
   opentelemetry::sdk::logs::BatchLogRecordProcessorOptions options;
 
-  if (model->schedule_delay > 0)
-  {
-    options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
-  }
-  if (model->export_timeout > 0)
-  {
-    options.export_timeout_millis = std::chrono::milliseconds(model->export_timeout);
-  }
-  if (model->max_queue_size > 0)
-  {
-    options.max_queue_size = model->max_queue_size;
-  }
-  if (model->max_export_batch_size > 0)
-  {
-    options.max_export_batch_size = model->max_export_batch_size;
-  }
+  options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
+  options.export_timeout_millis = std::chrono::milliseconds(model->export_timeout);
+  options.max_queue_size        = model->max_queue_size;
+  options.max_export_batch_size = model->max_export_batch_size;
 
   auto exporter_sdk = CreateLogRecordExporter(model->exporter);
 
@@ -2019,14 +1983,8 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
   opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
   if (model->limits)
   {
-    if (model->limits->attribute_count_limit > 0)
-    {
-      log_record_limits.attribute_count_limit = model->limits->attribute_count_limit;
-    }
-    if (model->limits->attribute_value_length_limit > 0)
-    {
-      log_record_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
-    }
+    log_record_limits.attribute_count_limit        = model->limits->attribute_count_limit;
+    log_record_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
   }
 
   std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<

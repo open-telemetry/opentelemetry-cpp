@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <cstddef>
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -16,13 +18,20 @@ namespace configuration
 class SpanLimitsConfiguration
 {
 public:
-  // Zero values indicate the field is not set.
-  std::size_t attribute_value_length_limit{0};
-  std::size_t attribute_count_limit{0};
-  std::size_t event_count_limit{0};
-  std::size_t link_count_limit{0};
-  std::size_t event_attribute_count_limit{0};
-  std::size_t link_attribute_count_limit{0};
+  // TODO: spec default is no limit, using 4096 to preserve original behavior
+  static constexpr std::size_t kDefaultAttributeValueLengthLimit = 4096;
+  static constexpr std::size_t kDefaultAttributeCountLimit       = 128;
+  static constexpr std::size_t kDefaultEventCountLimit           = 128;
+  static constexpr std::size_t kDefaultLinkCountLimit            = 128;
+  static constexpr std::size_t kDefaultEventAttributeCountLimit  = 128;
+  static constexpr std::size_t kDefaultLinkAttributeCountLimit   = 128;
+
+  std::size_t attribute_value_length_limit{kDefaultAttributeValueLengthLimit};
+  std::size_t attribute_count_limit{kDefaultAttributeCountLimit};
+  std::size_t event_count_limit{kDefaultEventCountLimit};
+  std::size_t link_count_limit{kDefaultLinkCountLimit};
+  std::size_t event_attribute_count_limit{kDefaultEventAttributeCountLimit};
+  std::size_t link_attribute_count_limit{kDefaultLinkAttributeCountLimit};
 };
 
 }  // namespace configuration
