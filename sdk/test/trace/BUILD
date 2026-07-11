@@ -205,3 +205,19 @@ otel_cc_benchmark(
         "//sdk/src/trace",
     ],
 )
+
+otel_cc_benchmark(
+    name = "span_data_benchmark",
+    srcs = ["span_data_benchmark.cc"],
+    tags = [
+        "benchmark",
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//exporters/memory:in_memory_span_exporter",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "//test_common:headers",
+    ],
+)

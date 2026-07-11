@@ -286,6 +286,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
   ASSERT_EQ(checked_label_num, 3);
 }
 
+namespace
+{
 class SanitizeTest : public ::testing::Test
 {
   Resource resource_ = Resource::Create({});
@@ -308,6 +310,7 @@ protected:
     EXPECT_EQ(result.begin()->metric.begin()->label.begin()->name, sanitized);
   }
 };
+}  // namespace
 
 TEST_F(SanitizeTest, Label)
 {
@@ -321,6 +324,8 @@ TEST_F(SanitizeTest, Label)
 
 TEST_F(SanitizeTest, Name) {}
 
+namespace
+{
 class AttributeCollisionTest : public ::testing::Test
 {
   Resource resource_ = Resource::Create(ResourceAttributes{});
@@ -356,6 +361,7 @@ protected:
     }
   }
 };
+}  // namespace
 
 TEST_F(AttributeCollisionTest, SeparatesDistinctKeys)
 {
