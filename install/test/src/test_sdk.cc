@@ -202,19 +202,19 @@ protected:
   void SetUp() override
   {
     propagation::GlobalTextMapPropagator::SetGlobalPropagator(
-        nostd::shared_ptr<propagation::TextMapPropagator>(nullptr));
-    trace::Provider::SetTracerProvider(nostd::shared_ptr<trace::TracerProvider>(nullptr));
-    logs::Provider::SetLoggerProvider(nostd::shared_ptr<logs::LoggerProvider>(nullptr));
-    metrics::Provider::SetMeterProvider(nostd::shared_ptr<metrics::MeterProvider>(nullptr));
+        {std::make_shared<propagation::NoOpPropagator>()});
+    trace::Provider::SetTracerProvider({std::make_shared<trace::NoopTracerProvider>()});
+    logs::Provider::SetLoggerProvider({std::make_shared<logs::NoopLoggerProvider>()});
+    metrics::Provider::SetMeterProvider({std::make_shared<metrics::NoopMeterProvider>()});
   }
 
   void TearDown() override
   {
     propagation::GlobalTextMapPropagator::SetGlobalPropagator(
-        nostd::shared_ptr<propagation::TextMapPropagator>(nullptr));
-    trace::Provider::SetTracerProvider(nostd::shared_ptr<trace::TracerProvider>(nullptr));
-    logs::Provider::SetLoggerProvider(nostd::shared_ptr<logs::LoggerProvider>(nullptr));
-    metrics::Provider::SetMeterProvider(nostd::shared_ptr<metrics::MeterProvider>(nullptr));
+        {std::make_shared<propagation::NoOpPropagator>()});
+    trace::Provider::SetTracerProvider({std::make_shared<trace::NoopTracerProvider>()});
+    logs::Provider::SetLoggerProvider({std::make_shared<logs::NoopLoggerProvider>()});
+    metrics::Provider::SetMeterProvider({std::make_shared<metrics::NoopMeterProvider>()});
   }
 };
 

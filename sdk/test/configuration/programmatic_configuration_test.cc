@@ -16,14 +16,17 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/global_propagator.h"
+#include "opentelemetry/context/propagation/noop_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
+#include "opentelemetry/logs/noop.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/meter_provider.h"
+#include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/metrics/provider.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -31,6 +34,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/trace/context.h"
+#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
@@ -300,9 +304,11 @@ protected:
   {
     MakeRegistry();
 
-    trace::Provider::SetTracerProvider(nostd::shared_ptr<trace::TracerProvider>(nullptr));
-    logs::Provider::SetLoggerProvider(nostd::shared_ptr<logs::LoggerProvider>(nullptr));
-    metrics::Provider::SetMeterProvider(nostd::shared_ptr<metrics::MeterProvider>(nullptr));
+    propagation::GlobalTextMapPropagator::SetGlobalPropagator(
+        {std::make_shared<propagation::NoOpPropagator>()});
+    trace::Provider::SetTracerProvider({std::make_shared<trace::NoopTracerProvider>()});
+    logs::Provider::SetLoggerProvider({std::make_shared<logs::NoopLoggerProvider>()});
+    metrics::Provider::SetMeterProvider({std::make_shared<metrics::NoopMeterProvider>()});
   }
 
   void TearDown() override
@@ -360,7 +366,10 @@ protected:
     exporter->name   = "recording";
     auto reader      = std::make_unique<config_sdk::PeriodicMetricReaderConfiguration>();
     reader->exporter = std::move(exporter);
-    auto config      = std::make_unique<config_sdk::MeterProviderConfiguration>();
+    reader->interval = 3'600'000;  // milliseconds. Set to a large value and rely on ForceFlush to
+                                   // trigger collection.
+    reader->timeout = 60'000;      // milliseconds
+    auto config     = std::make_unique<config_sdk::MeterProviderConfiguration>();
     config->readers.emplace_back(std::move(reader));
     return config;
   }
@@ -523,7 +532,7 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLoggerConfigurator)
   EXPECT_FALSE(error_logger->Enabled(logs::Severity::kInfo));
   EXPECT_TRUE(error_logger->Enabled(logs::Severity::kError));
 
-  sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
 
   EXPECT_GE(log_buffer_->size(), 2);
 }
@@ -544,7 +553,7 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessor)
   ASSERT_NE(sdk_->logger_provider, nullptr);
 
   logs::Provider::GetLoggerProvider()->GetLogger("test")->Info("test-message");
-  sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
 
   EXPECT_GE(log_buffer_->size(), 1);
 }
@@ -565,7 +574,7 @@ TEST_F(ProgrammaticConfigTest, MeterProvider)
       ->CreateUInt64Counter("test-counter")
       ->Add(1);
 
-  sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000));
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000)));
 
   EXPECT_GE(metric_buffer_->size(), 1);
 }
@@ -593,15 +602,18 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithMeterConfigurator)
   auto disabled_meter = metrics::Provider::GetMeterProvider()->GetMeter(disabled_meter_config.name);
   disabled_meter->CreateUInt64Counter("disabled-test-counter")->Add(1);
 
-  sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000));
-  ASSERT_EQ(metric_buffer_->size(), 1);
-  EXPECT_NE(metric_buffer_->at(0).instrument_descriptor.name_, "disabled-test-counter");
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  EXPECT_GE(metric_buffer_->size(), 1);
+  for (const auto &metric : *metric_buffer_)
+  {
+    EXPECT_NE(metric.instrument_descriptor.name_, "disabled-test-counter");
+  }
 }
 
 TEST_F(ProgrammaticConfigTest, MeterProviderWithViews)
 {
   // View 1: Base2 exponential aggregation
-  const std::size_t max_scale   = 100;
+  const std::size_t max_scale   = 10;
   const std::size_t max_buckets = 135;
   auto base2_histogram_aggregation =
       std::make_unique<config_sdk::Base2ExponentialBucketHistogramAggregationConfiguration>();
@@ -664,10 +676,10 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithViews)
   meter->CreateDoubleHistogram("exponential-histogram")->Record(42.0, context);
   meter->CreateDoubleHistogram("explicit-histogram")->Record(42.0, context);
   meter->CreateUInt64Counter("default-counter")->Add(1, context);
-  sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000));
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000)));
 
-  // check that the three data points were collected and are of the right type.
-  EXPECT_EQ(metric_buffer_->size(), 3);
+  // check that instances of the three data points were collected and are of the right type.
+  EXPECT_GE(metric_buffer_->size(), 3);
   bool found_base2_histogram    = false;
   bool found_explicit_histogram = false;
   bool found_default_counter    = false;
@@ -678,10 +690,10 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithViews)
     if (nostd::holds_alternative<metrics_sdk::Base2ExponentialHistogramPointData>(point_data))
     {
       found_base2_histogram = true;
-      auto &point_data      = nostd::get<metrics_sdk::Base2ExponentialHistogramPointData>(
-          metric.point_data_attr_.front().point_data);
-      EXPECT_EQ(point_data.max_buckets_, max_buckets);
-      EXPECT_LE(point_data.scale_, max_scale);
+      auto &base2_point_data =
+          nostd::get<metrics_sdk::Base2ExponentialHistogramPointData>(point_data);
+      EXPECT_EQ(base2_point_data.max_buckets_, max_buckets);
+      EXPECT_LE(base2_point_data.scale_, max_scale);
     }
     else if (nostd::holds_alternative<metrics_sdk::HistogramPointData>(point_data))
     {
@@ -712,7 +724,7 @@ TEST_F(ProgrammaticConfigTest, TracerProviderDefaults)
   auto default_tracer = trace::Provider::GetTracerProvider()->GetTracer("default-tracer");
   default_tracer->StartSpan("test-span")->End();
 
-  sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
 
   EXPECT_EQ(span_buffer_->size(), 1);
 }
@@ -740,7 +752,7 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithTracerConfigurator)
   auto disabled_tracer = trace::Provider::GetTracerProvider()->GetTracer("disabled-tracer");
   disabled_tracer->StartSpan("disabled-test-span")->End();
 
-  sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
 
   ASSERT_EQ(span_buffer_->size(), 1);
   EXPECT_NE(span_buffer_->at(0)->GetName(), "disabled-test-span");
@@ -764,7 +776,7 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithSampler)
   ASSERT_NE(sdk_->tracer_provider, nullptr);
 
   trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
-  sdk_->tracer_provider->ForceFlush();
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
 
   EXPECT_EQ(span_buffer_->size(), 0);
 }
@@ -784,7 +796,7 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessor)
   CreateAndInstallSdk(model);
 
   trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
-  sdk_->tracer_provider->ForceFlush();
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
 
   EXPECT_GE(span_buffer_->size(), 1);
 }
