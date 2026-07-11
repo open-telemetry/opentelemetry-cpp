@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.28.0] 2026-07-10
+## [1.28.0] 2026-07-11
 
 * [RELEASE] Bump main branch to 1.28.0-dev
   [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)
@@ -323,6 +323,9 @@ Increment the:
 
 * [BENCHMARK] add SpanData recordable benchmark and unify common utils
   [#4203](https://github.com/open-telemetry/opentelemetry-cpp/pull/4203)
+
+* [CI] Add `modernize-` and `cppcoreguidelines-pro-` checks to clang-tidy (#4238)
+  [#4238](https://github.com/open-telemetry/opentelemetry-cpp/pull/4238)
 
 * [RELEASE] Release opentelemetry-cpp 1.28.0
   [#4233](https://github.com/open-telemetry/opentelemetry-cpp/pull/4233)
