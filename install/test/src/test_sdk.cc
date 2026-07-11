@@ -3,6 +3,9 @@
 
 #include <gtest/gtest.h>
 
+#include <opentelemetry/context/propagation/global_propagator.h>
+#include <opentelemetry/context/propagation/noop_propagator.h>
+#include <opentelemetry/context/propagation/text_map_propagator.h>
 #include <opentelemetry/logs/provider.h>
 #include <opentelemetry/metrics/provider.h>
 #include <opentelemetry/trace/provider.h>
@@ -32,7 +35,27 @@
 #include <opentelemetry/sdk/metrics/meter_provider_factory.h>
 #include <opentelemetry/sdk/metrics/provider.h>
 
+#include <opentelemetry/sdk/configuration/configuration.h>
+#include <opentelemetry/sdk/configuration/configured_sdk.h>
+#include <opentelemetry/sdk/configuration/console_log_record_exporter_builder.h>
+#include <opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h>
+#include <opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h>
+#include <opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h>
+#include <opentelemetry/sdk/configuration/console_span_exporter_builder.h>
+#include <opentelemetry/sdk/configuration/console_span_exporter_configuration.h>
+#include <opentelemetry/sdk/configuration/logger_provider_configuration.h>
+#include <opentelemetry/sdk/configuration/meter_provider_configuration.h>
+#include <opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h>
+#include <opentelemetry/sdk/configuration/propagator_configuration.h>
+#include <opentelemetry/sdk/configuration/registry.h>
+#include <opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h>
+#include <opentelemetry/sdk/configuration/simple_span_processor_configuration.h>
+#include <opentelemetry/sdk/configuration/text_map_propagator_builder.h>
+#include <opentelemetry/sdk/configuration/tracer_provider_configuration.h>
+
 namespace nostd        = opentelemetry::nostd;
+namespace propagation  = opentelemetry::context::propagation;
+namespace config_sdk   = opentelemetry::sdk::configuration;
 namespace version_sdk  = opentelemetry::sdk::version;
 namespace common       = opentelemetry::common;
 namespace common_sdk   = opentelemetry::sdk::common;
@@ -45,6 +68,8 @@ namespace logs         = opentelemetry::logs;
 namespace trace_sdk    = opentelemetry::sdk::trace;
 namespace trace        = opentelemetry::trace;
 
+namespace
+{
 class NoopLogRecordable : public logs_sdk::Recordable
 {
 public:
@@ -171,7 +196,31 @@ public:
   }
 };
 
-TEST(SdkInstallTest, SdkVersionCheck)
+class SdkInstallTest : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
+    propagation::GlobalTextMapPropagator::SetGlobalPropagator(
+        nostd::shared_ptr<propagation::TextMapPropagator>(nullptr));
+    trace::Provider::SetTracerProvider(nostd::shared_ptr<trace::TracerProvider>(nullptr));
+    logs::Provider::SetLoggerProvider(nostd::shared_ptr<logs::LoggerProvider>(nullptr));
+    metrics::Provider::SetMeterProvider(nostd::shared_ptr<metrics::MeterProvider>(nullptr));
+  }
+
+  void TearDown() override
+  {
+    propagation::GlobalTextMapPropagator::SetGlobalPropagator(
+        nostd::shared_ptr<propagation::TextMapPropagator>(nullptr));
+    trace::Provider::SetTracerProvider(nostd::shared_ptr<trace::TracerProvider>(nullptr));
+    logs::Provider::SetLoggerProvider(nostd::shared_ptr<logs::LoggerProvider>(nullptr));
+    metrics::Provider::SetMeterProvider(nostd::shared_ptr<metrics::MeterProvider>(nullptr));
+  }
+};
+
+}  // namespace
+
+TEST_F(SdkInstallTest, SdkVersionCheck)
 {
   EXPECT_NE(OPENTELEMETRY_SDK_VERSION, "not a version");
   EXPECT_GE(version_sdk::major_version, 0);
@@ -181,7 +230,7 @@ TEST(SdkInstallTest, SdkVersionCheck)
   EXPECT_NE(version_sdk::short_version, "");
 }
 
-TEST(SdkInstallTest, ResourceDetectorCheck)
+TEST_F(SdkInstallTest, ResourceDetectorCheck)
 {
   auto resource = resource_sdk::Resource::GetDefault();
   resource_sdk::OTELResourceDetector detector;
@@ -190,7 +239,7 @@ TEST(SdkInstallTest, ResourceDetectorCheck)
   EXPECT_NE(attributes.size(), 0);
 }
 
-TEST(SdkInstallTest, LoggerProviderCheck)
+TEST_F(SdkInstallTest, LoggerProviderCheck)
 {
   {
     auto exporter     = nostd::unique_ptr<logs_sdk::LogRecordExporter>(new NoopLogRecordExporter());
@@ -211,7 +260,7 @@ TEST(SdkInstallTest, LoggerProviderCheck)
   sdk_provider->ForceFlush();
 }
 
-TEST(SdkInstallTest, TracerProviderCheck)
+TEST_F(SdkInstallTest, TracerProviderCheck)
 {
   {
     auto exporter     = nostd::unique_ptr<trace_sdk::SpanExporter>(new NoopSpanExporter());
@@ -234,7 +283,7 @@ TEST(SdkInstallTest, TracerProviderCheck)
   sdk_provider->ForceFlush();
 }
 
-TEST(SdkInstallTest, MeterProviderCheck)
+TEST_F(SdkInstallTest, MeterProviderCheck)
 {
   {
     auto exporter =
@@ -259,4 +308,130 @@ TEST(SdkInstallTest, MeterProviderCheck)
   }
   auto sdk_provider = static_cast<metrics_sdk::MeterProvider *>(provider.get());
   sdk_provider->ForceFlush();
+}
+
+TEST_F(SdkInstallTest, ConfigurationCoreCheck)
+{
+  class NoopConsoleSpanBuilder : public config_sdk::ConsoleSpanExporterBuilder
+  {
+  public:
+    std::unique_ptr<trace_sdk::SpanExporter> Build(
+        const config_sdk::ConsoleSpanExporterConfiguration *) const override
+    {
+      return std::make_unique<NoopSpanExporter>();
+    }
+  };
+
+  class NoopConsoleLogRecordBuilder : public config_sdk::ConsoleLogRecordExporterBuilder
+  {
+  public:
+    std::unique_ptr<logs_sdk::LogRecordExporter> Build(
+        const config_sdk::ConsoleLogRecordExporterConfiguration *) const override
+    {
+      return std::make_unique<NoopLogRecordExporter>();
+    }
+  };
+
+  class NoopConsolePushMetricBuilder : public config_sdk::ConsolePushMetricExporterBuilder
+  {
+  public:
+    std::unique_ptr<metrics_sdk::PushMetricExporter> Build(
+        const config_sdk::ConsolePushMetricExporterConfiguration *) const override
+    {
+      return std::make_unique<NoopPushMetricExporter>();
+    }
+  };
+
+  class NoopTextMapPropagatorBuilder : public config_sdk::TextMapPropagatorBuilder
+  {
+  public:
+    std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> Build() const override
+    {
+      return std::make_unique<opentelemetry::context::propagation::NoOpPropagator>();
+    }
+  };
+
+  // Programmatic SDK Configuration
+  std::unique_ptr<config_sdk::ConfiguredSdk> sdk;
+  {
+    const std::string propagator_name{"noop"};
+
+    auto registry = std::make_shared<config_sdk::Registry>();
+    registry->SetConsoleSpanBuilder(std::make_unique<NoopConsoleSpanBuilder>());
+    registry->SetConsoleLogRecordBuilder(std::make_unique<NoopConsoleLogRecordBuilder>());
+    registry->SetConsolePushMetricExporterBuilder(std::make_unique<NoopConsolePushMetricBuilder>());
+    registry->SetTextMapPropagatorBuilder(propagator_name,
+                                          std::make_unique<NoopTextMapPropagatorBuilder>());
+
+    auto model = std::make_unique<config_sdk::Configuration>();
+
+    // Tracer provider: simple processor + console exporter
+    auto span_exporter       = std::make_unique<config_sdk::ConsoleSpanExporterConfiguration>();
+    auto span_processor      = std::make_unique<config_sdk::SimpleSpanProcessorConfiguration>();
+    span_processor->exporter = std::move(span_exporter);
+    auto tracer_config       = std::make_unique<config_sdk::TracerProviderConfiguration>();
+    tracer_config->processors.push_back(std::move(span_processor));
+
+    // Logger provider: simple processor + console exporter
+    auto log_exporter       = std::make_unique<config_sdk::ConsoleLogRecordExporterConfiguration>();
+    auto log_processor      = std::make_unique<config_sdk::SimpleLogRecordProcessorConfiguration>();
+    log_processor->exporter = std::move(log_exporter);
+    auto logger_config      = std::make_unique<config_sdk::LoggerProviderConfiguration>();
+    logger_config->processors.push_back(std::move(log_processor));
+
+    // Meter provider: periodic reader + console push exporter
+    auto metric_exporter = std::make_unique<config_sdk::ConsolePushMetricExporterConfiguration>();
+    auto metric_reader   = std::make_unique<config_sdk::PeriodicMetricReaderConfiguration>();
+    metric_reader->exporter = std::move(metric_exporter);
+    auto meter_config       = std::make_unique<config_sdk::MeterProviderConfiguration>();
+    meter_config->readers.push_back(std::move(metric_reader));
+
+    // Propagator: noop
+    auto propagator_config = std::make_unique<config_sdk::PropagatorConfiguration>();
+    propagator_config->composite.push_back(propagator_name);
+
+    // Assemble the full configuration model
+    model->tracer_provider = std::move(tracer_config);
+    model->logger_provider = std::move(logger_config);
+    model->meter_provider  = std::move(meter_config);
+    model->propagator      = std::move(propagator_config);
+
+    ASSERT_NO_THROW(sdk = config_sdk::ConfiguredSdk::Create(registry, model));
+    ASSERT_NE(sdk, nullptr);
+    ASSERT_NE(sdk->tracer_provider, nullptr);
+    ASSERT_NE(sdk->logger_provider, nullptr);
+    ASSERT_NE(sdk->meter_provider, nullptr);
+    ASSERT_NE(sdk->propagator, nullptr);
+  }
+
+  // Set the global providers
+  sdk->Install();
+
+  auto propagator = propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+  ASSERT_NE(propagator, nullptr);
+
+  auto tracer_provider = trace::Provider::GetTracerProvider();
+  ASSERT_NE(tracer_provider, nullptr);
+
+  auto logger_provider = logs::Provider::GetLoggerProvider();
+  ASSERT_NE(logger_provider, nullptr);
+
+  auto meter_provider = metrics::Provider::GetMeterProvider();
+  ASSERT_NE(meter_provider, nullptr);
+
+  auto tracer  = tracer_provider->GetTracer("config-core-test");
+  auto logger  = logger_provider->GetLogger("config-core-test");
+  auto meter   = meter_provider->GetMeter("config-core-test");
+  auto counter = meter->CreateUInt64Counter("test-counter");
+
+  {
+    auto span = tracer->StartSpan("test-span");
+    opentelemetry::trace::Scope scope(span);
+    logger->Info("test-message");
+    counter->Add(1);
+    span->End();
+  }
+
+  // Destroy the global providers
+  sdk->UnInstall();
 }

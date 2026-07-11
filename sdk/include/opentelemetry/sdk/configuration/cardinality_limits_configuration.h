@@ -18,15 +18,15 @@ namespace configuration
 class CardinalityLimitsConfiguration
 {
 public:
-  std::size_t default_limit;
+  std::size_t default_limit{0};
   // For all limits, 0 means unset, use default_limit
-  std::size_t counter;
-  std::size_t gauge;
-  std::size_t histogram;
-  std::size_t observable_counter;
-  std::size_t observable_gauge;
-  std::size_t observable_up_down_counter;
-  std::size_t up_down_counter;
+  std::size_t counter{0};
+  std::size_t gauge{0};
+  std::size_t histogram{0};
+  std::size_t observable_counter{0};
+  std::size_t observable_gauge{0};
+  std::size_t observable_up_down_counter{0};
+  std::size_t up_down_counter{0};
 };
 
 }  // namespace configuration

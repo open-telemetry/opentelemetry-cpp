@@ -25,6 +25,7 @@ otel_add_component(
   opentelemetry_logs
   opentelemetry_trace
   opentelemetry_metrics
+  opentelemetry_configuration_core
   FILES_DIRECTORY
   "include/opentelemetry/"
   FILES_DESTINATION
@@ -33,7 +34,16 @@ otel_add_component(
   PATTERN
   "*.h"
   PATTERN
-  "sdk/configuration/*.h"
+  "sdk/configuration/configuration_parser.h"
+  EXCLUDE
+  PATTERN
+  "sdk/configuration/yaml_configuration_parser.h"
+  EXCLUDE
+  PATTERN
+  "sdk/configuration/ryml_document.h"
+  EXCLUDE
+  PATTERN
+  "sdk/configuration/ryml_document_node.h"
   EXCLUDE)
 
 if(WITH_CONFIGURATION)
@@ -48,7 +58,13 @@ if(WITH_CONFIGURATION)
     "include/opentelemetry"
     FILES_MATCHING
     PATTERN
-    "sdk/configuration/*.h")
+    "sdk/configuration/configuration_parser.h"
+    PATTERN
+    "sdk/configuration/yaml_configuration_parser.h"
+    PATTERN
+    "sdk/configuration/ryml_document.h"
+    PATTERN
+    "sdk/configuration/ryml_document_node.h")
 endif()
 
 if(BUILD_TESTING)

@@ -23,6 +23,7 @@ public:
     visitor->VisitBase2ExponentialBucketHistogram(this);
   }
 
+  // Zero values indicate the field is not set.
   std::size_t max_scale{0};
   std::size_t max_size{0};
   bool record_min_max{false};

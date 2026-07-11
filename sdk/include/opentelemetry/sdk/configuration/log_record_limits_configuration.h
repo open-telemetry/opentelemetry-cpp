@@ -16,8 +16,9 @@ namespace configuration
 class LogRecordLimitsConfiguration
 {
 public:
-  std::size_t attribute_value_length_limit;
-  std::size_t attribute_count_limit;
+  // Zero values indicate the field is not set.
+  std::size_t attribute_value_length_limit{0};
+  std::size_t attribute_count_limit{0};
 };
 
 }  // namespace configuration

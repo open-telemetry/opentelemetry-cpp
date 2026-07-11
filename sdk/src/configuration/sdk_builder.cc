@@ -16,6 +16,7 @@
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/context/propagation/composite_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -192,6 +193,68 @@ using common::WildcardMatch;
 
 namespace
 {
+
+static opentelemetry::logs::Severity ToLogSeverity(
+    opentelemetry::sdk::configuration::SeverityNumber severity_number)
+{
+  // Convert configuration::SeverityNumber to opentelemetry::logs::Severity
+  // The configuration::SeverityNumber enum values do not match the opentelemetry::logs::Severity
+  // enum values use a switch statement for conversion.
+  switch (severity_number)
+  {
+    case SeverityNumber::trace:
+      return opentelemetry::logs::Severity::kTrace;
+    case SeverityNumber::trace2:
+      return opentelemetry::logs::Severity::kTrace2;
+    case SeverityNumber::trace3:
+      return opentelemetry::logs::Severity::kTrace3;
+    case SeverityNumber::trace4:
+      return opentelemetry::logs::Severity::kTrace4;
+    case SeverityNumber::debug:
+      return opentelemetry::logs::Severity::kDebug;
+    case SeverityNumber::debug2:
+      return opentelemetry::logs::Severity::kDebug2;
+    case SeverityNumber::debug3:
+      return opentelemetry::logs::Severity::kDebug3;
+    case SeverityNumber::debug4:
+      return opentelemetry::logs::Severity::kDebug4;
+    case SeverityNumber::info:
+      return opentelemetry::logs::Severity::kInfo;
+    case SeverityNumber::info2:
+      return opentelemetry::logs::Severity::kInfo2;
+    case SeverityNumber::info3:
+      return opentelemetry::logs::Severity::kInfo3;
+    case SeverityNumber::info4:
+      return opentelemetry::logs::Severity::kInfo4;
+    case SeverityNumber::warn:
+      return opentelemetry::logs::Severity::kWarn;
+    case SeverityNumber::warn2:
+      return opentelemetry::logs::Severity::kWarn2;
+    case SeverityNumber::warn3:
+      return opentelemetry::logs::Severity::kWarn3;
+    case SeverityNumber::warn4:
+      return opentelemetry::logs::Severity::kWarn4;
+    case SeverityNumber::error:
+      return opentelemetry::logs::Severity::kError;
+    case SeverityNumber::error2:
+      return opentelemetry::logs::Severity::kError2;
+    case SeverityNumber::error3:
+      return opentelemetry::logs::Severity::kError3;
+    case SeverityNumber::error4:
+      return opentelemetry::logs::Severity::kError4;
+    case SeverityNumber::fatal:
+      return opentelemetry::logs::Severity::kFatal;
+    case SeverityNumber::fatal2:
+      return opentelemetry::logs::Severity::kFatal2;
+    case SeverityNumber::fatal3:
+      return opentelemetry::logs::Severity::kFatal3;
+    case SeverityNumber::fatal4:
+      return opentelemetry::logs::Severity::kFatal4;
+    default:
+      break;
+  }
+  return opentelemetry::logs::Severity::kInvalid;
+}
 
 class ResourceAttributeValueSetter
     : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor
@@ -991,14 +1054,22 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateBatc
   std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> sdk;
   opentelemetry::sdk::trace::BatchSpanProcessorOptions options;
 
-  options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
-
-#ifdef LATER
-  options.xxx = model->export_timeout;
-#endif
-
-  options.max_queue_size        = model->max_queue_size;
-  options.max_export_batch_size = model->max_export_batch_size;
+  if (model->schedule_delay > 0)
+  {
+    options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
+  }
+  if (model->export_timeout > 0)
+  {
+    options.export_timeout = std::chrono::milliseconds(model->export_timeout);
+  }
+  if (model->max_queue_size > 0)
+  {
+    options.max_queue_size = model->max_queue_size;
+  }
+  if (model->max_export_batch_size > 0)
+  {
+    options.max_export_batch_size = model->max_export_batch_size;
+  }
 
   auto exporter_sdk = CreateSpanExporter(model->exporter);
 
@@ -1095,6 +1166,12 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
   if (model->sampler)
   {
     sampler = CreateSampler(model->sampler);
+  }
+  else
+  {
+    // Spec default: parentbased_always_on
+    sampler = opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create(
+        opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create());
   }
 
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> sdk_processors;
@@ -1463,8 +1540,14 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
 
   opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions options;
 
-  options.export_interval_millis = std::chrono::milliseconds(model->interval);
-  options.export_timeout_millis  = std::chrono::milliseconds(model->timeout);
+  if (model->interval > 0)
+  {
+    options.export_interval_millis = std::chrono::milliseconds(model->interval);
+  }
+  if (model->timeout > 0)
+  {
+    options.export_timeout_millis = std::chrono::milliseconds(model->timeout);
+  }
 
   auto exporter_sdk = CreatePushMetricExporter(model->exporter);
 
@@ -1525,8 +1608,14 @@ SdkBuilder::CreateBase2ExponentialBucketHistogramAggregation(
   auto sdk =
       std::make_unique<opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>();
 
-  sdk->max_buckets_    = model->max_size;
-  sdk->max_scale_      = static_cast<int32_t>(model->max_scale);
+  if (model->max_size > 0)
+  {
+    sdk->max_buckets_ = model->max_size;
+  }
+  if (model->max_scale > 0)
+  {
+    sdk->max_scale_ = static_cast<int32_t>(model->max_scale);
+  }
   sdk->record_min_max_ = model->record_min_max;
 
   return sdk;
@@ -1600,7 +1689,10 @@ void SdkBuilder::AddView(
 
   std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> sdk_aggregation_config;
 
-  sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
+  if (stream->aggregation)
+  {
+    sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
+  }
 
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk_attribute_processor;
 
@@ -1806,9 +1898,22 @@ SdkBuilder::CreateBatchLogRecordProcessor(
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> sdk;
   opentelemetry::sdk::logs::BatchLogRecordProcessorOptions options;
 
-  options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
-  options.max_queue_size        = model->max_queue_size;
-  options.max_export_batch_size = model->max_export_batch_size;
+  if (model->schedule_delay > 0)
+  {
+    options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
+  }
+  if (model->export_timeout > 0)
+  {
+    options.export_timeout_millis = std::chrono::milliseconds(model->export_timeout);
+  }
+  if (model->max_queue_size > 0)
+  {
+    options.max_queue_size = model->max_queue_size;
+  }
+  if (model->max_export_batch_size > 0)
+  {
+    options.max_export_batch_size = model->max_export_batch_size;
+  }
 
   auto exporter_sdk = CreateLogRecordExporter(model->exporter);
 
@@ -1876,15 +1981,17 @@ SdkBuilder::CreateLoggerConfigurator(
   using opentelemetry::sdk::instrumentationscope::ScopeConfigurator;
   using opentelemetry::sdk::logs::LoggerConfig;
 
-  LoggerConfig default_config =
-      model->default_config.enabled ? LoggerConfig::Enabled() : LoggerConfig::Disabled();
+  LoggerConfig default_config = LoggerConfig::Create(
+      model->default_config.enabled, ToLogSeverity(model->default_config.minimum_severity),
+      model->default_config.trace_based);
 
   auto builder = ScopeConfigurator<LoggerConfig>::Builder(default_config);
 
   for (const auto &entry : model->loggers)
   {
     LoggerConfig entry_config =
-        entry.config.enabled ? LoggerConfig::Enabled() : LoggerConfig::Disabled();
+        LoggerConfig::Create(entry.config.enabled, ToLogSeverity(entry.config.minimum_severity),
+                             entry.config.trace_based);
     std::string pattern = entry.name;
     builder.AddCondition(
         [pattern](const InstrumentationScope &scope) {
@@ -1912,8 +2019,14 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
   opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
   if (model->limits)
   {
-    log_record_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
-    log_record_limits.attribute_count_limit        = model->limits->attribute_count_limit;
+    if (model->limits->attribute_count_limit > 0)
+    {
+      log_record_limits.attribute_count_limit = model->limits->attribute_count_limit;
+    }
+    if (model->limits->attribute_value_length_limit > 0)
+    {
+      log_record_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
+    }
   }
 
   std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<

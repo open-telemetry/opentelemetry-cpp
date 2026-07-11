@@ -242,6 +242,8 @@ build configuration.
 |                            | opentelemetry-cpp::trace                                                                         |
 |                            | opentelemetry-cpp::metrics                                                                       |
 |                            | opentelemetry-cpp::logs                                                                          |
+|                            | opentelemetry-cpp::configuration_core                                                            |
+| **configuration**          | opentelemetry-cpp::configuration                                                                 |
 | **ext_common**             | opentelemetry-cpp::ext                                                                           |
 | **ext_http_curl**          | opentelemetry-cpp::http_client_curl                                                              |
 | **ext_dll**                | opentelemetry-cpp::opentelemetry_cpp                                                             |

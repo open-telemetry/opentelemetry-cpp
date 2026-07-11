@@ -33,7 +33,7 @@ public:
   bool without_scope_info{false};
   bool without_target_info{false};
   std::unique_ptr<IncludeExcludeConfiguration> with_resource_constant_labels;
-  TranslationStrategy translation_strategy;
+  TranslationStrategy translation_strategy{TranslationStrategy::UnderscoreEscapingWithSuffixes};
 };
 
 }  // namespace configuration

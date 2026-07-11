@@ -26,6 +26,7 @@ public:
     visitor->VisitBatch(this);
   }
 
+  // Zero values indicate the field is not set.
   std::size_t schedule_delay{0};
   std::size_t export_timeout{0};
   std::size_t max_queue_size{0};

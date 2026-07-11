@@ -16,12 +16,13 @@ namespace configuration
 class SpanLimitsConfiguration
 {
 public:
-  std::size_t attribute_value_length_limit;
-  std::size_t attribute_count_limit;
-  std::size_t event_count_limit;
-  std::size_t link_count_limit;
-  std::size_t event_attribute_count_limit;
-  std::size_t link_attribute_count_limit;
+  // Zero values indicate the field is not set.
+  std::size_t attribute_value_length_limit{0};
+  std::size_t attribute_count_limit{0};
+  std::size_t event_count_limit{0};
+  std::size_t link_count_limit{0};
+  std::size_t event_attribute_count_limit{0};
+  std::size_t link_attribute_count_limit{0};
 };
 
 }  // namespace configuration

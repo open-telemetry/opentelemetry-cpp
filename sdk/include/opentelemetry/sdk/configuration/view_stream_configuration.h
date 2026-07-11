@@ -25,7 +25,7 @@ public:
   std::string name;
   std::string description;
   std::unique_ptr<AggregationConfiguration> aggregation;
-  std::size_t aggregation_cardinality_limit;
+  std::size_t aggregation_cardinality_limit{0};
   std::unique_ptr<IncludeExcludeConfiguration> attribute_keys;
 };
 
