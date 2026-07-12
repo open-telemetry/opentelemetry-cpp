@@ -1992,8 +1992,8 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
   opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
   if (model->limits)
   {
-    log_record_limits.attribute_count_limit        = model->limits->attribute_count_limit;
     log_record_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
+    log_record_limits.attribute_count_limit        = model->limits->attribute_count_limit;
   }
 
   std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<

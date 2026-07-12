@@ -62,17 +62,12 @@ add_executable(
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_ext_http.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_ext_http_curl.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_ostream.cc
-  ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_ostream_builder.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_in_memory.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_otlp_common.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_otlp_grpc.cc
-  ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_otlp_grpc_builder.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_otlp_http.cc
-  ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_otlp_http_builder.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_otlp_file.cc
-  ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_otlp_file_builder.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_prometheus.cc
-  ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_prometheus_builder.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_zipkin.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_elasticsearch.cc)
 
