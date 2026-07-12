@@ -251,6 +251,8 @@ TEST(SpanData, SpanLimitsDuplicateAttributeKeys)
   limits.event_count_limit            = 1;
   limits.event_attribute_count_limit  = 2;
 
+  recordable.SetSpanLimits(limits);
+
   // Create three attributes. One has a duplicate key.
   std::vector<std::pair<std::string, std::string>> attributes{
       {"attribute_one", "AA"}, {"attribute_two", "BB"}, {"attribute_one", "CC"}};

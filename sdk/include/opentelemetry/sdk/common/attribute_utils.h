@@ -289,7 +289,7 @@ struct AttributeEqualToVisitor
  * @return A pair of an iterator to the element and a bool (true if the insertion took place).
  */
 template <typename Map, typename Value>
-OPENTELEMETRY_MAYBE_UNUSED inline std::pair<typename Map::iterator, bool>
+inline std::pair<typename Map::iterator, bool>
 AttributeInsertOrAssign(Map &map, opentelemetry::nostd::string_view key, Value &&value) noexcept
 {
 #if __cplusplus >= 201703L
@@ -388,7 +388,7 @@ public:
   }
 
   // Convert non-owning key-value to owning std::string(key) and OwnedAttributeValue(value)
-  void SetAttribute(nostd::string_view key,
+  bool SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value,
                     std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept
   {
@@ -397,7 +397,9 @@ public:
     if (result.second)
     {
       AttributeInsertOrAssign(*this, key, std::move(result.first));
+      return true;
     }
+    return false;
   }
 
   // Compare the attributes of this map with another KeyValueIterable
