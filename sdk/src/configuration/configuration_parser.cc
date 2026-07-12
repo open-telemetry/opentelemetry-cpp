@@ -1661,11 +1661,16 @@ ConfigurationParser::ParseJaegerRemoteSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node,
     size_t depth) const
 {
+  using Config = JaegerRemoteSamplerConfiguration;
+
   auto model = std::make_unique<JaegerRemoteSamplerConfiguration>();
   std::unique_ptr<DocumentNode> child;
 
-  using Config    = JaegerRemoteSamplerConfiguration;
-  model->endpoint = node->GetRequiredString("endpoint");
+  // Unclear if endpoint and interval are required/optional
+  // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/238
+  OTEL_INTERNAL_LOG_ERROR("JaegerRemoteSamplerConfiguration: FIXME");
+
+  model->endpoint = node->GetString("endpoint", "FIXME");
   model->interval = node->GetInteger("interval", Config::kDefaultIntervalMs);
 
   child = node->GetChildNode("initial_sampler");
