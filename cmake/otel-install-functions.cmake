@@ -317,26 +317,40 @@ endfunction()
 
 #-----------------------------------------------------------------------
 # otel_add_component:
-#   Adds a component to the list of components to be installed. A component name and list of targest are required.
+#   Adds a component to the list of components to be installed. A component name and list of targets are required.
 #   Optional files can be added to the component by specifying a directory, destination and matching pattern.
 #   Each target is assigned to the component and its dependencies are identified based on the LINK_LIBRARIES property.
 #   An alias target is also created for each target in the form of PROJECT_NAME::TARGET_EXPORT_NAME.
+#   DEPRECATED_NAMES lists old component names that are redirected to this component with a deprecation warning.
+#   DEPRECATED marks a component that has been fully removed with no replacement (no TARGETS required).
 # Usage:
 #    otel_add_component(
 #      COMPONENT <component_name>
+#      [DEPRECATED_NAMES <old_name1> <old_name2> ...]
 #      TARGETS <target1> <target2> ...
-#      FILES_DIRECTORY <directory>
-#      FILES_DESTINATION <destination>
-#      FILES_MATCHING <matching>)
+#      [FILES_DIRECTORY <directory>
+#       FILES_DESTINATION <destination>
+#       FILES_MATCHING <matching>])
+#    otel_add_component(
+#      COMPONENT <removed_component_name>
+#      DEPRECATED)
 #-----------------------------------------------------------------------
 function(otel_add_component)
-  set(optionArgs )
+  set(optionArgs DEPRECATED)
   set(oneValueArgs COMPONENT FILES_DIRECTORY FILES_DESTINATION)
-  set(multiValueArgs TARGETS FILES_MATCHING)
+  set(multiValueArgs TARGETS FILES_MATCHING DEPRECATED_NAMES)
   cmake_parse_arguments(_OTEL_ADD_COMP "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" "${ARGN}")
 
   if(NOT _OTEL_ADD_COMP_COMPONENT)
     message(FATAL_ERROR "otel_add_component: COMPONENT is required")
+  endif()
+
+  if(_OTEL_ADD_COMP_DEPRECATED)
+    get_property(_deprecated_components DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST)
+    list(APPEND _deprecated_components "${_OTEL_ADD_COMP_COMPONENT}")
+    set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST "${_deprecated_components}")
+    message(DEBUG "  DEPRECATED: ${_OTEL_ADD_COMP_COMPONENT} (no replacement)")
+    return()
   endif()
 
   if(NOT _OTEL_ADD_COMP_TARGETS)
@@ -378,6 +392,16 @@ function(otel_add_component)
     FILES_MATCHING ${_OTEL_ADD_COMP_FILES_MATCHING}
     COMPONENT_DEPENDS ${_COMPONENT_DEPENDS}
     THIRDPARTY_DEPENDS ${_THIRDPARTY_DEPENDS})
+
+  foreach(_DEP_NAME IN LISTS _OTEL_ADD_COMP_DEPRECATED_NAMES)
+    get_property(_deprecated_components DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST)
+    list(APPEND _deprecated_components "${_DEP_NAME}")
+    set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST "${_deprecated_components}")
+    set_property(DIRECTORY ${PROJECT_SOURCE_DIR}
+      PROPERTY OTEL_COMPONENT_DEPRECATED_ALIAS_${_DEP_NAME}
+      "${_OTEL_ADD_COMP_COMPONENT}")
+    message(DEBUG "  DEPRECATED_NAME: ${_DEP_NAME} -> ${_OTEL_ADD_COMP_COMPONENT}")
+  endforeach()
 endfunction()
 
 #-----------------------------------------------------------------------
@@ -418,6 +442,22 @@ function(otel_install_components)
     _otel_populate_component_targets_block(${_COMPONENT} OTEL_COMPONENTS_TARGETS_BLOCK)
     _otel_populate_component_internal_depends_block(${_COMPONENT} OTEL_COMPONENTS_INTERNAL_DEPENDENCIES_BLOCK)
     _otel_populate_component_thirdparty_depends_block(${_COMPONENT} OTEL_COMPONENTS_THIRDPARTY_DEPENDENCIES_BLOCK)
+  endforeach()
+
+  message(STATUS "Install DEPRECATED COMPONENTS")
+  get_property(OTEL_DEPRECATED_COMPONENTS_LIST DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST)
+
+  set(OTEL_COMPONENTS_DEPRECATED_ALIASES_BLOCK "")
+  foreach(_DEP_COMP IN LISTS OTEL_DEPRECATED_COMPONENTS_LIST)
+    get_property(_alias DIRECTORY ${PROJECT_SOURCE_DIR}
+      PROPERTY OTEL_COMPONENT_DEPRECATED_ALIAS_${_DEP_COMP})
+    if(_alias)
+      message(STATUS "  Deprecated COMPONENT ${_DEP_COMP} -> ${_alias}")
+      string(APPEND OTEL_COMPONENTS_DEPRECATED_ALIASES_BLOCK
+        "set(COMPONENT_${_DEP_COMP}_DEPRECATED_ALIAS ${_alias})\n")
+    else()
+      message(STATUS "  Deprecated COMPONENT ${_DEP_COMP} (no replacement)")
+    endif()
   endforeach()
 
   configure_file(

@@ -59,6 +59,9 @@ enable_testing()
 # 3. Test find_package with components specified but missing dependent components
 # 4. Test find_package with components specified but including
 #    unsupported/unknown components
+# 5. Test find_package with components specified but including deprecated
+#    components
+# -----------------------------------------------------------
 
 add_test(
   NAME cmake-usage-no-components-test
@@ -90,6 +93,14 @@ add_test(
     ${CMAKE_COMMAND} --log-level=DEBUG -S
     ${CMAKE_SOURCE_DIR}/usage_tests/unsupported_components -B
     build-cmake-usage-unsupported-components-test
+    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
+
+add_test(
+  NAME cmake-usage-deprecated-components-test
+  COMMAND
+    ${CMAKE_COMMAND} --log-level=DEBUG -S
+    ${CMAKE_SOURCE_DIR}/usage_tests/deprecated_components -B
+    build-cmake-usage-deprecated-components-test
     "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
 
 # -----------------------------------------------------------
