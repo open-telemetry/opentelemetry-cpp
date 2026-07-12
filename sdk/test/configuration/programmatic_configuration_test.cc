@@ -458,7 +458,8 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderDefaults)
       logs::Severity::kInfo, nostd::string_view("test-message"),
       common::MakeAttributes({{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}));
 
-  sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
 
   EXPECT_GE(log_buffer_->size(), 1);
 }
@@ -484,7 +485,8 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLogRecordLimits)
       logs::Severity::kInfo, nostd::string_view("test-message"),
       common::MakeAttributes({{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}));
 
-  sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
 
   EXPECT_GE(log_buffer_->size(), 1);
   auto *record = log_buffer_->front().get();
@@ -533,6 +535,7 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLoggerConfigurator)
   EXPECT_TRUE(error_logger->Enabled(logs::Severity::kError));
 
   ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
 
   EXPECT_GE(log_buffer_->size(), 2);
 }
@@ -554,6 +557,7 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessor)
 
   logs::Provider::GetLoggerProvider()->GetLogger("test")->Info("test-message");
   ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
 
   EXPECT_GE(log_buffer_->size(), 1);
 }
@@ -575,6 +579,7 @@ TEST_F(ProgrammaticConfigTest, MeterProvider)
       ->Add(1);
 
   ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(5000)));
 
   EXPECT_GE(metric_buffer_->size(), 1);
 }
@@ -603,6 +608,8 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithMeterConfigurator)
   disabled_meter->CreateUInt64Counter("disabled-test-counter")->Add(1);
 
   ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(5000)));
+
   EXPECT_GE(metric_buffer_->size(), 1);
   for (const auto &metric : *metric_buffer_)
   {
@@ -677,6 +684,7 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithViews)
   meter->CreateDoubleHistogram("explicit-histogram")->Record(42.0, context);
   meter->CreateUInt64Counter("default-counter")->Add(1, context);
   ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(5000)));
 
   // check that instances of the three data points were collected and are of the right type.
   EXPECT_GE(metric_buffer_->size(), 3);
@@ -725,6 +733,7 @@ TEST_F(ProgrammaticConfigTest, TracerProviderDefaults)
   default_tracer->StartSpan("test-span")->End();
 
   ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
 
   EXPECT_EQ(span_buffer_->size(), 1);
 }
@@ -760,23 +769,17 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithTracerConfigurator)
 
 TEST_F(ProgrammaticConfigTest, TracerProviderWithSampler)
 {
-  auto sampler                = std::make_unique<config_sdk::AlwaysOffSamplerConfiguration>();
-  auto exporter               = std::make_unique<config_sdk::ExtensionSpanExporterConfiguration>();
-  exporter->name              = "recording";
-  auto processor              = std::make_unique<config_sdk::SimpleSpanProcessorConfiguration>();
-  processor->exporter         = std::move(exporter);
-  auto tracer_provider_config = std::make_unique<config_sdk::TracerProviderConfiguration>();
-  tracer_provider_config->processors.emplace_back(std::move(processor));
-  tracer_provider_config->sampler = std::move(sampler);
-
-  auto model             = std::make_unique<config_sdk::Configuration>();
-  model->tracer_provider = std::move(tracer_provider_config);
+  auto sampler                    = std::make_unique<config_sdk::AlwaysOffSamplerConfiguration>();
+  auto model                      = std::make_unique<config_sdk::Configuration>();
+  model->tracer_provider          = MakeTracerProviderConfig();
+  model->tracer_provider->sampler = std::move(sampler);
 
   CreateAndInstallSdk(model);
   ASSERT_NE(sdk_->tracer_provider, nullptr);
 
   trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
   ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
 
   EXPECT_EQ(span_buffer_->size(), 0);
 }
@@ -797,6 +800,7 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessor)
 
   trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
   ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
 
   EXPECT_GE(span_buffer_->size(), 1);
 }
@@ -811,6 +815,7 @@ TEST_F(ProgrammaticConfigTest, Propagators)
   propagator_config->composite.emplace_back("baggage");
   propagator_config->composite.emplace_back("b3");
   propagator_config->composite.emplace_back("b3multi");
+  propagator_config->composite.emplace_back("jaeger");
 
   auto model             = std::make_unique<config_sdk::Configuration>();
   model->tracer_provider = MakeTracerProviderConfig();
@@ -837,7 +842,8 @@ TEST_F(ProgrammaticConfigTest, Propagators)
   const std::string &traceparent = carrier.map().at("traceparent");
   EXPECT_EQ(traceparent.size(), 55U);
   EXPECT_EQ(traceparent.substr(0, 3), "00-");
-  EXPECT_NE(carrier.map().find("baggage"), carrier.map().end());       // baggage
-  EXPECT_NE(carrier.map().find("b3"), carrier.map().end());            // b3 single
-  EXPECT_NE(carrier.map().find("X-B3-TraceId"), carrier.map().end());  // b3multi
+  EXPECT_NE(carrier.map().find("baggage"), carrier.map().end());        // baggage
+  EXPECT_NE(carrier.map().find("b3"), carrier.map().end());             // b3 single
+  EXPECT_NE(carrier.map().find("X-B3-TraceId"), carrier.map().end());   // b3multi
+  EXPECT_NE(carrier.map().find("uber-trace-id"), carrier.map().end());  // jaeger
 }
