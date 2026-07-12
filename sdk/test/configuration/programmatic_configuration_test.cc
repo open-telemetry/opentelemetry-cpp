@@ -83,6 +83,7 @@
 #include "opentelemetry/sdk/configuration/meter_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
@@ -656,8 +657,8 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithViews)
   explicit_histogram_view->stream   = std::move(explicit_histogram_stream);
 
   // View 3: no aggregation set
-  auto default_stream = std::make_unique<config_sdk::ViewStreamConfiguration>();
-  // default_stream->aggregation = intentionally not set
+  auto default_stream         = std::make_unique<config_sdk::ViewStreamConfiguration>();
+  default_stream->aggregation = nullptr;  // intentionally null
 
   auto default_selector             = std::make_unique<config_sdk::ViewSelectorConfiguration>();
   default_selector->instrument_type = config_sdk::InstrumentType::counter;
@@ -782,6 +783,24 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithSampler)
   ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
 
   EXPECT_EQ(span_buffer_->size(), 0);
+}
+
+TEST_F(ProgrammaticConfigTest, TracerProviderWithParentBasedSamplerNullRoot)
+{
+  auto sampler                    = std::make_unique<config_sdk::ParentBasedSamplerConfiguration>();
+  sampler->root                   = nullptr;  // explicitly null
+  auto model                      = std::make_unique<config_sdk::Configuration>();
+  model->tracer_provider          = MakeTracerProviderConfig();
+  model->tracer_provider->sampler = std::move(sampler);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->tracer_provider, nullptr);
+
+  trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
+
+  EXPECT_EQ(span_buffer_->size(), 1);
 }
 
 TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessor)

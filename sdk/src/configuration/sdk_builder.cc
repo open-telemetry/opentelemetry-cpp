@@ -724,7 +724,8 @@ public:
     aggregation_type = opentelemetry::sdk::metrics::AggregationType::kSum;
   }
 
-  opentelemetry::sdk::metrics::AggregationType aggregation_type;
+  opentelemetry::sdk::metrics::AggregationType aggregation_type{
+      opentelemetry::sdk::metrics::AggregationType::kDefault};
   std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> aggregation_config;
 
 private:
@@ -853,7 +854,15 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateParentBase
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> local_parent_sampled_sdk;
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> local_parent_not_sampled_sdk;
 
-  auto root_sdk = SdkBuilder::CreateSampler(model->root);
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> root_sdk;
+  if (model->root)
+  {
+    root_sdk = SdkBuilder::CreateSampler(model->root);
+  }
+  else
+  {
+    root_sdk = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+  }
 
   if (model->remote_parent_sampled != nullptr)
   {
