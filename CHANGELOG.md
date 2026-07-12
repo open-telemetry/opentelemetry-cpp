@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Apply metric cardinality limits to non-overflow attribute sets and
+  reserve the overflow point separately.
+  [#4236](https://github.com/open-telemetry/opentelemetry-cpp/pull/4236)
+
 * [CODE HEALTH] Move otlp, zipkin and prometheus test classes into anonymous namespace
   [#4231](https://github.com/open-telemetry/opentelemetry-cpp/pull/4231)
 

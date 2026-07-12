@@ -10,7 +10,7 @@ cc_test(
     ],
     tags = [
         "test",
-        "trace",
+        "yaml",
     ],
     deps = [
         "//sdk:headers",
