@@ -215,18 +215,11 @@ private:
     {
       return true;
     }
-    // Determine if overflow entry already exists.
-    bool has_overflow = (hash_map_.find(GetOverflowAttributes()) != hash_map_.end());
-    // If overflow already present, total size already includes it; trigger overflow
-    // when current size (including overflow) is >= limit.
-    if (has_overflow)
-    {
-      return hash_map_.size() >= attributes_limit_;
-    }
-    // If overflow not present yet, simulate adding a new distinct key. If that
-    // would exceed the limit, we redirect to overflow instead of creating a
-    // new real attribute entry.
-    return (hash_map_.size() + 1) >= attributes_limit_;
+    // The configured limit applies to distinct non-overflow attribute sets.
+    // The overflow point is an additional reserved entry.
+    const bool has_overflow        = (hash_map_.find(GetOverflowAttributes()) != hash_map_.end());
+    const size_t non_overflow_size = hash_map_.size() - (has_overflow ? 1 : 0);
+    return non_overflow_size >= attributes_limit_;
   }
 };
 

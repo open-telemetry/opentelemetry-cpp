@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.28.0] 2026-07-11
+## [1.28.0] 2026-07-12
 
 * [RELEASE] Bump main branch to 1.28.0-dev
   [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)
@@ -326,6 +326,10 @@ Increment the:
 
 * [CI] Add `modernize-` and `cppcoreguidelines-pro-` checks to clang-tidy (#4238)
   [#4238](https://github.com/open-telemetry/opentelemetry-cpp/pull/4238)
+
+* [SDK] Apply metric cardinality limits to non-overflow attribute sets and
+  reserve the overflow point separately.
+  [#4236](https://github.com/open-telemetry/opentelemetry-cpp/pull/4236)
 
 * [RELEASE] Release opentelemetry-cpp 1.28.0
   [#4233](https://github.com/open-telemetry/opentelemetry-cpp/pull/4233)
