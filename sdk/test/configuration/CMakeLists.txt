@@ -1,17 +1,16 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-add_executable(programmatic_configuration_test
-               programmatic_configuration_test.cc)
-target_link_libraries(
-  programmatic_configuration_test
-  PRIVATE ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-          opentelemetry_configuration_core opentelemetry_trace
-          opentelemetry_logs opentelemetry_metrics)
-gtest_add_tests(
-  TARGET programmatic_configuration_test
-  TEST_PREFIX configuration_core.
-  TEST_LIST programmatic_configuration_test)
+foreach(testname sdk_builder_test programmatic_configuration_test)
+  add_executable(${testname} "${testname}.cc")
+  target_link_libraries(
+    ${testname} PRIVATE ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+                        opentelemetry_configuration_core)
+  gtest_add_tests(
+    TARGET ${testname}
+    TEST_PREFIX config.
+    TEST_LIST ${testname})
+endforeach()
 
 if(WITH_CONFIGURATION)
   foreach(
@@ -24,11 +23,12 @@ if(WITH_CONFIGURATION)
     yaml_trace_test
     yaml_distribution_test)
     add_executable(${testname} "${testname}.cc")
-    target_link_libraries(${testname} ${GTEST_BOTH_LIBRARIES}
-                          ${CMAKE_THREAD_LIBS_INIT} opentelemetry_configuration)
+    target_link_libraries(
+      ${testname} PRIVATE ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+                          opentelemetry_configuration)
     gtest_add_tests(
       TARGET ${testname}
-      TEST_PREFIX trace.
+      TEST_PREFIX config.
       TEST_LIST ${testname})
   endforeach()
 endif()
