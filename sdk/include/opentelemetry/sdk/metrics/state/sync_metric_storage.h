@@ -247,12 +247,10 @@ private:
     }
     const size_t limit      = aggregation_config_->cardinality_limit_;
     const bool has_overflow = active_keys_.find(GetOverflowAttributes()) != active_keys_.end();
-    // Mirror AttributesHashMap::IsOverflowAttributes() exactly. When the
-    // overflow slot is already counted in active_keys_, only route to
-    // overflow when total active keys reach the limit. Otherwise simulate
-    // adding the overflow slot too, matching the (size + 1) >= limit branch.
-    const bool would_overflow =
-        has_overflow ? (active_keys_.size() >= limit) : (active_keys_.size() + 1 >= limit);
+    // Mirror AttributesHashMap::IsOverflowAttributes() exactly. The configured
+    // limit applies to non-overflow attribute sets, while overflow is reserved.
+    const size_t non_overflow_size = active_keys_.size() - (has_overflow ? 1 : 0);
+    const bool would_overflow      = non_overflow_size >= limit;
     if (would_overflow)
     {
       active_keys_.insert(GetOverflowAttributes());
