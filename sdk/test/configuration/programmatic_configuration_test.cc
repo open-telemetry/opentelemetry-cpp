@@ -470,7 +470,7 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithDefaults)
 TEST_F(ProgrammaticConfigTest, LoggerProviderWithLogRecordLimits)
 {
   config_sdk::LogRecordLimitsConfiguration limits{
-      0, 0};  // TODO: Remove the default initialization once the limit members are initalized.
+      0, 0};  // TODO: Remove the default initialization once the limit members are initialized.
   limits.attribute_count_limit        = 2;
   limits.attribute_value_length_limit = 5;
 

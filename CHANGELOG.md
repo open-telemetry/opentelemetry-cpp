@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Programmatic configuration use case tests and fixes
+  [#4243](https://github.com/open-telemetry/opentelemetry-cpp/pull/4243)
+
 * [SDK] Apply metric cardinality limits to non-overflow attribute sets and
   reserve the overflow point separately.
   [#4236](https://github.com/open-telemetry/opentelemetry-cpp/pull/4236)
