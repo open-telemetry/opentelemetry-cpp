@@ -46,7 +46,7 @@ AggregationTemporality MetricCollector::GetAggregationTemporality(
   return aggregation_temporality;
 }
 
-std::size_t MetricCollector::GetCardinalityLimit(InstrumentType instrument_type) noexcept
+std::size_t MetricCollector::GetCardinalityLimit(InstrumentType instrument_type) const noexcept
 {
   return metric_reader_->GetCardinalityLimit(instrument_type);
 }

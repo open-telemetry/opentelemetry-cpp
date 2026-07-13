@@ -41,16 +41,11 @@ public:
 
   /**
    * Get the cardinality limit for a given instrument type.
-   * Returns kAggregationCardinalityLimit (2000) by default.
    *
    * @param instrument_type The instrument type to get the limit for
    * @return The cardinality limit for the requested instrument type
    */
-  virtual std::size_t GetCardinalityLimit(InstrumentType instrument_type) noexcept
-  {
-    (void)instrument_type;
-    return kDefaultCardinalityLimit;
-  }
+  virtual std::size_t GetCardinalityLimit(InstrumentType instrument_type) const noexcept = 0;
 };
 
 /**
@@ -76,7 +71,7 @@ public:
   AggregationTemporality GetAggregationTemporality(
       InstrumentType instrument_type) noexcept override;
 
-  std::size_t GetCardinalityLimit(InstrumentType instrument_type) noexcept override;
+  std::size_t GetCardinalityLimit(InstrumentType instrument_type) const noexcept override;
 
   /**
    * The callback to be called for each metric exporter. This will only be those
