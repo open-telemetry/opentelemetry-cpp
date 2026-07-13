@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Implement configurable cardinality limit at view-level and
+  reader-level via `CardinalityLimits` struct and `SetCardinalityLimits()`/
+  `GetCardinalityLimit()` on `MetricReader`. Backwards-compatible addition;
+  existing behavior is unchanged.
+  [#3292](https://github.com/open-telemetry/opentelemetry-cpp/issues/3292)
+
 * [ETW] Ensure spans own their names until they are ended
   [#4247](https://github.com/open-telemetry/opentelemetry-cpp/pull/4247)
 
