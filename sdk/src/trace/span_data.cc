@@ -59,6 +59,7 @@ bool SetAttributeImpl(opentelemetry::sdk::common::AttributeMap &attribute_map,
       return false;  // There was an exception converting the value. Skip this attribute.
     }
     it->second = std::move(convert_result.first);
+    return true;
   }
   // The map is under the limit. Set the attribute (insert or assign).
   return attribute_map.SetAttribute(key, value, attribute_value_length_limit);
