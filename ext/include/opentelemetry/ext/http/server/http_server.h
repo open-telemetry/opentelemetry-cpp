@@ -3,7 +3,9 @@
 
 #pragma once
 
+#include <cerrno>
 #include <cstdint>
+#include <cstdlib>
 #include <functional>
 #include <list>
 #include <map>
@@ -433,7 +435,21 @@ protected:
         auto const contentLength = conn.request.headers.find("Content-Length");
         if (contentLength != conn.request.headers.end())
         {
-          conn.contentLength = atoi(contentLength->second.c_str());
+          char *lengthEnd     = nullptr;
+          errno               = 0;
+          auto const declared = std::strtol(contentLength->second.c_str(), &lengthEnd, 10);
+          // Reject a non-numeric, negative, or out-of-range Content-Length; tolerate trailing
+          // characters (e.g. optional whitespace) after a valid leading count.
+          if (errno != 0 || lengthEnd == contentLength->second.c_str() || declared < 0)
+          {
+            LOG_WARN("HttpServer: [%s] invalid Content-Length - %s", conn.request.client.c_str(),
+                     contentLength->second.c_str());
+            conn.response.code = 400;  // Bad Request
+            conn.keepalive     = false;
+            conn.state         = Connection::Processing;
+            continue;
+          }
+          conn.contentLength = static_cast<size_t>(declared);
         }
         else
         {

@@ -42,13 +42,13 @@ public:
   opentelemetry::sdk::metrics::AggregationTemporality GetAggregationTemporality(
       opentelemetry::sdk::metrics::InstrumentType) const noexcept override;
 
+private:
   bool OnForceFlush(std::chrono::microseconds) noexcept override;
 
   bool OnShutDown(std::chrono::microseconds) noexcept override;
 
   void OnInitialized() noexcept override;
 
-private:
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter_;
 };
 

@@ -892,6 +892,16 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.otlp.
     TEST_LIST otlp_log_recordable_test)
 
+  add_executable(otlp_populate_attribute_utils_test
+                 test/otlp_populate_attribute_utils_test.cc)
+  target_link_libraries(
+    otlp_populate_attribute_utils_test ${GTEST_BOTH_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
+  gtest_add_tests(
+    TARGET otlp_populate_attribute_utils_test
+    TEST_PREFIX exporter.otlp.
+    TEST_LIST otlp_populate_attribute_utils_test)
+
   add_executable(otlp_metrics_serialization_test
                  test/otlp_metrics_serialization_test.cc)
   target_link_libraries(
@@ -1215,7 +1225,11 @@ if(WITH_BENCHMARK)
 
   target_link_libraries(
     otlp_recordable_benchmark
-    PRIVATE opentelemetry_otlp_recordable opentelemetry_trace
-            opentelemetry_metrics opentelemetry_resources benchmark::benchmark
+    PRIVATE opentelemetry_otlp_recordable
+            opentelemetry_trace
+            opentelemetry_metrics
+            opentelemetry_resources
+            benchmark::benchmark
+            opentelemetry_test_common
             ${CMAKE_THREAD_LIBS_INIT})
 endif()

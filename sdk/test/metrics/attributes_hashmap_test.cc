@@ -82,6 +82,9 @@ TEST(AttributesHashMap, BasicTests)
   EXPECT_EQ(count, hash_map.Size());
 }
 
+namespace
+{
+
 class MetricAttributeMapHashForCollision
 {
 public:
@@ -180,6 +183,7 @@ TEST(AttributesHashMap, OverflowCardinalityLimitBehavior)
 
   // Size should be exactly 'limit' (no overflow yet)
   EXPECT_EQ(map.Size(), limit);
+  EXPECT_EQ(map.Get(GetOverflowAttributes()), nullptr);
 
   // Insert one more distinct attribute; this should not increase the real attributes count
   MetricAttributes overflow_trigger = {{"k", "overflow"}};
@@ -187,9 +191,9 @@ TEST(AttributesHashMap, OverflowCardinalityLimitBehavior)
                       []() { return std::unique_ptr<Aggregation>(new DropAggregation()); })
       ->Aggregate(static_cast<int64_t>(1));
 
-  EXPECT_EQ(map.Size(), limit);
+  EXPECT_EQ(map.Size(), limit + 1);
 
-  // Insert several more unique attributes - size must remain constant (limit)
+  // Insert several more unique attributes - size must remain constant (limit + overflow)
   for (size_t i = 0; i < limit - 1; ++i)
   {
     MetricAttributes extra_attr = {{"k", std::string("extra") + std::to_string(i)}};
@@ -197,13 +201,13 @@ TEST(AttributesHashMap, OverflowCardinalityLimitBehavior)
                         []() { return std::unique_ptr<Aggregation>(new DropAggregation()); })
         ->Aggregate(static_cast<int64_t>(1));
   }
-  EXPECT_EQ(map.Size(), limit);
+  EXPECT_EQ(map.Size(), limit + 1);
 
   // Ensure overflow key was actually created and accessible via Get
-  EXPECT_NE(map.Get(kOverflowAttributes), nullptr);
+  EXPECT_NE(map.Get(GetOverflowAttributes()), nullptr);
 
   // Ensure original real attributes still present
-  for (size_t i = 0; i < limit - 1; ++i)
+  for (size_t i = 0; i < limit; ++i)
   {
     MetricAttributes attr = {{"k", std::to_string(i)}};
     EXPECT_NE(map.Get(attr), nullptr);
@@ -216,10 +220,12 @@ TEST(AttributesHashMap, OverflowCardinalityLimitBehavior)
     return true;
   });
   EXPECT_EQ(map_copy.Size(), map.Size());
-  EXPECT_NE(map_copy.Get(kOverflowAttributes), nullptr);
-  for (size_t i = 0; i < limit - 1; ++i)
+  EXPECT_NE(map_copy.Get(GetOverflowAttributes()), nullptr);
+  for (size_t i = 0; i < limit; ++i)
   {
     MetricAttributes attr = {{"k", std::to_string(i)}};
     EXPECT_NE(map_copy.Get(attr), nullptr);
   }
 }
+
+}  // namespace

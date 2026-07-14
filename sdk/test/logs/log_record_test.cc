@@ -85,6 +85,9 @@ TEST(ReadWriteLogRecord, SetAndGet)
   ASSERT_EQ(record.GetTimestamp().time_since_epoch(), now.time_since_epoch());
 }
 
+namespace
+{
+
 // Define a basic Logger class
 class TestBodyLogger : public opentelemetry::logs::Logger
 {
@@ -343,3 +346,5 @@ TEST(LogBody, BodyConversation)
     }
   }
 }
+
+}  // namespace

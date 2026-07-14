@@ -57,6 +57,8 @@ namespace otlp
 
 namespace resource = opentelemetry::sdk::resource;
 
+namespace
+{
 class ProtobufGlobalSymbolGuard
 {
 public:
@@ -67,6 +69,7 @@ public:
   ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
   ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
 };
+}  // namespace
 
 static std::tm GetLocalTime(std::chrono::system_clock::time_point tp)
 {
@@ -128,7 +131,7 @@ static std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable(
     const resource::Resource &resource,
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope)
 {
-  OtlpRecordable *recordable = new OtlpRecordable();
+  auto recordable = std::make_unique<OtlpRecordable>();
   recordable->SetResource(resource);
   recordable->SetInstrumentationScope(instrumentation_scope);
 
@@ -156,16 +159,17 @@ static std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable(
     recordable->SetIdentity(span_context, parent_span_id);
   }
 
-  return std::unique_ptr<opentelemetry::sdk::trace::Recordable>(recordable);
+  // We should not depends NRVO of compilers, so do not return std::move(recordable) or recordable.
+  return {std::move(recordable)};
 }
 
 TEST(OtlpFileClientTest, Shutdown)
 {
   opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request;
-  auto client = std::unique_ptr<opentelemetry::exporter::otlp::OtlpFileClient>(
-      new opentelemetry::exporter::otlp::OtlpFileClient(
+  std::unique_ptr<opentelemetry::exporter::otlp::OtlpFileClient> client =
+      std::make_unique<opentelemetry::exporter::otlp::OtlpFileClient>(
           opentelemetry::exporter::otlp::OtlpFileClientOptions(),
-          opentelemetry::exporter::otlp::OtlpFileClientRuntimeOptions()));
+          opentelemetry::exporter::otlp::OtlpFileClientRuntimeOptions());
   ASSERT_FALSE(client->IsShutdown());
   ASSERT_TRUE(client->Shutdown());
   ASSERT_TRUE(client->IsShutdown());
@@ -191,8 +195,8 @@ TEST(OtlpFileClientTest, ExportToOstreamTest)
   opentelemetry::exporter::otlp::OtlpFileClientRuntimeOptions rt_opts;
   opts.backend_options = std::ref(output_stream);
 
-  auto client = std::unique_ptr<opentelemetry::exporter::otlp::OtlpFileClient>(
-      new opentelemetry::exporter::otlp::OtlpFileClient(std::move(opts), std::move(rt_opts)));
+  auto client = std::make_unique<opentelemetry::exporter::otlp::OtlpFileClient>(std::move(opts),
+                                                                                std::move(rt_opts));
   client->Export(request, 1);
 
   {
@@ -266,8 +270,6 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateIndexTest)
   opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request;
   OtlpRecordableUtils::PopulateRequest(MakeSpan(recordable), &request);
 
-  std::stringstream output_stream;
-
   // Clear old files
   {
     std::fstream clear_file1("otlp_file_client_test_dir/trace-1.jsonl",
@@ -291,8 +293,8 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateIndexTest)
   opentelemetry::exporter::otlp::OtlpFileClientRuntimeOptions rt_opts;
   opts.backend_options = backend_opts;
 
-  auto client = std::unique_ptr<opentelemetry::exporter::otlp::OtlpFileClient>(
-      new opentelemetry::exporter::otlp::OtlpFileClient(std::move(opts), std::move(rt_opts)));
+  auto client = std::make_unique<opentelemetry::exporter::otlp::OtlpFileClient>(std::move(opts),
+                                                                                std::move(rt_opts));
 
   // Write 5 records with rotatation index 1,2,3,1,2
   for (int i = 0; i < 4; ++i)
@@ -304,16 +306,12 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateIndexTest)
   client->ForceFlush();
 
   std::unique_ptr<std::ifstream> input_file[5] = {
-      std::unique_ptr<std::ifstream>(
-          new std::ifstream("otlp_file_client_test_dir/trace-1.jsonl", std::ios::in)),
-      std::unique_ptr<std::ifstream>(
-          new std::ifstream("otlp_file_client_test_dir/trace-2.jsonl", std::ios::in)),
-      std::unique_ptr<std::ifstream>(
-          new std::ifstream("otlp_file_client_test_dir/trace-3.jsonl", std::ios::in)),
-      std::unique_ptr<std::ifstream>(
-          new std::ifstream("otlp_file_client_test_dir/trace-4.jsonl", std::ios::in)),
-      std::unique_ptr<std::ifstream>(
-          new std::ifstream("otlp_file_client_test_dir/trace-latest.jsonl", std::ios::in))};
+      std::make_unique<std::ifstream>("otlp_file_client_test_dir/trace-1.jsonl", std::ios::in),
+      std::make_unique<std::ifstream>("otlp_file_client_test_dir/trace-2.jsonl", std::ios::in),
+      std::make_unique<std::ifstream>("otlp_file_client_test_dir/trace-3.jsonl", std::ios::in),
+      std::make_unique<std::ifstream>("otlp_file_client_test_dir/trace-4.jsonl", std::ios::in),
+      std::make_unique<std::ifstream>("otlp_file_client_test_dir/trace-latest.jsonl",
+                                      std::ios::in)};
 
   EXPECT_TRUE(input_file[0]->is_open());
   EXPECT_TRUE(input_file[1]->is_open());
@@ -401,8 +399,6 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateByTimeTest)
   opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request;
   OtlpRecordableUtils::PopulateRequest(MakeSpan(recordable), &request);
 
-  std::stringstream output_stream;
-
   opentelemetry::exporter::otlp::OtlpFileClientFileSystemOptions backend_opts;
   backend_opts.file_pattern  = "otlp_file_client_test_dir/trace-%Y-%m-%d-%H-%M-%S.jsonl";
   backend_opts.alias_pattern = "";
@@ -413,8 +409,8 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateByTimeTest)
   opentelemetry::exporter::otlp::OtlpFileClientRuntimeOptions rt_opts;
   opts.backend_options = backend_opts;
 
-  auto client = std::unique_ptr<opentelemetry::exporter::otlp::OtlpFileClient>(
-      new opentelemetry::exporter::otlp::OtlpFileClient(std::move(opts), std::move(rt_opts)));
+  auto client = std::make_unique<opentelemetry::exporter::otlp::OtlpFileClient>(std::move(opts),
+                                                                                std::move(rt_opts));
 
   auto start_time = std::chrono::system_clock::now();
   client->Export(request, 1);
@@ -433,8 +429,7 @@ TEST(OtlpFileClientTest, ExportToFileSystemRotateByTimeTest)
                   "otlp_file_client_test_dir/trace-%Y-%m-%d-%H-%M-%S.jsonl", &local_tm);
     start_time += std::chrono::seconds{1};
 
-    input_file[found_file_index] =
-        std::unique_ptr<std::ifstream>(new std::ifstream(file_path_buf, std::ios::in));
+    input_file[found_file_index] = std::make_unique<std::ifstream>(file_path_buf, std::ios::in);
     if (input_file[found_file_index]->is_open())
     {
       ++found_file_index;
@@ -522,8 +517,8 @@ TEST(OtlpFileClientTest, ConfigTest)
     opts.console_debug   = true;
     opts.backend_options = std::ref(std::cout);
 
-    auto client = std::unique_ptr<opentelemetry::exporter::otlp::OtlpFileClient>(
-        new opentelemetry::exporter::otlp::OtlpFileClient(std::move(opts), std::move(rt_opts)));
+    auto client = std::make_unique<opentelemetry::exporter::otlp::OtlpFileClient>(
+        std::move(opts), std::move(rt_opts));
 
     ASSERT_TRUE(client->GetOptions().console_debug);
     ASSERT_TRUE(opentelemetry::nostd::holds_alternative<std::reference_wrapper<std::ostream>>(
@@ -539,8 +534,8 @@ TEST(OtlpFileClientTest, ConfigTest)
     opts.console_debug   = false;
     opts.backend_options = backend_opts;
 
-    auto client = std::unique_ptr<opentelemetry::exporter::otlp::OtlpFileClient>(
-        new opentelemetry::exporter::otlp::OtlpFileClient(std::move(opts), std::move(rt_opts)));
+    auto client = std::make_unique<opentelemetry::exporter::otlp::OtlpFileClient>(
+        std::move(opts), std::move(rt_opts));
 
     ASSERT_FALSE(client->GetOptions().console_debug);
     ASSERT_TRUE(opentelemetry::nostd::holds_alternative<

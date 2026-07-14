@@ -59,6 +59,8 @@ namespace otlp
 namespace trace_api = opentelemetry::trace;
 namespace resource  = opentelemetry::sdk::resource;
 
+namespace
+{
 class ProtobufGlobalSymbolGuard
 {
 public:
@@ -69,6 +71,7 @@ public:
   ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
   ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
 };
+}  // namespace
 
 template <class T, size_t N>
 static nostd::span<T, N> MakeSpan(T (&array)[N])
@@ -76,6 +79,8 @@ static nostd::span<T, N> MakeSpan(T (&array)[N])
   return nostd::span<T, N>(array);
 }
 
+namespace
+{
 class OtlpFileExporterTestPeer : public ::testing::Test
 {
 public:
@@ -111,8 +116,8 @@ public:
     processor_opts.max_queue_size        = 5;
     processor_opts.schedule_delay_millis = std::chrono::milliseconds(256);
 
-    auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-        new sdk::trace::BatchSpanProcessor(std::move(exporter), processor_opts));
+    std::unique_ptr<sdk::trace::SpanProcessor> processor =
+        std::make_unique<sdk::trace::BatchSpanProcessor>(std::move(exporter), processor_opts);
     auto provider = nostd::shared_ptr<sdk::trace::TracerProvider>(
         new sdk::trace::TracerProvider(std::move(processor), resource));
 
@@ -183,10 +188,12 @@ public:
     }
   }
 };
+}  // namespace
 
 TEST(OtlpFileExporterTest, Shutdown)
 {
-  auto exporter = std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(new OtlpFileExporter());
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter =
+      std::make_unique<OtlpFileExporter>();
   ASSERT_TRUE(exporter->Shutdown());
 
   nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> spans = {};
