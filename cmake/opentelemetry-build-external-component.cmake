@@ -13,7 +13,7 @@ endfunction()
 # Enable building external components through otel-cpp build
 # The config options are
 #  - OPENTELEMETRY_EXTERNAL_COMPONENT_PATH - Setting local paths of the external
-# component. Multiple paths can be set by separating them with.
+# component. Multiple paths can be set by separating them with semicolons.
 
 # Add custom vendor component from local path
 # CMake option.
