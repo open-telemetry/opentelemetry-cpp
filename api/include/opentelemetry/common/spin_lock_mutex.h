@@ -35,16 +35,18 @@ constexpr int SPINLOCK_SLEEP_MS        = 1;
  * 2. A loop where the current thread yields control after checking the lock.
  * 3. Issuing a thread-sleep call before starting back in phase 1.
  *
- * This is meant to give a good balance of perofrmance and CPU consumption in
+ * This is meant to give a good balance of performance and CPU consumption in
  * practice.
  *
- * This mutex uses an incremental back-off strategy with the following phases:
- * 1. A tight spin-lock loop (pending: using hardware PAUSE/YIELD instructions)
- * 2. A loop where the current thread yields control after checking the lock.
- * 3. Issuing a thread-sleep call before starting back in phase 1.
- *
- * This is meant to give a good balance of perofrmance and CPU consumption in
- * practice.
+ * On Windows (`_MSC_VER`) the mutex is instead backed by a Slim Reader/Writer
+ * (SRW) lock. The generic back-off above falls back to
+ * `std::this_thread::sleep_for(SPINLOCK_SLEEP_MS)` (1 ms) once a thread fails to
+ * acquire the lock after spinning. On Windows sleep durations are rounded up to
+ * the system timer resolution, which defaults to ~15.6 ms; under contention this
+ * turns the intended ~1 ms back-off into a ~15 ms stall and produces a large
+ * tail latency (high p99). An SRWLOCK spins briefly and then parks the waiting
+ * thread on a kernel keyed event, waking it as soon as the lock is released,
+ * without depending on the timer resolution and without busy-spinning the CPU.
  *
  * This class implements the `BasicLockable` specification:
  * https://en.cppreference.com/w/cpp/named_req/BasicLockable
@@ -79,6 +81,26 @@ public:
 #endif
   }
 
+#if defined(_MSC_VER)
+  /**
+   * Attempts to lock the mutex.  Return immediately with `true` (success) or `false` (failure).
+   */
+  bool try_lock() noexcept { return TryAcquireSRWLockExclusive(&mutex_) != 0; }
+
+  /**
+   * Blocks until a lock can be obtained for the current thread.
+   *
+   * The SRWLOCK spins briefly and then parks the waiting thread until the lock is
+   * released, so a contended waiter does not sleep for a full timer quantum.
+   */
+  void lock() noexcept { AcquireSRWLockExclusive(&mutex_); }
+
+  /** Releases the lock held by the execution agent. Throws no exceptions. */
+  void unlock() noexcept { ReleaseSRWLockExclusive(&mutex_); }
+
+private:
+  SRWLOCK mutex_ = SRWLOCK_INIT;
+#else
   /**
    * Attempts to lock the mutex.  Return immediately with `true` (success) or `false` (failure).
    */
@@ -129,6 +151,7 @@ public:
 
 private:
   std::atomic<bool> flag_{false};
+#endif
 };
 
 }  // namespace common

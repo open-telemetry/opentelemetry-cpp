@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Back `SpinLockMutex` with an SRWLOCK on Windows to avoid the
+  `sleep_for(1ms)` back-off being rounded up to the ~15.6 ms system timer
+  resolution, which caused large tail latency (high p99) under contention.
+  [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
+
 * [SDK] Apply metric cardinality limits to non-overflow attribute sets and
   reserve the overflow point separately.
   [#4236](https://github.com/open-telemetry/opentelemetry-cpp/pull/4236)
