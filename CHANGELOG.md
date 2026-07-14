@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [ETW] Ensure spans own their names until they are ended
+
 * [SDK] Apply metric cardinality limits to non-overflow attribute sets and
   reserve the overflow point separately.
   [#4236](https://github.com/open-telemetry/opentelemetry-cpp/pull/4236)
