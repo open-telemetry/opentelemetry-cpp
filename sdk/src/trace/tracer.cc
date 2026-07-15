@@ -108,7 +108,7 @@ opentelemetry::trace::SpanContext GetSpanContext(const context::Context &context
     return *(*span_context);
   }
   return opentelemetry::trace::SpanContext::GetInvalid();
-};
+}
 
 }  // namespace
 

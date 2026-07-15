@@ -41,6 +41,7 @@
 namespace trace_api = opentelemetry::trace;
 namespace baggage   = opentelemetry::baggage;
 namespace common    = opentelemetry::common;
+namespace context   = opentelemetry::context;
 namespace nostd     = opentelemetry::nostd;
 namespace shim      = opentelemetry::opentracingshim;
 
@@ -138,8 +139,7 @@ TEST(ShimUtilsTest, MakeOptionsShim_EmptyRefs)
             common::SystemTimestamp{options.start_system_timestamp});
   ASSERT_EQ(options_shim.start_steady_time,
             common::SteadyTimestamp{options.start_steady_timestamp});
-  ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent),
-            trace_api::SpanContext::GetInvalid());
+  ASSERT_FALSE(nostd::get<context::Context>(options_shim.parent).HasKey(trace_api::kSpanKey));
 }
 
 TEST(ShimUtilsTest, MakeOptionsShim_InvalidSpanContext)
@@ -154,8 +154,8 @@ TEST(ShimUtilsTest, MakeOptionsShim_InvalidSpanContext)
             common::SystemTimestamp{options.start_system_timestamp});
   ASSERT_EQ(options_shim.start_steady_time,
             common::SteadyTimestamp{options.start_steady_timestamp});
-  ASSERT_EQ(nostd::get<trace_api::SpanContext>(options_shim.parent),
-            trace_api::SpanContext::GetInvalid());
+
+  ASSERT_FALSE(nostd::get<context::Context>(options_shim.parent).HasKey(trace_api::kSpanKey));
 }
 
 TEST(ShimUtilsTest, MakeOptionsShim_FirstChildOf)
