@@ -34,6 +34,11 @@ Increment the:
 * [CMAKE] Fix and test WITH_API_ONLY option
   [#4201](https://github.com/open-telemetry/opentelemetry-cpp/pull/4201)
 
+* [SDK] Span limits can now be configured through the TracerProvider interface
+        and declaritive configuration. When set, limits are enforced by the
+        SpanData and OtlpRecordables recordables used by the standard exporters
+  [#4232](https://github.com/open-telemetry/opentelemetry-cpp/pull/4232)
+
 * [API] Fix `TraceState::IsValidKey()` to comply with the W3C Trace Context
   Level 2, where keys containing `@` and keys with more than 241 characters
   before `@` or more than 14 characters after `@` are now accepted.

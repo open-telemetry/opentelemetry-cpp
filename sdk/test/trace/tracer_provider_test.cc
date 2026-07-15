@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <atomic>
+#include <cstddef>
+#include <cstdint>
+#include <future>
+#include <limits>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
-
-#include <atomic>
-#include <future>
-#include <thread>
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
@@ -26,6 +28,7 @@
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
@@ -35,7 +38,6 @@
 #include "opentelemetry/trace/tracer.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <stdint.h>
 #  include <initializer_list>
 #  include <map>
 #  include <unordered_map>
@@ -517,4 +519,67 @@ TEST(TracerProvider, UpdateTracerConfiguratorConcurrentStartSpan)
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   EXPECT_TRUE(tracer->Enabled());
 #endif
+}
+
+TEST(TracerProvider, SpanLimitsSpecDefaults)
+{
+  SpanLimits limits;
+  EXPECT_EQ(limits.attribute_count_limit, 128u);
+  EXPECT_EQ(limits.event_count_limit, 128u);
+  EXPECT_EQ(limits.link_count_limit, 128u);
+  EXPECT_EQ(limits.event_attribute_count_limit, 128u);
+  EXPECT_EQ(limits.link_attribute_count_limit, 128u);
+  EXPECT_EQ(limits.attribute_value_length_limit, (std::numeric_limits<std::size_t>::max)());
+}
+
+TEST(TracerProvider, SpanLimitsNoLimits)
+{
+  SpanLimits limits = SpanLimits::NoLimits();
+  EXPECT_EQ(limits.attribute_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+  EXPECT_EQ(limits.attribute_value_length_limit, (std::numeric_limits<std::size_t>::max)());
+  EXPECT_EQ(limits.event_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+  EXPECT_EQ(limits.link_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+  EXPECT_EQ(limits.event_attribute_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+  EXPECT_EQ(limits.link_attribute_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+}
+
+TEST(TracerProvider, SpanLimitsTracerProviderFactoryCreate)
+{
+  SpanLimits limits;
+  limits.attribute_count_limit        = 5;
+  limits.attribute_value_length_limit = 10;
+  limits.event_count_limit            = 3;
+  limits.link_count_limit             = 2;
+  limits.event_attribute_count_limit  = 4;
+  limits.link_attribute_count_limit   = 4;
+
+  auto provider = TracerProviderFactory::Create(
+      std::make_unique<SimpleSpanProcessor>(nullptr), Resource::Create({}),
+      std::make_unique<AlwaysOnSampler>(), std::make_unique<RandomIdGenerator>(),
+      std::make_unique<ScopeConfigurator<TracerConfig>>(
+          ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default()).Build()),
+      limits);
+
+  const auto &stored = provider->GetSpanLimits();
+  EXPECT_EQ(stored.attribute_count_limit, limits.attribute_count_limit);
+  EXPECT_EQ(stored.attribute_value_length_limit, limits.attribute_value_length_limit);
+  EXPECT_EQ(stored.event_count_limit, limits.event_count_limit);
+  EXPECT_EQ(stored.link_count_limit, limits.link_count_limit);
+  EXPECT_EQ(stored.event_attribute_count_limit, limits.event_attribute_count_limit);
+  EXPECT_EQ(stored.link_attribute_count_limit, limits.link_attribute_count_limit);
+}
+
+TEST(TracerProvider, SpanLimitsTracerProviderFactoryCreateDefault)
+{
+  auto provider = TracerProviderFactory::Create(std::make_unique<SimpleSpanProcessor>(nullptr));
+
+  const auto no_limits = SpanLimits::NoLimits();
+
+  const auto &limits = provider->GetSpanLimits();
+  EXPECT_EQ(limits.attribute_count_limit, no_limits.attribute_count_limit);
+  EXPECT_EQ(limits.event_count_limit, no_limits.event_count_limit);
+  EXPECT_EQ(limits.link_count_limit, no_limits.link_count_limit);
+  EXPECT_EQ(limits.event_attribute_count_limit, no_limits.event_attribute_count_limit);
+  EXPECT_EQ(limits.link_attribute_count_limit, no_limits.link_attribute_count_limit);
+  EXPECT_EQ(limits.attribute_value_length_limit, no_limits.attribute_value_length_limit);
 }
