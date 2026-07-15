@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <cstddef>
+#include <cstdint>
 #include <fstream>
 #include <limits>
 #include <map>
@@ -1680,12 +1681,22 @@ std::unique_ptr<SpanLimitsConfiguration> ConfigurationParser::ParseSpanLimitsCon
 {
   auto model = std::make_unique<SpanLimitsConfiguration>();
 
+  const auto get_valid_uint32 = [&node](const std::string &name, std::size_t default_value) {
+    std::size_t value = node->GetInteger(name, default_value);
+    if (value > std::numeric_limits<std::uint32_t>::max())
+    {
+      std::string message = "Invalid value for " + name + ": " + std::to_string(value);
+      throw InvalidSchemaException(node->Location(), message);
+    }
+    return static_cast<uint32_t>(value);
+  };
+
   model->attribute_value_length_limit = node->GetInteger("attribute_value_length_limit", 4096);
-  model->attribute_count_limit        = node->GetInteger("attribute_count_limit", 128);
-  model->event_count_limit            = node->GetInteger("event_count_limit", 128);
-  model->link_count_limit             = node->GetInteger("link_count_limit", 128);
-  model->event_attribute_count_limit  = node->GetInteger("event_attribute_count_limit", 128);
-  model->link_attribute_count_limit   = node->GetInteger("link_attribute_count_limit", 128);
+  model->attribute_count_limit        = get_valid_uint32("attribute_count_limit", 128);
+  model->event_count_limit            = get_valid_uint32("event_count_limit", 128);
+  model->link_count_limit             = get_valid_uint32("link_count_limit", 128);
+  model->event_attribute_count_limit  = get_valid_uint32("event_attribute_count_limit", 128);
+  model->link_attribute_count_limit   = get_valid_uint32("link_attribute_count_limit", 128);
 
   return model;
 }
