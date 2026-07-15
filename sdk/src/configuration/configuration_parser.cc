@@ -1,11 +1,14 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <cstdlib>
 #include <cstddef>
 #include <fstream>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
@@ -20,6 +23,7 @@
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
@@ -135,6 +139,71 @@ namespace sdk
 {
 namespace configuration
 {
+
+namespace
+{
+
+int32_t ParseSignedIntegerValue(const std::unique_ptr<DocumentNode> &node,
+                                const std::string &name,
+                                int32_t default_value)
+{
+  auto child = node->GetChildNode(name);
+  if (!child)
+  {
+    return default_value;
+  }
+
+  std::string value = child->AsString();
+  if (value.empty())
+  {
+    return default_value;
+  }
+
+  errno = 0;
+  char *end = nullptr;
+  long long parsed = strtoll(value.c_str(), &end, 10);
+  if (errno == ERANGE || end != value.c_str() + value.size())
+  {
+    throw InvalidSchemaException(child->Location(), "Illegal integer value: " + value);
+  }
+
+  if (parsed < std::numeric_limits<int32_t>::min() ||
+      parsed > std::numeric_limits<int32_t>::max())
+  {
+    throw InvalidSchemaException(child->Location(), "Illegal integer value: " + value);
+  }
+
+  return static_cast<int32_t>(parsed);
+}
+
+size_t ParseUnsignedIntegerValue(const std::unique_ptr<DocumentNode> &node,
+                                 const std::string &name,
+                                 size_t default_value)
+{
+  auto child = node->GetChildNode(name);
+  if (!child)
+  {
+    return default_value;
+  }
+
+  std::string value = child->AsString();
+  if (value.empty())
+  {
+    return default_value;
+  }
+
+  errno = 0;
+  char *end = nullptr;
+  unsigned long long parsed = strtoull(value.c_str(), &end, 10);
+  if (errno == ERANGE || end != value.c_str() + value.size() || parsed > std::numeric_limits<size_t>::max())
+  {
+    throw InvalidSchemaException(child->Location(), "Illegal integer value: " + value);
+  }
+
+  return static_cast<size_t>(parsed);
+}
+
+}  // namespace
 
 // FIXME: proper sizing
 constexpr size_t MAX_SAMPLER_DEPTH = 10;
@@ -1348,9 +1417,24 @@ ConfigurationParser::ParseBase2ExponentialBucketHistogramAggregationConfiguratio
 {
   auto model = std::make_unique<Base2ExponentialBucketHistogramAggregationConfiguration>();
 
-  model->max_scale      = node->GetInteger("max_scale", 20);
-  model->max_size       = node->GetInteger("max_size", 160);
+  model->max_scale      = ParseSignedIntegerValue(*node, "max_scale", 20);
+  model->max_size       = ParseUnsignedIntegerValue(*node, "max_size",
+                                                    opentelemetry::sdk::metrics::kBase2ExponentialHistogramDefaultMaxSize);
   model->record_min_max = node->GetBoolean("record_min_max", true);
+
+  if (model->max_scale < opentelemetry::sdk::metrics::kBase2ExponentialHistogramMinScale ||
+      model->max_scale > opentelemetry::sdk::metrics::kBase2ExponentialHistogramMaxScale)
+  {
+    throw InvalidSchemaException(node->Location(),
+                                 "Illegal max_scale value: " + std::to_string(model->max_scale));
+  }
+
+  if (model->max_size < opentelemetry::sdk::metrics::kBase2ExponentialHistogramMinSize ||
+      model->max_size > opentelemetry::sdk::metrics::kBase2ExponentialHistogramMaxSize)
+  {
+    throw InvalidSchemaException(node->Location(),
+                                 "Illegal max_size value: " + std::to_string(model->max_size));
+  }
 
   return model;
 }

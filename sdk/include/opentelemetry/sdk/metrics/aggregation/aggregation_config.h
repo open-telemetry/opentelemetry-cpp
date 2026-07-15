@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <vector>
 
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -43,6 +44,12 @@ public:
   virtual ~AggregationConfig() = default;
 };
 
+static constexpr size_t kBase2ExponentialHistogramDefaultMaxSize = 160;
+static constexpr size_t kBase2ExponentialHistogramMinSize = 2;
+static constexpr size_t kBase2ExponentialHistogramMaxSize = 1024;
+static constexpr int32_t kBase2ExponentialHistogramMinScale = -10;
+static constexpr int32_t kBase2ExponentialHistogramMaxScale = 20;
+
 class HistogramAggregationConfig : public AggregationConfig
 {
 public:
@@ -69,8 +76,8 @@ public:
     return AggregationType::kBase2ExponentialHistogram;
   }
 
-  size_t max_buckets_  = 160;
-  int32_t max_scale_   = 20;
+  size_t max_size_     = kBase2ExponentialHistogramDefaultMaxSize;
+  int32_t max_scale_   = kBase2ExponentialHistogramMaxScale;
   bool record_min_max_ = true;
 };
 

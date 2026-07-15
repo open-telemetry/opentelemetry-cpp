@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"
 #include "opentelemetry/version.h"
@@ -23,7 +25,7 @@ public:
     visitor->VisitBase2ExponentialBucketHistogram(this);
   }
 
-  std::size_t max_scale{0};
+  std::int32_t max_scale{0};
   std::size_t max_size{0};
   bool record_min_max{false};
 };
