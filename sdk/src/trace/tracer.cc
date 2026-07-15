@@ -47,7 +47,7 @@ namespace
 {
 
 nostd::shared_ptr<NonRecordingSpan> MakeNonRecordingSpan(
-    opentelemetry::trace::SpanContext &&span_context)
+    opentelemetry::trace::SpanContext &&span_context) noexcept
 {
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
@@ -72,7 +72,7 @@ nostd::shared_ptr<Span> MakeSpan(std::shared_ptr<Tracer> &&tracer,
                                  const opentelemetry::trace::SpanContextKeyValueIterable &links,
                                  const opentelemetry::trace::StartSpanOptions &options,
                                  const opentelemetry::trace::SpanContext &parent_context,
-                                 opentelemetry::trace::SpanContext &&span_context)
+                                 opentelemetry::trace::SpanContext &&span_context) noexcept
 {
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try

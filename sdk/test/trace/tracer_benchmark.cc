@@ -73,7 +73,6 @@
 namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
 namespace scope_sdk = opentelemetry::sdk::instrumentationscope;
-namespace nostd     = opentelemetry::nostd;
 namespace context   = opentelemetry::context;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 

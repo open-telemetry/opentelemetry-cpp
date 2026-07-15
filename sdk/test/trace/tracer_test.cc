@@ -65,6 +65,8 @@ using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
 
+namespace
+{
 /**
  * A mock sampler with ShouldSample returning:
  *  Decision::RECORD_AND_SAMPLE if trace_id is valid
@@ -169,8 +171,6 @@ public:
   uint8_t buf_trace[16] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
 };
 
-namespace
-{
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(std::unique_ptr<SpanExporter> &&exporter)
 {
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));
