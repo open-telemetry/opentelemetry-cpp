@@ -79,11 +79,14 @@ using opentelemetry::exporter::memory::InMemorySpanExporter;
 namespace
 {
 
-constexpr std::size_t kStartSpanBatchSize = 2048;
-
 std::shared_ptr<trace_api::Tracer> CreateTracer(bool is_enabled = true)
 {
-  auto exporter  = std::make_unique<InMemorySpanExporter>(kStartSpanBatchSize);
+  // Set the batch size to 0 so the InMemorySpanExporter's circular buffer has a capcity of 1 and
+  // rejects the span from the first iteration. This will force destruction of the span in the
+  // timing loop consistently.
+  constexpr std::size_t kExporterBufferSize = 0;
+
+  auto exporter  = std::make_unique<InMemorySpanExporter>(kExporterBufferSize);
   auto processor = std::make_unique<trace_sdk::SimpleSpanProcessor>(std::move(exporter));
   std::vector<std::unique_ptr<trace_sdk::SpanProcessor>> processors;
   processors.push_back(std::move(processor));
