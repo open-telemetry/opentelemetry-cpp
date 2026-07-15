@@ -1173,14 +1173,11 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
   if (model->limits)
   {
     span_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
-    span_limits.attribute_count_limit =
-        static_cast<std::uint32_t>(model->limits->attribute_count_limit);
-    span_limits.event_count_limit = static_cast<std::uint32_t>(model->limits->event_count_limit);
-    span_limits.link_count_limit  = static_cast<std::uint32_t>(model->limits->link_count_limit);
-    span_limits.event_attribute_count_limit =
-        static_cast<std::uint32_t>(model->limits->event_attribute_count_limit);
-    span_limits.link_attribute_count_limit =
-        static_cast<std::uint32_t>(model->limits->link_attribute_count_limit);
+    span_limits.attribute_count_limit        = model->limits->attribute_count_limit;
+    span_limits.event_count_limit            = model->limits->event_count_limit;
+    span_limits.link_count_limit             = model->limits->link_count_limit;
+    span_limits.event_attribute_count_limit  = model->limits->event_attribute_count_limit;
+    span_limits.link_attribute_count_limit   = model->limits->link_attribute_count_limit;
   }
 
   if (model->tracer_configurator)

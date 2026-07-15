@@ -18,6 +18,7 @@
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
+#include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
@@ -591,6 +592,79 @@ tracer_provider:
   ASSERT_EQ(config->tracer_provider->limits->link_count_limit, 4444);
   ASSERT_EQ(config->tracer_provider->limits->event_attribute_count_limit, 5555);
   ASSERT_EQ(config->tracer_provider->limits->link_attribute_count_limit, 6666);
+}
+
+TEST(YamlTrace, limits_with_invalid_values)
+{
+  std::string invalid_attribute_count_yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_count_limit: 4294967296
+)";
+
+  std::string invalid_event_count_yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    event_count_limit: 4294967296
+)";
+
+  std::string invalid_link_count_yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    link_count_limit: 4294967296
+)";
+
+  std::string invalid_event_attribute_count_yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    event_attribute_count_limit: 4294967296
+)";
+
+  std::string invalid_link_attribute_count_yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    link_attribute_count_limit: 4294967296
+)";
+
+  auto config = DoParse(invalid_attribute_count_yaml);
+  EXPECT_TRUE(config == nullptr);
+
+  config = DoParse(invalid_event_count_yaml);
+  EXPECT_TRUE(config == nullptr);
+
+  config = DoParse(invalid_link_count_yaml);
+  EXPECT_TRUE(config == nullptr);
+
+  config = DoParse(invalid_event_attribute_count_yaml);
+  EXPECT_TRUE(config == nullptr);
+
+  config = DoParse(invalid_link_attribute_count_yaml);
+  EXPECT_TRUE(config == nullptr);
 }
 
 TEST(YamlTrace, no_sampler)
