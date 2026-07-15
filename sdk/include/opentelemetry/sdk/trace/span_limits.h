@@ -32,7 +32,7 @@ struct SpanLimits
   /// Maximum number of attributes per span.
   std::uint32_t attribute_count_limit{kDefaultAttributeCountLimit};
 
-  /// Maximum byte length of string and byte array attribute values.
+  /// Maximum allowed attribute value length (applies to string values and byte arrays)
   std::size_t attribute_value_length_limit{kDefaultAttributeValueLengthLimit};
 
   /// Maximum number of events per span.
