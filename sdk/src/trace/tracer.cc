@@ -46,7 +46,7 @@ namespace trace
 namespace
 {
 
-nostd::shared_ptr<NonRecordingSpan> MakeNonRecordingSpan(
+nostd::shared_ptr<opentelemetry::trace::Span> MakeNonRecordingSpan(
     opentelemetry::trace::SpanContext &&span_context) noexcept
 {
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
@@ -62,17 +62,18 @@ nostd::shared_ptr<NonRecordingSpan> MakeNonRecordingSpan(
   }
 #else
   return nostd::shared_ptr<opentelemetry::trace::Span>{
-      new (std::nothrow) NonRecordingSpan{std::move(span_context)}};
+      new (std::nothrow) NonRecordingSpan(std::move(span_context))};
 #endif
 }
 
-nostd::shared_ptr<Span> MakeSpan(std::shared_ptr<Tracer> &&tracer,
-                                 nostd::string_view name,
-                                 const opentelemetry::common::KeyValueIterable &attributes,
-                                 const opentelemetry::trace::SpanContextKeyValueIterable &links,
-                                 const opentelemetry::trace::StartSpanOptions &options,
-                                 const opentelemetry::trace::SpanContext &parent_context,
-                                 opentelemetry::trace::SpanContext &&span_context) noexcept
+nostd::shared_ptr<opentelemetry::trace::Span> MakeSpan(
+    std::shared_ptr<Tracer> &&tracer,
+    nostd::string_view name,
+    const opentelemetry::common::KeyValueIterable &attributes,
+    const opentelemetry::trace::SpanContextKeyValueIterable &links,
+    const opentelemetry::trace::StartSpanOptions &options,
+    const opentelemetry::trace::SpanContext &parent_context,
+    opentelemetry::trace::SpanContext &&span_context) noexcept
 {
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
