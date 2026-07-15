@@ -1,8 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdint.h>
 #include <chrono>
+#include <cstdint>
 #include <map>
 #include <mutex>
 #include <new>
@@ -23,6 +23,7 @@
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/context.h"
+#include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable.h"
@@ -34,7 +35,6 @@
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
 
-#include "src/trace/non_recording_span.h"
 #include "src/trace/span.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -53,7 +53,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> MakeNonRecordingSpan(
   try
   {
 #endif
-    return {std::make_shared<NonRecordingSpan>(std::move(span_context))};
+    return {std::make_shared<opentelemetry::trace::DefaultSpan>(std::move(span_context))};
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
   catch (const std::bad_alloc &)
@@ -62,7 +62,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> MakeNonRecordingSpan(
   }
 #else
   return nostd::shared_ptr<opentelemetry::trace::Span>{
-      new (std::nothrow) NonRecordingSpan(std::move(span_context))};
+      new (std::nothrow) opentelemetry::trace::DefaultSpan(std::move(span_context))};
 #endif
 }
 
@@ -117,8 +117,8 @@ Tracer::Tracer(std::shared_ptr<TracerContext> context,
     : instrumentation_scope_{std::move(instrumentation_scope)},
       context_{std::move(context)},
       tracer_config_(context_->GetTracerConfigurator().ComputeConfig(*instrumentation_scope_)),
-      noop_span_{
-          std::make_shared<NonRecordingSpan>(opentelemetry::trace::SpanContext::GetInvalid())}
+      noop_span_{std::make_shared<opentelemetry::trace::DefaultSpan>(
+          opentelemetry::trace::SpanContext::GetInvalid())}
 {
   UpdateEnabled(tracer_config_.IsEnabled());
 }
@@ -193,17 +193,9 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
       flags &= ~opentelemetry::trace::TraceFlags::kIsSampled;
     }
 
-#if 0
-  /* https://github.com/open-telemetry/opentelemetry-specification as of v1.29.0 */
-  /* Support W3C Trace Context version 1. */
-  flags &= opentelemetry::trace::TraceFlags::kAllW3CTraceContext1Flags;
-#endif
-
-#if 1
     /* Waiting for https://github.com/open-telemetry/opentelemetry-specification/issues/3411 */
     /* Support W3C Trace Context version 2. */
     flags &= opentelemetry::trace::TraceFlags::kAllW3CTraceContext2Flags;
-#endif
 
     return opentelemetry::trace::TraceFlags(flags);
   }();
