@@ -45,10 +45,21 @@ OtlpGrpcExporterOptions::OtlpGrpcExporterOptions()
   retry_policy_backoff_multiplier = GetOtlpDefaultTracesRetryBackoffMultiplier();
 }
 
-OtlpGrpcExporterOptions::OtlpGrpcExporterOptions(void *)
+OtlpGrpcExporterOptions::OtlpGrpcExporterOptions(void *) : OtlpGrpcClientOptions(nullptr)
 {
   use_ssl_credentials = true;
   max_threads         = 0;
+
+#ifdef ENABLE_ASYNC_EXPORT
+  max_concurrent_requests = 64;
+#endif
+}
+
+OtlpGrpcExporterOptions::OtlpGrpcExporterOptions(const OtlpGrpcClientOptions &client_options)
+    : OtlpGrpcClientOptions(client_options)
+{
+  timeout  = GetOtlpDefaultTracesTimeout();
+  metadata = GetOtlpDefaultTracesHeaders();
 
 #ifdef ENABLE_ASYNC_EXPORT
   max_concurrent_requests = 64;

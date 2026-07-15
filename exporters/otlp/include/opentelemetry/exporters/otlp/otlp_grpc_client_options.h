@@ -24,8 +24,14 @@ namespace otlp
 
 struct OtlpGrpcClientOptions
 {
-  virtual ~OtlpGrpcClientOptions()                                = default;
-  OtlpGrpcClientOptions()                                         = default;
+  virtual ~OtlpGrpcClientOptions();
+
+  /** Lookup environment variables, and populate spec-compliant defaults. */
+  OtlpGrpcClientOptions();
+
+  /** No defaults. */
+  explicit OtlpGrpcClientOptions(void *);
+
   OtlpGrpcClientOptions(const OtlpGrpcClientOptions &)            = default;
   OtlpGrpcClientOptions(OtlpGrpcClientOptions &&)                 = default;
   OtlpGrpcClientOptions &operator=(const OtlpGrpcClientOptions &) = default;

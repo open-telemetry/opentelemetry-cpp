@@ -18,6 +18,17 @@ Increment the:
 * docs: update supported development platforms
   [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
 
+* [EXPORTER] Populate `OtlpGrpcClientOptions` with spec-compliant environment
+  variable defaults, and add constructors to `OtlpGrpcExporterOptions` /
+  `OtlpGrpcMetricExporterOptions` / `OtlpGrpcLogRecordExporterOptions` that
+  build from a shared `OtlpGrpcClientOptions`, to support sharing one gRPC
+  client across the trace, metric, and log exporters.
+  [#4239](https://github.com/open-telemetry/opentelemetry-cpp/issues/4239)
+
+* [SDK] Apply metric cardinality limits to non-overflow attribute sets and
+  reserve the overflow point separately.
+  [#4236](https://github.com/open-telemetry/opentelemetry-cpp/pull/4236)
+
 * [RELEASE] Bump main branch to 1.29.0-dev
   [#4259](https://github.com/open-telemetry/opentelemetry-cpp/pull/4259)
 

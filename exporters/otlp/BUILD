@@ -77,6 +77,7 @@ cc_library(
     srcs = [
         "src/otlp_grpc_client.cc",
         "src/otlp_grpc_client_factory.cc",
+        "src/otlp_grpc_client_options.cc",
         "src/otlp_grpc_utils.cc",
     ],
     hdrs = [
@@ -99,6 +100,7 @@ cc_library(
     ],
     deps = [
         "//ext:headers",
+        "//sdk/src/common:env_variables",
         "//sdk/src/common:global_log_handler",
         "@com_github_grpc_grpc//:grpc++",
         "@com_github_opentelemetry_proto//:common_proto_cc",
@@ -729,6 +731,23 @@ cc_test(
     ],
     deps = [
         ":otlp_grpc_client",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_grpc_client_options_test",
+    srcs = ["test/otlp_grpc_client_options_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_grpc",
+        "test",
+    ],
+    deps = [
+        ":otlp_grpc_client",
+        ":otlp_grpc_exporter",
+        ":otlp_grpc_metric_exporter",
+        ":otlp_grpc_log_record_exporter",
         "@com_google_googletest//:gtest_main",
     ],
 )

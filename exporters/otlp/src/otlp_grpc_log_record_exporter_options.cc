@@ -46,9 +46,22 @@ OtlpGrpcLogRecordExporterOptions::OtlpGrpcLogRecordExporterOptions()
 }
 
 OtlpGrpcLogRecordExporterOptions::OtlpGrpcLogRecordExporterOptions(void *)
+    : OtlpGrpcClientOptions(nullptr)
 {
   use_ssl_credentials = true;
   max_threads         = 0;
+
+#ifdef ENABLE_ASYNC_EXPORT
+  max_concurrent_requests = 64;
+#endif
+}
+
+OtlpGrpcLogRecordExporterOptions::OtlpGrpcLogRecordExporterOptions(
+    const OtlpGrpcClientOptions &client_options)
+    : OtlpGrpcClientOptions(client_options)
+{
+  timeout  = GetOtlpDefaultLogsTimeout();
+  metadata = GetOtlpDefaultLogsHeaders();
 
 #ifdef ENABLE_ASYNC_EXPORT
   max_concurrent_requests = 64;
