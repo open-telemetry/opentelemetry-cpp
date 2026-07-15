@@ -4,7 +4,7 @@
 // clang-format off
 //
 // ~/build/sdk/test/trace/tracer_benchmark --benchmark_repetitions=5 --benchmark_display_aggregates_only=true
-// 2026-07-15T00:33:53+00:00
+// 2026-07-15T00:37:18+00:00
 // Running /home/devuser/build/sdk/test/trace/tracer_benchmark
 // Run on (32 X 5700 MHz CPU s)
 // CPU Caches:
@@ -12,35 +12,35 @@
 //   L1 Instruction 32 KiB (x16)
 //   L2 Unified 2048 KiB (x16)
 //   L3 Unified 36864 KiB (x1)
-// Load Average: 2.44, 3.34, 2.63
+// Load Average: 3.34, 3.81, 2.96
 // ***WARNING*** ASLR is enabled, the results may have unreproducible noise in them.
 // ---------------------------------------------------------------------------------------
 // Benchmark                                             Time             CPU   Iterations
 // ---------------------------------------------------------------------------------------
-// BM_StartSpanTracerDisabled_mean                    6.85 ns         6.85 ns            5
-// BM_StartSpanTracerDisabled_median                  6.84 ns         6.84 ns            5
-// BM_StartSpanTracerDisabled_stddev                 0.025 ns        0.023 ns            5
-// BM_StartSpanTracerDisabled_cv                      0.36 %          0.34 %             5
-// BM_StartSpan_mean                                   187 ns          187 ns            5
-// BM_StartSpan_median                                 187 ns          187 ns            5
-// BM_StartSpan_stddev                                1.22 ns         1.23 ns            5
-// BM_StartSpan_cv                                    0.65 %          0.66 %             5
-// BM_StartSpanWithScope_mean                          255 ns          255 ns            5
-// BM_StartSpanWithScope_median                        255 ns          255 ns            5
-// BM_StartSpanWithScope_stddev                       1.09 ns         1.11 ns            5
-// BM_StartSpanWithScope_cv                           0.43 %          0.44 %             5
-// BM_StartSpanWithImplicitParent_mean                 172 ns          172 ns            5
-// BM_StartSpanWithImplicitParent_median               172 ns          172 ns            5
-// BM_StartSpanWithImplicitParent_stddev             0.447 ns        0.447 ns            5
-// BM_StartSpanWithImplicitParent_cv                  0.26 %          0.26 %             5
-// BM_StartSpanWithExplicitParentContext_mean          173 ns          173 ns            5
-// BM_StartSpanWithExplicitParentContext_median        173 ns          173 ns            5
-// BM_StartSpanWithExplicitParentContext_stddev      0.343 ns        0.337 ns            5
-// BM_StartSpanWithExplicitParentContext_cv           0.20 %          0.20 %             5
-// BM_StartSpanWithExplicitRootContext_mean            187 ns          187 ns            5
-// BM_StartSpanWithExplicitRootContext_median          187 ns          187 ns            5
-// BM_StartSpanWithExplicitRootContext_stddev        0.679 ns        0.666 ns            5
-// BM_StartSpanWithExplicitRootContext_cv             0.36 %          0.36 %             5
+// BM_StartSpanTracerDisabled_mean                    5.24 ns         5.24 ns            5
+// BM_StartSpanTracerDisabled_median                  5.24 ns         5.24 ns            5
+// BM_StartSpanTracerDisabled_stddev                 0.046 ns        0.047 ns            5
+// BM_StartSpanTracerDisabled_cv                      0.89 %          0.89 %             5
+// BM_StartSpan_mean                                   152 ns          152 ns            5
+// BM_StartSpan_median                                 152 ns          152 ns            5
+// BM_StartSpan_stddev                                2.74 ns         2.74 ns            5
+// BM_StartSpan_cv                                    1.80 %          1.80 %             5
+// BM_StartSpanWithScope_mean                          218 ns          218 ns            5
+// BM_StartSpanWithScope_median                        217 ns          217 ns            5
+// BM_StartSpanWithScope_stddev                       1.75 ns         1.75 ns            5
+// BM_StartSpanWithScope_cv                           0.80 %          0.81 %             5
+// BM_StartSpanWithImplicitParent_mean                 153 ns          153 ns            5
+// BM_StartSpanWithImplicitParent_median               153 ns          153 ns            5
+// BM_StartSpanWithImplicitParent_stddev             0.802 ns        0.800 ns            5
+// BM_StartSpanWithImplicitParent_cv                  0.52 %          0.52 %             5
+// BM_StartSpanWithExplicitParentContext_mean          154 ns          154 ns            5
+// BM_StartSpanWithExplicitParentContext_median        154 ns          154 ns            5
+// BM_StartSpanWithExplicitParentContext_stddev      0.898 ns        0.899 ns            5
+// BM_StartSpanWithExplicitParentContext_cv           0.58 %          0.58 %             5
+// BM_StartSpanWithExplicitRootContext_mean            148 ns          148 ns            5
+// BM_StartSpanWithExplicitRootContext_median          148 ns          148 ns            5
+// BM_StartSpanWithExplicitRootContext_stddev        0.686 ns        0.688 ns            5
+// BM_StartSpanWithExplicitRootContext_cv             0.46 %          0.47 %             5
 //
 // clang-format on
 

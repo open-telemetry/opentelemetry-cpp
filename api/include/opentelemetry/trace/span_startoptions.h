@@ -59,7 +59,7 @@ struct StartSpanOptions
   // - If the `parent` field is not set, the newly created Span will inherit the
   // parent of the currently active Span (if any) in the current context.
   //
-  nostd::variant<SpanContext, context::Context> parent = SpanContext::GetInvalid();
+  nostd::variant<SpanContext, context::Context> parent = context::Context{};
 
   // TODO:
   // SpanContext remote_parent;

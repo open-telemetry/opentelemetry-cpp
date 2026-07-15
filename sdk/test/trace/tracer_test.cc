@@ -589,13 +589,9 @@ TEST(Tracer, StartSpanWithDisabledConfig)
                            new RandomIdGenerator(), disable_tracer);
   auto span   = tracer->StartSpan("span 1");
 
-  std::shared_ptr<opentelemetry::trace::Tracer> noop_tracer =
-      std::make_shared<opentelemetry::trace::NoopTracer>();
-  auto noop_span = noop_tracer->StartSpan("noop");
-  EXPECT_TRUE(span.get() == noop_span.get());
+  EXPECT_FALSE(span->IsRecording());
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  EXPECT_FALSE(noop_tracer->Enabled());
   EXPECT_FALSE(tracer->Enabled());
 #endif
 }
@@ -610,22 +606,15 @@ TEST(Tracer, StartSpanWithEnabledConfig)
                            new RandomIdGenerator(), enable_tracer);
   auto span   = tracer->StartSpan("span 1");
 
-  std::shared_ptr<opentelemetry::trace::Tracer> noop_tracer =
-      std::make_shared<opentelemetry::trace::NoopTracer>();
-  auto noop_span = noop_tracer->StartSpan("noop");
-  EXPECT_FALSE(span.get() == noop_span.get());
+  EXPECT_TRUE(span->IsRecording());
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  EXPECT_FALSE(noop_tracer->Enabled());
   EXPECT_TRUE(tracer->Enabled());
 #endif
 }
 
 TEST(Tracer, StartSpanWithCustomConfig)
 {
-  std::shared_ptr<opentelemetry::trace::Tracer> noop_tracer =
-      std::make_shared<opentelemetry::trace::NoopTracer>();
-  auto noop_span                = noop_tracer->StartSpan("noop");
   auto check_if_version_present = [](const InstrumentationScope &scope_info) {
     return !scope_info.GetVersion().empty();
   };
@@ -640,31 +629,30 @@ TEST(Tracer, StartSpanWithCustomConfig)
       initTracer(std::unique_ptr<SpanExporter>{new InMemorySpanExporter()}, new AlwaysOnSampler(),
                  new RandomIdGenerator(), custom_configurator);
   const auto span_default_scope = tracer_default_scope->StartSpan("span 1");
-  EXPECT_TRUE(span_default_scope == noop_span);
+  EXPECT_FALSE(span_default_scope->IsRecording());
 
   auto foo_scope = InstrumentationScope::Create("foo_library");
   const auto tracer_foo_scope =
       initTracer(std::unique_ptr<SpanExporter>{new InMemorySpanExporter()}, new AlwaysOnSampler(),
                  new RandomIdGenerator(), custom_configurator, std::move(foo_scope));
   const auto span_foo_scope = tracer_foo_scope->StartSpan("span 1");
-  EXPECT_TRUE(span_foo_scope == noop_span);
+  EXPECT_FALSE(span_foo_scope->IsRecording());
 
   auto foo_scope_with_version = InstrumentationScope::Create("foo_library", "1.0.0");
   const auto tracer_foo_scope_with_version =
       initTracer(std::unique_ptr<SpanExporter>{new InMemorySpanExporter()}, new AlwaysOnSampler(),
                  new RandomIdGenerator(), custom_configurator, std::move(foo_scope_with_version));
   const auto span_foo_scope_with_version = tracer_foo_scope_with_version->StartSpan("span 1");
-  EXPECT_FALSE(span_foo_scope_with_version == noop_span);
+  EXPECT_TRUE(span_foo_scope_with_version->IsRecording());
 
   auto bar_scope = InstrumentationScope::Create("bar_library");
   auto tracer_bar_scope =
       initTracer(std::unique_ptr<SpanExporter>{new InMemorySpanExporter()}, new AlwaysOnSampler(),
                  new RandomIdGenerator(), custom_configurator, std::move(bar_scope));
   auto span_bar_scope = tracer_bar_scope->StartSpan("span 1");
-  EXPECT_FALSE(span_bar_scope == noop_span);
+  EXPECT_TRUE(span_bar_scope->IsRecording());
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  EXPECT_FALSE(noop_tracer->Enabled());
   EXPECT_FALSE(tracer_default_scope->Enabled());
   EXPECT_FALSE(tracer_foo_scope->Enabled());
   EXPECT_TRUE(tracer_foo_scope_with_version->Enabled());
@@ -674,9 +662,6 @@ TEST(Tracer, StartSpanWithCustomConfig)
 
 TEST(Tracer, StartSpanWithCustomConfigDifferingConditionOrder)
 {
-  std::shared_ptr<opentelemetry::trace::Tracer> noop_tracer =
-      std::make_shared<opentelemetry::trace::NoopTracer>();
-  auto noop_span                = noop_tracer->StartSpan("noop");
   auto check_if_version_present = [](const InstrumentationScope &scope_info) {
     return !scope_info.GetVersion().empty();
   };
@@ -705,12 +690,12 @@ TEST(Tracer, StartSpanWithCustomConfigDifferingConditionOrder)
 
   // Custom configurator 1 evaluates version first and enables the tracer
   const auto span_foo_scope_with_version_1 = tracer_foo_scope_with_version_1->StartSpan("span 1");
-  EXPECT_FALSE(span_foo_scope_with_version_1 == noop_span);
+  EXPECT_TRUE(span_foo_scope_with_version_1->IsRecording());
 
   // Custom configurator 2 evaluates the name first and therefore disables the tracer without
   // evaluating other condition
   const auto span_foo_scope_with_version_2 = tracer_foo_scope_with_version_2->StartSpan("span 1");
-  EXPECT_TRUE(span_foo_scope_with_version_2 == noop_span);
+  EXPECT_FALSE(span_foo_scope_with_version_2->IsRecording());
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   EXPECT_TRUE(tracer_foo_scope_with_version_1->Enabled());
