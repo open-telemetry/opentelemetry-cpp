@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add Tracer::StartSpan benchmark and optimizations
+  [#4248](https://github.com/open-telemetry/opentelemetry-cpp/pull/4248)
+
 * [SDK] Apply metric cardinality limits to non-overflow attribute sets and
   reserve the overflow point separately.
   [#4236](https://github.com/open-telemetry/opentelemetry-cpp/pull/4236)
