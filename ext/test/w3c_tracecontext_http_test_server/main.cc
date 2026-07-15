@@ -3,9 +3,9 @@
 
 #include <ctype.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <atomic>
 #include <chrono>
+#include <cstdlib>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
   {
-    port = static_cast<uint16_t>(atoi(argv[1]));
+    port = static_cast<uint16_t>(std::strtol(argv[1], nullptr, 10));
   }
 
   auto root_span = get_tracer()->StartSpan(__func__);

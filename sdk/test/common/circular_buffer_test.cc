@@ -23,7 +23,11 @@ using opentelemetry::sdk::common::AtomicUniquePtr;
 using opentelemetry::sdk::common::CircularBuffer;
 using opentelemetry::sdk::common::CircularBufferRange;
 
-static thread_local std::mt19937 RandomNumberGenerator{std::random_device{}()};
+static std::mt19937 &RandomNumberGenerator()
+{
+  static thread_local std::mt19937 generator{std::random_device{}()};
+  return generator;
+}
 
 static void GenerateRandomNumbers(CircularBuffer<uint32_t> &buffer,
                                   std::vector<uint32_t> &numbers,
@@ -31,7 +35,7 @@ static void GenerateRandomNumbers(CircularBuffer<uint32_t> &buffer,
 {
   for (int i = 0; i < n; ++i)
   {
-    auto value = static_cast<uint32_t>(RandomNumberGenerator());
+    auto value = static_cast<uint32_t>(RandomNumberGenerator()());
     std::unique_ptr<uint32_t> x{new uint32_t{value}};
     if (buffer.Add(x))
     {
@@ -73,7 +77,8 @@ static void RunNumberConsumer(CircularBuffer<uint32_t> &buffer,
     {
       return;
     }
-    auto n = std::uniform_int_distribution<size_t>{0, buffer.Peek().size()}(RandomNumberGenerator);
+    auto n =
+        std::uniform_int_distribution<size_t>{0, buffer.Peek().size()}(RandomNumberGenerator());
     buffer.Consume(n, [&](CircularBufferRange<AtomicUniquePtr<uint32_t>> range) noexcept {
       assert(range.size() == n);
       range.ForEach([&](AtomicUniquePtr<uint32_t> &ptr) noexcept {

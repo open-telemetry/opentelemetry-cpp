@@ -62,7 +62,7 @@ size_t GetBenchmarkThreads()
   const char *env = std::getenv("BENCHMARK_THREADS");
   if (env != nullptr && env[0] != '\0')
   {
-    int val = std::atoi(env);
+    int val = static_cast<int>(std::strtol(env, nullptr, 10));
     if (val > 0)
     {
       return static_cast<size_t>(val);

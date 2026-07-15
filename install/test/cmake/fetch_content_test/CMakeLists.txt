@@ -4,7 +4,8 @@
 # This test uses CMake's FetchContent module to build opentelemetry-cpp from src
 # and make its targets available within an external project.
 
-cmake_minimum_required(VERSION 3.16)
+# CMake 3.18+ is required to build curl 8.21.0+
+cmake_minimum_required(VERSION 3.18)
 
 project(opentelemetry-cpp-fetch-content-test LANGUAGES CXX)
 

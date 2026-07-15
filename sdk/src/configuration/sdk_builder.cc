@@ -16,6 +16,7 @@
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/context/propagation/composite_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -64,6 +65,7 @@
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
@@ -133,6 +135,7 @@
 #include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
@@ -190,6 +193,68 @@ using common::WildcardMatch;
 
 namespace
 {
+
+static opentelemetry::logs::Severity ToLogSeverity(
+    opentelemetry::sdk::configuration::SeverityNumber severity_number)
+{
+  // Convert configuration::SeverityNumber to opentelemetry::logs::Severity
+  // The configuration::SeverityNumber enum values do not match the opentelemetry::logs::Severity
+  // enum values use a switch statement for conversion.
+  switch (severity_number)
+  {
+    case SeverityNumber::trace:
+      return opentelemetry::logs::Severity::kTrace;
+    case SeverityNumber::trace2:
+      return opentelemetry::logs::Severity::kTrace2;
+    case SeverityNumber::trace3:
+      return opentelemetry::logs::Severity::kTrace3;
+    case SeverityNumber::trace4:
+      return opentelemetry::logs::Severity::kTrace4;
+    case SeverityNumber::debug:
+      return opentelemetry::logs::Severity::kDebug;
+    case SeverityNumber::debug2:
+      return opentelemetry::logs::Severity::kDebug2;
+    case SeverityNumber::debug3:
+      return opentelemetry::logs::Severity::kDebug3;
+    case SeverityNumber::debug4:
+      return opentelemetry::logs::Severity::kDebug4;
+    case SeverityNumber::info:
+      return opentelemetry::logs::Severity::kInfo;
+    case SeverityNumber::info2:
+      return opentelemetry::logs::Severity::kInfo2;
+    case SeverityNumber::info3:
+      return opentelemetry::logs::Severity::kInfo3;
+    case SeverityNumber::info4:
+      return opentelemetry::logs::Severity::kInfo4;
+    case SeverityNumber::warn:
+      return opentelemetry::logs::Severity::kWarn;
+    case SeverityNumber::warn2:
+      return opentelemetry::logs::Severity::kWarn2;
+    case SeverityNumber::warn3:
+      return opentelemetry::logs::Severity::kWarn3;
+    case SeverityNumber::warn4:
+      return opentelemetry::logs::Severity::kWarn4;
+    case SeverityNumber::error:
+      return opentelemetry::logs::Severity::kError;
+    case SeverityNumber::error2:
+      return opentelemetry::logs::Severity::kError2;
+    case SeverityNumber::error3:
+      return opentelemetry::logs::Severity::kError3;
+    case SeverityNumber::error4:
+      return opentelemetry::logs::Severity::kError4;
+    case SeverityNumber::fatal:
+      return opentelemetry::logs::Severity::kFatal;
+    case SeverityNumber::fatal2:
+      return opentelemetry::logs::Severity::kFatal2;
+    case SeverityNumber::fatal3:
+      return opentelemetry::logs::Severity::kFatal3;
+    case SeverityNumber::fatal4:
+      return opentelemetry::logs::Severity::kFatal4;
+    default:
+      break;
+  }
+  return opentelemetry::logs::Severity::kInvalid;
+}
 
 class ResourceAttributeValueSetter
     : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor
@@ -1874,15 +1939,17 @@ SdkBuilder::CreateLoggerConfigurator(
   using opentelemetry::sdk::instrumentationscope::ScopeConfigurator;
   using opentelemetry::sdk::logs::LoggerConfig;
 
-  LoggerConfig default_config =
-      model->default_config.enabled ? LoggerConfig::Enabled() : LoggerConfig::Disabled();
+  LoggerConfig default_config = LoggerConfig::Create(
+      model->default_config.enabled, ToLogSeverity(model->default_config.minimum_severity),
+      model->default_config.trace_based);
 
   auto builder = ScopeConfigurator<LoggerConfig>::Builder(default_config);
 
   for (const auto &entry : model->loggers)
   {
     LoggerConfig entry_config =
-        entry.config.enabled ? LoggerConfig::Enabled() : LoggerConfig::Disabled();
+        LoggerConfig::Create(entry.config.enabled, ToLogSeverity(entry.config.minimum_severity),
+                             entry.config.trace_based);
     std::string pattern = entry.name;
     builder.AddCondition(
         [pattern](const InstrumentationScope &scope) {
@@ -1907,19 +1974,33 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
     sdk_processors.push_back(CreateLogRecordProcessor(processor_model));
   }
 
-  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3303
-  // FIXME-SDK: use limits
+  opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
+  if (model->limits)
+  {
+    log_record_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
+    log_record_limits.attribute_count_limit        = model->limits->attribute_count_limit;
+  }
+
+  std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+      opentelemetry::sdk::logs::LoggerConfig>>
+      logger_configurator;
   if (model->logger_configurator)
   {
-    auto logger_configurator = CreateLoggerConfigurator(model->logger_configurator);
-    sdk                      = opentelemetry::sdk::logs::LoggerProviderFactory::Create(
-        std::move(sdk_processors), resource, std::move(logger_configurator));
+    logger_configurator = CreateLoggerConfigurator(model->logger_configurator);
   }
   else
   {
-    sdk = opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(sdk_processors),
-                                                                  resource);
+    logger_configurator =
+        std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+            opentelemetry::sdk::logs::LoggerConfig>>(
+            opentelemetry::sdk::instrumentationscope::
+                ScopeConfigurator<opentelemetry::sdk::logs::LoggerConfig>::Builder(
+                    opentelemetry::sdk::logs::LoggerConfig::Default())
+                    .Build());
   }
+
+  sdk = opentelemetry::sdk::logs::LoggerProviderFactory::Create(
+      std::move(sdk_processors), resource, std::move(logger_configurator), log_record_limits);
 
   return sdk;
 }

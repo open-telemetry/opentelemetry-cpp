@@ -27,6 +27,9 @@ using namespace opentelemetry::sdk::resource;
 namespace nostd   = opentelemetry::nostd;
 namespace semconv = opentelemetry::semconv;
 
+namespace
+{
+
 class TestResource : public Resource
 {
 public:
@@ -292,3 +295,5 @@ TEST(ResourceTest, DerivedResourceDetector)
   EXPECT_EQ(resource.GetSchemaURL(), detector.schema_url);
   EXPECT_TRUE(received_attributes.find("key") != received_attributes.end());
 }
+
+}  // namespace

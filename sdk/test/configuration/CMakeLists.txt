@@ -3,6 +3,7 @@
 
 foreach(
   testname
+  sdk_builder_test
   yaml_logs_test
   yaml_metrics_test
   yaml_propagator_test

@@ -47,7 +47,7 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
       []() -> std::unique_ptr<Aggregation> {
     return std::unique_ptr<Aggregation>(new LongSumAggregation(true));
   };
-  // add 10 unique metric points. 9 should be added to hashmap, 10th should be overflow.
+  // Add 10 unique metric points. All should be independently aggregated without overflow.
   int64_t record_value = 100;
   for (auto i = 0; i < 10; i++)
   {
@@ -56,15 +56,16 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
         ->Aggregate(record_value);
   }
   EXPECT_EQ(hash_map.Size(), 10);
+  EXPECT_EQ(hash_map.Get(GetOverflowAttributes()), nullptr);
   // add 5 unique metric points above limit, they all should get consolidated as single
-  // overflowmetric point.
+  // overflow metric point.
   for (auto i = 10; i < 15; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
     static_cast<LongSumAggregation *>(hash_map.GetOrSetDefault(attributes, aggregation_callback))
         ->Aggregate(record_value);
   }
-  EXPECT_EQ(hash_map.Size(), 10);  // only one more metric point should be added as overflow.
+  EXPECT_EQ(hash_map.Size(), 11);  // one additional metric point should be added as overflow.
   // record 5 more measurements to already existing (and not-overflow) metric points. They
   // should get aggregated to these existing metric points.
   for (auto i = 0; i < 5; i++)
@@ -73,16 +74,16 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
     static_cast<LongSumAggregation *>(hash_map.GetOrSetDefault(attributes, aggregation_callback))
         ->Aggregate(record_value);
   }
-  EXPECT_EQ(hash_map.Size(), 10);  // no new metric point added
+  EXPECT_EQ(hash_map.Size(), 11);  // no new metric point added
 
   // get the overflow metric point
-  auto agg1 = hash_map.GetOrSetDefault(kOverflowAttributes, aggregation_callback);
+  auto agg1 = hash_map.GetOrSetDefault(GetOverflowAttributes(), aggregation_callback);
   EXPECT_NE(agg1, nullptr);
   auto sum_agg1 = static_cast<LongSumAggregation *>(agg1);
   EXPECT_EQ(nostd::get<int64_t>(nostd::get<SumPointData>(sum_agg1->ToPoint()).value_),
-            record_value * 6);  // 1 from previous 10, 5 from current 5.
+            record_value * 5);
   // get remaining metric points
-  for (auto i = 0; i < 9; i++)
+  for (auto i = 0; i < 10; i++)
   {
     FilteredOrderedAttributeMap attributes = {{"key", std::to_string(i)}};
     auto agg2 = hash_map.GetOrSetDefault(attributes, aggregation_callback);
@@ -100,6 +101,9 @@ TEST(CardinalityLimit, AttributesHashMapBasicTests)
     }
   }
 }
+
+namespace
+{
 
 class WritableMetricStorageCardinalityLimitTestFixture
     : public ::testing::TestWithParam<AggregationTemporality>
@@ -122,7 +126,7 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
                             &aggConfig);
 
   int64_t record_value = 100;
-  // add 9 unique metric points, and 6 more above limit.
+  // Add 10 unique metric points, and 5 more above limit.
   for (auto i = 0; i < 15; i++)
   {
     std::map<std::string, std::string> attributes = {{"key", std::to_string(i)}};
@@ -151,13 +155,13 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
             // value `true`.
             EXPECT_EQ(data_attr.attributes.size(), 1u);
             EXPECT_EQ(nostd::get<bool>(data_attr.attributes.begin()->second), true);
-            EXPECT_EQ(nostd::get<int64_t>(data.value_), record_value * 6);
+            EXPECT_EQ(nostd::get<int64_t>(data.value_), record_value * 5);
             overflow_present = true;
           }
         }
         return true;
       });
-  EXPECT_EQ(count_attributes, attributes_limit);
+  EXPECT_EQ(count_attributes, attributes_limit + 1);
   EXPECT_EQ(overflow_present, true);
 }
 INSTANTIATE_TEST_SUITE_P(All,
@@ -174,12 +178,14 @@ INSTANTIATE_TEST_SUITE_P(All,
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#cardinality-limits
 TEST(CardinalityLimitOverflowAttribute, MatchesSpecLiteral)
 {
-  EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowKey, "otel.metric.overflow");
+  EXPECT_STREQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowKey, "otel.metric.overflow");
   EXPECT_EQ(opentelemetry::sdk::metrics::kAttributesLimitOverflowValue, true);
   // The precomputed overflow attribute set MUST contain exactly the spec key
   // mapped to the boolean value `true`.
-  ASSERT_EQ(opentelemetry::sdk::metrics::kOverflowAttributes.size(), 1u);
-  const auto &entry = *opentelemetry::sdk::metrics::kOverflowAttributes.begin();
+  ASSERT_EQ(opentelemetry::sdk::metrics::GetOverflowAttributes().size(), 1u);
+  const auto &entry = *opentelemetry::sdk::metrics::GetOverflowAttributes().begin();
   EXPECT_EQ(entry.first, "otel.metric.overflow");
   EXPECT_EQ(nostd::get<bool>(entry.second), true);
 }
+
+}  // namespace
