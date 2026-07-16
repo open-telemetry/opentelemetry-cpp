@@ -9,12 +9,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
-#include <unordered_set>
-#include <utility>
 
-#include "opentelemetry/common/kv_properties.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/version/version.h"
 #include "opentelemetry/version.h"
 
@@ -180,219 +175,23 @@ float GetOtlpDefaultLogsRetryBackoffMultiplier();
  * environment variables and fall back to the same spec defaults used above.
  */
 
-inline std::string GetOtlpDefaultGrpcClientEndpoint()
-{
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_ENDPOINT";
-  constexpr char kDefault[]    = "http://localhost:4317";
+void DumpOtlpHeaders(OtlpHeaders &output, const char *env_var_name);
 
-  std::string value;
-
-  if (opentelemetry::sdk::common::GetStringEnvironmentVariable(kGenericEnv, value))
-  {
-    return value;
-  }
-
-  return kDefault;
-}
-
-inline bool GetOtlpDefaultGrpcClientIsInsecure()
-{
-  std::string endpoint = GetOtlpDefaultGrpcClientEndpoint();
-
-  if (endpoint.substr(0, 6) == "https:")
-  {
-    return false;
-  }
-
-  if (endpoint.substr(0, 5) == "http:")
-  {
-    return true;
-  }
-
-  constexpr char kGenericEnv[]    = "OTEL_EXPORTER_OTLP_INSECURE";
-  constexpr char kOldGenericEnv[] = "OTEL_EXPORTER_OTLP_SSL_ENABLE";
-
-  bool insecure{};
-  bool ssl_enabled{};
-
-  if (opentelemetry::sdk::common::GetBoolEnvironmentVariable(kGenericEnv, insecure))
-  {
-    return insecure;
-  }
-
-  if (opentelemetry::sdk::common::GetBoolEnvironmentVariable(kOldGenericEnv, ssl_enabled))
-  {
-    return !ssl_enabled;
-  }
-
-  return false;
-}
-
-inline std::string GetOtlpDefaultGrpcClientSslCertificatePath()
-{
-  std::string value;
-  opentelemetry::sdk::common::GetStringEnvironmentVariable("OTEL_EXPORTER_OTLP_CERTIFICATE", value);
-  return value;
-}
-
-inline std::string GetOtlpDefaultGrpcClientSslCertificateString()
-{
-  std::string value;
-  opentelemetry::sdk::common::GetStringEnvironmentVariable("OTEL_EXPORTER_OTLP_CERTIFICATE_STRING",
-                                                           value);
-  return value;
-}
-
-inline std::string GetOtlpDefaultGrpcClientSslClientKeyPath()
-{
-  std::string value;
-  opentelemetry::sdk::common::GetStringEnvironmentVariable("OTEL_EXPORTER_OTLP_CLIENT_KEY", value);
-  return value;
-}
-
-inline std::string GetOtlpDefaultGrpcClientSslClientKeyString()
-{
-  std::string value;
-  opentelemetry::sdk::common::GetStringEnvironmentVariable("OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING",
-                                                           value);
-  return value;
-}
-
-inline std::string GetOtlpDefaultGrpcClientSslClientCertificatePath()
-{
-  std::string value;
-  opentelemetry::sdk::common::GetStringEnvironmentVariable("OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE",
-                                                           value);
-  return value;
-}
-
-inline std::string GetOtlpDefaultGrpcClientSslClientCertificateString()
-{
-  std::string value;
-  opentelemetry::sdk::common::GetStringEnvironmentVariable(
-      "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING", value);
-  return value;
-}
-
-inline std::chrono::system_clock::duration GetOtlpDefaultGrpcClientTimeout()
-{
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_TIMEOUT";
-
-  std::chrono::system_clock::duration value;
-
-  if (opentelemetry::sdk::common::GetDurationEnvironmentVariable(kGenericEnv, value))
-  {
-    return value;
-  }
-
-  return std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{10});
-}
-
-inline OtlpHeaders GetOtlpDefaultGrpcClientHeaders()
-{
-  OtlpHeaders result;
-
-  std::string raw_value;
-  if (!opentelemetry::sdk::common::GetStringEnvironmentVariable("OTEL_EXPORTER_OTLP_HEADERS",
-                                                                raw_value))
-  {
-    return result;
-  }
-
-  opentelemetry::common::KeyValueStringTokenizer tokenizer{raw_value};
-  opentelemetry::nostd::string_view header_key;
-  opentelemetry::nostd::string_view header_value;
-  bool header_valid = true;
-
-  std::unordered_set<std::string> remove_cache;
-
-  while (tokenizer.next(header_valid, header_key, header_value))
-  {
-    if (header_valid)
-    {
-      std::string key(header_key);
-      if (remove_cache.end() == remove_cache.find(key))
-      {
-        remove_cache.insert(key);
-        auto range = result.equal_range(key);
-        if (range.first != range.second)
-        {
-          result.erase(range.first, range.second);
-        }
-      }
-
-      std::string value(header_value);
-      result.emplace(std::make_pair(std::move(key), std::move(value)));
-    }
-  }
-
-  return result;
-}
-
-inline std::string GetOtlpDefaultGrpcClientCompression()
-{
-  std::string value;
-
-  if (opentelemetry::sdk::common::GetStringEnvironmentVariable("OTEL_EXPORTER_OTLP_COMPRESSION",
-                                                               value))
-  {
-    return value;
-  }
-
-  return std::string{"none"};
-}
-
-inline std::uint32_t GetOtlpDefaultGrpcClientRetryMaxAttempts()
-{
-  std::uint32_t value{};
-
-  if (opentelemetry::sdk::common::GetUintEnvironmentVariable(
-          "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS", value))
-  {
-    return value;
-  }
-
-  return 5U;
-}
-
-inline std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryInitialBackoff()
-{
-  float value{};
-
-  if (opentelemetry::sdk::common::GetFloatEnvironmentVariable(
-          "OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF", value))
-  {
-    return std::chrono::duration<float>{value};
-  }
-
-  return std::chrono::duration<float>{1.0f};
-}
-
-inline std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryMaxBackoff()
-{
-  float value{};
-
-  if (opentelemetry::sdk::common::GetFloatEnvironmentVariable(
-          "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", value))
-  {
-    return std::chrono::duration<float>{value};
-  }
-
-  return std::chrono::duration<float>{5.0f};
-}
-
-inline float GetOtlpDefaultGrpcClientRetryBackoffMultiplier()
-{
-  float value{};
-
-  if (opentelemetry::sdk::common::GetFloatEnvironmentVariable(
-          "OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", value))
-  {
-    return value;
-  }
-
-  return 1.5f;
-}
+std::string GetOtlpDefaultGrpcClientEndpoint();
+bool GetOtlpDefaultGrpcClientIsInsecure();
+std::string GetOtlpDefaultGrpcClientSslCertificatePath();
+std::string GetOtlpDefaultGrpcClientSslCertificateString();
+std::string GetOtlpDefaultGrpcClientSslClientKeyPath();
+std::string GetOtlpDefaultGrpcClientSslClientKeyString();
+std::string GetOtlpDefaultGrpcClientSslClientCertificatePath();
+std::string GetOtlpDefaultGrpcClientSslClientCertificateString();
+std::chrono::system_clock::duration GetOtlpDefaultGrpcClientTimeout();
+OtlpHeaders GetOtlpDefaultGrpcClientHeaders();
+std::string GetOtlpDefaultGrpcClientCompression();
+std::uint32_t GetOtlpDefaultGrpcClientRetryMaxAttempts();
+std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryInitialBackoff();
+std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryMaxBackoff();
+float GetOtlpDefaultGrpcClientRetryBackoffMultiplier();
 
 }  // namespace otlp
 }  // namespace exporter

@@ -12,34 +12,29 @@ namespace otlp
 {
 
 OtlpGrpcClientOptions::OtlpGrpcClientOptions()
+    : endpoint(GetOtlpDefaultGrpcClientEndpoint()),
+      use_ssl_credentials(!GetOtlpDefaultGrpcClientIsInsecure()),
+      ssl_credentials_cacert_path(GetOtlpDefaultGrpcClientSslCertificatePath()),
+      ssl_credentials_cacert_as_string(GetOtlpDefaultGrpcClientSslCertificateString()),
+      timeout(GetOtlpDefaultGrpcClientTimeout()),
+      metadata(GetOtlpDefaultGrpcClientHeaders()),
+      user_agent(GetOtlpDefaultUserAgent()),
+      max_threads(0),
+      compression(GetOtlpDefaultGrpcClientCompression()),
+#ifdef ENABLE_ASYNC_EXPORT
+      max_concurrent_requests(64),
+#endif
+      retry_policy_max_attempts(GetOtlpDefaultGrpcClientRetryMaxAttempts()),
+      retry_policy_initial_backoff(GetOtlpDefaultGrpcClientRetryInitialBackoff()),
+      retry_policy_max_backoff(GetOtlpDefaultGrpcClientRetryMaxBackoff()),
+      retry_policy_backoff_multiplier(GetOtlpDefaultGrpcClientRetryBackoffMultiplier())
 {
-  endpoint                         = GetOtlpDefaultGrpcClientEndpoint();
-  use_ssl_credentials              = !GetOtlpDefaultGrpcClientIsInsecure();
-  ssl_credentials_cacert_path      = GetOtlpDefaultGrpcClientSslCertificatePath();
-  ssl_credentials_cacert_as_string = GetOtlpDefaultGrpcClientSslCertificateString();
-
 #ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
   ssl_client_key_path    = GetOtlpDefaultGrpcClientSslClientKeyPath();
   ssl_client_key_string  = GetOtlpDefaultGrpcClientSslClientKeyString();
   ssl_client_cert_path   = GetOtlpDefaultGrpcClientSslClientCertificatePath();
   ssl_client_cert_string = GetOtlpDefaultGrpcClientSslClientCertificateString();
 #endif
-
-  timeout    = GetOtlpDefaultGrpcClientTimeout();
-  metadata   = GetOtlpDefaultGrpcClientHeaders();
-  user_agent = GetOtlpDefaultUserAgent();
-
-  max_threads = 0;
-
-  compression = GetOtlpDefaultGrpcClientCompression();
-#ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests = 64;
-#endif
-
-  retry_policy_max_attempts       = GetOtlpDefaultGrpcClientRetryMaxAttempts();
-  retry_policy_initial_backoff    = GetOtlpDefaultGrpcClientRetryInitialBackoff();
-  retry_policy_max_backoff        = GetOtlpDefaultGrpcClientRetryMaxBackoff();
-  retry_policy_backoff_multiplier = GetOtlpDefaultGrpcClientRetryBackoffMultiplier();
 }
 
 OtlpGrpcClientOptions::OtlpGrpcClientOptions(void *)

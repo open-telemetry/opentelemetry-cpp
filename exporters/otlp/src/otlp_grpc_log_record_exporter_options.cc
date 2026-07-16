@@ -64,7 +64,7 @@ OtlpGrpcLogRecordExporterOptions::OtlpGrpcLogRecordExporterOptions(
   metadata = GetOtlpDefaultLogsHeaders();
 
 #ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests = 64;
+  max_concurrent_requests = client_options.max_concurrent_requests;
 #endif
 }
 

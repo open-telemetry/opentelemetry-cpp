@@ -22,7 +22,7 @@ namespace exporter
 namespace otlp
 {
 
-struct OtlpGrpcClientOptions
+struct OPENTELEMETRY_EXPORT OtlpGrpcClientOptions
 {
   virtual ~OtlpGrpcClientOptions();
 
