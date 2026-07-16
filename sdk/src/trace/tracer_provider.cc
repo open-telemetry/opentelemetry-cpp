@@ -16,6 +16,7 @@
 #include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
@@ -41,14 +42,14 @@ TracerProvider::TracerProvider(
     const resource::Resource &resource,
     std::unique_ptr<Sampler> sampler,
     std::unique_ptr<IdGenerator> id_generator,
-    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
-        tracer_configurator) noexcept
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator,
+    SpanLimits span_limits) noexcept
 {
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor));
-  context_ =
-      std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
-                                      std::move(id_generator), std::move(tracer_configurator));
+  context_ = std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
+                                             std::move(id_generator),
+                                             std::move(tracer_configurator), span_limits);
 }
 
 TracerProvider::TracerProvider(
@@ -56,13 +57,14 @@ TracerProvider::TracerProvider(
     const resource::Resource &resource,
     std::unique_ptr<Sampler> sampler,
     std::unique_ptr<IdGenerator> id_generator,
-    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
-        tracer_configurator) noexcept
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator,
+    SpanLimits span_limits) noexcept
     : context_(std::make_shared<TracerContext>(std::move(processors),
                                                resource,
                                                std::move(sampler),
                                                std::move(id_generator),
-                                               std::move(tracer_configurator)))
+                                               std::move(tracer_configurator),
+                                               span_limits))
 {}
 
 TracerProvider::~TracerProvider()
@@ -161,6 +163,11 @@ void TracerProvider::UpdateTracerConfigurator(
 const resource::Resource &TracerProvider::GetResource() const noexcept
 {
   return context_->GetResource();
+}
+
+const opentelemetry::sdk::trace::SpanLimits &TracerProvider::GetSpanLimits() const noexcept
+{
+  return context_->GetSpanLimits();
 }
 
 bool TracerProvider::Shutdown(std::chrono::microseconds timeout) noexcept

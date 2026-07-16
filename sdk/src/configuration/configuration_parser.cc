@@ -1,11 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <cstddef>
+#include <cstdint>
 #include <fstream>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
@@ -1621,16 +1621,26 @@ std::unique_ptr<SpanLimitsConfiguration> ConfigurationParser::ParseSpanLimitsCon
   using Config = SpanLimitsConfiguration;
   auto model   = std::make_unique<SpanLimitsConfiguration>();
 
+  const auto get_valid_uint32 = [&node](const std::string &name, std::size_t default_value) {
+    std::size_t value = node->GetInteger(name, default_value);
+    if (value > std::numeric_limits<std::uint32_t>::max())
+    {
+      std::string message = "Invalid value for " + name + ": " + std::to_string(value);
+      throw InvalidSchemaException(node->Location(), message);
+    }
+    return static_cast<uint32_t>(value);
+  };
+
   model->attribute_value_length_limit =
       node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);
   model->attribute_count_limit =
-      node->GetInteger("attribute_count_limit", Config::kDefaultAttributeCountLimit);
-  model->event_count_limit = node->GetInteger("event_count_limit", Config::kDefaultEventCountLimit);
-  model->link_count_limit  = node->GetInteger("link_count_limit", Config::kDefaultLinkCountLimit);
+      get_valid_uint32("attribute_count_limit", Config::kDefaultAttributeCountLimit);
+  model->event_count_limit = get_valid_uint32("event_count_limit", Config::kDefaultEventCountLimit);
+  model->link_count_limit  = get_valid_uint32("link_count_limit", Config::kDefaultLinkCountLimit);
   model->event_attribute_count_limit =
-      node->GetInteger("event_attribute_count_limit", Config::kDefaultEventAttributeCountLimit);
+      get_valid_uint32("event_attribute_count_limit", Config::kDefaultEventAttributeCountLimit);
   model->link_attribute_count_limit =
-      node->GetInteger("link_attribute_count_limit", Config::kDefaultLinkAttributeCountLimit);
+      get_valid_uint32("link_attribute_count_limit", Config::kDefaultLinkAttributeCountLimit);
 
   return model;
 }
