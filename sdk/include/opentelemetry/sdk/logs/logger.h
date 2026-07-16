@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -91,6 +92,17 @@ protected:
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 private:
+  // LoggerProvider needs access to UpdateLoggerConfig to propagate configuration updates to
+  // existing loggers.
+  friend class LoggerProvider;
+
+  /**
+   * Update this logger's LoggerConfig. Called only by
+   * LoggerProvider::UpdateLoggerConfigurator when the provider-level
+   * LoggerConfigurator is replaced at runtime.
+   */
+  void UpdateLoggerConfig(LoggerConfig config) noexcept;
+
   // The name of this logger
   std::string logger_name_;
 
@@ -98,7 +110,10 @@ private:
   // logger-context.
   std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope_;
   std::shared_ptr<LoggerContext> context_;
-  LoggerConfig logger_config_;
+  // LoggerConfig state is stored in atomic variables to avoid locking in the hot path of Enabled()
+  // and EmitLogRecord().
+  std::atomic<bool> logger_enabled_{true};
+  std::atomic<bool> trace_based_{false};
   static opentelemetry::logs::NoopLogger kNoopLogger;
 };
 

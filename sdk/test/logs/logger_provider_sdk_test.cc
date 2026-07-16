@@ -3,37 +3,50 @@
 
 #include <gtest/gtest.h>
 #include <stdint.h>
+#include <atomic>
 #include <chrono>
+#include <cstddef>
+#include <future>
+#include <mutex>
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
 #include "opentelemetry/logs/provider.h"
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/event_logger_provider.h"          // IWYU pragma: keep
 #include "opentelemetry/sdk/logs/event_logger_provider_factory.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger.h"
+#include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_context.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/provider.h"
+#include "opentelemetry/sdk/logs/read_write_log_record.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 #include "opentelemetry/sdk/resource/resource.h"
 
 using namespace opentelemetry::sdk::logs;
-namespace logs_api = opentelemetry::logs;
-namespace logs_sdk = opentelemetry::sdk::logs;
-namespace nostd    = opentelemetry::nostd;
+namespace logs_api  = opentelemetry::logs;
+namespace logs_sdk  = opentelemetry::sdk::logs;
+namespace nostd     = opentelemetry::nostd;
+namespace scope_sdk = opentelemetry::sdk::instrumentationscope;
 
 TEST(LoggerProviderSDK, PushToAPI)
 {
@@ -210,6 +223,8 @@ TEST(LoggerProviderSDK, GetLoggerInequalityCheck)
   EXPECT_NE(logger_attribute_1, logger_attribute_2);
 }
 
+namespace
+{
 class DummyLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
 public:
@@ -255,6 +270,7 @@ public:
   bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 };
+}  // namespace
 
 TEST(LoggerProviderSDK, GetResource)
 {
@@ -291,4 +307,337 @@ TEST(LoggerProviderSDK, ForceFlush)
   LoggerProvider lp(std::move(context));
 
   EXPECT_TRUE(lp.ForceFlush());
+}
+
+// ---------------------------------------------------------------------------
+// UpdateLoggerConfigurator tests
+// ---------------------------------------------------------------------------
+namespace
+{
+
+// Minimal recording exporter used across the UpdateLoggerConfigurator tests.
+class RecordingExporter final : public logs_sdk::LogRecordExporter
+{
+public:
+  std::unique_ptr<logs_sdk::Recordable> MakeRecordable() noexcept override
+  {
+    return std::make_unique<logs_sdk::ReadWriteLogRecord>();
+  }
+
+  opentelemetry::sdk::common::ExportResult Export(
+      const opentelemetry::nostd::span<std::unique_ptr<logs_sdk::Recordable>> &records) noexcept
+      override
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto &r : records)
+    {
+      records_.push_back(std::move(r));
+    }
+    return opentelemetry::sdk::common::ExportResult::kSuccess;
+  }
+
+  bool ForceFlush(std::chrono::microseconds /*timeout*/) noexcept override { return true; }
+
+  bool Shutdown(std::chrono::microseconds /*timeout*/) noexcept override { return true; }
+
+  std::size_t RecordCount() const
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    return records_.size();
+  }
+
+  void Reset()
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    records_.clear();
+  }
+
+private:
+  mutable std::mutex mutex_;
+  std::vector<std::unique_ptr<logs_sdk::Recordable>> records_;
+};
+
+// Helper: make a ScopeConfigurator where all loggers default to enabled with the given min
+// severity.
+std::unique_ptr<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>> AllAtSeverity(
+    logs_api::Severity severity)
+{
+  return std::make_unique<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>>(
+      scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>::Builder(
+          logs_sdk::LoggerConfig::Create(true, severity, false))
+          .Build());
+}
+
+// Helper: make a ScopeConfigurator where the named scope is disabled; default is enabled.
+std::unique_ptr<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>> DisableByName(
+    opentelemetry::nostd::string_view name)
+{
+  return std::make_unique<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>>(
+      scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>::Builder(
+          logs_sdk::LoggerConfig::Default())
+          .AddConditionNameEquals(name, logs_sdk::LoggerConfig::Disabled())
+          .Build());
+}
+
+// Helper: make a ScopeConfigurator that disables all loggers.
+std::unique_ptr<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>> DisableAll()
+{
+  return std::make_unique<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>>(
+      scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>::Builder(
+          logs_sdk::LoggerConfig::Disabled())
+          .Build());
+}
+
+// Helper: make a ScopeConfigurator that enables all loggers (default config).
+std::unique_ptr<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>> EnableAll()
+{
+  return std::make_unique<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>>(
+      scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>::Builder(
+          logs_sdk::LoggerConfig::Default())
+          .Build());
+}
+
+// Helper: Info default for all scopes with the named scope set to a specific minimum severity
+// override.
+std::unique_ptr<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>> InfoWithOverrideSeverity(
+    opentelemetry::nostd::string_view scope_name,
+    logs_api::Severity override_severity)
+{
+  return std::make_unique<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>>(
+      scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>::Builder(
+          logs_sdk::LoggerConfig::Create(true, logs_api::Severity::kInfo, false))
+          .AddConditionNameEquals(scope_name,
+                                  logs_sdk::LoggerConfig::Create(true, override_severity, false))
+          .Build());
+}
+
+// Builds a LoggerProvider whose RecordingExporter pointer is returned via the out parameter.
+std::unique_ptr<logs_sdk::LoggerProvider> MakeProvider(
+    RecordingExporter *&exporter_out,
+    std::unique_ptr<scope_sdk::ScopeConfigurator<logs_sdk::LoggerConfig>> configurator =
+        EnableAll())
+{
+  auto exporter  = std::make_unique<RecordingExporter>();
+  exporter_out   = exporter.get();
+  auto processor = std::make_unique<logs_sdk::SimpleLogRecordProcessor>(std::move(exporter));
+  return std::make_unique<logs_sdk::LoggerProvider>(
+      std::move(processor), opentelemetry::sdk::resource::Resource::Create({}),
+      std::move(configurator));
+}
+
+}  // namespace
+
+TEST(LoggerProviderSDK, UpdateLoggerConfiguratorDisableByName)
+{
+  RecordingExporter *exporter{};
+  auto provider = MakeProvider(exporter);
+  ASSERT_TRUE(exporter != nullptr);
+
+  auto logger_disabled_by_update = provider->GetLogger("logger.disabled", "scope.disabled");
+  auto logger_unaffected         = provider->GetLogger("logger.unaffected", "scope.unaffected");
+
+  // Both loggers are initially enabled.
+  ASSERT_TRUE(logger_disabled_by_update->Enabled(logs_api::Severity::kInfo));
+  ASSERT_TRUE(logger_unaffected->Enabled(logs_api::Severity::kInfo));
+
+  // Disable scope.disabled by name; scope.unaffected must remain enabled.
+  provider->UpdateLoggerConfigurator(DisableByName("scope.disabled"));
+
+  EXPECT_FALSE(logger_disabled_by_update->Enabled(logs_api::Severity::kInfo));
+  EXPECT_TRUE(logger_unaffected->Enabled(logs_api::Severity::kInfo));
+
+  // Verify that emission is suppressed for the disabled logger.
+  exporter->Reset();
+  logger_disabled_by_update->Info("should not appear");
+  logger_unaffected->Info("should appear");
+  EXPECT_EQ(exporter->RecordCount(), 1u);
+}
+
+TEST(LoggerProviderSDK, UpdateLoggerConfiguratorReEnable)
+{
+  RecordingExporter *exporter{};
+  auto provider = MakeProvider(exporter, DisableAll());
+  ASSERT_TRUE(exporter != nullptr);
+
+  auto existing_logger = provider->GetLogger("existing", "scope.existing");
+
+  ASSERT_FALSE(existing_logger->Enabled(logs_api::Severity::kInfo));
+
+  // enable all loggers.
+  provider->UpdateLoggerConfigurator(EnableAll());
+
+  // The existing logger handle must immediately reflect the updated config.
+  EXPECT_TRUE(existing_logger->Enabled(logs_api::Severity::kInfo));
+
+  // Loggers obtained after the update also reflect the new configurator.
+  auto logger_after = provider->GetLogger("after", "scope.after");
+  EXPECT_TRUE(logger_after->Enabled(logs_api::Severity::kInfo));
+}
+
+TEST(LoggerProviderSDK, UpdateLoggerConfiguratorMinSeverityChange)
+{
+  RecordingExporter *exporter{};
+  // Start with min severity = Info.
+  auto provider = MakeProvider(exporter, AllAtSeverity(logs_api::Severity::kInfo));
+
+  ASSERT_TRUE(exporter != nullptr);
+
+  auto logger = provider->GetLogger("mylogger", "scope.test");
+
+  // At Info threshold: Debug is suppressed, Info passes.
+  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kDebug));
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kInfo));
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kError));
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  // In ABIv2, emit filtering is implicit
+  exporter->Reset();
+  ASSERT_EQ(exporter->RecordCount(), 0u);
+  logger->Debug("debug msg");  // filtered
+  logger->Info("info msg");    // passes
+  logger->Error("error msg");  // passes
+  EXPECT_EQ(exporter->RecordCount(), 2u);
+#endif
+
+  // Raise min severity to Warn.
+  provider->UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kWarn));
+
+  EXPECT_FALSE(logger->Enabled(logs_api::Severity::kInfo));
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kWarn));
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kError));
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  exporter->Reset();
+  ASSERT_EQ(exporter->RecordCount(), 0u);
+  logger->Info("info msg");    // filtered
+  logger->Warn("warn msg");    // passes
+  logger->Error("error msg");  // passes
+  EXPECT_EQ(exporter->RecordCount(), 2u);
+#endif
+
+  // Drop min severity to Debug.
+  provider->UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kDebug));
+
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kDebug));
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  exporter->Reset();
+  ASSERT_EQ(exporter->RecordCount(), 0u);
+  logger->Debug("debug msg");  // passes
+  logger->Info("info msg");    // passes
+  EXPECT_EQ(exporter->RecordCount(), 2u);
+#endif
+}
+
+TEST(LoggerProviderSDK, UpdateLoggerConfiguratorPerScopeMinSeverity)
+{
+  RecordingExporter *exporter{};
+  // Default Info; "scope.verbose" gets Debug.
+  auto provider =
+      MakeProvider(exporter, InfoWithOverrideSeverity("scope.verbose", logs_api::Severity::kDebug));
+
+  ASSERT_TRUE(exporter != nullptr);
+
+  auto logger_default = provider->GetLogger("default", "scope.default");
+  auto logger_verbose = provider->GetLogger("verbose", "scope.verbose");
+
+  // scope.default filtered at Debug, passes at Info.
+  EXPECT_FALSE(logger_default->Enabled(logs_api::Severity::kDebug));
+  EXPECT_TRUE(logger_default->Enabled(logs_api::Severity::kInfo));
+
+  // scope.verbose passes at Debug.
+  EXPECT_TRUE(logger_verbose->Enabled(logs_api::Severity::kDebug));
+
+  // Now raise scope.verbose to Warn; everything else stays at Info.
+  provider->UpdateLoggerConfigurator(
+      InfoWithOverrideSeverity("scope.verbose", logs_api::Severity::kWarn));
+
+  EXPECT_FALSE(logger_verbose->Enabled(logs_api::Severity::kInfo));
+  EXPECT_TRUE(logger_verbose->Enabled(logs_api::Severity::kWarn));
+  EXPECT_TRUE(logger_default->Enabled(logs_api::Severity::kInfo));
+}
+
+TEST(LoggerProviderSDK, UpdateLoggerConfiguratorNewLoggerUsesUpdatedConfig)
+{
+  RecordingExporter *exporter{};
+  auto provider = MakeProvider(exporter);
+  ASSERT_TRUE(exporter != nullptr);
+
+  // Install a configurator that disables "scope.disabled" before any logger for that scope exists.
+  provider->UpdateLoggerConfigurator(DisableByName("scope.disabled"));
+
+  // A logger obtained after the update must reflect the new config.
+  auto logger_for_disabled_scope = provider->GetLogger("disabled", "scope.disabled");
+  EXPECT_FALSE(logger_for_disabled_scope->Enabled(logs_api::Severity::kInfo));
+
+  // Scopes not named in the configurator remain enabled.
+  auto logger_for_unaffected_scope = provider->GetLogger("unaffected", "scope.unaffected");
+  EXPECT_TRUE(logger_for_unaffected_scope->Enabled(logs_api::Severity::kInfo));
+}
+
+TEST(LoggerProviderSDK, UpdateLoggerConfiguratorNullIgnored)
+{
+  RecordingExporter *exporter{};
+  auto provider = MakeProvider(exporter, AllAtSeverity(logs_api::Severity::kInfo));
+  ASSERT_TRUE(exporter != nullptr);
+
+  auto logger = provider->GetLogger("mylogger", "scope.test");
+  ASSERT_TRUE(logger->Enabled(logs_api::Severity::kInfo));
+
+  // Passing nullptr must be a no-op (logged as an error internally, config unchanged).
+  provider->UpdateLoggerConfigurator(nullptr);
+
+  EXPECT_TRUE(logger->Enabled(logs_api::Severity::kInfo));
+}
+
+TEST(LoggerProviderSDK, UpdateLoggerConfiguratorConcurrentEmit)
+{
+  RecordingExporter *exporter{};
+  auto provider = MakeProvider(exporter, AllAtSeverity(logs_api::Severity::kInfo));
+  ASSERT_TRUE(exporter != nullptr);
+
+  auto logger = provider->GetLogger("mylogger", "scope.concurrent");
+
+  std::atomic<bool> stop{false};
+  std::atomic<bool> worker_saw_suppressed{false};
+  std::atomic<bool> worker_saw_emitted{false};
+
+  std::promise<void> worker_ready;
+  std::future<void> worker_ready_future = worker_ready.get_future();
+
+  // Worker: call Enabled() and emit in a tight loop; flag each observed state.
+  std::thread worker([&] {
+    worker_ready.set_value();
+    while (!stop.load(std::memory_order_relaxed))
+    {
+      if (logger->Enabled(logs_api::Severity::kInfo))
+      {
+        logger->Info("emit");
+        worker_saw_emitted.store(true, std::memory_order_relaxed);
+      }
+      else
+      {
+        worker_saw_suppressed.store(true, std::memory_order_relaxed);
+      }
+    }
+  });
+
+  worker_ready_future.wait();
+
+  // Raise min severity so Info is suppressed; wait for worker to observe it.
+  provider->UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kError));
+  while (!worker_saw_suppressed.load(std::memory_order_relaxed))
+  {
+    std::this_thread::yield();
+  }
+
+  // Lower min severity back to Info; wait for worker to observe it.
+  provider->UpdateLoggerConfigurator(AllAtSeverity(logs_api::Severity::kInfo));
+  while (!worker_saw_emitted.load(std::memory_order_relaxed))
+  {
+    std::this_thread::yield();
+  }
+
+  stop.store(true, std::memory_order_relaxed);
+  worker.join();
 }

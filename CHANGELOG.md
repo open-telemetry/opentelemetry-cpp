@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.28.0] 2026-07-12
+## [1.28.0] 2026-07-16
 
 * [RELEASE] Bump main branch to 1.28.0-dev
   [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)
@@ -330,6 +330,27 @@ Increment the:
 * [SDK] Apply metric cardinality limits to non-overflow attribute sets and
   reserve the overflow point separately.
   [#4236](https://github.com/open-telemetry/opentelemetry-cpp/pull/4236)
+
+* [CONFIGURATION] fix yaml configuration of the logger configurator
+  [#4241](https://github.com/open-telemetry/opentelemetry-cpp/pull/4241)
+
+* [SDK] Support LoggerConfigurator updates and example
+  [#4224](https://github.com/open-telemetry/opentelemetry-cpp/pull/4224)
+
+* Bump actions/stale from 10.3.0 to 10.4.0
+  [#4242](https://github.com/open-telemetry/opentelemetry-cpp/pull/4242)
+
+* [CMAKE] Remove environment variable support from the add external components script
+  [#4211](https://github.com/open-telemetry/opentelemetry-cpp/pull/4211)
+
+* [ETW] Make spans own their names
+  [#4247](https://github.com/open-telemetry/opentelemetry-cpp/pull/4247)
+
+* [SDK] Span limits configuration
+  [#4232](https://github.com/open-telemetry/opentelemetry-cpp/pull/4232)
+
+* [CONFIGURATION] Define and set spec default values in configuration objects
+  [#4244](https://github.com/open-telemetry/opentelemetry-cpp/pull/4244)
 
 * [RELEASE] Release opentelemetry-cpp 1.28.0
   [#4233](https://github.com/open-telemetry/opentelemetry-cpp/pull/4233)
