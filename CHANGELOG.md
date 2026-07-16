@@ -174,6 +174,11 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy `bugprone-throwing-static-initialization` warnings
   [#4206](https://github.com/open-telemetry/opentelemetry-cpp/pull/4206)
 
+* [API] Add `trace::GetSpanContext()` to read the active span's `SpanContext`
+  from a `Context` without the `DefaultSpan` allocation that
+  `GetSpan(context)->GetContext()` incurs, and use it at existing call sites.
+  [#4254](https://github.com/open-telemetry/opentelemetry-cpp/pull/4254)
+
 ## [1.27.0] 2026-05-13
 
 * [RELEASE] Bump main branch to 1.27.0-dev
