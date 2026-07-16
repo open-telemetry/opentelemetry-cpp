@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [RELEASE] Bump main branch to 1.29.0-dev
+  [#4259](https://github.com/open-telemetry/opentelemetry-cpp/pull/4259)
+
 ## [1.28.0] 2026-07-16
 
 * [RELEASE] Bump main branch to 1.28.0-dev
