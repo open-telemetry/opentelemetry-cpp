@@ -352,6 +352,9 @@ Increment the:
 * [CONFIGURATION] Define and set spec default values in configuration objects
   [#4244](https://github.com/open-telemetry/opentelemetry-cpp/pull/4244)
 
+* [CMAKE] Upgrade to protobuf 35.1 and grpc 1.82.1
+  [#4255](https://github.com/open-telemetry/opentelemetry-cpp/pull/4255)
+
 * [RELEASE] Release opentelemetry-cpp 1.28.0
   [#4233](https://github.com/open-telemetry/opentelemetry-cpp/pull/4233)
 
