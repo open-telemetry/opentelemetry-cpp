@@ -15,8 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
-* [SDK] Add Tracer::StartSpan benchmark and optimizations
-  [#4248](https://github.com/open-telemetry/opentelemetry-cpp/pull/4248)
+* [ETW] Ensure spans own their names until they are ended
+  [#4247](https://github.com/open-telemetry/opentelemetry-cpp/pull/4247)
 
 * [SDK] Apply metric cardinality limits to non-overflow attribute sets and
   reserve the overflow point separately.
@@ -34,6 +34,11 @@ Increment the:
 * [CMAKE] Fix and test WITH_API_ONLY option
   [#4201](https://github.com/open-telemetry/opentelemetry-cpp/pull/4201)
 
+* [SDK] Span limits can now be configured through the TracerProvider interface
+        and declaritive configuration. When set, limits are enforced by the
+        SpanData and OtlpRecordables recordables used by the standard exporters
+  [#4232](https://github.com/open-telemetry/opentelemetry-cpp/pull/4232)
+
 * [API] Fix `TraceState::IsValidKey()` to comply with the W3C Trace Context
   Level 2, where keys containing `@` and keys with more than 241 characters
   before `@` or more than 14 characters after `@` are now accepted.
@@ -45,6 +50,9 @@ Increment the:
 
 * [SDK] Add `TracerProvider::UpdateTracerConfigurator()` and example
   [#4065](https://github.com/open-telemetry/opentelemetry-cpp/pull/4065)
+
+* [SDK] Add Tracer::StartSpan benchmark and optimizations
+  [#4248](https://github.com/open-telemetry/opentelemetry-cpp/pull/4248)
 
 * [RELEASE] Bump main branch to 1.28.0-dev
   [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)

@@ -503,6 +503,20 @@ TEST(ETWTracer, AlwayOffTailSampler)
   auto tracer = tp.GetTracer(providerName);
 }
 
+TEST(ETWTracer, SpanOwnsName)
+{
+  exporter::etw::TracerProvider tp;
+  auto tracer = tp.GetTracer("SpanOwnsName");
+  std::string name = "original";
+  auto span = tracer->StartSpan(name);
+
+  name[0] = 'X';
+
+  auto etw_span = static_cast<exporter::etw::Span *>(span.get());
+  EXPECT_EQ(etw_span->GetName(), "original");
+  span->End();
+}
+
 TEST(ETWTracer, CustomIdGenerator)
 {
   std::string providerName = kGlobalProviderName; // supply unique instrumentation name here

@@ -38,6 +38,7 @@
 #include "opentelemetry/sdk/trace/samplers/parent.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
@@ -187,7 +188,8 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
     IdGenerator *id_generator = new RandomIdGenerator,
     const ScopeConfigurator<TracerConfig> &tracer_configurator =
         ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default()).Build(),
-    std::unique_ptr<InstrumentationScope> scope = InstrumentationScope::Create(""))
+    std::unique_ptr<InstrumentationScope> scope       = InstrumentationScope::Create(""),
+    opentelemetry::sdk::trace::SpanLimits span_limits = SpanLimits::NoLimits())
 {
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));
   std::vector<std::unique_ptr<SpanProcessor>> processors;
@@ -196,7 +198,7 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
   auto context  = std::make_shared<TracerContext>(
       std::move(processors), resource, std::unique_ptr<Sampler>(sampler),
       std::unique_ptr<IdGenerator>(id_generator),
-      std::make_unique<ScopeConfigurator<TracerConfig>>(tracer_configurator));
+      std::make_unique<ScopeConfigurator<TracerConfig>>(tracer_configurator), span_limits);
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context, std::move(scope)));
 }
 
@@ -1465,4 +1467,52 @@ TEST(Tracer, SpanSamplerDecision)
     }
   }
   EXPECT_EQ(3, span_data->GetSpans().size());
+}
+
+TEST(Tracer, SpanLimits)
+{
+  opentelemetry::sdk::trace::SpanLimits limits;
+  limits.attribute_count_limit        = 2;
+  limits.attribute_value_length_limit = 5;
+  limits.event_count_limit            = 2;
+  limits.event_attribute_count_limit  = 2;
+
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(
+      std::unique_ptr<SpanExporter>{exporter}, new AlwaysOnSampler(), new RandomIdGenerator,
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default()).Build(),
+      InstrumentationScope::Create(""), limits);
+
+  std::vector<std::pair<std::string, std::string>> attributes = {
+      {"one", "1_value"}, {"two", "2_value"}, {"three", "3_value"}};
+
+  {
+    auto span = tracer->StartSpan("span_with_limits", attributes);
+    span->SetAttribute("four", "4_value");
+    span->AddEvent("event1", attributes);
+    span->AddEvent("event2", attributes);
+    span->AddEvent("event3", attributes);
+    span->End();
+  }
+
+  const auto span_batch = span_data->GetSpans();
+  ASSERT_EQ(1, span_batch.size());
+
+  const auto &recordable = span_batch.at(0);
+
+  ASSERT_EQ(limits.attribute_count_limit, recordable->GetAttributes().size());
+  EXPECT_EQ(limits.attribute_value_length_limit,
+            nostd::get<std::string>(recordable->GetAttributes().at("one")).size());
+  EXPECT_EQ("1_val", nostd::get<std::string>(recordable->GetAttributes().at("one")));
+  EXPECT_EQ("2_val", nostd::get<std::string>(recordable->GetAttributes().at("two")));
+
+  const auto &events = recordable->GetEvents();
+  ASSERT_EQ(limits.event_count_limit, events.size());
+  EXPECT_EQ("event1", events.at(0).GetName());
+  EXPECT_EQ("event2", events.at(1).GetName());
+  EXPECT_EQ(limits.event_attribute_count_limit, events.at(0).GetAttributes().size());
+  EXPECT_EQ(limits.event_attribute_count_limit, events.at(1).GetAttributes().size());
+  EXPECT_EQ(limits.attribute_value_length_limit,
+            nostd::get<std::string>(events.at(0).GetAttributes().at("one")).size());
 }
