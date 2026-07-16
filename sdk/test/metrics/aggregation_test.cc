@@ -441,6 +441,36 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(diffd_point.positive_buckets_->Get(2), 1);
 }
 
+TEST(Aggregation, Base2ExponentialHistogramAggregationInvalidConfigFallsBackToDefault)
+{
+  const Base2ExponentialHistogramAggregationConfig default_config;
+
+  auto point_of = [](const Base2ExponentialHistogramAggregationConfig &config) {
+    Base2ExponentialHistogramAggregation aggr(&config);
+    return nostd::get<Base2ExponentialHistogramPointData>(aggr.ToPoint());
+  };
+
+  {
+    auto point = point_of(MakeAggregationConfig(kMaxScaleMax + 1, 100));
+    EXPECT_EQ(point.scale_, default_config.max_scale_);
+    EXPECT_EQ(point.max_buckets_, 100);
+  }
+  {
+    auto point = point_of(MakeAggregationConfig(kMaxScaleMin - 1, 100));
+    EXPECT_EQ(point.scale_, default_config.max_scale_);
+  }
+  {
+    auto point = point_of(MakeAggregationConfig(0, kMaxSizeMin - 1));
+    EXPECT_EQ(point.max_buckets_, default_config.max_size_);
+    EXPECT_EQ(point.scale_, 0);
+  }
+  {
+    auto point = point_of(MakeAggregationConfig(kMaxScaleMin, kMaxSizeMin));
+    EXPECT_EQ(point.scale_, kMaxScaleMin);
+    EXPECT_EQ(point.max_buckets_, kMaxSizeMin);
+  }
+}
+
 TEST(Aggregation, Base2ExponentialHistogramAggregationMerge)
 {
   Base2ExponentialHistogramAggregationConfig config;
