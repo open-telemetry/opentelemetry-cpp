@@ -544,9 +544,7 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLoggerConfigurator)
   EXPECT_GE(log_buffer_->size(), 2);
 }
 
-// TODO: Re-enable this test once the BatchLogRecordProcessorConfiguration is initialized with spec
-// defaults.
-TEST_F(ProgrammaticConfigTest, DISABLED_LoggerProviderWithBatchProcessorDefaults)
+TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorDefaults)
 {
   auto exporter       = std::make_unique<config_sdk::ExtensionLogRecordExporterConfiguration>();
   exporter->name      = "recording";
@@ -836,7 +834,7 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithParentBasedSamplerNullRoot)
 
 // TODO: Re-enable this test once the BatchSpanProcessorConfiguration is initialized with spec
 // defaults.
-TEST_F(ProgrammaticConfigTest, DISABLED_TracerProviderWithBatchProcessor)
+TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessor)
 {
   auto exporter               = std::make_unique<config_sdk::ExtensionSpanExporterConfiguration>();
   exporter->name              = "recording";
