@@ -21,6 +21,10 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/version.h"
 
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  include <new>
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -277,6 +281,62 @@ struct AttributeEqualToVisitor
 };
 
 /**
+ * Insert or assign a key-value pair into a map using map.insert_or_assign if available, or
+ * map.emplace otherwise.
+ * @param map The map to insert or assign the key-value pair into.
+ * @param key The key to insert or assign.
+ * @param value The value to insert or assign.
+ * @return A pair of an iterator to the element and a bool (true if the insertion took place).
+ */
+template <typename Map, typename Value>
+inline std::pair<typename Map::iterator, bool>
+AttributeInsertOrAssign(Map &map, opentelemetry::nostd::string_view key, Value &&value) noexcept
+{
+#if __cplusplus >= 201703L
+  // Use insert_or_assign if C++17 is available
+  return map.insert_or_assign(std::string(key), std::forward<Value>(value));
+#else
+  auto result          = map.emplace(std::string(key), typename Map::mapped_type{});
+  result.first->second = std::forward<Value>(value);
+  return result;
+#endif
+}
+
+/**
+ * VisitVariant
+ *
+ * Invokes nostd::visit(visitor, value) with exception-safe handling.
+ * Returns pair<ReturnType, bool>: second=true on success, false if an exception was caught
+ * On exception the first element is default-constructed.
+ */
+template <typename Visitor, typename Variant>
+inline auto VisitVariant(Visitor &&visitor, const Variant &value) noexcept
+    -> std::pair<decltype(opentelemetry::nostd::visit(std::forward<Visitor>(visitor), value)), bool>
+{
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  using ReturnType = decltype(opentelemetry::nostd::visit(std::forward<Visitor>(visitor), value));
+  try
+  {
+#endif
+    return {opentelemetry::nostd::visit(std::forward<Visitor>(visitor), value), true};
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+#  if defined(OPENTELEMETRY_HAVE_STD_VARIANT)
+  catch (const std::bad_variant_access &)
+#  else
+  catch (const opentelemetry::nostd::bad_variant_access &)
+#  endif
+  {
+    return {ReturnType{}, false};
+  }
+  catch (const std::bad_alloc &)
+  {
+    return {ReturnType{}, false};
+  }
+#endif
+}
+
+/**
  * Class for storing attributes.
  */
 class AttributeMap : public std::unordered_map<std::string, OwnedAttributeValue>
@@ -328,10 +388,18 @@ public:
   }
 
   // Convert non-owning key-value to owning std::string(key) and OwnedAttributeValue(value)
-  void SetAttribute(nostd::string_view key,
-                    const opentelemetry::common::AttributeValue &value) noexcept
+  bool SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &value,
+                    std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept
   {
-    (*this)[std::string(key)] = nostd::visit(AttributeConverter(), value);
+    std::pair<OwnedAttributeValue, bool> result =
+        VisitVariant(AttributeConverter(max_length), value);
+    if (result.second)
+    {
+      AttributeInsertOrAssign(*this, key, std::move(result.first));
+      return true;
+    }
+    return false;
   }
 
   // Compare the attributes of this map with another KeyValueIterable
@@ -403,9 +471,15 @@ public:
 
   // Convert non-owning key-value to owning std::string(key) and OwnedAttributeValue(value)
   void SetAttribute(nostd::string_view key,
-                    const opentelemetry::common::AttributeValue &value) noexcept
+                    const opentelemetry::common::AttributeValue &value,
+                    std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept
   {
-    (*this)[std::string(key)] = nostd::visit(AttributeConverter(), value);
+    std::pair<OwnedAttributeValue, bool> result =
+        VisitVariant(AttributeConverter(max_length), value);
+    if (result.second)
+    {
+      AttributeInsertOrAssign(*this, key, std::move(result.first));
+    }
   }
 };
 
