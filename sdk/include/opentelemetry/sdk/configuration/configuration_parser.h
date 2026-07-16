@@ -474,8 +474,8 @@ public:
 
 private:
   std::string version_;
-  int version_major_;
-  int version_minor_;
+  int version_major_{};
+  int version_minor_{};
 };
 
 }  // namespace configuration
