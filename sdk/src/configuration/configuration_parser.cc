@@ -1381,7 +1381,7 @@ ConfigurationParser::ParseBase2ExponentialBucketHistogramAggregationConfiguratio
   }
   model->max_scale = static_cast<std::int32_t>(max_scale);
 
-  model->max_size = node->GetInteger("max_size", 160);
+  model->max_size = node->GetInteger("max_size", Config::kDefaultMaxSize);
   if (model->max_size < opentelemetry::sdk::metrics::kMaxSizeMin)
   {
     std::string message("Illegal max_size: ");
@@ -1389,7 +1389,7 @@ ConfigurationParser::ParseBase2ExponentialBucketHistogramAggregationConfiguratio
     throw InvalidSchemaException(node->Location(), message);
   }
 
-  model->record_min_max = node->GetBoolean("record_min_max", true);
+  model->record_min_max = node->GetBoolean("record_min_max", Config::kDefaultRecordMinMax);
 
   return model;
 }
