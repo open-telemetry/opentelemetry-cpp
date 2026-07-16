@@ -19,11 +19,21 @@
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
+#include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
+
+using opentelemetry::sdk::configuration::Registry;
+using opentelemetry::sdk::configuration::SdkBuilder;
+using opentelemetry::sdk::configuration::SpanLimitsConfiguration;
+using opentelemetry::sdk::configuration::TracerProviderConfiguration;
 
 namespace logs       = opentelemetry::logs;
 namespace logs_sdk   = opentelemetry::sdk::logs;
@@ -35,6 +45,52 @@ namespace config_sdk = opentelemetry::sdk::configuration;
 // These tests focus on the API of the SdkBuilder for creating SDK components that can be
 // independently verified. For full integration tests of the SdkBuilder with configuration models,
 // see the programmatic_configuration_test.cc file.
+
+TEST(SdkBuilder, SpanLimitsDefaults)
+{
+  auto model    = std::make_unique<TracerProviderConfiguration>();
+  model->limits = nullptr;
+
+  SdkBuilder builder(std::make_shared<Registry>());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateTracerProvider(model, resource);
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits         = provider->GetSpanLimits();
+  const auto default_limits = opentelemetry::sdk::trace::SpanLimits{};
+
+  EXPECT_EQ(limits.attribute_count_limit, default_limits.attribute_count_limit);
+  EXPECT_EQ(limits.event_count_limit, default_limits.event_count_limit);
+  EXPECT_EQ(limits.link_count_limit, default_limits.link_count_limit);
+  EXPECT_EQ(limits.event_attribute_count_limit, default_limits.event_attribute_count_limit);
+  EXPECT_EQ(limits.link_attribute_count_limit, default_limits.link_attribute_count_limit);
+  EXPECT_EQ(limits.attribute_value_length_limit, default_limits.attribute_value_length_limit);
+}
+
+TEST(SdkBuilder, SpanLimitsConfiguration)
+{
+  auto model                                  = std::make_unique<TracerProviderConfiguration>();
+  model->limits                               = std::make_unique<SpanLimitsConfiguration>();
+  model->limits->attribute_value_length_limit = 1111;
+  model->limits->attribute_count_limit        = 2222;
+  model->limits->event_count_limit            = 3333;
+  model->limits->link_count_limit             = 4444;
+  model->limits->event_attribute_count_limit  = 5555;
+  model->limits->link_attribute_count_limit   = 6666;
+
+  SdkBuilder builder(std::make_shared<Registry>());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateTracerProvider(model, resource);
+  ASSERT_NE(provider, nullptr);
+
+  auto limits = provider->GetSpanLimits();
+  EXPECT_EQ(limits.attribute_value_length_limit, model->limits->attribute_value_length_limit);
+  EXPECT_EQ(limits.attribute_count_limit, model->limits->attribute_count_limit);
+  EXPECT_EQ(limits.event_count_limit, model->limits->event_count_limit);
+  EXPECT_EQ(limits.link_count_limit, model->limits->link_count_limit);
+  EXPECT_EQ(limits.event_attribute_count_limit, model->limits->event_attribute_count_limit);
+  EXPECT_EQ(limits.link_attribute_count_limit, model->limits->link_attribute_count_limit);
+}
 
 TEST(SdkBuilder, CreateLoggerConfigurator)
 {
