@@ -28,6 +28,7 @@ C++ standards:
 * ISO/IEC 14882:2014 (C++14)
 * ISO/IEC 14882:2017 (C++17)
 * ISO/IEC 14882:2020 (C++20)
+* ISO/IEC 14882:2024 (C++23)
 
 Any exceptions to this are noted in the individual `README.md` files.
 
