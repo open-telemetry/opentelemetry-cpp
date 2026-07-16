@@ -297,6 +297,9 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy `bugprone-throwing-static-initialization` warnings
   [#4206](https://github.com/open-telemetry/opentelemetry-cpp/pull/4206)
 
+* [METRICS SDK] Validate Base2 Exponential Histogram Aggregation config
+  [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
+
 * Bump rules_cc from 0.2.21 to 0.2.22
   [#4223](https://github.com/open-telemetry/opentelemetry-cpp/pull/4223)
 
