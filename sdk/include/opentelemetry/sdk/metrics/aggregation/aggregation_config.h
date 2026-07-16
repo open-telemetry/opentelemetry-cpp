@@ -69,7 +69,7 @@ public:
     return AggregationType::kBase2ExponentialHistogram;
   }
 
-  size_t max_buckets_  = 160;
+  size_t max_size_     = 160;
   int32_t max_scale_   = 20;
   bool record_min_max_ = true;
 };

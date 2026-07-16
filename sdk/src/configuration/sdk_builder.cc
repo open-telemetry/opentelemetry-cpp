@@ -1608,7 +1608,7 @@ SdkBuilder::CreateBase2ExponentialBucketHistogramAggregation(
   auto sdk =
       std::make_unique<opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>();
 
-  sdk->max_buckets_    = model->max_size;
+  sdk->max_size_       = model->max_size;
   sdk->max_scale_      = static_cast<int32_t>(model->max_scale);
   sdk->record_min_max_ = model->record_min_max;
 

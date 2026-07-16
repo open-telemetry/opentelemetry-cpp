@@ -51,11 +51,11 @@ uint64_t SumAllBuckets(const Base2ExponentialHistogramPointData &point)
   return total;
 }
 
-Base2ExponentialHistogramAggregationConfig MakeAggregationConfig(int max_scale, size_t max_buckets)
+Base2ExponentialHistogramAggregationConfig MakeAggregationConfig(int max_scale, size_t max_size)
 {
   Base2ExponentialHistogramAggregationConfig config;
-  config.max_scale_   = max_scale;
-  config.max_buckets_ = max_buckets;
+  config.max_scale_ = max_scale;
+  config.max_size_  = max_size;
   return config;
 }
 
@@ -315,7 +315,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
   auto MAX_BUCKETS0 = 7;
   Base2ExponentialHistogramAggregationConfig scale0_config;
   scale0_config.max_scale_      = SCALE0;
-  scale0_config.max_buckets_    = MAX_BUCKETS0;
+  scale0_config.max_size_       = MAX_BUCKETS0;
   scale0_config.record_min_max_ = true;
   Base2ExponentialHistogramAggregation scale0_aggr(&scale0_config);
   auto point = scale0_aggr.ToPoint();
@@ -388,7 +388,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
 
   Base2ExponentialHistogramAggregationConfig scale1_config;
   scale1_config.max_scale_      = 1;
-  scale1_config.max_buckets_    = 14;
+  scale1_config.max_size_       = 14;
   scale1_config.record_min_max_ = true;
   Base2ExponentialHistogramAggregation scale1_aggr(&scale1_config);
 
@@ -445,7 +445,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMerge)
 {
   Base2ExponentialHistogramAggregationConfig config;
   config.max_scale_      = 10;
-  config.max_buckets_    = 100;
+  config.max_size_       = 100;
   config.record_min_max_ = true;
 
   Base2ExponentialHistogramAggregation aggr(&config);
@@ -468,7 +468,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMerge)
   ASSERT_DOUBLE_EQ(aggr_point.sum_, expected_sum);
   ASSERT_EQ(aggr_point.zero_count_, 0);
   ASSERT_GT(aggr_point.scale_, -10);
-  ASSERT_EQ(aggr_point.max_buckets_, config.max_buckets_);
+  ASSERT_EQ(aggr_point.max_buckets_, config.max_size_);
 
   auto test_merge = [](const std::unique_ptr<Aggregation> &merged_aggr, int expected_count,
                        double expected_sum, int expected_zero_count, int expected_scale,
@@ -943,7 +943,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationDefaultConfigMerge)
   ExpectCountInvariant(pb.count_, pb, "b");
   EXPECT_LE(pa.scale_, 20);
   EXPECT_LE(pb.scale_, 20);
-  EXPECT_EQ(pa.max_buckets_, config.max_buckets_);
+  EXPECT_EQ(pa.max_buckets_, config.max_size_);
   EXPECT_GT(pa.max_, pa.min_);
   EXPECT_GT(pb.max_, pb.min_);
 
