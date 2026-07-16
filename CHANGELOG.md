@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* docs: update supported development platforms
+  [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
+
 ## [1.28.0] 2026-07-16
 
 * [RELEASE] Bump main branch to 1.28.0-dev
