@@ -37,16 +37,16 @@ of the current project.
 
 ## Supported Development Platforms
 
- Our CI pipeline builds and tests on following `x86-64` platforms:
+Our CI pipeline builds and tests on the following platforms:
 
-| Platform                                                            |   Build type  |
-|---------------------------------------------------------------------|---------------|
-| ubuntu-22.04 (GCC 10, GCC 12, Clang 14)                             | CMake, Bazel  |
-| ubuntu-20.04 (GCC 9.4.0 - default compiler)                         | CMake, Bazel  |
-| ubuntu-20.04 (GCC 9.4.0 with -std=c++14/17/20 flags)                | CMake, Bazel  |
-| macOS 12.7 (Xcode 14.2)                                             | Bazel         |
-| Windows Server 2019 (Visual Studio Enterprise 2019)                 | CMake, Bazel  |
-| Windows Server 2022 (Visual Studio Enterprise 2022)                 | CMake         |
+| Platform            | Architecture | Build type   |
+|---------------------|--------------|--------------|
+| Ubuntu 22.04        | x86-64       | CMake        |
+| Ubuntu 24.04        | x86-64       | CMake, Bazel |
+| macOS 14            | arm64        | CMake        |
+| macOS 15            | arm64        | Bazel        |
+| Windows Server 2022 | x86-64       | CMake, Bazel |
+| Windows Server 2025 | x86-64       | CMake        |
 
 In general, the code shipped from this repository should build on all platforms
 having C++ compiler with [supported C++ standards](#supported-c-versions).
