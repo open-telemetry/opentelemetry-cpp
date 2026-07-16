@@ -128,6 +128,7 @@
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -1370,9 +1371,25 @@ ConfigurationParser::ParseBase2ExponentialBucketHistogramAggregationConfiguratio
   using Config = Base2ExponentialBucketHistogramAggregationConfiguration;
   auto model   = std::make_unique<Base2ExponentialBucketHistogramAggregationConfiguration>();
 
-  model->max_scale      = node->GetInteger("max_scale", Config::kDefaultMaxScale);
-  model->max_size       = node->GetInteger("max_size", Config::kDefaultMaxSize);
-  model->record_min_max = node->GetBoolean("record_min_max", Config::kDefaultRecordMinMax);
+  std::int64_t max_scale = node->GetSignedInteger("max_scale", Config::kDefaultMaxScale);
+  if (max_scale < opentelemetry::sdk::metrics::kMaxScaleMin ||
+      max_scale > opentelemetry::sdk::metrics::kMaxScaleMax)
+  {
+    std::string message("Illegal max_scale: ");
+    message.append(std::to_string(max_scale));
+    throw InvalidSchemaException(node->Location(), message);
+  }
+  model->max_scale = static_cast<std::int32_t>(max_scale);
+
+  model->max_size = node->GetInteger("max_size", 160);
+  if (model->max_size < opentelemetry::sdk::metrics::kMaxSizeMin)
+  {
+    std::string message("Illegal max_size: ");
+    message.append(std::to_string(model->max_size));
+    throw InvalidSchemaException(node->Location(), message);
+  }
+
+  model->record_min_max = node->GetBoolean("record_min_max", true);
 
   return model;
 }

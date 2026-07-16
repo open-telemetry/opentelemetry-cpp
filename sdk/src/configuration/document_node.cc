@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <cctype>
+#include <cstdint>
 #include <cstdlib>
 #include <string>
 
@@ -241,6 +242,21 @@ size_t DocumentNode::IntegerFromString(const std::string &value) const
   char *end       = nullptr;
   size_t len      = value.length();
   size_t val      = strtoll(ptr, &end, 10);
+  if (ptr + len != end)
+  {
+    std::string message("Illegal integer value: ");
+    message.append(value);
+    throw InvalidSchemaException(Location(), message);
+  }
+  return val;
+}
+
+std::int64_t DocumentNode::SignedIntegerFromString(const std::string &value) const
+{
+  const char *ptr  = value.c_str();
+  char *end        = nullptr;
+  size_t len       = value.length();
+  std::int64_t val = strtoll(ptr, &end, 10);
   if (ptr + len != end)
   {
     std::string message("Illegal integer value: ");

@@ -56,6 +56,13 @@ public:
   bool record_min_max_ = true;
 };
 
+// Valid ranges per the declarative configuration schema; the schema defines no maximum for
+// max_size.
+// https://github.com/open-telemetry/opentelemetry-configuration/blob/main/schema/meter_provider.yaml
+constexpr int32_t kMaxScaleMin = -10;
+constexpr int32_t kMaxScaleMax = 20;
+constexpr size_t kMaxSizeMin   = 2;
+
 class Base2ExponentialHistogramAggregationConfig : public AggregationConfig
 {
 public:
