@@ -223,7 +223,6 @@ if(grpc IN_LIST _THIRDPARTY_PACKAGE_LIST)
     GIT_TAG ${grpc_GIT_TAG}
     GIT_SHALLOW ON
     GIT_SUBMODULES "third_party/re2" "third_party/cares/cares"
-                   "third_party/boringssl-with-bazel"
     PREFIX ${CMAKE_BINARY_DIR}/external/grpc
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
     CMAKE_ARGS "${CMAKE_OPTIONS}"
@@ -238,6 +237,7 @@ if(grpc IN_LIST _THIRDPARTY_PACKAGE_LIST)
                "-DgRPC_BUILD_GRPC_RUBY_PLUGIN=OFF"
                "-DgRPC_BUILD_GRPCPP_OTEL_PLUGIN=OFF"
                "-DRE2_BUILD_TESTING=OFF"
+               "-DgRPC_SSL_PROVIDER=package"
                "-DgRPC_ZLIB_PROVIDER=package"
                "-DgRPC_PROTOBUF_PROVIDER=package"
                "-DgRPC_PROTOBUF_PACKAGE_TYPE=CONFIG"
