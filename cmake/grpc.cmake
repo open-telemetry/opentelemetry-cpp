@@ -23,7 +23,6 @@ if(NOT gRPC_FOUND)
           "third_party/abseil-cpp"
           "third_party/protobuf"
           "third_party/cares/cares"
-          "third_party/boringssl-with-bazel"
       )
   set(gRPC_PROVIDER "fetch_repository")
 
@@ -38,6 +37,7 @@ if(NOT gRPC_FOUND)
   set(gRPC_BUILD_GRPC_PYTHON_PLUGIN OFF CACHE BOOL "" FORCE)
   set(gRPC_BUILD_GRPC_RUBY_PLUGIN OFF CACHE BOOL "" FORCE)
   set(gRPC_BUILD_GRPCPP_OTEL_PLUGIN OFF CACHE BOOL "" FORCE)
+  set(gRPC_SSL_PROVIDER "package" CACHE STRING "" FORCE)
   set(gRPC_ZLIB_PROVIDER "package" CACHE STRING "" FORCE)
   set(gRPC_RE2_PROVIDER "module"  CACHE STRING "" FORCE)
   set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
