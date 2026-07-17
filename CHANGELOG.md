@@ -23,6 +23,8 @@ Increment the:
 
 * [API] Add `trace::GetSpanContext()` to read the active span's `SpanContext`
   from a `Context` without the `DefaultSpan` allocation that
+  `GetSpan(context)->GetContext()` incurs, and use it at existing call sites.
+  [#4254](https://github.com/open-telemetry/opentelemetry-cpp/pull/4254)
 
 ## [1.28.0] 2026-07-16
 
