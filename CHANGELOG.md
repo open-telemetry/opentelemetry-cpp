@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Read span limits from the environment variables defined in the
+        specification (OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, OTEL_SPAN_EVENT_COUNT_LIMIT,
+        OTEL_SPAN_LINK_COUNT_LIMIT, ...) in the TracerProviderFactory overloads
+        that do not receive explicit SpanLimits
+  [#4258](https://github.com/open-telemetry/opentelemetry-cpp/pull/4258)
+
 * docs: update supported development platforms
   [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
 

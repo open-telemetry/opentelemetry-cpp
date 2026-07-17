@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stdlib.h>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
@@ -36,6 +37,12 @@
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
+
+#if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
+#endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 #  include <initializer_list>
@@ -567,6 +574,102 @@ TEST(TracerProvider, SpanLimitsTracerProviderFactoryCreate)
   EXPECT_EQ(stored.link_count_limit, limits.link_count_limit);
   EXPECT_EQ(stored.event_attribute_count_limit, limits.event_attribute_count_limit);
   EXPECT_EQ(stored.link_attribute_count_limit, limits.link_attribute_count_limit);
+}
+
+namespace
+{
+
+void UnsetSpanLimitsEnv()
+{
+  unsetenv("OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT");
+  unsetenv("OTEL_ATTRIBUTE_COUNT_LIMIT");
+  unsetenv("OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT");
+  unsetenv("OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT");
+  unsetenv("OTEL_SPAN_EVENT_COUNT_LIMIT");
+  unsetenv("OTEL_SPAN_LINK_COUNT_LIMIT");
+  unsetenv("OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT");
+  unsetenv("OTEL_LINK_ATTRIBUTE_COUNT_LIMIT");
+}
+
+}  // namespace
+
+TEST(TracerProvider, SpanLimitsFromEnvUnsetIsNoLimits)
+{
+  UnsetSpanLimitsEnv();
+
+  const SpanLimits limits    = span_limits_env::GetSpanLimitsFromEnv();
+  const SpanLimits no_limits = SpanLimits::NoLimits();
+  EXPECT_EQ(limits.attribute_count_limit, no_limits.attribute_count_limit);
+  EXPECT_EQ(limits.attribute_value_length_limit, no_limits.attribute_value_length_limit);
+  EXPECT_EQ(limits.event_count_limit, no_limits.event_count_limit);
+  EXPECT_EQ(limits.link_count_limit, no_limits.link_count_limit);
+  EXPECT_EQ(limits.event_attribute_count_limit, no_limits.event_attribute_count_limit);
+  EXPECT_EQ(limits.link_attribute_count_limit, no_limits.link_attribute_count_limit);
+}
+
+TEST(TracerProvider, SpanLimitsFromEnvReadsVariables)
+{
+  UnsetSpanLimitsEnv();
+  setenv("OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT", "100", 1);
+  setenv("OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT", "5", 1);
+  setenv("OTEL_SPAN_EVENT_COUNT_LIMIT", "3", 1);
+  setenv("OTEL_SPAN_LINK_COUNT_LIMIT", "2", 1);
+  setenv("OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT", "4", 1);
+  setenv("OTEL_LINK_ATTRIBUTE_COUNT_LIMIT", "6", 1);
+
+  const SpanLimits limits = span_limits_env::GetSpanLimitsFromEnv();
+  EXPECT_EQ(limits.attribute_value_length_limit, 100u);
+  EXPECT_EQ(limits.attribute_count_limit, 5u);
+  EXPECT_EQ(limits.event_count_limit, 3u);
+  EXPECT_EQ(limits.link_count_limit, 2u);
+  EXPECT_EQ(limits.event_attribute_count_limit, 4u);
+  EXPECT_EQ(limits.link_attribute_count_limit, 6u);
+
+  UnsetSpanLimitsEnv();
+}
+
+TEST(TracerProvider, SpanLimitsFromEnvGeneralAttributeVariablesApply)
+{
+  UnsetSpanLimitsEnv();
+  setenv("OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT", "50", 1);
+  setenv("OTEL_ATTRIBUTE_COUNT_LIMIT", "10", 1);
+
+  const SpanLimits limits = span_limits_env::GetSpanLimitsFromEnv();
+  EXPECT_EQ(limits.attribute_value_length_limit, 50u);
+  EXPECT_EQ(limits.attribute_count_limit, 10u);
+  EXPECT_EQ(limits.event_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+
+  UnsetSpanLimitsEnv();
+}
+
+TEST(TracerProvider, SpanLimitsFromEnvSpanSpecificTakesPrecedence)
+{
+  UnsetSpanLimitsEnv();
+  setenv("OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT", "50", 1);
+  setenv("OTEL_ATTRIBUTE_COUNT_LIMIT", "10", 1);
+  setenv("OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT", "100", 1);
+  setenv("OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT", "20", 1);
+
+  const SpanLimits limits = span_limits_env::GetSpanLimitsFromEnv();
+  EXPECT_EQ(limits.attribute_value_length_limit, 100u);
+  EXPECT_EQ(limits.attribute_count_limit, 20u);
+
+  UnsetSpanLimitsEnv();
+}
+
+TEST(TracerProvider, SpanLimitsTracerProviderFactoryCreateDefaultReadsEnv)
+{
+  UnsetSpanLimitsEnv();
+  setenv("OTEL_SPAN_EVENT_COUNT_LIMIT", "42", 1);
+
+  auto provider = TracerProviderFactory::Create(std::make_unique<SimpleSpanProcessor>(nullptr));
+
+  const auto &limits = provider->GetSpanLimits();
+  EXPECT_EQ(limits.event_count_limit, 42u);
+  EXPECT_EQ(limits.attribute_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+  EXPECT_EQ(limits.link_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+
+  UnsetSpanLimitsEnv();
 }
 
 TEST(TracerProvider, SpanLimitsTracerProviderFactoryCreateDefault)
