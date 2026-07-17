@@ -9,7 +9,6 @@
 #include <cstdint>
 #include <cstring>
 #include <limits>
-#include <new>
 #include <ostream>
 #include <string>
 #include <type_traits>
