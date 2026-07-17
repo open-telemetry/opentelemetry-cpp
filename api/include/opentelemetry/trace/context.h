@@ -38,14 +38,14 @@ inline SpanContext GetSpanContext(const context::Context &context) noexcept
   if (const nostd::shared_ptr<Span> *maybe_span =
           nostd::get_if<nostd::shared_ptr<Span>>(&context_value))
   {
-    return (*maybe_span)->GetContext();
+    return *maybe_span ? (*maybe_span)->GetContext() : SpanContext::GetInvalid();
   }
   // Get the span metadata directly from a SpanContext in the context.
   // TODO: This path is unused and may be removed in the future.
   if (const nostd::shared_ptr<SpanContext> *maybe_span_context =
           nostd::get_if<nostd::shared_ptr<SpanContext>>(&context_value))
   {
-    return **maybe_span_context;
+    return *maybe_span_context ? **maybe_span_context : SpanContext::GetInvalid();
   }
   return SpanContext::GetInvalid();
 }
