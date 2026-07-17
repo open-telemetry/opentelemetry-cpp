@@ -15,11 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
-* [CONFIGURATION] Programmatic configuration use case tests and fixes
-  [#4243](https://github.com/open-telemetry/opentelemetry-cpp/pull/4243)
+* docs: update supported development platforms
+  [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
 
 * [RELEASE] Bump main branch to 1.29.0-dev
   [#4259](https://github.com/open-telemetry/opentelemetry-cpp/pull/4259)
+
+* [CONFIGURATION] Programmatic configuration use case tests and fixes
+  [#4243](https://github.com/open-telemetry/opentelemetry-cpp/pull/4243)
 
 ## [1.28.0] 2026-07-16
 
