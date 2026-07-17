@@ -86,15 +86,9 @@ struct AttributeValueVisitor
   }
 
   void operator()(bool value) const { proto_value_->set_bool_value(value); }
-  void operator()(std::int32_t value) const
-  {
-    proto_value_->set_int_value(static_cast<std::int64_t>(value));
-  }
+  void operator()(std::int32_t value) const { proto_value_->set_int_value(value); }
   void operator()(std::int64_t value) const { proto_value_->set_int_value(value); }
-  void operator()(std::uint32_t value) const
-  {
-    proto_value_->set_int_value(static_cast<std::int64_t>(value));
-  }
+  void operator()(std::uint32_t value) const { proto_value_->set_int_value(value); }
   void operator()(std::uint64_t value) const { SetUint64Value(proto_value_, value); }
   void operator()(double value) const { proto_value_->set_double_value(value); }
   void operator()(const char *value) const
@@ -133,7 +127,7 @@ struct AttributeValueVisitor
     array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
     for (const std::int32_t val : values)
     {
-      array_value->add_values()->set_int_value(static_cast<std::int64_t>(val));
+      array_value->add_values()->set_int_value(val);
     }
   }
   void operator()(nostd::span<const std::int64_t> values) const
@@ -151,7 +145,7 @@ struct AttributeValueVisitor
     array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
     for (const std::uint32_t val : values)
     {
-      array_value->add_values()->set_int_value(static_cast<std::int64_t>(val));
+      array_value->add_values()->set_int_value(val);
     }
   }
   void operator()(nostd::span<const double> values) const
@@ -216,14 +210,8 @@ struct OwnedAttributeValueVisitor
   }
 
   void operator()(bool value) const { proto_value_->set_bool_value(value); }
-  void operator()(std::int32_t value) const
-  {
-    proto_value_->set_int_value(static_cast<std::int64_t>(value));
-  }
-  void operator()(std::uint32_t value) const
-  {
-    proto_value_->set_int_value(static_cast<std::int64_t>(value));
-  }
+  void operator()(std::int32_t value) const { proto_value_->set_int_value(value); }
+  void operator()(std::uint32_t value) const { proto_value_->set_int_value(value); }
   void operator()(std::int64_t value) const { proto_value_->set_int_value(value); }
   void operator()(std::uint64_t value) const { SetUint64Value(proto_value_, value); }
   void operator()(double value) const { proto_value_->set_double_value(value); }
@@ -259,7 +247,7 @@ struct OwnedAttributeValueVisitor
     array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
     for (const std::int32_t val : values)
     {
-      array_value->add_values()->set_int_value(static_cast<std::int64_t>(val));
+      array_value->add_values()->set_int_value(val);
     }
   }
   void operator()(const std::vector<std::uint32_t> &values) const
@@ -268,7 +256,7 @@ struct OwnedAttributeValueVisitor
     array_value->mutable_values()->Reserve(static_cast<int>(values.size()));
     for (const std::uint32_t val : values)
     {
-      array_value->add_values()->set_int_value(static_cast<std::int64_t>(val));
+      array_value->add_values()->set_int_value(val);
     }
   }
   void operator()(const std::vector<std::int64_t> &values) const
@@ -329,80 +317,24 @@ struct OwnedAttributeValueVisitor
 
 }  // namespace
 
-void OtlpPopulateAttributeUtils::PopulateAnyValue(
+bool OtlpPopulateAttributeUtils::PopulateAnyValue(
     opentelemetry::proto::common::v1::AnyValue *proto_value,
     const opentelemetry::common::AttributeValue &value,
     AttributeConverterOptions options) noexcept
 {
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-  try
-  {
-#endif
-    nostd::visit(AttributeValueVisitor{proto_value, options}, value);
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-  }
-#  if defined(OPENTELEMETRY_HAVE_STD_VARIANT)
-  catch (const std::bad_variant_access &e)
-#  else
-  catch (const opentelemetry::nostd::bad_variant_access &e)
-#  endif
-  {
-    OTEL_INTERNAL_LOG_ERROR(
-        "[OTLP Populate Attribute] bad_variant_access in PopulateAnyValue: " << e.what());
-  }
-  catch (const std::bad_alloc &)  // NOLINT(bugprone-empty-catch)
-  {
-    // TODO: Log an error once the logger doesn't require dynamic memory allocation.
-    // OTEL_INTERNAL_LOG_ERROR(
-    //     "[OTLP Populate Attribute] std::bad_alloc in PopulateAnyValue: " << e.what());
-  }
-#endif
+  auto result =
+      opentelemetry::sdk::common::VisitVariant(AttributeValueVisitor{proto_value, options}, value);
+  return result.second;
 }
 
-void OtlpPopulateAttributeUtils::PopulateAnyValue(
-    opentelemetry::proto::common::v1::AnyValue *proto_value,
-    const opentelemetry::common::AttributeValue &value,
-    bool /* allow_bytes */) noexcept
-{
-  PopulateAnyValue(proto_value, value, AttributeConverterOptions{});
-}
-
-void OtlpPopulateAttributeUtils::PopulateAnyValue(
+bool OtlpPopulateAttributeUtils::PopulateAnyValue(
     opentelemetry::proto::common::v1::AnyValue *proto_value,
     const opentelemetry::sdk::common::OwnedAttributeValue &value,
     AttributeConverterOptions options) noexcept
 {
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-  try
-  {
-#endif
-    nostd::visit(OwnedAttributeValueVisitor{proto_value, options}, value);
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
-  }
-#  if defined(OPENTELEMETRY_HAVE_STD_VARIANT)
-  catch (const std::bad_variant_access &e)
-#  else
-  catch (const opentelemetry::nostd::bad_variant_access &e)
-#  endif
-  {
-    OTEL_INTERNAL_LOG_ERROR(
-        "[OTLP Populate Attribute] bad_variant_access in PopulateAnyValue: " << e.what());
-  }
-  catch (const std::bad_alloc &)  // NOLINT(bugprone-empty-catch)
-  {
-    // TODO: Log an error once the logger doesn't require dynamic memory allocation.
-    // OTEL_INTERNAL_LOG_ERROR(
-    //     "[OTLP Populate Attribute] std::bad_alloc in PopulateAnyValue: " << e.what());
-  }
-#endif
-}
-
-void OtlpPopulateAttributeUtils::PopulateAnyValue(
-    opentelemetry::proto::common::v1::AnyValue *proto_value,
-    const opentelemetry::sdk::common::OwnedAttributeValue &value,
-    bool /* allow_bytes */) noexcept
-{
-  PopulateAnyValue(proto_value, value, AttributeConverterOptions{});
+  auto result = opentelemetry::sdk::common::VisitVariant(
+      OwnedAttributeValueVisitor{proto_value, options}, value);
+  return result.second;
 }
 
 void OtlpPopulateAttributeUtils::PopulateAttribute(
@@ -423,16 +355,13 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
       "AttributeValue contains unknown type");
 
   attribute->set_key(key.data(), key.size());
-  PopulateAnyValue(attribute->mutable_value(), value, options);
-}
-
-void OtlpPopulateAttributeUtils::PopulateAttribute(
-    opentelemetry::proto::common::v1::KeyValue *attribute,
-    nostd::string_view key,
-    const opentelemetry::common::AttributeValue &value,
-    bool /* allow_bytes */) noexcept
-{
-  PopulateAttribute(attribute, key, value, AttributeConverterOptions{});
+  bool result = PopulateAnyValue(attribute->mutable_value(), value, options);
+  if (!result)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[OTLP Populate Attribute] PopulateAnyValue from AttributeValue failed for key: "
+        << std::string(key));
+  }
 }
 
 /** Maps from C++ attribute into OTLP proto attribute. */
@@ -454,16 +383,13 @@ void OtlpPopulateAttributeUtils::PopulateAttribute(
                 "OwnedAttributeValue contains unknown type");
 
   attribute->set_key(key.data(), key.size());
-  PopulateAnyValue(attribute->mutable_value(), value, options);
-}
-
-void OtlpPopulateAttributeUtils::PopulateAttribute(
-    opentelemetry::proto::common::v1::KeyValue *attribute,
-    nostd::string_view key,
-    const opentelemetry::sdk::common::OwnedAttributeValue &value,
-    bool /* allow_bytes */) noexcept
-{
-  PopulateAttribute(attribute, key, value, AttributeConverterOptions{});
+  bool result = PopulateAnyValue(attribute->mutable_value(), value, options);
+  if (!result)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[OTLP Populate Attribute] PopulateAnyValue from OwnedAttributeValue failed for key: "
+        << std::string(key));
+  }
 }
 
 void OtlpPopulateAttributeUtils::PopulateAttribute(

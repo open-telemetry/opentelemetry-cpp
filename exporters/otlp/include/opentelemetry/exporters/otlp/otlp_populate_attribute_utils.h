@@ -85,12 +85,12 @@ public:
                                 const opentelemetry::sdk::instrumentationscope::InstrumentationScope
                                     &instrumentation_scope) noexcept;
 
-  static void PopulateAnyValue(
+  static bool PopulateAnyValue(
       opentelemetry::proto::common::v1::AnyValue *proto_value,
       const opentelemetry::common::AttributeValue &value,
       AttributeConverterOptions options = AttributeConverterOptions{}) noexcept;
 
-  static void PopulateAnyValue(
+  static bool PopulateAnyValue(
       opentelemetry::proto::common::v1::AnyValue *proto_value,
       const opentelemetry::sdk::common::OwnedAttributeValue &value,
       AttributeConverterOptions options = AttributeConverterOptions{}) noexcept;
@@ -106,37 +106,6 @@ public:
       nostd::string_view key,
       const opentelemetry::sdk::common::OwnedAttributeValue &value,
       AttributeConverterOptions options = AttributeConverterOptions{}) noexcept;
-
-  /**
-   *  The following overloads are deprecated and will be removed in a future release. Use the
-   *overloads that take an AttributeConverterOptions instead. The deprecated overloads call the new
-   *overloads with default AttributeConverterOptions, the `allow_bytes` parameter is unused.
-   **/
-  OPENTELEMETRY_DEPRECATED_MESSAGE(
-      "allow_bytes is unused; use the AttributeConverterOptions overload instead")
-  static void PopulateAnyValue(opentelemetry::proto::common::v1::AnyValue *proto_value,
-                               const opentelemetry::common::AttributeValue &value,
-                               bool allow_bytes) noexcept;
-
-  OPENTELEMETRY_DEPRECATED_MESSAGE(
-      "allow_bytes is unused; use the AttributeConverterOptions overload instead")
-  static void PopulateAnyValue(opentelemetry::proto::common::v1::AnyValue *proto_value,
-                               const opentelemetry::sdk::common::OwnedAttributeValue &value,
-                               bool allow_bytes) noexcept;
-
-  OPENTELEMETRY_DEPRECATED_MESSAGE(
-      "allow_bytes is unused; use the AttributeConverterOptions overload instead")
-  static void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
-                                nostd::string_view key,
-                                const opentelemetry::common::AttributeValue &value,
-                                bool allow_bytes) noexcept;
-
-  OPENTELEMETRY_DEPRECATED_MESSAGE(
-      "allow_bytes is unused; use the AttributeConverterOptions overload instead")
-  static void PopulateAttribute(opentelemetry::proto::common::v1::KeyValue *attribute,
-                                nostd::string_view key,
-                                const opentelemetry::sdk::common::OwnedAttributeValue &value,
-                                bool allow_bytes) noexcept;
 
   /**
    * Byte length of the longest prefix of `value` that fits within `max_bytes`

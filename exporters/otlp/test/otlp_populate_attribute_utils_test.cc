@@ -619,66 +619,6 @@ TEST_F(PopulateAttributeTest, PopulateAttributeKeyValueOwned)
   EXPECT_EQ(proto_keyvalue_.value().string_value(), "my-value");
 }
 
-// ---------------------------------------------------------------------------
-// Deprecated bool allow_bytes overloads
-// ---------------------------------------------------------------------------
-
-/*
- * The following overloads are deprecated.
- * Suppress warnings in tests, to have a clean build and coverage.
- */
-#if defined(_MSC_VER)
-#  pragma warning(push)
-#  pragma warning(disable : 4996)
-#elif defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(__clang__) || defined(__apple_build_version__)
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#endif
-
-TEST_F(PopulateAnyValueTest, DeprecatedAllowBytesAttributeValue)
-{
-  OtlpPopulateAttributeUtils::PopulateAnyValue(
-      &proto_anyvalue_, common::AttributeValue{int64_t{77}}, /*allow_bytes=*/true);
-  EXPECT_EQ(proto_anyvalue_.int_value(), 77);
-}
-
-TEST_F(PopulateAnyValueTest, DeprecatedAllowBytesOwnedAttributeValue)
-{
-  OtlpPopulateAttributeUtils::PopulateAnyValue(
-      &proto_anyvalue_, sdk::common::OwnedAttributeValue{std::string{"owned"}},
-      /*allow_bytes=*/false);
-  EXPECT_EQ(proto_anyvalue_.string_value(), "owned");
-}
-
-TEST_F(PopulateAttributeTest, DeprecatedAllowBytesAttributeValue)
-{
-  OtlpPopulateAttributeUtils::PopulateAttribute(&proto_keyvalue_, nostd::string_view{"key"},
-                                                common::AttributeValue{int64_t{99}},
-                                                /*allow_bytes=*/true);
-  EXPECT_EQ(proto_keyvalue_.key(), "key");
-  EXPECT_EQ(proto_keyvalue_.value().int_value(), 99);
-}
-
-TEST_F(PopulateAttributeTest, DeprecatedAllowBytesOwnedAttributeValue)
-{
-  OtlpPopulateAttributeUtils::PopulateAttribute(
-      &proto_keyvalue_, nostd::string_view{"key"},
-      sdk::common::OwnedAttributeValue{std::string{"value"}}, /*allow_bytes=*/false);
-  EXPECT_EQ(proto_keyvalue_.key(), "key");
-  EXPECT_EQ(proto_keyvalue_.value().string_value(), "value");
-}
-
-#if defined(_MSC_VER)
-#  pragma warning(pop)
-#elif defined(__GNUC__) && !defined(__clang__) && !defined(__apple_build_version__)
-#  pragma GCC diagnostic pop
-#elif defined(__clang__) || defined(__apple_build_version__)
-#  pragma clang diagnostic pop
-#endif
-
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
