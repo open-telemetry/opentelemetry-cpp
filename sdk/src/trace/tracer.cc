@@ -94,22 +94,6 @@ nostd::shared_ptr<opentelemetry::trace::Span> MakeSpan(
 #endif
 }
 
-opentelemetry::trace::SpanContext GetSpanContext(const context::Context &context) noexcept
-{
-  const context::ContextValue span_value = context.GetValue(opentelemetry::trace::kSpanKey);
-  if (const nostd::shared_ptr<opentelemetry::trace::Span> *span =
-          nostd::get_if<nostd::shared_ptr<opentelemetry::trace::Span>>(&span_value))
-  {
-    return (*span)->GetContext();
-  }
-  else if (const nostd::shared_ptr<opentelemetry::trace::SpanContext> *span_context =
-               nostd::get_if<nostd::shared_ptr<opentelemetry::trace::SpanContext>>(&span_value))
-  {
-    return *(*span_context);
-  }
-  return opentelemetry::trace::SpanContext::GetInvalid();
-}
-
 }  // namespace
 
 Tracer::Tracer(std::shared_ptr<TracerContext> context,
@@ -152,16 +136,19 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     }
     else if (const auto *context = nostd::get_if<context::Context>(&options.parent))
     {
-      if (context->HasKey(opentelemetry::trace::kSpanKey))
+      const auto ctx_span_context = opentelemetry::trace::GetSpanContext(*context);
+      if (ctx_span_context.IsValid())
       {
-        return GetSpanContext(*context);
+        return ctx_span_context;
       }
       else if (opentelemetry::trace::IsRootSpan(*context))
       {
         return opentelemetry::trace::SpanContext::GetInvalid();
       }
     }
-    return GetSpanContext(opentelemetry::context::RuntimeContext::GetCurrent());
+
+    return opentelemetry::trace::GetSpanContext(
+        opentelemetry::context::RuntimeContext::GetCurrent());
   }();
 
   IdGenerator &generator                     = GetIdGenerator();
