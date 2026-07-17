@@ -462,9 +462,14 @@ public:
             [&mock_session, report_trace_id, report_span_id, &received_record_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
-              request_body.ParseFromArray(
+              const bool parsed = request_body.ParseFromArray(
                   &mock_session->GetRequest()->body_[0],
                   static_cast<int>(mock_session->GetRequest()->body_.size()));
+              EXPECT_TRUE(parsed);
+              if (!parsed)
+              {
+                return;
+              }
               if (request_body.resource_logs_size() == 0 ||
                   request_body.resource_logs(0).scope_logs_size() == 0 ||
                   request_body.resource_logs(0).scope_logs(0).log_records_size() == 0)
@@ -590,9 +595,14 @@ public:
             [&mock_session, report_trace_id, report_span_id, schema_url, &received_record_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest request_body;
-              request_body.ParseFromArray(
+              const bool parsed = request_body.ParseFromArray(
                   &mock_session->GetRequest()->body_[0],
                   static_cast<int>(mock_session->GetRequest()->body_.size()));
+              EXPECT_TRUE(parsed);
+              if (!parsed)
+              {
+                return;
+              }
               if (request_body.resource_logs_size() == 0 ||
                   request_body.resource_logs(0).scope_logs_size() == 0 ||
                   request_body.resource_logs(0).scope_logs(0).log_records_size() == 0)

@@ -301,8 +301,14 @@ public:
                             const std::shared_ptr<opentelemetry::ext::http::client::EventHandler>
                                 &callback) {
           opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest request_body;
-          request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
-                                      static_cast<int>(mock_session->GetRequest()->body_.size()));
+          const bool parsed = request_body.ParseFromArray(
+              &mock_session->GetRequest()->body_[0],
+              static_cast<int>(mock_session->GetRequest()->body_.size()));
+          EXPECT_TRUE(parsed);
+          if (!parsed)
+          {
+            return;
+          }
           if (request_body.resource_metrics_size() == 0 ||
               request_body.resource_metrics(0).scope_metrics_size() == 0 ||
               request_body.resource_metrics(0).scope_metrics(0).metrics_size() == 0)
@@ -522,8 +528,14 @@ public:
                             const std::shared_ptr<opentelemetry::ext::http::client::EventHandler>
                                 &callback) {
           opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest request_body;
-          request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
-                                      static_cast<int>(mock_session->GetRequest()->body_.size()));
+          const bool parsed = request_body.ParseFromArray(
+              &mock_session->GetRequest()->body_[0],
+              static_cast<int>(mock_session->GetRequest()->body_.size()));
+          EXPECT_TRUE(parsed);
+          if (!parsed)
+          {
+            return;
+          }
           if (request_body.resource_metrics_size() == 0 ||
               request_body.resource_metrics(0).scope_metrics_size() == 0 ||
               request_body.resource_metrics(0).scope_metrics(0).metrics_size() == 0)
@@ -788,8 +800,14 @@ public:
                             const std::shared_ptr<opentelemetry::ext::http::client::EventHandler>
                                 &callback) {
           opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest request_body;
-          request_body.ParseFromArray(&mock_session->GetRequest()->body_[0],
-                                      static_cast<int>(mock_session->GetRequest()->body_.size()));
+          const bool parsed = request_body.ParseFromArray(
+              &mock_session->GetRequest()->body_[0],
+              static_cast<int>(mock_session->GetRequest()->body_.size()));
+          EXPECT_TRUE(parsed);
+          if (!parsed)
+          {
+            return;
+          }
           if (request_body.resource_metrics_size() == 0 ||
               request_body.resource_metrics(0).scope_metrics_size() == 0 ||
               request_body.resource_metrics(0).scope_metrics(0).metrics_size() == 0)
