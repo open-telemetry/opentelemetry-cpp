@@ -87,8 +87,8 @@ nostd::shared_ptr<opentelemetry::trace::Span> MakeSpan(
   }
 #else
   return nostd::shared_ptr<opentelemetry::trace::Span>{
-      new (std::nothrow) Span{std::move(tracer), name, attributes, links, options, parent_context,
-                              std::move(span_context)}};
+      new (std::nothrow) Span{std::move(tracer), name, attributes, links, options, sampling_result,
+                              parent_context, std::move(span_context)}};
 #endif
 }
 
