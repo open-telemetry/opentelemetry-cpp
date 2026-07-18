@@ -15,9 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
-* [SDK] Complete exemplar filtering: the exemplar filter (`AlwaysOn`/`AlwaysOff`/`TraceBased`)
-  is now applied through a `FilteredExemplarReservoir` decorator instead of an inline check
-  duplicated across the sync and async metric storage (metrics exemplar preview feature).
+* [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
+  `AlwaysOff`/`TraceBased`)
   [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
 
 * docs: update supported development platforms
