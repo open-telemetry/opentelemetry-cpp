@@ -15,8 +15,19 @@ Increment the:
 
 ## [Unreleased]
 
+* docs: update supported development platforms
+  [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
+
 * [RELEASE] Bump main branch to 1.29.0-dev
   [#4259](https://github.com/open-telemetry/opentelemetry-cpp/pull/4259)
+
+* [CONFIGURATION] Programmatic configuration use case tests and fixes
+  [#4243](https://github.com/open-telemetry/opentelemetry-cpp/pull/4243)
+
+* [API] Add `trace::GetSpanContext()` to read the active span's `SpanContext`
+  from a `Context` without the `DefaultSpan` allocation that
+  `GetSpan(context)->GetContext()` incurs, and use it at existing call sites.
+  [#4254](https://github.com/open-telemetry/opentelemetry-cpp/pull/4254)
 
 * [METRICS SDK] Validate Base2 Exponential Histogram Aggregation config
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
