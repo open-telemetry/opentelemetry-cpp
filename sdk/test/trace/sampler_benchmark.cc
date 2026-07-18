@@ -65,11 +65,13 @@
 // clang-format on
 
 #include <benchmark/benchmark.h>
+#include <cstddef>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/context/context_value.h"  // IWYU pragma: keep
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
