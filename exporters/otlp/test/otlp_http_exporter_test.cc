@@ -423,9 +423,14 @@ public:
             [&mock_session, report_trace_id, &received_trace_id_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
-              request_body.ParseFromArray(
+              const bool parsed = request_body.ParseFromArray(
                   &mock_session->GetRequest()->body_[0],
                   static_cast<int>(mock_session->GetRequest()->body_.size()));
+              EXPECT_TRUE(parsed);
+              if (!parsed)
+              {
+                return;
+              }
               if (request_body.resource_spans_size() == 0 ||
                   request_body.resource_spans(0).scope_spans_size() == 0 ||
                   request_body.resource_spans(0).scope_spans(0).spans_size() == 0)
@@ -520,9 +525,14 @@ public:
             [&mock_session, report_trace_id, &received_trace_id_counter](
                 const std::shared_ptr<opentelemetry::ext::http::client::EventHandler> &callback) {
               opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request_body;
-              request_body.ParseFromArray(
+              const bool parsed = request_body.ParseFromArray(
                   &mock_session->GetRequest()->body_[0],
                   static_cast<int>(mock_session->GetRequest()->body_.size()));
+              EXPECT_TRUE(parsed);
+              if (!parsed)
+              {
+                return;
+              }
               if (request_body.resource_spans_size() == 0 ||
                   request_body.resource_spans(0).scope_spans_size() == 0 ||
                   request_body.resource_spans(0).scope_spans(0).spans_size() == 0)
@@ -777,9 +787,12 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigRetryGenericValuesFromEnv)
 #  ifdef ENABLE_OTLP_RETRY_PREVIEW
 using StatusCodeVector = std::vector<int>;
 
+namespace
+{
 class OtlpHttpExporterRetryIntegrationTests
     : public ::testing::TestWithParam<std::tuple<bool, StatusCodeVector, std::size_t>>
 {};
+}  // namespace
 
 INSTANTIATE_TEST_SUITE_P(StatusCodes,
                          OtlpHttpExporterRetryIntegrationTests,

@@ -24,6 +24,7 @@
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_metadata.h"
@@ -548,11 +549,14 @@ TEST(OtlpRecordable, PopulateRequestMissing)
   }
 }
 
+namespace
+{
 template <typename T>
 struct EmptyArrayAttributeTest : public testing::Test
 {
   using ElementType = T;
 };
+}  // namespace
 
 using ArrayElementTypes =
     testing::Types<bool, double, nostd::string_view, uint8_t, int, int64_t, unsigned int, uint64_t>;
@@ -576,11 +580,14 @@ TYPED_TEST(EmptyArrayAttributeTest, SetEmptyArrayAttribute)
  * unsigned int, and uint64_t. To avoid writing test cases for each, we can
  * use a template approach to test all int types.
  */
+namespace
+{
 template <typename T>
 struct IntAttributeTest : public testing::Test
 {
   using IntParamType = T;
 };
+}  // namespace
 
 using IntTypes = testing::Types<int, int64_t, unsigned int, uint64_t>;
 TYPED_TEST_SUITE(IntAttributeTest, IntTypes);
@@ -657,6 +664,7 @@ TEST(OtlpRecordable, SetUint64ArrayOverflowAsStringPerSpec)
   EXPECT_EQ(array_v.values(1).string_value(), std::to_string(overflow_val));
 }
 
+// TODO: remove this test case once the deprecated otlp options span limit fields are removed.
 TEST(OtlpRecordableTest, TestCollectionLimits)
 {
   // Initialize recordable with strict limits:
@@ -698,6 +706,7 @@ TEST(OtlpRecordableTest, TestCollectionLimits)
   EXPECT_EQ(event_list[0].dropped_attributes_count(), 1);
 }
 
+// TODO: remove this test case once the deprecated otlp options span limit fields are removed.
 TEST(OtlpRecordableTest, TestLinkLimits)
 {
   // Limits: Max Links: 2, Max Attributes Per Link: 1
@@ -779,6 +788,275 @@ TEST(OtlpRecordable, PopulateRequestSameScope)
   EXPECT_EQ(req.resource_spans(0).scope_spans(0).spans_size(), 2);
   EXPECT_EQ(req.resource_spans(0).scope_spans(0).scope().name(), "lib");
 }
+
+TEST(OtlpRecordable, SpanLimits)
+{
+  OtlpRecordable data;
+  opentelemetry::sdk::trace::SpanLimits limits;
+  limits.attribute_count_limit        = 1;
+  limits.attribute_value_length_limit = 2;
+  limits.link_count_limit             = 1;
+  limits.link_attribute_count_limit   = 1;
+  limits.event_count_limit            = 1;
+  limits.event_attribute_count_limit  = 1;
+
+  constexpr const char *kKey1   = "one";
+  constexpr const char *kKey2   = "two";
+  constexpr const char *kValue1 = "1234";
+  constexpr const char *kValue2 = "5678";
+
+  std::map<std::string, std::string> attribute_collection{{kKey1, kValue1}, {kKey2, kValue2}};
+
+  const auto &proto_span = data.span();
+
+  data.SetSpanLimits(limits);
+
+  // span attribute count and length limits
+  data.SetAttribute(kKey1, kValue1);
+  data.SetAttribute(kKey2, kValue2);
+
+  EXPECT_EQ(proto_span.attributes_size(), 1);
+  EXPECT_EQ(proto_span.dropped_attributes_count(), 1);
+  EXPECT_EQ(proto_span.attributes(0).value().string_value(), "12");
+
+  // event count and per-event attribute count limits
+  data.AddEvent("event1", std::chrono::system_clock::now(),
+                common::MakeAttributes(attribute_collection));
+  data.AddEvent("event2", std::chrono::system_clock::now(),
+                common::MakeAttributes(attribute_collection));
+
+  ASSERT_EQ(proto_span.events_size(), 1);
+  EXPECT_EQ(proto_span.dropped_events_count(), 1);
+  const auto &event = proto_span.events(0);
+  EXPECT_EQ(event.dropped_attributes_count(), 1);
+  EXPECT_EQ(event.name(), "event1");
+  const auto &event_attributes = event.attributes();
+  EXPECT_EQ(event_attributes.size(), 1);
+  EXPECT_EQ(event_attributes.at(0).value().string_value(), "12");
+
+  // link count and per-link attribute count limits
+  data.AddLink(trace_api::SpanContext(true, false), common::MakeAttributes(attribute_collection));
+  data.AddLink(trace_api::SpanContext(true, false), common::MakeAttributes(attribute_collection));
+  ASSERT_EQ(proto_span.links_size(), 1);
+  EXPECT_EQ(proto_span.dropped_links_count(), 1);
+  const auto &link = proto_span.links(0);
+  EXPECT_EQ(link.dropped_attributes_count(), 1);
+  const auto &link_attributes = link.attributes();
+  EXPECT_EQ(link_attributes.size(), 1);
+  EXPECT_EQ(link_attributes.at(0).value().string_value(), "12");
+}
+
+TEST(OtlpRecordable, SpanLimitsNoLimitDefault)
+{
+  constexpr std::uint32_t kMaxCount = 500;
+  OtlpRecordable recordable;
+  std::map<std::string, std::string> attributes;
+
+  for (std::uint32_t i = 0; i < kMaxCount; ++i)
+  {
+    attributes["attribute_" + std::to_string(i)] = std::to_string(i);
+  }
+
+  for (std::uint32_t i = 0; i < kMaxCount; ++i)
+  {
+    recordable.SetAttribute("attribute_" + std::to_string(i), i);
+    recordable.AddEvent("event_" + std::to_string(i), std::chrono::system_clock::now(),
+                        common::MakeAttributes(attributes));
+    recordable.AddLink(trace::SpanContext::GetInvalid(), common::MakeAttributes(attributes));
+  }
+
+  EXPECT_EQ(recordable.span().attributes_size(), kMaxCount);
+  EXPECT_EQ(recordable.span().dropped_attributes_count(), 0u);
+  EXPECT_EQ(recordable.span().events_size(), kMaxCount);
+  EXPECT_EQ(recordable.span().dropped_events_count(), 0u);
+  EXPECT_EQ(recordable.span().links_size(), kMaxCount);
+  EXPECT_EQ(recordable.span().dropped_links_count(), 0u);
+  EXPECT_EQ(recordable.span().events(0).dropped_attributes_count(), 0u);
+  EXPECT_EQ(recordable.span().links(0).dropped_attributes_count(), 0u);
+}
+
+// TODO: remove this test case once the deprecated otlp options span limit fields are removed.
+TEST(OtlpRecordable, SpanLimitsFieldsMerged)
+{
+  constexpr std::uint32_t kOtlpAttributeCount      = 2;
+  constexpr std::uint32_t kOtlpEventCount          = 3;
+  constexpr std::uint32_t kOtlpLinkCount           = 4;
+  constexpr std::uint32_t kOtlpEventAttributeCount = 5;
+  constexpr std::uint32_t kOtlpLinkAttributeCount  = 6;
+
+  trace_sdk::SpanLimits more_restrictive_limits;
+  more_restrictive_limits.attribute_count_limit        = 1;
+  more_restrictive_limits.event_count_limit            = 2;
+  more_restrictive_limits.link_count_limit             = 3;
+  more_restrictive_limits.event_attribute_count_limit  = 4;
+  more_restrictive_limits.link_attribute_count_limit   = 5;
+  more_restrictive_limits.attribute_value_length_limit = 2;
+
+  trace_sdk::SpanLimits less_restrictive_limits;
+  less_restrictive_limits.attribute_count_limit        = 3;
+  less_restrictive_limits.event_count_limit            = 4;
+  less_restrictive_limits.link_count_limit             = 5;
+  less_restrictive_limits.event_attribute_count_limit  = 6;
+  less_restrictive_limits.link_attribute_count_limit   = 7;
+  less_restrictive_limits.attribute_value_length_limit = 6;
+
+  auto make_recordable =
+      [&](const trace_sdk::SpanLimits &limits) -> std::unique_ptr<OtlpRecordable> {
+    auto recordable =
+        std::make_unique<OtlpRecordable>(kOtlpAttributeCount, kOtlpEventCount, kOtlpLinkCount,
+                                         kOtlpEventAttributeCount, kOtlpLinkAttributeCount);
+    recordable->SetSpanLimits(limits);
+    return recordable;
+  };
+
+  auto make_attributes = []() -> std::map<std::string, int> {
+    constexpr std::uint32_t kMaxCount = 10;
+    std::map<std::string, int> attributes;
+    for (std::uint32_t i = 0; i < kMaxCount; ++i)
+    {
+      attributes["attribute_" + std::to_string(i)] = static_cast<int>(i);
+    }
+    return attributes;
+  };
+
+  const std::map<std::string, int> empty_attributes;
+  const auto event_time = std::chrono::system_clock::time_point{std::chrono::seconds{1000000000}};
+
+  // attribute_count_limit: config limits are more restrictive than the deprecated otlp options.
+  {
+    auto recordable       = make_recordable(more_restrictive_limits);
+    const auto attributes = make_attributes();
+    for (const auto &attr : attributes)
+    {
+      recordable->SetAttribute(attr.first, attr.second);
+    }
+    EXPECT_EQ(recordable->span().attributes_size(),
+              static_cast<int>(more_restrictive_limits.attribute_count_limit));
+    EXPECT_EQ(recordable->span().dropped_attributes_count(),
+              attributes.size() - more_restrictive_limits.attribute_count_limit);
+  }
+  // attribute_count_limit: config limits are less restrictive than the deprecated otlp options.
+  {
+    auto recordable       = make_recordable(less_restrictive_limits);
+    const auto attributes = make_attributes();
+    for (const auto &attr : attributes)
+    {
+      recordable->SetAttribute(attr.first, attr.second);
+    }
+    EXPECT_EQ(recordable->span().attributes_size(), static_cast<int>(kOtlpAttributeCount));
+    EXPECT_EQ(recordable->span().dropped_attributes_count(),
+              attributes.size() - kOtlpAttributeCount);
+  }
+
+  // attribute_value_length_limit: config limits are more restrictive than the deprecated otlp
+  // options.
+  {
+    auto recordable = make_recordable(more_restrictive_limits);
+    recordable->SetAttribute("value", nostd::string_view("abcdefghij"));
+    EXPECT_EQ(recordable->span().attributes(0).value().string_value().size(),
+              more_restrictive_limits.attribute_value_length_limit);
+  }
+  // attribute_value_length_limit: config limits are less restrictive than the deprecated otlp
+  // options.
+  {
+    auto recordable = make_recordable(less_restrictive_limits);
+    recordable->SetAttribute("value", nostd::string_view("abcdefghij"));
+    EXPECT_EQ(recordable->span().attributes(0).value().string_value().size(),
+              less_restrictive_limits.attribute_value_length_limit);
+  }
+
+  // event_count_limit: config limits are more restrictive than the deprecated otlp options.
+  {
+    auto recordable = make_recordable(more_restrictive_limits);
+    recordable->AddEvent("event_one", event_time, common::MakeAttributes(empty_attributes));
+    recordable->AddEvent("event_two", event_time, common::MakeAttributes(empty_attributes));
+    recordable->AddEvent("event_three", event_time, common::MakeAttributes(empty_attributes));
+    EXPECT_EQ(recordable->span().events_size(),
+              static_cast<int>(more_restrictive_limits.event_count_limit));
+    EXPECT_EQ(recordable->span().dropped_events_count(), 1u);
+  }
+  // event_count_limit: config limits are less restrictive than the deprecated otlp options.
+  {
+    auto recordable = make_recordable(less_restrictive_limits);
+    recordable->AddEvent("event_one", event_time, common::MakeAttributes(empty_attributes));
+    recordable->AddEvent("event_two", event_time, common::MakeAttributes(empty_attributes));
+    recordable->AddEvent("event_three", event_time, common::MakeAttributes(empty_attributes));
+    recordable->AddEvent("event_four", event_time, common::MakeAttributes(empty_attributes));
+    EXPECT_EQ(recordable->span().events_size(), static_cast<int>(kOtlpEventCount));
+    EXPECT_EQ(recordable->span().dropped_events_count(), 1u);
+  }
+
+  // link_count_limit: config limits are more restrictive than the deprecated otlp options.
+  {
+    auto recordable = make_recordable(more_restrictive_limits);
+    for (std::uint32_t i = 0; i < kOtlpLinkCount; ++i)
+    {
+      recordable->AddLink(trace::SpanContext::GetInvalid(),
+                          common::MakeAttributes(empty_attributes));
+    }
+    EXPECT_EQ(recordable->span().links_size(),
+              static_cast<int>(more_restrictive_limits.link_count_limit));
+    EXPECT_EQ(recordable->span().dropped_links_count(), 1u);
+  }
+  // link_count_limit: config limits are less restrictive than the deprecated otlp options.
+  {
+    auto recordable = make_recordable(less_restrictive_limits);
+    for (std::uint32_t i = 0; i < less_restrictive_limits.link_count_limit; ++i)
+    {
+      recordable->AddLink(trace::SpanContext::GetInvalid(),
+                          common::MakeAttributes(empty_attributes));
+    }
+    EXPECT_EQ(recordable->span().links_size(), static_cast<int>(kOtlpLinkCount));
+    EXPECT_EQ(recordable->span().dropped_links_count(), 1u);
+  }
+
+  // event_attribute_count_limit: config limits are more restrictive than the deprecated otlp
+  // options.
+  {
+    auto recordable       = make_recordable(more_restrictive_limits);
+    const auto attributes = make_attributes();
+    recordable->AddEvent("test_event", event_time, common::MakeAttributes(attributes));
+    EXPECT_EQ(recordable->span().events(0).attributes_size(),
+              static_cast<int>(more_restrictive_limits.event_attribute_count_limit));
+    EXPECT_EQ(recordable->span().events(0).dropped_attributes_count(),
+              attributes.size() - more_restrictive_limits.event_attribute_count_limit);
+  }
+  // event_attribute_count_limit: config limits are less restrictive than the deprecated otlp
+  // options.
+  {
+    auto recordable       = make_recordable(less_restrictive_limits);
+    const auto attributes = make_attributes();
+    recordable->AddEvent("test_event", event_time, common::MakeAttributes(attributes));
+    EXPECT_EQ(recordable->span().events(0).attributes_size(),
+              static_cast<int>(kOtlpEventAttributeCount));
+    EXPECT_EQ(recordable->span().events(0).dropped_attributes_count(),
+              attributes.size() - kOtlpEventAttributeCount);
+  }
+
+  // link_attribute_count_limit: config limits are more restrictive than the deprecated otlp
+  // options.
+  {
+    auto recordable       = make_recordable(more_restrictive_limits);
+    const auto attributes = make_attributes();
+    recordable->AddLink(trace::SpanContext::GetInvalid(), common::MakeAttributes(attributes));
+    EXPECT_EQ(recordable->span().links(0).attributes_size(),
+              static_cast<int>(more_restrictive_limits.link_attribute_count_limit));
+    EXPECT_EQ(recordable->span().links(0).dropped_attributes_count(),
+              attributes.size() - more_restrictive_limits.link_attribute_count_limit);
+  }
+  // link_attribute_count_limit: config limits are less restrictive than the deprecated otlp
+  // options.
+  {
+    auto recordable       = make_recordable(less_restrictive_limits);
+    const auto attributes = make_attributes();
+    recordable->AddLink(trace::SpanContext::GetInvalid(), common::MakeAttributes(attributes));
+    EXPECT_EQ(recordable->span().links(0).attributes_size(),
+              static_cast<int>(kOtlpLinkAttributeCount));
+    EXPECT_EQ(recordable->span().links(0).dropped_attributes_count(),
+              attributes.size() - kOtlpLinkAttributeCount);
+  }
+}
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

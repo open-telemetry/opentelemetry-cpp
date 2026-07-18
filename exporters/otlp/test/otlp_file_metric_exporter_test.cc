@@ -43,6 +43,8 @@ namespace exporter
 namespace otlp
 {
 
+namespace
+{
 class ProtobufGlobalSymbolGuard
 {
 public:
@@ -53,6 +55,7 @@ public:
   ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
   ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
 };
+}  // namespace
 
 template <class IntegerType>
 static IntegerType JsonToInteger(const nlohmann::json &value)
