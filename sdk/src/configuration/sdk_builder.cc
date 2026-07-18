@@ -43,6 +43,7 @@
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/exemplar_filter.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
@@ -143,7 +144,6 @@
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
-#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
@@ -182,7 +182,7 @@
 #include "src/common/wildcard_match.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#  include "opentelemetry/sdk/configuration/exemplar_filter.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -726,7 +726,8 @@ public:
     aggregation_type = opentelemetry::sdk::metrics::AggregationType::kSum;
   }
 
-  opentelemetry::sdk::metrics::AggregationType aggregation_type;
+  opentelemetry::sdk::metrics::AggregationType aggregation_type{
+      opentelemetry::sdk::metrics::AggregationType::kDefault};
   std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> aggregation_config;
 
 private:
@@ -855,7 +856,15 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateParentBase
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> local_parent_sampled_sdk;
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> local_parent_not_sampled_sdk;
 
-  auto root_sdk = SdkBuilder::CreateSampler(model->root);
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> root_sdk;
+  if (model->root)
+  {
+    root_sdk = SdkBuilder::CreateSampler(model->root);
+  }
+  else
+  {
+    root_sdk = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+  }
 
   if (model->remote_parent_sampled != nullptr)
   {
@@ -1057,11 +1066,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateBatc
   opentelemetry::sdk::trace::BatchSpanProcessorOptions options;
 
   options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
-
-#ifdef LATER
-  options.xxx = model->export_timeout;
-#endif
-
+  options.export_timeout        = std::chrono::milliseconds(model->export_timeout);
   options.max_queue_size        = model->max_queue_size;
   options.max_export_batch_size = model->max_export_batch_size;
 
@@ -1160,6 +1165,12 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
   if (model->sampler)
   {
     sampler = CreateSampler(model->sampler);
+  }
+  else
+  {
+    // Spec default: parentbased_always_on
+    sampler = opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create(
+        opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create());
   }
 
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> sdk_processors;
@@ -1608,8 +1619,8 @@ SdkBuilder::CreateBase2ExponentialBucketHistogramAggregation(
   auto sdk =
       std::make_unique<opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>();
 
-  sdk->max_buckets_    = model->max_size;
-  sdk->max_scale_      = static_cast<int32_t>(model->max_scale);
+  sdk->max_size_       = model->max_size;
+  sdk->max_scale_      = model->max_scale;
   sdk->record_min_max_ = model->record_min_max;
 
   return sdk;
@@ -1683,7 +1694,10 @@ void SdkBuilder::AddView(
 
   std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> sdk_aggregation_config;
 
-  sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
+  if (stream->aggregation)
+  {
+    sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
+  }
 
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk_attribute_processor;
 
@@ -1890,6 +1904,7 @@ SdkBuilder::CreateBatchLogRecordProcessor(
   opentelemetry::sdk::logs::BatchLogRecordProcessorOptions options;
 
   options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
+  options.export_timeout_millis = std::chrono::milliseconds(model->export_timeout);
   options.max_queue_size        = model->max_queue_size;
   options.max_export_batch_size = model->max_export_batch_size;
 
