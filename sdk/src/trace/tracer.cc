@@ -70,6 +70,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> MakeSpan(
     const opentelemetry::common::KeyValueIterable &attributes,
     const opentelemetry::trace::SpanContextKeyValueIterable &links,
     const opentelemetry::trace::StartSpanOptions &options,
+    const opentelemetry::sdk::trace::SamplingResult &sampling_result,
     const opentelemetry::trace::SpanContext &parent_context,
     opentelemetry::trace::SpanContext &&span_context) noexcept
 {
@@ -78,7 +79,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> MakeSpan(
   {
 #endif
     return {std::make_shared<Span>(std::move(tracer), name, attributes, links, options,
-                                   parent_context, std::move(span_context))};
+                                   sampling_result, parent_context, std::move(span_context))};
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
   catch (const std::bad_alloc &)
@@ -178,7 +179,6 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
       flags &= ~opentelemetry::trace::TraceFlags::kIsSampled;
     }
 
-    /* Waiting for https://github.com/open-telemetry/opentelemetry-specification/issues/3411 */
     /* Support W3C Trace Context version 2. */
     flags &= opentelemetry::trace::TraceFlags::kAllW3CTraceContext2Flags;
 
@@ -205,29 +205,19 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   {
     auto non_recording_span = MakeNonRecordingSpan(std::move(span_context));
 
-    if (non_recording_span)
+    if (!non_recording_span)
     {
-      return non_recording_span;
+      return noop_span_;
     }
-    return noop_span_;
+    return non_recording_span;
   }
 
-  auto span = MakeSpan(shared_from_this(), name, attributes, links, options, parent_context,
-                       std::move(span_context));
+  auto span = MakeSpan(shared_from_this(), name, attributes, links, options, sampling_result,
+                       parent_context, std::move(span_context));
   if (!span)
   {
     return noop_span_;
   }
-
-  // if the attributes is not nullptr, add attributes to the span.
-  if (sampling_result.attributes)
-  {
-    for (auto &kv : *sampling_result.attributes)
-    {
-      span->SetAttribute(kv.first, kv.second);
-    }
-  }
-
   return span;
 }
 

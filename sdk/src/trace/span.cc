@@ -55,6 +55,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            const common::KeyValueIterable &attributes,
            const opentelemetry::trace::SpanContextKeyValueIterable &links,
            const opentelemetry::trace::StartSpanOptions &options,
+           const opentelemetry::sdk::trace::SamplingResult &sampling_result,
            const opentelemetry::trace::SpanContext &parent_span_context,
            opentelemetry::trace::SpanContext span_context) noexcept
     : tracer_{std::move(tracer)},
@@ -85,6 +86,14 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     recordable_->AddLink(span_context, attributes);
     return true;
   });
+
+  if (sampling_result.attributes != nullptr)
+  {
+    for (const auto &kv : *sampling_result.attributes)
+    {
+      recordable_->SetAttribute(kv.first, kv.second);
+    }
+  }
 
   recordable_->SetSpanKind(options.kind);
   recordable_->SetStartTime(NowOr(options.start_system_time));

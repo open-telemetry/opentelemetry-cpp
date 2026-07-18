@@ -31,6 +31,7 @@ public:
        const opentelemetry::common::KeyValueIterable &attributes,
        const opentelemetry::trace::SpanContextKeyValueIterable &links,
        const opentelemetry::trace::StartSpanOptions &options,
+       const opentelemetry::sdk::trace::SamplingResult &sampling_result,
        const opentelemetry::trace::SpanContext &parent_span_context,
        opentelemetry::trace::SpanContext span_context) noexcept;
 
