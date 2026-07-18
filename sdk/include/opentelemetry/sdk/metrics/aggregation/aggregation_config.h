@@ -56,6 +56,13 @@ public:
   bool record_min_max_ = true;
 };
 
+// Valid ranges per the declarative configuration schema; the schema defines no maximum for
+// max_size.
+// https://github.com/open-telemetry/opentelemetry-configuration/blob/main/schema/meter_provider.yaml
+constexpr std::int32_t kMaxScaleMin = -10;
+constexpr std::int32_t kMaxScaleMax = 20;
+constexpr std::size_t kMaxSizeMin   = 2;
+
 class Base2ExponentialHistogramAggregationConfig : public AggregationConfig
 {
 public:
@@ -69,7 +76,7 @@ public:
     return AggregationType::kBase2ExponentialHistogram;
   }
 
-  size_t max_buckets_  = 160;
+  size_t max_size_     = 160;
   int32_t max_scale_   = 20;
   bool record_min_max_ = true;
 };
