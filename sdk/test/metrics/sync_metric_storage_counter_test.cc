@@ -27,7 +27,6 @@
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
@@ -53,7 +52,7 @@ TEST_P(WritableMetricStorageTestFixture, LongCounterSumAggregation)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 
@@ -193,7 +192,7 @@ TEST_P(WritableMetricStorageTestFixture, DoubleCounterSumAggregation)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 
@@ -329,7 +328,7 @@ TEST(SyncMetricStorageTest, DeltaCounterStartTimestampTracksEmptyCycles)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 
@@ -407,7 +406,7 @@ TEST(SyncMetricStorageTest, DeltaCounterFirstIntervalUsesInstrumentCreationTime)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
   auto after_creation = std::chrono::system_clock::now();
@@ -460,7 +459,7 @@ TEST(SyncMetricStorageTest, DeltaCounterMultiCollectorFirstIntervalUsesInstrumen
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
   auto after_creation = std::chrono::system_clock::now();

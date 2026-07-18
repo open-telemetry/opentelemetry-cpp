@@ -75,7 +75,7 @@ public:
 
   static nostd::shared_ptr<ExemplarReservoir> GetSimpleFilteredExemplarReservoir(
       ExemplarFilterType filter_type,
-      std::shared_ptr<ExemplarReservoir> reservoir);
+      nostd::shared_ptr<ExemplarReservoir> reservoir);
 
   static nostd::shared_ptr<ExemplarReservoir> GetSimpleFixedSizeExemplarReservoir(
       size_t size,
