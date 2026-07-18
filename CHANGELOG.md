@@ -32,6 +32,13 @@ Increment the:
 * [METRICS SDK] Validate Base2 Exponential Histogram Aggregation config
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
 
+Breaking changes:
+
+* [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
+  [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
+  * The public configuration member `max_buckets_` was renamed to `max_size_` to
+    match the configuration schema. Please adjust SDK configuration accordingly.
+
 ## [1.28.0] 2026-07-16
 
 * [RELEASE] Bump main branch to 1.28.0-dev
