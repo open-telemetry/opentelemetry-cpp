@@ -3,8 +3,8 @@
 
 // clang-format off
 //
-// ~/build/sdk/test/trace/sampler_benchmark --benchmark_repetitions=5 --benchmark_display_aggregates_only=true
-// 2026-07-17T17:28:24+00:00
+//  ~/build/sdk/test/trace/sampler_benchmark --benchmark_repetitions=5 --benchmark_display_aggregates_only=true
+// 2026-07-18T13:33:22+00:00
 // Running /home/devuser/build/sdk/test/trace/sampler_benchmark
 // Run on (32 X 5700 MHz CPU s)
 // CPU Caches:
@@ -12,43 +12,59 @@
 //   L1 Instruction 32 KiB (x16)
 //   L2 Unified 2048 KiB (x16)
 //   L3 Unified 36864 KiB (x1)
-// Load Average: 1.38, 4.38, 4.67
+// Load Average: 0.93, 2.55, 2.62
 // ***WARNING*** ASLR is enabled, the results may have unreproducible noise in them.
-// -----------------------------------------------------------------------------------------
-// Benchmark                                               Time             CPU   Iterations
-// -----------------------------------------------------------------------------------------
-// BM_AlwaysOffSamplerConstruction_mean                0.351 ns        0.351 ns            5
-// BM_AlwaysOffSamplerConstruction_median              0.353 ns        0.353 ns            5
-// BM_AlwaysOffSamplerConstruction_stddev              0.005 ns        0.005 ns            5
-// BM_AlwaysOffSamplerConstruction_cv                   1.55 %          1.55 %             5
-// BM_AlwaysOnSamplerConstruction_mean                 0.338 ns        0.338 ns            5
-// BM_AlwaysOnSamplerConstruction_median               0.337 ns        0.337 ns            5
-// BM_AlwaysOnSamplerConstruction_stddev               0.003 ns        0.003 ns            5
-// BM_AlwaysOnSamplerConstruction_cv                    0.76 %          0.76 %             5
-// BM_AlwaysOffSamplerShouldSample_mean                 4.14 ns         4.14 ns            5
-// BM_AlwaysOffSamplerShouldSample_median               4.13 ns         4.13 ns            5
-// BM_AlwaysOffSamplerShouldSample_stddev              0.018 ns        0.018 ns            5
-// BM_AlwaysOffSamplerShouldSample_cv                   0.43 %          0.42 %             5
-// BM_AlwaysOnSamplerShouldSample_mean                  4.32 ns         4.31 ns            5
-// BM_AlwaysOnSamplerShouldSample_median                4.31 ns         4.31 ns            5
-// BM_AlwaysOnSamplerShouldSample_stddev               0.052 ns        0.052 ns            5
-// BM_AlwaysOnSamplerShouldSample_cv                    1.20 %          1.20 %             5
-// BM_ParentBasedSamplerShouldSample_mean               7.13 ns         7.13 ns            5
-// BM_ParentBasedSamplerShouldSample_median             7.16 ns         7.16 ns            5
-// BM_ParentBasedSamplerShouldSample_stddev            0.061 ns        0.061 ns            5
-// BM_ParentBasedSamplerShouldSample_cv                 0.86 %          0.85 %             5
-// BM_TraceIdRatioBasedSamplerShouldSample_mean         3.96 ns         3.96 ns            5
-// BM_TraceIdRatioBasedSamplerShouldSample_median       3.97 ns         3.97 ns            5
-// BM_TraceIdRatioBasedSamplerShouldSample_stddev      0.012 ns        0.012 ns            5
-// BM_TraceIdRatioBasedSamplerShouldSample_cv           0.30 %          0.31 %             5
-// BM_SpanCreation_mean                                  213 ns          213 ns            5
-// BM_SpanCreation_median                                214 ns          214 ns            5
-// BM_SpanCreation_stddev                               1.54 ns         1.54 ns            5
-// BM_SpanCreation_cv                                   0.72 %          0.72 %             5
-// BM_NoopSpanCreation_mean                             30.7 ns         30.7 ns            5
-// BM_NoopSpanCreation_median                           30.7 ns         30.7 ns            5
-// BM_NoopSpanCreation_stddev                          0.206 ns        0.207 ns            5
-// BM_NoopSpanCreation_cv                               0.67 %          0.67 %             5
+// -------------------------------------------------------------------------------------------------
+// Benchmark                                                       Time             CPU   Iterations
+// -------------------------------------------------------------------------------------------------
+// BM_AlwaysOffSamplerConstruction_mean                        0.345 ns        0.345 ns            5
+// BM_AlwaysOffSamplerConstruction_median                      0.345 ns        0.345 ns            5
+// BM_AlwaysOffSamplerConstruction_stddev                      0.003 ns        0.003 ns            5
+// BM_AlwaysOffSamplerConstruction_cv                           0.78 %          0.77 %             5
+// BM_AlwaysOnSamplerConstruction_mean                         0.339 ns        0.339 ns            5
+// BM_AlwaysOnSamplerConstruction_median                       0.336 ns        0.336 ns            5
+// BM_AlwaysOnSamplerConstruction_stddev                       0.008 ns        0.008 ns            5
+// BM_AlwaysOnSamplerConstruction_cv                            2.33 %          2.32 %             5
+// BM_AlwaysOffSamplerShouldSample_mean                         4.14 ns         4.14 ns            5
+// BM_AlwaysOffSamplerShouldSample_median                       4.12 ns         4.12 ns            5
+// BM_AlwaysOffSamplerShouldSample_stddev                      0.053 ns        0.053 ns            5
+// BM_AlwaysOffSamplerShouldSample_cv                           1.29 %          1.28 %             5
+// BM_AlwaysOnSamplerShouldSample_mean                          4.51 ns         4.51 ns            5
+// BM_AlwaysOnSamplerShouldSample_median                        4.52 ns         4.52 ns            5
+// BM_AlwaysOnSamplerShouldSample_stddev                       0.052 ns        0.052 ns            5
+// BM_AlwaysOnSamplerShouldSample_cv                            1.16 %          1.15 %             5
+// BM_ParentBasedSamplerShouldSample_mean                       7.42 ns         7.42 ns            5
+// BM_ParentBasedSamplerShouldSample_median                     7.42 ns         7.41 ns            5
+// BM_ParentBasedSamplerShouldSample_stddev                    0.011 ns        0.011 ns            5
+// BM_ParentBasedSamplerShouldSample_cv                         0.15 %          0.15 %             5
+// BM_TraceIdRatioBasedSamplerShouldSample_mean                 4.03 ns         4.03 ns            5
+// BM_TraceIdRatioBasedSamplerShouldSample_median               4.03 ns         4.03 ns            5
+// BM_TraceIdRatioBasedSamplerShouldSample_stddev              0.007 ns        0.007 ns            5
+// BM_TraceIdRatioBasedSamplerShouldSample_cv                   0.18 %          0.19 %             5
+// BM_SpanCreation_mean                                          208 ns          208 ns            5
+// BM_SpanCreation_median                                        207 ns          207 ns            5
+// BM_SpanCreation_stddev                                       1.17 ns         1.18 ns            5
+// BM_SpanCreation_cv                                           0.57 %          0.57 %             5
+// BM_NoopSpanCreation_mean                                     30.0 ns         30.0 ns            5
+// BM_NoopSpanCreation_median                                   30.0 ns         30.0 ns            5
+// BM_NoopSpanCreation_stddev                                  0.048 ns        0.046 ns            5
+// BM_NoopSpanCreation_cv                                       0.16 %          0.15 %             5
+// BM_SpanCreationWithSamplingResultAttributes/0_mean            217 ns          217 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/0_median          216 ns          216 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/0_stddev        0.843 ns        0.850 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/0_cv             0.39 %          0.39 %             5
+// BM_SpanCreationWithSamplingResultAttributes/1_mean            257 ns          257 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/1_median          257 ns          257 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/1_stddev        0.649 ns        0.641 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/1_cv             0.25 %          0.25 %             5
+// BM_SpanCreationWithSamplingResultAttributes/10_mean           634 ns          633 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/10_median         628 ns          628 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/10_stddev        12.0 ns         12.0 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/10_cv            1.89 %          1.89 %             5
+// BM_SpanCreationWithSamplingResultAttributes/128_mean         8954 ns         8953 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/128_median       9197 ns         9196 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/128_stddev        381 ns          381 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/128_cv           4.26 %          4.25 %             5
 //
 // clang-format on
 
@@ -85,6 +101,8 @@
 using namespace opentelemetry::sdk::trace;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
+
+namespace nostd = opentelemetry::nostd;
 
 namespace
 {
@@ -228,6 +246,59 @@ void BM_NoopSpanCreation(benchmark::State &state)
   BenchmarkSpanCreation(std::move(sampler), state);
 }
 BENCHMARK(BM_NoopSpanCreation);
+
+namespace
+{
+class AttributeContributingSampler : public Sampler
+{
+public:
+  AttributeContributingSampler(std::size_t num_attributes)
+      : attributes_(CreateAttributes(num_attributes))
+  {}
+
+  static std::map<std::string, opentelemetry::common::AttributeValue> CreateAttributes(
+      std::size_t num_attributes)
+  {
+    auto attributes_map = std::map<std::string, opentelemetry::common::AttributeValue>();
+    for (std::size_t i = 0; i < num_attributes; ++i)
+    {
+      attributes_map.emplace("attr" + std::to_string(i), static_cast<int>(i));
+    }
+    return attributes_map;
+  }
+
+  SamplingResult ShouldSample(
+      const opentelemetry::trace::SpanContext & /*parent_context*/,
+      opentelemetry::trace::TraceId /*trace_id*/,
+      nostd::string_view /*name*/,
+      opentelemetry::trace::SpanKind /*span_kind*/,
+      const opentelemetry::common::KeyValueIterable & /*attributes*/,
+      const opentelemetry::trace::SpanContextKeyValueIterable & /*links*/) noexcept override
+  {
+    return SamplingResult{
+        Decision::RECORD_AND_SAMPLE,
+        std::make_unique<std::map<std::string, opentelemetry::common::AttributeValue>>(attributes_),
+        {}};
+  }
+
+  nostd::string_view GetDescription() const noexcept override
+  {
+    return "AttributeContributingSampler";
+  }
+
+private:
+  std::map<std::string, opentelemetry::common::AttributeValue> attributes_;
+};
+}  // namespace
+
+// Test to measure performance for a sampler that adds attributes to the span
+void BM_SpanCreationWithSamplingResultAttributes(benchmark::State &state)
+{
+  std::size_t num_attributes = static_cast<std::size_t>(state.range(0));
+  std::unique_ptr<Sampler> sampler(new AttributeContributingSampler(num_attributes));
+  BenchmarkSpanCreation(std::move(sampler), state);
+}
+BENCHMARK(BM_SpanCreationWithSamplingResultAttributes)->Arg(1)->Arg(10)->Arg(128);
 
 }  // namespace
 BENCHMARK_MAIN();
