@@ -234,7 +234,8 @@ public:
         return false;
       }
       auto digit = c - '0';
-      if (result > (std::numeric_limits<std::chrono::seconds::rep>::max() - digit) / 10)
+      if (result >
+          ((std::numeric_limits<std::chrono::seconds::rep>::max)() - digit) / 10)
       {
         return false;
       }
