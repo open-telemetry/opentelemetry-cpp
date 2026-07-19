@@ -319,3 +319,86 @@ function(project_build_tools_set_static_library_declaration DEFINITION_VARNAME)
     endforeach()
   endif()
 endfunction()
+
+function(_otelcpp_get_legacy_option_name __OPTION_NAME __OUTPUT_VARIABLE)
+  if(__OPTION_NAME MATCHES "^OTELCPP_WITH_")
+    string(REGEX REPLACE "^OTELCPP_" "" __LEGACY_OPTION_NAME "${__OPTION_NAME}")
+  elseif(__OPTION_NAME STREQUAL "OTELCPP_BUILD_W3CTRACECONTEXT_TEST")
+    set(__LEGACY_OPTION_NAME "BUILD_W3CTRACECONTEXT_TEST")
+  elseif(__OPTION_NAME STREQUAL "OTELCPP_INSTALL")
+    set(__LEGACY_OPTION_NAME "OPENTELEMETRY_INSTALL")
+  elseif(__OPTION_NAME STREQUAL "OTELCPP_SKIP_DYNAMIC_LOADING_TESTS")
+    set(__LEGACY_OPTION_NAME "OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS")
+  elseif(__OPTION_NAME STREQUAL "OTELCPP_BUILD_DLL")
+    set(__LEGACY_OPTION_NAME "OPENTELEMETRY_BUILD_DLL")
+  elseif(__OPTION_NAME STREQUAL "OTELCPP_BUILD_PACKAGE")
+    set(__LEGACY_OPTION_NAME "BUILD_PACKAGE")
+  elseif(__OPTION_NAME STREQUAL "OTELCPP_EXTERNAL_COMPONENT_PATH")
+    set(__LEGACY_OPTION_NAME "OPENTELEMETRY_EXTERNAL_COMPONENT_PATH")
+  elseif(__OPTION_NAME STREQUAL "OTELCPP_TARBALL")
+    set(__LEGACY_OPTION_NAME "TARBALL")
+  else()
+    set(__LEGACY_OPTION_NAME "")
+  endif()
+
+  set(${__OUTPUT_VARIABLE}
+      "${__LEGACY_OPTION_NAME}"
+      PARENT_SCOPE)
+endfunction()
+
+function(_otelcpp_get_option_default __OPTION_NAME __DEFAULT_VALUE
+         __OUTPUT_VARIABLE)
+  set(__RESOLVED_DEFAULT "${__DEFAULT_VALUE}")
+  _otelcpp_get_legacy_option_name("${__OPTION_NAME}" __LEGACY_OPTION_NAME)
+
+  if(NOT __LEGACY_OPTION_NAME STREQUAL "")
+    if(DEFINED ${__LEGACY_OPTION_NAME})
+      # Read the legacy value even when the namespaced option takes precedence,
+      # so CMake does not report a recognized deprecated option as unused.
+      set(__LEGACY_VALUE "${${__LEGACY_OPTION_NAME}}")
+      message(
+        DEPRECATION
+          "CMake option ${__LEGACY_OPTION_NAME} is deprecated. Use ${__OPTION_NAME} instead."
+      )
+      # The namespaced option takes precedence when both names are provided.
+      if(NOT DEFINED ${__OPTION_NAME})
+        set(__RESOLVED_DEFAULT "${__LEGACY_VALUE}")
+      endif()
+    endif()
+  endif()
+
+  set(${__OUTPUT_VARIABLE}
+      "${__RESOLVED_DEFAULT}"
+      PARENT_SCOPE)
+endfunction()
+
+function(otelcpp_option_flag __OPTION_NAME __HELP_TEXT __DEFAULT_VALUE)
+  _otelcpp_get_option_default("${__OPTION_NAME}" "${__DEFAULT_VALUE}"
+                              __RESOLVED_DEFAULT)
+  option(${__OPTION_NAME} "${__HELP_TEXT}" "${__RESOLVED_DEFAULT}")
+endfunction()
+
+function(otelcpp_option_variable __OPTION_NAME __DEFAULT_VALUE __CACHE_TYPE
+         __DOC_STRING)
+  _otelcpp_get_option_default("${__OPTION_NAME}" "${__DEFAULT_VALUE}"
+                              __RESOLVED_DEFAULT)
+  set(${__OPTION_NAME}
+      "${__RESOLVED_DEFAULT}"
+      CACHE "${__CACHE_TYPE}" "${__DOC_STRING}" ${ARGN})
+endfunction()
+
+include(CMakeDependentOption)
+
+function(otelcpp_dependent_option __OPTION_NAME __HELP_TEXT
+         __CONDITION_TRUE_VALUE __CONDITION_RULE __CONDITION_FALSE_VALUE)
+  _otelcpp_get_option_default("${__OPTION_NAME}" "${__CONDITION_TRUE_VALUE}"
+                              __RESOLVED_DEFAULT)
+  cmake_dependent_option(
+    ${__OPTION_NAME} "${__HELP_TEXT}" "${__RESOLVED_DEFAULT}"
+    "${__CONDITION_RULE}" "${__CONDITION_FALSE_VALUE}")
+  # cmake_dependent_option uses a normal variable when the condition is false.
+  # Propagate it out of this wrapper function as well as retaining cache values.
+  set(${__OPTION_NAME}
+      "${${__OPTION_NAME}}"
+      PARENT_SCOPE)
+endfunction()

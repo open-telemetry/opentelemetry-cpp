@@ -99,7 +99,7 @@ target_link_libraries(
          opentelemetry_configuration_metrics_builders
          opentelemetry_configuration_logs_builders)
 
-if(WITH_CONFIGURATION)
+if(OTELCPP_WITH_CONFIGURATION)
 
   # YAML configuration parser
   add_library(
