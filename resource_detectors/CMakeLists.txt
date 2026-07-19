@@ -34,6 +34,6 @@ otel_add_component(
   "resource_detectors/detail/*"
   EXCLUDE)
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_subdirectory(test)
 endif()

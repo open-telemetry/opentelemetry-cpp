@@ -30,7 +30,7 @@ foreach(
     TEST_LIST ${testname})
 endforeach()
 
-if(WITH_BENCHMARK)
+if(OTELCPP_WITH_BENCHMARK)
   add_executable(sampler_benchmark sampler_benchmark.cc)
   target_link_libraries(
     sampler_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}

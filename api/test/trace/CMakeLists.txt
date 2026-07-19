@@ -25,7 +25,7 @@ foreach(
     TEST_LIST api_${testname})
 endforeach()
 
-if(WITH_BENCHMARK)
+if(OTELCPP_WITH_BENCHMARK)
   add_executable(span_id_benchmark span_id_benchmark.cc)
   target_link_libraries(span_id_benchmark benchmark::benchmark
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)

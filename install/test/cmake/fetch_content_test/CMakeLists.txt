@@ -13,6 +13,10 @@ set(BUILD_TESTING
     ON
     CACHE BOOL "Build tests" FORCE)
 
+# Exercise the opentelemetry-cpp subproject default independently from the
+# parent project's standard BUILD_TESTING option.
+unset(OTELCPP_BUILD_TESTING CACHE)
+
 if(NOT DEFINED OPENTELEMETRY_CPP_SRC_DIR)
   message(
     FATAL_ERROR
@@ -30,6 +34,21 @@ FetchContent_Declare(
   googletest SOURCE_DIR "${OPENTELEMETRY_CPP_SRC_DIR}/third_party/googletest")
 FetchContent_Declare(opentelemetry-cpp SOURCE_DIR ${OPENTELEMETRY_CPP_SRC_DIR})
 FetchContent_MakeAvailable(googletest opentelemetry-cpp)
+
+if(NOT BUILD_TESTING)
+  message(FATAL_ERROR "The parent project BUILD_TESTING option was disabled")
+endif()
+
+if(NOT DEFINED OTELCPP_BUILD_TESTING)
+  message(FATAL_ERROR "OTELCPP_BUILD_TESTING was not defined")
+endif()
+
+if(OTELCPP_BUILD_TESTING)
+  message(
+    FATAL_ERROR
+      "OTELCPP_BUILD_TESTING must default to OFF when opentelemetry-cpp is a subproject"
+  )
+endif()
 
 if(NOT DEFINED OPENTELEMETRY_VERSION OR OPENTELEMETRY_VERSION
                                         VERSION_LESS_EQUAL 0.0.0)

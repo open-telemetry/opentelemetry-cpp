@@ -8,6 +8,6 @@ add_subdirectory(logs)
 add_subdirectory(version)
 add_subdirectory(resource)
 
-if(WITH_CONFIGURATION)
+if(OTELCPP_WITH_CONFIGURATION)
   add_subdirectory(configuration)
 endif()

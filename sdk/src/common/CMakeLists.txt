@@ -21,7 +21,7 @@ target_link_libraries(
   opentelemetry_common PUBLIC opentelemetry_api opentelemetry_sdk
                               Threads::Threads)
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     common
     "OpenTelemetry SDK - Common"

@@ -44,7 +44,7 @@ target_include_directories(
   opentelemetry_trace
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     trace "OpenTelemetry SDK - Trace"
     "Components for exporting traces in the OpenTelemetry SDK."

@@ -13,7 +13,7 @@ target_include_directories(
   opentelemetry_version
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     version "OpenTelemetry SDK - Version"
     "A library exporting version information for OpenTelemetry."

@@ -39,7 +39,7 @@ else()
       GIT_TAG "${protobuf_GIT_TAG}"
     )
 
-    set(protobuf_INSTALL ${OPENTELEMETRY_INSTALL} CACHE BOOL "" FORCE)
+    set(protobuf_INSTALL ${OTELCPP_INSTALL} CACHE BOOL "" FORCE)
     set(protobuf_BUILD_TESTS OFF CACHE BOOL "" FORCE)
     set(protobuf_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
@@ -81,7 +81,7 @@ message(STATUS "PROTOBUF_PROTOC_EXECUTABLE=${PROTOBUF_PROTOC_EXECUTABLE}")
 
 # When protobuf is fetched or built as a gRPC submodule utf8_range is compiled
 # but may need the alias target created
-if(WITH_OTLP_UTF8_VALIDITY)
+if(OTELCPP_WITH_OTLP_UTF8_VALIDITY)
   if(TARGET utf8_validity AND NOT TARGET utf8_range::utf8_validity)
     add_library(utf8_range::utf8_validity ALIAS utf8_validity)
     if(protobuf_SOURCE_DIR AND EXISTS

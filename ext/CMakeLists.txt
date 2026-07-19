@@ -25,6 +25,6 @@ otel_add_component(
 
 add_subdirectory(src)
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_subdirectory(test)
 endif()

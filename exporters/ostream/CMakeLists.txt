@@ -23,7 +23,7 @@ target_link_libraries(opentelemetry_exporter_ostream_span
 
 list(APPEND OPENTELEMETRY_OSTREAM_TARGETS opentelemetry_exporter_ostream_span)
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_executable(ostream_span_test test/ostream_span_test.cc)
   target_link_libraries(ostream_span_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_ostream_span)
@@ -31,7 +31,7 @@ if(BUILD_TESTING)
     TARGET ostream_span_test
     TEST_PREFIX exporter.
     TEST_LIST ostream_span_test)
-endif() # BUILD_TESTING
+endif() # OTELCPP_BUILD_TESTING
 
 #
 # opentelemetry_exporter_ostream_span_builder
@@ -74,7 +74,7 @@ target_link_libraries(opentelemetry_exporter_ostream_metrics
 list(APPEND OPENTELEMETRY_OSTREAM_TARGETS
      opentelemetry_exporter_ostream_metrics)
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_executable(ostream_metric_test test/ostream_metric_test.cc)
   target_link_libraries(
     ostream_metric_test ${GTEST_BOTH_LIBRARIES}
@@ -122,7 +122,7 @@ target_link_libraries(opentelemetry_exporter_ostream_logs
                       PUBLIC opentelemetry_logs)
 list(APPEND OPENTELEMETRY_OSTREAM_TARGETS opentelemetry_exporter_ostream_logs)
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_executable(ostream_log_test test/ostream_log_test.cc)
   target_link_libraries(ostream_log_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_ostream_logs)
@@ -191,7 +191,7 @@ otel_add_component(
   PATTERN
   "console_span_builder.h")
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     exporter_ostream_span "OpenTelemetry Exporter - OStream Span"
     "Exports trace spans to output stream." "opentelemetry_trace")

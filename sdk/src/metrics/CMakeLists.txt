@@ -47,7 +47,7 @@ target_include_directories(
   opentelemetry_metrics
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     metrics "OpenTelemetry SDK - Metrics"
     "Components for exporting metrics in the OpenTelemetry SDK."

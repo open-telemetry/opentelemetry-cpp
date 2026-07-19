@@ -95,7 +95,7 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
-      -DOPENTELEMETRY_BUILD_DLL=1 `
+      -DOTELCPP_BUILD_DLL=1 `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -118,7 +118,7 @@ switch ($action) {
     cmake $SRC_DIR `
       -DCMAKE_CXX_STANDARD=20 `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
-      -DOPENTELEMETRY_BUILD_DLL=1 `
+      -DOTELCPP_BUILD_DLL=1 `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -140,9 +140,9 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
-      -DWITH_OPENTRACING=OFF `
+      -DOTELCPP_WITH_OPENTRACING=OFF `
       -DOTELCPP_MAINTAINER_MODE=ON `
-      -DWITH_NO_DEPRECATED_CODE=ON `
+      -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
@@ -168,11 +168,11 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
-      -DWITH_OPENTRACING=OFF `
-      -DWITH_STL=CXX20 `
+      -DOTELCPP_WITH_OPENTRACING=OFF `
+      -DOTELCPP_WITH_STL=CXX20 `
       -DCMAKE_CXX_STANDARD=20 `
       -DOTELCPP_MAINTAINER_MODE=ON `
-      -DWITH_NO_DEPRECATED_CODE=ON `
+      -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
@@ -198,9 +198,9 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       "-C $SRC_DIR/test_common/cmake/all-options-abiv2-preview.cmake" `
-      -DWITH_OPENTRACING=OFF `
+      -DOTELCPP_WITH_OPENTRACING=OFF `
       -DOTELCPP_MAINTAINER_MODE=ON `
-      -DWITH_NO_DEPRECATED_CODE=ON `
+      -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
@@ -226,7 +226,7 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
-      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
+      -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -251,7 +251,7 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
-      -DWITH_OPENTRACING=OFF `
+      -DOTELCPP_WITH_OPENTRACING=OFF `
       -DVCPKG_TARGET_TRIPLET=x64-windows `      
     "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
@@ -277,8 +277,9 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
-      -DOPENTELEMETRY_BUILD_DLL=1 `
-      -DWITH_OTPROTCOL=ON `
+      -DOTELCPP_BUILD_DLL=1 `
+      -DOTELCPP_WITH_OTLP_GRPC=ON `
+      -DOTELCPP_WITH_OTLP_HTTP=ON `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -300,9 +301,9 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
-      -DWITH_OPENTRACING=OFF `
+      -DOTELCPP_WITH_OPENTRACING=OFF `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
-      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
+      -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -327,7 +328,7 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
-      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
+      -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -344,7 +345,7 @@ switch ($action) {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
       -DVCPKG_TARGET_TRIPLET=x64-windows `
-      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
+      -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON `
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -391,9 +392,9 @@ switch ($action) {
       $CMAKE_OPTIONS `
       "-DCMAKE_INSTALL_PREFIX=$INSTALL_TEST_DIR" `
       "-C $SRC_DIR/test_common/cmake/all-options-abiv2-preview.cmake" `
-      -DWITH_OPENTRACING=OFF `
-      -DWITH_GSL=ON `
-      -DOPENTELEMETRY_INSTALL=ON
+      -DOTELCPP_WITH_OPENTRACING=OFF `
+      -DOTELCPP_WITH_GSL=ON `
+      -DOTELCPP_INSTALL=ON
 
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
@@ -481,29 +482,29 @@ switch ($action) {
       "-DCMAKE_CXX_STANDARD=17",
       "-DVCPKG_TARGET_TRIPLET=x64-windows",
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake",
-      "-DOPENTELEMETRY_BUILD_DLL=1"
+      "-DOTELCPP_BUILD_DLL=1"
     )
 
     cmake $SRC_DIR `
       $CMAKE_OPTIONS `
       "-DCMAKE_INSTALL_PREFIX=$INSTALL_TEST_DIR" `
       "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake" `
-      -DOPENTELEMETRY_INSTALL=ON `
-      -DWITH_CONFIGURATION=OFF `
-      -DWITH_OPENTRACING=OFF `
-      -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF `
-      -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=OFF `
-      -DWITH_OTLP_RETRY_PREVIEW=OFF `
-      -DWITH_OTLP_GRPC=OFF `
-      -DWITH_OTLP_HTTP=OFF `
-      -DWITH_OTLP_FILE=OFF `
-      -DWITH_OTLP_HTTP_COMPRESSION=OFF `
-      -DWITH_HTTP_CLIENT_CURL=OFF `
-      -DWITH_PROMETHEUS=OFF `
-      -DWITH_ZIPKIN=OFF `
-      -DWITH_ELASTICSEARCH=OFF `
-      -DWITH_EXAMPLES=OFF `
-      -DWITH_EXAMPLES_HTTP=OFF
+      -DOTELCPP_INSTALL=ON `
+      -DOTELCPP_WITH_CONFIGURATION=OFF `
+      -DOTELCPP_WITH_OPENTRACING=OFF `
+      -DOTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF `
+      -DOTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW=OFF `
+      -DOTELCPP_WITH_OTLP_RETRY_PREVIEW=OFF `
+      -DOTELCPP_WITH_OTLP_GRPC=OFF `
+      -DOTELCPP_WITH_OTLP_HTTP=OFF `
+      -DOTELCPP_WITH_OTLP_FILE=OFF `
+      -DOTELCPP_WITH_OTLP_HTTP_COMPRESSION=OFF `
+      -DOTELCPP_WITH_HTTP_CLIENT_CURL=OFF `
+      -DOTELCPP_WITH_PROMETHEUS=OFF `
+      -DOTELCPP_WITH_ZIPKIN=OFF `
+      -DOTELCPP_WITH_ELASTICSEARCH=OFF `
+      -DOTELCPP_WITH_EXAMPLES=OFF `
+      -DOTELCPP_WITH_EXAMPLES_HTTP=OFF
 
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
