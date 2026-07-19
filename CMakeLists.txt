@@ -24,6 +24,8 @@ project(
 # Mark variables as used so cmake doesn't complain about them
 mark_as_advanced(CMAKE_TOOLCHAIN_FILE)
 
+include("${opentelemetry-cpp_SOURCE_DIR}/cmake/tools.cmake")
+
 # Set the third-party release git tags.
 if(EXISTS "${opentelemetry-cpp_SOURCE_DIR}/third_party_release")
   file(STRINGS "${opentelemetry-cpp_SOURCE_DIR}/third_party_release"
@@ -57,32 +59,42 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
       CACHE STRING "")
 endif()
 
-option(WITH_ABI_VERSION_1 "ABI version 1" ON)
-option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
+otelcpp_option_flag(OTELCPP_WITH_ABI_VERSION_1 "ABI version 1" ON)
+otelcpp_option_flag(OTELCPP_WITH_ABI_VERSION_2
+                    "EXPERIMENTAL: ABI version 2 preview" OFF)
 
-if(DEFINED WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
-   AND WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
-   AND NOT WITH_ABI_VERSION_2)
+set(_OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW_REQUESTED OFF)
+if(DEFINED OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW)
+  set(_OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW_REQUESTED
+      "${OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW}")
+elseif(DEFINED WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW)
+  set(_OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW_REQUESTED
+      "${WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW}")
+endif()
+if(_OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW_REQUESTED
+   AND NOT OTELCPP_WITH_ABI_VERSION_2)
   message(
     FATAL_ERROR
-      "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW requires WITH_ABI_VERSION_2")
+      "OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW requires OTELCPP_WITH_ABI_VERSION_2"
+  )
 endif()
-
-include(CMakeDependentOption)
+unset(_OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW_REQUESTED)
 
 # Experimental: bound synchronous metric instruments (Counter, Histogram).
-# Requires WITH_ABI_VERSION_2. Context-bearing bound operations, exemplar
-# parity, Gauge, and UpDownCounter bound support are follow-ups.
-cmake_dependent_option(
-  WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+# Requires OTELCPP_WITH_ABI_VERSION_2. Context-bearing bound operations,
+# exemplar parity, Gauge, and UpDownCounter bound support are follow-ups.
+otelcpp_dependent_option(
+  OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
   "EXPERIMENTAL: bound synchronous metric instruments preview" OFF
-  "WITH_ABI_VERSION_2" OFF)
+  "OTELCPP_WITH_ABI_VERSION_2" OFF)
 
-option(WITH_CONFIGURATION "EXPERIMENTAL: YAML configuration file" OFF)
+otelcpp_option_flag(OTELCPP_WITH_CONFIGURATION
+                    "EXPERIMENTAL: YAML configuration file" OFF)
 
 #
-# We do not want to have WITH_ABI_VERSION = "1" or "2", and instead prefer two
-# distinct flags, WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2.
+# We do not want to have OTELCPP_WITH_ABI_VERSION = "1" or "2", and instead
+# prefer two distinct flags, OTELCPP_WITH_ABI_VERSION_1 and
+# OTELCPP_WITH_ABI_VERSION_2.
 #
 # This allows:
 #
@@ -90,53 +102,56 @@ option(WITH_CONFIGURATION "EXPERIMENTAL: YAML configuration file" OFF)
 # * to mark experimental/stable/deprecated on flags, for clarity
 # * to search for exact abi usage move easily, discouraging:
 #
-#   * cmake -DWITH_ABI_VERSION=${ARG}
+#   * cmake -DOTELCPP_WITH_ABI_VERSION=${ARG}
 #
-# While not supported, having distinct WITH_ABI_VERSION_1 and WITH_ABI_VERSION_2
-# flags also opens the possibility to support multiple ABI concurrently, should
-# that become necessary.
+# While not supported, having distinct OTELCPP_WITH_ABI_VERSION_1 and
+# OTELCPP_WITH_ABI_VERSION_2 flags also opens the possibility to support
+# multiple ABI concurrently, should that become necessary.
 #
-if(WITH_ABI_VERSION_1 AND WITH_ABI_VERSION_2)
+if(OTELCPP_WITH_ABI_VERSION_1 AND OTELCPP_WITH_ABI_VERSION_2)
   #
   # Only one ABI is supported in a build.
   #
   message(
-    FATAL_ERROR "Set either WITH_ABI_VERSION_1 or WITH_ABI_VERSION_2, not both")
+    FATAL_ERROR
+      "Set either OTELCPP_WITH_ABI_VERSION_1 or OTELCPP_WITH_ABI_VERSION_2, not both"
+  )
 endif()
 
-if(WITH_ABI_VERSION_2)
+if(OTELCPP_WITH_ABI_VERSION_2)
   set(OPENTELEMETRY_ABI_VERSION_NO "2")
-elseif(WITH_ABI_VERSION_1)
+elseif(OTELCPP_WITH_ABI_VERSION_1)
   set(OPENTELEMETRY_ABI_VERSION_NO "1")
 else()
   set(OPENTELEMETRY_ABI_VERSION_NO "${OPENTELEMETRY_ABI_VERSION_DEFAULT}")
 endif()
 
-if(WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW AND NOT WITH_ABI_VERSION_2)
+if(OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+   AND NOT OTELCPP_WITH_ABI_VERSION_2)
   message(
     FATAL_ERROR
-      "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW requires WITH_ABI_VERSION_2")
+      "OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW requires OTELCPP_WITH_ABI_VERSION_2"
+  )
 endif()
 
-option(WITH_NO_DEPRECATED_CODE "Do not include deprecated code" OFF)
+otelcpp_option_flag(OTELCPP_WITH_NO_DEPRECATED_CODE
+                    "Do not include deprecated code" OFF)
 
-set(WITH_STL
-    "OFF"
-    CACHE STRING "Which version of the Standard Library for C++ to use")
+otelcpp_option_variable(OTELCPP_WITH_STL "OFF" STRING
+                        "Which version of the Standard Library for C++ to use")
 
-option(WITH_GSL
-       "Whether to use Guidelines Support Library for C++ latest features" OFF)
+otelcpp_option_flag(
+  OTELCPP_WITH_GSL
+  "Whether to use Guidelines Support Library for C++ latest features" OFF)
 
-set(OPENTELEMETRY_INSTALL_default ON)
+set(OTELCPP_INSTALL_DEFAULT ON)
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-  set(OPENTELEMETRY_INSTALL_default OFF)
+  set(OTELCPP_INSTALL_DEFAULT OFF)
 endif()
-option(OPENTELEMETRY_INSTALL "Whether to install opentelemetry targets"
-       ${OPENTELEMETRY_INSTALL_default})
+otelcpp_option_flag(OTELCPP_INSTALL "Whether to install opentelemetry targets"
+                    ${OTELCPP_INSTALL_DEFAULT})
 
-include("${opentelemetry-cpp_SOURCE_DIR}/cmake/tools.cmake")
-
-if(NOT WITH_STL STREQUAL "OFF")
+if(NOT OTELCPP_WITH_STL STREQUAL "OFF")
   # These definitions are needed for test projects that do not link against
   # opentelemetry-api library directly. We ensure that variant implementation
   # (absl::variant or std::variant) in variant unit test code is consistent with
@@ -155,67 +170,98 @@ if(NOT WITH_STL STREQUAL "OFF")
   endif()
 endif()
 
-option(WITH_OTLP_RETRY_PREVIEW "Whether to enable retry functionality" ON)
+otelcpp_option_flag(OTELCPP_WITH_OTLP_RETRY_PREVIEW
+                    "Whether to enable retry functionality" ON)
 
-option(WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
-       "Whether to enable mTLS support for gRPC" ON)
+otelcpp_option_flag(OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
+                    "Whether to enable mTLS support for gRPC" ON)
 
-option(WITH_OTLP_GRPC_CREDENTIAL_PREVIEW
-       "Whether to enable gRPC credentials option in OTLP gRPC Exporter" OFF)
+otelcpp_option_flag(
+  OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW
+  "Whether to enable gRPC credentials option in OTLP gRPC Exporter" OFF)
 
-option(WITH_OTLP_GRPC "Whether to include the OTLP gRPC exporter in the SDK"
-       OFF)
+otelcpp_option_flag(OTELCPP_WITH_OTLP_GRPC
+                    "Whether to include the OTLP gRPC exporter in the SDK" OFF)
 
-option(WITH_OTLP_HTTP "Whether to include the OTLP http exporter in the SDK"
-       OFF)
+otelcpp_option_flag(OTELCPP_WITH_OTLP_HTTP
+                    "Whether to include the OTLP http exporter in the SDK" OFF)
 
-option(WITH_OTLP_FILE "Whether to include the OTLP file exporter in the SDK"
-       OFF)
+otelcpp_option_flag(OTELCPP_WITH_OTLP_FILE
+                    "Whether to include the OTLP file exporter in the SDK" OFF)
 
-option(
-  WITH_OTLP_HTTP_COMPRESSION
+otelcpp_option_flag(
+  OTELCPP_WITH_OTLP_HTTP_COMPRESSION
   "Whether to include gzip compression for the OTLP http exporter in the SDK"
   OFF)
 
-option(
-  WITH_OTLP_UTF8_VALIDITY
+otelcpp_option_flag(
+  OTELCPP_WITH_OTLP_UTF8_VALIDITY
   "Whether to enable UTF-8 validity checks for the OTLP exporter in the SDK" ON)
 
-option(WITH_CURL_LOGGING "Whether to enable select CURL verbosity in OTel logs"
-       OFF)
+otelcpp_option_flag(OTELCPP_WITH_CURL_LOGGING
+                    "Whether to enable select CURL verbosity in OTel logs" OFF)
 
-option(WITH_ZIPKIN "Whether to include the Zipkin exporter in the SDK" OFF)
+otelcpp_option_flag(OTELCPP_WITH_ZIPKIN
+                    "Whether to include the Zipkin exporter in the SDK" OFF)
 
-option(WITH_PROMETHEUS "Whether to include the Prometheus Client in the SDK"
-       OFF)
+otelcpp_option_flag(OTELCPP_WITH_PROMETHEUS
+                    "Whether to include the Prometheus Client in the SDK" OFF)
 
-option(WITH_ELASTICSEARCH
-       "Whether to include the Elasticsearch Client in the SDK" OFF)
+otelcpp_option_flag(
+  OTELCPP_WITH_ELASTICSEARCH
+  "Whether to include the Elasticsearch Client in the SDK" OFF)
 
-option(WITH_NO_GETENV "Whether the platform supports environment variables" OFF)
+otelcpp_option_flag(OTELCPP_WITH_NO_GETENV
+                    "Whether the platform supports environment variables" OFF)
 
-option(BUILD_TESTING "Whether to enable tests" ON)
+# BUILD_TESTING is a standard CMake variable, so use it only as the top-level
+# default and do not treat it as a deprecated alias.
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  if(DEFINED BUILD_TESTING)
+    option(OTELCPP_BUILD_TESTING "Whether to enable tests" "${BUILD_TESTING}")
+  else()
+    option(OTELCPP_BUILD_TESTING "Whether to enable tests" ON)
+  endif()
+  otelcpp_option_flag(
+    OTELCPP_WITH_BENCHMARK "Whether to build benchmark program"
+    ${OTELCPP_BUILD_TESTING})
+else()
+  option(OTELCPP_BUILD_TESTING "Whether to enable tests" OFF)
+  otelcpp_option_flag(OTELCPP_WITH_BENCHMARK
+                      "Whether to build benchmark program" OFF)
+endif()
 
-option(WITH_BENCHMARK "Whether to build benchmark program" ON)
+otelcpp_option_flag(OTELCPP_BUILD_W3CTRACECONTEXT_TEST
+                    "Whether to build w3c trace context" OFF)
 
-option(BUILD_W3CTRACECONTEXT_TEST "Whether to build w3c trace context" OFF)
+otelcpp_option_flag(OTELCPP_MAINTAINER_MODE
+                    "Build in maintainer mode (-Wall -Werror)" OFF)
 
-option(OTELCPP_MAINTAINER_MODE "Build in maintainer mode (-Wall -Werror)" OFF)
+otelcpp_option_flag(OTELCPP_WITH_OPENTRACING
+                    "Whether to include the Opentracing shim" OFF)
 
-option(WITH_OPENTRACING "Whether to include the Opentracing shim" OFF)
+otelcpp_option_flag(OTELCPP_VERSIONED_LIBS
+                    "Whether to generate the versioned shared libs" OFF)
+otelcpp_option_flag(
+  OTELCPP_BUILD_DLL
+  "Whether to build the OpenTelemetry C++ SDK as a Windows DLL" OFF)
 
-option(OTELCPP_VERSIONED_LIBS "Whether to generate the versioned shared libs"
-       OFF)
+otelcpp_option_flag(OTELCPP_BUILD_PACKAGE "Whether to generate a package" OFF)
+
+otelcpp_option_variable(
+  OTELCPP_EXTERNAL_COMPONENT_PATH "" STRING
+  "Semicolon-separated paths to external components to build")
 
 if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
 endif()
 
 if(WIN32)
-  option(WITH_ETW "Whether to include the ETW Exporter in the SDK" ON)
+  otelcpp_option_flag(OTELCPP_WITH_ETW
+                      "Whether to include the ETW Exporter in the SDK" ON)
 else()
-  if(DEFINED (WITH_ETW))
-    message(FATAL_ERROR "WITH_ETW is only supported on Windows")
+  if(DEFINED OTELCPP_WITH_ETW OR DEFINED WITH_ETW)
+    message(FATAL_ERROR "OTELCPP_WITH_ETW is only supported on Windows")
   endif()
 endif(WIN32)
 
@@ -224,36 +270,38 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
   add_compile_options(-Wno-error=deprecated-declarations)
 endif()
 
-option(
-  WITH_API_ONLY
-  "Only build the API (use as a header-only library). Overrides WITH_EXAMPLES and all options to enable exporters"
+otelcpp_option_flag(
+  OTELCPP_WITH_API_ONLY
+  "Only build the API (use as a header-only library). Overrides OTELCPP_WITH_EXAMPLES and all options to enable exporters"
   OFF)
-option(WITH_EXAMPLES "Whether to build examples" ON)
+otelcpp_option_flag(OTELCPP_WITH_EXAMPLES "Whether to build examples" ON)
 
 # This requires CURL, OFF by default.
-option(
-  WITH_EXAMPLES_HTTP
-  "Whether to build http client/server examples. Requires WITH_EXAMPLES and CURL"
+otelcpp_option_flag(
+  OTELCPP_WITH_EXAMPLES_HTTP
+  "Whether to build http client/server examples. Requires OTELCPP_WITH_EXAMPLES and CURL"
   OFF)
 
-option(WITH_FUNC_TESTS "Whether to build functional tests" ON)
+otelcpp_option_flag(OTELCPP_WITH_FUNC_TESTS "Whether to build functional tests"
+                    ON)
 
-option(WITH_ASYNC_EXPORT_PREVIEW "Whether to enable async export" OFF)
+otelcpp_option_flag(OTELCPP_WITH_ASYNC_EXPORT_PREVIEW
+                    "Whether to enable async export" OFF)
 
 # Exemplar specs status is experimental, so behind feature flag by default
-option(WITH_METRICS_EXEMPLAR_PREVIEW
-       "Whether to enable exemplar within metrics" OFF)
+otelcpp_option_flag(OTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW
+                    "Whether to enable exemplar within metrics" OFF)
 
 # Experimental, so behind feature flag by default
-option(WITH_THREAD_INSTRUMENTATION_PREVIEW
-       "Whether to enable thread instrumentation" OFF)
+otelcpp_option_flag(OTELCPP_WITH_THREAD_INSTRUMENTATION_PREVIEW
+                    "Whether to enable thread instrumentation" OFF)
 
-option(WITH_RESOURCE_DETECTORS_PREVIEW
-       "Whether to enable inbuilt resource detectors" OFF)
+otelcpp_option_flag(OTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW
+                    "Whether to enable inbuilt resource detectors" OFF)
 
-option(OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS
-       "Whether to build test libraries that are always linked as shared libs"
-       OFF)
+otelcpp_option_flag(
+  OTELCPP_SKIP_DYNAMIC_LOADING_TESTS
+  "Whether to build test libraries that are always linked as shared libs" OFF)
 
 #
 # Verify options dependencies
@@ -261,15 +309,17 @@ option(OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS
 
 include(FetchContent)
 
-if(WITH_EXAMPLES_HTTP AND NOT WITH_EXAMPLES)
-  message(FATAL_ERROR "WITH_EXAMPLES_HTTP=ON requires WITH_EXAMPLES=ON")
+if(OTELCPP_WITH_EXAMPLES_HTTP AND NOT OTELCPP_WITH_EXAMPLES)
+  message(
+    FATAL_ERROR
+      "OTELCPP_WITH_EXAMPLES_HTTP=ON requires OTELCPP_WITH_EXAMPLES=ON")
 endif()
 
-if(WITH_GSL)
+if(OTELCPP_WITH_GSL)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/ms-gsl.cmake")
 endif()
 
-if(NOT WITH_API_ONLY)
+if(NOT OTELCPP_WITH_API_ONLY)
   find_package(Threads)
 endif()
 
@@ -300,44 +350,43 @@ include(GNUInstallDirs)
 # Do we need HTTP CLIENT CURL ?
 #
 
-include(CMakeDependentOption)
-cmake_dependent_option(
-  WITH_HTTP_CLIENT_CURL
+otelcpp_dependent_option(
+  OTELCPP_WITH_HTTP_CLIENT_CURL
   "Use the curl HTTP client backend. Defaults to ON when any HTTP exporter is enabled; set OFF to supply a custom transport."
   ON
-  "WITH_OTLP_HTTP OR WITH_ELASTICSEARCH OR WITH_ZIPKIN OR BUILD_W3CTRACECONTEXT_TEST OR WITH_EXAMPLES_HTTP"
+  "OTELCPP_WITH_OTLP_HTTP OR OTELCPP_WITH_ELASTICSEARCH OR OTELCPP_WITH_ZIPKIN OR OTELCPP_BUILD_W3CTRACECONTEXT_TEST OR OTELCPP_WITH_EXAMPLES_HTTP"
   OFF)
 
 #
-# Locally override options if WITH_API_ONLY is set to prevent third party
-# dependencies from being imported
+# Locally override options if OTELCPP_WITH_API_ONLY is set to prevent third
+# party dependencies from being imported
 #
 
-if(WITH_API_ONLY)
-  set(WITH_EXAMPLES OFF)
-  set(WITH_EXAMPLES_HTTP OFF)
-  set(WITH_OTLP_GRPC OFF)
-  set(WITH_OTLP_HTTP OFF)
-  set(WITH_OTLP_FILE OFF)
-  set(WITH_ZIPKIN OFF)
-  set(WITH_PROMETHEUS OFF)
-  set(WITH_ELASTICSEARCH OFF)
-  set(WITH_OPENTRACING OFF)
-  set(WITH_ETW OFF)
-  set(WITH_CONFIGURATION OFF)
-  set(WITH_HTTP_CLIENT_CURL OFF)
-  set(WITH_OTLP_HTTP_COMPRESSION OFF)
-  set(WITH_BENCHMARK OFF)
-  set(WITH_FUNC_TESTS OFF)
-  set(BUILD_TESTING OFF)
-  set(BUILD_W3CTRACECONTEXT_TEST OFF)
+if(OTELCPP_WITH_API_ONLY)
+  set(OTELCPP_WITH_EXAMPLES OFF)
+  set(OTELCPP_WITH_EXAMPLES_HTTP OFF)
+  set(OTELCPP_WITH_OTLP_GRPC OFF)
+  set(OTELCPP_WITH_OTLP_HTTP OFF)
+  set(OTELCPP_WITH_OTLP_FILE OFF)
+  set(OTELCPP_WITH_ZIPKIN OFF)
+  set(OTELCPP_WITH_PROMETHEUS OFF)
+  set(OTELCPP_WITH_ELASTICSEARCH OFF)
+  set(OTELCPP_WITH_OPENTRACING OFF)
+  set(OTELCPP_WITH_ETW OFF)
+  set(OTELCPP_WITH_CONFIGURATION OFF)
+  set(OTELCPP_WITH_HTTP_CLIENT_CURL OFF)
+  set(OTELCPP_WITH_OTLP_HTTP_COMPRESSION OFF)
+  set(OTELCPP_WITH_BENCHMARK OFF)
+  set(OTELCPP_WITH_FUNC_TESTS OFF)
+  set(OTELCPP_BUILD_TESTING OFF)
+  set(OTELCPP_BUILD_W3CTRACECONTEXT_TEST OFF)
 endif()
 
 #
 # Do we need ZLIB ?
 #
 
-if(WITH_HTTP_CLIENT_CURL AND WITH_OTLP_HTTP_COMPRESSION)
+if(OTELCPP_WITH_HTTP_CLIENT_CURL AND OTELCPP_WITH_OTLP_HTTP_COMPRESSION)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/zlib.cmake")
 endif()
 
@@ -345,7 +394,7 @@ endif()
 # Do we need CURL ?
 #
 
-if(WITH_HTTP_CLIENT_CURL)
+if(OTELCPP_WITH_HTTP_CLIENT_CURL)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/curl.cmake")
 endif()
 
@@ -353,7 +402,7 @@ endif()
 # Do we need prometheus-cpp ?
 #
 
-if(WITH_PROMETHEUS)
+if(OTELCPP_WITH_PROMETHEUS)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/prometheus-cpp.cmake")
 endif()
 
@@ -361,13 +410,13 @@ endif()
 # Do we need protobuf and/or gRPC ?
 #
 
-if(WITH_OTLP_GRPC
-   OR WITH_OTLP_HTTP
-   OR WITH_OTLP_FILE)
+if(OTELCPP_WITH_OTLP_GRPC
+   OR OTELCPP_WITH_OTLP_HTTP
+   OR OTELCPP_WITH_OTLP_FILE)
 
   # find or fetch grpc before protobuf to allow protobuf to be built in-tree as
   # a grpc submodule.
-  if(WITH_OTLP_GRPC)
+  if(OTELCPP_WITH_OTLP_GRPC)
     include("${opentelemetry-cpp_SOURCE_DIR}/cmake/grpc.cmake")
   endif()
 
@@ -380,12 +429,12 @@ endif()
 # Do we need NLOHMANN_JSON ?
 #
 
-if(WITH_ELASTICSEARCH
-   OR WITH_ZIPKIN
-   OR WITH_OTLP_HTTP
-   OR WITH_OTLP_FILE
-   OR BUILD_W3CTRACECONTEXT_TEST
-   OR WITH_ETW)
+if(OTELCPP_WITH_ELASTICSEARCH
+   OR OTELCPP_WITH_ZIPKIN
+   OR OTELCPP_WITH_OTLP_HTTP
+   OR OTELCPP_WITH_OTLP_FILE
+   OR OTELCPP_BUILD_W3CTRACECONTEXT_TEST
+   OR OTELCPP_WITH_ETW)
   set(USE_NLOHMANN_JSON ON)
 else()
   set(USE_NLOHMANN_JSON OFF)
@@ -399,7 +448,7 @@ endif()
 # Do we need RapidYaml ?
 #
 
-if(WITH_CONFIGURATION)
+if(OTELCPP_WITH_CONFIGURATION)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/ryml.cmake")
 endif()
 
@@ -407,15 +456,22 @@ endif()
 # Do we need OpenTracing ?
 #
 
-if(WITH_OPENTRACING)
+if(OTELCPP_WITH_OPENTRACING)
   include("${opentelemetry-cpp_SOURCE_DIR}/cmake/opentracing-cpp.cmake")
 endif()
 
-include(CTest)
-if(BUILD_TESTING)
-  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/googletest.cmake")
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  # Keep CTest's standard option aligned for top-level builds without exposing
+  # it as an opentelemetry-cpp subproject setting.
+  set(BUILD_TESTING "${OTELCPP_BUILD_TESTING}")
+  include(CTest)
+elseif(OTELCPP_BUILD_TESTING)
   enable_testing()
-  if(WITH_BENCHMARK)
+endif()
+
+if(OTELCPP_BUILD_TESTING)
+  include("${opentelemetry-cpp_SOURCE_DIR}/cmake/googletest.cmake")
+  if(OTELCPP_WITH_BENCHMARK)
     include("${opentelemetry-cpp_SOURCE_DIR}/cmake/benchmark.cmake")
   endif()
 endif()
@@ -530,74 +586,91 @@ message(STATUS "BUILD_SHARED_LIBS: ${BUILD_SHARED_LIBS}")
 message(STATUS "---------------------------------------------")
 message(STATUS "opentelemetry-cpp build options")
 message(STATUS "---------------------------------------------")
-message(STATUS "WITH_API_ONLY: ${WITH_API_ONLY}")
-message(STATUS "WITH_NO_DEPRECATED_CODE: ${WITH_NO_DEPRECATED_CODE}")
-message(STATUS "WITH_ABI_VERSION_1: ${WITH_ABI_VERSION_1}")
-message(STATUS "WITH_ABI_VERSION_2: ${WITH_ABI_VERSION_2}")
+message(STATUS "OTELCPP_WITH_API_ONLY: ${OTELCPP_WITH_API_ONLY}")
+message(
+  STATUS "OTELCPP_WITH_NO_DEPRECATED_CODE: ${OTELCPP_WITH_NO_DEPRECATED_CODE}")
+message(STATUS "OTELCPP_WITH_ABI_VERSION_1: ${OTELCPP_WITH_ABI_VERSION_1}")
+message(STATUS "OTELCPP_WITH_ABI_VERSION_2: ${OTELCPP_WITH_ABI_VERSION_2}")
 message(STATUS "OTELCPP_VERSIONED_LIBS: ${OTELCPP_VERSIONED_LIBS}")
+message(STATUS "OTELCPP_BUILD_PACKAGE: ${OTELCPP_BUILD_PACKAGE}")
+message(
+  STATUS "OTELCPP_EXTERNAL_COMPONENT_PATH: ${OTELCPP_EXTERNAL_COMPONENT_PATH}")
 message(STATUS "OTELCPP_MAINTAINER_MODE: ${OTELCPP_MAINTAINER_MODE}")
-message(STATUS "WITH_STL: ${WITH_STL}")
-message(STATUS "WITH_GSL: ${WITH_GSL}")
-message(STATUS "WITH_NO_GETENV: ${WITH_NO_GETENV}")
-message(STATUS "OPENTELEMETRY_INSTALL: ${OPENTELEMETRY_INSTALL}")
+message(STATUS "OTELCPP_WITH_STL: ${OTELCPP_WITH_STL}")
+message(STATUS "OTELCPP_WITH_GSL: ${OTELCPP_WITH_GSL}")
+message(STATUS "OTELCPP_WITH_NO_GETENV: ${OTELCPP_WITH_NO_GETENV}")
+message(STATUS "OTELCPP_INSTALL: ${OTELCPP_INSTALL}")
 
 message(STATUS "---------------------------------------------")
 message(STATUS "opentelemetry-cpp cmake component options")
 message(STATUS "---------------------------------------------")
-message(STATUS "WITH_OTLP_GRPC: ${WITH_OTLP_GRPC}")
-message(STATUS "WITH_OTLP_HTTP: ${WITH_OTLP_HTTP}")
-message(STATUS "WITH_OTLP_FILE: ${WITH_OTLP_FILE}")
-message(STATUS "WITH_HTTP_CLIENT_CURL: ${WITH_HTTP_CLIENT_CURL}")
-message(STATUS "WITH_ZIPKIN: ${WITH_ZIPKIN}")
-message(STATUS "WITH_PROMETHEUS: ${WITH_PROMETHEUS}")
-message(STATUS "WITH_ELASTICSEARCH: ${WITH_ELASTICSEARCH}")
-message(STATUS "WITH_OPENTRACING: ${WITH_OPENTRACING}")
-message(STATUS "WITH_ETW: ${WITH_ETW}")
-message(STATUS "OPENTELEMETRY_BUILD_DLL: ${OPENTELEMETRY_BUILD_DLL}")
-message(STATUS "WITH_CONFIGURATION: ${WITH_CONFIGURATION}")
+message(STATUS "OTELCPP_WITH_OTLP_GRPC: ${OTELCPP_WITH_OTLP_GRPC}")
+message(STATUS "OTELCPP_WITH_OTLP_HTTP: ${OTELCPP_WITH_OTLP_HTTP}")
+message(STATUS "OTELCPP_WITH_OTLP_FILE: ${OTELCPP_WITH_OTLP_FILE}")
+message(
+  STATUS "OTELCPP_WITH_HTTP_CLIENT_CURL: ${OTELCPP_WITH_HTTP_CLIENT_CURL}")
+message(STATUS "OTELCPP_WITH_ZIPKIN: ${OTELCPP_WITH_ZIPKIN}")
+message(STATUS "OTELCPP_WITH_PROMETHEUS: ${OTELCPP_WITH_PROMETHEUS}")
+message(STATUS "OTELCPP_WITH_ELASTICSEARCH: ${OTELCPP_WITH_ELASTICSEARCH}")
+message(STATUS "OTELCPP_WITH_OPENTRACING: ${OTELCPP_WITH_OPENTRACING}")
+message(STATUS "OTELCPP_WITH_ETW: ${OTELCPP_WITH_ETW}")
+message(STATUS "OTELCPP_BUILD_DLL: ${OTELCPP_BUILD_DLL}")
+message(STATUS "OTELCPP_WITH_CONFIGURATION: ${OTELCPP_WITH_CONFIGURATION}")
 
 message(STATUS "---------------------------------------------")
 message(STATUS "feature preview options")
 message(STATUS "---------------------------------------------")
-message(STATUS "WITH_ASYNC_EXPORT_PREVIEW: ${WITH_ASYNC_EXPORT_PREVIEW}")
 message(
   STATUS
-    "WITH_THREAD_INSTRUMENTATION_PREVIEW: ${WITH_THREAD_INSTRUMENTATION_PREVIEW}"
+    "OTELCPP_WITH_ASYNC_EXPORT_PREVIEW: ${OTELCPP_WITH_ASYNC_EXPORT_PREVIEW}")
+message(
+  STATUS
+    "OTELCPP_WITH_THREAD_INSTRUMENTATION_PREVIEW: ${OTELCPP_WITH_THREAD_INSTRUMENTATION_PREVIEW}"
 )
 message(
-  STATUS "WITH_METRICS_EXEMPLAR_PREVIEW: ${WITH_METRICS_EXEMPLAR_PREVIEW}")
-message(
-  STATUS "WITH_OTLP_GRPC_SSL_MTLS_PREVIEW: ${WITH_OTLP_GRPC_SSL_MTLS_PREVIEW}")
+  STATUS
+    "OTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW: ${OTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW}"
+)
 message(
   STATUS
-    "WITH_OTLP_GRPC_CREDENTIAL_PREVIEW: ${WITH_OTLP_GRPC_CREDENTIAL_PREVIEW}")
-message(STATUS "WITH_OTLP_RETRY_PREVIEW: ${WITH_OTLP_RETRY_PREVIEW}")
+    "OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW: ${OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW}"
+)
 message(
   STATUS
-    "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW: ${WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW}"
+    "OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW: ${OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW}"
+)
+message(
+  STATUS "OTELCPP_WITH_OTLP_RETRY_PREVIEW: ${OTELCPP_WITH_OTLP_RETRY_PREVIEW}")
+message(
+  STATUS
+    "OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW: ${OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW}"
 )
 message(STATUS "---------------------------------------------")
 message(STATUS "third-party options")
 message(STATUS "---------------------------------------------")
 message(STATUS "WITH_NLOHMANN_JSON: ${USE_NLOHMANN_JSON}")
-message(STATUS "WITH_CURL_LOGGING: ${WITH_CURL_LOGGING}")
-message(STATUS "WITH_OTLP_HTTP_COMPRESSION: ${WITH_OTLP_HTTP_COMPRESSION}")
+message(STATUS "OTELCPP_WITH_CURL_LOGGING: ${OTELCPP_WITH_CURL_LOGGING}")
+message(
+  STATUS
+    "OTELCPP_WITH_OTLP_HTTP_COMPRESSION: ${OTELCPP_WITH_OTLP_HTTP_COMPRESSION}")
 message(STATUS "---------------------------------------------")
 message(STATUS "examples and test options")
 message(STATUS "---------------------------------------------")
-message(STATUS "WITH_BENCHMARK: ${WITH_BENCHMARK}")
-message(STATUS "WITH_EXAMPLES: ${WITH_EXAMPLES}")
-message(STATUS "WITH_EXAMPLES_HTTP: ${WITH_EXAMPLES_HTTP}")
-message(STATUS "WITH_FUNC_TESTS: ${WITH_FUNC_TESTS}")
-message(STATUS "BUILD_W3CTRACECONTEXT_TEST: ${BUILD_W3CTRACECONTEXT_TEST}")
-message(STATUS "BUILD_TESTING: ${BUILD_TESTING}")
+message(STATUS "OTELCPP_WITH_BENCHMARK: ${OTELCPP_WITH_BENCHMARK}")
+message(STATUS "OTELCPP_WITH_EXAMPLES: ${OTELCPP_WITH_EXAMPLES}")
+message(STATUS "OTELCPP_WITH_EXAMPLES_HTTP: ${OTELCPP_WITH_EXAMPLES_HTTP}")
+message(STATUS "OTELCPP_WITH_FUNC_TESTS: ${OTELCPP_WITH_FUNC_TESTS}")
+message(
+  STATUS
+    "OTELCPP_BUILD_W3CTRACECONTEXT_TEST: ${OTELCPP_BUILD_W3CTRACECONTEXT_TEST}")
+message(STATUS "OTELCPP_BUILD_TESTING: ${OTELCPP_BUILD_TESTING}")
 message(STATUS "---------------------------------------------")
 message(STATUS "versions")
 message(STATUS "---------------------------------------------")
 message(STATUS "CMake: ${CMAKE_VERSION}")
 message(STATUS "GTest: ${GTest_VERSION} (${GTest_PROVIDER})")
 message(STATUS "benchmark: ${benchmark_VERSION} (${benchmark_PROVIDER})")
-if(WITH_GSL)
+if(OTELCPP_WITH_GSL)
   message(
     STATUS "Microsoft.GSL: ${Microsoft.GSL_VERSION} (${Microsoft.GSL_PROVIDER})"
   )
@@ -631,12 +704,12 @@ if(USE_NLOHMANN_JSON)
     STATUS "nlohmann-json: ${nlohmann_json_VERSION} (${nlohmann_json_PROVIDER})"
   )
 endif()
-if(WITH_PROMETHEUS)
+if(OTELCPP_WITH_PROMETHEUS)
   message(
     STATUS
       "prometheus-cpp: ${prometheus-cpp_VERSION} (${prometheus-cpp_PROVIDER})")
 endif()
-if(WITH_OPENTRACING)
+if(OTELCPP_WITH_OPENTRACING)
   message(
     STATUS "opentracing-cpp: ${OpenTracing_VERSION} (${OpenTracing_PROVIDER})")
 endif()
@@ -649,14 +722,14 @@ include("${opentelemetry-cpp_SOURCE_DIR}/cmake/otel-install-functions.cmake")
 
 include(CMakePackageConfigHelpers)
 
-if(DEFINED OPENTELEMETRY_BUILD_DLL)
+if(OTELCPP_BUILD_DLL)
   if(NOT WIN32)
     message(FATAL_ERROR "Build DLL is only supported on Windows!")
   endif()
   if(NOT MSVC)
     message(WARNING "Build DLL is supposed to work with MSVC!")
   endif()
-  if(WITH_STL)
+  if(OTELCPP_WITH_STL)
     message(
       WARNING "Build DLL with C++ STL could cause binary incompatibility!")
   endif()
@@ -665,27 +738,25 @@ endif()
 
 add_subdirectory(api)
 
-if(NOT WITH_API_ONLY)
-  if(WITH_OPENTRACING)
+if(NOT OTELCPP_WITH_API_ONLY)
+  if(OTELCPP_WITH_OPENTRACING)
     add_subdirectory(opentracing-shim)
   endif()
-
-  set(BUILD_TESTING ${BUILD_TESTING})
 
   add_subdirectory(sdk)
   add_subdirectory(ext)
   add_subdirectory(exporters)
-  if(WITH_RESOURCE_DETECTORS_PREVIEW)
+  if(OTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW)
     add_subdirectory(resource_detectors)
   endif()
 
-  if(BUILD_TESTING)
+  if(OTELCPP_BUILD_TESTING)
     add_subdirectory(test_common)
   endif()
-  if(WITH_EXAMPLES)
+  if(OTELCPP_WITH_EXAMPLES)
     add_subdirectory(examples)
   endif()
-  if(WITH_FUNC_TESTS)
+  if(OTELCPP_WITH_FUNC_TESTS)
     add_subdirectory(functional)
   endif()
 
@@ -696,7 +767,7 @@ endif()
 
 include("${opentelemetry-cpp_SOURCE_DIR}/cmake/patch-imported-config.cmake")
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   # Install the cmake config and version files
   otel_install_cmake_config()
 
@@ -706,7 +777,7 @@ if(OPENTELEMETRY_INSTALL)
   # Install the thirdparty dependency definition file
   otel_install_thirdparty_definitions()
 
-  if(BUILD_PACKAGE)
+  if(OTELCPP_BUILD_PACKAGE)
     include("${opentelemetry-cpp_SOURCE_DIR}/cmake/package.cmake")
     include(CPack)
   endif()

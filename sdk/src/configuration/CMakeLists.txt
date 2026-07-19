@@ -27,7 +27,7 @@ target_link_libraries(
          opentelemetry_metrics opentelemetry_logs
   PRIVATE)
 
-if(WITH_CONFIGURATION)
+if(OTELCPP_WITH_CONFIGURATION)
 
   add_library(
     opentelemetry_configuration
