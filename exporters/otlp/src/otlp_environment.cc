@@ -30,26 +30,29 @@ namespace exporter
 namespace otlp
 {
 
-constexpr char kEnvOtlpEndpoint[]                = "OTEL_EXPORTER_OTLP_ENDPOINT";
-constexpr char kEnvOtlpInsecure[]                = "OTEL_EXPORTER_OTLP_INSECURE";
-constexpr char kEnvOtlpSslEnable[]               = "OTEL_EXPORTER_OTLP_SSL_ENABLE";
-constexpr char kEnvOtlpCertificate[]             = "OTEL_EXPORTER_OTLP_CERTIFICATE";
-constexpr char kEnvOtlpCertificateString[]       = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING";
-constexpr char kEnvOtlpClientKey[]               = "OTEL_EXPORTER_OTLP_CLIENT_KEY";
-constexpr char kEnvOtlpClientKeyString[]         = "OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING";
-constexpr char kEnvOtlpClientCertificate[]       = "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE";
-constexpr char kEnvOtlpClientCertificateString[] = "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING";
-constexpr char kEnvOtlpTimeout[]                 = "OTEL_EXPORTER_OTLP_TIMEOUT";
-constexpr char kEnvOtlpHeaders[]                 = "OTEL_EXPORTER_OTLP_HEADERS";
-constexpr char kEnvOtlpCompression[]             = "OTEL_EXPORTER_OTLP_COMPRESSION";
-constexpr char kEnvOtlpRetryMaxAttempts[]        = "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS";
-constexpr char kEnvOtlpRetryInitialBackoff[]     = "OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF";
-constexpr char kEnvOtlpRetryMaxBackoff[]         = "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF";
-constexpr char kEnvOtlpRetryBackoffMultiplier[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER";
-constexpr char kEnvOtlpMinTls[]                 = "OTEL_CPP_EXPORTER_OTLP_MIN_TLS";
-constexpr char kEnvOtlpMaxTls[]                 = "OTEL_CPP_EXPORTER_OTLP_MAX_TLS";
-constexpr char kEnvOtlpCipher[]                 = "OTEL_CPP_EXPORTER_OTLP_CIPHER";
-constexpr char kEnvOtlpCipherSuite[]            = "OTEL_CPP_EXPORTER_OTLP_CIPHER_SUITE";
+static constexpr char kEnvOtlpEndpoint[]          = "OTEL_EXPORTER_OTLP_ENDPOINT";
+static constexpr char kEnvOtlpInsecure[]          = "OTEL_EXPORTER_OTLP_INSECURE";
+static constexpr char kEnvOtlpSslEnable[]         = "OTEL_EXPORTER_OTLP_SSL_ENABLE";
+static constexpr char kEnvOtlpCertificate[]       = "OTEL_EXPORTER_OTLP_CERTIFICATE";
+static constexpr char kEnvOtlpCertificateString[] = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING";
+static constexpr char kEnvOtlpClientKey[]         = "OTEL_EXPORTER_OTLP_CLIENT_KEY";
+static constexpr char kEnvOtlpClientKeyString[]   = "OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING";
+static constexpr char kEnvOtlpClientCertificate[] = "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE";
+static constexpr char kEnvOtlpClientCertificateString[] =
+    "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING";
+static constexpr char kEnvOtlpTimeout[]          = "OTEL_EXPORTER_OTLP_TIMEOUT";
+static constexpr char kEnvOtlpHeaders[]          = "OTEL_EXPORTER_OTLP_HEADERS";
+static constexpr char kEnvOtlpCompression[]      = "OTEL_EXPORTER_OTLP_COMPRESSION";
+static constexpr char kEnvOtlpRetryMaxAttempts[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS";
+static constexpr char kEnvOtlpRetryInitialBackoff[] =
+    "OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF";
+static constexpr char kEnvOtlpRetryMaxBackoff[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF";
+static constexpr char kEnvOtlpRetryBackoffMultiplier[] =
+    "OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER";
+static constexpr char kEnvOtlpMinTls[]      = "OTEL_CPP_EXPORTER_OTLP_MIN_TLS";
+static constexpr char kEnvOtlpMaxTls[]      = "OTEL_CPP_EXPORTER_OTLP_MAX_TLS";
+static constexpr char kEnvOtlpCipher[]      = "OTEL_CPP_EXPORTER_OTLP_CIPHER";
+static constexpr char kEnvOtlpCipherSuite[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER_SUITE";
 
 static bool GetBoolDualEnvVar(const char *signal_name, const char *generic_name, bool &value)
 {
@@ -336,7 +339,7 @@ bool GetOtlpDefaultGrpcTracesIsInsecure()
 
   /* The trace endpoint, when providing a scheme, takes precedence. */
 
-  if (endpoint.substr(0, 6) == "https:")
+  if (opentelemetry::nostd::string_view(endpoint).substr(0, 6) == "https:")
   {
     return false;
   }
@@ -392,7 +395,7 @@ bool GetOtlpDefaultGrpcMetricsIsInsecure()
 
   /* The metrics endpoint, when providing a scheme, takes precedence. */
 
-  if (endpoint.substr(0, 6) == "https:")
+  if (opentelemetry::nostd::string_view(endpoint).substr(0, 6) == "https:")
   {
     return false;
   }
@@ -448,7 +451,7 @@ bool GetOtlpDefaultGrpcLogsIsInsecure()
 
   /* The logs endpoint, when providing a scheme, takes precedence. */
 
-  if (endpoint.substr(0, 6) == "https:")
+  if (opentelemetry::nostd::string_view(endpoint).substr(0, 6) == "https:")
   {
     return false;
   }
@@ -1301,7 +1304,7 @@ bool GetOtlpDefaultGrpcClientIsInsecure()
 {
   std::string endpoint = GetOtlpDefaultGrpcClientEndpoint();
 
-  if (endpoint.substr(0, 6) == "https:")
+  if (opentelemetry::nostd::string_view(endpoint).substr(0, 6) == "https:")
   {
     return false;
   }
