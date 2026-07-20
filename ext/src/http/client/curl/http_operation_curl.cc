@@ -11,7 +11,6 @@
 #include <stdint.h>
 #include <algorithm>
 #include <atomic>
-#include <cctype>
 #include <chrono>
 #include <cmath>
 #include <cstring>
@@ -30,6 +29,9 @@
 #  define strncasecmp _strnicmp
 #else
 #  include <strings.h>
+#endif
+sx#ifdef OTEL_CURL_DEBUG
+#  include <cctype>
 #endif
 
 #include "opentelemetry/common/timestamp.h"
