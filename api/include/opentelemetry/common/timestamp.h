@@ -9,6 +9,7 @@
 #include <ctime>
 #include <iomanip>
 #include <limits>
+#include <locale>
 #include <sstream>
 #include <string>
 
@@ -229,7 +230,7 @@ public:
     std::chrono::seconds::rep result = 0;
     for (const char c : value)
     {
-      if (!std::isdigit(static_cast<unsigned char>(c)))
+      if (!std::isdigit(static_cast<int>(static_cast<unsigned char>(c))))
       {
         return false;
       }
@@ -251,6 +252,7 @@ public:
     std::string str(value.data(), value.size());
     std::tm tm = {};
     std::istringstream ss(str);
+    ss.imbue(std::locale::classic());
 
     ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S");
     if (!ss.fail())
@@ -265,12 +267,13 @@ public:
     ss >> std::get_time(&tm, "%A, %d-%b-%y %H:%M:%S");
     if (!ss.fail())
     {
-      std::time_t now_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-      int current_year  = 1970 + static_cast<int>(now_t / 31556952);
-      int full_year     = 1900 + tm.tm_year;
-      if (full_year - current_year > 50)
+      std::time_t now_t   = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+      int current_year    = 1970 + static_cast<int>(now_t / 31556952);
+      int full_year       = 1900 + tm.tm_year;
+      int centuries_ahead = (full_year - current_year + 50) / 100;
+      if (centuries_ahead > 0)
       {
-        full_year -= 100;
+        full_year -= 100 * centuries_ahead;
       }
       tm.tm_year = full_year - 1900;
       date       = std::chrono::system_clock::from_time_t(PortableTimegm(&tm));

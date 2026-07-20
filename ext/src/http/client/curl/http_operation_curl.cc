@@ -25,6 +25,13 @@
 #include <utility>
 #include <vector>
 
+#ifdef _MSC_VER
+#  include <string.h>
+#  define strncasecmp _strnicmp
+#else
+#  include <strings.h>
+#endif
+
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
@@ -41,12 +48,15 @@
 namespace
 {
 
-bool FindRetryAfterValue(const std::vector<uint8_t> &raw_headers, std::string &value)
+bool FindRetryAfterValue(const std::vector<uint8_t> &raw_headers, nostd::string_view &value)
 {
   if (raw_headers.empty())
   {
     return false;
   }
+
+  static const char kRetryAfterHeader[] = "retry-after:";
+  static const size_t kRetryAfterLen    = sizeof(kRetryAfterHeader) - 1;
 
   const char *data = reinterpret_cast<const char *>(raw_headers.data());
   const char *end  = data + raw_headers.size();
@@ -60,23 +70,11 @@ bool FindRetryAfterValue(const std::vector<uint8_t> &raw_headers, std::string &v
       ++line_end;
     }
 
-    static const char kRetryAfterHeader[] = "retry-after:";
-    static const size_t kRetryAfterLen    = sizeof(kRetryAfterHeader) - 1;
-
     size_t line_len = static_cast<size_t>(line_end - line);
-    if (line_len > kRetryAfterLen)
+    if (line_len > kRetryAfterLen && strncasecmp(line, kRetryAfterHeader, kRetryAfterLen) == 0)
     {
-      bool match = true;
-      for (size_t i = 0; i < kRetryAfterLen && match; ++i)
-      {
-        match = (std::tolower(static_cast<unsigned char>(line[i])) == kRetryAfterHeader[i]);
-      }
-
-      if (match)
-      {
-        value = std::string(line + kRetryAfterLen, line_end);
-        return true;
-      }
+      value = nostd::string_view(line + kRetryAfterLen, line_len - kRetryAfterLen);
+      return true;
     }
 
     line = (line_end < end) ? line_end + 1 : end;
@@ -1572,7 +1570,7 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
   if (IsRetryable())
   {
 
-    std::string retry_after;
+    nostd::string_view retry_after;
     if (FindRetryAfterValue(response_headers_, retry_after))
     {
       std::chrono::seconds delay;
