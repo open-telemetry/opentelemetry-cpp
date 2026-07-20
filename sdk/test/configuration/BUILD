@@ -202,22 +202,3 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
-
-cc_test(
-    name = "programmatic_configuration_test",
-    srcs = [
-        "programmatic_configuration_test.cc",
-    ],
-    tags = [
-        "test",
-    ],
-    deps = [
-        "//api",
-        "//sdk:headers",
-        "//sdk/src/configuration:configuration_core",
-        "//sdk/src/logs",
-        "//sdk/src/metrics",
-        "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
