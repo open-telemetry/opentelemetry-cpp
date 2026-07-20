@@ -30,7 +30,8 @@
 #else
 #  include <strings.h>
 #endif
-sx#ifdef OTEL_CURL_DEBUG
+
+#ifdef OTEL_CURL_DEBUG
 #  include <cctype>
 #endif
 
