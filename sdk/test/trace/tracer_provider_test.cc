@@ -628,6 +628,19 @@ TEST(TracerProvider, SpanLimitsFromEnvReadsVariables)
   UnsetSpanLimitsEnv();
 }
 
+TEST(TracerProvider, SpanLimitsFromEnvCustomFallbackDefaults)
+{
+  UnsetSpanLimitsEnv();
+  setenv("OTEL_SPAN_EVENT_COUNT_LIMIT", "42", 1);
+
+  const SpanLimits limits = span_limits_env::GetSpanLimitsFromEnv(SpanLimits{});
+  EXPECT_EQ(limits.event_count_limit, 42u);
+  EXPECT_EQ(limits.attribute_count_limit, SpanLimits::kDefaultAttributeCountLimit);
+  EXPECT_EQ(limits.link_count_limit, SpanLimits::kDefaultLinkCountLimit);
+
+  UnsetSpanLimitsEnv();
+}
+
 TEST(TracerProvider, SpanLimitsFromEnvGeneralAttributeVariablesApply)
 {
   UnsetSpanLimitsEnv();

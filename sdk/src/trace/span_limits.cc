@@ -51,9 +51,9 @@ void UpdateFromEnv(const char *env_var_name, std::size_t &limit)
 
 }  // namespace
 
-SpanLimits GetSpanLimitsFromEnv()
+SpanLimits GetSpanLimitsFromEnv(const SpanLimits &defaults)
 {
-  SpanLimits limits = SpanLimits::NoLimits();
+  SpanLimits limits = defaults;
 
   // General attribute limits first; the span-specific variables below take precedence.
   UpdateFromEnv(kAttributeValueLengthLimitEnv, limits.attribute_value_length_limit);
