@@ -1255,7 +1255,7 @@ CURLcode HttpOperation::Setup()
       return rc;
     }
 
-    rc = SetCurlStrOption(CURLOPT_POSTFIELDS, NULL);
+    rc = SetCurlStrOption(CURLOPT_POSTFIELDS, nullptr);
     if (rc != CURLE_OK)
     {
       return rc;
