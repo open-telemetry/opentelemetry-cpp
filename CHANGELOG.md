@@ -127,6 +127,10 @@ Breaking changes:
 * [CODE HEALTH] Move registry.cc propagator builders into anonymous namespace
   [#4121](https://github.com/open-telemetry/opentelemetry-cpp/pull/4121)
 
+* [EXPORTER] Spec-compliant fix to allow byte arrays in all attribute
+             collections and disallow empty attribute keys
+  [#4226](https://github.com/open-telemetry/opentelemetry-cpp/pull/4226)
+
 * [CODE HEALTH] Move sdk_builder.cc builders into anonymous namespace
   [#4122](https://github.com/open-telemetry/opentelemetry-cpp/pull/4122)
 
