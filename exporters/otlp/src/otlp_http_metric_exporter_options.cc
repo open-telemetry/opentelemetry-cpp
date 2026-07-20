@@ -16,14 +16,8 @@ namespace otlp
 OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions()
     : url(GetOtlpDefaultMetricsEndpoint()),
       content_type(GetOtlpHttpProtocolFromString(GetOtlpDefaultHttpMetricsProtocol())),
-      json_bytes_mapping(JsonBytesMappingKind::kHexId),
       timeout(GetOtlpDefaultMetricsTimeout()),
       http_headers(GetOtlpDefaultMetricsHeaders()),
-      aggregation_temporality(PreferredAggregationTemporality::kCumulative),
-#ifdef ENABLE_ASYNC_EXPORT
-      max_concurrent_requests{64},
-      max_requests_per_connection{8},
-#endif
       ssl_ca_cert_path(GetOtlpDefaultMetricsSslCertificatePath()),
       ssl_ca_cert_string(GetOtlpDefaultMetricsSslCertificateString()),
       ssl_client_key_path(GetOtlpDefaultMetricsSslClientKeyPath()),
@@ -41,17 +35,7 @@ OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions()
       retry_policy_backoff_multiplier(GetOtlpDefaultMetricsRetryBackoffMultiplier())
 {}
 
-OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions(void *)
-    : url(),
-      content_type(exporter::otlp::HttpRequestContentType::kBinary),
-      json_bytes_mapping(JsonBytesMappingKind::kHexId),
-      aggregation_temporality(PreferredAggregationTemporality::kCumulative)
-#ifdef ENABLE_ASYNC_EXPORT
-      ,
-      max_concurrent_requests{64},
-      max_requests_per_connection{8}
-#endif
-{}
+OtlpHttpMetricExporterOptions::OtlpHttpMetricExporterOptions(void *) {}
 
 OtlpHttpMetricExporterOptions::~OtlpHttpMetricExporterOptions() {}
 

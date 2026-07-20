@@ -36,7 +36,7 @@ struct OPENTELEMETRY_EXPORT OtlpGrpcMetricExporterOptions : public OtlpGrpcClien
 
   /** Preferred Aggregation Temporality. */
   PreferredAggregationTemporality aggregation_temporality{
-      PreferredAggregationTemporality::kUnspecified};
+      PreferredAggregationTemporality::kCumulative};
 };
 
 }  // namespace otlp

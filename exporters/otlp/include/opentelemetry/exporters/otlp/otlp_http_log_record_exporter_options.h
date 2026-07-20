@@ -46,7 +46,7 @@ struct OPENTELEMETRY_EXPORT OtlpHttpLogRecordExporterOptions
   std::string url;
 
   /** HTTP content type. */
-  HttpRequestContentType content_type;
+  HttpRequestContentType content_type{HttpRequestContentType::kBinary};
 
   /**
     Json byte mapping.
@@ -54,7 +54,7 @@ struct OPENTELEMETRY_EXPORT OtlpHttpLogRecordExporterOptions
     Used only for HttpRequestContentType::kJson.
     Convert bytes to hex / base64.
   */
-  JsonBytesMappingKind json_bytes_mapping;
+  JsonBytesMappingKind json_bytes_mapping{JsonBytesMappingKind::kHexId};
 
   /**
     Use json names (true) or protobuf field names (false) to set the json key.
@@ -72,10 +72,10 @@ struct OPENTELEMETRY_EXPORT OtlpHttpLogRecordExporterOptions
 
 #ifdef ENABLE_ASYNC_EXPORT
   /** Max number of concurrent requests. */
-  std::size_t max_concurrent_requests{};
+  std::size_t max_concurrent_requests{64};
 
   /** Max number of requests per connection. */
-  std::size_t max_requests_per_connection{};
+  std::size_t max_requests_per_connection{8};
 #endif
 
   /** True do disable SSL. */
