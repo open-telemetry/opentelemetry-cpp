@@ -5,19 +5,22 @@ cmake_minimum_required(VERSION 3.16)
 
 project(opentelemetry-cpp-deprecated-components-install-test LANGUAGES CXX)
 
-set(DEPRECATED_COMPONENTS_WITH_ALIAS
-    exporters_otlp_builder_utils exporters_otlp_file_builder
-    exporters_otlp_http_builder exporters_otlp_grpc_builder
-    exporters_prometheus_builder)
+if(NOT INSTALL_TEST_DEPRECATED_COMPONENTS)
+  message(FATAL_ERROR "INSTALL_TEST_DEPRECATED_COMPONENTS is empty")
+endif()
 
-foreach(component ${DEPRECATED_COMPONENTS_WITH_ALIAS})
-  # request a deprecated component — if it has an alias it resolves
-  # transparently
-  find_package(opentelemetry-cpp CONFIG COMPONENTS ${component})
+message(
+  STATUS
+    "INSTALL_TEST_DEPRECATED_COMPONENTS: ${INSTALL_TEST_DEPRECATED_COMPONENTS}")
+
+foreach(deprecated_component ${INSTALL_TEST_DEPRECATED_COMPONENTS})
+  # if a deprecated component is a DEPRECATED_NAME of a valid component then
+  # find_package must succeed.
+  find_package(opentelemetry-cpp CONFIG COMPONENTS ${deprecated_component})
   if(NOT opentelemetry-cpp_FOUND)
     message(
       FATAL_ERROR
-        "find_package with deprecated component '${component}' with an alias should succeed but opentelemetry-cpp_FOUND is FALSE"
+        "find_package with deprecated component '${deprecated_component}' must succeed but opentelemetry-cpp_FOUND is FALSE"
     )
   endif()
 endforeach()

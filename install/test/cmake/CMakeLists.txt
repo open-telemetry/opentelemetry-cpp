@@ -95,13 +95,17 @@ add_test(
     build-cmake-usage-unsupported-components-test
     "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
 
-add_test(
-  NAME cmake-usage-deprecated-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/deprecated_components -B
-    build-cmake-usage-deprecated-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
+if(INSTALL_TEST_DEPRECATED_COMPONENTS)
+  add_test(
+    NAME cmake-usage-deprecated-components-test
+    COMMAND
+      ${CMAKE_COMMAND} --log-level=DEBUG -S
+      ${CMAKE_SOURCE_DIR}/usage_tests/deprecated_components -B
+      build-cmake-usage-deprecated-components-test
+      "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS}
+      "-DINSTALL_TEST_DEPRECATED_COMPONENTS=${INSTALL_TEST_DEPRECATED_COMPONENTS}"
+  )
+endif()
 
 # -----------------------------------------------------------
 # Test the full package install using legacy cmake build instructions
