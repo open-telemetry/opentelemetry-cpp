@@ -635,8 +635,8 @@ TEST(TracerProvider, SpanLimitsFromEnvCustomFallbackDefaults)
 
   const SpanLimits limits = span_limits_env::GetSpanLimitsFromEnv(SpanLimits{});
   EXPECT_EQ(limits.event_count_limit, 42u);
-  EXPECT_EQ(limits.attribute_count_limit, SpanLimits::kDefaultAttributeCountLimit);
-  EXPECT_EQ(limits.link_count_limit, SpanLimits::kDefaultLinkCountLimit);
+  EXPECT_EQ(limits.attribute_count_limit, 128u);
+  EXPECT_EQ(limits.link_count_limit, 128u);
 
   UnsetSpanLimitsEnv();
 }
