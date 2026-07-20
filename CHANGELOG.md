@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Fix more clang tidy warnings (member initialization)
+  [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
+
 * docs: update supported development platforms
   [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
 
