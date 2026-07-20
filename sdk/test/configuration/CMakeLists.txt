@@ -1,7 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-foreach(testname sdk_builder_test programmatic_configuration_test)
+foreach(testname sdk_builder_test configured_sdk_test
+                 programmatic_configuration_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} PRIVATE ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
@@ -28,7 +29,7 @@ if(WITH_CONFIGURATION)
                           opentelemetry_configuration)
     gtest_add_tests(
       TARGET ${testname}
-      TEST_PREFIX config.
+      TEST_PREFIX yaml.
       TEST_LIST ${testname})
   endforeach()
 endif()

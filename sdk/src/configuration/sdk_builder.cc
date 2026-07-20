@@ -1,9 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stddef.h>
-#include <stdint.h>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
@@ -117,6 +117,7 @@
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/string_array_attribute_value_configuration.h"
@@ -173,6 +174,7 @@
 #include "opentelemetry/sdk/trace/samplers/parent_factory.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
@@ -1178,20 +1180,38 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
     sdk_processors.push_back(CreateSpanProcessor(processor_model));
   }
 
-  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3303
-  // FIXME-SDK: use limits, id_generator, ...
+  opentelemetry::sdk::trace::SpanLimits span_limits;
+  if (model->limits)
+  {
+    span_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
+    span_limits.attribute_count_limit        = model->limits->attribute_count_limit;
+    span_limits.event_count_limit            = model->limits->event_count_limit;
+    span_limits.link_count_limit             = model->limits->link_count_limit;
+    span_limits.event_attribute_count_limit  = model->limits->event_attribute_count_limit;
+    span_limits.link_attribute_count_limit   = model->limits->link_attribute_count_limit;
+  }
+
   if (model->tracer_configurator)
   {
     auto tracer_configurator = CreateTracerConfigurator(model->tracer_configurator);
     auto id_generator        = opentelemetry::sdk::trace::RandomIdGeneratorFactory::Create();
     sdk                      = opentelemetry::sdk::trace::TracerProviderFactory::Create(
         std::move(sdk_processors), resource, std::move(sampler), std::move(id_generator),
-        std::move(tracer_configurator));
+        std::move(tracer_configurator), span_limits);
   }
   else
   {
-    sdk = opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sdk_processors),
-                                                                   resource, std::move(sampler));
+    auto id_generator = opentelemetry::sdk::trace::RandomIdGeneratorFactory::Create();
+    auto tracer_configurator =
+        std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+            opentelemetry::sdk::trace::TracerConfig>>(
+            opentelemetry::sdk::instrumentationscope::
+                ScopeConfigurator<opentelemetry::sdk::trace::TracerConfig>::Builder(
+                    opentelemetry::sdk::trace::TracerConfig::Default())
+                    .Build());
+    sdk = opentelemetry::sdk::trace::TracerProviderFactory::Create(
+        std::move(sdk_processors), resource, std::move(sampler), std::move(id_generator),
+        std::move(tracer_configurator), span_limits);
   }
 
   return sdk;
@@ -1599,8 +1619,8 @@ SdkBuilder::CreateBase2ExponentialBucketHistogramAggregation(
   auto sdk =
       std::make_unique<opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>();
 
-  sdk->max_buckets_    = model->max_size;
-  sdk->max_scale_      = static_cast<int32_t>(model->max_scale);
+  sdk->max_size_       = model->max_size;
+  sdk->max_scale_      = model->max_scale;
   sdk->record_min_max_ = model->record_min_max;
 
   return sdk;

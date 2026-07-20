@@ -75,7 +75,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   else if (const context::Context *context = nostd::get_if<context::Context>(&options.parent))
   {
     // fetch span context from parent span stored in the context
-    auto parent_span_context = opentelemetry::trace::GetSpan(*context)->GetContext();
+    auto parent_span_context = opentelemetry::trace::GetSpanContext(*context);
     if (parent_span_context.IsValid())
     {
       parent_context      = parent_span_context;

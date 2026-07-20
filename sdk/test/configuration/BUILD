@@ -9,8 +9,48 @@ cc_test(
         "sdk_builder_test.cc",
     ],
     tags = [
+        "config",
         "test",
-        "yaml",
+    ],
+    deps = [
+        "//sdk:headers",
+        "//sdk/src/configuration",
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "configured_sdk_test",
+    srcs = [
+        "configured_sdk_test.cc",
+    ],
+    tags = [
+        "config",
+        "test",
+    ],
+    deps = [
+        "//sdk:headers",
+        "//sdk/src/configuration",
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "programmatic_configuration_test",
+    srcs = [
+        "programmatic_configuration_test.cc",
+    ],
+    tags = [
+        "config",
+        "test",
     ],
     deps = [
         "//sdk:headers",

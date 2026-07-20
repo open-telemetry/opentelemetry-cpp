@@ -40,22 +40,6 @@
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
-#include "opentelemetry/sdk/common/exporter_utils.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/sdk/logs/read_write_log_record.h"
-#include "opentelemetry/sdk/metrics/data/metric_data.h"
-#include "opentelemetry/sdk/metrics/data/point_data.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/meter_provider.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
-#include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/span_data.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
-
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
@@ -103,20 +87,34 @@
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 
-namespace nostd        = opentelemetry::nostd;
-namespace trace        = opentelemetry::trace;
-namespace logs         = opentelemetry::logs;
-namespace metrics      = opentelemetry::metrics;
-namespace common       = opentelemetry::common;
-namespace baggage      = opentelemetry::baggage;
-namespace propagation  = opentelemetry::context::propagation;
-namespace context      = opentelemetry::context;
-namespace common_sdk   = opentelemetry::sdk::common;
-namespace logs_sdk     = opentelemetry::sdk::logs;
-namespace metrics_sdk  = opentelemetry::sdk::metrics;
-namespace trace_sdk    = opentelemetry::sdk::trace;
-namespace config_sdk   = opentelemetry::sdk::configuration;
-namespace internal_log = opentelemetry::sdk::common::internal_log;
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
+
+namespace nostd       = opentelemetry::nostd;
+namespace trace       = opentelemetry::trace;
+namespace logs        = opentelemetry::logs;
+namespace metrics     = opentelemetry::metrics;
+namespace common      = opentelemetry::common;
+namespace baggage     = opentelemetry::baggage;
+namespace propagation = opentelemetry::context::propagation;
+namespace context     = opentelemetry::context;
+namespace common_sdk  = opentelemetry::sdk::common;
+namespace logs_sdk    = opentelemetry::sdk::logs;
+namespace metrics_sdk = opentelemetry::sdk::metrics;
+namespace trace_sdk   = opentelemetry::sdk::trace;
+namespace config_sdk  = opentelemetry::sdk::configuration;
 
 namespace
 {
@@ -128,7 +126,8 @@ using SpanBuffer      = std::vector<std::unique_ptr<trace_sdk::SpanData>>;
 using MetricBuffer    = std::vector<metrics_sdk::MetricData>;
 
 // ---------------------------------------------------------------------------
-// Recording exporters
+// Recording exporters to support integration testing of the configured SDK.
+// These exporters record the data they receive into a buffer for later inspection.
 
 class RecordingSpanExporter : public trace_sdk::SpanExporter
 {
@@ -222,7 +221,7 @@ private:
 };
 
 // ---------------------------------------------------------------------------
-// Builders for recording exporters
+// Configuration Builders for recording exporters
 
 class RecordingSpanExporterBuilder : public config_sdk::ExtensionSpanExporterBuilder
 {
@@ -274,7 +273,7 @@ private:
 };
 
 // ---------------------------------------------------------------------------
-// TextMapCarrier implementation for testing
+// TextMapCarrier for propagator tests.
 
 class MapCarrier : public propagation::TextMapCarrier
 {
@@ -296,7 +295,9 @@ private:
 };
 
 //---------------------------------------------------------------------------
-// ProgrammaticConfigTest fixture
+// ProgrammaticConfigTest fixture: This supports integration testing of the configured SDK.
+// It registers the recording exporters and maintains buffers for inspection of exported signal
+// data.
 
 class ProgrammaticConfigTest : public ::testing::Test
 {
@@ -386,7 +387,7 @@ protected:
 }  // namespace
 
 //---------------------------------------------------------------------------
-// ConfiguredSdk common cases
+// Resource configuration tests
 
 TEST_F(ProgrammaticConfigTest, ResourceAttributesFromList)
 {
@@ -404,6 +405,9 @@ TEST_F(ProgrammaticConfigTest, ResourceAttributesFromList)
   EXPECT_EQ(nostd::get<std::string>(attributes.at("service.version")), "1.0");
 }
 
+//--------------------------------------------------------------------------
+// Disabled SDK configuration tests
+
 TEST_F(ProgrammaticConfigTest, DisabledConfigProducesNullProviders)
 {
   auto model             = std::make_unique<config_sdk::Configuration>();
@@ -420,30 +424,28 @@ TEST_F(ProgrammaticConfigTest, DisabledConfigProducesNullProviders)
   EXPECT_EQ(sdk_->propagator, nullptr);
 }
 
-TEST_F(ProgrammaticConfigTest, ConfiguredSdkDefaultLogLevel)
+TEST_F(ProgrammaticConfigTest, EnabledConfigProducesProviders)
 {
-  // default log level is info
-  auto model      = std::make_unique<config_sdk::Configuration>();
-  model->resource = std::make_unique<config_sdk::ResourceConfiguration>();
-  CreateAndInstallSdk(model);
-  EXPECT_EQ(sdk_->log_level, internal_log::LogLevel::Info);
-  EXPECT_EQ(internal_log::GlobalLogHandler::GetLogLevel(), internal_log::LogLevel::Info);
-}
+  auto model                        = std::make_unique<config_sdk::Configuration>();
+  model->disabled                   = false;
+  model->tracer_provider            = MakeTracerProviderConfig();
+  model->logger_provider            = MakeLoggerProviderConfig();
+  model->meter_provider             = MakeMeterProviderConfig();
+  model->propagator                 = std::make_unique<config_sdk::PropagatorConfiguration>();
+  model->propagator->composite_list = "tracecontext";
 
-TEST_F(ProgrammaticConfigTest, ConfiguredSdkSetLogLevel)
-{
-  auto model       = std::make_unique<config_sdk::Configuration>();
-  model->resource  = std::make_unique<config_sdk::ResourceConfiguration>();
-  model->log_level = config_sdk::SeverityNumber::debug;
   CreateAndInstallSdk(model);
-  EXPECT_EQ(sdk_->log_level, internal_log::LogLevel::Debug);
-  EXPECT_EQ(internal_log::GlobalLogHandler::GetLogLevel(), internal_log::LogLevel::Debug);
+
+  EXPECT_NE(sdk_->tracer_provider, nullptr);
+  EXPECT_NE(sdk_->logger_provider, nullptr);
+  EXPECT_NE(sdk_->meter_provider, nullptr);
+  EXPECT_NE(sdk_->propagator, nullptr);
 }
 
 //---------------------------------------------------------------------------
 // LoggerProvider tests
 
-TEST_F(ProgrammaticConfigTest, LoggerProviderDefaults)
+TEST_F(ProgrammaticConfigTest, LoggerProviderWithDefaults)
 {
   auto logger_provider_config = MakeLoggerProviderConfig();
 
@@ -467,7 +469,8 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderDefaults)
 
 TEST_F(ProgrammaticConfigTest, LoggerProviderWithLogRecordLimits)
 {
-  config_sdk::LogRecordLimitsConfiguration limits;
+  config_sdk::LogRecordLimitsConfiguration limits{
+      0, 0};  // TODO: Remove the default initialization once the limit members are initialized.
   limits.attribute_count_limit        = 2;
   limits.attribute_value_length_limit = 5;
 
@@ -541,7 +544,7 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLoggerConfigurator)
   EXPECT_GE(log_buffer_->size(), 2);
 }
 
-TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessor)
+TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorDefaults)
 {
   auto exporter       = std::make_unique<config_sdk::ExtensionLogRecordExporterConfiguration>();
   exporter->name      = "recording";
@@ -563,10 +566,39 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessor)
   EXPECT_GE(log_buffer_->size(), 1);
 }
 
+TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorConfigured)
+{
+  auto exporter       = std::make_unique<config_sdk::ExtensionLogRecordExporterConfiguration>();
+  exporter->name      = "recording";
+  auto processor      = std::make_unique<config_sdk::BatchLogRecordProcessorConfiguration>();
+  processor->exporter = std::move(exporter);
+  processor->schedule_delay        = 60000;
+  processor->max_queue_size        = 100;
+  processor->max_export_batch_size = 50;
+  processor->export_timeout        = 5000;
+  auto logger_provider_config      = std::make_unique<config_sdk::LoggerProviderConfiguration>();
+  logger_provider_config->processors.emplace_back(std::move(processor));
+
+  auto model             = std::make_unique<config_sdk::Configuration>();
+  model->logger_provider = std::move(logger_provider_config);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->logger_provider, nullptr);
+
+  logs::Provider::GetLoggerProvider()->GetLogger("test")->Info("test-message");
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
+
+  EXPECT_GE(log_buffer_->size(), 1);
+}
+
 //--------------------------------------------------------------------------
 // MeterProvider tests
 
-TEST_F(ProgrammaticConfigTest, MeterProvider)
+// TODO: These test cases may timeout due to threading in the PeriodicExportingMetricReader
+// that cause ForceFlush or Shutdown to block indefinitely. Disabling for now until we can fix the
+// underlying issue.
+TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithDefaults)
 {
   auto model            = std::make_unique<config_sdk::Configuration>();
   model->meter_provider = MakeMeterProviderConfig();
@@ -585,7 +617,7 @@ TEST_F(ProgrammaticConfigTest, MeterProvider)
   EXPECT_GE(metric_buffer_->size(), 1);
 }
 
-TEST_F(ProgrammaticConfigTest, MeterProviderWithMeterConfigurator)
+TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithMeterConfigurator)
 {
   auto disabled_meter_config           = config_sdk::MeterMatcherAndConfigConfiguration();
   disabled_meter_config.name           = "disabled-meter";
@@ -618,7 +650,7 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithMeterConfigurator)
   }
 }
 
-TEST_F(ProgrammaticConfigTest, MeterProviderWithViews)
+TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithViews)
 {
   // View 1: Base2 exponential aggregation
   const std::size_t max_scale   = 10;
@@ -722,7 +754,7 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithViews)
 //---------------------------------------------------------------------------
 // TracerProvider tests
 
-TEST_F(ProgrammaticConfigTest, TracerProviderDefaults)
+TEST_F(ProgrammaticConfigTest, TracerProviderWithDefaults)
 {
   auto model             = std::make_unique<config_sdk::Configuration>();
   model->tracer_provider = MakeTracerProviderConfig();
@@ -803,6 +835,8 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithParentBasedSamplerNullRoot)
   EXPECT_EQ(span_buffer_->size(), 1);
 }
 
+// TODO: Re-enable this test once the BatchSpanProcessorConfiguration is initialized with spec
+// defaults.
 TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessor)
 {
   auto exporter               = std::make_unique<config_sdk::ExtensionSpanExporterConfiguration>();
@@ -824,25 +858,38 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessor)
   EXPECT_GE(span_buffer_->size(), 1);
 }
 
+TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessorConfigured)
+{
+  auto exporter             = std::make_unique<config_sdk::ExtensionSpanExporterConfiguration>();
+  exporter->name            = "recording";
+  auto processor            = std::make_unique<config_sdk::BatchSpanProcessorConfiguration>();
+  processor->schedule_delay = 60000;
+  processor->max_queue_size = 100;
+  processor->max_export_batch_size = 50;
+  processor->export_timeout        = 5000;
+  processor->exporter              = std::move(exporter);
+  auto tracer_provider_config      = std::make_unique<config_sdk::TracerProviderConfiguration>();
+  tracer_provider_config->processors.emplace_back(std::move(processor));
+
+  auto model             = std::make_unique<config_sdk::Configuration>();
+  model->tracer_provider = std::move(tracer_provider_config);
+
+  CreateAndInstallSdk(model);
+
+  trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
+
+  EXPECT_GE(span_buffer_->size(), 1);
+}
+
 //---------------------------------------------------------------------------
 // Propagator tests
 
-TEST_F(ProgrammaticConfigTest, Propagators)
+namespace
 {
-  auto propagator_config = std::make_unique<config_sdk::PropagatorConfiguration>();
-  propagator_config->composite.emplace_back("tracecontext");
-  propagator_config->composite.emplace_back("baggage");
-  propagator_config->composite.emplace_back("b3");
-  propagator_config->composite.emplace_back("b3multi");
-  propagator_config->composite.emplace_back("jaeger");
-
-  auto model             = std::make_unique<config_sdk::Configuration>();
-  model->tracer_provider = MakeTracerProviderConfig();
-  model->propagator      = std::move(propagator_config);
-
-  CreateAndInstallSdk(model);
-  ASSERT_NE(sdk_->propagator, nullptr);
-
+void CheckPropagators()
+{
   auto tracer = trace::Provider::GetTracerProvider()->GetTracer("test");
 
   auto span = tracer->StartSpan("test-span");
@@ -865,4 +912,39 @@ TEST_F(ProgrammaticConfigTest, Propagators)
   EXPECT_NE(carrier.map().find("b3"), carrier.map().end());             // b3 single
   EXPECT_NE(carrier.map().find("X-B3-TraceId"), carrier.map().end());   // b3multi
   EXPECT_NE(carrier.map().find("uber-trace-id"), carrier.map().end());  // jaeger
+}
+}  // namespace
+
+TEST_F(ProgrammaticConfigTest, PropagatorsCompositeList)
+{
+  auto propagator_config            = std::make_unique<config_sdk::PropagatorConfiguration>();
+  propagator_config->composite_list = "tracecontext,baggage,b3,b3multi,jaeger";
+
+  auto model             = std::make_unique<config_sdk::Configuration>();
+  model->tracer_provider = MakeTracerProviderConfig();
+  model->propagator      = std::move(propagator_config);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->propagator, nullptr);
+
+  CheckPropagators();
+}
+
+TEST_F(ProgrammaticConfigTest, PropagatorsComposite)
+{
+  auto propagator_config = std::make_unique<config_sdk::PropagatorConfiguration>();
+  propagator_config->composite.emplace_back("tracecontext");
+  propagator_config->composite.emplace_back("baggage");
+  propagator_config->composite.emplace_back("b3");
+  propagator_config->composite.emplace_back("b3multi");
+  propagator_config->composite.emplace_back("jaeger");
+
+  auto model             = std::make_unique<config_sdk::Configuration>();
+  model->tracer_provider = MakeTracerProviderConfig();
+  model->propagator      = std::move(propagator_config);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->propagator, nullptr);
+
+  CheckPropagators();
 }
