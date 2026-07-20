@@ -48,7 +48,8 @@
 namespace
 {
 
-bool FindRetryAfterValue(const std::vector<uint8_t> &raw_headers, nostd::string_view &value)
+bool FindRetryAfterValue(const std::vector<uint8_t> &raw_headers,
+                         opentelemetry::nostd::string_view &value)
 {
   if (raw_headers.empty())
   {
@@ -73,7 +74,7 @@ bool FindRetryAfterValue(const std::vector<uint8_t> &raw_headers, nostd::string_
     size_t line_len = static_cast<size_t>(line_end - line);
     if (line_len > kRetryAfterLen && strncasecmp(line, kRetryAfterHeader, kRetryAfterLen) == 0)
     {
-      value = nostd::string_view(line + kRetryAfterLen, line_len - kRetryAfterLen);
+      value = opentelemetry::nostd::string_view(line + kRetryAfterLen, line_len - kRetryAfterLen);
       return true;
     }
 
