@@ -30,13 +30,14 @@
 #else
 #  include <strings.h>
 #endif
-sx#ifdef OTEL_CURL_DEBUG
+
+#ifdef OTEL_CURL_DEBUG
 #  include <cctype>
 #endif
 
-#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
+#include "opentelemetry/ext/http/client/curl/http_time_util.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -1570,37 +1571,57 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
     DispatchEvent(opentelemetry::ext::http::client::SessionState::Response);
   }
 
-  if (IsRetryable())
-  {
+  // A server-driven Retry-After may request a retry far beyond the retry
+  // policy's max_backoff (e.g. a malicious or misbehaving server returning
+  // "Retry-After: 2 years"). Such a session would linger in the pending retry
+  // list and block the FIFO drain in doRetrySessions(), so it must be closed
+  // rather than honored. Cap the requested delay at max_backoff; if the
+  // server-driven retry time still exceeds the maximum expected retry window,
+  // the session is closed below and not retried.
+  const bool is_retryable            = IsRetryable();
+  bool retry_after_exceeds_max_delay = false;
 
+  if (is_retryable)
+  {
     nostd::string_view retry_after;
     if (FindRetryAfterValue(response_headers_, retry_after))
     {
       std::chrono::seconds delay;
+      std::chrono::system_clock::time_point date;
+      const bool parsed_delay = HttpTimeUtil::ParseDelaySeconds(retry_after, delay);
+      const bool parsed_date  = !parsed_delay && HttpTimeUtil::ParseHttpDate(retry_after, date);
 
-      if (opentelemetry::common::HttpUtil::ParseDelaySeconds(retry_after, delay))
+      if (parsed_delay || parsed_date)
       {
-        retry_after_time_point_ = std::chrono::system_clock::now() + delay;
-      }
-      else
-      {
-        std::chrono::system_clock::time_point date;
-        if (opentelemetry::common::HttpUtil::ParseHttpDate(retry_after, date))
+        // Reuse the attempt timestamp instead of calling now() again, so the
+        // retry-after delay is measured from the attempt that produced this
+        // response and we avoid an extra system_clock syscall on the hot path.
+        retry_after_time_point_ = parsed_delay
+                                      ? (last_attempt_time_ + delay)
+                                      : ((date > last_attempt_time_) ? date : last_attempt_time_);
+
+        const auto max_retry_time =
+            last_attempt_time_ +
+            std::chrono::duration_cast<std::chrono::milliseconds>(retry_policy_.max_backoff);
+        if (retry_after_time_point_ > max_retry_time)
         {
-          auto now                = std::chrono::system_clock::now();
-          retry_after_time_point_ = (date > now) ? date : now;
+          retry_after_exceeds_max_delay = true;
         }
       }
     }
 
-    // Clear any response data received in previous attempt
-    ReleaseResponse();
-    // Rewind request data so that read callback can re-transfer the payload
-    request_nwrite_ = 0;
-    // Reset session state
-    DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
+    if (!retry_after_exceeds_max_delay)
+    {
+      // Clear any response data received in previous attempt
+      ReleaseResponse();
+      // Rewind request data so that read callback can re-transfer the payload
+      request_nwrite_ = 0;
+      // Reset session state
+      DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
+    }
   }
-  else
+
+  if (!is_retryable || retry_after_exceeds_max_delay)
   {
     // Cleanup and unbind easy handle from multi handle, and finish callback
     Cleanup();
