@@ -1286,7 +1286,7 @@ float GetOtlpDefaultLogsRetryBackoffMultiplier()
   return 1.5f;
 }
 
-std::string GetOtlpDefaultGrpcClientEndpoint()
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientEndpoint()
 {
   constexpr char kDefault[] = "http://localhost:4317";
 
@@ -1300,7 +1300,7 @@ std::string GetOtlpDefaultGrpcClientEndpoint()
   return kDefault;
 }
 
-bool GetOtlpDefaultGrpcClientIsInsecure()
+OPENTELEMETRY_EXPORT bool GetOtlpDefaultGrpcClientIsInsecure()
 {
   std::string endpoint = GetOtlpDefaultGrpcClientEndpoint();
 
@@ -1330,49 +1330,49 @@ bool GetOtlpDefaultGrpcClientIsInsecure()
   return false;
 }
 
-std::string GetOtlpDefaultGrpcClientSslCertificatePath()
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslCertificatePath()
 {
   std::string value;
   sdk_common::GetStringEnvironmentVariable(kEnvOtlpCertificate, value);
   return value;
 }
 
-std::string GetOtlpDefaultGrpcClientSslCertificateString()
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslCertificateString()
 {
   std::string value;
   sdk_common::GetStringEnvironmentVariable(kEnvOtlpCertificateString, value);
   return value;
 }
 
-std::string GetOtlpDefaultGrpcClientSslClientKeyPath()
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslClientKeyPath()
 {
   std::string value;
   sdk_common::GetStringEnvironmentVariable(kEnvOtlpClientKey, value);
   return value;
 }
 
-std::string GetOtlpDefaultGrpcClientSslClientKeyString()
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslClientKeyString()
 {
   std::string value;
   sdk_common::GetStringEnvironmentVariable(kEnvOtlpClientKeyString, value);
   return value;
 }
 
-std::string GetOtlpDefaultGrpcClientSslClientCertificatePath()
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslClientCertificatePath()
 {
   std::string value;
   sdk_common::GetStringEnvironmentVariable(kEnvOtlpClientCertificate, value);
   return value;
 }
 
-std::string GetOtlpDefaultGrpcClientSslClientCertificateString()
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslClientCertificateString()
 {
   std::string value;
   sdk_common::GetStringEnvironmentVariable(kEnvOtlpClientCertificateString, value);
   return value;
 }
 
-std::chrono::system_clock::duration GetOtlpDefaultGrpcClientTimeout()
+OPENTELEMETRY_EXPORT std::chrono::system_clock::duration GetOtlpDefaultGrpcClientTimeout()
 {
   std::chrono::system_clock::duration value;
 
@@ -1384,14 +1384,14 @@ std::chrono::system_clock::duration GetOtlpDefaultGrpcClientTimeout()
   return std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{10});
 }
 
-OtlpHeaders GetOtlpDefaultGrpcClientHeaders()
+OPENTELEMETRY_EXPORT OtlpHeaders GetOtlpDefaultGrpcClientHeaders()
 {
   OtlpHeaders result;
   DumpOtlpHeaders(result, kEnvOtlpHeaders);
   return result;
 }
 
-std::string GetOtlpDefaultGrpcClientCompression()
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientCompression()
 {
   std::string value;
 
@@ -1403,7 +1403,7 @@ std::string GetOtlpDefaultGrpcClientCompression()
   return std::string{"none"};
 }
 
-std::uint32_t GetOtlpDefaultGrpcClientRetryMaxAttempts()
+OPENTELEMETRY_EXPORT std::uint32_t GetOtlpDefaultGrpcClientRetryMaxAttempts()
 {
   std::uint32_t value{};
 
@@ -1415,7 +1415,7 @@ std::uint32_t GetOtlpDefaultGrpcClientRetryMaxAttempts()
   return 5U;
 }
 
-std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryInitialBackoff()
+OPENTELEMETRY_EXPORT std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryInitialBackoff()
 {
   float value{};
 
@@ -1427,7 +1427,7 @@ std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryInitialBackoff()
   return std::chrono::duration<float>{1.0f};
 }
 
-std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryMaxBackoff()
+OPENTELEMETRY_EXPORT std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryMaxBackoff()
 {
   float value{};
 
@@ -1439,7 +1439,7 @@ std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryMaxBackoff()
   return std::chrono::duration<float>{5.0f};
 }
 
-float GetOtlpDefaultGrpcClientRetryBackoffMultiplier()
+OPENTELEMETRY_EXPORT float GetOtlpDefaultGrpcClientRetryBackoffMultiplier()
 {
   float value{};
 
