@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [OTLP/HTTP] Honor `Retry-After` response header when retrying exports,
+  supporting both delay-seconds and HTTP-date formats per RFC 7231 §7.1.3.
+  [#4172](https://github.com/open-telemetry/opentelemetry-cpp/issues/4172)
+* [CODE HEALTH] Move api/test and sdk/test classes into anonymous namespace
+  [#4217](https://github.com/open-telemetry/opentelemetry-cpp/pull/4217)
 * docs: update supported development platforms
   [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
 

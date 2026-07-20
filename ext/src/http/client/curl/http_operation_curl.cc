@@ -8,6 +8,7 @@
 #  include <array>
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
+#include <stdint.h>
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -23,6 +24,18 @@
 #include <utility>
 #include <vector>
 
+#ifdef _MSC_VER
+#  include <string.h>
+#  define strncasecmp _strnicmp
+#else
+#  include <strings.h>
+#endif
+
+#ifdef OTEL_CURL_DEBUG
+#  include <cctype>
+#endif
+
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
@@ -34,6 +47,47 @@
 #ifndef CURL_VERSION_BITS
 #  define CURL_VERSION_BITS(x, y, z) ((x) << 16 | (y) << 8 | (z))
 #endif
+
+namespace
+{
+
+bool FindRetryAfterValue(const std::vector<uint8_t> &raw_headers,
+                         opentelemetry::nostd::string_view &value)
+{
+  if (raw_headers.empty())
+  {
+    return false;
+  }
+
+  static const char kRetryAfterHeader[] = "retry-after:";
+  static const size_t kRetryAfterLen    = sizeof(kRetryAfterHeader) - 1;
+
+  const char *data = reinterpret_cast<const char *>(raw_headers.data());
+  const char *end  = data + raw_headers.size();
+  const char *line = data;
+
+  while (line < end)
+  {
+    const char *line_end = line;
+    while (line_end < end && *line_end != '\n')
+    {
+      ++line_end;
+    }
+
+    size_t line_len = static_cast<size_t>(line_end - line);
+    if (line_len > kRetryAfterLen && strncasecmp(line, kRetryAfterHeader, kRetryAfterLen) == 0)
+    {
+      value = opentelemetry::nostd::string_view(line + kRetryAfterLen, line_len - kRetryAfterLen);
+      return true;
+    }
+
+    line = (line_end < end) ? line_end + 1 : end;
+  }
+
+  return false;
+}
+
+}  // namespace
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace ext
@@ -560,6 +614,11 @@ bool HttpOperation::IsRetryable()
 
 std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
 {
+  if (retry_after_time_point_ != std::chrono::system_clock::time_point{})
+  {
+    return retry_after_time_point_;
+  }
+
   static std::random_device rd;
   static std::mt19937 gen(rd());
   static std::uniform_real_distribution<float> dis(0.8f, 1.2f);
@@ -1463,8 +1522,9 @@ void HttpOperation::Abort()
 void HttpOperation::PerformCurlMessage(CURLcode code)
 {
   ++retry_attempts_;
-  last_attempt_time_ = std::chrono::system_clock::now();
-  last_curl_result_  = code;
+  last_attempt_time_      = std::chrono::system_clock::now();
+  last_curl_result_       = code;
+  retry_after_time_point_ = std::chrono::system_clock::time_point{};
 
   if (code != CURLE_OK)
   {
@@ -1513,6 +1573,27 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
 
   if (IsRetryable())
   {
+
+    nostd::string_view retry_after;
+    if (FindRetryAfterValue(response_headers_, retry_after))
+    {
+      std::chrono::seconds delay;
+
+      if (opentelemetry::common::HttpUtil::ParseDelaySeconds(retry_after, delay))
+      {
+        retry_after_time_point_ = std::chrono::system_clock::now() + delay;
+      }
+      else
+      {
+        std::chrono::system_clock::time_point date;
+        if (opentelemetry::common::HttpUtil::ParseHttpDate(retry_after, date))
+        {
+          auto now                = std::chrono::system_clock::now();
+          retry_after_time_point_ = (date > now) ? date : now;
+        }
+      }
+    }
+
     // Clear any response data received in previous attempt
     ReleaseResponse();
     // Rewind request data so that read callback can re-transfer the payload
