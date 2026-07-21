@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add Tracer::StartSpan benchmark and optimizations
+  [#4248](https://github.com/open-telemetry/opentelemetry-cpp/pull/4248)
+
 * [CODE HEALTH] Fix more clang tidy warnings (member initialization)
   [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
 
@@ -49,9 +52,6 @@ Breaking changes:
     match the configuration schema. Please adjust SDK configuration accordingly.
 
 ## [1.28.0] 2026-07-16
-
-* [SDK] Add Tracer::StartSpan benchmark and optimizations
-  [#4248](https://github.com/open-telemetry/opentelemetry-cpp/pull/4248)
 
 * [RELEASE] Bump main branch to 1.28.0-dev
   [#4081](https://github.com/open-telemetry/opentelemetry-cpp/pull/4081)
