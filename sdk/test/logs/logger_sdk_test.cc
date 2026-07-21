@@ -230,7 +230,7 @@ public:
 private:
   opentelemetry::logs::Severity severity_ = opentelemetry::logs::Severity::kInvalid;
   std::string body_;
-  int64_t event_id_;
+  int64_t event_id_{0};
   std::string log_record_event_name_;
   opentelemetry::trace::TraceId trace_id_;
   opentelemetry::trace::SpanId span_id_;
