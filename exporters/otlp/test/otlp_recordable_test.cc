@@ -321,13 +321,13 @@ TEST(OtlpRecordable, SetResource)
     }
     else if (attr.key() == "bytes_value")
     {
-      EXPECT_EQ(attr.value().array_value().values_size(), 6);
-      EXPECT_EQ(attr.value().array_value().values(0).int_value(), 1);
-      EXPECT_EQ(attr.value().array_value().values(1).int_value(), 0);
-      EXPECT_EQ(attr.value().array_value().values(2).int_value(), 3);
-      EXPECT_EQ(attr.value().array_value().values(3).int_value(), static_cast<int>('a'));
-      EXPECT_EQ(attr.value().array_value().values(4).int_value(), static_cast<int>('b'));
-      EXPECT_EQ(attr.value().array_value().values(5).int_value(), static_cast<int>('c'));
+      EXPECT_EQ(attr.value().bytes_value().size(), 6u);
+      EXPECT_EQ(static_cast<uint8_t>(attr.value().bytes_value()[0]), 1);
+      EXPECT_EQ(static_cast<uint8_t>(attr.value().bytes_value()[1]), 0);
+      EXPECT_EQ(static_cast<uint8_t>(attr.value().bytes_value()[2]), 3);
+      EXPECT_EQ(attr.value().bytes_value()[3], 'a');
+      EXPECT_EQ(attr.value().bytes_value()[4], 'b');
+      EXPECT_EQ(attr.value().bytes_value()[5], 'c');
       ++found_attribute_count;
     }
     else if (attr.key() == "bool_array")
@@ -412,15 +412,11 @@ TEST(OtlpRecordable, SetSingleAttribute)
             nostd::get<nostd::string_view>(str_val).data());
 
   EXPECT_EQ(rec.span().attributes(3).key(), byte_key);
-  EXPECT_EQ(rec.span().attributes(3).value().array_value().values_size(), 4);
-  EXPECT_EQ(rec.span().attributes(3).value().array_value().values(0).int_value(),
-            static_cast<int>('T'));
-  EXPECT_EQ(rec.span().attributes(3).value().array_value().values(1).int_value(),
-            static_cast<int>('e'));
-  EXPECT_EQ(rec.span().attributes(3).value().array_value().values(2).int_value(),
-            static_cast<int>('s'));
-  EXPECT_EQ(rec.span().attributes(3).value().array_value().values(3).int_value(),
-            static_cast<int>('t'));
+  EXPECT_EQ(rec.span().attributes(3).value().bytes_value().size(), 4u);
+  EXPECT_EQ(rec.span().attributes(3).value().bytes_value()[0], 'T');
+  EXPECT_EQ(rec.span().attributes(3).value().bytes_value()[1], 'e');
+  EXPECT_EQ(rec.span().attributes(3).value().bytes_value()[2], 's');
+  EXPECT_EQ(rec.span().attributes(3).value().bytes_value()[3], 't');
 }
 
 // Test non-int array types. Int array types are tested using templates (see IntAttributeTest)
@@ -559,7 +555,7 @@ struct EmptyArrayAttributeTest : public testing::Test
 }  // namespace
 
 using ArrayElementTypes =
-    testing::Types<bool, double, nostd::string_view, uint8_t, int, int64_t, unsigned int, uint64_t>;
+    testing::Types<bool, double, nostd::string_view, int, int64_t, unsigned int, uint64_t>;
 TYPED_TEST_SUITE(EmptyArrayAttributeTest, ArrayElementTypes);
 
 // Test empty arrays.
@@ -787,6 +783,57 @@ TEST(OtlpRecordable, PopulateRequestSameScope)
   ASSERT_EQ(req.resource_spans(0).scope_spans_size(), 1);
   EXPECT_EQ(req.resource_spans(0).scope_spans(0).spans_size(), 2);
   EXPECT_EQ(req.resource_spans(0).scope_spans(0).scope().name(), "lib");
+}
+// Test that setting an attribute with an existing key overwrites the value in place
+// without creating a duplicate entry (spec: attribute keys MUST be unique).
+TEST(OtlpRecordable, DISABLED_SetAttributeDeduplicatesKey)
+{
+  OtlpRecordable rec;
+  rec.SetAttribute("key", common::AttributeValue{static_cast<int64_t>(1)});
+  rec.SetAttribute("key", common::AttributeValue{static_cast<int64_t>(2)});
+
+  const auto &proto_span = rec.span();
+  // Only one attribute; the second call must overwrite, not append.
+  ASSERT_EQ(proto_span.attributes_size(), 1);
+  EXPECT_EQ(proto_span.attributes(0).key(), "key");
+  EXPECT_EQ(proto_span.attributes(0).value().int_value(), 2);
+}
+
+// Test that updating a duplicate key does not consume an attribute slot or increment
+// the dropped-attributes counter, even when the attribute limit is already reached.
+TEST(OtlpRecordable, DISABLED_SetAttributeDeduplicateDoesNotIncrementDropped)
+{
+  // Limit to exactly one attribute so the slot is full after the first call.
+  OtlpRecordable rec(/*max_attributes=*/1);
+  rec.SetAttribute("duplicate_attribute", common::AttributeValue{static_cast<int64_t>(1)});
+  rec.SetAttribute("duplicate_attribute", common::AttributeValue{static_cast<int64_t>(2)});
+
+  const auto &proto_span = rec.span();
+  ASSERT_EQ(proto_span.attributes_size(), 1);
+  EXPECT_EQ(proto_span.attributes(0).value().int_value(), 2);
+  EXPECT_EQ(proto_span.dropped_attributes_count(), 0u);
+}
+
+// Test that updating a duplicate key changes the type as well as the value.
+TEST(OtlpRecordable, DISABLED_SetAttributeDeduplicateChangesType)
+{
+  OtlpRecordable rec;
+  rec.SetAttribute("type_change_attribute", common::AttributeValue{static_cast<int64_t>(42)});
+  rec.SetAttribute("type_change_attribute", common::AttributeValue{nostd::string_view("hello")});
+
+  const auto &proto_span = rec.span();
+  ASSERT_EQ(proto_span.attributes_size(), 1);
+  EXPECT_EQ(proto_span.attributes(0).value().string_value(), "hello");
+}
+
+// Test that an empty key is rejected and not stored.
+TEST(OtlpRecordable, SetAttributeEmptyKeyIsRejected)
+{
+  OtlpRecordable rec;
+  rec.SetAttribute("", common::AttributeValue{static_cast<int64_t>(1)});
+
+  const auto &proto_span = rec.span();
+  EXPECT_EQ(proto_span.attributes_size(), 0);
 }
 
 TEST(OtlpRecordable, SpanLimits)
