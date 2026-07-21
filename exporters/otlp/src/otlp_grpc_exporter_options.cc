@@ -14,7 +14,7 @@ namespace exporter
 namespace otlp
 {
 
-OtlpGrpcExporterOptions::OtlpGrpcExporterOptions()
+OtlpGrpcExporterOptions::OtlpGrpcExporterOptions() : OtlpGrpcClientOptions()
 {
   endpoint                         = GetOtlpDefaultGrpcTracesEndpoint();
   use_ssl_credentials              = !GetOtlpDefaultGrpcTracesIsInsecure(); /* negation intended. */
@@ -28,16 +28,9 @@ OtlpGrpcExporterOptions::OtlpGrpcExporterOptions()
   ssl_client_cert_string = GetOtlpDefaultTracesSslClientCertificateString();
 #endif
 
-  timeout    = GetOtlpDefaultTracesTimeout();
-  metadata   = GetOtlpDefaultTracesHeaders();
-  user_agent = GetOtlpDefaultUserAgent();
-
-  max_threads = 0;
-
+  timeout     = GetOtlpDefaultTracesTimeout();
+  metadata    = GetOtlpDefaultTracesHeaders();
   compression = GetOtlpDefaultTracesCompression();
-#ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests = 64;
-#endif
 
   retry_policy_max_attempts       = GetOtlpDefaultTracesRetryMaxAttempts();
   retry_policy_initial_backoff    = GetOtlpDefaultTracesRetryInitialBackoff();
@@ -45,13 +38,28 @@ OtlpGrpcExporterOptions::OtlpGrpcExporterOptions()
   retry_policy_backoff_multiplier = GetOtlpDefaultTracesRetryBackoffMultiplier();
 }
 
-OtlpGrpcExporterOptions::OtlpGrpcExporterOptions(void *)
+OtlpGrpcExporterOptions::OtlpGrpcExporterOptions(void *) : OtlpGrpcClientOptions(nullptr)
 {
   use_ssl_credentials = true;
   max_threads         = 0;
 
 #ifdef ENABLE_ASYNC_EXPORT
   max_concurrent_requests = 64;
+#endif
+}
+
+OtlpGrpcExporterOptions::OtlpGrpcExporterOptions(const OtlpGrpcClientOptions &client_options)
+    : OtlpGrpcClientOptions(client_options)
+{
+  std::chrono::system_clock::duration signal_timeout;
+  if (GetOtlpDefaultTracesTimeoutOverride(signal_timeout))
+  {
+    timeout = signal_timeout;
+  }
+  metadata = GetOtlpDefaultTracesHeaders();
+
+#ifdef ENABLE_ASYNC_EXPORT
+  max_concurrent_requests = client_options.max_concurrent_requests;
 #endif
 }
 

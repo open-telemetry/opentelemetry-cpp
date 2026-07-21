@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <algorithm>
 #include <chrono>
+#include <cstdint>
 #include <map>
 #include <string>
 
@@ -121,6 +122,10 @@ std::chrono::system_clock::duration GetOtlpDefaultTracesTimeout();
 std::chrono::system_clock::duration GetOtlpDefaultMetricsTimeout();
 std::chrono::system_clock::duration GetOtlpDefaultLogsTimeout();
 
+bool GetOtlpDefaultTracesTimeoutOverride(std::chrono::system_clock::duration &value);
+bool GetOtlpDefaultMetricsTimeoutOverride(std::chrono::system_clock::duration &value);
+bool GetOtlpDefaultLogsTimeoutOverride(std::chrono::system_clock::duration &value);
+
 // Compatibility with OTELCPP 1.8.2
 inline std::chrono::system_clock::duration GetOtlpDefaultTimeout()
 {
@@ -167,6 +172,30 @@ std::chrono::duration<float> GetOtlpDefaultLogsRetryMaxBackoff();
 float GetOtlpDefaultTracesRetryBackoffMultiplier();
 float GetOtlpDefaultMetricsRetryBackoffMultiplier();
 float GetOtlpDefaultLogsRetryBackoffMultiplier();
+
+/**
+ * Signal-independent accessors, for use by a gRPC client shared across
+ * multiple signal exporters. These read only the generic OTEL_EXPORTER_OTLP_*
+ * environment variables and fall back to the same spec defaults used above.
+ */
+
+void DumpOtlpHeaders(OtlpHeaders &output, const char *env_var_name);
+
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientEndpoint();
+OPENTELEMETRY_EXPORT bool GetOtlpDefaultGrpcClientIsInsecure();
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslCertificatePath();
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslCertificateString();
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslClientKeyPath();
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslClientKeyString();
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslClientCertificatePath();
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslClientCertificateString();
+OPENTELEMETRY_EXPORT std::chrono::system_clock::duration GetOtlpDefaultGrpcClientTimeout();
+OPENTELEMETRY_EXPORT OtlpHeaders GetOtlpDefaultGrpcClientHeaders();
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientCompression();
+OPENTELEMETRY_EXPORT std::uint32_t GetOtlpDefaultGrpcClientRetryMaxAttempts();
+OPENTELEMETRY_EXPORT std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryInitialBackoff();
+OPENTELEMETRY_EXPORT std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryMaxBackoff();
+OPENTELEMETRY_EXPORT float GetOtlpDefaultGrpcClientRetryBackoffMultiplier();
 
 }  // namespace otlp
 }  // namespace exporter

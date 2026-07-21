@@ -97,7 +97,8 @@ if(WITH_OTLP_GRPC)
   add_library(
     opentelemetry_exporter_otlp_grpc_client
     ${OPENTELEMETRY_OTLP_GRPC_CLIENT_LIB_TYPE} src/otlp_grpc_client.cc
-    src/otlp_grpc_client_factory.cc src/otlp_grpc_utils.cc)
+    src/otlp_grpc_client_factory.cc src/otlp_grpc_client_options.cc
+    src/otlp_grpc_utils.cc)
   set_target_properties(opentelemetry_exporter_otlp_grpc_client
                         PROPERTIES EXPORT_NAME otlp_grpc_client)
   set_target_version(opentelemetry_exporter_otlp_grpc_client)
@@ -935,6 +936,18 @@ if(BUILD_TESTING)
       TARGET otlp_grpc_target_test
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_grpc_target_test)
+
+    add_executable(otlp_grpc_client_options_test
+                   test/otlp_grpc_client_options_test.cc)
+    target_link_libraries(
+      otlp_grpc_client_options_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc
+      opentelemetry_exporter_otlp_grpc_log
+      opentelemetry_exporter_otlp_grpc_metrics)
+    gtest_add_tests(
+      TARGET otlp_grpc_client_options_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_grpc_client_options_test)
 
     add_executable(otlp_grpc_exporter_factory_test
                    test/otlp_grpc_exporter_factory_test.cc)
