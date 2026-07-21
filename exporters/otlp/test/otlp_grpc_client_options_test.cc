@@ -119,6 +119,21 @@ TEST(OtlpGrpcClientOptionsTest, SignalWithoutSpecificOverrideFallsBackToSharedCl
   EXPECT_EQ(metric_options.timeout, std::chrono::seconds(20));
 }
 
+TEST(OtlpGrpcClientOptionsTest, ProgrammaticSharedClientTimeoutIsPreservedWithoutEnvVar)
+{
+  OtlpGrpcClientOptions client_options(static_cast<void *>(nullptr));
+  client_options.timeout = std::chrono::seconds(30);
+
+  OtlpGrpcExporterOptions trace_options(client_options);
+  EXPECT_EQ(trace_options.timeout, std::chrono::seconds(30));
+
+  OtlpGrpcMetricExporterOptions metric_options(client_options);
+  EXPECT_EQ(metric_options.timeout, std::chrono::seconds(30));
+
+  OtlpGrpcLogRecordExporterOptions log_options(client_options);
+  EXPECT_EQ(log_options.timeout, std::chrono::seconds(30));
+}
+
 TEST(OtlpGrpcClientOptionsTest, DerivedVoidPointerConstructorsSkipDefaults)
 {
   ScopedEnvVar env("OTEL_EXPORTER_OTLP_ENDPOINT", "https://collector.example.com:4317");

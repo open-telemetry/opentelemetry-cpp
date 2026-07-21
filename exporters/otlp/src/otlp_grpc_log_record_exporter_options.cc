@@ -60,7 +60,11 @@ OtlpGrpcLogRecordExporterOptions::OtlpGrpcLogRecordExporterOptions(
     const OtlpGrpcClientOptions &client_options)
     : OtlpGrpcClientOptions(client_options)
 {
-  timeout  = GetOtlpDefaultLogsTimeout();
+  std::chrono::system_clock::duration signal_timeout;
+  if (GetOtlpDefaultLogsTimeoutOverride(signal_timeout))
+  {
+    timeout = signal_timeout;
+  }
   metadata = GetOtlpDefaultLogsHeaders();
 
 #ifdef ENABLE_ASYNC_EXPORT

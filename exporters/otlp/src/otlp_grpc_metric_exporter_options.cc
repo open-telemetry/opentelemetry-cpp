@@ -64,7 +64,11 @@ OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions(
     : OtlpGrpcClientOptions(client_options),
       aggregation_temporality(PreferredAggregationTemporality::kCumulative)
 {
-  timeout  = GetOtlpDefaultMetricsTimeout();
+  std::chrono::system_clock::duration signal_timeout;
+  if (GetOtlpDefaultMetricsTimeoutOverride(signal_timeout))
+  {
+    timeout = signal_timeout;
+  }
   metadata = GetOtlpDefaultMetricsHeaders();
 
 #ifdef ENABLE_ASYNC_EXPORT

@@ -122,6 +122,10 @@ std::chrono::system_clock::duration GetOtlpDefaultTracesTimeout();
 std::chrono::system_clock::duration GetOtlpDefaultMetricsTimeout();
 std::chrono::system_clock::duration GetOtlpDefaultLogsTimeout();
 
+bool GetOtlpDefaultTracesTimeoutOverride(std::chrono::system_clock::duration &value);
+bool GetOtlpDefaultMetricsTimeoutOverride(std::chrono::system_clock::duration &value);
+bool GetOtlpDefaultLogsTimeoutOverride(std::chrono::system_clock::duration &value);
+
 // Compatibility with OTELCPP 1.8.2
 inline std::chrono::system_clock::duration GetOtlpDefaultTimeout()
 {

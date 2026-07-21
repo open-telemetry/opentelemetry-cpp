@@ -51,7 +51,11 @@ OtlpGrpcExporterOptions::OtlpGrpcExporterOptions(void *) : OtlpGrpcClientOptions
 OtlpGrpcExporterOptions::OtlpGrpcExporterOptions(const OtlpGrpcClientOptions &client_options)
     : OtlpGrpcClientOptions(client_options)
 {
-  timeout  = GetOtlpDefaultTracesTimeout();
+  std::chrono::system_clock::duration signal_timeout;
+  if (GetOtlpDefaultTracesTimeoutOverride(signal_timeout))
+  {
+    timeout = signal_timeout;
+  }
   metadata = GetOtlpDefaultTracesHeaders();
 
 #ifdef ENABLE_ASYNC_EXPORT

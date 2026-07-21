@@ -1012,6 +1012,24 @@ std::chrono::system_clock::duration GetOtlpDefaultLogsTimeout()
   return value;
 }
 
+bool GetOtlpDefaultTracesTimeoutOverride(std::chrono::system_clock::duration &value)
+{
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_TIMEOUT";
+  return sdk_common::GetDurationEnvironmentVariable(kSignalEnv, value);
+}
+
+bool GetOtlpDefaultMetricsTimeoutOverride(std::chrono::system_clock::duration &value)
+{
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_TIMEOUT";
+  return sdk_common::GetDurationEnvironmentVariable(kSignalEnv, value);
+}
+
+bool GetOtlpDefaultLogsTimeoutOverride(std::chrono::system_clock::duration &value)
+{
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_TIMEOUT";
+  return sdk_common::GetDurationEnvironmentVariable(kSignalEnv, value);
+}
+
 void DumpOtlpHeaders(OtlpHeaders &output, const char *env_var_name)
 {
   std::string raw_value;
