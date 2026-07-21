@@ -26,11 +26,11 @@ class ProbabilitySampler : public Sampler
 {
 public:
   /**
-   * @param ratio the sampling probability, in range [0.0, 1.0]. Values
-   * outside the range (including NaN) log a warning and fall back to the
-   * default of 1.0. If the randomness value of the span is greater than or
-   * equal to the rejection threshold derived from the ratio, ShouldSample
-   * will return RECORD_AND_SAMPLE.
+   * @param ratio the sampling probability: either 0 (never sample) or a
+   * value in [2^-56, 1.0]. Other values (including NaN) log a warning and
+   * fall back to the default of 1.0. If the randomness value of the span is
+   * greater than or equal to the rejection threshold derived from the ratio,
+   * ShouldSample will return RECORD_AND_SAMPLE.
    */
   explicit ProbabilitySampler(double ratio);
 

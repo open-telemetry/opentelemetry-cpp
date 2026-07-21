@@ -23,17 +23,19 @@ namespace trace_api = opentelemetry::trace;
 
 namespace
 {
-// Returns ratio when it is inside [0.0, 1.0]; otherwise (including NaN) logs a
-// warning and returns 1.0, the default of the configuration specification.
+// Valid ratios are 0 (never sample) and [2^-56, 1.0]; 2^-56 is the smallest
+// probability expressible with a 56-bit threshold. Anything else (including
+// NaN) logs a warning and returns 1.0, the default of the configuration
+// specification.
 double ValidateRatio(double ratio) noexcept
 {
-  if (!(ratio >= 0.0 && ratio <= 1.0))
+  if (ratio == 0.0 || (ratio >= 0x1p-56 && ratio <= 1.0))
   {
-    OTEL_INTERNAL_LOG_WARN("[ProbabilitySampler] ratio "
-                           << ratio << " is outside [0.0, 1.0], using the default 1.0");
-    return 1.0;
+    return ratio;
   }
-  return ratio;
+  OTEL_INTERNAL_LOG_WARN("[ProbabilitySampler] ratio "
+                         << ratio << " is not 0 or within [2^-56, 1.0], using the default 1.0");
+  return 1.0;
 }
 }  // namespace
 

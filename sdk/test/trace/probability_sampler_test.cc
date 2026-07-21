@@ -137,8 +137,9 @@ TEST(ProbabilitySampler, ShouldSampleNever)
 
 TEST(ProbabilitySampler, InvalidRatioFallsBackToDefault)
 {
-  // Out-of-range ratios (including NaN) fall back to the default of 1.0.
-  for (double ratio : {-0.5, 1.5, std::nan("")})
+  // Invalid ratios (out of range, below the 2^-56 minimum, or NaN) fall back
+  // to the default of 1.0.
+  for (double ratio : {-0.5, 1.5, 0x1p-57, std::nan("")})
   {
     ProbabilitySampler s1(ratio);
     ASSERT_EQ("ProbabilitySampler{1.000000}", s1.GetDescription());
@@ -364,7 +365,7 @@ TEST(ProbabilitySampler, FullTraceStateKeepsParentTraceState)
   ASSERT_EQ("0", k0_value);
 }
 
-TEST(ProbabilitySampler, OversizedSubKeyDroppedToRecordThreshold)
+TEST(ProbabilitySampler, ThresholdOmittedWhenSubKeyWouldOverflow)
 {
   ProbabilitySampler s1(0.5);
 
@@ -373,8 +374,8 @@ TEST(ProbabilitySampler, OversizedSubKeyDroppedToRecordThreshold)
   uint8_t span_id_buffer[trace_api::SpanId::kSize] = {1};
   trace_api::SpanId span_id{span_id_buffer};
 
-  // A sampled span must record th; the foreign sub-key would push the ot value
-  // past the 256 char limit, so it is dropped to make room for th.
+  // Adding th would push the ot value past the 256 char limit; the inherited
+  // foreign sub-key must be preserved, so th is omitted.
   std::string ot_value = "a:" + std::string(253, 'b');
   auto trace_state     = trace_api::TraceState::FromHeader("ot=" + ot_value);
   trace_api::SpanContext context(trace_id, span_id, trace_api::TraceFlags{0}, false, trace_state);
@@ -386,10 +387,10 @@ TEST(ProbabilitySampler, OversizedSubKeyDroppedToRecordThreshold)
 
   std::string result_ot;
   ASSERT_TRUE(sampling_result.trace_state->Get("ot", result_ot));
-  ASSERT_EQ("th:8", result_ot);
+  ASSERT_EQ(ot_value, result_ot);
 }
 
-TEST(ProbabilitySampler, OversizedSubKeyDroppedReplacesStaleThreshold)
+TEST(ProbabilitySampler, StaleThresholdRemovedWhenSubKeyWouldOverflow)
 {
   ProbabilitySampler s1(0.1);
 
@@ -398,8 +399,9 @@ TEST(ProbabilitySampler, OversizedSubKeyDroppedReplacesStaleThreshold)
   uint8_t span_id_buffer[trace_api::SpanId::kSize] = {1};
   trace_api::SpanId span_id{span_id_buffer};
 
-  // The inherited th is replaced by this sampler's th; the foreign sub-key
-  // overflows the 256 char limit and is dropped, keeping the fresh th.
+  // The inherited th is stale and must go; this sampler's own th does not fit
+  // next to the foreign sub-key, which must be preserved, so no th is
+  // recorded.
   std::string rest = "x:" + std::string(245, 'b');
   auto trace_state = trace_api::TraceState::FromHeader("ot=th:8;" + rest);
   trace_api::SpanContext context(trace_id, span_id, trace_api::TraceFlags{0}, false, trace_state);
@@ -411,8 +413,8 @@ TEST(ProbabilitySampler, OversizedSubKeyDroppedReplacesStaleThreshold)
 
   std::string result_ot;
   ASSERT_TRUE(sampling_result.trace_state->Get("ot", result_ot));
-  ASSERT_NE(std::string::npos, result_ot.find("th:"));
-  ASSERT_EQ(std::string::npos, result_ot.find("x:"));
+  ASSERT_EQ(std::string::npos, result_ot.find("th:"));
+  ASSERT_EQ(rest, result_ot);
 }
 
 TEST(ProbabilitySampler, IgnoresParentSampledFlag)
