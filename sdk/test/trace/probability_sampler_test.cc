@@ -135,6 +135,20 @@ TEST(ProbabilitySampler, ShouldSampleNever)
   ASSERT_FALSE(sampling_result.trace_state->Get("ot", ot_value));
 }
 
+TEST(ProbabilitySampler, InvalidRatioFallsBackToDefault)
+{
+  // Out-of-range ratios (including NaN) fall back to the default of 1.0.
+  for (double ratio : {-0.5, 1.5, std::nan("")})
+  {
+    ProbabilitySampler s1(ratio);
+    ASSERT_EQ("ProbabilitySampler{1.000000}", s1.GetDescription());
+
+    auto sampling_result =
+        SampleWithContext(s1, trace_api::SpanContext::GetInvalid(), TraceIdWithRandomness(0));
+    ASSERT_EQ(Decision::RECORD_AND_SAMPLE, sampling_result.decision);
+  }
+}
+
 TEST(ProbabilitySampler, ShouldSampleAtThreshold)
 {
   // For ratio 0.5 the rejection threshold is 2^55 (0x80000000000000).
@@ -472,18 +486,8 @@ TEST(ProbabilitySampler, GetDescription)
   ASSERT_EQ("ProbabilitySampler{1.000000}", s4.GetDescription());
 
   ProbabilitySampler s5(-3.00);
-  ASSERT_EQ("ProbabilitySampler{0.000000}", s5.GetDescription());
+  ASSERT_EQ("ProbabilitySampler{1.000000}", s5.GetDescription());
 
   ProbabilitySampler s6(std::nan(""));
-  ASSERT_EQ("ProbabilitySampler{0.000000}", s6.GetDescription());
-}
-
-TEST(ProbabilitySampler, ShouldSampleNeverWithNaN)
-{
-  ProbabilitySampler s1(std::nan(""));
-
-  auto sampling_result = SampleWithContext(s1, trace_api::SpanContext::GetInvalid(),
-                                           TraceIdWithRandomness(0xffffffffffffff));
-
-  ASSERT_EQ(Decision::DROP, sampling_result.decision);
+  ASSERT_EQ("ProbabilitySampler{1.000000}", s6.GetDescription());
 }

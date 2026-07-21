@@ -23,13 +23,16 @@ namespace trace_api = opentelemetry::trace;
 
 namespace
 {
-// Clamps ratio to [0, 1]. NaN and negatives map to 0 (never-sample).
-double ClampProbability(double ratio) noexcept
+// Returns ratio when it is inside [0.0, 1.0]; otherwise (including NaN) logs a
+// warning and returns 1.0, the default of the configuration specification.
+double ValidateRatio(double ratio) noexcept
 {
-  if (!(ratio > 0.0))
-    return 0.0;
-  if (ratio > 1.0)
+  if (!(ratio >= 0.0 && ratio <= 1.0))
+  {
+    OTEL_INTERNAL_LOG_WARN("[ProbabilitySampler] ratio "
+                           << ratio << " is outside [0.0, 1.0], using the default 1.0");
     return 1.0;
+  }
   return ratio;
 }
 }  // namespace
@@ -41,9 +44,11 @@ namespace trace
 {
 
 ProbabilitySampler::ProbabilitySampler(double ratio)
-    : description_("ProbabilitySampler{" + std::to_string(ClampProbability(ratio)) + "}"),
-      threshold_(CalculateThreshold(ClampProbability(ratio)))
-{}
+{
+  ratio        = ValidateRatio(ratio);
+  description_ = "ProbabilitySampler{" + std::to_string(ratio) + "}";
+  threshold_   = CalculateThreshold(ratio);
+}
 
 SamplingResult ProbabilitySampler::ShouldSample(
     const trace_api::SpanContext &parent_context,
@@ -53,15 +58,18 @@ SamplingResult ProbabilitySampler::ShouldSample(
     const opentelemetry::common::KeyValueIterable & /*attributes*/,
     const trace_api::SpanContextKeyValueIterable & /*links*/) noexcept
 {
-  auto parent_trace_state = parent_context.trace_state();
-  if (!parent_trace_state)
-  {
-    parent_trace_state = trace_api::TraceState::GetDefault();
-  }
+  const auto &parent_trace_state = parent_context.trace_state();
+  const bool has_parent_entries  = parent_trace_state && !parent_trace_state->Empty();
 
-  std::string ot_value;
-  parent_trace_state->Get(kOtTraceStateKey, ot_value);
-  OtelTraceState ot_state = OtelTraceState::Parse(ot_value);
+  OtelTraceState ot_state;
+  if (has_parent_entries)
+  {
+    std::string ot_value;
+    if (parent_trace_state->Get(kOtTraceStateKey, ot_value))
+    {
+      ot_state = OtelTraceState::Parse(ot_value);
+    }
+  }
 
   bool drop = threshold_ == kMaxThreshold;
   if (!drop)
@@ -104,9 +112,14 @@ SamplingResult ProbabilitySampler::ShouldSample(
   }
 
   std::string new_ot_value = ot_state.Serialize();
-  auto trace_state         = parent_trace_state->Delete(kOtTraceStateKey);
+  auto trace_state =
+      has_parent_entries ? parent_trace_state->Delete(kOtTraceStateKey) : parent_trace_state;
   if (!new_ot_value.empty())
   {
+    if (!trace_state)
+    {
+      trace_state = trace_api::TraceState::GetDefault();
+    }
     trace_state = trace_state->Set(kOtTraceStateKey, new_ot_value);
   }
 
