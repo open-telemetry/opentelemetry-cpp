@@ -45,6 +45,12 @@ Increment the:
 * [METRICS SDK] Validate Base2 Exponential Histogram Aggregation config
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
 
+* [SDK] Read span limits from the environment variables defined in the
+        specification (OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, OTEL_SPAN_EVENT_COUNT_LIMIT,
+        OTEL_SPAN_LINK_COUNT_LIMIT, ...) in the TracerProviderFactory overloads
+        that do not receive explicit SpanLimits
+  [#4258](https://github.com/open-telemetry/opentelemetry-cpp/pull/4258)
+
 Breaking changes:
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
