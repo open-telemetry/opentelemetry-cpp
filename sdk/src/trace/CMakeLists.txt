@@ -16,6 +16,7 @@ add_library(
   batch_span_processor_options.cc
   simple_processor_factory.cc
   span_data.cc
+  span_limits.cc
   samplers/always_on_factory.cc
   samplers/always_off_factory.cc
   samplers/parent.cc
