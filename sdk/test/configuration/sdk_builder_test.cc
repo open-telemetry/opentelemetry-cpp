@@ -2,23 +2,31 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
-
 #include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
+#include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 
@@ -26,9 +34,17 @@ using opentelemetry::sdk::configuration::Registry;
 using opentelemetry::sdk::configuration::SdkBuilder;
 using opentelemetry::sdk::configuration::SpanLimitsConfiguration;
 using opentelemetry::sdk::configuration::TracerProviderConfiguration;
-namespace config_sdk = opentelemetry::sdk::configuration;
-namespace scope_sdk  = opentelemetry::sdk::instrumentationscope;
+
+namespace logs       = opentelemetry::logs;
 namespace logs_sdk   = opentelemetry::sdk::logs;
+namespace scope_sdk  = opentelemetry::sdk::instrumentationscope;
+namespace config_sdk = opentelemetry::sdk::configuration;
+
+//------------------------------------------------------------------------------
+// Tests for the SdkBuilder class methods that create SDK components from configuration models
+// These tests focus on the API of the SdkBuilder for creating SDK components that can be
+// independently verified. For full integration tests of the SdkBuilder with configuration models,
+// see the programmatic_configuration_test.cc file.
 
 TEST(SdkBuilder, SpanLimitsDefaults)
 {
@@ -116,14 +132,93 @@ TEST(SdkBuilder, CreateLoggerConfigurator)
   logs_sdk::LoggerConfig sdk_logger_config_2 = logger_configurator->ComputeConfig(*scope_2);
 
   EXPECT_TRUE(sdk_logger_config_default.IsEnabled());
-  EXPECT_EQ(sdk_logger_config_default.GetMinimumSeverity(), opentelemetry::logs::Severity::kWarn);
+  EXPECT_EQ(sdk_logger_config_default.GetMinimumSeverity(), logs::Severity::kWarn);
   EXPECT_FALSE(sdk_logger_config_default.IsTraceBased());
 
   EXPECT_TRUE(sdk_logger_config_1.IsEnabled());
-  EXPECT_EQ(sdk_logger_config_1.GetMinimumSeverity(), opentelemetry::logs::Severity::kError3);
+  EXPECT_EQ(sdk_logger_config_1.GetMinimumSeverity(), logs::Severity::kError3);
   EXPECT_FALSE(sdk_logger_config_1.IsTraceBased());
 
   EXPECT_FALSE(sdk_logger_config_2.IsEnabled());
-  EXPECT_EQ(sdk_logger_config_2.GetMinimumSeverity(), opentelemetry::logs::Severity::kDebug);
+  EXPECT_EQ(sdk_logger_config_2.GetMinimumSeverity(), logs::Severity::kDebug);
   EXPECT_TRUE(sdk_logger_config_2.IsTraceBased());
+}
+
+TEST(SdkBuilder, CreateParentBasedSampler)
+{
+  // parent based with no root configured should default to always on
+  {
+    config_sdk::ParentBasedSamplerConfiguration parent_based_sampler_config;
+    parent_based_sampler_config.root = nullptr;
+    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
+    ASSERT_NE(sampler, nullptr);
+    EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ParentBased{AlwaysOnSampler})");
+  }
+
+  // parent based with root always on
+  {
+    config_sdk::ParentBasedSamplerConfiguration parent_based_sampler_config;
+    parent_based_sampler_config.root = std::make_unique<config_sdk::AlwaysOnSamplerConfiguration>();
+    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
+    ASSERT_NE(sampler, nullptr);
+    EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ParentBased{AlwaysOnSampler})");
+  }
+
+  // parent based with root always off
+  {
+    config_sdk::ParentBasedSamplerConfiguration parent_based_sampler_config;
+    parent_based_sampler_config.root =
+        std::make_unique<config_sdk::AlwaysOffSamplerConfiguration>();
+    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
+    ASSERT_NE(sampler, nullptr);
+    EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ParentBased{AlwaysOffSampler})");
+  }
+
+  // parent based with a custom root sampler
+  {
+    config_sdk::ParentBasedSamplerConfiguration parent_based_sampler_config;
+    auto trace_id_ratio_based_sampler_config =
+        std::make_unique<config_sdk::TraceIdRatioBasedSamplerConfiguration>();
+    trace_id_ratio_based_sampler_config->ratio = 0.5;
+    parent_based_sampler_config.root           = std::move(trace_id_ratio_based_sampler_config);
+    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
+    ASSERT_NE(sampler, nullptr);
+    EXPECT_EQ(std::string{sampler->GetDescription()},
+              R"(ParentBased{TraceIdRatioBasedSampler{0.500000}})");
+  }
+
+  // parent based with all sub samplers set
+  {
+    config_sdk::ParentBasedSamplerConfiguration parent_based_sampler_config;
+    auto trace_id_ratio_based_sampler_config =
+        std::make_unique<config_sdk::TraceIdRatioBasedSamplerConfiguration>();
+    trace_id_ratio_based_sampler_config->ratio = 0.25;
+    parent_based_sampler_config.root           = std::move(trace_id_ratio_based_sampler_config);
+
+    auto always_off_sampler_config = std::make_unique<config_sdk::AlwaysOffSamplerConfiguration>();
+    parent_based_sampler_config.remote_parent_sampled = std::move(always_off_sampler_config);
+
+    auto always_on_sampler_config = std::make_unique<config_sdk::AlwaysOnSamplerConfiguration>();
+    parent_based_sampler_config.remote_parent_not_sampled = std::move(always_on_sampler_config);
+
+    auto trace_id_ratio_based_sampler_config_2 =
+        std::make_unique<config_sdk::TraceIdRatioBasedSamplerConfiguration>();
+    trace_id_ratio_based_sampler_config_2->ratio = 0.35;
+    parent_based_sampler_config.local_parent_sampled =
+        std::move(trace_id_ratio_based_sampler_config_2);
+
+    auto always_off_sampler_config_2 =
+        std::make_unique<config_sdk::AlwaysOffSamplerConfiguration>();
+    parent_based_sampler_config.local_parent_not_sampled = std::move(always_off_sampler_config_2);
+
+    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
+    ASSERT_NE(sampler, nullptr);
+    EXPECT_EQ(std::string{sampler->GetDescription()},
+              R"(ParentBased{TraceIdRatioBasedSampler{0.250000}})");
+  }
 }

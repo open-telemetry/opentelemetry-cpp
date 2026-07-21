@@ -183,7 +183,7 @@ opentracing::expected<std::unique_ptr<opentracing::SpanContext>> TracerShim::ext
   CarrierReaderShim carrier{reader};
   auto current_context = opentelemetry::context::RuntimeContext::GetCurrent();
   auto context         = propagator->Extract(carrier, current_context);
-  auto span_context    = opentelemetry::trace::GetSpan(context)->GetContext();
+  auto span_context    = opentelemetry::trace::GetSpanContext(context);
   auto baggage         = opentelemetry::baggage::GetBaggage(context);
 
   // The operation MUST return a `SpanContext` Shim instance with the extracted values if any of

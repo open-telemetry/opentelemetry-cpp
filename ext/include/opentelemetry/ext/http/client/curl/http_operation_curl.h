@@ -323,7 +323,7 @@ private:
   const bool reuse_connection_{false};    // Reuse connection
   const std::chrono::milliseconds http_conn_timeout_;  // Timeout for connect.  Default: 5000ms
 
-  char curl_error_message_[CURL_ERROR_SIZE];
+  char curl_error_message_[CURL_ERROR_SIZE]{};
   HttpCurlEasyResource curl_resource_;
   CURLcode last_curl_result_{CURLE_OK};  // Curl result OR HTTP status code if successful
 
@@ -361,7 +361,7 @@ private:
 
   struct AsyncData
   {
-    Session *session;  // Owner Session
+    Session *session{nullptr};  // Owner Session
 
     std::thread::id callback_thread;
     std::function<void(HttpOperation &)> callback;

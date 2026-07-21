@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
   Scope scope(root_span);
   http_server.Start();
   std::cout << "Server is running..Press ctrl-c to exit...\n";
-  while (1)
+  while (true)
   {
     std::this_thread::sleep_for(std::chrono::seconds(100));
   }
