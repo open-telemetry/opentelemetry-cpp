@@ -11,7 +11,8 @@ endif()
 
 message(
   STATUS
-    "INSTALL_TEST_DEPRECATED_COMPONENTS: ${INSTALL_TEST_DEPRECATED_COMPONENTS}")
+    "Test will call find_package with deprecated components: ${INSTALL_TEST_DEPRECATED_COMPONENTS}"
+)
 
 foreach(deprecated_component ${INSTALL_TEST_DEPRECATED_COMPONENTS})
   # if a deprecated component is a DEPRECATED_NAME of a valid component then

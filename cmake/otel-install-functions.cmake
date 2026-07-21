@@ -346,6 +346,8 @@ function(otel_add_component)
   endif()
 
   if(_OTEL_ADD_COMP_DEPRECATED)
+    # TODO: Support deprecated components that still install their targets, and
+    # mark those targets deprecated during the deprecation window.
     get_property(_deprecated_components DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST)
     list(APPEND _deprecated_components "${_OTEL_ADD_COMP_COMPONENT}")
     set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST "${_deprecated_components}")
@@ -398,7 +400,7 @@ function(otel_add_component)
     list(APPEND _deprecated_components "${_DEP_NAME}")
     set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST "${_deprecated_components}")
     set_property(DIRECTORY ${PROJECT_SOURCE_DIR}
-      PROPERTY OTEL_COMPONENT_DEPRECATED_ALIAS_${_DEP_NAME}
+      PROPERTY OTEL_COMPONENT_REPLACEMENT_${_DEP_NAME}
       "${_OTEL_ADD_COMP_COMPONENT}")
     message(DEBUG "  DEPRECATED_NAME: ${_DEP_NAME} -> ${_OTEL_ADD_COMP_COMPONENT}")
   endforeach()
@@ -444,19 +446,23 @@ function(otel_install_components)
     _otel_populate_component_thirdparty_depends_block(${_COMPONENT} OTEL_COMPONENTS_THIRDPARTY_DEPENDENCIES_BLOCK)
   endforeach()
 
-  message(STATUS "Install DEPRECATED COMPONENTS")
   get_property(OTEL_DEPRECATED_COMPONENTS_LIST DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST)
 
-  set(OTEL_COMPONENTS_DEPRECATED_ALIASES_BLOCK "")
-  foreach(_DEP_COMP IN LISTS OTEL_DEPRECATED_COMPONENTS_LIST)
-    get_property(_alias DIRECTORY ${PROJECT_SOURCE_DIR}
-      PROPERTY OTEL_COMPONENT_DEPRECATED_ALIAS_${_DEP_COMP})
-    if(_alias)
-      message(STATUS "  Deprecated COMPONENT ${_DEP_COMP} -> ${_alias}")
-      string(APPEND OTEL_COMPONENTS_DEPRECATED_ALIASES_BLOCK
-        "set(COMPONENT_${_DEP_COMP}_DEPRECATED_ALIAS ${_alias})\n")
+  if(OTEL_DEPRECATED_COMPONENTS_LIST)
+     message(STATUS "Install DEPRECATED COMPONENT definitions:")
+  endif()
+
+  set(OTEL_COMPONENTS_REPLACEMENTS_BLOCK "")
+  foreach(_DEPRECATED_COMPONENT IN LISTS OTEL_DEPRECATED_COMPONENTS_LIST)
+    get_property(_REPLACEMENT_COMPONENT DIRECTORY ${PROJECT_SOURCE_DIR}
+      PROPERTY OTEL_COMPONENT_REPLACEMENT_${_DEPRECATED_COMPONENT})
+    message(STATUS "  Deprecated COMPONENT ${_DEPRECATED_COMPONENT}")
+    if(_REPLACEMENT_COMPONENT)
+      message(STATUS "    Replacement: ${_REPLACEMENT_COMPONENT}")
+      string(APPEND OTEL_COMPONENTS_REPLACEMENTS_BLOCK
+        "set(COMPONENT_${_DEPRECATED_COMPONENT}_REPLACEMENT ${_REPLACEMENT_COMPONENT})\n")
     else()
-      message(STATUS "  Deprecated COMPONENT ${_DEP_COMP} (no replacement)")
+      message(STATUS "    No replacement installed.")
     endif()
   endforeach()
 
