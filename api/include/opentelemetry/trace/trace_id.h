@@ -23,7 +23,7 @@ public:
   static constexpr size_t kSize = 16;
 
   // An invalid TraceId (all zeros).
-  TraceId() noexcept : rep_{0} {}
+  TraceId() noexcept = default;
 
   // Creates a TraceId with the given ID.
   explicit TraceId(nostd::span<const uint8_t, kSize> id) noexcept
@@ -65,7 +65,7 @@ public:
   }
 
 private:
-  uint8_t rep_[kSize];
+  uint8_t rep_[kSize]{};
 };
 
 }  // namespace trace

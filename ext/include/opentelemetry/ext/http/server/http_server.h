@@ -42,7 +42,7 @@ struct HttpRequest
 
 struct HttpResponse
 {
-  int code;
+  int code{0};
   std::string message;
   std::map<std::string, std::string> headers;
   std::string body;
@@ -108,9 +108,9 @@ protected:
       SendingHeaders,
       SendingBody,
       Closing
-    } state;
-    size_t contentLength;
-    bool keepalive;
+    } state{Idle};
+    size_t contentLength{0};
+    bool keepalive{false};
     HttpRequest request;
     HttpResponse response;
   };
@@ -783,7 +783,7 @@ protected:
 
   static std::string formatTimestamp(time_t time)
   {
-    tm tm;
+    tm tm{};
 #ifdef _WIN32
     gmtime_s(&tm, &time);
 #else
