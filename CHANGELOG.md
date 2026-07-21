@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Fix more clang tidy warnings (member initialization)
+  [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
+  
 * [API] Fix Windows metrics tail latency: `common::SpinLockMutex` now parks a
   contended waiter on its final back-off tier instead of
   `std::this_thread::sleep_for(1ms)`, which Windows rounds up to the ~15.6 ms
@@ -24,9 +27,6 @@ Increment the:
   previous `sleep_for` fallback. The `std::atomic<bool>` member is unchanged, so
   the class layout / ABI is preserved.
   [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
-
-* [ETW] Ensure spans own their names until they are ended
-  [#4247](https://github.com/open-telemetry/opentelemetry-cpp/pull/4247)
 
 * docs: update supported development platforms
   [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
