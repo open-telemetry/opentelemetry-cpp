@@ -172,7 +172,7 @@ public:
       return attrs;
     };
     intent.trace_state_provider =
-        [](opentelemetry::nostd::shared_ptr<trace_api::TraceState> trace_state) {
+        [](const opentelemetry::nostd::shared_ptr<trace_api::TraceState> &trace_state) {
           return trace_state->Set("p", "1");
         };
     return intent;

@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <cstddef>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
@@ -30,7 +31,7 @@ static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse
 
 namespace
 {
-enum class DetectorType
+enum class DetectorType : std::uint8_t
 {
   kNone,
   kContainer,
