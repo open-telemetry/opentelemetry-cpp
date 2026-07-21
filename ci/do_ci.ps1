@@ -222,6 +222,38 @@ switch ($action) {
       exit $exit
     }
   }
+  "cmake.legacy_options.test" {
+    # Ensure the legacy (pre "OTELCPP_" prefix) CMake option names still drive
+    # the new OTELCPP_* options for the Windows-only options. See
+    # https://github.com/open-telemetry/opentelemetry-cpp/issues/4184
+    cd "$BUILD_DIR"
+    Remove-Item -Recurse -Force "$BUILD_DIR\*"
+    # cmake prints the deprecation warnings to stderr; keep them from becoming
+    # terminating errors under $ErrorActionPreference = "Stop".
+    $saved_error_action_preference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    cmake $SRC_DIR `
+      -DOTELCPP_BUILD_TESTING=OFF `
+      -DWITH_ETW=OFF `
+      -DOPENTELEMETRY_BUILD_DLL=ON 2>&1 | Tee-Object -FilePath configure.log
+    $exit = $LASTEXITCODE
+    $ErrorActionPreference = $saved_error_action_preference
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    $configure_log = Get-Content configure.log -Raw
+    foreach ($legacy_option in @("WITH_ETW", "OPENTELEMETRY_BUILD_DLL")) {
+      if ($configure_log -notmatch "CMake option $legacy_option is deprecated") {
+        Write-Error "missing deprecation warning for option $legacy_option"
+      }
+    }
+    $cache = Get-Content CMakeCache.txt
+    foreach ($expected_entry in @("OTELCPP_WITH_ETW:BOOL=OFF", "OTELCPP_BUILD_DLL:BOOL=ON")) {
+      if (-not ($cache -contains $expected_entry)) {
+        Write-Error "expected CMakeCache.txt entry missing: $expected_entry"
+      }
+    }
+  }
   "cmake.with_async_export.test" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
