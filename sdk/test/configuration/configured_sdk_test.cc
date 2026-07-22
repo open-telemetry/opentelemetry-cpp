@@ -33,6 +33,7 @@
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
@@ -47,9 +48,12 @@
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+
+#include "config_test_common.h"
 
 namespace nostd       = opentelemetry::nostd;
 namespace trace       = opentelemetry::trace;
@@ -66,92 +70,8 @@ namespace internal_log = opentelemetry::sdk::common::internal_log;
 
 namespace
 {
-//------------------------------------------------------------------------------
-// Noop Exporters
 
-class NoopSpanExporter : public trace_sdk::SpanExporter
-{
-public:
-  NoopSpanExporter() = default;
-  std::unique_ptr<trace_sdk::Recordable> MakeRecordable() noexcept override
-  {
-    return std::make_unique<trace_sdk::SpanData>();
-  }
-  common_sdk::ExportResult Export(
-      const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &) noexcept override
-  {
-    return common_sdk::ExportResult::kSuccess;
-  }
-  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
-  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
-};
-
-class NoopLogRecordExporter : public logs_sdk::LogRecordExporter
-{
-public:
-  NoopLogRecordExporter() = default;
-  std::unique_ptr<logs_sdk::Recordable> MakeRecordable() noexcept override
-  {
-    return std::make_unique<logs_sdk::ReadWriteLogRecord>();
-  }
-  common_sdk::ExportResult Export(
-      const nostd::span<std::unique_ptr<logs_sdk::Recordable>> &) noexcept override
-  {
-    return common_sdk::ExportResult::kSuccess;
-  }
-  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
-  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
-};
-
-class NoopPushMetricExporter : public metrics_sdk::PushMetricExporter
-{
-public:
-  NoopPushMetricExporter() = default;
-  common_sdk::ExportResult Export(const metrics_sdk::ResourceMetrics &) noexcept override
-  {
-    return common_sdk::ExportResult::kSuccess;
-  }
-  metrics_sdk::AggregationTemporality GetAggregationTemporality(
-      metrics_sdk::InstrumentType) const noexcept override
-  {
-    return metrics_sdk::AggregationTemporality::kCumulative;
-  }
-  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
-  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
-};
-
-//------------------------------------------------------------------------------
-// Configuration Builders
-
-class NoopSpanExporterBuilder : public config_sdk::ExtensionSpanExporterBuilder
-{
-public:
-  std::unique_ptr<trace_sdk::SpanExporter> Build(
-      const config_sdk::ExtensionSpanExporterConfiguration *) const override
-  {
-    return std::make_unique<NoopSpanExporter>();
-  }
-};
-
-class NoopLogRecordExporterBuilder : public config_sdk::ExtensionLogRecordExporterBuilder
-{
-public:
-  std::unique_ptr<logs_sdk::LogRecordExporter> Build(
-      const config_sdk::ExtensionLogRecordExporterConfiguration *) const override
-  {
-    return std::make_unique<NoopLogRecordExporter>();
-  }
-};
-
-class NoopPushMetricExporterBuilder : public config_sdk::ExtensionPushMetricExporterBuilder
-{
-public:
-  std::unique_ptr<metrics_sdk::PushMetricExporter> Build(
-      const config_sdk::ExtensionPushMetricExporterConfiguration *) const override
-  {
-    return std::make_unique<NoopPushMetricExporter>();
-  }
-};
+using namespace config_test;  // NOLINT(google-build-using-namespace)
 
 //------------------------------------------------------------------------------
 // ConfiguredSdkTest fixture
@@ -216,6 +136,7 @@ protected:
         "noop", std::make_unique<NoopLogRecordExporterBuilder>());
     registry_->SetExtensionPushMetricExporterBuilder(
         "noop", std::make_unique<NoopPushMetricExporterBuilder>());
+    registry_->SetPeriodicMetricReaderBuilder(std::make_unique<NoopPeriodicMetricReaderBuilder>());
   }
 
   static std::unique_ptr<config_sdk::TracerProviderConfiguration> MakeTracerProviderConfig()

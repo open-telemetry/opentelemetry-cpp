@@ -68,6 +68,7 @@
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
@@ -96,11 +97,14 @@
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+
+#include "config_test_common.h"
 
 namespace nostd       = opentelemetry::nostd;
 namespace trace       = opentelemetry::trace;
@@ -118,181 +122,8 @@ namespace config_sdk  = opentelemetry::sdk::configuration;
 
 namespace
 {
-// ---------------------------------------------------------------------------
-// Shared export buffers
 
-using LogRecordBuffer = std::vector<std::unique_ptr<logs_sdk::ReadWriteLogRecord>>;
-using SpanBuffer      = std::vector<std::unique_ptr<trace_sdk::SpanData>>;
-using MetricBuffer    = std::vector<metrics_sdk::MetricData>;
-
-// ---------------------------------------------------------------------------
-// Recording exporters to support integration testing of the configured SDK.
-// These exporters record the data they receive into a buffer for later inspection.
-
-class RecordingSpanExporter : public trace_sdk::SpanExporter
-{
-public:
-  explicit RecordingSpanExporter(std::shared_ptr<SpanBuffer> buffer) : buffer_(std::move(buffer)) {}
-
-  std::unique_ptr<trace_sdk::Recordable> MakeRecordable() noexcept override
-  {
-    return std::make_unique<trace_sdk::SpanData>();
-  }
-
-  common_sdk::ExportResult Export(
-      const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &spans) noexcept override
-  {
-    for (auto &span : spans)
-    {
-      buffer_->emplace_back(static_cast<trace_sdk::SpanData *>(span.release()));
-    }
-    return common_sdk::ExportResult::kSuccess;
-  }
-
-  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
-  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
-
-private:
-  std::shared_ptr<SpanBuffer> buffer_;
-};
-
-class RecordingLogRecordExporter : public logs_sdk::LogRecordExporter
-{
-public:
-  explicit RecordingLogRecordExporter(std::shared_ptr<LogRecordBuffer> buffer)
-      : buffer_(std::move(buffer))
-  {}
-
-  std::unique_ptr<logs_sdk::Recordable> MakeRecordable() noexcept override
-  {
-    return std::make_unique<logs_sdk::ReadWriteLogRecord>();
-  }
-
-  common_sdk::ExportResult Export(
-      const nostd::span<std::unique_ptr<logs_sdk::Recordable>> &records) noexcept override
-  {
-    for (auto &rec : records)
-    {
-      buffer_->emplace_back(static_cast<logs_sdk::ReadWriteLogRecord *>(rec.release()));
-    }
-    return common_sdk::ExportResult::kSuccess;
-  }
-
-  bool RecordableEnforcesLogRecordLimits() const noexcept override { return true; }
-
-  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
-  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
-
-private:
-  std::shared_ptr<LogRecordBuffer> buffer_;
-};
-
-class RecordingPushMetricExporter : public metrics_sdk::PushMetricExporter
-{
-public:
-  explicit RecordingPushMetricExporter(std::shared_ptr<MetricBuffer> buffer)
-      : buffer_(std::move(buffer))
-  {}
-
-  common_sdk::ExportResult Export(
-      const metrics_sdk::ResourceMetrics &resource_metrics) noexcept override
-  {
-    for (const auto &scope : resource_metrics.scope_metric_data_)
-    {
-      for (const auto &metric : scope.metric_data_)
-      {
-        buffer_->emplace_back(metric);
-      }
-    }
-    return common_sdk::ExportResult::kSuccess;
-  }
-
-  metrics_sdk::AggregationTemporality GetAggregationTemporality(
-      metrics_sdk::InstrumentType) const noexcept override
-  {
-    return metrics_sdk::AggregationTemporality::kCumulative;
-  }
-
-  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
-  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
-
-private:
-  std::shared_ptr<MetricBuffer> buffer_;
-};
-
-// ---------------------------------------------------------------------------
-// Configuration Builders for recording exporters
-
-class RecordingSpanExporterBuilder : public config_sdk::ExtensionSpanExporterBuilder
-{
-public:
-  explicit RecordingSpanExporterBuilder(std::shared_ptr<SpanBuffer> buffer)
-      : buffer_(std::move(buffer))
-  {}
-  std::unique_ptr<trace_sdk::SpanExporter> Build(
-      const config_sdk::ExtensionSpanExporterConfiguration *) const override
-  {
-    return std::make_unique<RecordingSpanExporter>(buffer_);
-  }
-
-private:
-  std::shared_ptr<SpanBuffer> buffer_;
-};
-
-class RecordingLogRecordExporterBuilder : public config_sdk::ExtensionLogRecordExporterBuilder
-{
-public:
-  explicit RecordingLogRecordExporterBuilder(std::shared_ptr<LogRecordBuffer> buffer)
-      : buffer_(std::move(buffer))
-  {}
-  std::unique_ptr<logs_sdk::LogRecordExporter> Build(
-      const config_sdk::ExtensionLogRecordExporterConfiguration *) const override
-  {
-    return std::make_unique<RecordingLogRecordExporter>(buffer_);
-  }
-
-private:
-  std::shared_ptr<LogRecordBuffer> buffer_;
-};
-
-class RecordingPushMetricExporterBuilder : public config_sdk::ExtensionPushMetricExporterBuilder
-{
-public:
-  explicit RecordingPushMetricExporterBuilder(std::shared_ptr<MetricBuffer> buffer)
-      : buffer_(std::move(buffer))
-  {}
-  std::unique_ptr<metrics_sdk::PushMetricExporter> Build(
-      const config_sdk::ExtensionPushMetricExporterConfiguration *) const override
-  {
-    auto exporter = std::make_unique<RecordingPushMetricExporter>(buffer_);
-    return exporter;
-  }
-
-private:
-  std::shared_ptr<MetricBuffer> buffer_;
-};
-
-// ---------------------------------------------------------------------------
-// TextMapCarrier for propagator tests.
-
-class MapCarrier : public propagation::TextMapCarrier
-{
-public:
-  nostd::string_view Get(nostd::string_view key) const noexcept override
-  {
-    auto it = map_.find(std::string(key));
-    return it != map_.end() ? nostd::string_view(it->second) : "";
-  }
-  void Set(nostd::string_view key, nostd::string_view value) noexcept override
-  {
-    map_[std::string(key)] = std::string(value);
-  }
-
-  const std::map<std::string, std::string> &map() const { return map_; }
-
-private:
-  std::map<std::string, std::string> map_;
-};
+using namespace config_test;  // NOLINT(google-build-using-namespace)
 
 //---------------------------------------------------------------------------
 // ProgrammaticConfigTest fixture: This supports integration testing of the configured SDK.
@@ -338,6 +169,7 @@ protected:
         "recording", std::make_unique<RecordingLogRecordExporterBuilder>(log_buffer_));
     registry_->SetExtensionPushMetricExporterBuilder(
         "recording", std::make_unique<RecordingPushMetricExporterBuilder>(metric_buffer_));
+    registry_->SetPeriodicMetricReaderBuilder(std::make_unique<SyncPeriodicMetricReaderBuilder>());
   }
 
   static std::unique_ptr<config_sdk::TracerProviderConfiguration> MakeTracerProviderConfig()
@@ -469,8 +301,7 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithDefaults)
 
 TEST_F(ProgrammaticConfigTest, LoggerProviderWithLogRecordLimits)
 {
-  config_sdk::LogRecordLimitsConfiguration limits{
-      0, 0};  // TODO: Remove the default initialization once the limit members are initialized.
+  config_sdk::LogRecordLimitsConfiguration limits;
   limits.attribute_count_limit        = 2;
   limits.attribute_value_length_limit = 5;
 
@@ -595,10 +426,7 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorConfigured)
 //--------------------------------------------------------------------------
 // MeterProvider tests
 
-// TODO: These test cases may timeout due to threading in the PeriodicExportingMetricReader
-// that cause ForceFlush or Shutdown to block indefinitely. Disabling for now until we can fix the
-// underlying issue.
-TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithDefaults)
+TEST_F(ProgrammaticConfigTest, MeterProviderWithDefaults)
 {
   auto model            = std::make_unique<config_sdk::Configuration>();
   model->meter_provider = MakeMeterProviderConfig();
@@ -617,7 +445,7 @@ TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithDefaults)
   EXPECT_GE(metric_buffer_->size(), 1);
 }
 
-TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithMeterConfigurator)
+TEST_F(ProgrammaticConfigTest, MeterProviderWithMeterConfigurator)
 {
   auto disabled_meter_config           = config_sdk::MeterMatcherAndConfigConfiguration();
   disabled_meter_config.name           = "disabled-meter";
@@ -650,7 +478,7 @@ TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithMeterConfigurator)
   }
 }
 
-TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithViews)
+TEST_F(ProgrammaticConfigTest, MeterProviderWithViews)
 {
   // View 1: Base2 exponential aggregation
   const std::size_t max_scale   = 10;

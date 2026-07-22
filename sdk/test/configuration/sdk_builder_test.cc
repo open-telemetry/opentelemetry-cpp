@@ -3,18 +3,24 @@
 
 #include <gtest/gtest.h>
 
+#include <chrono>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
@@ -25,7 +31,12 @@
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/resource/resource.h"
+
+#include "config_test_common.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
@@ -35,10 +46,19 @@ using opentelemetry::sdk::configuration::SdkBuilder;
 using opentelemetry::sdk::configuration::SpanLimitsConfiguration;
 using opentelemetry::sdk::configuration::TracerProviderConfiguration;
 
-namespace logs       = opentelemetry::logs;
-namespace logs_sdk   = opentelemetry::sdk::logs;
-namespace scope_sdk  = opentelemetry::sdk::instrumentationscope;
-namespace config_sdk = opentelemetry::sdk::configuration;
+namespace logs        = opentelemetry::logs;
+namespace logs_sdk    = opentelemetry::sdk::logs;
+namespace scope_sdk   = opentelemetry::sdk::instrumentationscope;
+namespace config_sdk  = opentelemetry::sdk::configuration;
+namespace common_sdk  = opentelemetry::sdk::common;
+namespace metrics_sdk = opentelemetry::sdk::metrics;
+
+namespace
+{
+
+using namespace config_test;  // NOLINT(google-build-using-namespace)
+
+}  // namespace
 
 //------------------------------------------------------------------------------
 // Tests for the SdkBuilder class methods that create SDK components from configuration models
@@ -221,4 +241,34 @@ TEST(SdkBuilder, CreateParentBasedSampler)
     EXPECT_EQ(std::string{sampler->GetDescription()},
               R"(ParentBased{TraceIdRatioBasedSampler{0.250000}})");
   }
+}
+
+TEST(SdkBuilder, CreatePeriodicMetricReader)
+{
+  auto exporter  = std::make_unique<config_sdk::ExtensionPushMetricExporterConfiguration>();
+  exporter->name = "noop";
+
+  config_sdk::PeriodicMetricReaderConfiguration model;
+  model.exporter = std::move(exporter);
+  model.interval = 12345;  // milliseconds
+  model.timeout  = 678;    // milliseconds
+
+  auto captured = std::make_shared<CapturedPeriodicReaderArgs>();
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  registry->SetExtensionPushMetricExporterBuilder(
+      "noop", std::make_unique<NoopPushMetricExporterBuilder>());
+  registry->SetPeriodicMetricReaderBuilder(
+      std::make_unique<CapturingPeriodicMetricReaderBuilder>(captured));
+
+  config_sdk::SdkBuilder builder(registry);
+  auto reader = builder.CreatePeriodicMetricReader(&model);
+  ASSERT_NE(reader, nullptr);
+
+  // The registered builder must receive the reader configuration matching the input model,
+  // along with the exporter built from the model exporter configuration.
+  EXPECT_TRUE(captured->called);
+  EXPECT_EQ(captured->interval, model.interval);
+  EXPECT_EQ(captured->timeout, model.timeout);
+  EXPECT_TRUE(captured->exporter_provided);
 }
