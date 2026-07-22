@@ -17,6 +17,16 @@ Increment the:
 
 * [CODE HEALTH] Fix more clang tidy warnings (member initialization)
   [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
+  
+* [API] Fix Windows metrics tail latency: `common::SpinLockMutex` now parks a
+  contended waiter on its final back-off tier instead of
+  `std::this_thread::sleep_for(1ms)`, which Windows rounds up to the ~15.6 ms
+  system timer quantum (producing a ~15 ms p99/p999 on a hot histogram). It uses
+  C++20 `std::atomic::wait`/`notify_one` when available, else Win32
+  `WaitOnAddress`/`WakeByAddressSingle` on MSVC targeting Windows 8+, else the
+  previous `sleep_for` fallback. The `std::atomic<bool>` member is unchanged, so
+  the class layout / ABI is preserved.
+  [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
 
 * docs: update supported development platforms
   [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
