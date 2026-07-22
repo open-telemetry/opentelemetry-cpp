@@ -4,7 +4,10 @@
 #pragma once
 
 #include <chrono>
+#include <cstddef>
 #include <memory>
+
+#include "opentelemetry/sdk/metrics/cardinality_limits.h"
 
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"

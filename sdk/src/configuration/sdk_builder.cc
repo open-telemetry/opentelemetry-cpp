@@ -184,10 +184,6 @@
 #include "opentelemetry/version.h"
 #include "src/common/wildcard_match.h"
 
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#endif
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
