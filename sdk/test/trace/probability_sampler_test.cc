@@ -139,7 +139,7 @@ TEST(ProbabilitySampler, InvalidRatioFallsBackToDefault)
 {
   // Invalid ratios (out of range, below the 2^-56 minimum, or NaN) fall back
   // to the default of 1.0.
-  for (double ratio : {-0.5, 1.5, 0x1p-57, std::nan("")})
+  for (double ratio : {-0.5, 1.5, std::ldexp(1.0, -57), std::nan("")})
   {
     ProbabilitySampler s1(ratio);
     ASSERT_EQ("ProbabilitySampler{1.000000}", s1.GetDescription());

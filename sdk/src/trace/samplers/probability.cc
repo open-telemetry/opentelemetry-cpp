@@ -29,7 +29,9 @@ namespace
 // specification.
 double ValidateRatio(double ratio) noexcept
 {
-  if (ratio == 0.0 || (ratio >= 0x1p-56 && ratio <= 1.0))
+  // 2^-56; hex float literals would need C++17.
+  constexpr double kMinRatio = 1.0 / static_cast<double>(opentelemetry::sdk::trace::kMaxThreshold);
+  if (ratio == 0.0 || (ratio >= kMinRatio && ratio <= 1.0))
   {
     return ratio;
   }
