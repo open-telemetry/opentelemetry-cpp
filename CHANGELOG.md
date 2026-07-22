@@ -15,9 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
-* [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
-  `AlwaysOff`/`TraceBased`)
-  [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+* [CODE HEALTH] Fix more clang tidy warnings (member initialization)
+  [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
 
 * docs: update supported development platforms
   [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
@@ -25,10 +24,33 @@ Increment the:
 * [RELEASE] Bump main branch to 1.29.0-dev
   [#4259](https://github.com/open-telemetry/opentelemetry-cpp/pull/4259)
 
+* [CONFIGURATION] Programmatic configuration use case tests and fixes
+  [#4243](https://github.com/open-telemetry/opentelemetry-cpp/pull/4243)
+
 * [API] Add `trace::GetSpanContext()` to read the active span's `SpanContext`
   from a `Context` without the `DefaultSpan` allocation that
   `GetSpan(context)->GetContext()` incurs, and use it at existing call sites.
   [#4254](https://github.com/open-telemetry/opentelemetry-cpp/pull/4254)
+
+* [METRICS SDK] Validate Base2 Exponential Histogram Aggregation config
+  [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
+
+* [SDK] Read span limits from the environment variables defined in the
+        specification (OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, OTEL_SPAN_EVENT_COUNT_LIMIT,
+        OTEL_SPAN_LINK_COUNT_LIMIT, ...) in the TracerProviderFactory overloads
+        that do not receive explicit SpanLimits
+  [#4258](https://github.com/open-telemetry/opentelemetry-cpp/pull/4258)
+
+* [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
+  `AlwaysOff`/`TraceBased`)
+  [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+
+Breaking changes:
+
+* [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
+  [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
+  * The public configuration member `max_buckets_` was renamed to `max_size_` to
+    match the configuration schema. Please adjust SDK configuration accordingly.
 
 ## [1.28.0] 2026-07-16
 
@@ -114,6 +136,10 @@ Increment the:
 
 * [CODE HEALTH] Move registry.cc propagator builders into anonymous namespace
   [#4121](https://github.com/open-telemetry/opentelemetry-cpp/pull/4121)
+
+* [EXPORTER] Spec-compliant fix to allow byte arrays in all attribute
+             collections and disallow empty attribute keys
+  [#4226](https://github.com/open-telemetry/opentelemetry-cpp/pull/4226)
 
 * [CODE HEALTH] Move sdk_builder.cc builders into anonymous namespace
   [#4122](https://github.com/open-telemetry/opentelemetry-cpp/pull/4122)
