@@ -165,8 +165,9 @@ class NoopPeriodicMetricReaderBuilder
 public:
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(
       const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *,
-      std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> &&) const override
+      std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> &&exporter) const override
   {
+    auto unused = std::move(exporter);
     return std::make_unique<NoopMetricReader>();
   }
 };
@@ -405,10 +406,11 @@ public:
       const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model,
       std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> &&exporter) const override
   {
+    auto owned_exporter          = std::move(exporter);
     captured_->called            = true;
     captured_->interval          = model->interval;
     captured_->timeout           = model->timeout;
-    captured_->exporter_provided = (exporter != nullptr);
+    captured_->exporter_provided = (owned_exporter != nullptr);
     return std::make_unique<NoopMetricReader>();
   }
 

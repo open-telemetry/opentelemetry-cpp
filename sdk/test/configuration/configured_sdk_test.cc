@@ -49,16 +49,10 @@
 
 #include "config_test_common.h"
 
-namespace nostd       = opentelemetry::nostd;
-namespace trace       = opentelemetry::trace;
-namespace logs        = opentelemetry::logs;
-namespace metrics     = opentelemetry::metrics;
-namespace propagation = opentelemetry::context::propagation;
-
-namespace common_sdk   = opentelemetry::sdk::common;
-namespace logs_sdk     = opentelemetry::sdk::logs;
-namespace metrics_sdk  = opentelemetry::sdk::metrics;
-namespace trace_sdk    = opentelemetry::sdk::trace;
+namespace trace        = opentelemetry::trace;
+namespace logs         = opentelemetry::logs;
+namespace metrics      = opentelemetry::metrics;
+namespace propagation  = opentelemetry::context::propagation;
 namespace config_sdk   = opentelemetry::sdk::configuration;
 namespace internal_log = opentelemetry::sdk::common::internal_log;
 

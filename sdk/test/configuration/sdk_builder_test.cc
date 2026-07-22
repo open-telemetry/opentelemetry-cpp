@@ -45,12 +45,10 @@ using opentelemetry::sdk::configuration::SdkBuilder;
 using opentelemetry::sdk::configuration::SpanLimitsConfiguration;
 using opentelemetry::sdk::configuration::TracerProviderConfiguration;
 
-namespace logs        = opentelemetry::logs;
-namespace logs_sdk    = opentelemetry::sdk::logs;
-namespace scope_sdk   = opentelemetry::sdk::instrumentationscope;
-namespace config_sdk  = opentelemetry::sdk::configuration;
-namespace common_sdk  = opentelemetry::sdk::common;
-namespace metrics_sdk = opentelemetry::sdk::metrics;
+namespace logs       = opentelemetry::logs;
+namespace logs_sdk   = opentelemetry::sdk::logs;
+namespace scope_sdk  = opentelemetry::sdk::instrumentationscope;
+namespace config_sdk = opentelemetry::sdk::configuration;
 
 namespace
 {

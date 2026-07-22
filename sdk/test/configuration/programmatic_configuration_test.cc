@@ -100,18 +100,15 @@
 
 #include "config_test_common.h"
 
+namespace common      = opentelemetry::common;
 namespace nostd       = opentelemetry::nostd;
+namespace metrics     = opentelemetry::metrics;
 namespace trace       = opentelemetry::trace;
 namespace logs        = opentelemetry::logs;
-namespace metrics     = opentelemetry::metrics;
-namespace common      = opentelemetry::common;
 namespace baggage     = opentelemetry::baggage;
 namespace propagation = opentelemetry::context::propagation;
 namespace context     = opentelemetry::context;
-namespace common_sdk  = opentelemetry::sdk::common;
-namespace logs_sdk    = opentelemetry::sdk::logs;
 namespace metrics_sdk = opentelemetry::sdk::metrics;
-namespace trace_sdk   = opentelemetry::sdk::trace;
 namespace config_sdk  = opentelemetry::sdk::configuration;
 
 namespace
