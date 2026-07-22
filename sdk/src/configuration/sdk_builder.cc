@@ -172,6 +172,7 @@
 #include "opentelemetry/sdk/trace/samplers/always_off_factory.h"
 #include "opentelemetry/sdk/trace/samplers/always_on_factory.h"
 #include "opentelemetry/sdk/trace/samplers/parent_factory.h"
+#include "opentelemetry/sdk/trace/samplers/probability_factory.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
@@ -455,7 +456,14 @@ public:
       const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
       override
   {
-    sampler = opentelemetry::sdk::trace::TraceIdRatioBasedSamplerFactory::Create(model->ratio);
+    if (model->ratio > 0.0)
+    {
+      sampler = opentelemetry::sdk::trace::ProbabilitySamplerFactory::Create(model->ratio);
+    }
+    else
+    {
+      sampler = opentelemetry::sdk::trace::AlwaysOffSamplerFactory::Create();
+    }
   }
 
   void VisitComposableParentThreshold(
