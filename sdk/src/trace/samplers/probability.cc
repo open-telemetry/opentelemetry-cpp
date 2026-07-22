@@ -4,6 +4,7 @@
 #include <atomic>
 #include <cstdint>
 #include <map>
+#include <ostream>
 #include <string>
 
 #include "opentelemetry/nostd/shared_ptr.h"
