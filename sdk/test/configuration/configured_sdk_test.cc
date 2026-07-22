@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <chrono>
 #include <string>
 #include <utility>
 #include <vector>
@@ -18,7 +17,6 @@
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/provider.h"
 
-#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
@@ -45,13 +43,9 @@
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
-#include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/read_write_log_record.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/metric_reader.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 
 #include "config_test_common.h"
 
