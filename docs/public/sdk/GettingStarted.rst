@@ -108,12 +108,13 @@ Sampler
 ^^^^^^^
 
 Sampling is mechanism to control/reducing the number of samples of traces collected and sent to the backend.
-OpenTelemetry C++ SDK  offers four samplers out of the box:
+OpenTelemetry C++ SDK  offers five samplers out of the box:
 
 - AlwaysOnSampler which samples every trace regardless of upstream sampling decisions.
 - AlwaysOffSampler which doesn’t sample any trace, regardless of upstream sampling decisions.
 - ParentBased which uses the parent span to make sampling decisions, if present.
 - TraceIdRatioBased which samples a configurable percentage of traces.
+- ProbabilitySampler which samples a configurable ratio of traces following the consistent probability sampling specification.
 
 .. code:: cpp
 
@@ -133,6 +134,10 @@ OpenTelemetry C++ SDK  offers four samplers out of the box:
     double ratio       = 0.5;
     auto always_off_sampler = std::unique_ptr<sdktrace::TraceIdRatioBasedSampler>
         (new sdktrace::TraceIdRatioBasedSampler(ratio));
+
+    //ProbabilitySampler - Sample 50% generated spans using consistent probability sampling
+    auto probability_sampler = std::unique_ptr<sdktrace::ProbabilitySampler>
+        (new sdktrace::ProbabilitySampler(ratio));
 
 TracerContext
 ^^^^^^^^^^^^^

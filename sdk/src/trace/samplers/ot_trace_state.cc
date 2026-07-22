@@ -3,12 +3,14 @@
 
 #include "ot_trace_state.h"
 
+#include <atomic>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <string>
 
 #include "opentelemetry/nostd/span.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
 
@@ -99,9 +101,11 @@ uint64_t CalculateThreshold(double sampling_probability) noexcept
   {
     return 0;
   }
-  // 0x1p56 == 2^56. sampling_probability is in (0, 1) here, so the rounded
-  // product is in [0, kMaxThreshold] and the subtraction never underflows.
-  uint64_t kept = static_cast<uint64_t>(std::llround(sampling_probability * 0x1p56));
+  // kMaxThreshold == 2^56. sampling_probability is in (0, 1) here, so the
+  // rounded product is in [0, kMaxThreshold] and the subtraction never
+  // underflows.
+  uint64_t kept = static_cast<uint64_t>(
+      std::llround(sampling_probability * static_cast<double>(kMaxThreshold)));
   return kMaxThreshold - kept;
 }
 
@@ -172,33 +176,48 @@ OtelTraceState OtelTraceState::Parse(const std::string &ot_value) noexcept
 
 std::string OtelTraceState::Serialize() const
 {
+  // Inherited sub-keys are never dropped (the tracestate spec requires
+  // preserving existing OpenTelemetry concerns); when adding "th" would push
+  // the value past the 256 char limit, the new threshold is omitted instead.
+  std::string rest;
+  if (has_random_value)
+  {
+    rest.append("rv:");
+    AppendRandomHex(rest, random_value);
+  }
+  for (const auto &pair : other_subkeys)
+  {
+    if (!rest.empty())
+    {
+      rest.push_back(';');
+    }
+    rest.append(pair);
+  }
+
   std::string out;
   if (has_threshold && threshold < kMaxThreshold)
   {
     out.append("th:");
     AppendThresholdHex(out, threshold);
+    if (out.size() + (rest.empty() ? 0 : rest.size() + 1) > 256)
+    {
+      static std::atomic<bool> warned{false};
+      if (!warned.exchange(true))
+      {
+        OTEL_INTERNAL_LOG_WARN(
+            "[OtelTraceState] omitting th: recording it would exceed the 256 character tracestate "
+            "value limit");
+      }
+      out.clear();
+    }
   }
-  if (has_random_value)
+  if (!rest.empty())
   {
     if (!out.empty())
     {
       out.push_back(';');
     }
-    out.append("rv:");
-    AppendRandomHex(out, random_value);
-  }
-  for (const auto &pair : other_subkeys)
-  {
-    std::size_t extra = out.empty() ? pair.size() : pair.size() + 1;
-    if (out.size() + extra > 256)
-    {
-      break;
-    }
-    if (!out.empty())
-    {
-      out.push_back(';');
-    }
-    out.append(pair);
+    out.append(rest);
   }
   return out;
 }
