@@ -43,9 +43,6 @@
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
-#include "opentelemetry/sdk/logs/recordable.h"
-#include "opentelemetry/sdk/metrics/state/filtered_ordered_attribute_map.h"
-#include "opentelemetry/sdk/trace/span_limits.h"
 
 #include "config_test_common.h"
 
@@ -58,8 +55,6 @@ namespace internal_log = opentelemetry::sdk::common::internal_log;
 
 namespace
 {
-
-using namespace config_test;  // NOLINT(google-build-using-namespace)
 
 //------------------------------------------------------------------------------
 // ConfiguredSdkTest fixture
@@ -119,12 +114,14 @@ protected:
   void MakeRegistry()
   {
     registry_ = std::make_shared<config_sdk::Registry>();
-    registry_->SetExtensionSpanExporterBuilder("noop", std::make_unique<NoopSpanExporterBuilder>());
+    registry_->SetExtensionSpanExporterBuilder(
+        "noop", std::make_unique<config_test::NoopSpanExporterBuilder>());
     registry_->SetExtensionLogRecordExporterBuilder(
-        "noop", std::make_unique<NoopLogRecordExporterBuilder>());
+        "noop", std::make_unique<config_test::NoopLogRecordExporterBuilder>());
     registry_->SetExtensionPushMetricExporterBuilder(
-        "noop", std::make_unique<NoopPushMetricExporterBuilder>());
-    registry_->SetPeriodicMetricReaderBuilder(std::make_unique<NoopPeriodicMetricReaderBuilder>());
+        "noop", std::make_unique<config_test::NoopPushMetricExporterBuilder>());
+    registry_->SetPeriodicMetricReaderBuilder(
+        std::make_unique<config_test::NoopPeriodicMetricReaderBuilder>());
   }
 
   static std::unique_ptr<config_sdk::TracerProviderConfiguration> MakeTracerProviderConfig()

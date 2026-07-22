@@ -50,13 +50,6 @@ namespace logs_sdk   = opentelemetry::sdk::logs;
 namespace scope_sdk  = opentelemetry::sdk::instrumentationscope;
 namespace config_sdk = opentelemetry::sdk::configuration;
 
-namespace
-{
-
-using namespace config_test;  // NOLINT(google-build-using-namespace)
-
-}  // namespace
-
 //------------------------------------------------------------------------------
 // Tests for the SdkBuilder class methods that create SDK components from configuration models
 // These tests focus on the API of the SdkBuilder for creating SDK components that can be
@@ -247,25 +240,23 @@ TEST(SdkBuilder, CreatePeriodicMetricReader)
 
   config_sdk::PeriodicMetricReaderConfiguration model;
   model.exporter = std::move(exporter);
-  model.interval = 12345;  // milliseconds
-  model.timeout  = 678;    // milliseconds
+  model.interval = 12345;
+  model.timeout  = 678;
 
-  auto captured = std::make_shared<CapturedPeriodicReaderArgs>();
+  auto captured = std::make_shared<config_test::CapturedPeriodicReaderArgs>();
 
   auto registry = std::make_shared<config_sdk::Registry>();
   registry->SetExtensionPushMetricExporterBuilder(
-      "noop", std::make_unique<NoopPushMetricExporterBuilder>());
+      "noop", std::make_unique<config_test::NoopPushMetricExporterBuilder>());
   registry->SetPeriodicMetricReaderBuilder(
-      std::make_unique<CapturingPeriodicMetricReaderBuilder>(captured));
+      std::make_unique<config_test::CapturingPeriodicMetricReaderBuilder>(captured));
 
   config_sdk::SdkBuilder builder(registry);
   auto reader = builder.CreatePeriodicMetricReader(&model);
   ASSERT_NE(reader, nullptr);
 
-  // The registered builder must receive the reader configuration matching the input model,
-  // along with the exporter built from the model exporter configuration.
   EXPECT_TRUE(captured->called);
   EXPECT_EQ(captured->interval, model.interval);
   EXPECT_EQ(captured->timeout, model.timeout);
-  EXPECT_TRUE(captured->exporter_provided);
+  EXPECT_TRUE(captured->exporter != nullptr);
 }

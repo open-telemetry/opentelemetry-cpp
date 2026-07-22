@@ -40,7 +40,6 @@
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/trace/tracer_provider.h"
 
-#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
@@ -114,8 +113,6 @@ namespace config_sdk  = opentelemetry::sdk::configuration;
 namespace
 {
 
-using namespace config_test;  // NOLINT(google-build-using-namespace)
-
 //---------------------------------------------------------------------------
 // ProgrammaticConfigTest fixture: This supports integration testing of the configured SDK.
 // It registers the recording exporters and maintains buffers for inspection of exported signal
@@ -155,12 +152,14 @@ protected:
   {
     registry_ = std::make_shared<config_sdk::Registry>();
     registry_->SetExtensionSpanExporterBuilder(
-        "recording", std::make_unique<RecordingSpanExporterBuilder>(span_buffer_));
+        "recording", std::make_unique<config_test::RecordingSpanExporterBuilder>(span_buffer_));
     registry_->SetExtensionLogRecordExporterBuilder(
-        "recording", std::make_unique<RecordingLogRecordExporterBuilder>(log_buffer_));
+        "recording", std::make_unique<config_test::RecordingLogRecordExporterBuilder>(log_buffer_));
     registry_->SetExtensionPushMetricExporterBuilder(
-        "recording", std::make_unique<RecordingPushMetricExporterBuilder>(metric_buffer_));
-    registry_->SetPeriodicMetricReaderBuilder(std::make_unique<SyncPeriodicMetricReaderBuilder>());
+        "recording",
+        std::make_unique<config_test::RecordingPushMetricExporterBuilder>(metric_buffer_));
+    registry_->SetPeriodicMetricReaderBuilder(
+        std::make_unique<config_test::SyncPeriodicMetricReaderBuilder>());
   }
 
   static std::unique_ptr<config_sdk::TracerProviderConfiguration> MakeTracerProviderConfig()
@@ -199,9 +198,12 @@ protected:
     return config;
   }
 
-  std::shared_ptr<SpanBuffer> span_buffer_{std::make_shared<SpanBuffer>()};
-  std::shared_ptr<LogRecordBuffer> log_buffer_{std::make_shared<LogRecordBuffer>()};
-  std::shared_ptr<MetricBuffer> metric_buffer_{std::make_shared<MetricBuffer>()};
+  std::shared_ptr<config_test::SpanBuffer> span_buffer_{
+      std::make_shared<config_test::SpanBuffer>()};
+  std::shared_ptr<config_test::LogRecordBuffer> log_buffer_{
+      std::make_shared<config_test::LogRecordBuffer>()};
+  std::shared_ptr<config_test::MetricBuffer> metric_buffer_{
+      std::make_shared<config_test::MetricBuffer>()};
 
   std::shared_ptr<config_sdk::Registry> registry_;
   std::unique_ptr<config_sdk::ConfiguredSdk> sdk_;
@@ -719,7 +721,7 @@ void CheckPropagators()
   auto baggage = baggage::Baggage::GetDefault()->Set("key", "value");
   auto ctx     = baggage::SetBaggage(ctx1, baggage);
 
-  MapCarrier carrier;
+  config_test::MapCarrier carrier;
   propagation::GlobalTextMapPropagator::GetGlobalPropagator()->Inject(carrier, ctx);
 
   ASSERT_NE(carrier.map().find("traceparent"), carrier.map().end());  // tracecontext

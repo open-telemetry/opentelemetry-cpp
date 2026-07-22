@@ -1,18 +1,24 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#pragma once
-
-// Shared test helpers for the SDK configuration test suite.
+// Shared test helpers for the SDK configuration tests
 //
 // Provides:
-//   - Buffer type aliases  (SpanBuffer, LogRecordBuffer, MetricBuffer)
-//   - Noop exporters and their extension builders  (install/uninstall tests)
-//   - NoopMetricReader / NoopPeriodicMetricReaderBuilder  (no export thread)
-//   - SyncMetricReader / SyncPeriodicMetricReaderBuilder  (deterministic flush)
-//   - Recording exporters and their extension builders  (integration tests)
+//  Noop Exporters and Builders:
+//   - NoopSpanExporter / NoopSpanExporterBuilder
+//   - NoopLogRecordExporter / NoopLogRecordExporterBuilder
+//   - NoopPushMetricExporter / NoopPeriodicMetricReaderBuilder
+//
+//  Recording Exporters and Builders: (data collection with no threading)
+//   - RecordingLogRecordExporter / RecordingLogRecordExporterBuilder
+//   - RecordingSpanExporter / RecordingSpanExporterBuilder
+//   - SyncMetricReader / SyncPeriodicMetricReaderBuilder
 //   - CapturedPeriodicReaderArgs / CapturingPeriodicMetricReaderBuilder
-//       (unit tests that verify builder is called with the right config)
+//
+//  Propagator:
+//   - MapCarrier
+
+#pragma once
 
 #include <chrono>
 #include <cstddef>
@@ -51,7 +57,7 @@ using LogRecordBuffer = std::vector<std::unique_ptr<opentelemetry::sdk::logs::Re
 using MetricBuffer    = std::vector<opentelemetry::sdk::metrics::MetricData>;
 
 // ---------------------------------------------------------------------------
-// No-op exporters: accept data silently.
+// No-op exporters
 
 class NoopSpanExporter : public opentelemetry::sdk::trace::SpanExporter
 {
@@ -143,7 +149,7 @@ public:
 };
 
 // ---------------------------------------------------------------------------
-// No-op metric reader: no export thread, for install/uninstall tests.
+// No-op metric reader
 
 class NoopMetricReader : public opentelemetry::sdk::metrics::MetricReader
 {
@@ -169,62 +175,6 @@ public:
   {
     auto unused = std::move(exporter);
     return std::make_unique<NoopMetricReader>();
-  }
-};
-
-// ---------------------------------------------------------------------------
-// Synchronous metric reader: collects and exports on ForceFlush/Shutdown in
-// the calling thread. Avoids the threaded PeriodicExportingMetricReader so
-// integration tests are deterministic and cannot block indefinitely.
-
-class SyncMetricReader : public opentelemetry::sdk::metrics::MetricReader
-{
-public:
-  explicit SyncMetricReader(
-      std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter)
-      : exporter_(std::move(exporter))
-  {}
-
-  opentelemetry::sdk::metrics::AggregationTemporality GetAggregationTemporality(
-      opentelemetry::sdk::metrics::InstrumentType instrument_type) const noexcept override
-  {
-    return exporter_->GetAggregationTemporality(instrument_type);
-  }
-
-private:
-  bool CollectAndExport() noexcept
-  {
-    bool result = true;
-    Collect([this, &result](opentelemetry::sdk::metrics::ResourceMetrics &metric_data) {
-      result =
-          (exporter_->Export(metric_data) == opentelemetry::sdk::common::ExportResult::kSuccess);
-      return true;
-    });
-    return result;
-  }
-
-  bool OnForceFlush(std::chrono::microseconds timeout) noexcept override
-  {
-    return CollectAndExport() && exporter_->ForceFlush(timeout);
-  }
-
-  bool OnShutDown(std::chrono::microseconds timeout) noexcept override
-  {
-    return CollectAndExport() && exporter_->Shutdown(timeout);
-  }
-
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter_;
-};
-
-class SyncPeriodicMetricReaderBuilder
-    : public opentelemetry::sdk::configuration::PeriodicMetricReaderBuilder
-{
-public:
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(
-      const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *,
-      std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> &&exporter) const override
-  {
-    return std::make_unique<SyncMetricReader>(std::move(exporter));
   }
 };
 
@@ -382,14 +332,69 @@ private:
 };
 
 // ---------------------------------------------------------------------------
-// Capturing periodic metric reader builder: records the configuration
-// arguments passed to Build() so unit tests can verify them.
+// Synchronous metric reader: collects and exports on ForceFlush/Shutdown in
+// the calling thread.
+class SyncMetricReader : public opentelemetry::sdk::metrics::MetricReader
+{
+public:
+  explicit SyncMetricReader(
+      std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter)
+      : exporter_(std::move(exporter))
+  {}
+
+  opentelemetry::sdk::metrics::AggregationTemporality GetAggregationTemporality(
+      opentelemetry::sdk::metrics::InstrumentType instrument_type) const noexcept override
+  {
+    return exporter_->GetAggregationTemporality(instrument_type);
+  }
+
+private:
+  bool CollectAndExport() noexcept
+  {
+    bool result = true;
+    Collect([this, &result](opentelemetry::sdk::metrics::ResourceMetrics &metric_data) {
+      result =
+          (exporter_->Export(metric_data) == opentelemetry::sdk::common::ExportResult::kSuccess);
+      return true;
+    });
+    return result;
+  }
+
+  bool OnForceFlush(std::chrono::microseconds timeout) noexcept override
+  {
+    return CollectAndExport() && exporter_->ForceFlush(timeout);
+  }
+
+  bool OnShutDown(std::chrono::microseconds timeout) noexcept override
+  {
+    return CollectAndExport() && exporter_->Shutdown(timeout);
+  }
+
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter_;
+};
+
+class SyncPeriodicMetricReaderBuilder
+    : public opentelemetry::sdk::configuration::PeriodicMetricReaderBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(
+      const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *,
+      std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> &&exporter) const override
+  {
+    return std::make_unique<SyncMetricReader>(std::move(exporter));
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Capturing periodic metric reader builder. Records the configuration
+// arguments passed to Build()
 
 struct CapturedPeriodicReaderArgs
 {
   std::size_t interval{0};
   std::size_t timeout{0};
-  bool exporter_provided{false};
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter;
+  // TODO: add cardinality limits and producers when we support them in the builder
   bool called{false};
 };
 
@@ -406,11 +411,10 @@ public:
       const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model,
       std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> &&exporter) const override
   {
-    auto owned_exporter          = std::move(exporter);
-    captured_->called            = true;
-    captured_->interval          = model->interval;
-    captured_->timeout           = model->timeout;
-    captured_->exporter_provided = (owned_exporter != nullptr);
+    captured_->called   = true;
+    captured_->interval = model->interval;
+    captured_->timeout  = model->timeout;
+    captured_->exporter = std::move(exporter);
     return std::make_unique<NoopMetricReader>();
   }
 
