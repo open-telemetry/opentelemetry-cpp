@@ -1165,6 +1165,12 @@ CURLcode HttpOperation::Setup()
     return rc;
   }
 
+  rc = SetCurlLongOption(CURLOPT_TCP_KEEPALIVE, 1L);
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
+
   if (reuse_connection_)
   {
     rc = SetCurlLongOption(CURLOPT_FRESH_CONNECT, 0L);
