@@ -28,7 +28,6 @@
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
@@ -66,7 +65,7 @@ TEST_P(WritableMetricStorageTestFixture, TestAggregation)
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kSum,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
   int64_t get_count1                                                                  = 20;
@@ -161,7 +160,7 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kDefault,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
   int64_t get_count1                                                                  = 20;
@@ -257,7 +256,7 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
   int64_t freq_cpu0                                                                   = 3;

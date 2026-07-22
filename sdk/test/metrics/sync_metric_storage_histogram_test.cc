@@ -27,7 +27,6 @@
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
@@ -57,7 +56,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kHistogram, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 
@@ -198,7 +197,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, DoubleHistogram)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kHistogram, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 
@@ -346,7 +345,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kBase2ExponentialHistogram, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 

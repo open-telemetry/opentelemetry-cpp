@@ -41,6 +41,10 @@ Increment the:
         that do not receive explicit SpanLimits
   [#4258](https://github.com/open-telemetry/opentelemetry-cpp/pull/4258)
 
+* [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
+  `AlwaysOff`/`TraceBased`)
+  [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+
 Breaking changes:
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
