@@ -58,11 +58,11 @@ struct SamplingResult
   //  The tracestate used by the span.
   nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state;
 
-  inline bool IsRecording()
+  inline bool IsRecording() const noexcept
   {
     return decision == Decision::RECORD_ONLY || decision == Decision::RECORD_AND_SAMPLE;
   }
-  inline bool IsSampled() { return decision == Decision::RECORD_AND_SAMPLE; }
+  inline bool IsSampled() const noexcept { return decision == Decision::RECORD_AND_SAMPLE; }
 };
 
 /**

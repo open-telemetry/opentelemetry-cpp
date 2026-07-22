@@ -27,12 +27,13 @@ inline nostd::shared_ptr<Span> GetSpan(const context::Context &context) noexcept
 // stored directly in the context, and returns an invalid SpanContext if neither is present.
 inline SpanContext GetSpanContext(const context::Context &context) noexcept
 {
-  if (!context.HasKey(kSpanKey))
+  const context::ContextValue context_value = context.GetValue(kSpanKey);
+
+  if (nostd::holds_alternative<nostd::monostate>(context_value))
   {
+    // The context does not have a span or span context
     return SpanContext::GetInvalid();
   }
-
-  const context::ContextValue context_value = context.GetValue(kSpanKey);
 
   // Get the span metadata from the active span in the context.
   if (const nostd::shared_ptr<Span> *maybe_span =
