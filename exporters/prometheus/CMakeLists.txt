@@ -48,23 +48,10 @@ target_link_libraries(opentelemetry_exporter_prometheus_builder
 otel_add_component(
   COMPONENT
   exporters_prometheus
-  TARGETS
-  opentelemetry_exporter_prometheus
-  FILES_DIRECTORY
-  "include/opentelemetry/exporters/prometheus"
-  FILES_DESTINATION
-  "include/opentelemetry/exporters"
-  FILES_MATCHING
-  PATTERN
-  "*.h"
-  PATTERN
-  "prometheus_pull_builder.h"
-  EXCLUDE)
-
-otel_add_component(
-  COMPONENT
+  DEPRECATED_NAMES
   exporters_prometheus_builder
   TARGETS
+  opentelemetry_exporter_prometheus
   opentelemetry_exporter_prometheus_builder
   FILES_DIRECTORY
   "include/opentelemetry/exporters/prometheus"
@@ -72,7 +59,7 @@ otel_add_component(
   "include/opentelemetry/exporters"
   FILES_MATCHING
   PATTERN
-  "prometheus_pull_builder.h")
+  "*.h")
 
 if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(

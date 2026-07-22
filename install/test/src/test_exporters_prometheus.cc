@@ -5,10 +5,25 @@
 
 #include <opentelemetry/exporters/prometheus/exporter_factory.h>
 #include <opentelemetry/exporters/prometheus/exporter_options.h>
+#include <opentelemetry/exporters/prometheus/prometheus_pull_builder.h>
 
 TEST(ExportersPrometheusInstall, PrometheusExporter)
 {
   auto options  = opentelemetry::exporter::metrics::PrometheusExporterOptions();
   auto exporter = opentelemetry::exporter::metrics::PrometheusExporterFactory::Create(options);
+  ASSERT_TRUE(exporter != nullptr);
+}
+
+TEST(ExportersPrometheusBuilderInstall, PrometheusPullBuilder)
+{
+  auto builder = std::make_unique<opentelemetry::exporter::metrics::PrometheusPullBuilder>();
+  ASSERT_TRUE(builder != nullptr);
+
+  opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration model;
+  model.host               = "localhost";
+  model.port               = 1234;
+  model.without_scope_info = false;
+
+  auto exporter = builder->Build(&model);
   ASSERT_TRUE(exporter != nullptr);
 }
