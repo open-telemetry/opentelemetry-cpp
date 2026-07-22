@@ -195,8 +195,8 @@ void Session::SendRequest(
     deflateEnd(&zs);
 #else
     OTEL_INTERNAL_LOG_ERROR(
-        "[HTTP Client Curl] Set WITH_OTLP_HTTP_COMPRESSION=ON to use gzip compression with the "
-        "OTLP HTTP Exporter");
+        "[HTTP Client Curl] Set OTELCPP_WITH_OTLP_HTTP_COMPRESSION=ON to use gzip compression with "
+        "the OTLP HTTP Exporter");
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
   }
 

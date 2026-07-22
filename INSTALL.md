@@ -104,10 +104,10 @@ If building and installing Protobuf and gRPC manually with cmake the
    - `-DBUILD_SHARED_LIBS=ON` : To build shared libraries for the targets.
       Please refer to note [below](#building-shared-libs-for-windows) for
       Windows DLL support.
-   - `-DWITH_OTLP_GRPC=ON` : To enable building OTLP GRPC exporter.
-   - `-DWITH_OTLP_HTTP=ON` : To enable building OTLP HTTP exporter.
-   - `-DWITH_PROMETHEUS=ON` : To enable building prometheus exporter.
-   - `-DOPENTELEMETRY_INSTALL=ON`: To install `otel-cpp` library needed
+   - `-DOTELCPP_WITH_OTLP_GRPC=ON` : To enable building OTLP GRPC exporter.
+   - `-DOTELCPP_WITH_OTLP_HTTP=ON` : To enable building OTLP HTTP exporter.
+   - `-DOTELCPP_WITH_PROMETHEUS=ON` : To enable building prometheus exporter.
+   - `-DOTELCPP_INSTALL=ON`: To install `otel-cpp` library needed
       for external code linking.
 
 3. Once the build configuration is created, build the CMake targets - this
@@ -376,12 +376,12 @@ and user may have to customize it further before using it as distribution.
 - Windows : NuGet, zip
 
 This requires platform specific package generators already installed. The package
-generation can subsequently be enabled by using BUILD_PACKAGE option during cmake
-configuration
+generation can subsequently be enabled by using OTELCPP_BUILD_PACKAGE option
+during cmake configuration
 
    ```console
    $ cd opentelemetry-cpp
-   $ mkdir build && cd build && cmake -DBUILD_PACKAGE=ON ..
+   $ mkdir build && cd build && cmake -DOTELCPP_BUILD_PACKAGE=ON ..
 
    -- Package name: opentelemetry-cpp-1.8.1-ubuntu-20.04-x86_64.deb
    -- Configuring done

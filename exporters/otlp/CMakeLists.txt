@@ -33,7 +33,7 @@ target_include_directories(
 
 set(OPENTELEMETRY_OTLP_TARGETS opentelemetry_otlp_recordable)
 
-if(WITH_OTLP_UTF8_VALIDITY AND TARGET utf8_range::utf8_validity)
+if(OTELCPP_WITH_OTLP_UTF8_VALIDITY AND TARGET utf8_range::utf8_validity)
   target_link_libraries(
     opentelemetry_otlp_recordable
     PUBLIC opentelemetry_logs opentelemetry_metrics
@@ -64,7 +64,7 @@ target_include_directories(
 target_link_libraries(opentelemetry_exporter_otlp_builder_utils
                       PUBLIC opentelemetry_otlp_recordable)
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     otlp_recordable
     "OpenTelemetry OTLP - Recordable"
@@ -78,7 +78,7 @@ if(OPENTELEMETRY_INSTALL)
     "opentelemetry_otlp_recordable")
 endif()
 
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   if(NOT DEFINED grpc_lib_type)
     message(
       FATAL_ERROR "cmake/opentelemetry-proto.cmake should be included first")
@@ -256,7 +256,7 @@ if(WITH_OTLP_GRPC)
   list(APPEND OPENTELEMETRY_OTLP_GRPC_BUILDER_TARGETS
        opentelemetry_exporter_otlp_grpc_metric_builder)
 
-  if(OPENTELEMETRY_INSTALL)
+  if(OTELCPP_INSTALL)
     opentelemetry_add_pkgconfig(
       exporter_otlp_grpc_client "OpenTelemetry OTLP - gRPC Client"
       "gRPC client for OTLP protocol." "opentelemetry_api opentelemetry_common")
@@ -300,7 +300,7 @@ if(WITH_OTLP_GRPC)
 
 endif()
 
-if(WITH_OTLP_HTTP)
+if(OTELCPP_WITH_OTLP_HTTP)
 
   #
   # opentelemetry_exporter_otlp_http_client
@@ -460,7 +460,7 @@ if(WITH_OTLP_HTTP)
   list(APPEND OPENTELEMETRY_OTLP_HTTP_BUILDER_TARGETS
        opentelemetry_exporter_otlp_http_metric_builder)
 
-  if(OPENTELEMETRY_INSTALL)
+  if(OTELCPP_INSTALL)
     opentelemetry_add_pkgconfig(
       exporter_otlp_http_client "OpenTelemetry OTLP - HTTP Client"
       "HTTP client for OTLP protocol." "opentelemetry_api")
@@ -504,7 +504,7 @@ if(WITH_OTLP_HTTP)
 
 endif()
 
-if(WITH_OTLP_FILE)
+if(OTELCPP_WITH_OTLP_FILE)
 
   #
   # opentelemetry_exporter_otlp_file_client
@@ -657,7 +657,7 @@ if(WITH_OTLP_FILE)
   list(APPEND OPENTELEMETRY_OTLP_FILE_BUILDER_TARGETS
        opentelemetry_exporter_otlp_file_metric_builder)
 
-  if(OPENTELEMETRY_INSTALL)
+  if(OTELCPP_INSTALL)
     opentelemetry_add_pkgconfig(
       exporter_otlp_file_client "OpenTelemetry OTLP - File Client"
       "File client for OTLP protocol." "opentelemetry_api opentelemetry_common")
@@ -744,7 +744,7 @@ otel_add_component(
   PATTERN
   "otlp_builder_utils.h")
 
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   otel_add_component(
     COMPONENT
     exporters_otlp_grpc
@@ -786,7 +786,7 @@ if(WITH_OTLP_GRPC)
 
 endif()
 
-if(WITH_OTLP_HTTP)
+if(OTELCPP_WITH_OTLP_HTTP)
   otel_add_component(
     COMPONENT
     exporters_otlp_http
@@ -828,7 +828,7 @@ if(WITH_OTLP_HTTP)
 
 endif()
 
-if(WITH_OTLP_FILE)
+if(OTELCPP_WITH_OTLP_FILE)
   otel_add_component(
     COMPONENT
     exporters_otlp_file
@@ -870,7 +870,7 @@ if(WITH_OTLP_FILE)
 
 endif()
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_executable(otlp_recordable_test test/otlp_recordable_test.cc)
   target_link_libraries(
     otlp_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
@@ -883,7 +883,7 @@ if(BUILD_TESTING)
   add_executable(otlp_log_recordable_test test/otlp_log_recordable_test.cc)
   target_link_libraries(otlp_log_recordable_test ${GTEST_BOTH_LIBRARIES}
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
-  if(WITH_OTLP_UTF8_VALIDITY AND TARGET utf8_range::utf8_validity)
+  if(OTELCPP_WITH_OTLP_UTF8_VALIDITY AND TARGET utf8_range::utf8_validity)
     target_compile_definitions(otlp_log_recordable_test
                                PRIVATE ENABLE_OTLP_UTF8_VALIDITY)
   endif()
@@ -917,7 +917,7 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.otlp.
     TEST_LIST otlp_metrics_serialization_test)
 
-  if(WITH_OTLP_GRPC)
+  if(OTELCPP_WITH_OTLP_GRPC)
     add_executable(otlp_grpc_exporter_test test/otlp_grpc_exporter_test.cc)
     target_link_libraries(
       otlp_grpc_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
@@ -1001,7 +1001,7 @@ if(BUILD_TESTING)
       TEST_LIST otlp_grpc_metric_exporter_factory_test)
   endif()
 
-  if(WITH_OTLP_HTTP)
+  if(OTELCPP_WITH_OTLP_HTTP)
     add_executable(otlp_http_exporter_test test/otlp_http_exporter_test.cc)
     target_link_libraries(
       otlp_http_exporter_test
@@ -1119,7 +1119,7 @@ if(BUILD_TESTING)
       TEST_LIST otlp_http_log_record_exporter_custom_client_test)
   endif()
 
-  if(WITH_OTLP_FILE)
+  if(OTELCPP_WITH_OTLP_FILE)
     add_executable(otlp_file_client_test test/otlp_file_client_test.cc)
     target_link_libraries(
       otlp_file_client_test
@@ -1211,9 +1211,11 @@ if(BUILD_TESTING)
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_file_metric_exporter_factory_test)
   endif()
-endif() # BUILD_TESTING
+endif() # OTELCPP_BUILD_TESTING
 
-if(WITH_BENCHMARK AND WITH_OTLP_HTTP)
+if(OTELCPP_BUILD_TESTING
+   AND OTELCPP_WITH_BENCHMARK
+   AND OTELCPP_WITH_OTLP_HTTP)
   add_executable(otlp_http_metric_exporter_benchmark
                  benchmark/otlp_http_metric_exporter_benchmark.cc)
 
@@ -1224,7 +1226,7 @@ if(WITH_BENCHMARK AND WITH_OTLP_HTTP)
             ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
-if(WITH_BENCHMARK)
+if(OTELCPP_BUILD_TESTING AND OTELCPP_WITH_BENCHMARK)
   add_executable(otlp_recordable_benchmark test/otlp_recordable_benchmark.cc)
 
   target_link_libraries(

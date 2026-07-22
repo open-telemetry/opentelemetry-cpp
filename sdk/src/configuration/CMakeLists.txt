@@ -32,7 +32,7 @@ target_link_libraries(
          opentelemetry_metrics opentelemetry_logs
   PRIVATE ryml::ryml)
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     configuration "OpenTelemetry SDK - Configuration"
     "Components for exporting traces in the OpenTelemetry SDK."

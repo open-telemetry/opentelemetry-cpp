@@ -6,7 +6,7 @@ target_link_libraries(
   batch_span_processor_example PRIVATE opentelemetry-cpp::ostream_span_exporter
                                        opentelemetry-cpp::trace)
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_test(NAME examples.batch
            COMMAND "$<TARGET_FILE:batch_span_processor_example>")
 endif()

@@ -92,14 +92,14 @@ build all CMake components with preview options enabled.
 
 These tests build the core API and SDK components in maintainer mode.
 
-* `cmake.c++14.test`: C++14, WITH_STL=OFF
-* `cmake.c++17.test`: C++17, WITH_STL=OFF
-* `cmake.c++20.test`: C++20, WITH_STL=OFF
-* `cmake.c++23.test`: C++23, WITH_STL=OFF
-* `cmake.c++14.stl.test`: C++14, WITH_STL=CXX14
-* `cmake.c++17.stl.test`: C++17, WITH_STL=CXX17
-* `cmake.c++20.stl.test`: C++20, WITH_STL=CXX20
-* `cmake.c++23.stl.test`: C++23, WITH_STL=CXX23
+* `cmake.c++14.test`: C++14, OTELCPP_WITH_STL=OFF
+* `cmake.c++17.test`: C++17, OTELCPP_WITH_STL=OFF
+* `cmake.c++20.test`: C++20, OTELCPP_WITH_STL=OFF
+* `cmake.c++23.test`: C++23, OTELCPP_WITH_STL=OFF
+* `cmake.c++14.stl.test`: C++14, OTELCPP_WITH_STL=CXX14
+* `cmake.c++17.stl.test`: C++17, OTELCPP_WITH_STL=CXX17
+* `cmake.c++20.stl.test`: C++20, OTELCPP_WITH_STL=CXX20
+* `cmake.c++23.stl.test`: C++23, OTELCPP_WITH_STL=CXX23
 
 ### CMake feature and packaging tests
 

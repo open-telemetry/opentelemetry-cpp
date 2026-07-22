@@ -75,6 +75,44 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.api_only.test
 
+  cmake_legacy_options_test:
+    name: CMake legacy option names compatibility test
+    runs-on: ubuntu-24.04
+    env:
+      CXX_STANDARD: '17'
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+      with:
+        egress-policy: audit
+
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+        sudo -E apt-get install -y zlib1g-dev libcurl4-openssl-dev
+    - name: install dependencies
+      run: |
+        sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file ./install/cmake/third_party_stable --packages "zlib;abseil;protobuf;grpc;ryml"
+    - name: run cmake legacy options test
+      run: |
+        ./ci/do_ci.sh cmake.legacy_options.test
+
+  cmake_msvc_legacy_options_test:
+    name: CMake msvc legacy option names compatibility test
+    runs-on: windows-latest
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+      with:
+        egress-policy: audit
+
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+    - name: run cmake legacy options test
+      run: ./ci/do_ci.ps1 cmake.legacy_options.test
+
   cmake_fetch_content_test:
     name: CMake FetchContent usage with opentelemetry-cpp
     runs-on: ubuntu-24.04

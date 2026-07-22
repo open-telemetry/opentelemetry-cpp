@@ -16,7 +16,7 @@ target_link_libraries(
   PUBLIC opentelemetry_ext
   PRIVATE CURL::libcurl)
 
-if(WITH_CURL_LOGGING)
+if(OTELCPP_WITH_CURL_LOGGING)
   target_compile_definitions(opentelemetry_http_client_curl
                              PRIVATE ENABLE_CURL_LOGGING)
 endif()
@@ -24,7 +24,7 @@ endif()
 target_compile_definitions(opentelemetry_http_client_curl
                            PUBLIC ENABLE_HTTP_CLIENT_CURL)
 
-if(WITH_OTLP_HTTP_COMPRESSION)
+if(OTELCPP_WITH_OTLP_HTTP_COMPRESSION)
   target_link_libraries(
     opentelemetry_http_client_curl
     PUBLIC opentelemetry_ext

@@ -38,7 +38,7 @@ add_executable(random_fork_test random_fork_test.cc)
 target_link_libraries(random_fork_test opentelemetry_common)
 add_test(random_fork_test random_fork_test)
 
-if(WITH_BENCHMARK)
+if(OTELCPP_WITH_BENCHMARK)
   add_executable(base64_benchmark base64_benchmark.cc)
   target_link_libraries(base64_benchmark benchmark::benchmark
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)

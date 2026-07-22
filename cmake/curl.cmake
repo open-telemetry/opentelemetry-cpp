@@ -17,7 +17,7 @@ if(NOT CURL_FOUND)
     )
   set(CURL_PROVIDER "fetch_repository")
 
-  if(OPENTELEMETRY_INSTALL)
+  if(OTELCPP_INSTALL)
     set(_CURL_DISABLE_INSTALL OFF)
   else()
     set(_CURL_DISABLE_INSTALL ON)
