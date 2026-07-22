@@ -320,27 +320,66 @@ function(project_build_tools_set_static_library_declaration DEFINITION_VARNAME)
   endif()
 endfunction()
 
-function(_otelcpp_get_legacy_option_name __OPTION_NAME __OUTPUT_VARIABLE)
-  if(__OPTION_NAME MATCHES "^OTELCPP_WITH_")
-    string(REGEX REPLACE "^OTELCPP_" "" __LEGACY_OPTION_NAME "${__OPTION_NAME}")
-  else()
-    set(_otelcpp_legacy_option_name_OTELCPP_BUILD_W3CTRACECONTEXT_TEST
-        "BUILD_W3CTRACECONTEXT_TEST")
-    set(_otelcpp_legacy_option_name_OTELCPP_INSTALL "OPENTELEMETRY_INSTALL")
-    set(_otelcpp_legacy_option_name_OTELCPP_SKIP_DYNAMIC_LOADING_TESTS
-        "OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS")
-    set(_otelcpp_legacy_option_name_OTELCPP_BUILD_DLL "OPENTELEMETRY_BUILD_DLL")
-    set(_otelcpp_legacy_option_name_OTELCPP_BUILD_PACKAGE "BUILD_PACKAGE")
-    set(_otelcpp_legacy_option_name_OTELCPP_EXTERNAL_COMPONENT_PATH
-        "OPENTELEMETRY_EXTERNAL_COMPONENT_PATH")
-    set(_otelcpp_legacy_option_name_OTELCPP_TARBALL "TARBALL")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_ABI_VERSION_1 "WITH_ABI_VERSION_1")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_ABI_VERSION_2 "WITH_ABI_VERSION_2")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_API_ONLY "WITH_API_ONLY")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_ASYNC_EXPORT_PREVIEW
+    "WITH_ASYNC_EXPORT_PREVIEW")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_BENCHMARK "WITH_BENCHMARK")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_CONFIGURATION "WITH_CONFIGURATION")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_CURL_LOGGING "WITH_CURL_LOGGING")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_ELASTICSEARCH "WITH_ELASTICSEARCH")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_ETW "WITH_ETW")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_EXAMPLES "WITH_EXAMPLES")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_EXAMPLES_HTTP "WITH_EXAMPLES_HTTP")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_FUNC_TESTS "WITH_FUNC_TESTS")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_GSL "WITH_GSL")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_HTTP_CLIENT_CURL
+    "WITH_HTTP_CLIENT_CURL")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
+    "WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW
+    "WITH_METRICS_EXEMPLAR_PREVIEW")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_NO_DEPRECATED_CODE
+    "WITH_NO_DEPRECATED_CODE")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_NO_GETENV "WITH_NO_GETENV")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_OPENTRACING "WITH_OPENTRACING")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_FILE "WITH_OTLP_FILE")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_GRPC "WITH_OTLP_GRPC")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW
+    "WITH_OTLP_GRPC_CREDENTIAL_PREVIEW")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
+    "WITH_OTLP_GRPC_SSL_MTLS_PREVIEW")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_HTTP "WITH_OTLP_HTTP")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_HTTP_COMPRESSION
+    "WITH_OTLP_HTTP_COMPRESSION")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_RETRY_PREVIEW
+    "WITH_OTLP_RETRY_PREVIEW")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_UTF8_VALIDITY
+    "WITH_OTLP_UTF8_VALIDITY")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_PROMETHEUS "WITH_PROMETHEUS")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW
+    "WITH_RESOURCE_DETECTORS_PREVIEW")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_STL "WITH_STL")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_THREAD_INSTRUMENTATION_PREVIEW
+    "WITH_THREAD_INSTRUMENTATION_PREVIEW")
+set(_otelcpp_legacy_option_name_OTELCPP_WITH_ZIPKIN "WITH_ZIPKIN")
+set(_otelcpp_legacy_option_name_OTELCPP_BUILD_W3CTRACECONTEXT_TEST
+    "BUILD_W3CTRACECONTEXT_TEST")
+set(_otelcpp_legacy_option_name_OTELCPP_INSTALL "OPENTELEMETRY_INSTALL")
+set(_otelcpp_legacy_option_name_OTELCPP_SKIP_DYNAMIC_LOADING_TESTS
+    "OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS")
+set(_otelcpp_legacy_option_name_OTELCPP_BUILD_DLL "OPENTELEMETRY_BUILD_DLL")
+set(_otelcpp_legacy_option_name_OTELCPP_BUILD_PACKAGE "BUILD_PACKAGE")
+set(_otelcpp_legacy_option_name_OTELCPP_EXTERNAL_COMPONENT_PATH
+    "OPENTELEMETRY_EXTERNAL_COMPONENT_PATH")
+set(_otelcpp_legacy_option_name_OTELCPP_TARBALL "TARBALL")
 
-    if(DEFINED _otelcpp_legacy_option_name_${__OPTION_NAME})
-      set(__LEGACY_OPTION_NAME
-          "${_otelcpp_legacy_option_name_${__OPTION_NAME}}")
-    else()
-      set(__LEGACY_OPTION_NAME "")
-    endif()
+function(_otelcpp_get_legacy_option_name __OPTION_NAME __OUTPUT_VARIABLE)
+  if(DEFINED _otelcpp_legacy_option_name_${__OPTION_NAME})
+    set(__LEGACY_OPTION_NAME "${_otelcpp_legacy_option_name_${__OPTION_NAME}}")
+  else()
+    set(__LEGACY_OPTION_NAME "")
   endif()
 
   set(${__OUTPUT_VARIABLE}
