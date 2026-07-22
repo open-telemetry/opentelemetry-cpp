@@ -1,59 +1,53 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef OPENTELEMETRY_STL_VERSION
-// Unfortunately as of 04/27/2021 the fix is NOT in the vcpkg snapshot of Google Test.
-// Remove above `#ifdef` once the GMock fix for C++20 is in the mainline.
-//
-// Please refer to this GitHub issue for additional details:
-// https://github.com/google/googletest/issues/2914
-// https://github.com/google/googletest/commit/61f010d703b32de9bfb20ab90ece38ab2f25977f
-//
-// If we compile using Visual Studio 2019 with `c++latest` (C++20) without the GMock fix,
-// then the compilation here fails in `gmock-actions.h` from:
-//   .\tools\vcpkg\installed\x64-windows\include\gmock\gmock-actions.h(819):
-//   error C2653: 'result_of': is not a class or namespace name
-//
-// That is because `std::result_of` has been removed in C++20.
+#include <grpcpp/grpcpp.h>
+#include <gtest/gtest.h>
+#include <stdlib.h>
+#include <algorithm>
+#include <chrono>
+#include <functional>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+#include "gmock/gmock.h"
 
-#  include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
+#include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
+#include "opentelemetry/version.h"
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"
+// clang-format off
+#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "opentelemetry/proto/collector/metrics/v1/metrics_service_mock.grpc.pb.h"
+#include "opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.h"
+#include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
+#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
+// clang-format on
 
-// Problematic code that pulls in Gmock and breaks with vs2019/c++latest :
-#  include "opentelemetry/proto/collector/metrics/v1/metrics_service_mock.grpc.pb.h"
+// IWYU pragma: no_include <grpc/support/port_platform.h>
+// IWYU pragma: no_include <grpcpp/support/status.h>
 
-#  include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"
-
-#  include "opentelemetry/exporters/otlp/otlp_grpc_client.h"
-#  include "opentelemetry/exporters/otlp/otlp_grpc_client_factory.h"
-
-#  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/sdk/common/global_log_handler.h"
-#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
-#  include "opentelemetry/sdk/metrics/data/metric_data.h"
-#  include "opentelemetry/sdk/metrics/data/point_data.h"
-#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#  include "opentelemetry/sdk/metrics/instruments.h"
-#  include "opentelemetry/sdk/resource/resource.h"
-#  include "opentelemetry/sdk/trace/simple_processor.h"
-#  include "opentelemetry/sdk/trace/tracer_provider.h"
-#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
-#  include "opentelemetry/trace/provider.h"
-
-#  include <grpcpp/grpcpp.h>
-#  include <gtest/gtest.h>
-#  include <algorithm>
-#  include <functional>
-#  include <utility>
-#  include <vector>
-
-#  if defined(_MSC_VER)
-#    include "opentelemetry/sdk/common/env_variables.h"
+#if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
-#  endif
+#endif
 
 using namespace testing;
 
@@ -69,14 +63,14 @@ class OtlpMockMetricsServiceStub : public proto::collector::metrics::v1::MockMet
 {
 public:
 // Some old toolchains can only use gRPC 1.33 and it's experimental.
-#  if defined(GRPC_CPP_VERSION_MAJOR) && \
-      (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+#if defined(GRPC_CPP_VERSION_MAJOR) && \
+    (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
   using async_interface_base =
       proto::collector::metrics::v1::MetricsService::StubInterface::async_interface;
-#  else
+#else
   using async_interface_base =
       proto::collector::metrics::v1::MetricsService::StubInterface::experimental_async_interface;
-#  endif
+#endif
 
   OtlpMockMetricsServiceStub() : async_interface_(this) {}
 
@@ -96,9 +90,9 @@ public:
     }
 
 // Some old toolchains can only use gRPC 1.33 and it's experimental.
-#  if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
-          (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
-      defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
+#if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
+        (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
+    defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
     void Export(
         ::grpc::ClientContext * /*context*/,
         const ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest
@@ -106,7 +100,7 @@ public:
         ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceResponse * /*response*/,
         ::grpc::ClientUnaryReactor * /*reactor*/) override
     {}
-#  else
+#else
     void Export(
         ::grpc::ClientContext * /*context*/,
         const ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceRequest
@@ -114,7 +108,7 @@ public:
         ::opentelemetry::proto::collector::metrics::v1::ExportMetricsServiceResponse * /*response*/,
         ::grpc::experimental::ClientUnaryReactor * /*reactor*/)
     {}
-#  endif
+#endif
 
   private:
     OtlpMockMetricsServiceStub *stub_;
@@ -193,7 +187,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigSslCredentialsTest)
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
 }
 
-#  ifndef NO_GETENV
+#ifndef NO_GETENV
 // Test exporter configuration options with use_ssl_credentials
 TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigFromEnv)
 {
@@ -361,7 +355,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF");
   unsetenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER");
 }
-#  endif  // NO_GETENV
+#endif  // NO_GETENV
 
 TEST_F(OtlpGrpcMetricExporterTestPeer, CheckGetAggregationTemporality)
 {
@@ -450,4 +444,3 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ExportPartialSuccess)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-#endif /* OPENTELEMETRY_STL_VERSION */
