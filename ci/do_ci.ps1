@@ -472,6 +472,58 @@ switch ($action) {
 
     exit 0
   }
+  "cmake.install_functions.test" {
+    # Test the otel install functions and installed cmake package config
+    # with mock components injected via OPENTELEMETRY_EXTERNAL_COMPONENT_PATH.
+    # The package is installed, it then runs cmake configure time tests from
+    # install/test/cmake/install_functions_test.
+    Remove-Item -Recurse -Force "$BUILD_DIR\*"
+    Remove-Item -Recurse -Force "$INSTALL_TEST_DIR\*"
+    cd "$BUILD_DIR"
+
+    cmake $SRC_DIR `
+      -DVCPKG_TARGET_TRIPLET=x64-windows `
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake" `
+      "-DCMAKE_INSTALL_PREFIX=$INSTALL_TEST_DIR" `
+      -DOPENTELEMETRY_INSTALL=ON `
+      -DWITH_EXAMPLES=OFF `
+      -DBUILD_TESTING=OFF `
+      "-DOPENTELEMETRY_EXTERNAL_COMPONENT_PATH=$SRC_DIR\install\test\cmake\install_functions_test\components"
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+
+    cmake --build . -j $nproc
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+
+    cmake --build . --target install
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+
+    mkdir "$BUILD_DIR\install_functions_test"
+    cd "$BUILD_DIR\install_functions_test"
+
+    cmake "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
+      -S "$SRC_DIR\install\test\cmake\install_functions_test"
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+
+    ctest -C Debug --output-on-failure
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+
+    exit 0
+  }
   "cmake.dll.install.test" {
     cd "$BUILD_DIR"
     Remove-Item -Recurse -Force "$BUILD_DIR\*"

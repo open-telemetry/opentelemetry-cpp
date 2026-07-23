@@ -28,6 +28,23 @@ function(resolve_deprecated_components requested_components_inout)
 endfunction()
 
 #-------------------------------------------------------------------------
+# Function to set the <package>_<component>_FOUND variable for requested
+# deprecated component names that have a replacement component.
+#-------------------------------------------------------------------------
+function(set_deprecated_components_found requested_components_in)
+  foreach(_COMPONENT IN LISTS ${requested_components_in})
+    if(${_COMPONENT} IN_LIST OTEL_DEPRECATED_COMPONENTS_LIST)
+      set(_replacement_var "COMPONENT_${_COMPONENT}_REPLACEMENT")
+      if(DEFINED ${_replacement_var}
+         AND ${CMAKE_FIND_PACKAGE_NAME}_${${_replacement_var}}_FOUND)
+        set(${CMAKE_FIND_PACKAGE_NAME}_${_COMPONENT}_FOUND TRUE
+          CACHE BOOL "whether ${CMAKE_FIND_PACKAGE_NAME} deprecated component ${_COMPONENT} is found (via replacement ${${_replacement_var}})" FORCE)
+      endif()
+    endif()
+  endforeach()
+endfunction()
+
+#-------------------------------------------------------------------------
 # Function to get installed components.
 #-------------------------------------------------------------------------
 function(get_installed_components installed_components_out)

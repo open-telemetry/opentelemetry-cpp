@@ -322,7 +322,9 @@ endfunction()
 #   Each target is assigned to the component and its dependencies are identified based on the LINK_LIBRARIES property.
 #   An alias target is also created for each target in the form of PROJECT_NAME::TARGET_EXPORT_NAME.
 #   DEPRECATED_NAMES lists old component names that are redirected to this component with a deprecation warning.
-#   DEPRECATED marks a component that has been fully removed with no replacement (no TARGETS required).
+#
+#   TODO: add a DEPRECATED tag to support deprecated components that are still installed but will be removed in the future.
+#
 # Usage:
 #    otel_add_component(
 #      COMPONENT <component_name>
@@ -331,9 +333,6 @@ endfunction()
 #      [FILES_DIRECTORY <directory>
 #       FILES_DESTINATION <destination>
 #       FILES_MATCHING <matching>])
-#    otel_add_component(
-#      COMPONENT <removed_component_name>
-#      DEPRECATED)
 #-----------------------------------------------------------------------
 function(otel_add_component)
   set(optionArgs DEPRECATED)
@@ -345,15 +344,15 @@ function(otel_add_component)
     message(FATAL_ERROR "otel_add_component: COMPONENT is required")
   endif()
 
-  if(_OTEL_ADD_COMP_DEPRECATED)
-    # TODO: Support deprecated components that still install their targets, and
-    # mark those targets deprecated during the deprecation window.
-    get_property(_deprecated_components DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST)
-    list(APPEND _deprecated_components "${_OTEL_ADD_COMP_COMPONENT}")
-    set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST "${_deprecated_components}")
-    message(DEBUG "  DEPRECATED: ${_OTEL_ADD_COMP_COMPONENT} (no replacement)")
-    return()
-  endif()
+  # TODO: Support deprecated components that still install their targets, and mark those targets deprecated during the deprecation window.
+  #
+  # if(_OTEL_ADD_COMP_DEPRECATED)
+  #   get_property(_deprecated_components DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST)
+  #   list(APPEND _deprecated_components "${_OTEL_ADD_COMP_COMPONENT}")
+  #   set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST "${_deprecated_components}")
+  #   message(DEBUG "  DEPRECATED: ${_OTEL_ADD_COMP_COMPONENT} (no replacement)")
+  #   return()
+  # endif()
 
   if(NOT _OTEL_ADD_COMP_TARGETS)
     message(FATAL_ERROR "otel_add_component: TARGETS is required")
@@ -462,7 +461,7 @@ function(otel_install_components)
       string(APPEND OTEL_COMPONENTS_REPLACEMENTS_BLOCK
         "set(COMPONENT_${_DEPRECATED_COMPONENT}_REPLACEMENT ${_REPLACEMENT_COMPONENT})\n")
     else()
-      message(STATUS "    No replacement installed.")
+      message(FATAL_ERROR " no DEPRECATED_NAME on an installed component was found for ${_DEPRECATED_COMPONENT} -- deprecating components with no replacement is not currently supported.")
     endif()
   endforeach()
 

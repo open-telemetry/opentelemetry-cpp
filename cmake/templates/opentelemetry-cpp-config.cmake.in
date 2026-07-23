@@ -206,6 +206,10 @@ foreach(_COMPONENT IN LISTS _REQUESTED_COMPONENTS)
     CACHE BOOL "whether ${CMAKE_FIND_PACKAGE_NAME} component ${_COMPONENT} is found" FORCE)
 endforeach()
 
+# set the component found flag for requested deprecated component names
+# resolved to an imported replacement component
+set_deprecated_components_found(${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
+
 # get installed and requested targets
 set(_OPENTELEMETRY_CPP_TARGETS "")
 get_targets(_REQUESTED_COMPONENTS _OPENTELEMETRY_CPP_TARGETS)
@@ -226,7 +230,6 @@ endforeach()
 # TRUE if all variables listed contain valid results, e.g. valid file paths.
 include("FindPackageHandleStandardArgs")
 
-set(${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS ${_REQUESTED_COMPONENTS})
 set(${CMAKE_FIND_PACKAGE_NAME}_CONFIG ${CMAKE_CURRENT_LIST_FILE})
 
 find_package_handle_standard_args(

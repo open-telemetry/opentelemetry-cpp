@@ -457,6 +457,42 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
   exit 0
+elif [[ "$1" == "cmake.install_functions.test" ]]; then
+  # Test the otel install functions and installed cmake package config
+  # with mock components injected via
+  # OPENTELEMETRY_EXTERNAL_COMPONENT_PATH. The package is installed, it then runs
+  # cmake configure time tests from install/test/cmake/install_functions_test.
+  if [[ -n "${BUILD_SHARED_LIBS}" && "${BUILD_SHARED_LIBS}" == "ON" ]]; then
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=ON")
+    echo "BUILD_SHARED_LIBS is set to: ON"
+  else
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=OFF")
+    echo "BUILD_SHARED_LIBS is set to: OFF"
+  fi
+  CMAKE_OPTIONS+=("-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
+
+  cd "${BUILD_DIR}"
+  rm -rf *
+  rm -rf ${INSTALL_TEST_DIR}/*
+
+  cmake "${CMAKE_OPTIONS[@]}" \
+        -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
+        -DOPENTELEMETRY_INSTALL=ON \
+        -DWITH_EXAMPLES=OFF \
+        -DBUILD_TESTING=OFF \
+        -DOPENTELEMETRY_EXTERNAL_COMPONENT_PATH=${SRC_DIR}/install/test/cmake/install_functions_test/components \
+        "${SRC_DIR}"
+
+  cmake --build . "${CMAKE_BUILD_ARGS[@]}"
+  cmake --build . "${CMAKE_BUILD_ARGS[@]}" --target install
+  export LD_LIBRARY_PATH="${INSTALL_TEST_DIR}/lib:$LD_LIBRARY_PATH"
+
+  mkdir -p "${BUILD_DIR}/install_functions_test"
+  cd "${BUILD_DIR}/install_functions_test"
+  cmake "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
+        -S "${SRC_DIR}/install/test/cmake/install_functions_test"
+  ctest --output-on-failure
+  exit 0
 elif [[ "$1" == "cmake.install.test" ]]; then
   if [[ -n "${BUILD_SHARED_LIBS}" && "${BUILD_SHARED_LIBS}" == "ON" ]]; then
     CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=ON")
