@@ -332,7 +332,7 @@ private:
 };
 
 // ---------------------------------------------------------------------------
-// Synchronous metric reader: collects and exports on ForceFlush/Shutdown in
+// Synchronous metric reader: collects and exports on ForceFlush in
 // the calling thread.
 class SyncMetricReader : public opentelemetry::sdk::metrics::MetricReader
 {
@@ -351,23 +351,22 @@ public:
 private:
   bool CollectAndExport() noexcept
   {
-    bool result = true;
-    Collect([this, &result](opentelemetry::sdk::metrics::ResourceMetrics &metric_data) {
-      result =
-          (exporter_->Export(metric_data) == opentelemetry::sdk::common::ExportResult::kSuccess);
-      return true;
+    const bool success = Collect([this](opentelemetry::sdk::metrics::ResourceMetrics &metric_data) {
+      return (exporter_->Export(metric_data) == opentelemetry::sdk::common::ExportResult::kSuccess);
     });
-    return result;
+    return success;
   }
 
   bool OnForceFlush(std::chrono::microseconds timeout) noexcept override
   {
-    return CollectAndExport() && exporter_->ForceFlush(timeout);
+    const bool collect_result = CollectAndExport();
+    const bool flush_result   = exporter_->ForceFlush(timeout);
+    return collect_result && flush_result;
   }
 
   bool OnShutDown(std::chrono::microseconds timeout) noexcept override
   {
-    return CollectAndExport() && exporter_->Shutdown(timeout);
+    return exporter_->Shutdown(timeout);
   }
 
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter_;

@@ -113,6 +113,8 @@ namespace config_sdk  = opentelemetry::sdk::configuration;
 namespace
 {
 
+constexpr std::chrono::milliseconds kProcessTimeout{1000};
+
 //---------------------------------------------------------------------------
 // ProgrammaticConfigTest fixture: This supports integration testing of the configured SDK.
 // It registers the recording exporters and maintains buffers for inspection of exported signal
@@ -190,10 +192,7 @@ protected:
     exporter->name   = "recording";
     auto reader      = std::make_unique<config_sdk::PeriodicMetricReaderConfiguration>();
     reader->exporter = std::move(exporter);
-    reader->interval = 3'600'000;  // milliseconds. Set to a large value and rely on ForceFlush to
-                                   // trigger collection.
-    reader->timeout = 60'000;      // milliseconds
-    auto config     = std::make_unique<config_sdk::MeterProviderConfiguration>();
+    auto config      = std::make_unique<config_sdk::MeterProviderConfiguration>();
     config->readers.emplace_back(std::move(reader));
     return config;
   }
@@ -286,10 +285,10 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithDefaults)
       logs::Severity::kInfo, nostd::string_view("test-message"),
       common::MakeAttributes({{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}));
 
-  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
-  EXPECT_GE(log_buffer_->size(), 1);
+  EXPECT_EQ(log_buffer_->size(), 1);
 }
 
 TEST_F(ProgrammaticConfigTest, LoggerProviderWithLogRecordLimits)
@@ -313,10 +312,10 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLogRecordLimits)
       logs::Severity::kInfo, nostd::string_view("test-message"),
       common::MakeAttributes({{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}));
 
-  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
-  EXPECT_GE(log_buffer_->size(), 1);
+  EXPECT_EQ(log_buffer_->size(), 1);
   auto *record = log_buffer_->front().get();
   EXPECT_EQ(nostd::get<std::string>(record->GetBody()), "test-message");
   const auto &attributes = record->GetAttributes();
@@ -362,10 +361,10 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLoggerConfigurator)
   EXPECT_FALSE(error_logger->Enabled(logs::Severity::kInfo));
   EXPECT_TRUE(error_logger->Enabled(logs::Severity::kError));
 
-  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
-  EXPECT_GE(log_buffer_->size(), 2);
+  EXPECT_EQ(log_buffer_->size(), 2);
 }
 
 // TODO: Re-enable this test once a mock BatchSpanProcessor can be configured.
@@ -387,8 +386,8 @@ TEST_F(ProgrammaticConfigTest, DISABLED_LoggerProviderWithBatchProcessorDefaults
   ASSERT_NE(sdk_->logger_provider, nullptr);
 
   logs::Provider::GetLoggerProvider()->GetLogger("test")->Info("test-message");
-  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_GE(log_buffer_->size(), 1);
 }
@@ -400,10 +399,10 @@ TEST_F(ProgrammaticConfigTest, DISABLED_LoggerProviderWithBatchProcessorConfigur
   exporter->name      = "recording";
   auto processor      = std::make_unique<config_sdk::BatchLogRecordProcessorConfiguration>();
   processor->exporter = std::move(exporter);
-  processor->schedule_delay        = 60000;
+  processor->schedule_delay        = 1000;
   processor->max_queue_size        = 100;
   processor->max_export_batch_size = 50;
-  processor->export_timeout        = 5000;
+  processor->export_timeout        = 1000;
   auto logger_provider_config      = std::make_unique<config_sdk::LoggerProviderConfiguration>();
   logger_provider_config->processors.emplace_back(std::move(processor));
 
@@ -414,8 +413,8 @@ TEST_F(ProgrammaticConfigTest, DISABLED_LoggerProviderWithBatchProcessorConfigur
   ASSERT_NE(sdk_->logger_provider, nullptr);
 
   logs::Provider::GetLoggerProvider()->GetLogger("test")->Info("test-message");
-  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_GE(log_buffer_->size(), 1);
 }
@@ -436,10 +435,10 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithDefaults)
       ->CreateUInt64Counter("test-counter")
       ->Add(1);
 
-  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
-  EXPECT_GE(metric_buffer_->size(), 1);
+  EXPECT_EQ(metric_buffer_->size(), 1);
 }
 
 TEST_F(ProgrammaticConfigTest, MeterProviderWithMeterConfigurator)
@@ -465,10 +464,10 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithMeterConfigurator)
   auto disabled_meter = metrics::Provider::GetMeterProvider()->GetMeter(disabled_meter_config.name);
   disabled_meter->CreateUInt64Counter("disabled-test-counter")->Add(1);
 
-  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
-  EXPECT_GE(metric_buffer_->size(), 1);
+  EXPECT_EQ(metric_buffer_->size(), 1);
   for (const auto &metric : *metric_buffer_)
   {
     EXPECT_NE(metric.instrument_descriptor.name_, "disabled-test-counter");
@@ -541,11 +540,11 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithViews)
   meter->CreateDoubleHistogram("exponential-histogram")->Record(42.0, context);
   meter->CreateDoubleHistogram("explicit-histogram")->Record(42.0, context);
   meter->CreateUInt64Counter("default-counter")->Add(1, context);
-  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   // check that instances of the three data points were collected and are of the right type.
-  EXPECT_GE(metric_buffer_->size(), 3);
+  EXPECT_EQ(metric_buffer_->size(), 3);
   bool found_base2_histogram    = false;
   bool found_explicit_histogram = false;
   bool found_default_counter    = false;
@@ -590,8 +589,8 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithDefaults)
   auto default_tracer = trace::Provider::GetTracerProvider()->GetTracer("default-tracer");
   default_tracer->StartSpan("test-span")->End();
 
-  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_EQ(span_buffer_->size(), 1);
 }
@@ -619,7 +618,7 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithTracerConfigurator)
   auto disabled_tracer = trace::Provider::GetTracerProvider()->GetTracer("disabled-tracer");
   disabled_tracer->StartSpan("disabled-test-span")->End();
 
-  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
 
   ASSERT_EQ(span_buffer_->size(), 1);
   EXPECT_NE(span_buffer_->at(0)->GetName(), "disabled-test-span");
@@ -636,8 +635,8 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithSampler)
   ASSERT_NE(sdk_->tracer_provider, nullptr);
 
   trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
-  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_EQ(span_buffer_->size(), 0);
 }
@@ -654,8 +653,8 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithParentBasedSamplerNullRoot)
   ASSERT_NE(sdk_->tracer_provider, nullptr);
 
   trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
-  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_EQ(span_buffer_->size(), 1);
 }
@@ -676,8 +675,8 @@ TEST_F(ProgrammaticConfigTest, DISABLED_TracerProviderWithBatchProcessor)
   CreateAndInstallSdk(model);
 
   trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
-  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_GE(span_buffer_->size(), 1);
 }
@@ -691,7 +690,7 @@ TEST_F(ProgrammaticConfigTest, DISABLED_TracerProviderWithBatchProcessorConfigur
   processor->schedule_delay = 60000;
   processor->max_queue_size = 100;
   processor->max_export_batch_size = 50;
-  processor->export_timeout        = 5000;
+  processor->export_timeout        = 1000;
   processor->exporter              = std::move(exporter);
   auto tracer_provider_config      = std::make_unique<config_sdk::TracerProviderConfiguration>();
   tracer_provider_config->processors.emplace_back(std::move(processor));
@@ -702,8 +701,8 @@ TEST_F(ProgrammaticConfigTest, DISABLED_TracerProviderWithBatchProcessorConfigur
   CreateAndInstallSdk(model);
 
   trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
-  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_GE(span_buffer_->size(), 1);
 }
