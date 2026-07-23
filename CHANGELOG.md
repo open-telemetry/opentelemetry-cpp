@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Fix nonblocking send/recv handling in the ext/http embedded server
+  [#4283](https://github.com/open-telemetry/opentelemetry-cpp/pull/4283)
+
 * [CODE HEALTH] Fix more clang tidy warnings (member initialization)
   [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
 
