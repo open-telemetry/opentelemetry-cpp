@@ -19,6 +19,9 @@ Increment the:
   namespaces
   [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)
 
+* [BUG] Fix nonblocking send/recv handling in the ext/http embedded server
+  [#4283](https://github.com/open-telemetry/opentelemetry-cpp/pull/4283)
+
 * [CODE HEALTH] Move metrics storage test fixtures into anonymous namespace
   [#4286](https://github.com/open-telemetry/opentelemetry-cpp/pull/4286)
 
