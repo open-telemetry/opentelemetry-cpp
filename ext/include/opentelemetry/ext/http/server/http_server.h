@@ -244,7 +244,7 @@ public:
 
   void stop() { m_reactor.stop(); }
 
-protected:
+private:
   void onSocketAcceptable(SocketTools::Socket socket) override
   {
     LOG_TRACE("HttpServer: accepting socket fd=0x%llx", socket.m_sock);
@@ -331,6 +331,7 @@ protected:
     handleConnectionClosed(conn);
   }
 
+protected:
   bool sendMore(Connection &conn)
   {
     if (conn.sendBuffer.empty())
@@ -356,7 +357,6 @@ protected:
     return false;
   }
 
-protected:
   void handleConnectionClosed(Connection &conn)
   {
     LOG_TRACE("HttpServer: [%s] closed", conn.request.client.c_str());
