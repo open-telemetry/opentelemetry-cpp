@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -52,10 +53,15 @@ private:
   bool FileGetSuccess(const std::string &filename, std::vector<char> &result)
   {
 #ifdef _WIN32
-    std::replace(filename.begin(), filename.end(), '/', '\\');
+    // std::replace writes through its iterators, so it needs a modifiable string rather than
+    // the const parameter.
+    std::string path = filename;
+    std::replace(path.begin(), path.end(), '/', '\\');
+#else
+    const std::string &path = filename;
 #endif
     std::streampos size;
-    std::ifstream file(filename, std::ios::in | std::ios::binary | std::ios::ate);
+    std::ifstream file(path, std::ios::in | std::ios::binary | std::ios::ate);
     if (file.is_open())
     {
       size = file.tellg();
