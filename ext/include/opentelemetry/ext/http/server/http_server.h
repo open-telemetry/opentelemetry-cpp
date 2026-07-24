@@ -282,15 +282,19 @@ protected:
 
     char buffer[2048] = {0};
     int received      = socket.recv(buffer, sizeof(buffer));
+    int recvError     = (received < 0) ? socket.error() : 0;
     LOG_TRACE("HttpServer: [%s] received %d", conn.request.client.c_str(), received);
-    if (received <= 0)
+    if (received > 0)
     {
-      handleConnectionClosed(conn);
-      return;
+      conn.receiveBuffer.append(buffer, buffer + received);
+      handleConnection(conn);
     }
-    conn.receiveBuffer.append(buffer, buffer + received);
-
-    handleConnection(conn);
+    else if (received == 0 || recvError != SocketTools::Socket::ErrorWouldBlock)
+    {
+      // Orderly shutdown (received == 0) or a real error; a transient would-block is
+      // retried on the next readable event.
+      handleConnectionClosed(conn);
+    }
   }
 
   void onSocketWritable(SocketTools::Socket socket) override
@@ -339,12 +343,20 @@ protected:
     }
 
     int sent = conn.socket.send(conn.sendBuffer.data(), static_cast<int>(conn.sendBuffer.size()));
+    int sendError = (sent < 0) ? conn.socket.error() : 0;
     LOG_TRACE("HttpServer: [%s] sent %d", conn.request.client.c_str(), sent);
-    if (sent < 0 && conn.socket.error() != SocketTools::Socket::ErrorWouldBlock)
+    if (sent < 0)
     {
+      if (sendError == SocketTools::Socket::ErrorWouldBlock)
+      {
+        // Backpressure: keep the unsent data and wait for the socket to become writable.
+        m_reactor.addSocket(conn.socket,
+                            SocketTools::Reactor::Writable | SocketTools::Reactor::Closed);
+      }
+      // Never erase the buffer on a failed send: a negative count would wipe it.
       return true;
     }
-    conn.sendBuffer.erase(0, sent);
+    conn.sendBuffer.erase(0, static_cast<size_t>(sent));
 
     if (!conn.sendBuffer.empty())
     {
