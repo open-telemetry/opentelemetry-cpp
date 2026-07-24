@@ -44,6 +44,9 @@ Increment the:
         that do not receive explicit SpanLimits
   [#4258](https://github.com/open-telemetry/opentelemetry-cpp/pull/4258)
 
+* [CODE HEALTH] Fix remaining misc-override-with-different-visibility warnings
+  [#4280](https://github.com/open-telemetry/opentelemetry-cpp/pull/4280)
+
 Breaking changes:
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
