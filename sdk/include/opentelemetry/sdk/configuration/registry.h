@@ -25,6 +25,7 @@
 #include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/version.h"
@@ -143,6 +144,16 @@ public:
     prometheus_metric_builder_ = std::move(builder);
   }
 
+  const PeriodicMetricReaderBuilder *GetPeriodicMetricReaderBuilder() const
+  {
+    return periodic_metric_reader_builder_.get();
+  }
+
+  void SetPeriodicMetricReaderBuilder(std::unique_ptr<PeriodicMetricReaderBuilder> &&builder)
+  {
+    periodic_metric_reader_builder_ = std::move(builder);
+  }
+
   const OtlpHttpLogRecordExporterBuilder *GetOtlpHttpLogRecordBuilder() const
   {
     return otlp_http_log_record_builder_.get();
@@ -246,6 +257,7 @@ private:
   std::unique_ptr<OtlpFilePushMetricExporterBuilder> otlp_file_push_metric_builder_;
   std::unique_ptr<ConsolePushMetricExporterBuilder> console_metric_builder_;
   std::unique_ptr<PrometheusPullMetricExporterBuilder> prometheus_metric_builder_;
+  std::unique_ptr<PeriodicMetricReaderBuilder> periodic_metric_reader_builder_;
 
   std::unique_ptr<OtlpHttpLogRecordExporterBuilder> otlp_http_log_record_builder_;
   std::unique_ptr<OtlpGrpcLogRecordExporterBuilder> otlp_grpc_log_record_builder_;

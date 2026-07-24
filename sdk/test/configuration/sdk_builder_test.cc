@@ -7,14 +7,22 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "config_test_common.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
+
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
@@ -22,9 +30,11 @@
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
+
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
@@ -221,4 +231,32 @@ TEST(SdkBuilder, CreateParentBasedSampler)
     EXPECT_EQ(std::string{sampler->GetDescription()},
               R"(ParentBased{TraceIdRatioBasedSampler{0.250000}})");
   }
+}
+
+TEST(SdkBuilder, CreatePeriodicMetricReader)
+{
+  auto exporter  = std::make_unique<config_sdk::ExtensionPushMetricExporterConfiguration>();
+  exporter->name = "noop";
+
+  config_sdk::PeriodicMetricReaderConfiguration model;
+  model.exporter = std::move(exporter);
+  model.interval = 12345;
+  model.timeout  = 678;
+
+  auto captured = std::make_shared<config_test::CapturedPeriodicReaderArgs>();
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  registry->SetExtensionPushMetricExporterBuilder(
+      "noop", std::make_unique<config_test::NoopPushMetricExporterBuilder>());
+  registry->SetPeriodicMetricReaderBuilder(
+      std::make_unique<config_test::CapturingPeriodicMetricReaderBuilder>(captured));
+
+  config_sdk::SdkBuilder builder(registry);
+  auto reader = builder.CreatePeriodicMetricReader(&model);
+  ASSERT_NE(reader, nullptr);
+
+  EXPECT_TRUE(captured->called);
+  EXPECT_EQ(captured->interval, model.interval);
+  EXPECT_EQ(captured->timeout, model.timeout);
+  EXPECT_TRUE(captured->exporter != nullptr);
 }
