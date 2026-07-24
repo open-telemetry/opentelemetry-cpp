@@ -5,8 +5,10 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstddef>
 
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/sdk/metrics/cardinality_limits.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/version.h"
@@ -16,6 +18,7 @@ namespace sdk
 {
 namespace metrics
 {
+
 /**
  * MetricReader defines the interface to collect metrics from SDK
  */
@@ -46,6 +49,27 @@ public:
       InstrumentType instrument_type) const noexcept = 0;
 
   /**
+   * Get the cardinality limit for a given instrument type.
+   * Defaults to kAggregationCardinalityLimit (2000) unless overridden via
+   * SetCardinalityLimits().
+   *
+   * @param instrument_type The instrument type to get the limit for
+   * @return The cardinality limit for the requested instrument type
+   */
+  std::size_t GetCardinalityLimit(InstrumentType instrument_type) const noexcept;
+
+  /**
+   * Set per-instrument-type cardinality limits for this reader.
+   *
+   * TODO: Reader-level limits are stored but not yet enforced as a per-collector
+   * fallback during the collection path. Enforcement will be added in a follow-up.
+   * View-level limits (via AggregationConfig) are enforced today.
+   *
+   * @param limits The cardinality limits to apply
+   */
+  void SetCardinalityLimits(const CardinalityLimits &limits) noexcept;
+
+  /**
    * Shutdown the metric reader.
    */
   bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
@@ -73,6 +97,7 @@ protected:
 private:
   MetricProducer *metric_producer_{nullptr};
   std::atomic<bool> shutdown_{false};
+  CardinalityLimits cardinality_limits_;
 };
 }  // namespace metrics
 }  // namespace sdk

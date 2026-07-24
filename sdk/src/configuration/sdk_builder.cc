@@ -32,6 +32,7 @@
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
@@ -144,6 +145,8 @@
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/cardinality_limits.h"
+#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
@@ -180,10 +183,6 @@
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/version.h"
 #include "src/common/wildcard_match.h"
-
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -256,6 +255,40 @@ static opentelemetry::logs::Severity ToLogSeverity(
       break;
   }
   return opentelemetry::logs::Severity::kInvalid;
+}
+
+/// Convert a CardinalityLimitsConfiguration (where 0 means "unset, use
+/// default_limit") into a fully-resolved CardinalityLimits struct ready for
+/// MetricReader::SetCardinalityLimits().
+static opentelemetry::sdk::metrics::CardinalityLimits ToCardinalityLimits(
+    const opentelemetry::sdk::configuration::CardinalityLimitsConfiguration &cfg)
+{
+  opentelemetry::sdk::metrics::CardinalityLimits limits;
+  // If the caller supplied a non-zero default, use it; otherwise keep the
+  // SDK default (kDefaultCardinalityLimit = 2000) already in the struct.
+  const std::size_t d  = cfg.default_limit != CardinalityLimitsConfiguration::kInheritDefault
+                             ? cfg.default_limit
+                             : limits.default_limit;
+  limits.default_limit = d;
+  limits.counter = cfg.counter != CardinalityLimitsConfiguration::kInheritDefault ? cfg.counter : d;
+  limits.gauge   = cfg.gauge != CardinalityLimitsConfiguration::kInheritDefault ? cfg.gauge : d;
+  limits.histogram =
+      cfg.histogram != CardinalityLimitsConfiguration::kInheritDefault ? cfg.histogram : d;
+  limits.observable_counter =
+      cfg.observable_counter != CardinalityLimitsConfiguration::kInheritDefault
+          ? cfg.observable_counter
+          : d;
+  limits.observable_gauge = cfg.observable_gauge != CardinalityLimitsConfiguration::kInheritDefault
+                                ? cfg.observable_gauge
+                                : d;
+  limits.observable_up_down_counter =
+      cfg.observable_up_down_counter != CardinalityLimitsConfiguration::kInheritDefault
+          ? cfg.observable_up_down_counter
+          : d;
+  limits.up_down_counter = cfg.up_down_counter != CardinalityLimitsConfiguration::kInheritDefault
+                               ? cfg.up_down_counter
+                               : d;
+  return limits;
 }
 
 class ResourceAttributeValueSetter
@@ -1567,13 +1600,13 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
     OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
   }
 
-  if (model->cardinality_limits != nullptr)
-  {
-    OTEL_INTERNAL_LOG_WARN("cardinality limits not supported, ignoring");
-  }
-
   sdk = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
       std::move(exporter_sdk), options);
+
+  if (model->cardinality_limits != nullptr)
+  {
+    sdk->SetCardinalityLimits(ToCardinalityLimits(*model->cardinality_limits));
+  }
 
   return sdk;
 }
@@ -1592,7 +1625,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePul
 
   if (model->cardinality_limits != nullptr)
   {
-    OTEL_INTERNAL_LOG_WARN("cardinality limits not supported, ignoring");
+    sdk->SetCardinalityLimits(ToCardinalityLimits(*model->cardinality_limits));
   }
 
   return sdk;
@@ -1697,6 +1730,20 @@ void SdkBuilder::AddView(
   if (stream->aggregation)
   {
     sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
+  }
+
+  // Apply aggregation_cardinality_limit from the view stream configuration
+  if (stream->aggregation_cardinality_limit != 0)
+  {
+    if (sdk_aggregation_config)
+    {
+      sdk_aggregation_config->cardinality_limit_ = stream->aggregation_cardinality_limit;
+    }
+    else
+    {
+      sdk_aggregation_config = std::make_shared<opentelemetry::sdk::metrics::AggregationConfig>(
+          stream->aggregation_cardinality_limit);
+    }
   }
 
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk_attribute_processor;

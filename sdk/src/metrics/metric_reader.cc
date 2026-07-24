@@ -3,6 +3,7 @@
 
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/metrics/cardinality_limits.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/version.h"
 
@@ -82,6 +83,40 @@ bool MetricReader::ForceFlush(std::chrono::microseconds timeout) noexcept
 bool MetricReader::IsShutdown() const noexcept
 {
   return shutdown_.load(std::memory_order_acquire);
+}
+
+std::size_t MetricReader::GetCardinalityLimit(InstrumentType instrument_type) const noexcept
+{
+  switch (instrument_type)
+  {
+    case InstrumentType::kCounter:
+      return cardinality_limits_.counter;
+    case InstrumentType::kHistogram:
+      return cardinality_limits_.histogram;
+    case InstrumentType::kUpDownCounter:
+      return cardinality_limits_.up_down_counter;
+    case InstrumentType::kObservableCounter:
+      return cardinality_limits_.observable_counter;
+    case InstrumentType::kObservableGauge:
+      return cardinality_limits_.observable_gauge;
+    case InstrumentType::kObservableUpDownCounter:
+      return cardinality_limits_.observable_up_down_counter;
+    case InstrumentType::kGauge:
+      return cardinality_limits_.gauge;
+    default:
+      return cardinality_limits_.default_limit;
+  }
+}
+
+void MetricReader::SetCardinalityLimits(const CardinalityLimits &limits) noexcept
+{
+  cardinality_limits_ = limits;
+  // TODO: Reader-level limits are stored but not yet enforced as a per-collector
+  // fallback during the collection path. Enforcement will be added in a follow-up.
+  OTEL_INTERNAL_LOG_WARN(
+      "MetricReader::SetCardinalityLimits - reader-level cardinality limits are stored "
+      "but not yet enforced during collection. Use view-level AggregationConfig to "
+      "enforce limits today.");
 }
 
 }  // namespace metrics

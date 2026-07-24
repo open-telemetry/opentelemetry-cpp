@@ -24,6 +24,11 @@ Increment the:
 * [RELEASE] Bump main branch to 1.29.0-dev
   [#4259](https://github.com/open-telemetry/opentelemetry-cpp/pull/4259)
 
+* [ETW] Ensure spans own their names until they are ended
+  [#4247](https://github.com/open-telemetry/opentelemetry-cpp/pull/4247)
+
+* [Metrics SDK] Implement configurable cardinality limit
+  [#4188](https://github.com/open-telemetry/opentelemetry-cpp/pull/4188)
 * [CONFIGURATION] Programmatic configuration use case tests and fixes
   [#4243](https://github.com/open-telemetry/opentelemetry-cpp/pull/4243)
 

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <map>
 #include <memory>
@@ -15,10 +16,13 @@
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/metrics/sync_instruments.h"  // IWYU pragma: keep
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/cardinality_limits.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_filter.h"
@@ -27,7 +31,11 @@
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
+#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/metrics/view/view_registry_factory.h"
 
@@ -400,6 +408,190 @@ TEST_F(MetricCollectorTest, CollectWithMetricFilterTestAttributesTest2)
       }
     }
   }
+}
+
+TEST_F(MetricCollectorTest, CardinalityLimitDelegation)
+{
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+
+  // Create reader with per-instrument-type cardinality limits
+  auto reader = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits limits;
+  limits.default_limit              = 1000;
+  limits.counter                    = 100;
+  limits.histogram                  = 200;
+  limits.up_down_counter            = 1000;
+  limits.observable_counter         = 1000;
+  limits.observable_gauge           = 1000;
+  limits.observable_up_down_counter = 1000;
+  limits.gauge                      = 1000;
+  reader->SetCardinalityLimits(limits);
+
+  auto collector = AddMetricReaderToMeterContext(context, reader).lock();
+
+  // MetricCollector must delegate to the underlying MetricReader
+  EXPECT_EQ(collector->GetCardinalityLimit(InstrumentType::kCounter), 100);
+  EXPECT_EQ(collector->GetCardinalityLimit(InstrumentType::kHistogram), 200);
+  EXPECT_EQ(collector->GetCardinalityLimit(InstrumentType::kUpDownCounter), 1000);
+  EXPECT_EQ(collector->GetCardinalityLimit(InstrumentType::kObservableCounter), 1000);
+}
+
+TEST_F(MetricCollectorTest, MeterContextMaxCardinalityLimit)
+{
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+
+  // Test with no readers — each collector returns kDefaultCardinalityLimit
+  EXPECT_EQ(context->GetCollectors().size(), 0u);
+
+  // Add first reader with specific limits
+  auto reader1 = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits limits1;
+  limits1.counter   = 100;
+  limits1.histogram = 500;
+  reader1->SetCardinalityLimits(limits1);
+  auto weak1 = AddMetricReaderToMeterContext(context, reader1);
+
+  auto collectors1 = context->GetCollectors();
+  ASSERT_EQ(collectors1.size(), 1u);
+  EXPECT_EQ(collectors1[0]->GetCardinalityLimit(InstrumentType::kCounter), 100);
+  EXPECT_EQ(collectors1[0]->GetCardinalityLimit(InstrumentType::kHistogram), 500);
+
+  // Add second reader with different limits
+  auto reader2 = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits limits2;
+  limits2.counter   = 1000;
+  limits2.histogram = 200;
+  reader2->SetCardinalityLimits(limits2);
+  AddMetricReaderToMeterContext(context, reader2);
+
+  auto collectors2 = context->GetCollectors();
+  ASSERT_EQ(collectors2.size(), 2u);
+  EXPECT_EQ(collectors2[0]->GetCardinalityLimit(InstrumentType::kCounter), 100);
+  EXPECT_EQ(collectors2[1]->GetCardinalityLimit(InstrumentType::kCounter), 1000);
+  EXPECT_EQ(collectors2[0]->GetCardinalityLimit(InstrumentType::kHistogram), 500);
+  EXPECT_EQ(collectors2[1]->GetCardinalityLimit(InstrumentType::kHistogram), 200);
+}
+
+TEST_F(MetricCollectorTest, MeterContextCardinalityLimitWithMultipleReaders)
+{
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+
+  auto reader1 = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits limits1;
+  limits1.default_limit              = 500;
+  limits1.counter                    = 100;
+  limits1.histogram                  = 500;
+  limits1.up_down_counter            = 500;
+  limits1.observable_counter         = 500;
+  limits1.observable_gauge           = 500;
+  limits1.observable_up_down_counter = 500;
+  limits1.gauge                      = 500;
+  reader1->SetCardinalityLimits(limits1);
+  AddMetricReaderToMeterContext(context, reader1);
+
+  auto reader2 = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits limits2;
+  limits2.default_limit              = 1000;
+  limits2.counter                    = 1000;
+  limits2.histogram                  = 300;
+  limits2.up_down_counter            = 1000;
+  limits2.observable_counter         = 1000;
+  limits2.observable_gauge           = 1000;
+  limits2.observable_up_down_counter = 1000;
+  limits2.gauge                      = 1000;
+  reader2->SetCardinalityLimits(limits2);
+  AddMetricReaderToMeterContext(context, reader2);
+
+  auto reader3 = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits limits3;
+  limits3.counter   = 200;
+  limits3.histogram = 400;
+  // default_limit and other fields remain at kDefaultCardinalityLimit (2000)
+  reader3->SetCardinalityLimits(limits3);
+  AddMetricReaderToMeterContext(context, reader3);
+
+  auto collectors = context->GetCollectors();
+  ASSERT_EQ(collectors.size(), 3u);
+
+  // reader1: counter=100, histogram=500
+  EXPECT_EQ(collectors[0]->GetCardinalityLimit(InstrumentType::kCounter), 100);
+  EXPECT_EQ(collectors[0]->GetCardinalityLimit(InstrumentType::kHistogram), 500);
+  EXPECT_EQ(collectors[0]->GetCardinalityLimit(InstrumentType::kUpDownCounter), 500);
+
+  // reader2: counter=1000, histogram=300
+  EXPECT_EQ(collectors[1]->GetCardinalityLimit(InstrumentType::kCounter), 1000);
+  EXPECT_EQ(collectors[1]->GetCardinalityLimit(InstrumentType::kHistogram), 300);
+  EXPECT_EQ(collectors[1]->GetCardinalityLimit(InstrumentType::kUpDownCounter), 1000);
+
+  // reader3: counter=200, histogram=400, others=kDefaultCardinalityLimit (2000)
+  EXPECT_EQ(collectors[2]->GetCardinalityLimit(InstrumentType::kCounter), 200);
+  EXPECT_EQ(collectors[2]->GetCardinalityLimit(InstrumentType::kHistogram), 400);
+  EXPECT_EQ(collectors[2]->GetCardinalityLimit(InstrumentType::kUpDownCounter),
+            kDefaultCardinalityLimit);
+}
+
+// Verify that when a view-level cardinality limit is set via AggregationConfig,
+// streams exceeding the limit produce an overflow attribute point.
+TEST_F(MetricCollectorTest, ViewCardinalityLimitEnforcedOnCollection)
+{
+  constexpr size_t kLimit = 5;
+
+  // Build a MeterContext with a View that applies a small cardinality limit to
+  // "limited_counter" so that SyncMetricStorage respects it during recording.
+  auto view_registry = ViewRegistryFactory::Create();
+  auto aggr_config   = std::make_shared<AggregationConfig>(kLimit);
+  view_registry->AddView(std::unique_ptr<InstrumentSelector>(new InstrumentSelector(
+                             InstrumentType::kCounter, "limited_counter", "")),
+                         std::unique_ptr<MeterSelector>(new MeterSelector(
+                             "ReaderCardinalityLimitEnforcedOnCollection", "", "")),
+                         std::unique_ptr<View>(new View("limited_counter_view", "",
+                                                        AggregationType::kSum, aggr_config)));
+
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(std::move(view_registry)));
+  auto scope   = InstrumentationScope::Create("ReaderCardinalityLimitEnforcedOnCollection");
+  auto meter   = std::shared_ptr<Meter>(new Meter(context, std::move(scope)));
+  context->AddMeter(meter);
+
+  auto reader    = std::shared_ptr<MetricReader>(new MockMetricReader());
+  auto collector = AddMetricReaderToMeterContext(context, reader).lock();
+
+  auto counter = meter->CreateUInt64Counter("limited_counter");
+
+  // Record kLimit + 5 unique attribute sets — up to (kLimit - 1) distinct
+  // points are stored; everything beyond collapses into the overflow point.
+  for (size_t i = 0; i < kLimit + 5; ++i)
+  {
+    std::map<std::string, std::string> attrs = {{"key", std::to_string(i)}};
+    counter->Add(
+        1, opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        opentelemetry::context::Context{});
+  }
+
+  auto resource_metrics = collector->Produce().points_;
+
+  bool overflow_present = false;
+  size_t total_points   = 0;
+  for (const ScopeMetrics &sm : resource_metrics.scope_metric_data_)
+  {
+    for (const MetricData &md : sm.metric_data_)
+    {
+      total_points = md.point_data_attr_.size();
+      for (const PointDataAttributes &pda : md.point_data_attr_)
+      {
+        if (!pda.attributes.GetAttributes().empty() &&
+            pda.attributes.GetAttributes().begin()->first == kAttributesLimitOverflowKey)
+        {
+          overflow_present = true;
+        }
+      }
+    }
+  }
+
+  // Total data points: up to kLimit real attribute sets + 1 overflow point.
+  // Since #4236, the overflow point is reserved separately from the limit.
+  EXPECT_LE(total_points, kLimit + 1);
+  // The overflow sentinel point must be present
+  EXPECT_TRUE(overflow_present);
 }
 
 #if defined(__GNUC__) || defined(__clang__) || defined(__apple_build_version__)
