@@ -482,7 +482,8 @@ elif [[ "$1" == "cmake.install_functions.test" ]]; then
         -DENABLE_COMPONENTS=OFF \
         -DENABLE_EXAMPLES=OFF \
         -DENABLE_TESTS=OFF \
-        -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
+        -DENABLE_PREVIEW=OFF \
+        -C ${SRC_DIR}/test_common/cmake/all-options-abiv1.cmake \
         "${SRC_DIR}"
 
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"

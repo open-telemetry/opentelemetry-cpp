@@ -490,7 +490,8 @@ switch ($action) {
       -DENABLE_EXAMPLES=OFF `
       -DENABLE_TESTS=OFF `
       -DENABLE_COMPONENTS=OFF `
-      "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake"
+      -DENABLE_PREVIEW=OFF `
+      "-C $SRC_DIR/test_common/cmake/all-options-abiv1.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit
