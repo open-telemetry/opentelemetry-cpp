@@ -280,7 +280,7 @@ struct Socket
 
   Socket(Type sock = Invalid) : m_sock(sock) {}
 
-  Socket(int af, int type, int proto) : m_sock(::socket(af, type, proto)) {}
+  Socket(int af, int type, int proto) : m_sock(::socket(af, type, proto)) { suppressSigPipe(); }
 
   operator Socket::Type() const { return m_sock; }
 
@@ -345,6 +345,25 @@ struct Socket
     m_sock = Invalid;
   }
 
+  /**
+   * Stop writes to a socket whose peer has gone away from raising SIGPIPE, whose default
+   * disposition would terminate the host process. Platforms that offer MSG_NOSIGNAL do this
+   * per call in send() instead, and Windows has no SIGPIPE at all. Deliberately per socket
+   * rather than by changing the process signal disposition, which belongs to the embedding
+   * program rather than to this library.
+   */
+  void suppressSigPipe()
+  {
+#ifdef SO_NOSIGPIPE
+    if (m_sock != Invalid)
+    {
+      int value = 1;
+      ::setsockopt(m_sock, SOL_SOCKET, SO_NOSIGPIPE, reinterpret_cast<char *>(&value),
+                   sizeof(value));
+    }
+#endif
+  }
+
   int recv(void *buffer, unsigned size)
   {
     assert(m_sock != Invalid);
@@ -355,7 +374,12 @@ struct Socket
   int send(void const *buffer, unsigned size)
   {
     assert(m_sock != Invalid);
-    return static_cast<int>(::send(m_sock, reinterpret_cast<char const *>(buffer), size, 0));
+#ifdef MSG_NOSIGNAL
+    int const flags = MSG_NOSIGNAL;
+#else
+    int const flags = 0;
+#endif
+    return static_cast<int>(::send(m_sock, reinterpret_cast<char const *>(buffer), size, flags));
   }
 
   bool bind(SocketAddr const &addr)
@@ -390,6 +414,7 @@ struct Socket
     socklen_t addrlen = sizeof(caddr);
 #endif
     csock = ::accept(m_sock, caddr, &addrlen);
+    csock.suppressSigPipe();
     return !csock.invalid();
   }
 
