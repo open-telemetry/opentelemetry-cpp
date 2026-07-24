@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Move metrics storage test fixtures into anonymous namespace
+  [#4286](https://github.com/open-telemetry/opentelemetry-cpp/pull/4286)
+
 * [CODE HEALTH] Fix more clang tidy warnings (member initialization)
   [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
 
