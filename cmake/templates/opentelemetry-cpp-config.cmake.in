@@ -72,6 +72,7 @@
 # COMPONENTS
 #   api
 #   sdk
+#   configuration
 #   ext_common
 #   ext_http_curl
 #   ext_dll
@@ -88,6 +89,14 @@
 #   resource_detectors
 #   shims_opentracing
 #
+# DEPRECATED COMPONENTS
+#   exporters_otlp_builder_utils           - targets moved to COMPONENT exporters_otlp_common
+#   exporters_otlp_file_builder            - targets moved to COMPONENT exporters_otlp_file
+#   exporters_otlp_http_builder            - targets moved to COMPONENT exporters_otlp_http
+#   exporters_otlp_grpc_builder            - targets moved to COMPONENT exporters_otlp_grpc
+#   exporters_ostream_builder              - targets moved to COMPONENT exporters_ostream
+#   exporters_prometheus_builder           - targets moved to COMPONENT exporters_prometheus
+# --------------------
 # ::
 #
 # TARGETS
@@ -99,6 +108,8 @@
 #   opentelemetry-cpp::trace                             - Imported target of COMPONENT sdk
 #   opentelemetry-cpp::metrics                           - Imported target of COMPONENT sdk
 #   opentelemetry-cpp::logs                              - Imported target of COMPONENT sdk
+#   opentelemetry-cpp::configuration_core                - Imported target of COMPONENT sdk
+#   opentelemetry-cpp::configuration                     - Imported target of COMPONENT configuration
 #   opentelemetry-cpp::ext                               - Imported target of COMPONENT ext_common
 #   opentelemetry-cpp::http_client_curl                  - Imported target of COMPONENT ext_http_curl
 #   opentelemetry-cpp::opentelemetry_cpp                 - Imported target of COMPONENT ext_dll
@@ -143,6 +154,7 @@
 #   - **Protobuf**
 #   - **gRPC**
 #   - **prometheus-cpp**
+#   - **ryml**
 #   - **OpenTracing**
 #
 #   **Found using the CMake MODULE search mode:**
@@ -193,6 +205,10 @@ foreach(_COMPONENT IN LISTS _REQUESTED_COMPONENTS)
   set(${CMAKE_FIND_PACKAGE_NAME}_${_COMPONENT}_FOUND TRUE
     CACHE BOOL "whether ${CMAKE_FIND_PACKAGE_NAME} component ${_COMPONENT} is found" FORCE)
 endforeach()
+
+# set the component found flag for requested deprecated component names
+# resolved to an imported replacement component
+set_deprecated_components_found(${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
 
 # get installed and requested targets
 set(_OPENTELEMETRY_CPP_TARGETS "")

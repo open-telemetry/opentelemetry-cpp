@@ -5,6 +5,46 @@ include("${CMAKE_CURRENT_LIST_DIR}/component-definitions.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/thirdparty-dependency-definitions.cmake")
 
 #-------------------------------------------------------------------------
+# Function to resolve deprecated component names to their aliases.
+# Components without an alias are removed from the list
+#-------------------------------------------------------------------------
+function(resolve_deprecated_components requested_components_inout)
+  set(_result ${${requested_components_inout}})
+  foreach(_COMPONENT IN LISTS ${requested_components_inout})
+    if(${_COMPONENT} IN_LIST OTEL_DEPRECATED_COMPONENTS_LIST)
+      set(_replacement_var "COMPONENT_${_COMPONENT}_REPLACEMENT")
+      if(DEFINED ${_replacement_var})
+        message(DEPRECATION "opentelemetry-cpp: component `${_COMPONENT}` is deprecated, use `${${_replacement_var}}` instead.")
+        list(REMOVE_ITEM _result ${_COMPONENT})
+        list(APPEND _result ${${_replacement_var}})
+      else()
+        message(DEPRECATION "opentelemetry-cpp: component `${_COMPONENT}` is deprecated with no replacement.")
+        list(REMOVE_ITEM _result ${_COMPONENT})
+      endif()
+    endif()
+  endforeach()
+  list(REMOVE_DUPLICATES _result)
+  set(${requested_components_inout} "${_result}" PARENT_SCOPE)
+endfunction()
+
+#-------------------------------------------------------------------------
+# Function to set the <package>_<component>_FOUND variable for requested
+# deprecated component names that have a replacement component.
+#-------------------------------------------------------------------------
+function(set_deprecated_components_found requested_components_in)
+  foreach(_COMPONENT IN LISTS ${requested_components_in})
+    if(${_COMPONENT} IN_LIST OTEL_DEPRECATED_COMPONENTS_LIST)
+      set(_replacement_var "COMPONENT_${_COMPONENT}_REPLACEMENT")
+      if(DEFINED ${_replacement_var}
+         AND ${CMAKE_FIND_PACKAGE_NAME}_${${_replacement_var}}_FOUND)
+        set(${CMAKE_FIND_PACKAGE_NAME}_${_COMPONENT}_FOUND TRUE
+          CACHE BOOL "whether ${CMAKE_FIND_PACKAGE_NAME} deprecated component ${_COMPONENT} is found (via replacement ${${_replacement_var}})" FORCE)
+      endif()
+    endif()
+  endforeach()
+endfunction()
+
+#-------------------------------------------------------------------------
 # Function to get installed components.
 #-------------------------------------------------------------------------
 function(get_installed_components installed_components_out)
@@ -33,7 +73,6 @@ function(get_dependent_components component_in dependent_components_out)
   set(${dependent_components_out} ${result} PARENT_SCOPE)
 endfunction()
 
-
 #-------------------------------------------------------------------------
 # Function to get requested components.
 #-------------------------------------------------------------------------
@@ -44,8 +83,10 @@ function(get_requested_components installed_components_in requested_components_o
     message(DEBUG "get_requested_components: No components explicitly requested. Importing all installed components including: ${result}")
     set(${requested_components_out} ${result} PARENT_SCOPE)
   else()
-    message(DEBUG "get_requested_components: Components requested: ${opentelemetry-cpp_FIND_COMPONENTS}")
-    foreach(_COMPONENT IN LISTS opentelemetry-cpp_FIND_COMPONENTS)
+    set(REQUESTED_COMPONENTS ${opentelemetry-cpp_FIND_COMPONENTS})
+    message(DEBUG "get_requested_components: Components requested: ${REQUESTED_COMPONENTS}")
+    resolve_deprecated_components(REQUESTED_COMPONENTS)
+    foreach(_COMPONENT IN LISTS REQUESTED_COMPONENTS)
         if(NOT ${_COMPONENT} IN_LIST OTEL_BUILT_COMPONENTS_LIST)
             message(ERROR " get_requested_components: Component `${_COMPONENT}` is not a built component of the opentelemetry-cpp package. Built components include: ${OTEL_BUILT_COMPONENTS_LIST}")
             return()
