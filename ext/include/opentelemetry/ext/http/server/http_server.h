@@ -367,7 +367,11 @@ protected:
     m_reactor.removeSocket(conn.socket);
     auto connIt = m_connections.find(conn.socket);
     conn.socket.close();
-    m_connections.erase(connIt);
+    if (connIt != m_connections.end())
+    {
+      // Destroys the Connection that conn refers to: callers must not use conn afterwards.
+      m_connections.erase(connIt);
+    }
   }
 
   void handleConnection(Connection &conn)
@@ -522,7 +526,11 @@ protected:
 
       if (conn.state == Connection::Processing)
       {
-        processRequest(conn);
+        if (!processRequest(conn))
+        {
+          // A handler closed the connection: conn has been erased and must not be touched.
+          return;
+        }
 
         std::ostringstream os;
         os << conn.request.protocol << ' ' << conn.response.code << ' ' << conn.response.message
@@ -736,7 +744,12 @@ protected:
     return result;
   }
 
-  void processRequest(Connection &conn)
+  /**
+   * Run the registered handlers for a request and fill in the response.
+   * @return false if a handler asked to close the connection, in which case the connection has
+   *         already been closed and \p conn must not be used again by the caller.
+   */
+  bool processRequest(Connection &conn)
   {
     conn.response.message.clear();
     conn.response.headers.clear();
@@ -767,6 +780,7 @@ protected:
       {
         LOG_TRACE("HttpServer: [%s] closing by request", conn.request.client.c_str());
         handleConnectionClosed(conn);
+        return false;
       }
     }
 
@@ -779,6 +793,8 @@ protected:
     conn.response.headers["Connection"]     = (conn.keepalive ? "keep-alive" : "close");
     conn.response.headers["Date"]           = formatTimestamp(time(nullptr));
     conn.response.headers["Content-Length"] = std::to_string(conn.response.body.size());
+
+    return true;
   }
 
   static std::string formatTimestamp(time_t time)

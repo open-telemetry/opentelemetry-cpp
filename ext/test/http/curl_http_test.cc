@@ -204,6 +204,12 @@ public:
       response.headers["Content-Type"] = "text/plain";
       response_status                  = 429;
     }
+    else if (request.uri == "/close/")
+    {
+      // -1 is the documented way for a handler to ask the server to terminate the
+      // connection immediately without sending a response.
+      response_status = -1;
+    }
 
     cv_got_events.notify_one();
 
@@ -459,6 +465,24 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 
   http_client::Headers m1 = {};
   auto result             = http_client.GetNoSsl("http://127.0.0.1:19000/get/", m1);
+  EXPECT_EQ(result, true);
+  EXPECT_EQ(result.GetSessionState(), http_client::SessionState::Response);
+}
+
+TEST_F(BasicCurlHttpTests, HandlerRequestedCloseKeepsServerUsable)
+{
+  received_requests_.clear();
+  curl::HttpClientSync http_client;
+  http_client::Headers m1 = {};
+
+  // A handler returning -1 closes the connection without a response. The server used to
+  // keep reading and writing the Connection it had just erased, which AddressSanitizer
+  // reports as a use-after-free on this request.
+  auto closed = http_client.GetNoSsl("http://127.0.0.1:19000/close/", m1);
+  EXPECT_EQ(closed, false);
+
+  // The server has to still be serving afterwards.
+  auto result = http_client.GetNoSsl("http://127.0.0.1:19000/get/", m1);
   EXPECT_EQ(result, true);
   EXPECT_EQ(result.GetSessionState(), http_client::SessionState::Response);
 }
