@@ -506,6 +506,13 @@ protected:
           return;
         }
 
+        // addSocket() replaces the interest set rather than adding to it, so a would-block
+        // while sending the interim response leaves the socket registered for writability
+        // only. Restore read interest before going back to waiting for the request body:
+        // this is the one transition from a sending state to a receiving one, and the
+        // keep-alive path at the end of SendingBody already does the same thing.
+        m_reactor.addSocket(conn.socket,
+                            SocketTools::Reactor::Readable | SocketTools::Reactor::Closed);
         conn.state = Connection::ReceivingBody;
         LOG_TRACE("HttpServer: [%s] receiving body", conn.request.client.c_str());
       }
