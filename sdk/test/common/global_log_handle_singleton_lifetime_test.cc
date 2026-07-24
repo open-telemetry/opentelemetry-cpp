@@ -11,6 +11,9 @@
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
+namespace
+{
+
 class GlobalLogHandlerChecker
 {
 public:
@@ -38,14 +41,11 @@ public:
 };
 bool GlobalLogHandlerChecker::custom_handler_destroyed = false;
 
-namespace
-{
 static GlobalLogHandlerChecker &ConstructChecker()
 {
   static GlobalLogHandlerChecker checker;
   return checker;
 }
-}  // namespace
 
 class CustomLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
 {
@@ -112,3 +112,5 @@ TEST(GlobalLogHandleSingletonTest, Lifetime)
     EXPECT_TRUE(!!handle);
   }
 }
+
+}  // namespace
