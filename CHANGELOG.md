@@ -19,6 +19,9 @@ Increment the:
   namespaces
   [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)
 
+* [BUG] Make SocketAddr string parsing memory safe on Windows and POSIX
+  [#4292](https://github.com/open-telemetry/opentelemetry-cpp/pull/4292)
+
 * [CODE HEALTH] Move metrics storage test fixtures into anonymous namespace
   [#4286](https://github.com/open-telemetry/opentelemetry-cpp/pull/4286)
 
