@@ -486,9 +486,11 @@ switch ($action) {
       "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake" `
       "-DCMAKE_INSTALL_PREFIX=$INSTALL_TEST_DIR" `
       -DOPENTELEMETRY_INSTALL=ON `
-      -DWITH_EXAMPLES=OFF `
-      -DBUILD_TESTING=OFF `
-      "-DOPENTELEMETRY_EXTERNAL_COMPONENT_PATH=$SRC_DIR\install\test\cmake\install_functions_test\components"
+      "-DOPENTELEMETRY_EXTERNAL_COMPONENT_PATH=$SRC_DIR\install\test\cmake\install_functions_test\components" `
+      -DENABLE_EXAMPLES=OFF `
+      -DENABLE_TESTS=OFF `
+      -DENABLE_COMPONENTS=OFF `
+      "-C $SRC_DIR/test_common/cmake/all-options-abiv1-preview.cmake"
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
       exit $exit

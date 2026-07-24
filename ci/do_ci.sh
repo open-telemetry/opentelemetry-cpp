@@ -478,9 +478,11 @@ elif [[ "$1" == "cmake.install_functions.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}" \
         -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
         -DOPENTELEMETRY_INSTALL=ON \
-        -DWITH_EXAMPLES=OFF \
-        -DBUILD_TESTING=OFF \
         -DOPENTELEMETRY_EXTERNAL_COMPONENT_PATH=${SRC_DIR}/install/test/cmake/install_functions_test/components \
+        -DENABLE_COMPONENTS=OFF \
+        -DENABLE_EXAMPLES=OFF \
+        -DENABLE_TESTS=OFF \
+        -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
         "${SRC_DIR}"
 
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
