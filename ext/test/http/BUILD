@@ -4,6 +4,18 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
+    name = "socket_tools_test",
+    srcs = [
+        "socket_tools_test.cc",
+    ],
+    tags = ["test"],
+    deps = [
+        "//ext:headers",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "curl_http_test",
     srcs = [
         "curl_http_test.cc",

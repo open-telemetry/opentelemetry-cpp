@@ -186,12 +186,19 @@ struct SocketAddr
 #ifdef _WIN32
     INT addrlen = sizeof(m_data);
     WCHAR buf[200];
-    for (int i = 0; i < sizeof(buf) && addr[i]; i++)
+    // sizeof(buf) is a byte count, not an element count: bound the copy by the latter.
+    size_t const capacity = sizeof(buf) / sizeof(buf[0]) - 1;
+    size_t copied         = 0;
+    while (copied < capacity && addr[copied])
     {
-      buf[i] = addr[i];
+      buf[copied] = static_cast<WCHAR>(static_cast<unsigned char>(addr[copied]));
+      ++copied;
     }
-    buf[199] = L'\0';
-    ::WSAStringToAddressW(buf, AF_INET, nullptr, &m_data, &addrlen);
+    buf[copied] = L'\0';
+    if (::WSAStringToAddressW(buf, AF_INET, nullptr, &m_data, &addrlen) != 0)
+    {
+      LOG_WARN("SocketAddr: cannot parse address %s", addr);
+    }
 #else
     sockaddr_in &inet4 = reinterpret_cast<sockaddr_in &>(m_data);
     inet4.sin_family   = AF_INET;
@@ -211,14 +218,23 @@ struct SocketAddr
         inet4.sin_port = 0;
       }
       char buf[16];
-      memcpy(buf, addr, (std::min<ptrdiff_t>)(15, colon - addr));
-      buf[15] = '\0';
-      ::inet_pton(AF_INET, buf, &inet4.sin_addr);
+      // Terminate after what was actually copied: buf is uninitialized, so terminating at a
+      // fixed index would leave indeterminate bytes for inet_pton to read.
+      size_t const hostLength = static_cast<size_t>((std::min<ptrdiff_t>)(15, colon - addr));
+      memcpy(buf, addr, hostLength);
+      buf[hostLength] = '\0';
+      if (::inet_pton(AF_INET, buf, &inet4.sin_addr) != 1)
+      {
+        LOG_WARN("SocketAddr: cannot parse address %s", addr);
+      }
     }
     else
     {
       inet4.sin_port = 0;
-      ::inet_pton(AF_INET, addr, &inet4.sin_addr);
+      if (::inet_pton(AF_INET, addr, &inet4.sin_addr) != 1)
+      {
+        LOG_WARN("SocketAddr: cannot parse address %s", addr);
+      }
     }
 #endif
   }

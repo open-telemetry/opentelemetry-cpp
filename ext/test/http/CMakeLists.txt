@@ -14,6 +14,15 @@ if(WITH_HTTP_CLIENT_CURL)
     TEST_LIST ${FILENAME})
 endif()
 
+set(SOCKET_TOOLS_FILENAME socket_tools_test)
+add_executable(${SOCKET_TOOLS_FILENAME} ${SOCKET_TOOLS_FILENAME}.cc)
+target_link_libraries(${SOCKET_TOOLS_FILENAME} opentelemetry_ext ${GMOCK_LIB}
+                      ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+gtest_add_tests(
+  TARGET ${SOCKET_TOOLS_FILENAME}
+  TEST_PREFIX ext.http.sockettools.
+  TEST_LIST ${SOCKET_TOOLS_FILENAME})
+
 set(URL_PARSER_FILENAME url_parser_test)
 add_executable(${URL_PARSER_FILENAME} ${URL_PARSER_FILENAME}.cc)
 target_link_libraries(${URL_PARSER_FILENAME} opentelemetry_ext ${GMOCK_LIB}
