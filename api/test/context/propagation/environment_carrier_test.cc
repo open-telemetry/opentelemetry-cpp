@@ -103,7 +103,8 @@ TEST_F(EnvironmentCarrierTest, GetCachesValues)
   auto value1 = carrier.Get("traceparent");
   EXPECT_EQ(value1, "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01");
 
-  // Change environment - cached value should be returned
+  // Cached value is returned even after the environment variable changes.
+  // This ensures the returned string_view remains valid for the lifetime of the carrier.
   test_setenv("TRACEPARENT", "changed-value");
   auto value2 = carrier.Get("traceparent");
   EXPECT_EQ(value2, "00-4bf92f3577b34da6a3ce929d0e0e4736-0102030405060708-01");
@@ -193,6 +194,29 @@ TEST_F(EnvironmentCarrierTest, GetCacheKeyedByNormalizedName)
   EXPECT_EQ(v2, "original");
 
   test_unsetenv("X_B3_TRACEID");
+}
+
+TEST_F(EnvironmentCarrierTest, NormalizeKeyEmpty)
+{
+  // Per spec: an empty key name normalizes to "_"
+  auto env_map = std::make_shared<std::map<std::string, std::string>>();
+  context::propagation::EnvironmentCarrier carrier(env_map);
+
+  carrier.Set("", "some-value");
+  EXPECT_EQ(env_map->count("_"), 1u);
+  EXPECT_EQ(env_map->at("_"), "some-value");
+}
+
+TEST_F(EnvironmentCarrierTest, GetEmptyKeyNormalizesToUnderscore)
+{
+  // Per spec: Get("") normalizes the key to "_" and reads the "_" environment variable.
+  test_setenv("_", "underscore-value");
+
+  context::propagation::EnvironmentCarrier carrier;
+  auto value = carrier.Get("");
+  EXPECT_EQ(value, "underscore-value");
+
+  test_unsetenv("_");
 }
 
 TEST_F(EnvironmentCarrierTest, ExtractTraceContext)
