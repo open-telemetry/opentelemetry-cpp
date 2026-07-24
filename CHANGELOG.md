@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Fix remaining misc-override-with-different-visibility warnings
+  [#4280](https://github.com/open-telemetry/opentelemetry-cpp/pull/4280)
+
 * [CODE HEALTH] Fix more clang tidy warnings (member initialization)
   [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
 
