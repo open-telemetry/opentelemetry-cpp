@@ -140,6 +140,7 @@ protected:
   std::atomic<bool> is_setup_{false};
   std::atomic<bool> is_running_{false};
   std::vector<HTTP_SERVER_NS::HttpRequest> received_requests_;
+  std::atomic<unsigned> close_requests_{0};
   std::mutex cv_mtx_requests;
   std::mutex mtx_requests;
   std::condition_variable cv_got_events;
@@ -165,6 +166,7 @@ protected:
     server_.addHandler("/get/", *this);
     server_.addHandler("/post/", *this);
     server_.addHandler("/retry/", *this);
+    server_.addHandler("/close/", *this);
     server_.start();
     is_running_ = true;
   }
@@ -208,6 +210,7 @@ public:
     {
       // -1 is the documented way for a handler to ask the server to terminate the
       // connection immediately without sending a response.
+      close_requests_.fetch_add(1, std::memory_order_relaxed);
       response_status = -1;
     }
 
@@ -471,15 +474,19 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 
 TEST_F(BasicCurlHttpTests, HandlerRequestedCloseKeepsServerUsable)
 {
-  received_requests_.clear();
   curl::HttpClientSync http_client;
   http_client::Headers m1 = {};
 
-  // A handler returning -1 closes the connection without a response. The server used to
-  // keep reading and writing the Connection it had just erased, which AddressSanitizer
-  // reports as a use-after-free on this request.
+  // A handler returning -1 closes the connection without a response. The server used to keep
+  // reading and writing the Connection it had just erased, which AddressSanitizer reports as
+  // a use-after-free on this request.
   auto closed = http_client.GetNoSsl("http://127.0.0.1:19000/close/", m1);
-  EXPECT_EQ(closed, false);
+  ASSERT_EQ(closed, false);
+
+  // Prove the request actually reached the handler. Without this, an unregistered route or a
+  // typo would leave the server answering 404 and the assertion above would be measuring the
+  // wrong thing.
+  EXPECT_EQ(close_requests_.load(std::memory_order_relaxed), 1U);
 
   // The server has to still be serving afterwards.
   auto result = http_client.GetNoSsl("http://127.0.0.1:19000/get/", m1);

@@ -367,6 +367,11 @@ protected:
     m_reactor.removeSocket(conn.socket);
     auto connIt = m_connections.find(conn.socket);
     conn.socket.close();
+    // Every caller passes a connection that is in the map. The guard keeps a broken invariant
+    // from turning into erase(end()), and the assert keeps it from passing unnoticed in a
+    // debug build. This does not make the function idempotent: the reactor removal and the
+    // socket close above have already run.
+    assert(connIt != m_connections.end());
     if (connIt != m_connections.end())
     {
       // Destroys the Connection that conn refers to: callers must not use conn afterwards.
@@ -526,9 +531,12 @@ protected:
 
       if (conn.state == Connection::Processing)
       {
-        if (!processRequest(conn))
+        if (processRequest(conn) == RequestOutcome::CloseConnection)
         {
-          // A handler closed the connection: conn has been erased and must not be touched.
+          // Mark the close as intentional so it is not reported as unexpected, then stop:
+          // handleConnectionClosed() erases conn, so it must not be touched afterwards.
+          conn.state = Connection::Closing;
+          handleConnectionClosed(conn);
           return;
         }
 
@@ -744,12 +752,18 @@ protected:
     return result;
   }
 
+  enum class RequestOutcome : std::uint8_t
+  {
+    SendResponse,
+    CloseConnection
+  };
+
   /**
    * Run the registered handlers for a request and fill in the response.
-   * @return false if a handler asked to close the connection, in which case the connection has
-   *         already been closed and \p conn must not be used again by the caller.
+   * @return CloseConnection if a handler asked for the connection to be terminated. Closing is
+   *         left to the caller, which owns the connection's lifetime.
    */
-  bool processRequest(Connection &conn)
+  RequestOutcome processRequest(Connection &conn)
   {
     conn.response.message.clear();
     conn.response.headers.clear();
@@ -779,8 +793,7 @@ protected:
       if (conn.response.code == -1)
       {
         LOG_TRACE("HttpServer: [%s] closing by request", conn.request.client.c_str());
-        handleConnectionClosed(conn);
-        return false;
+        return RequestOutcome::CloseConnection;
       }
     }
 
@@ -794,7 +807,7 @@ protected:
     conn.response.headers["Date"]           = formatTimestamp(time(nullptr));
     conn.response.headers["Content-Length"] = std::to_string(conn.response.body.size());
 
-    return true;
+    return RequestOutcome::SendResponse;
   }
 
   static std::string formatTimestamp(time_t time)
