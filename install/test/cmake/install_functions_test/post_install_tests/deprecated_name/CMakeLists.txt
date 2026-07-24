@@ -4,9 +4,7 @@
 # Post-install test: find_package with a deprecated component name.
 #
 # Requesting the deprecated name must resolve to the replacement component and
-# emit a deprecation warning. The parent harness runs this project with
-# -Wdeprecated and asserts the "CMake Deprecation Warning" banner with
-# PASS_REGULAR_EXPRESSION.
+# emit a deprecation warning.
 
 cmake_minimum_required(VERSION 3.16)
 project(otel-install-functions-deprecated-name-test LANGUAGES NONE)

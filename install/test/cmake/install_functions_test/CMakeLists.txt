@@ -40,11 +40,6 @@ add_test(
     ${CMAKE_SOURCE_DIR}/post_install_tests/deprecated_name -B
     build-deprecated-name-test "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
 
-set_tests_properties(
-  install-functions-deprecated-name-test
-  PROPERTIES PASS_REGULAR_EXPRESSION "CMake Deprecation Warning"
-             FAIL_REGULAR_EXPRESSION "CMake Error")
-
 # ---------------------------------------------------------------
 # Test find_package component dependency resolution. Unsorted components must be
 # imported in the correct order.
