@@ -19,6 +19,9 @@ Increment the:
   namespaces
   [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)
 
+* [BUG] Fix use-after-free when an HTTP handler closes the connection
+  [#4289](https://github.com/open-telemetry/opentelemetry-cpp/pull/4289)
+
 * [CODE HEALTH] Move metrics storage test fixtures into anonymous namespace
   [#4286](https://github.com/open-telemetry/opentelemetry-cpp/pull/4286)
 
