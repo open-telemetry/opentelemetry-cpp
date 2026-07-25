@@ -22,6 +22,7 @@
 // #  include <windows.h>
 
 #  include <winsock2.h>
+#  include <ws2tcpip.h>  // inet_pton
 
 // TODO: consider NOMINMAX
 #  undef min
@@ -183,82 +184,79 @@ struct SocketAddr
 
   SocketAddr(char const *addr)
   {
-#ifdef _WIN32
-    // WSAStringToAddress fails with WSAEINVAL unless the sockaddr's family is preset.
-    m_data.sa_family = AF_INET;
-    INT addrlen      = sizeof(m_data);
-    WCHAR buf[200];
-    // sizeof(buf) is a byte count, not an element count: bound the copy by the latter.
-    size_t const capacity = sizeof(buf) / sizeof(buf[0]) - 1;
-    size_t copied         = 0;
-    while (copied < capacity && addr[copied])
+    // One parser for every platform: inet_pton (Winsock provides it since Vista) plus a strict
+    // decimal port. This avoids WSAStringToAddress, whose grammar and default-component filling
+    // differ from the POSIX path. Parse into a local sockaddr_in and commit with memcpy only on
+    // success, which keeps m_data at AF_UNSPEC on failure and avoids accessing the sockaddr
+    // storage through a sockaddr_in glvalue (an alignment/type-access issue tracked in #4287).
+    if (addr == nullptr)
     {
-      buf[copied] = static_cast<WCHAR>(static_cast<unsigned char>(addr[copied]));
-      ++copied;
+      LOG_WARN("SocketAddr: cannot parse a null address");
+      return;  // m_data is already AF_UNSPEC, so port() reports -1.
     }
-    buf[copied] = L'\0';
-    if (::WSAStringToAddressW(buf, AF_INET, nullptr, &m_data, &addrlen) != 0)
-    {
-      // Leave an unusable address rather than a plausible endpoint that connect()/bind() would
-      // accept: a family of AF_UNSPEC makes port() return -1.
-      m_data = {};
-      LOG_WARN("SocketAddr: cannot parse address %s", addr);
-    }
-#else
-    sockaddr_in &inet4 = reinterpret_cast<sockaddr_in &>(m_data);
-    inet4.sin_family   = AF_INET;
+
+    sockaddr_in parsed{};
+    parsed.sin_family = AF_INET;
 
     char const *colon          = strchr(addr, ':');
     char const *hostEnd        = colon ? colon : addr + strlen(addr);
     ptrdiff_t const hostLength = hostEnd - addr;
 
-    bool ok = true;
-
     // Reject a host that would not fit rather than truncating it into a different valid address
-    // (for example "255.255.255.2559" would otherwise become "255.255.255.255").
-    if (hostLength <= 0 || hostLength > 15)
-    {
-      ok = false;
-    }
-    else
+    // (for example "255.255.255.2559" would otherwise become "255.255.255.255"). No dotted-quad
+    // exceeds 15 characters.
+    bool ok = (hostLength >= 1 && hostLength <= 15);
+    if (ok)
     {
       char host[16];
       memcpy(host, addr, static_cast<size_t>(hostLength));
       host[hostLength] = '\0';
-      ok               = (::inet_pton(AF_INET, host, &inet4.sin_addr) == 1);
+      ok               = (::inet_pton(AF_INET, host, &parsed.sin_addr) == 1);
     }
 
-    uint16_t port = 0;
+    // Port: decimal digits only, with overflow checked before it can wrap. strtol would also
+    // accept a leading sign or whitespace and depend on the locale.
     if (ok && colon)
     {
-      char *portEnd = nullptr;
-      errno         = 0;
-      // auto keeps strtol's long return type without tripping google-runtime-int.
-      auto const parsed = std::strtol(colon + 1, &portEnd, 10);
-      // Require the entire port to be consumed, so trailing text such as ":80junk" or a second
-      // ":90" is rejected rather than silently truncated to the leading number.
-      if (errno != 0 || portEnd == colon + 1 || *portEnd != '\0' || parsed < 0 || parsed > 65535)
+      char const *p     = colon + 1;
+      unsigned int port = 0;
+      if (*p == '\0')
       {
-        ok = false;
+        ok = false;  // empty port, e.g. "127.0.0.1:"
       }
-      else
+      while (ok && *p != '\0')
       {
-        port = static_cast<uint16_t>(parsed);
+        if (*p < '0' || *p > '9')
+        {
+          ok = false;
+          break;
+        }
+        unsigned int const digit = static_cast<unsigned int>(*p - '0');
+        if (port > (65535u - digit) / 10u)
+        {
+          ok = false;  // would exceed 65535
+          break;
+        }
+        port = port * 10u + digit;
+        ++p;
+      }
+      if (ok)
+      {
+        parsed.sin_port = htons(static_cast<uint16_t>(port));
       }
     }
 
     if (ok)
     {
-      inet4.sin_port = htons(port);
+      memcpy(&m_data, &parsed, sizeof(parsed));
     }
     else
     {
-      // Unusable address; port() returns -1 so callers can tell parse failure from a real
-      // endpoint, including the legitimate ":0".
-      m_data = {};
-      LOG_WARN("SocketAddr: cannot parse address %s", addr);
+      // Leave m_data at AF_UNSPEC; port() returns -1 so callers can tell a parse failure from a
+      // real endpoint, including the legitimate ":0". Do not echo the raw input, which may be
+      // arbitrarily long.
+      LOG_WARN("SocketAddr: cannot parse address");
     }
-#endif
   }
 
   operator sockaddr *() { return &m_data; }
@@ -270,7 +268,10 @@ struct SocketAddr
     switch (m_data.sa_family)
     {
       case AF_INET: {
-        sockaddr_in const &inet4 = reinterpret_cast<sockaddr_in const &>(m_data);
+        // Copy out rather than binding a sockaddr_in glvalue to sockaddr storage, which is an
+        // alignment/type-access issue (see the constructor and #4287).
+        sockaddr_in inet4{};
+        memcpy(&inet4, &m_data, sizeof(inet4));
         return ntohs(inet4.sin_port);
       }
 
@@ -286,8 +287,9 @@ struct SocketAddr
     switch (m_data.sa_family)
     {
       case AF_INET: {
-        sockaddr_in const &inet4 = reinterpret_cast<sockaddr_in const &>(m_data);
-        u_long addr              = ntohl(inet4.sin_addr.s_addr);
+        sockaddr_in inet4{};
+        memcpy(&inet4, &m_data, sizeof(inet4));
+        u_long addr = ntohl(inet4.sin_addr.s_addr);
         os << (addr >> 24) << '.' << ((addr >> 16) & 255) << '.' << ((addr >> 8) & 255) << '.'
            << (addr & 255);
         os << ':' << ntohs(inet4.sin_port);

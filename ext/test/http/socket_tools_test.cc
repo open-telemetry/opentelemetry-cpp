@@ -93,4 +93,39 @@ TEST(SocketAddrTest, HandlesEmptyInput)
   EXPECT_EQ(addr.port(), -1);
 }
 
+TEST(SocketAddrTest, RejectsNullInput)
+{
+  SocketTools::SocketAddr addr(nullptr);
+  EXPECT_EQ(addr.port(), -1);
+}
+
+TEST(SocketAddrTest, RejectsEmptyHostOrPort)
+{
+  EXPECT_EQ(SocketTools::SocketAddr(":80").port(), -1);
+  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1:").port(), -1);
+}
+
+// The port grammar is decimal digits only: a sign or whitespace that strtol would have accepted
+// must be rejected so both platforms agree.
+TEST(SocketAddrTest, RejectsSignAndWhitespaceInPort)
+{
+  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1:+80").port(), -1);
+  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1:-0").port(), -1);
+  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1: 80").port(), -1);
+}
+
+TEST(SocketAddrTest, RejectsPortOverflow)
+{
+  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1:65536").port(), -1);
+  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1:4294967377").port(), -1);
+}
+
+// inet_pton requires a full dotted quad, so shorthand and leading-zero forms are rejected on
+// every platform rather than parsed differently by a legacy resolver.
+TEST(SocketAddrTest, RejectsNonDottedQuadHost)
+{
+  EXPECT_EQ(SocketTools::SocketAddr("127.1:80").port(), -1);
+  EXPECT_EQ(SocketTools::SocketAddr("01.02.03.004:80").port(), -1);
+}
+
 }  // namespace
