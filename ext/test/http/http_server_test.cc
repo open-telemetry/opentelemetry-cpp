@@ -7,8 +7,9 @@
 #include "opentelemetry/ext/http/server/socket_tools.h"
 
 // The would-block path is exercised with a POSIX socketpair whose kernel send buffer is filled.
-// Windows has no socketpair(); the reactor's would-block handling is identical, so the coverage is
-// provided on the POSIX runners.
+// Windows has no socketpair(); the shared HttpServer would-block decision logic these tests drive
+// is platform-independent, so the coverage is provided on the POSIX runners. Windows-specific
+// reactor notification behavior is outside this target.
 #ifndef _WIN32
 
 #  include <errno.h>
@@ -25,9 +26,9 @@ namespace
 
 // sendMore() is protected because it is a reactor internal. A test subclass reaches it so the
 // would-block branch can be driven directly: under the level-triggered reactor a single send()
-// after a readiness event returns a positive count, so this branch is otherwise only reached from
-// the readable path on a backlogged keep-alive connection, which is hard to stage
-// deterministically.
+// after a writable readiness event returns a positive count on the normal Linux path, so this
+// branch is otherwise reached from the readable path on a backlogged keep-alive connection, which
+// is hard to stage deterministically.
 class SendMoreProbe : public HTTP_SERVER_NS::HttpServer
 {
 public:
@@ -111,10 +112,10 @@ TEST(HttpServerSendMoreTest, WouldBlockPreservesTheSendBuffer)
   ::close(fds[1]);
 }
 
-// A readable event can fire on a nonblocking socket that has no data yet: a spurious wakeup, or a
-// peer that connected but has not written. recv() then returns -1 with EWOULDBLOCK, which
-// onSocketReadable() must treat as transient (ignore it and wait for the next readable event)
-// rather than as end-of-stream that tears the connection down.
+// A readiness notification can go stale before the callback runs, so a nonblocking recv() in
+// onSocketReadable() can return -1 with EWOULDBLOCK even though the readable callback fired. That
+// transient must be ignored (wait for the next readable event) rather than treated as end-of-stream
+// that tears the connection down.
 TEST(HttpServerReadableTest, WouldBlockKeepsTheConnection)
 {
   int fds[2];
@@ -138,9 +139,13 @@ TEST(HttpServerReadableTest, WouldBlockKeepsTheConnection)
   // reaches the private onSocketReadable() override, so no production surface has to be widened.
   server.m_reactor.m_callback.onSocketReadable(sock);
 
-  // The would-block recv() is transient: the connection must stay registered and the socket open.
+  // The would-block recv() is transient: the connection stays in the map, the socket stays open,
+  // and its reactor registration is untouched (still Readable | Closed) so a later readable event
+  // can retry.
   EXPECT_TRUE(server.m_connections.find(sock) != server.m_connections.end());
   EXPECT_NE(::fcntl(fds[0], F_GETFD, 0), -1);
+  EXPECT_EQ(server.reactorFlags(sock),
+            SocketTools::Reactor::Readable | SocketTools::Reactor::Closed);
 
   ::close(fds[0]);
   ::close(fds[1]);
