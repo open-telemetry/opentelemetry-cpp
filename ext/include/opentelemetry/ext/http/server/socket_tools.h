@@ -182,6 +182,10 @@ struct SocketAddr
     inet4.sin_addr.s_addr = htonl(addr);
   }
 
+  /// Parses an IPv4 address in "host" or "host:port" form. Host parsing follows the platform's
+  /// inet_pton(AF_INET), which requires four decimal components; a port, when present, must be
+  /// decimal digits only in the range 0..65535, and an omitted port is represented as 0. Invalid
+  /// input leaves the address at AF_UNSPEC, for which port() returns -1.
   SocketAddr(char const *addr)
   {
     // One parser for every platform: inet_pton (Winsock provides it since Vista) plus a strict

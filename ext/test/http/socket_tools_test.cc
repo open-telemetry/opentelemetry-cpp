@@ -140,4 +140,13 @@ TEST(SocketAddrTest, RejectsPortOverflow)
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:4294967377"));
 }
 
+// inet_pton() requires four decimal components, so it rejects the shorthand form ("127.1") that the
+// legacy inet_aton()/inet_addr() resolvers accepted. This holds on every platform (verified on
+// glibc and macOS). Leading-zero components ("01.02.03.004") are deliberately not asserted: glibc
+// rejects them but macOS inet_pton accepts them, so that outcome is platform-dependent.
+TEST(SocketAddrTest, RejectsShorthandHost)
+{
+  ExpectInvalid(SocketTools::SocketAddr("127.1:80"));
+}
+
 }  // namespace
