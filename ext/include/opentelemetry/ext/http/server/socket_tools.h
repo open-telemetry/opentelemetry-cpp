@@ -347,13 +347,13 @@ struct Socket
 
   /**
    * Stop writes to a socket whose peer has gone away from raising SIGPIPE, whose default
-   * disposition would terminate the host process. send() passes MSG_NOSIGNAL per call wherever
-   * the platform defines it, which covers modern Linux, macOS and the BSDs. Where the platform
-   * also offers SO_NOSIGPIPE this sets it at the socket level as well: that is a second layer
-   * covering any write to the descriptor that does not go through send(), and the only layer on
-   * an older platform that lacks MSG_NOSIGNAL. Windows has no SIGPIPE. Deliberately per socket
-   * rather than by changing the process signal disposition, which belongs to the embedding
-   * program rather than to this library.
+   * disposition would terminate the host process. The guarantee is MSG_NOSIGNAL, which send()
+   * passes per call on every platform that defines it, which is modern Linux, macOS and the BSDs,
+   * and every platform this repo builds on. Where the platform also offers SO_NOSIGPIPE this
+   * additionally sets it at the socket level as a best-effort second layer, covering a write to
+   * the descriptor that does not go through send(). Windows has no SIGPIPE. Done per socket rather
+   * than by changing the process signal disposition, which belongs to the embedding program rather
+   * than to this library.
    */
   void suppressSigPipe()
   {
@@ -364,8 +364,10 @@ struct Socket
       if (::setsockopt(m_sock, SOL_SOCKET, SO_NOSIGPIPE, reinterpret_cast<char *>(&value),
                        sizeof(value)) != 0)
       {
-        // Harmless where send() also passes MSG_NOSIGNAL, but on a platform whose only defence
-        // is SO_NOSIGPIPE this leaves writes able to raise SIGPIPE, so do not swallow it.
+        // Best effort: MSG_NOSIGNAL already guards send() on every platform this repo builds on,
+        // so a failure here is logged where a logger is configured rather than failing the socket.
+        // This wrapper does not own the descriptor's lifetime and does not promise to protect a
+        // platform whose only defence would be SO_NOSIGPIPE.
         LOG_WARN("Socket: cannot set SO_NOSIGPIPE (errno %d)", errno);
       }
     }

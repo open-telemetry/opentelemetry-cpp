@@ -14,6 +14,20 @@ if(WITH_HTTP_CLIENT_CURL)
     TEST_LIST ${FILENAME})
 endif()
 
+# The SIGPIPE suppression is POSIX-only (Windows has no such signal), and the test body is
+# compiled out under _WIN32, so build the target only where it has tests. gtest_add_tests parses
+# the source for TEST() names and would otherwise register tests the Windows binary does not have.
+if(NOT WIN32)
+  set(SOCKET_SIGPIPE_FILENAME socket_sigpipe_test)
+  add_executable(${SOCKET_SIGPIPE_FILENAME} ${SOCKET_SIGPIPE_FILENAME}.cc)
+  target_link_libraries(${SOCKET_SIGPIPE_FILENAME} opentelemetry_ext ${GMOCK_LIB}
+                        ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+  gtest_add_tests(
+    TARGET ${SOCKET_SIGPIPE_FILENAME}
+    TEST_PREFIX ext.http.socketsigpipe.
+    TEST_LIST ${SOCKET_SIGPIPE_FILENAME})
+endif()
+
 set(URL_PARSER_FILENAME url_parser_test)
 add_executable(${URL_PARSER_FILENAME} ${URL_PARSER_FILENAME}.cc)
 target_link_libraries(${URL_PARSER_FILENAME} opentelemetry_ext ${GMOCK_LIB}
