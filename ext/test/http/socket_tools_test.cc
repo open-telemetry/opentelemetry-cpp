@@ -29,8 +29,8 @@ TEST(SocketAddrTest, ParsesHostAndPort)
   EXPECT_EQ(addr.toString(), "127.0.0.1:8800");
 }
 
-// The host part used to be copied into an uninitialized buffer that was terminated at a fixed
-// index, so inet_pton read indeterminate bytes for any host shorter than 15 characters.
+// A host shorter than the buffer must be null-terminated at its actual length; terminating at a
+// fixed index would leave inet_pton reading indeterminate bytes for any host under 15 characters.
 TEST(SocketAddrTest, ParsesHostShorterThanTheBuffer)
 {
   SocketTools::SocketAddr addr("1.2.3.4:80");
