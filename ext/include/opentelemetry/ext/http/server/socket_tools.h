@@ -192,7 +192,7 @@ struct SocketAddr
     // decimal port. This avoids WSAStringToAddress, whose grammar and default-component filling
     // differ from the POSIX path. Parse into a local sockaddr_in and commit with memcpy only on
     // success, which keeps m_data at AF_UNSPEC on failure and avoids accessing the sockaddr
-    // storage through a sockaddr_in glvalue (an alignment/type-access issue tracked in #4287).
+    // storage through a sockaddr_in glvalue (an alignment/type-access issue tracked in #4307).
     if (addr == nullptr)
     {
       LOG_WARN("SocketAddr: cannot parse a null address");
@@ -273,7 +273,7 @@ struct SocketAddr
     {
       case AF_INET: {
         // Copy out rather than binding a sockaddr_in glvalue to sockaddr storage, which is an
-        // alignment/type-access issue (see the constructor and #4287).
+        // alignment/type-access issue (see the constructor and #4307).
         sockaddr_in inet4{};
         memcpy(&inet4, &m_data, sizeof(inet4));
         return ntohs(inet4.sin_port);

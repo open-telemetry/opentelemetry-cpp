@@ -97,10 +97,9 @@ TEST(SocketAddrTest, RejectsInvalidHost)
   ExpectInvalid(SocketTools::SocketAddr("garbage"));
 }
 
-// On Windows the copy loop was bounded by sizeof(buf), a byte count, rather than by the element
-// count of a WCHAR array, so an address longer than 200 characters wrote past the end of the
-// buffer. This must be handled rather than crash, and reported as a rejection.
-TEST(SocketAddrTest, HandlesOverlongInput)
+// A host far longer than the 15-character dotted-quad maximum must be rejected by the length
+// bound before it can drive an out-of-bounds access on the fixed host buffer.
+TEST(SocketAddrTest, RejectsExtremelyOverlongHost)
 {
   const std::string overlong(512, '9');
   SocketTools::SocketAddr addr(overlong.c_str());
