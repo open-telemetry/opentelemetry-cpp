@@ -35,6 +35,9 @@ using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::common;
 
+namespace
+{
+
 class MockMetricExporter : public MetricReader
 {
 public:
@@ -53,9 +56,6 @@ private:
 
   void OnInitialized() noexcept override {}
 };
-
-namespace
-{
 
 size_t GetBenchmarkThreads()
 {
