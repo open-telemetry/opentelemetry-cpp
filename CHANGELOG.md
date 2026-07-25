@@ -15,9 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
-* [CODE HEALTH] Move SDK common and logs test helpers into anonymous
+* [CODE HEALTH] Move SDK trace and metrics test helpers into anonymous
   namespaces
-  [#4302](https://github.com/open-telemetry/opentelemetry-cpp/pull/4302)
+  [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)
 
 * [CODE HEALTH] Move metrics storage test fixtures into anonymous namespace
   [#4286](https://github.com/open-telemetry/opentelemetry-cpp/pull/4286)
@@ -50,6 +50,10 @@ Increment the:
 
 * [CODE HEALTH] Fix remaining misc-override-with-different-visibility warnings
   [#4280](https://github.com/open-telemetry/opentelemetry-cpp/pull/4280)
+
+* [CODE HEALTH] Move SDK common and logs test helpers into anonymous
+  namespaces
+  [#4302](https://github.com/open-telemetry/opentelemetry-cpp/pull/4302)
 
 Breaking changes:
 
