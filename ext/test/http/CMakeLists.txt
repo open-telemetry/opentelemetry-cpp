@@ -14,12 +14,11 @@ if(WITH_HTTP_CLIENT_CURL)
     TEST_LIST ${FILENAME})
 endif()
 
-# The SIGPIPE suppression is POSIX-only (Windows has no such signal), so the
-# CMake target is built only on POSIX; the Bazel target covers Windows. Every
-# test case compiles on every platform and skips at runtime where its mechanism
-# is absent, so gtest_add_tests (which parses the source, like the rest of this
-# tree) registers only tests that exist, and it works on the project's minimum
-# CMake, where gtest_discover_tests does not.
+# The CMake target is POSIX-only (Windows has no SIGPIPE); the Bazel target
+# covers Windows. The platform-dependent tests are declared unconditionally in
+# the POSIX source and skip at runtime where their mechanism is unavailable, so
+# gtest_add_tests, which scans the source, registers only tests the POSIX binary
+# actually contains.
 if(NOT WIN32)
   set(SOCKET_SIGPIPE_FILENAME socket_sigpipe_test)
   add_executable(${SOCKET_SIGPIPE_FILENAME} ${SOCKET_SIGPIPE_FILENAME}.cc)

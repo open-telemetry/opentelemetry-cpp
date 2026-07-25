@@ -368,7 +368,9 @@ struct Socket
         // is logged where a logger is configured rather than failing the socket.
         // This wrapper does not own the descriptor's lifetime and does not promise to protect a
         // platform whose only defence would be SO_NOSIGPIPE.
-        LOG_WARN("Socket: cannot set SO_NOSIGPIPE (errno %d)", errno);
+        const int saved_errno = errno;  // capture before LOG_WARN, which may clobber errno
+        LOG_WARN("Socket: cannot set SO_NOSIGPIPE (errno %d)", saved_errno);
+        static_cast<void>(saved_errno);  // LOG_WARN can compile to a no-op
       }
     }
 #endif
