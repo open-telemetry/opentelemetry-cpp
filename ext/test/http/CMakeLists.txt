@@ -15,19 +15,21 @@ if(WITH_HTTP_CLIENT_CURL)
 endif()
 
 # The SIGPIPE suppression is POSIX-only (Windows has no such signal), so the
-# CMake target is built only on POSIX; the Bazel target covers Windows with an
-# explicit skipped test. gtest_discover_tests enumerates the compiled binary
-# rather than parsing the source, so the SO_NOSIGPIPE-only tests are registered
-# only where they are actually compiled, never as phantom tests on a platform
-# that compiled them out.
+# CMake target is built only on POSIX; the Bazel target covers Windows. Every
+# test case compiles on every platform and skips at runtime where its mechanism
+# is absent, so gtest_add_tests (which parses the source, like the rest of this
+# tree) registers only tests that exist, and it works on the project's minimum
+# CMake, where gtest_discover_tests does not.
 if(NOT WIN32)
   set(SOCKET_SIGPIPE_FILENAME socket_sigpipe_test)
   add_executable(${SOCKET_SIGPIPE_FILENAME} ${SOCKET_SIGPIPE_FILENAME}.cc)
   target_link_libraries(
     ${SOCKET_SIGPIPE_FILENAME} opentelemetry_ext ${GMOCK_LIB}
     ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-  gtest_discover_tests(${SOCKET_SIGPIPE_FILENAME}
-                       TEST_PREFIX ext.http.socketsigpipe.)
+  gtest_add_tests(
+    TARGET ${SOCKET_SIGPIPE_FILENAME}
+    TEST_PREFIX ext.http.socketsigpipe.
+    TEST_LIST ${SOCKET_SIGPIPE_FILENAME})
 endif()
 
 set(URL_PARSER_FILENAME url_parser_test)

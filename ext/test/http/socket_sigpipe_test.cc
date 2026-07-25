@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <string>
 
 #include "opentelemetry/ext/http/server/socket_tools.h"
 
@@ -11,9 +12,10 @@
 #ifndef _WIN32
 
 #  include <errno.h>
-#  include <pthread.h>
+#  include <pthread.h>  // IWYU pragma: keep  (pthread_sigmask lives here on macOS/BSD)
 #  include <signal.h>
 #  include <sys/socket.h>
+#  include <sys/types.h>
 #  include <unistd.h>
 
 namespace
@@ -34,16 +36,20 @@ protected:
     // cannot kill the runner and the test does not depend on the process-wide handler.
     ASSERT_EQ(pthread_sigmask(SIG_BLOCK, &blocked_, &previous_), 0);
     mask_changed_ = true;
-    EXPECT_FALSE(SigPipeIsPending()) << "a SIGPIPE was already pending before the test";
+    // A SIGPIPE pending before the test would make the negative control and suppressed case below
+    // impossible to attribute, so treat it as a fatal precondition rather than an expectation.
+    ASSERT_FALSE(SigPipeIsPending()) << "a SIGPIPE was already pending before the test";
   }
 
   void TearDown() override
   {
-    DrainPendingSigPipe();
-    if (mask_changed_)
+    if (!mask_changed_)
     {
-      EXPECT_EQ(pthread_sigmask(SIG_SETMASK, &previous_, nullptr), 0);
+      return;  // SetUp never blocked SIGPIPE, so there is nothing to drain or restore, and
+               // sigwait() on an unblocked signal would be unsafe.
     }
+    DrainPendingSigPipe();
+    EXPECT_EQ(pthread_sigmask(SIG_SETMASK, &previous_, nullptr), 0);
   }
 
   static bool SigPipeIsPending()
@@ -88,8 +94,9 @@ TEST_F(SocketSigPipeTest, WriteToClosedPeerReportsEpipeWithoutRaisingSigPipe)
     ::close(raw[1]);
     errno           = 0;
     const ssize_t r = ::send(raw[0], &byte, 1, 0);
+    const int saved = errno;  // save before any assertion can perturb errno
     EXPECT_EQ(r, -1);
-    EXPECT_EQ(errno, EPIPE);
+    EXPECT_EQ(saved, EPIPE);
     EXPECT_TRUE(SigPipeIsPending()) << "the environment does not deliver SIGPIPE, so the "
                                        "suppressed case below would pass vacuously";
     DrainPendingSigPipe();
@@ -100,8 +107,8 @@ TEST_F(SocketSigPipeTest, WriteToClosedPeerReportsEpipeWithoutRaisingSigPipe)
   int fds[2];
   ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, fds), 0);
   SocketTools::Socket sender(fds[0]);
-  // Production sockets get SO_NOSIGPIPE from accept()/the (af,type,proto) ctor. Apply it here too,
-  // since on macOS and the BSDs, where MSG_NOSIGNAL is not defined, that option is the layer under
+  // Production sockets get SO_NOSIGPIPE from accept()/the (af,type,proto) ctor. Apply it here too:
+  // where MSG_NOSIGNAL is unavailable (some macOS and BSD builds) SO_NOSIGPIPE is the layer under
   // test.
   sender.suppressSigPipe();
   ::close(fds[1]);
@@ -117,11 +124,15 @@ TEST_F(SocketSigPipeTest, WriteToClosedPeerReportsEpipeWithoutRaisingSigPipe)
 #  endif
 }
 
-#  ifdef SO_NOSIGPIPE
 // Where the platform offers SO_NOSIGPIPE (macOS, the BSDs), the (af,type,proto) constructor sets
-// it.
+// it. Where it does not (Linux, which suppresses via MSG_NOSIGNAL instead) the test skips at
+// runtime, so it stays a real registered test on every POSIX platform rather than being compiled
+// out.
 TEST_F(SocketSigPipeTest, CreatedSocketCarriesSoNoSigPipe)
 {
+#  ifndef SO_NOSIGPIPE
+  GTEST_SKIP() << "SO_NOSIGPIPE is not available on this platform";
+#  else
   SocketTools::Socket sock(AF_INET, SOCK_STREAM, 0);
   ASSERT_FALSE(sock.invalid());
 
@@ -131,6 +142,7 @@ TEST_F(SocketSigPipeTest, CreatedSocketCarriesSoNoSigPipe)
   EXPECT_EQ(value, 1);
 
   sock.close();
+#  endif
 }
 
 // accept() must set SO_NOSIGPIPE on the socket it returns. The listener is wrapped from a raw fd
@@ -138,9 +150,11 @@ TEST_F(SocketSigPipeTest, CreatedSocketCarriesSoNoSigPipe)
 // accept(), so a pass proves accept()'s suppressSigPipe() call rather than option inheritance.
 TEST_F(SocketSigPipeTest, AcceptedSocketCarriesSoNoSigPipe)
 {
+#  ifndef SO_NOSIGPIPE
+  GTEST_SKIP() << "SO_NOSIGPIPE is not available on this platform";
+#  else
   SocketTools::Socket listener(::socket(AF_INET, SOCK_STREAM, 0));
   ASSERT_FALSE(listener.invalid());
-  listener.setReuseAddr();
 
   SocketTools::SocketAddr bind_addr(SocketTools::SocketAddr::Loopback, 0);  // 127.0.0.1, ephemeral
   ASSERT_TRUE(listener.bind(bind_addr));
@@ -167,16 +181,22 @@ TEST_F(SocketSigPipeTest, AcceptedSocketCarriesSoNoSigPipe)
   accepted.close();
   client.close();
   listener.close();
+#  endif
 }
-#  endif  // SO_NOSIGPIPE
 
 }  // namespace
 
-#else  // _WIN32
-
-TEST(SocketSigPipeTest, NotApplicableOnWindows)
-{
-  GTEST_SKIP() << "Windows does not generate POSIX SIGPIPE";
-}
-
 #endif  // _WIN32
+
+// Windows has no POSIX SIGPIPE, so the fixture and its tests above are POSIX-only. This placeholder
+// keeps the Windows test target non-empty and records why; on POSIX it is a no-op alongside the
+// real tests. Compiling it on every platform means gtest_add_tests registers only tests that
+// exist, never a phantom for a branch that was compiled out.
+TEST(SocketSigPipe, NotApplicableOnWindows)
+{
+#ifdef _WIN32
+  GTEST_SKIP() << "Windows does not generate POSIX SIGPIPE";
+#else
+  GTEST_SKIP() << "POSIX SIGPIPE suppression is covered by the SocketSigPipeTest fixture";
+#endif
+}
