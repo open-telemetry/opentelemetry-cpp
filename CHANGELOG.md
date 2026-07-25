@@ -44,6 +44,9 @@ Increment the:
         that do not receive explicit SpanLimits
   [#4258](https://github.com/open-telemetry/opentelemetry-cpp/pull/4258)
 
+* [CODE HEALTH] Fix remaining misc-override-with-different-visibility warnings
+  [#4280](https://github.com/open-telemetry/opentelemetry-cpp/pull/4280)
+
 * [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
   `AlwaysOff`/`TraceBased`)
   [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)

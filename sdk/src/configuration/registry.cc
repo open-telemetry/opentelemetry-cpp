@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <chrono>
 #include <map>
 #include <memory>
 #include <string>
@@ -14,8 +15,14 @@
 #include "opentelemetry/sdk/configuration/extension_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_builder.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
+#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
+#include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/propagation/jaeger.h"
@@ -80,6 +87,23 @@ public:
   }
 };
 
+class DefaultPeriodicMetricReaderBuilder : public PeriodicMetricReaderBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(
+      const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model,
+      std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> &&exporter) const override
+  {
+    opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions options;
+
+    options.export_interval_millis = std::chrono::milliseconds(model->interval);
+    options.export_timeout_millis  = std::chrono::milliseconds(model->timeout);
+
+    return opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
+        std::move(exporter), options);
+  }
+};
+
 }  // namespace
 
 Registry::Registry()
@@ -89,6 +113,8 @@ Registry::Registry()
   SetTextMapPropagatorBuilder("b3", std::make_unique<B3Builder>());
   SetTextMapPropagatorBuilder("b3multi", std::make_unique<B3MultiBuilder>());
   SetTextMapPropagatorBuilder("jaeger", std::make_unique<JaegerBuilder>());
+
+  SetPeriodicMetricReaderBuilder(std::make_unique<DefaultPeriodicMetricReaderBuilder>());
 }
 
 const TextMapPropagatorBuilder *Registry::GetTextMapPropagatorBuilder(const std::string &name) const
