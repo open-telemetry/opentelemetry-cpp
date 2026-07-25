@@ -99,6 +99,7 @@
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
@@ -148,8 +149,6 @@
 #include "opentelemetry/sdk/metrics/cardinality_limits.h"
 #include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
@@ -1588,11 +1587,6 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
 {
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
 
-  opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions options;
-
-  options.export_interval_millis = std::chrono::milliseconds(model->interval);
-  options.export_timeout_millis  = std::chrono::milliseconds(model->timeout);
-
   auto exporter_sdk = CreatePushMetricExporter(model->exporter);
 
   if (model->producers.size() > 0)
@@ -1609,6 +1603,17 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
   }
 
   return sdk;
+  const PeriodicMetricReaderBuilder *builder = registry_->GetPeriodicMetricReaderBuilder();
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreatePeriodicMetricReader() using registered builder");
+    sdk = builder->Build(model, std::move(exporter_sdk));
+    return sdk;
+  }
+
+  static const std::string die("No builder for PeriodicMetricReader");
+  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePullMetricReader(
