@@ -19,6 +19,9 @@ Increment the:
   namespaces
   [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)
 
+* [CODE HEALTH] Move remaining API test helpers into anonymous namespaces
+  [#4301](https://github.com/open-telemetry/opentelemetry-cpp/pull/4301)
+
 * [BUG] Make file_http_server.h compile on Windows
   [#4300](https://github.com/open-telemetry/opentelemetry-cpp/pull/4300)
 
