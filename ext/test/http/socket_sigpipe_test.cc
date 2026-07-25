@@ -34,6 +34,10 @@ TEST(SocketSigPipeTest, WriteToClosedPeerReportsEpipeWithoutRaisingSigPipe)
   int fds[2];
   ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, fds), 0);
   SocketTools::Socket sender(fds[0]);
+  // Production sockets get SO_NOSIGPIPE from accept()/the (af,type,proto) ctor. Apply it here too:
+  // on macOS and the BSDs, where MSG_NOSIGNAL is not defined, that option is the layer under test,
+  // and a raw-fd socket without it would raise SIGPIPE and fail the pending-signal check below.
+  sender.suppressSigPipe();
   ::close(fds[1]);  // the peer is gone, so any further write is a broken pipe
 
   const char byte = 'x';
