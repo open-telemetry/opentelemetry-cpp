@@ -8,8 +8,12 @@ cc_test(
     srcs = [
         "socket_sigpipe_test.cc",
     ],
-    # SIGPIPE is POSIX-only; the test body is compiled out on Windows, leaving no winsock calls, so
-    # no ws2_32 linkopt is needed here.
+    # socket_tools.h instantiates a WsaInitializer global on Windows (WSAStartup), so the Windows
+    # build links ws2_32 even though the SIGPIPE test body itself is compiled out there.
+    linkopts = select({
+        "//bazel:windows": ["-DEFAULTLIB:Ws2_32.lib"],
+        "//conditions:default": [],
+    }),
     tags = ["test"],
     deps = [
         "//ext:headers",
