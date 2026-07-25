@@ -18,6 +18,13 @@ Increment the:
 * [SDK] Implement the ProbabilitySampler
   [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
 
+* [CODE HEALTH] Move SDK trace and metrics test helpers into anonymous
+  namespaces
+  [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)
+
+* [CODE HEALTH] Move metrics storage test fixtures into anonymous namespace
+  [#4286](https://github.com/open-telemetry/opentelemetry-cpp/pull/4286)
+
 * [CODE HEALTH] Fix more clang tidy warnings (member initialization)
   [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
 
@@ -43,6 +50,9 @@ Increment the:
         OTEL_SPAN_LINK_COUNT_LIMIT, ...) in the TracerProviderFactory overloads
         that do not receive explicit SpanLimits
   [#4258](https://github.com/open-telemetry/opentelemetry-cpp/pull/4258)
+
+* [CODE HEALTH] Fix remaining misc-override-with-different-visibility warnings
+  [#4280](https://github.com/open-telemetry/opentelemetry-cpp/pull/4280)
 
 Breaking changes:
 

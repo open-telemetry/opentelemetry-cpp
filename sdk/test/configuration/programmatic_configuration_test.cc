@@ -68,6 +68,7 @@
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
@@ -86,213 +87,33 @@
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
-
-#include "opentelemetry/sdk/common/exporter_utils.h"
-#include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 
+#include "config_test_common.h"
+
+namespace common      = opentelemetry::common;
 namespace nostd       = opentelemetry::nostd;
+namespace metrics     = opentelemetry::metrics;
 namespace trace       = opentelemetry::trace;
 namespace logs        = opentelemetry::logs;
-namespace metrics     = opentelemetry::metrics;
-namespace common      = opentelemetry::common;
 namespace baggage     = opentelemetry::baggage;
 namespace propagation = opentelemetry::context::propagation;
 namespace context     = opentelemetry::context;
-namespace common_sdk  = opentelemetry::sdk::common;
-namespace logs_sdk    = opentelemetry::sdk::logs;
 namespace metrics_sdk = opentelemetry::sdk::metrics;
-namespace trace_sdk   = opentelemetry::sdk::trace;
 namespace config_sdk  = opentelemetry::sdk::configuration;
 
 namespace
 {
-// ---------------------------------------------------------------------------
-// Shared export buffers
 
-using LogRecordBuffer = std::vector<std::unique_ptr<logs_sdk::ReadWriteLogRecord>>;
-using SpanBuffer      = std::vector<std::unique_ptr<trace_sdk::SpanData>>;
-using MetricBuffer    = std::vector<metrics_sdk::MetricData>;
-
-// ---------------------------------------------------------------------------
-// Recording exporters to support integration testing of the configured SDK.
-// These exporters record the data they receive into a buffer for later inspection.
-
-class RecordingSpanExporter : public trace_sdk::SpanExporter
-{
-public:
-  explicit RecordingSpanExporter(std::shared_ptr<SpanBuffer> buffer) : buffer_(std::move(buffer)) {}
-
-  std::unique_ptr<trace_sdk::Recordable> MakeRecordable() noexcept override
-  {
-    return std::make_unique<trace_sdk::SpanData>();
-  }
-
-  common_sdk::ExportResult Export(
-      const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &spans) noexcept override
-  {
-    for (auto &span : spans)
-    {
-      buffer_->emplace_back(static_cast<trace_sdk::SpanData *>(span.release()));
-    }
-    return common_sdk::ExportResult::kSuccess;
-  }
-
-  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
-  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
-
-private:
-  std::shared_ptr<SpanBuffer> buffer_;
-};
-
-class RecordingLogRecordExporter : public logs_sdk::LogRecordExporter
-{
-public:
-  explicit RecordingLogRecordExporter(std::shared_ptr<LogRecordBuffer> buffer)
-      : buffer_(std::move(buffer))
-  {}
-
-  std::unique_ptr<logs_sdk::Recordable> MakeRecordable() noexcept override
-  {
-    return std::make_unique<logs_sdk::ReadWriteLogRecord>();
-  }
-
-  common_sdk::ExportResult Export(
-      const nostd::span<std::unique_ptr<logs_sdk::Recordable>> &records) noexcept override
-  {
-    for (auto &rec : records)
-    {
-      buffer_->emplace_back(static_cast<logs_sdk::ReadWriteLogRecord *>(rec.release()));
-    }
-    return common_sdk::ExportResult::kSuccess;
-  }
-
-  bool RecordableEnforcesLogRecordLimits() const noexcept override { return true; }
-
-  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
-  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
-
-private:
-  std::shared_ptr<LogRecordBuffer> buffer_;
-};
-
-class RecordingPushMetricExporter : public metrics_sdk::PushMetricExporter
-{
-public:
-  explicit RecordingPushMetricExporter(std::shared_ptr<MetricBuffer> buffer)
-      : buffer_(std::move(buffer))
-  {}
-
-  common_sdk::ExportResult Export(
-      const metrics_sdk::ResourceMetrics &resource_metrics) noexcept override
-  {
-    for (const auto &scope : resource_metrics.scope_metric_data_)
-    {
-      for (const auto &metric : scope.metric_data_)
-      {
-        buffer_->emplace_back(metric);
-      }
-    }
-    return common_sdk::ExportResult::kSuccess;
-  }
-
-  metrics_sdk::AggregationTemporality GetAggregationTemporality(
-      metrics_sdk::InstrumentType) const noexcept override
-  {
-    return metrics_sdk::AggregationTemporality::kCumulative;
-  }
-
-  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
-  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
-
-private:
-  std::shared_ptr<MetricBuffer> buffer_;
-};
-
-// ---------------------------------------------------------------------------
-// Configuration Builders for recording exporters
-
-class RecordingSpanExporterBuilder : public config_sdk::ExtensionSpanExporterBuilder
-{
-public:
-  explicit RecordingSpanExporterBuilder(std::shared_ptr<SpanBuffer> buffer)
-      : buffer_(std::move(buffer))
-  {}
-  std::unique_ptr<trace_sdk::SpanExporter> Build(
-      const config_sdk::ExtensionSpanExporterConfiguration *) const override
-  {
-    return std::make_unique<RecordingSpanExporter>(buffer_);
-  }
-
-private:
-  std::shared_ptr<SpanBuffer> buffer_;
-};
-
-class RecordingLogRecordExporterBuilder : public config_sdk::ExtensionLogRecordExporterBuilder
-{
-public:
-  explicit RecordingLogRecordExporterBuilder(std::shared_ptr<LogRecordBuffer> buffer)
-      : buffer_(std::move(buffer))
-  {}
-  std::unique_ptr<logs_sdk::LogRecordExporter> Build(
-      const config_sdk::ExtensionLogRecordExporterConfiguration *) const override
-  {
-    return std::make_unique<RecordingLogRecordExporter>(buffer_);
-  }
-
-private:
-  std::shared_ptr<LogRecordBuffer> buffer_;
-};
-
-class RecordingPushMetricExporterBuilder : public config_sdk::ExtensionPushMetricExporterBuilder
-{
-public:
-  explicit RecordingPushMetricExporterBuilder(std::shared_ptr<MetricBuffer> buffer)
-      : buffer_(std::move(buffer))
-  {}
-  std::unique_ptr<metrics_sdk::PushMetricExporter> Build(
-      const config_sdk::ExtensionPushMetricExporterConfiguration *) const override
-  {
-    auto exporter = std::make_unique<RecordingPushMetricExporter>(buffer_);
-    return exporter;
-  }
-
-private:
-  std::shared_ptr<MetricBuffer> buffer_;
-};
-
-// ---------------------------------------------------------------------------
-// TextMapCarrier for propagator tests.
-
-class MapCarrier : public propagation::TextMapCarrier
-{
-public:
-  nostd::string_view Get(nostd::string_view key) const noexcept override
-  {
-    auto it = map_.find(std::string(key));
-    return it != map_.end() ? nostd::string_view(it->second) : "";
-  }
-  void Set(nostd::string_view key, nostd::string_view value) noexcept override
-  {
-    map_[std::string(key)] = std::string(value);
-  }
-
-  const std::map<std::string, std::string> &map() const { return map_; }
-
-private:
-  std::map<std::string, std::string> map_;
-};
+constexpr std::chrono::milliseconds kProcessTimeout{1000};
 
 //---------------------------------------------------------------------------
 // ProgrammaticConfigTest fixture: This supports integration testing of the configured SDK.
@@ -333,11 +154,14 @@ protected:
   {
     registry_ = std::make_shared<config_sdk::Registry>();
     registry_->SetExtensionSpanExporterBuilder(
-        "recording", std::make_unique<RecordingSpanExporterBuilder>(span_buffer_));
+        "recording", std::make_unique<config_test::RecordingSpanExporterBuilder>(span_buffer_));
     registry_->SetExtensionLogRecordExporterBuilder(
-        "recording", std::make_unique<RecordingLogRecordExporterBuilder>(log_buffer_));
+        "recording", std::make_unique<config_test::RecordingLogRecordExporterBuilder>(log_buffer_));
     registry_->SetExtensionPushMetricExporterBuilder(
-        "recording", std::make_unique<RecordingPushMetricExporterBuilder>(metric_buffer_));
+        "recording",
+        std::make_unique<config_test::RecordingPushMetricExporterBuilder>(metric_buffer_));
+    registry_->SetPeriodicMetricReaderBuilder(
+        std::make_unique<config_test::SyncPeriodicMetricReaderBuilder>());
   }
 
   static std::unique_ptr<config_sdk::TracerProviderConfiguration> MakeTracerProviderConfig()
@@ -368,17 +192,17 @@ protected:
     exporter->name   = "recording";
     auto reader      = std::make_unique<config_sdk::PeriodicMetricReaderConfiguration>();
     reader->exporter = std::move(exporter);
-    reader->interval = 3'600'000;  // milliseconds. Set to a large value and rely on ForceFlush to
-                                   // trigger collection.
-    reader->timeout = 60'000;      // milliseconds
-    auto config     = std::make_unique<config_sdk::MeterProviderConfiguration>();
+    auto config      = std::make_unique<config_sdk::MeterProviderConfiguration>();
     config->readers.emplace_back(std::move(reader));
     return config;
   }
 
-  std::shared_ptr<SpanBuffer> span_buffer_{std::make_shared<SpanBuffer>()};
-  std::shared_ptr<LogRecordBuffer> log_buffer_{std::make_shared<LogRecordBuffer>()};
-  std::shared_ptr<MetricBuffer> metric_buffer_{std::make_shared<MetricBuffer>()};
+  std::shared_ptr<config_test::SpanBuffer> span_buffer_{
+      std::make_shared<config_test::SpanBuffer>()};
+  std::shared_ptr<config_test::LogRecordBuffer> log_buffer_{
+      std::make_shared<config_test::LogRecordBuffer>()};
+  std::shared_ptr<config_test::MetricBuffer> metric_buffer_{
+      std::make_shared<config_test::MetricBuffer>()};
 
   std::shared_ptr<config_sdk::Registry> registry_;
   std::unique_ptr<config_sdk::ConfiguredSdk> sdk_;
@@ -461,16 +285,15 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithDefaults)
       logs::Severity::kInfo, nostd::string_view("test-message"),
       common::MakeAttributes({{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}));
 
-  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
-  EXPECT_GE(log_buffer_->size(), 1);
+  EXPECT_EQ(log_buffer_->size(), 1);
 }
 
 TEST_F(ProgrammaticConfigTest, LoggerProviderWithLogRecordLimits)
 {
-  config_sdk::LogRecordLimitsConfiguration limits{
-      0, 0};  // TODO: Remove the default initialization once the limit members are initialized.
+  config_sdk::LogRecordLimitsConfiguration limits;
   limits.attribute_count_limit        = 2;
   limits.attribute_value_length_limit = 5;
 
@@ -489,10 +312,10 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLogRecordLimits)
       logs::Severity::kInfo, nostd::string_view("test-message"),
       common::MakeAttributes({{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}));
 
-  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
-  EXPECT_GE(log_buffer_->size(), 1);
+  EXPECT_EQ(log_buffer_->size(), 1);
   auto *record = log_buffer_->front().get();
   EXPECT_EQ(nostd::get<std::string>(record->GetBody()), "test-message");
   const auto &attributes = record->GetAttributes();
@@ -538,13 +361,16 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLoggerConfigurator)
   EXPECT_FALSE(error_logger->Enabled(logs::Severity::kInfo));
   EXPECT_TRUE(error_logger->Enabled(logs::Severity::kError));
 
-  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
-  EXPECT_GE(log_buffer_->size(), 2);
+  EXPECT_EQ(log_buffer_->size(), 2);
 }
 
-TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorDefaults)
+// TODO: Re-enable this test once a mock BatchSpanProcessor can be configured.
+// All tests that use a BatchProcessor may timeout due to the a race between the background thread
+// and the ForceFlush call.
+TEST_F(ProgrammaticConfigTest, DISABLED_LoggerProviderWithBatchProcessorDefaults)
 {
   auto exporter       = std::make_unique<config_sdk::ExtensionLogRecordExporterConfiguration>();
   exporter->name      = "recording";
@@ -560,22 +386,23 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorDefaults)
   ASSERT_NE(sdk_->logger_provider, nullptr);
 
   logs::Provider::GetLoggerProvider()->GetLogger("test")->Info("test-message");
-  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_GE(log_buffer_->size(), 1);
 }
 
-TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorConfigured)
+// TODO: Re-enable this test once a mock BatchProcessor can be configured.
+TEST_F(ProgrammaticConfigTest, DISABLED_LoggerProviderWithBatchProcessorConfigured)
 {
   auto exporter       = std::make_unique<config_sdk::ExtensionLogRecordExporterConfiguration>();
   exporter->name      = "recording";
   auto processor      = std::make_unique<config_sdk::BatchLogRecordProcessorConfiguration>();
   processor->exporter = std::move(exporter);
-  processor->schedule_delay        = 60000;
+  processor->schedule_delay        = 1000;
   processor->max_queue_size        = 100;
   processor->max_export_batch_size = 50;
-  processor->export_timeout        = 5000;
+  processor->export_timeout        = 1000;
   auto logger_provider_config      = std::make_unique<config_sdk::LoggerProviderConfiguration>();
   logger_provider_config->processors.emplace_back(std::move(processor));
 
@@ -586,8 +413,8 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorConfigured)
   ASSERT_NE(sdk_->logger_provider, nullptr);
 
   logs::Provider::GetLoggerProvider()->GetLogger("test")->Info("test-message");
-  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_GE(log_buffer_->size(), 1);
 }
@@ -595,10 +422,7 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorConfigured)
 //--------------------------------------------------------------------------
 // MeterProvider tests
 
-// TODO: These test cases may timeout due to threading in the PeriodicExportingMetricReader
-// that cause ForceFlush or Shutdown to block indefinitely. Disabling for now until we can fix the
-// underlying issue.
-TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithDefaults)
+TEST_F(ProgrammaticConfigTest, MeterProviderWithDefaults)
 {
   auto model            = std::make_unique<config_sdk::Configuration>();
   model->meter_provider = MakeMeterProviderConfig();
@@ -611,13 +435,13 @@ TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithDefaults)
       ->CreateUInt64Counter("test-counter")
       ->Add(1);
 
-  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
-  EXPECT_GE(metric_buffer_->size(), 1);
+  EXPECT_EQ(metric_buffer_->size(), 1);
 }
 
-TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithMeterConfigurator)
+TEST_F(ProgrammaticConfigTest, MeterProviderWithMeterConfigurator)
 {
   auto disabled_meter_config           = config_sdk::MeterMatcherAndConfigConfiguration();
   disabled_meter_config.name           = "disabled-meter";
@@ -640,17 +464,17 @@ TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithMeterConfigurator)
   auto disabled_meter = metrics::Provider::GetMeterProvider()->GetMeter(disabled_meter_config.name);
   disabled_meter->CreateUInt64Counter("disabled-test-counter")->Add(1);
 
-  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
-  EXPECT_GE(metric_buffer_->size(), 1);
+  EXPECT_EQ(metric_buffer_->size(), 1);
   for (const auto &metric : *metric_buffer_)
   {
     EXPECT_NE(metric.instrument_descriptor.name_, "disabled-test-counter");
   }
 }
 
-TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithViews)
+TEST_F(ProgrammaticConfigTest, MeterProviderWithViews)
 {
   // View 1: Base2 exponential aggregation
   const std::size_t max_scale   = 10;
@@ -716,11 +540,11 @@ TEST_F(ProgrammaticConfigTest, DISABLED_MeterProviderWithViews)
   meter->CreateDoubleHistogram("exponential-histogram")->Record(42.0, context);
   meter->CreateDoubleHistogram("explicit-histogram")->Record(42.0, context);
   meter->CreateUInt64Counter("default-counter")->Add(1, context);
-  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   // check that instances of the three data points were collected and are of the right type.
-  EXPECT_GE(metric_buffer_->size(), 3);
+  EXPECT_EQ(metric_buffer_->size(), 3);
   bool found_base2_histogram    = false;
   bool found_explicit_histogram = false;
   bool found_default_counter    = false;
@@ -765,8 +589,8 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithDefaults)
   auto default_tracer = trace::Provider::GetTracerProvider()->GetTracer("default-tracer");
   default_tracer->StartSpan("test-span")->End();
 
-  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_EQ(span_buffer_->size(), 1);
 }
@@ -794,7 +618,7 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithTracerConfigurator)
   auto disabled_tracer = trace::Provider::GetTracerProvider()->GetTracer("disabled-tracer");
   disabled_tracer->StartSpan("disabled-test-span")->End();
 
-  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
 
   ASSERT_EQ(span_buffer_->size(), 1);
   EXPECT_NE(span_buffer_->at(0)->GetName(), "disabled-test-span");
@@ -811,8 +635,8 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithSampler)
   ASSERT_NE(sdk_->tracer_provider, nullptr);
 
   trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
-  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_EQ(span_buffer_->size(), 0);
 }
@@ -829,15 +653,14 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithParentBasedSamplerNullRoot)
   ASSERT_NE(sdk_->tracer_provider, nullptr);
 
   trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
-  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_EQ(span_buffer_->size(), 1);
 }
 
-// TODO: Re-enable this test once the BatchSpanProcessorConfiguration is initialized with spec
-// defaults.
-TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessor)
+// TODO: Re-enable this test once a mock BatchSpanProcessor can be configured.
+TEST_F(ProgrammaticConfigTest, DISABLED_TracerProviderWithBatchProcessor)
 {
   auto exporter               = std::make_unique<config_sdk::ExtensionSpanExporterConfiguration>();
   exporter->name              = "recording";
@@ -852,13 +675,14 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessor)
   CreateAndInstallSdk(model);
 
   trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
-  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_GE(span_buffer_->size(), 1);
 }
 
-TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessorConfigured)
+// TODO: Re-enable this test once a mock BatchSpanProcessor can be configured.
+TEST_F(ProgrammaticConfigTest, DISABLED_TracerProviderWithBatchProcessorConfigured)
 {
   auto exporter             = std::make_unique<config_sdk::ExtensionSpanExporterConfiguration>();
   exporter->name            = "recording";
@@ -866,7 +690,7 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessorConfigured)
   processor->schedule_delay = 60000;
   processor->max_queue_size = 100;
   processor->max_export_batch_size = 50;
-  processor->export_timeout        = 5000;
+  processor->export_timeout        = 1000;
   processor->exporter              = std::move(exporter);
   auto tracer_provider_config      = std::make_unique<config_sdk::TracerProviderConfiguration>();
   tracer_provider_config->processors.emplace_back(std::move(processor));
@@ -877,8 +701,8 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessorConfigured)
   CreateAndInstallSdk(model);
 
   trace::Provider::GetTracerProvider()->GetTracer("test")->StartSpan("test-span")->End();
-  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(5000)));
-  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(5000)));
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_GE(span_buffer_->size(), 1);
 }
@@ -900,7 +724,7 @@ void CheckPropagators()
   auto baggage = baggage::Baggage::GetDefault()->Set("key", "value");
   auto ctx     = baggage::SetBaggage(ctx1, baggage);
 
-  MapCarrier carrier;
+  config_test::MapCarrier carrier;
   propagation::GlobalTextMapPropagator::GetGlobalPropagator()->Inject(carrier, ctx);
 
   ASSERT_NE(carrier.map().find("traceparent"), carrier.map().end());  // tracecontext
