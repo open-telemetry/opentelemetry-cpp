@@ -52,9 +52,9 @@ public:
 };
 
 // A nonblocking send() to a socket whose kernel send buffer is already full returns -1 with
-// EWOULDBLOCK. The old sendMore() fell through to sendBuffer.erase(0, sent) with sent == -1, which
-// converts to erase(0, SIZE_MAX) and wipes the entire unsent response. sendMore() must instead keep
-// the buffer intact and report that there is more to send.
+// EWOULDBLOCK. sendMore() must treat that as transient: keep the unsent response intact and report
+// there is more to send. Erasing on a negative count would compute erase(0, SIZE_MAX) and wipe the
+// entire response.
 TEST(HttpServerSendMoreTest, WouldBlockPreservesTheSendBuffer)
 {
   int fds[2];
@@ -96,8 +96,8 @@ TEST(HttpServerSendMoreTest, WouldBlockPreservesTheSendBuffer)
 
   const bool more = server.sendMore(conn);
 
-  // sendMore() hit the would-block branch: the response is kept, not wiped, and there is more to
-  // send. The old bug emptied conn.sendBuffer here.
+  // sendMore() hit the would-block branch: the response is kept (not wiped) and there is more to
+  // send.
   EXPECT_TRUE(more);
   EXPECT_EQ(conn.sendBuffer, response);
   // The socket is also re-armed for Writable | Closed so the reactor resumes the send once the
@@ -110,9 +110,9 @@ TEST(HttpServerSendMoreTest, WouldBlockPreservesTheSendBuffer)
 }
 
 // A readable event can fire on a nonblocking socket that has no data yet: a spurious wakeup, or a
-// peer that connected but has not written. recv() then returns -1 with EWOULDBLOCK. The old
-// onSocketReadable() treated every non-positive recv() as end-of-stream and tore the connection
-// down; a transient would-block must instead be ignored so the next readable event can retry.
+// peer that connected but has not written. recv() then returns -1 with EWOULDBLOCK, which
+// onSocketReadable() must treat as transient (ignore it and wait for the next readable event)
+// rather than as end-of-stream that tears the connection down.
 TEST(HttpServerReadableTest, WouldBlockKeepsTheConnection)
 {
   int fds[2];
@@ -136,8 +136,7 @@ TEST(HttpServerReadableTest, WouldBlockKeepsTheConnection)
   // reaches the private onSocketReadable() override, so no production surface has to be widened.
   server.m_reactor.m_callback.onSocketReadable(sock);
 
-  // The would-block recv() is transient: the connection stays registered and the socket stays open.
-  // The old bug erased the connection and closed fds[0] here.
+  // The would-block recv() is transient: the connection must stay registered and the socket open.
   EXPECT_TRUE(server.m_connections.find(sock) != server.m_connections.end());
   EXPECT_NE(::fcntl(fds[0], F_GETFD, 0), -1);
 
@@ -147,10 +146,9 @@ TEST(HttpServerReadableTest, WouldBlockKeepsTheConnection)
 
 // After the interim "100 Continue" response has drained, the server must return to reading so it
 // can receive the request body. addSocket() replaces (does not merge) the interest set, so a
-// would-block during the interim send leaves the socket armed for Writable only. The
-// Sending100Continue -> ReceivingBody transition must restore Readable | Closed; the old code
-// advanced to ReceivingBody while still armed Writable-only, so the body was never read and the
-// connection stalled.
+// would-block during the interim send leaves the socket armed for Writable only; the
+// Sending100Continue -> ReceivingBody transition must therefore restore Readable | Closed,
+// otherwise the body is never read and the connection stalls.
 TEST(HttpServer100ContinueTest, CompletedInterimResponseRestoresReadInterest)
 {
   int fds[2];
@@ -176,7 +174,7 @@ TEST(HttpServer100ContinueTest, CompletedInterimResponseRestoresReadInterest)
   server.handleConnection(conn);
 
   // The interim send is complete, so the server advances to reading the body and restores read
-  // interest. Without the fix the socket stays armed Writable-only and the body never arrives.
+  // interest.
   EXPECT_EQ(conn.state, SendMoreProbe::Connection::ReceivingBody);
   EXPECT_EQ(server.reactorFlags(conn.socket),
             SocketTools::Reactor::Readable | SocketTools::Reactor::Closed);
