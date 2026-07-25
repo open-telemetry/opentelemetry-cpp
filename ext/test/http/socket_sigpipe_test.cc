@@ -62,16 +62,8 @@ protected:
     // cannot kill the runner and the test does not depend on the process-wide handler.
     ASSERT_EQ(pthread_sigmask(SIG_BLOCK, &blocked_, &previous_), 0);
     mask_changed_ = true;
-    // gtest_add_tests runs each case in its own process, so a suppression test cannot rely on the
-    // negative control (a separate process) to establish the disposition. Force SIG_DFL here: with
-    // SIGPIPE blocked, an unsuppressed broken-pipe write then leaves it pending and a regression is
-    // observable, whereas an inherited SIG_IGN would discard the signal and mask the failure.
-    struct sigaction default_action = {};
-    default_action.sa_handler       = SIG_DFL;
-    ASSERT_EQ(::sigaction(SIGPIPE, &default_action, &previous_action_), 0);
-    action_changed_ = true;
-    // A SIGPIPE pending before the test would make the negative control and the suppressed cases
-    // impossible to attribute, so treat it as a fatal precondition rather than an expectation.
+    // A SIGPIPE pending before the test would make the signal-behavior cases impossible to
+    // attribute, so treat it as a fatal precondition rather than an expectation.
     ASSERT_FALSE(SigPipeIsPending()) << "a SIGPIPE was already pending before the test";
   }
 
@@ -91,10 +83,6 @@ protected:
     }
     DrainPendingSigPipe();
     EXPECT_EQ(pthread_sigmask(SIG_SETMASK, &previous_, nullptr), 0);
-    if (action_changed_)
-    {
-      EXPECT_EQ(::sigaction(SIGPIPE, &previous_action_, nullptr), 0);
-    }
   }
 
   static void CloseIfValid(SocketTools::Socket &sock)
@@ -113,6 +101,17 @@ protected:
     return sigismember(&pending, SIGPIPE) == 1;
   }
 
+  // Each case runs in its own process under gtest_add_tests, so a signal-behavior test must
+  // establish for itself that SIGPIPE can be observed. A linked library such as gRPC may set
+  // SIG_IGN process-wide, and an ignored signal is discarded before it can pend, so a broken-pipe
+  // write would prove nothing; the caller skips instead of passing vacuously.
+  static bool SigPipeIsIgnored()
+  {
+    struct sigaction current = {};
+    EXPECT_EQ(::sigaction(SIGPIPE, nullptr, &current), 0);
+    return current.sa_handler == SIG_IGN;
+  }
+
   void DrainPendingSigPipe()
   {
     if (SigPipeIsPending())
@@ -126,21 +125,22 @@ protected:
   sigset_t blocked_{};
   sigset_t previous_{};
   bool mask_changed_{false};
-  struct sigaction previous_action_ = {};
-  bool action_changed_{false};
   SocketTools::Socket socket_;
   SocketTools::Socket listener_;
   SocketTools::Socket client_;
   SocketTools::Socket accepted_;
 };
 
-// Negative control: a raw send() with no suppression to a closed peer must raise SIGPIPE. This
-// proves this thread really observes the signal, so a suppressed result in the tests below is
-// meaningful rather than vacuous.
+// Baseline: a raw send() with no suppression to a closed peer must raise SIGPIPE. It runs in its
+// own process and guards itself with SigPipeIsIgnored(), so it is an independent case rather than a
+// precondition the suppression tests below rely on.
 TEST_F(SocketSigPipeTest, RawSendToClosedPeerRaisesSigPipe)
 {
-  // SetUp forced SIGPIPE to SIG_DFL and blocked it, so a broken-pipe write makes the signal pending
-  // here regardless of the disposition the launcher inherited.
+  if (SigPipeIsIgnored())
+  {
+    GTEST_SKIP() << "SIGPIPE is ignored in this process; a broken-pipe write cannot be observed";
+  }
+
   ScopedFd pair;
   ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, pair.fds), 0);
   ::close(pair.fds[1]);
@@ -165,6 +165,11 @@ TEST_F(SocketSigPipeTest, WrapperSendToClosedPeerUsesMsgNoSignal)
 #  ifndef MSG_NOSIGNAL
   GTEST_SKIP() << "MSG_NOSIGNAL is not available on this platform";
 #  else
+  if (SigPipeIsIgnored())
+  {
+    GTEST_SKIP() << "SIGPIPE is ignored in this process; a broken-pipe write cannot be observed";
+  }
+
   ScopedFd pair;
   ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, pair.fds), 0);
   socket_     = SocketTools::Socket(pair.fds[0]);
@@ -190,6 +195,11 @@ TEST_F(SocketSigPipeTest, SuppressSigPipeGuardsRawSendToClosedPeer)
 #  ifndef SO_NOSIGPIPE
   GTEST_SKIP() << "SO_NOSIGPIPE is not available on this platform";
 #  else
+  if (SigPipeIsIgnored())
+  {
+    GTEST_SKIP() << "SIGPIPE is ignored in this process; a broken-pipe write cannot be observed";
+  }
+
   ScopedFd pair;
   ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, pair.fds), 0);
   const int fd = pair.fds[0];
