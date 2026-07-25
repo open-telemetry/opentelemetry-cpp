@@ -24,8 +24,7 @@ public:
     auto handle = GlobalLogHandler::GetLogHandler();
     // The checker must outlive the global handler. Fail if it is destroyed first
     // (custom_handler_destroyed still false) or if the handler is somehow still reachable
-    // (handle non-null). The old "handle && custom_handler_destroyed" only caught the second
-    // case, so a reversed order slipped through.
+    // (handle non-null).
     if (!custom_handler_destroyed || handle)
     {
       OTEL_INTERNAL_LOG_ERROR("GlobalLogHandler must be destroyed before the checker");
