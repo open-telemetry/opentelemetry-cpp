@@ -184,7 +184,9 @@ struct SocketAddr
   SocketAddr(char const *addr)
   {
 #ifdef _WIN32
-    INT addrlen = sizeof(m_data);
+    // WSAStringToAddress fails with WSAEINVAL unless the sockaddr's family is preset.
+    m_data.sa_family = AF_INET;
+    INT addrlen      = sizeof(m_data);
     WCHAR buf[200];
     // sizeof(buf) is a byte count, not an element count: bound the copy by the latter.
     size_t const capacity = sizeof(buf) / sizeof(buf[0]) - 1;
@@ -197,44 +199,64 @@ struct SocketAddr
     buf[copied] = L'\0';
     if (::WSAStringToAddressW(buf, AF_INET, nullptr, &m_data, &addrlen) != 0)
     {
+      // Leave an unusable address rather than a plausible endpoint that connect()/bind() would
+      // accept: a family of AF_UNSPEC makes port() return -1.
+      m_data = {};
       LOG_WARN("SocketAddr: cannot parse address %s", addr);
     }
 #else
     sockaddr_in &inet4 = reinterpret_cast<sockaddr_in &>(m_data);
     inet4.sin_family   = AF_INET;
-    char const *colon  = strchr(addr, ':');
-    if (colon)
+
+    char const *colon          = strchr(addr, ':');
+    char const *hostEnd        = colon ? colon : addr + strlen(addr);
+    ptrdiff_t const hostLength = hostEnd - addr;
+
+    bool ok = true;
+
+    // Reject a host that would not fit rather than truncating it into a different valid address
+    // (for example "255.255.255.2559" would otherwise become "255.255.255.255").
+    if (hostLength <= 0 || hostLength > 15)
     {
-      char *portEnd     = nullptr;
-      errno             = 0;
-      auto const parsed = std::strtol(colon + 1, &portEnd, 10);
-      // Accept only a converted, in-range port value; fall back to 0 otherwise.
-      if (errno == 0 && portEnd != colon + 1 && parsed >= 0 && parsed <= 65535)
-      {
-        inet4.sin_port = htons(static_cast<uint16_t>(parsed));
-      }
-      else
-      {
-        inet4.sin_port = 0;
-      }
-      char buf[16];
-      // Terminate after what was actually copied: buf is uninitialized, so terminating at a
-      // fixed index would leave indeterminate bytes for inet_pton to read.
-      size_t const hostLength = static_cast<size_t>((std::min<ptrdiff_t>)(15, colon - addr));
-      memcpy(buf, addr, hostLength);
-      buf[hostLength] = '\0';
-      if (::inet_pton(AF_INET, buf, &inet4.sin_addr) != 1)
-      {
-        LOG_WARN("SocketAddr: cannot parse address %s", addr);
-      }
+      ok = false;
     }
     else
     {
-      inet4.sin_port = 0;
-      if (::inet_pton(AF_INET, addr, &inet4.sin_addr) != 1)
+      char host[16];
+      memcpy(host, addr, static_cast<size_t>(hostLength));
+      host[hostLength] = '\0';
+      ok               = (::inet_pton(AF_INET, host, &inet4.sin_addr) == 1);
+    }
+
+    uint16_t port = 0;
+    if (ok && colon)
+    {
+      char *portEnd = nullptr;
+      errno         = 0;
+      // auto keeps strtol's long return type without tripping google-runtime-int.
+      auto const parsed = std::strtol(colon + 1, &portEnd, 10);
+      // Require the entire port to be consumed, so trailing text such as ":80junk" or a second
+      // ":90" is rejected rather than silently truncated to the leading number.
+      if (errno != 0 || portEnd == colon + 1 || *portEnd != '\0' || parsed < 0 || parsed > 65535)
       {
-        LOG_WARN("SocketAddr: cannot parse address %s", addr);
+        ok = false;
       }
+      else
+      {
+        port = static_cast<uint16_t>(parsed);
+      }
+    }
+
+    if (ok)
+    {
+      inet4.sin_port = htons(port);
+    }
+    else
+    {
+      // Unusable address; port() returns -1 so callers can tell parse failure from a real
+      // endpoint, including the legitimate ":0".
+      m_data = {};
+      LOG_WARN("SocketAddr: cannot parse address %s", addr);
     }
 #endif
   }

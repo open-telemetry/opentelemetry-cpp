@@ -8,6 +8,10 @@ cc_test(
     srcs = [
         "socket_tools_test.cc",
     ],
+    linkopts = select({
+        "//bazel:windows": ["-DEFAULTLIB:ws2_32.lib"],
+        "//conditions:default": [],
+    }),
     tags = ["test"],
     deps = [
         "//ext:headers",
