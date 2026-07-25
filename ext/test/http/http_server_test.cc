@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "opentelemetry/ext/http/server/http_server.h"
+#include "opentelemetry/ext/http/server/socket_tools.h"
 
 // The would-block path is exercised with a POSIX socketpair whose kernel send buffer is filled.
 // Windows has no socketpair(); the reactor's would-block handling is identical, so the coverage is
@@ -13,6 +14,7 @@
 #  include <errno.h>
 #  include <fcntl.h>
 #  include <sys/socket.h>
+#  include <sys/types.h>
 #  include <unistd.h>
 #  include <string>
 
@@ -29,6 +31,21 @@ class SendMoreProbe : public HTTP_SERVER_NS::HttpServer
 public:
   using HttpServer::Connection;
   using HttpServer::sendMore;
+
+  // After a would-block, sendMore() must re-arm the socket for Writable | Closed so the reactor
+  // calls back once the buffer drains. m_reactor is protected and Reactor::m_sockets is public, so
+  // the test can read back the software interest flags addSocket() recorded.
+  int reactorFlags(const SocketTools::Socket &socket)
+  {
+    for (const auto &data : m_reactor.m_sockets)
+    {
+      if (data.socket == socket)
+      {
+        return data.flags;
+      }
+    }
+    return 0;
+  }
 };
 
 // A nonblocking send() to a socket whose kernel send buffer is already full returns -1 with
@@ -53,8 +70,8 @@ TEST(HttpServerSendMoreTest, WouldBlockPreservesTheSendBuffer)
   for (int i = 0; i < 100000; ++i)
   {
     errno              = 0;
-    const ssize_t sent = ::send(fds[0], filler.data(), filler.size(), MSG_NOSIGNAL);
-    if (sent < 0 && (errno == EWOULDBLOCK || errno == EAGAIN))
+    const ssize_t sent = ::send(fds[0], filler.data(), filler.size(), 0);
+    if (sent < 0 && errno == SocketTools::Socket::ErrorWouldBlock)
     {
       blocked = true;
       break;
@@ -75,6 +92,10 @@ TEST(HttpServerSendMoreTest, WouldBlockPreservesTheSendBuffer)
   // send. The old bug emptied conn.sendBuffer here.
   EXPECT_TRUE(more);
   EXPECT_EQ(conn.sendBuffer, response);
+  // The socket is also re-armed for Writable | Closed so the reactor resumes the send once the
+  // buffer drains; without this the response is kept but the connection would stall forever.
+  EXPECT_EQ(server.reactorFlags(conn.socket),
+            SocketTools::Reactor::Writable | SocketTools::Reactor::Closed);
 
   conn.socket.close();  // closes fds[0]
   ::close(fds[1]);
