@@ -85,7 +85,7 @@ private:
    */
   std::string GetMimeContentType(const std::string &filename)
   {
-    std::string file_ext = filename.substr(filename.find_last_of(".") + 1);
+    std::string file_ext = filename.substr(filename.find_last_of('.') + 1);
     auto file_type       = mime_types_.find(file_ext);
     return (file_type != mime_types_.end()) ? file_type->second : HTTP_SERVER_NS::CONTENT_TYPE_TEXT;
   };
@@ -104,7 +104,7 @@ private:
     }
     // If filename appears to be a directory, serve the hypothetical index.html
     // file there
-    if (name.find(".") == std::string::npos)
+    if (name.find('.') == std::string::npos)
       name += "/index.html";
 
     return name;
