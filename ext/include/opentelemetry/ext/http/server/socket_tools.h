@@ -303,6 +303,16 @@ struct SocketAddr
   }
 };
 
+// The parser memcpys a sockaddr_in into m_data, and the socket syscalls pass sizeof(SocketAddr)
+// as the address length. Make those assumptions compile-time guarantees rather than trusting
+// every ABI to keep sockaddr and sockaddr_in the same size and family offset.
+static_assert(sizeof(sockaddr) >= sizeof(sockaddr_in),
+              "SocketAddr storage (sockaddr) must be large enough to hold a sockaddr_in");
+static_assert(offsetof(sockaddr, sa_family) == offsetof(sockaddr_in, sin_family),
+              "sockaddr and sockaddr_in must place the address family at the same offset");
+static_assert(sizeof(SocketAddr) == sizeof(sockaddr),
+              "SocketAddr must add no storage beyond its sockaddr, since syscalls use its size");
+
 /// <summary>
 /// Encapsulation of a socket (non-exclusive ownership)
 /// </summary>

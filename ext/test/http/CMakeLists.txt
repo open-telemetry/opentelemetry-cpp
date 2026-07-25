@@ -18,11 +18,8 @@ set(SOCKET_TOOLS_FILENAME socket_tools_test)
 add_executable(${SOCKET_TOOLS_FILENAME} ${SOCKET_TOOLS_FILENAME}.cc)
 target_link_libraries(${SOCKET_TOOLS_FILENAME} opentelemetry_ext ${GMOCK_LIB}
                       ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-if(WIN32)
-  # socket_tools.h autolinks ws2_32 via #pragma comment(lib) under MSVC only; name it
-  # explicitly so the test also links under MinGW/GCC where that pragma is ignored.
-  target_link_libraries(${SOCKET_TOOLS_FILENAME} ws2_32)
-endif()
+# ws2_32 is now an interface dependency of opentelemetry_ext, so it is inherited here; the test
+# thus verifies the public target's usage requirements rather than papering over them locally.
 gtest_add_tests(
   TARGET ${SOCKET_TOOLS_FILENAME}
   TEST_PREFIX ext.http.sockettools.

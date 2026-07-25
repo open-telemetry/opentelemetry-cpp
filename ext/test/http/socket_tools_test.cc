@@ -9,12 +9,19 @@
 namespace
 {
 
-// A parsed address reports a family and a non-negative port; a rejected one reports port() == -1
-// (its family is left AF_UNSPEC), which is how callers tell a real endpoint from a parse failure.
+// A parsed address reports AF_INET and a non-negative port; a rejected one is left at AF_UNSPEC
+// with port() == -1. Checking the family too, not just the port, catches a family byte being
+// corrupted while port() happens to still return -1.
+void ExpectInvalid(const SocketTools::SocketAddr &addr)
+{
+  EXPECT_EQ(addr.m_data.sa_family, AF_UNSPEC);
+  EXPECT_EQ(addr.port(), -1);
+}
 
 TEST(SocketAddrTest, ParsesHostAndPort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:8800");
+  EXPECT_EQ(addr.m_data.sa_family, AF_INET);
   EXPECT_EQ(addr.port(), 8800);
   EXPECT_EQ(addr.toString(), "127.0.0.1:8800");
 }
@@ -47,6 +54,7 @@ TEST(SocketAddrTest, ParsesHostWithoutPort)
 TEST(SocketAddrTest, ParsesLegitimateZeroPort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:0");
+  EXPECT_EQ(addr.m_data.sa_family, AF_INET);
   EXPECT_EQ(addr.port(), 0);
   EXPECT_EQ(addr.toString(), "127.0.0.1:0");
 }
@@ -54,7 +62,7 @@ TEST(SocketAddrTest, ParsesLegitimateZeroPort)
 TEST(SocketAddrTest, RejectsOutOfRangePort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:99999");
-  EXPECT_EQ(addr.port(), -1);
+  ExpectInvalid(addr);
 }
 
 // A host longer than the buffer must be rejected, not truncated into a different valid address:
@@ -62,19 +70,19 @@ TEST(SocketAddrTest, RejectsOutOfRangePort)
 TEST(SocketAddrTest, RejectsOverlongHostInsteadOfTruncating)
 {
   SocketTools::SocketAddr addr("255.255.255.2559:80");
-  EXPECT_EQ(addr.port(), -1);
+  ExpectInvalid(addr);
 }
 
 TEST(SocketAddrTest, RejectsTrailingGarbageInPort)
 {
-  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1:80junk").port(), -1);
-  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1:80:90").port(), -1);
+  ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:80junk"));
+  ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:80:90"));
 }
 
 TEST(SocketAddrTest, RejectsInvalidHost)
 {
-  EXPECT_EQ(SocketTools::SocketAddr("999.999.999.999:4318").port(), -1);
-  EXPECT_EQ(SocketTools::SocketAddr("garbage").port(), -1);
+  ExpectInvalid(SocketTools::SocketAddr("999.999.999.999:4318"));
+  ExpectInvalid(SocketTools::SocketAddr("garbage"));
 }
 
 // On Windows the copy loop was bounded by sizeof(buf), a byte count, rather than by the element
@@ -84,48 +92,49 @@ TEST(SocketAddrTest, HandlesOverlongInput)
 {
   const std::string overlong(512, '9');
   SocketTools::SocketAddr addr(overlong.c_str());
-  EXPECT_EQ(addr.port(), -1);
+  ExpectInvalid(addr);
 }
 
 TEST(SocketAddrTest, HandlesEmptyInput)
 {
   SocketTools::SocketAddr addr("");
-  EXPECT_EQ(addr.port(), -1);
+  ExpectInvalid(addr);
 }
 
 TEST(SocketAddrTest, RejectsNullInput)
 {
   SocketTools::SocketAddr addr(nullptr);
-  EXPECT_EQ(addr.port(), -1);
+  ExpectInvalid(addr);
 }
 
 TEST(SocketAddrTest, RejectsEmptyHostOrPort)
 {
-  EXPECT_EQ(SocketTools::SocketAddr(":80").port(), -1);
-  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1:").port(), -1);
+  ExpectInvalid(SocketTools::SocketAddr(":80"));
+  ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:"));
 }
 
 // The port grammar is decimal digits only: a sign or whitespace that strtol would have accepted
 // must be rejected so both platforms agree.
 TEST(SocketAddrTest, RejectsSignAndWhitespaceInPort)
 {
-  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1:+80").port(), -1);
-  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1:-0").port(), -1);
-  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1: 80").port(), -1);
+  ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:+80"));
+  ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:-0"));
+  ExpectInvalid(SocketTools::SocketAddr("127.0.0.1: 80"));
 }
 
 TEST(SocketAddrTest, RejectsPortOverflow)
 {
-  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1:65536").port(), -1);
-  EXPECT_EQ(SocketTools::SocketAddr("127.0.0.1:4294967377").port(), -1);
+  ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:65536"));
+  ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:4294967377"));
 }
 
-// inet_pton requires a full dotted quad, so shorthand and leading-zero forms are rejected on
-// every platform rather than parsed differently by a legacy resolver.
+// inet_pton() rejects the shorthand (127.1) and leading-zero (01.02.03.004) forms that the legacy
+// inet_aton()/inet_addr() resolvers accepted, on the BIND-derived parsers used by glibc, musl,
+// macOS, and Winsock.
 TEST(SocketAddrTest, RejectsNonDottedQuadHost)
 {
-  EXPECT_EQ(SocketTools::SocketAddr("127.1:80").port(), -1);
-  EXPECT_EQ(SocketTools::SocketAddr("01.02.03.004:80").port(), -1);
+  ExpectInvalid(SocketTools::SocketAddr("127.1:80"));
+  ExpectInvalid(SocketTools::SocketAddr("01.02.03.004:80"));
 }
 
 }  // namespace
