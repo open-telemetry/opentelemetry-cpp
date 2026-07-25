@@ -23,8 +23,10 @@ gtest_add_tests(
   TEST_PREFIX ext.http.urlparser.
   TEST_LIST ${URL_PARSER_FILENAME})
 
-# file_http_server.h is an installed header that no other target includes, so it was never
-# compiled. This object library compiles it (the POSIX branch here, the Windows branch on the
-# Windows runners) so a build regression in it is caught. It is not run.
-add_library(file_http_server_header_compile OBJECT file_http_server_header_compile.cc)
+# file_http_server.h is an installed header that no other target includes, so it
+# was never compiled. This object library compiles it (the POSIX branch here,
+# the Windows branch on the Windows runners) so a build regression in it is
+# caught. It is not run.
+add_library(file_http_server_header_compile OBJECT
+            file_http_server_header_compile.cc)
 target_link_libraries(file_http_server_header_compile PRIVATE opentelemetry_ext)
