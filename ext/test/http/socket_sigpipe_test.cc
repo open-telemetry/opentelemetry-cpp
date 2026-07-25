@@ -62,6 +62,14 @@ protected:
     // cannot kill the runner and the test does not depend on the process-wide handler.
     ASSERT_EQ(pthread_sigmask(SIG_BLOCK, &blocked_, &previous_), 0);
     mask_changed_ = true;
+    // gtest_add_tests runs each case in its own process, so a suppression test cannot rely on the
+    // negative control (a separate process) to establish the disposition. Force SIG_DFL here: with
+    // SIGPIPE blocked, an unsuppressed broken-pipe write then leaves it pending and a regression is
+    // observable, whereas an inherited SIG_IGN would discard the signal and mask the failure.
+    struct sigaction default_action = {};
+    default_action.sa_handler       = SIG_DFL;
+    ASSERT_EQ(::sigaction(SIGPIPE, &default_action, &previous_action_), 0);
+    action_changed_ = true;
     // A SIGPIPE pending before the test would make the negative control and the suppressed cases
     // impossible to attribute, so treat it as a fatal precondition rather than an expectation.
     ASSERT_FALSE(SigPipeIsPending()) << "a SIGPIPE was already pending before the test";
@@ -83,6 +91,10 @@ protected:
     }
     DrainPendingSigPipe();
     EXPECT_EQ(pthread_sigmask(SIG_SETMASK, &previous_, nullptr), 0);
+    if (action_changed_)
+    {
+      EXPECT_EQ(::sigaction(SIGPIPE, &previous_action_, nullptr), 0);
+    }
   }
 
   static void CloseIfValid(SocketTools::Socket &sock)
@@ -114,6 +126,8 @@ protected:
   sigset_t blocked_{};
   sigset_t previous_{};
   bool mask_changed_{false};
+  struct sigaction previous_action_ = {};
+  bool action_changed_{false};
   SocketTools::Socket socket_;
   SocketTools::Socket listener_;
   SocketTools::Socket client_;
@@ -125,15 +139,8 @@ protected:
 // meaningful rather than vacuous.
 TEST_F(SocketSigPipeTest, RawSendToClosedPeerRaisesSigPipe)
 {
-  // When SIGPIPE's disposition is SIG_IGN, a broken-pipe write cannot make the signal pending, so
-  // this control cannot demonstrate delivery; skip it rather than report a false failure.
-  struct sigaction current = {};
-  ASSERT_EQ(::sigaction(SIGPIPE, nullptr, &current), 0);
-  if (current.sa_handler == SIG_IGN)
-  {
-    GTEST_SKIP() << "SIGPIPE is ignored process-wide; a broken-pipe write cannot make it pending";
-  }
-
+  // SetUp forced SIGPIPE to SIG_DFL and blocked it, so a broken-pipe write makes the signal pending
+  // here regardless of the disposition the launcher inherited.
   ScopedFd pair;
   ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, pair.fds), 0);
   ::close(pair.fds[1]);
