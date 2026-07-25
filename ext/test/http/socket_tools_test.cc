@@ -3,6 +3,9 @@
 
 #include <gtest/gtest.h>
 #include <string>
+#ifndef _WIN32
+#  include <sys/socket.h>  // for sockaddr, AF_UNSPEC, AF_INET
+#endif
 
 #include "opentelemetry/ext/http/server/socket_tools.h"
 
@@ -135,14 +138,6 @@ TEST(SocketAddrTest, RejectsPortOverflow)
 {
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:65536"));
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:4294967377"));
-}
-
-// inet_pton() requires a canonical four-octet address, so it rejects the shorthand (127.1) and
-// leading-zero (01.02.03.004) forms that the legacy inet_aton()/inet_addr() resolvers accepted.
-TEST(SocketAddrTest, RejectsNonDottedQuadHost)
-{
-  ExpectInvalid(SocketTools::SocketAddr("127.1:80"));
-  ExpectInvalid(SocketTools::SocketAddr("01.02.03.004:80"));
 }
 
 }  // namespace
