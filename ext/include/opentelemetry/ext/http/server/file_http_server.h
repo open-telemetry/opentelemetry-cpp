@@ -3,13 +3,14 @@
 
 #pragma once
 
-#include <algorithm>
 #include <fstream>
-#include <iostream>
 #include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
+#ifdef _WIN32
+#  include <algorithm>  // std::replace, used only in the _WIN32 path below
+#endif
 
 #include "opentelemetry/ext/http/server/http_server.h"
 
@@ -30,7 +31,7 @@ protected:
     os << host << ":" << port;
     setServerName(os.str());
     addListeningPort(port);
-  };
+  }
 
   /**
    * Set the HTTP server to serve static files from the root of host:port.
@@ -76,7 +77,7 @@ private:
       return true;
     }
     return false;
-  };
+  }
 
   /**
    * Returns the extension of a file
@@ -88,7 +89,7 @@ private:
     std::string file_ext = filename.substr(filename.find_last_of('.') + 1);
     auto file_type       = mime_types_.find(file_ext);
     return (file_type != mime_types_.end()) ? file_type->second : HTTP_SERVER_NS::CONTENT_TYPE_TEXT;
-  };
+  }
 
   /**
    * Returns the standardized name of a file by removing backslashes, and
