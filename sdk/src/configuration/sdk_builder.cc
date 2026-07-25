@@ -1594,8 +1594,18 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
     OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
   }
 
-  sdk = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
-      std::move(exporter_sdk), options);
+  const PeriodicMetricReaderBuilder *builder = registry_->GetPeriodicMetricReaderBuilder();
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreatePeriodicMetricReader() using registered builder");
+    sdk = builder->Build(model, std::move(exporter_sdk));
+  }
+  else
+  {
+    static const std::string die("No builder for PeriodicMetricReader");
+    throw UnsupportedException(die);
+  }
 
   if (model->cardinality_limits != nullptr)
   {
@@ -1603,17 +1613,6 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
   }
 
   return sdk;
-  const PeriodicMetricReaderBuilder *builder = registry_->GetPeriodicMetricReaderBuilder();
-
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG("CreatePeriodicMetricReader() using registered builder");
-    sdk = builder->Build(model, std::move(exporter_sdk));
-    return sdk;
-  }
-
-  static const std::string die("No builder for PeriodicMetricReader");
-  throw UnsupportedException(die);
 }
 
 std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePullMetricReader(
