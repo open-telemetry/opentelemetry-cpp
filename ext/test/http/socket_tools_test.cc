@@ -59,6 +59,15 @@ TEST(SocketAddrTest, ParsesLegitimateZeroPort)
   EXPECT_EQ(addr.toString(), "127.0.0.1:0");
 }
 
+// A decimal port may carry leading zeros; the value is what matters, so "080" is port 80. The
+// pre-multiply overflow check still bounds the value at 65535 no matter how many zeros precede it.
+TEST(SocketAddrTest, AcceptsLeadingZeroPort)
+{
+  SocketTools::SocketAddr addr("127.0.0.1:080");
+  EXPECT_EQ(addr.m_data.sa_family, AF_INET);
+  EXPECT_EQ(addr.port(), 80);
+}
+
 TEST(SocketAddrTest, RejectsOutOfRangePort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:99999");
@@ -128,9 +137,8 @@ TEST(SocketAddrTest, RejectsPortOverflow)
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:4294967377"));
 }
 
-// inet_pton() rejects the shorthand (127.1) and leading-zero (01.02.03.004) forms that the legacy
-// inet_aton()/inet_addr() resolvers accepted, on the BIND-derived parsers used by glibc, musl,
-// macOS, and Winsock.
+// inet_pton() requires a canonical four-octet address, so it rejects the shorthand (127.1) and
+// leading-zero (01.02.03.004) forms that the legacy inet_aton()/inet_addr() resolvers accepted.
 TEST(SocketAddrTest, RejectsNonDottedQuadHost)
 {
   ExpectInvalid(SocketTools::SocketAddr("127.1:80"));

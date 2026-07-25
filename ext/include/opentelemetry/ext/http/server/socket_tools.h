@@ -304,10 +304,12 @@ struct SocketAddr
 };
 
 // The parser memcpys a sockaddr_in into m_data, and the socket syscalls pass sizeof(SocketAddr)
-// as the address length. Make those assumptions compile-time guarantees rather than trusting
-// every ABI to keep sockaddr and sockaddr_in the same size and family offset.
-static_assert(sizeof(sockaddr) >= sizeof(sockaddr_in),
-              "SocketAddr storage (sockaddr) must be large enough to hold a sockaddr_in");
+// as the address length. This wrapper is IPv4-only, so require sockaddr and sockaddr_in to have
+// the exact same size rather than trusting every ABI: passing an address length that is too large
+// for the family is a documented EINVAL for connect()/bind(). Exact equality also keeps the memcpy
+// safe. Together with the assertion below, sizeof(SocketAddr) == sizeof(sockaddr_in).
+static_assert(sizeof(sockaddr) == sizeof(sockaddr_in),
+              "SocketAddr is IPv4-only: sockaddr and sockaddr_in must have identical size");
 static_assert(offsetof(sockaddr, sa_family) == offsetof(sockaddr_in, sin_family),
               "sockaddr and sockaddr_in must place the address family at the same offset");
 static_assert(sizeof(SocketAddr) == sizeof(sockaddr),

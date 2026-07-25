@@ -8,10 +8,8 @@ cc_test(
     srcs = [
         "socket_tools_test.cc",
     ],
-    linkopts = select({
-        "//bazel:windows": ["-DEFAULTLIB:ws2_32.lib"],
-        "//conditions:default": [],
-    }),
+    # ws2_32 is an interface linkopt of //ext:headers, so it is inherited here rather than
+    # relinked, which also lets the test verify the public target's usage requirements.
     tags = ["test"],
     deps = [
         "//ext:headers",
