@@ -30,6 +30,9 @@ class SendMoreProbe : public HTTP_SERVER_NS::HttpServer
 {
 public:
   using HttpServer::Connection;
+  using HttpServer::handleConnection;
+  using HttpServer::m_connections;
+  using HttpServer::m_reactor;
   using HttpServer::sendMore;
 
   // After a would-block, sendMore() must re-arm the socket for Writable | Closed so the reactor
@@ -59,8 +62,9 @@ TEST(HttpServerSendMoreTest, WouldBlockPreservesTheSendBuffer)
 
   // A small send buffer plus a nonblocking sender fills quickly; the peer never reads.
   int sndbuf = 1024;
-  ::setsockopt(fds[0], SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof(sndbuf));
+  ASSERT_EQ(::setsockopt(fds[0], SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof(sndbuf)), 0);
   const int fl = ::fcntl(fds[0], F_GETFL, 0);
+  ASSERT_NE(fl, -1);
   ASSERT_EQ(::fcntl(fds[0], F_SETFL, fl | O_NONBLOCK), 0);
 
   // Fill the kernel send buffer so the next send() would block. Bounded so a misbehaving kernel
@@ -71,6 +75,10 @@ TEST(HttpServerSendMoreTest, WouldBlockPreservesTheSendBuffer)
   {
     errno              = 0;
     const ssize_t sent = ::send(fds[0], filler.data(), filler.size(), 0);
+    if (sent < 0 && errno == EINTR)
+    {
+      continue;
+    }
     if (sent < 0 && errno == SocketTools::Socket::ErrorWouldBlock)
     {
       blocked = true;
@@ -98,6 +106,82 @@ TEST(HttpServerSendMoreTest, WouldBlockPreservesTheSendBuffer)
             SocketTools::Reactor::Writable | SocketTools::Reactor::Closed);
 
   conn.socket.close();  // closes fds[0]
+  ::close(fds[1]);
+}
+
+// A readable event can fire on a nonblocking socket that has no data yet: a spurious wakeup, or a
+// peer that connected but has not written. recv() then returns -1 with EWOULDBLOCK. The old
+// onSocketReadable() treated every non-positive recv() as end-of-stream and tore the connection
+// down; a transient would-block must instead be ignored so the next readable event can retry.
+TEST(HttpServerReadableTest, WouldBlockKeepsTheConnection)
+{
+  int fds[2];
+  ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, fds), 0);
+
+  // The server side is nonblocking; the peer never writes, so recv() reports would-block.
+  const int fl = ::fcntl(fds[0], F_GETFL, 0);
+  ASSERT_NE(fl, -1);
+  ASSERT_EQ(::fcntl(fds[0], F_SETFL, fl | O_NONBLOCK), 0);
+
+  SendMoreProbe server;
+  const SocketTools::Socket sock(fds[0]);
+
+  // Stage a mid-request connection and arm it exactly as a freshly accepted connection would be.
+  SendMoreProbe::Connection &conn = server.m_connections[sock];
+  conn.socket                     = sock;
+  conn.state                      = SendMoreProbe::Connection::ReceivingHeaders;
+  server.m_reactor.addSocket(sock, SocketTools::Reactor::Readable | SocketTools::Reactor::Closed);
+
+  // Drive the readable path through the reactor's public callback reference. Virtual dispatch
+  // reaches the private onSocketReadable() override, so no production surface has to be widened.
+  server.m_reactor.m_callback.onSocketReadable(sock);
+
+  // The would-block recv() is transient: the connection stays registered and the socket stays open.
+  // The old bug erased the connection and closed fds[0] here.
+  EXPECT_TRUE(server.m_connections.find(sock) != server.m_connections.end());
+  EXPECT_NE(::fcntl(fds[0], F_GETFD, 0), -1);
+
+  ::close(fds[0]);
+  ::close(fds[1]);
+}
+
+// After the interim "100 Continue" response has drained, the server must return to reading so it
+// can receive the request body. addSocket() replaces (does not merge) the interest set, so a
+// would-block during the interim send leaves the socket armed for Writable only. The
+// Sending100Continue -> ReceivingBody transition must restore Readable | Closed; the old code
+// advanced to ReceivingBody while still armed Writable-only, so the body was never read and the
+// connection stalled.
+TEST(HttpServer100ContinueTest, CompletedInterimResponseRestoresReadInterest)
+{
+  int fds[2];
+  ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, fds), 0);
+  const int fl = ::fcntl(fds[0], F_GETFL, 0);
+  ASSERT_NE(fl, -1);
+  ASSERT_EQ(::fcntl(fds[0], F_SETFL, fl | O_NONBLOCK), 0);
+
+  SendMoreProbe server;
+  SendMoreProbe::Connection conn;
+  conn.socket = SocketTools::Socket(fds[0]);
+  // The interim response has finished sending (empty sendBuffer) and a one-byte body is still
+  // outstanding, so handleConnection() parks in ReceivingBody instead of running the request.
+  conn.state = SendMoreProbe::Connection::Sending100Continue;
+  conn.sendBuffer.clear();
+  conn.receiveBuffer.clear();
+  conn.contentLength = 1;
+
+  // Simulate the Writable-only interest left behind when the interim send blocked.
+  server.m_reactor.addSocket(conn.socket,
+                             SocketTools::Reactor::Writable | SocketTools::Reactor::Closed);
+
+  server.handleConnection(conn);
+
+  // The interim send is complete, so the server advances to reading the body and restores read
+  // interest. Without the fix the socket stays armed Writable-only and the body never arrives.
+  EXPECT_EQ(conn.state, SendMoreProbe::Connection::ReceivingBody);
+  EXPECT_EQ(server.reactorFlags(conn.socket),
+            SocketTools::Reactor::Readable | SocketTools::Reactor::Closed);
+
+  ::close(fds[0]);
   ::close(fds[1]);
 }
 
