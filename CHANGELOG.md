@@ -19,6 +19,9 @@ Increment the:
   namespaces
   [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)
 
+* [CODE HEALTH] Move remaining API test helpers into anonymous namespaces
+  [#4301](https://github.com/open-telemetry/opentelemetry-cpp/pull/4301)
+
 * [BUG] Make SocketAddr string parsing safe and reject malformed addresses
   [#4292](https://github.com/open-telemetry/opentelemetry-cpp/pull/4292)
 

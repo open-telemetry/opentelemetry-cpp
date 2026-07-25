@@ -28,6 +28,9 @@ using opentelemetry::logs::Provider;
 using opentelemetry::nostd::shared_ptr;
 namespace nostd = opentelemetry::nostd;
 
+namespace
+{
+
 class TestProvider : public LoggerProvider
 {
 public:
@@ -167,3 +170,5 @@ TEST(NoopEventLoggerProvider, CreateNoopEventLogger)
 #  endif
 
 #endif
+
+}  // namespace
