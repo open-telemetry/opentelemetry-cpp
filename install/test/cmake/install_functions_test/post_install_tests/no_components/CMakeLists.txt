@@ -24,9 +24,15 @@ endif()
 
 # Test components added:
 set(TEST_COMPONENT_TARGETS
-    opentelemetry-cpp::test_deprecation_target
+    opentelemetry-cpp::deprecation_test_target
     opentelemetry-cpp::test_component_base_target
     opentelemetry-cpp::test_component_depends_target)
+
+foreach(_COMPONENT_TARGET IN LISTS TEST_COMPONENT_TARGETS)
+  if(NOT TARGET ${_COMPONENT_TARGET})
+    message(FATAL_ERROR "component target ${_COMPONENT_TARGET} not found")
+  endif()
+endforeach()
 
 if(NOT TARGET opentelemetry-cpp::api)
   message(FATAL_ERROR "opentelemetry-cpp::api target not found")
