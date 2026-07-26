@@ -1203,8 +1203,8 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
     auto tracer_configurator = CreateTracerConfigurator(model->tracer_configurator);
     auto id_generator        = opentelemetry::sdk::trace::RandomIdGeneratorFactory::Create();
     sdk                      = opentelemetry::sdk::trace::TracerProviderFactory::Create(
-                             std::move(sdk_processors), resource, std::move(sampler), std::move(id_generator),
-                             std::move(tracer_configurator), span_limits);
+        std::move(sdk_processors), resource, std::move(sampler), std::move(id_generator),
+        std::move(tracer_configurator), span_limits);
   }
   else
   {
@@ -1770,7 +1770,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
   {
     auto meter_configurator = CreateMeterConfigurator(model->meter_configurator);
     meter_context           = opentelemetry::sdk::metrics::MeterContextFactory::Create(
-                  std::move(view_registry), resource, std::move(meter_configurator));
+        std::move(view_registry), resource, std::move(meter_configurator));
   }
   else
   {

@@ -116,7 +116,7 @@ logger_provider:
   ASSERT_EQ(config->logger_provider->processors.size(), 1);
   auto *processor = config->logger_provider->processors[0].get();
   ASSERT_NE(processor, nullptr);
-  auto *bridge = dynamic_cast<
+  auto *bridge = reinterpret_cast<
       opentelemetry::sdk::configuration::EventToSpanEventBridgeLogRecordProcessorConfiguration *>(
       processor);
   ASSERT_NE(bridge, nullptr);
