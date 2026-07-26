@@ -22,8 +22,8 @@ namespace
 {
 
 // Owns the two descriptors of a socketpair so they are closed on every path, including when a test
-// aborts on a fatal assertion. A descriptor handed to a SocketTools::Socket is released from this
-// owner by setting its slot to -1, which leaves the Socket as the sole owner.
+// aborts on a fatal assertion. A descriptor handed to a SocketTools::Socket has its slot here set
+// to -1 so this owner stops closing it; the wrapper is non-owning, so TearDown closes that Socket.
 struct ScopedFd
 {
   int fds[2]{-1, -1};
@@ -103,8 +103,8 @@ protected:
 
   // Each case runs in its own process under gtest_add_tests, so a signal-behavior test must
   // establish for itself that SIGPIPE can be observed. A linked library such as gRPC may set
-  // SIG_IGN process-wide, and an ignored signal is discarded before it can pend, so a broken-pipe
-  // write would prove nothing; the caller skips instead of passing vacuously.
+  // SIG_IGN process-wide, and a broken-pipe write then cannot be relied on to make SIGPIPE pending,
+  // so the caller skips instead of passing vacuously.
   static bool SigPipeIsIgnored()
   {
     struct sigaction current = {};
@@ -173,7 +173,7 @@ TEST_F(SocketSigPipeTest, WrapperSendToClosedPeerUsesMsgNoSignal)
   ScopedFd pair;
   ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, pair.fds), 0);
   socket_     = SocketTools::Socket(pair.fds[0]);
-  pair.fds[0] = -1;  // ownership handed to socket_, which TearDown closes
+  pair.fds[0] = -1;  // socket_ now holds this fd; TearDown closes it
   ::close(pair.fds[1]);
   pair.fds[1] = -1;
 
@@ -204,7 +204,7 @@ TEST_F(SocketSigPipeTest, SuppressSigPipeGuardsRawSendToClosedPeer)
   ASSERT_EQ(::socketpair(AF_UNIX, SOCK_STREAM, 0, pair.fds), 0);
   const int fd = pair.fds[0];
   socket_      = SocketTools::Socket(fd);
-  pair.fds[0]  = -1;  // ownership handed to socket_, which TearDown closes
+  pair.fds[0]  = -1;  // socket_ now holds this fd; TearDown closes it
   socket_.suppressSigPipe();
   ::close(pair.fds[1]);
   pair.fds[1] = -1;
