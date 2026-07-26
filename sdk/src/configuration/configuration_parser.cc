@@ -570,6 +570,13 @@ ConfigurationParser::ParseSimpleLogRecordProcessorConfiguration(
   return model;
 }
 
+std::unique_ptr<EventToSpanEventBridgeLogRecordProcessorConfiguration>
+ConfigurationParser::ParseEventToSpanEventBridgeLogRecordProcessorConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */) const
+{
+  return std::make_unique<EventToSpanEventBridgeLogRecordProcessorConfiguration>();
+}
+
 std::unique_ptr<ExtensionLogRecordProcessorConfiguration>
 ConfigurationParser::ParseExtensionLogRecordProcessorConfiguration(
     const std::string &name,
@@ -614,6 +621,10 @@ ConfigurationParser::ParseLogRecordProcessorConfiguration(
   else if (name == "simple")
   {
     model = ParseSimpleLogRecordProcessorConfiguration(child);
+  }
+  else if (name == "event_to_span_event_bridge/development")
+  {
+    model = ParseEventToSpanEventBridgeLogRecordProcessorConfiguration(child);
   }
   else
   {

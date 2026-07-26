@@ -67,6 +67,24 @@ cc_test(
 )
 
 cc_test(
+    name = "event_to_span_event_bridge_processor_test",
+    srcs = [
+        "event_to_span_event_bridge_processor_test.cc",
+    ],
+    tags = [
+        "logs",
+        "test",
+    ],
+    deps = [
+        "//exporters/memory:in_memory_span_exporter",
+        "//sdk/src/logs",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "log_record_test",
     srcs = [
         "log_record_test.cc",

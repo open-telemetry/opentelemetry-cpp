@@ -137,6 +137,7 @@
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
+#include "opentelemetry/sdk/logs/event_to_span_event_bridge_processor_factory.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
@@ -756,6 +757,13 @@ public:
     processor = sdk_builder_->CreateSimpleLogRecordProcessor(model);
   }
 
+  void VisitEventToSpanEventBridge(
+      const opentelemetry::sdk::configuration::EventToSpanEventBridgeLogRecordProcessorConfiguration
+          *model) override
+  {
+    processor = sdk_builder_->CreateEventToSpanEventBridgeLogRecordProcessor(model);
+  }
+
   void VisitExtension(
       const opentelemetry::sdk::configuration::ExtensionLogRecordProcessorConfiguration *model)
       override
@@ -1195,8 +1203,8 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
     auto tracer_configurator = CreateTracerConfigurator(model->tracer_configurator);
     auto id_generator        = opentelemetry::sdk::trace::RandomIdGeneratorFactory::Create();
     sdk                      = opentelemetry::sdk::trace::TracerProviderFactory::Create(
-        std::move(sdk_processors), resource, std::move(sampler), std::move(id_generator),
-        std::move(tracer_configurator), span_limits);
+                             std::move(sdk_processors), resource, std::move(sampler), std::move(id_generator),
+                             std::move(tracer_configurator), span_limits);
   }
   else
   {
@@ -1762,7 +1770,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
   {
     auto meter_configurator = CreateMeterConfigurator(model->meter_configurator);
     meter_context           = opentelemetry::sdk::metrics::MeterContextFactory::Create(
-        std::move(view_registry), resource, std::move(meter_configurator));
+                  std::move(view_registry), resource, std::move(meter_configurator));
   }
   else
   {
@@ -1928,6 +1936,14 @@ SdkBuilder::CreateSimpleLogRecordProcessor(
   sdk = opentelemetry::sdk::logs::SimpleLogRecordProcessorFactory::Create(std::move(exporter_sdk));
 
   return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>
+SdkBuilder::CreateEventToSpanEventBridgeLogRecordProcessor(
+    const opentelemetry::sdk::configuration::EventToSpanEventBridgeLogRecordProcessorConfiguration
+        * /* model */) const
+{
+  return opentelemetry::sdk::logs::EventToSpanEventBridgeProcessorFactory::Create();
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>

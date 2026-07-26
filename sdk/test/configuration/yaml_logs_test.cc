@@ -9,6 +9,7 @@
 
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
+#include "opentelemetry/sdk/configuration/event_to_span_event_bridge_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
@@ -98,6 +99,27 @@ logger_provider:
   ASSERT_NE(simple->exporter, nullptr);
   auto *exporter = simple->exporter.get();
   ASSERT_NE(exporter, nullptr);
+}
+
+TEST(YamlLogs, event_to_span_event_bridge_processor)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - event_to_span_event_bridge/development:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_EQ(config->logger_provider->processors.size(), 1);
+  auto *processor = config->logger_provider->processors[0].get();
+  ASSERT_NE(processor, nullptr);
+  auto *bridge = dynamic_cast<
+      opentelemetry::sdk::configuration::EventToSpanEventBridgeLogRecordProcessorConfiguration *>(
+      processor);
+  ASSERT_NE(bridge, nullptr);
 }
 
 TEST(YamlLogs, default_batch_processor)

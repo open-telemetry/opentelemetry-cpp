@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Implement EventToSpanEventBridge log record processor for
+  declarative configuration
+  [#4155](https://github.com/open-telemetry/opentelemetry-cpp/issues/4155)
+
 * [CODE HEALTH] Move SDK trace and metrics test helpers into anonymous
   namespaces
   [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)
