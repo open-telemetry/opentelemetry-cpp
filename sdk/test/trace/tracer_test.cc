@@ -68,6 +68,7 @@ using opentelemetry::trace::SpanContext;
 
 namespace
 {
+
 /**
  * A mock sampler with ShouldSample returning:
  *  Decision::RECORD_AND_SAMPLE if trace_id is valid

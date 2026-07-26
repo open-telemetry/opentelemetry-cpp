@@ -24,6 +24,9 @@ namespace nostd     = opentelemetry::nostd;
 namespace trace_api = opentelemetry::trace;
 namespace trace_sdk = opentelemetry::sdk::trace;
 
+namespace
+{
+
 class TestProvider : public TracerProvider
 {
 public:
@@ -80,3 +83,5 @@ TEST(Provider, SetTracerProviderDisabled)
   unsetenv("OTEL_SDK_DISABLED");
 }
 #endif
+
+}  // namespace
