@@ -138,7 +138,8 @@ TEST_F(SocketSigPipeTest, RawSendToClosedPeerRaisesSigPipe)
 {
   if (SigPipeIsIgnored())
   {
-    GTEST_SKIP() << "SIGPIPE is ignored in this process; a broken-pipe write cannot be observed";
+    GTEST_SKIP()
+        << "SIGPIPE is ignored in this process; suppression cannot be distinguished portably";
   }
 
   ScopedFd pair;
@@ -167,7 +168,8 @@ TEST_F(SocketSigPipeTest, WrapperSendToClosedPeerUsesMsgNoSignal)
 #  else
   if (SigPipeIsIgnored())
   {
-    GTEST_SKIP() << "SIGPIPE is ignored in this process; a broken-pipe write cannot be observed";
+    GTEST_SKIP()
+        << "SIGPIPE is ignored in this process; suppression cannot be distinguished portably";
   }
 
   ScopedFd pair;
@@ -197,7 +199,8 @@ TEST_F(SocketSigPipeTest, SuppressSigPipeGuardsRawSendToClosedPeer)
 #  else
   if (SigPipeIsIgnored())
   {
-    GTEST_SKIP() << "SIGPIPE is ignored in this process; a broken-pipe write cannot be observed";
+    GTEST_SKIP()
+        << "SIGPIPE is ignored in this process; suppression cannot be distinguished portably";
   }
 
   ScopedFd pair;
