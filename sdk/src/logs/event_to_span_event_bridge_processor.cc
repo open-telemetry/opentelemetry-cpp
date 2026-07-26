@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
@@ -126,31 +127,45 @@ public:
   explicit EventAttributesKeyValueIterable(
       const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>
           &attributes)
-      : attributes_(attributes)
+      : attributes_(&attributes)
   {}
 
   bool ForEachKeyValue(
       nostd::function_ref<bool(nostd::string_view, opentelemetry::common::AttributeValue)> callback)
       const noexcept override
   {
-    bool keep_going = true;
-    for (const auto &kv : attributes_)
+    // Building temporary buffers for array-of-bool and array-of-string attributes (see
+    // EventAttributeEmitter above) can allocate, so guard against a thrown bad_alloc escaping
+    // this noexcept override; conservatively stop iterating rather than terminate the process.
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
     {
-      if (!keep_going)
+#endif
+      bool keep_going = true;
+      for (const auto &kv : *attributes_)
       {
-        break;
+        if (!keep_going)
+        {
+          break;
+        }
+        EventAttributeEmitter emitter(kv.first, callback, &keep_going);
+        opentelemetry::nostd::visit(emitter, kv.second);
       }
-      EventAttributeEmitter emitter(kv.first, callback, &keep_going);
-      opentelemetry::nostd::visit(emitter, kv.second);
+      return keep_going;
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
     }
-    return keep_going;
+    catch (...)
+    {
+      return false;
+    }
+#endif
   }
 
-  std::size_t size() const noexcept override { return attributes_.size(); }
+  std::size_t size() const noexcept override { return attributes_->size(); }
 
 private:
   const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue>
-      &attributes_;
+      *attributes_;
 };
 
 }  // namespace
@@ -163,7 +178,7 @@ std::unique_ptr<Recordable> EventToSpanEventBridgeProcessor::MakeRecordable() no
 void EventToSpanEventBridgeProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
   std::unique_ptr<ReadWriteLogRecord> log_record(
-      static_cast<ReadWriteLogRecord *>(record.release()));
+      static_cast<ReadWriteLogRecord *>(std::move(record).release()));
   if (!log_record)
   {
     return;

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <chrono>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
@@ -12,10 +12,12 @@
 #include "opentelemetry/sdk/logs/event_to_span_event_bridge_processor.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
 #include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
+#include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
-#include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/tracer.h"
