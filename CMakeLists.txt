@@ -256,14 +256,14 @@ if(OTELCPP_VERSIONED_LIBS AND NOT BUILD_SHARED_LIBS)
   message(FATAL_ERROR "OTELCPP_VERSIONED_LIBS=ON requires BUILD_SHARED_LIBS=ON")
 endif()
 
-if(WIN32)
-  otelcpp_option_flag(OTELCPP_WITH_ETW
-                      "Whether to include the ETW Exporter in the SDK" ON)
-else()
-  if(DEFINED OTELCPP_WITH_ETW OR DEFINED WITH_ETW)
-    message(FATAL_ERROR "OTELCPP_WITH_ETW is only supported on Windows")
-  endif()
-endif(WIN32)
+otelcpp_option_flag(
+  OTELCPP_WITH_ETW
+  "Whether to include the ETW Exporter in the SDK"
+  ON
+  AVAILABLE_CONDITION
+  "WIN32"
+  UNAVAILABLE_MESSAGE
+  "OTELCPP_WITH_ETW is only supported on Windows")
 
 # Do not convert deprecated message to error
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
