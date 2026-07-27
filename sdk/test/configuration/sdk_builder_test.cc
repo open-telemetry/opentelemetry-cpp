@@ -359,39 +359,3 @@ TEST(SdkBuilder, AddViewCounterCardinalityLimitOnly)
 
   EXPECT_EQ(matched, 1);
 }
-
-TEST(SdkBuilder, AddViewBase2ExponentialHistogramCardinalityLimitOnly)
-{
-  namespace metrics_sdk = opentelemetry::sdk::metrics;
-
-  auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::base2_exponential_histogram,
-                                              123);
-
-  auto registry = std::make_shared<config_sdk::Registry>();
-  config_sdk::SdkBuilder builder(registry);
-
-  metrics_sdk::ViewRegistry view_registry;
-  builder.AddView(&view_registry, model);
-
-  metrics_sdk::InstrumentDescriptor instrument_descriptor{
-      "", "", "", metrics_sdk::InstrumentType::kBase2ExponentialHistogram,
-      metrics_sdk::InstrumentValueType::kLong};
-  auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
-
-  int matched = 0;
-  view_registry.FindViews(
-      instrument_descriptor, *instrumentation_scope, [&](const metrics_sdk::View &view) {
-        matched++;
-        auto *aggregation_config = view.GetAggregationConfig();
-        EXPECT_NE(aggregation_config, nullptr);
-        if (aggregation_config)
-        {
-          EXPECT_EQ(aggregation_config->GetType(),
-                    metrics_sdk::AggregationType::kBase2ExponentialHistogram);
-          EXPECT_EQ(aggregation_config->cardinality_limit_, 123u);
-        }
-        return true;
-      });
-
-  EXPECT_EQ(matched, 1);
-}

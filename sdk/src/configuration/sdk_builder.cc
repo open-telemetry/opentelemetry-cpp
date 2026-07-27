@@ -1768,12 +1768,6 @@ void SdkBuilder::AddView(
                   stream->aggregation_cardinality_limit);
           break;
 
-        case opentelemetry::sdk::metrics::AggregationType::kBase2ExponentialHistogram:
-          sdk_aggregation_config = std::make_shared<
-              opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>(
-              stream->aggregation_cardinality_limit);
-          break;
-
         default:
           sdk_aggregation_config = std::make_shared<opentelemetry::sdk::metrics::AggregationConfig>(
               stream->aggregation_cardinality_limit);
