@@ -130,6 +130,31 @@ void MeterProvider::AddView(std::unique_ptr<InstrumentSelector> instrument_selec
   context_->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 }
 
+void MeterProvider::UpdateMeterConfigurator(
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>
+        meter_configurator) noexcept
+{
+  if (!meter_configurator)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[MeterProvider::UpdateMeterConfigurator] meter_configurator must not be null, "
+        "ignoring.");
+    return;
+  }
+
+  // Shares the lock with GetMeter so a Meter is never returned while its MeterConfig is out of
+  // date with the provider configurator.
+  const std::lock_guard<std::mutex> guard(lock_);
+  context_->SetMeterConfigurator(std::move(meter_configurator));
+
+  for (auto &meter : context_->GetMeters())
+  {
+    MeterConfig new_config =
+        context_->GetMeterConfigurator().ComputeConfig(*meter->GetInstrumentationScope());
+    meter->UpdateMeterConfig(new_config);
+  }
+}
+
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 void MeterProvider::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type) noexcept

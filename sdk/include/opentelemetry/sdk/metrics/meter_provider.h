@@ -122,6 +122,19 @@ public:
                std::unique_ptr<MeterSelector> meter_selector,
                std::unique_ptr<View> view) noexcept;
 
+  /**
+   * Update the MeterConfigurator for this provider, recreate and propagate the resulting
+   * MeterConfig to all existing Meters while new Meters will use the updated configuration.
+   *
+   * @param meter_configurator The new configurator.
+   *
+   * @note Calling MeterProvider::GetMeter from within the
+   * ScopeConfigurator<MeterConfig>::ComputeConfig function (as a scope_matcher callback set with
+   * ScopeConfigurator<MeterConfig>::AddCondition) is not supported and will result in a deadlock.
+   */
+  void UpdateMeterConfigurator(std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>
+                                   meter_configurator) noexcept;
+
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
   void SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type =

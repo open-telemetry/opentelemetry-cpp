@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <memory>
 #include <string>
@@ -140,6 +141,20 @@ public:
   void DeregisterCallback(uintptr_t callback_id) noexcept override;
 #endif
 private:
+  // MeterProvider needs access to UpdateMeterConfig to propagate configuration updates to
+  // existing meters.
+  friend class MeterProvider;
+
+  /**
+   * Update this meter's MeterConfig. Called only by
+   * MeterProvider::UpdateMeterConfigurator when the provider-level MeterConfigurator is
+   * replaced at runtime.
+   */
+  void UpdateMeterConfig(MeterConfig config) noexcept;
+
+  /** Returns whether this meter is enabled by its current MeterConfig. */
+  bool IsMeterEnabled() const noexcept { return meter_enabled_.load(std::memory_order_relaxed); }
+
   // order of declaration is important here - instrumentation scope should destroy after
   // meter-context.
   std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> scope_;
@@ -151,7 +166,9 @@ private:
                                               InstrumentEqualNameCaseInsensitive>;
   MetricStorageMap storage_registry_;
   std::shared_ptr<ObservableRegistry> observable_registry_;
-  MeterConfig meter_config_;
+  // MeterConfig state is stored in an atomic variable so that instrument creation and Collect()
+  // never block on a concurrent MeterProvider::UpdateMeterConfigurator.
+  std::atomic<bool> meter_enabled_{true};
   std::unique_ptr<SyncWritableMetricStorage> RegisterSyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
   std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(
