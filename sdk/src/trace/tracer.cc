@@ -134,7 +134,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     }
     else if (const auto *context = nostd::get_if<context::Context>(&options.parent))
     {
-      const auto ctx_span_context = opentelemetry::trace::GetSpanContext(*context);
+      auto ctx_span_context = opentelemetry::trace::GetSpanContext(*context);
       if (ctx_span_context.IsValid())
       {
         return ctx_span_context;
