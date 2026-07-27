@@ -404,6 +404,11 @@ function(_otelcpp_get_option_default __OPTION_NAME __DEFAULT_VALUE
       # The namespaced option takes precedence when both names are provided.
       if(NOT DEFINED ${__OPTION_NAME})
         set(__RESOLVED_DEFAULT "${__LEGACY_VALUE}")
+      elseif(NOT "${${__OPTION_NAME}}" EQUAL "${__LEGACY_VALUE}")
+        message(
+          WARNING
+            "CMake option ${__LEGACY_OPTION_NAME} is deprecated. Use ${__OPTION_NAME} instead. The values of these options differ: ${__LEGACY_OPTION_NAME}=${__LEGACY_VALUE}, ${__OPTION_NAME}=${${__OPTION_NAME}}"
+        )
       endif()
     endif()
   endif()
@@ -414,6 +419,47 @@ function(_otelcpp_get_option_default __OPTION_NAME __DEFAULT_VALUE
 endfunction()
 
 function(otelcpp_option_flag __OPTION_NAME __HELP_TEXT __DEFAULT_VALUE)
+  set(optionArgs)
+  set(oneValueArgs AVAILABLE_CONDITION UNAVAILABLE_MESSAGE)
+  set(multiValueArgs)
+  cmake_parse_arguments(_otelcpp_option_flag "${optionArgs}" "${oneValueArgs}"
+                        "${multiValueArgs}" "${ARGN}")
+
+  if(_otelcpp_option_flag_AVAILABLE_CONDITION)
+    set(_option_available 0)
+    foreach(__cond ${_otelcpp_option_flag_AVAILABLE_CONDITION})
+      string(REGEX REPLACE " +" ";" __cond_dep "${__cond}")
+      if(${__cond_dep})
+        set(_option_available 1)
+        break()
+      endif()
+    endforeach()
+    if(_option_available EQUAL 0)
+      _otelcpp_get_legacy_option_name("${__OPTION_NAME}" __LEGACY_OPTION_NAME)
+      unset(_option_fatal_error_message)
+      if(NOT __LEGACY_OPTION_NAME STREQUAL "" AND DEFINED
+                                                  ${__LEGACY_OPTION_NAME})
+        set(_option_fatal_error_message
+            "${__LEGACY_OPTION_NAME} is unavailable.")
+      endif()
+      if(DEFINED ${__OPTION_NAME})
+        if(_option_fatal_error_message)
+          set(_option_fatal_error_message
+              "${_option_fatal_error_message} ${__OPTION_NAME} is unavailable.")
+        else()
+          set(_option_fatal_error_message "${__OPTION_NAME} is unavailable.")
+        endif()
+      endif()
+      if(_option_fatal_error_message)
+        message(
+          FATAL_ERROR
+            "${_option_fatal_error_message}${_otelcpp_option_flag_UNAVAILABLE_MESSAGE}"
+        )
+      endif()
+      return()
+    endif()
+  endif()
+
   _otelcpp_get_option_default("${__OPTION_NAME}" "${__DEFAULT_VALUE}"
                               __RESOLVED_DEFAULT)
   option(${__OPTION_NAME} "${__HELP_TEXT}" "${__RESOLVED_DEFAULT}")
