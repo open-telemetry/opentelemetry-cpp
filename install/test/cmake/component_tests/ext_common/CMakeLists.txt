@@ -14,3 +14,15 @@ target_link_libraries(ext_common_test PRIVATE opentelemetry-cpp::ext
                                               GTest::gtest GTest::gtest_main)
 
 gtest_discover_tests(ext_common_test)
+
+include(${CMAKE_CURRENT_LIST_DIR}/../../otel_header_probes.cmake)
+
+otel_add_header_probes(
+  TARGET
+  ext_common_header_probes
+  LINK
+  opentelemetry-cpp::ext
+  HEADERS
+  opentelemetry/ext/http/common/url_parser.h
+  opentelemetry/ext/http/server/http_server.h
+  opentelemetry/ext/http/server/socket_tools.h)

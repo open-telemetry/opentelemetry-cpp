@@ -15,6 +15,13 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Compile each installed ext header on its own in the install tests
+  [#4315](https://github.com/open-telemetry/opentelemetry-cpp/pull/4315)
+
+* [BUILD] Export curl as a public dependency of the curl HTTP client, so
+  consumers can compile its installed headers
+  [#4315](https://github.com/open-telemetry/opentelemetry-cpp/pull/4315)
+
 * [CODE HEALTH] Move SDK trace and metrics test helpers into anonymous
   namespaces
   [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)

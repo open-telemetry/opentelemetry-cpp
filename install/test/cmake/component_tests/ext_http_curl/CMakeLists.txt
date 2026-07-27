@@ -19,3 +19,15 @@ target_link_libraries(
                              GTest::gtest_main)
 
 gtest_discover_tests(ext_http_curl_test)
+
+include(${CMAKE_CURRENT_LIST_DIR}/../../otel_header_probes.cmake)
+
+otel_add_header_probes(
+  TARGET
+  ext_http_curl_header_probes
+  LINK
+  opentelemetry-cpp::http_client_curl
+  HEADERS
+  opentelemetry/ext/http/client/curl/http_client_curl.h
+  opentelemetry/ext/http/client/curl/http_client_factory_curl.h
+  opentelemetry/ext/http/client/curl/http_operation_curl.h)
