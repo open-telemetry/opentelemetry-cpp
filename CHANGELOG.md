@@ -59,6 +59,10 @@ Increment the:
 * [CODE HEALTH] Fix remaining misc-override-with-different-visibility warnings
   [#4280](https://github.com/open-telemetry/opentelemetry-cpp/pull/4280)
 
+* [CODE HEALTH] Move SDK common and logs test helpers into anonymous
+  namespaces
+  [#4302](https://github.com/open-telemetry/opentelemetry-cpp/pull/4302)
+
 Breaking changes:
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
