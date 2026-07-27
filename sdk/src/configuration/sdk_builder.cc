@@ -146,6 +146,7 @@
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/cardinality_limits.h"
 #include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -1745,8 +1746,39 @@ void SdkBuilder::AddView(
     }
     else
     {
-      sdk_aggregation_config = std::make_shared<opentelemetry::sdk::metrics::AggregationConfig>(
-          stream->aggregation_cardinality_limit);
+      // No explicit `aggregation` block was configured, so the view falls back to the
+      // instrument's default aggregation. ViewRegistry::AddView() rejects a view whose
+      // AggregationConfig type does not match the (possibly instrument-derived) aggregation
+      // type, so the config created here must match that same default rather than always
+      // being a plain AggregationConfig (which only satisfies kSum/kLastValue/kDrop).
+      auto effective_aggregation_type = sdk_aggregation_type;
+      if (effective_aggregation_type == opentelemetry::sdk::metrics::AggregationType::kDefault)
+      {
+        bool is_monotonic{false};
+        effective_aggregation_type =
+            opentelemetry::sdk::metrics::DefaultAggregation::GetDefaultAggregationType(
+                sdk_instrument_type, is_monotonic);
+      }
+
+      switch (effective_aggregation_type)
+      {
+        case opentelemetry::sdk::metrics::AggregationType::kHistogram:
+          sdk_aggregation_config =
+              std::make_shared<opentelemetry::sdk::metrics::HistogramAggregationConfig>(
+                  stream->aggregation_cardinality_limit);
+          break;
+
+        case opentelemetry::sdk::metrics::AggregationType::kBase2ExponentialHistogram:
+          sdk_aggregation_config = std::make_shared<
+              opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>(
+              stream->aggregation_cardinality_limit);
+          break;
+
+        default:
+          sdk_aggregation_config = std::make_shared<opentelemetry::sdk::metrics::AggregationConfig>(
+              stream->aggregation_cardinality_limit);
+          break;
+      }
     }
   }
 
