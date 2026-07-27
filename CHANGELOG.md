@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Fix histogram views being rejected when only
+  `aggregation_cardinality_limit` is set
+  [#4314](https://github.com/open-telemetry/opentelemetry-cpp/pull/4314)
+
 * [CODE HEALTH] Move SDK trace and metrics test helpers into anonymous
   namespaces
   [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)
