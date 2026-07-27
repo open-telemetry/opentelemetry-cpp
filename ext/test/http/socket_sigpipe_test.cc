@@ -139,7 +139,8 @@ TEST_F(SocketSigPipeTest, RawSendToClosedPeerRaisesSigPipe)
   if (SigPipeIsIgnored())
   {
     GTEST_SKIP()
-        << "SIGPIPE is ignored in this process; suppression cannot be distinguished portably";
+        << "SIGPIPE is ignored in this process; a broken-pipe write cannot be relied on to "
+           "make it pending";
   }
 
   ScopedFd pair;
@@ -153,8 +154,8 @@ TEST_F(SocketSigPipeTest, RawSendToClosedPeerRaisesSigPipe)
   const int saved      = errno;  // save before any assertion can perturb errno
   EXPECT_EQ(result, -1);
   EXPECT_EQ(saved, EPIPE);
-  EXPECT_TRUE(SigPipeIsPending()) << "the environment did not deliver SIGPIPE, so the suppression "
-                                     "tests would pass vacuously";
+  EXPECT_TRUE(SigPipeIsPending())
+      << "a raw send() to a closed peer did not make SIGPIPE pending in this process";
   DrainPendingSigPipe();
 }
 
