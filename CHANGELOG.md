@@ -15,9 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
-* [METRICS SDK] Fix histogram views being rejected when only
-  `aggregation_cardinality_limit` is set
-  [#4314](https://github.com/open-telemetry/opentelemetry-cpp/pull/4314)
+* [BUILD] Add missing opentelemetry_proto dependency to otlp_recordable
+  pkg-config
+  [#4316](https://github.com/open-telemetry/opentelemetry-cpp/pull/4316)
 
 * [CODE HEALTH] Move SDK trace and metrics test helpers into anonymous
   namespaces
@@ -66,6 +66,10 @@ Increment the:
 * [CODE HEALTH] Move SDK common and logs test helpers into anonymous
   namespaces
   [#4302](https://github.com/open-telemetry/opentelemetry-cpp/pull/4302)
+
+* [METRICS SDK] Fix histogram views being rejected when only
+  `aggregation_cardinality_limit` is set
+  [#4314](https://github.com/open-telemetry/opentelemetry-cpp/pull/4314)
 
 Breaking changes:
 
