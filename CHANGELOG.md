@@ -15,6 +15,15 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Fix Windows metrics tail latency on the synchronous record path:
+  `SyncMetricStorage::attribute_hashmap_lock_` now uses `std::mutex` instead of
+  `common::SpinLockMutex`. The spin lock's final `sleep_for(1ms)` back-off is
+  rounded up to the Windows timer quantum (~15.6 ms), so a waiter contending
+  on a hot instrument could stall for a full quantum, inflating tail latency.
+  `std::mutex` blocks the waiter instead. Only this one contended lock changes;
+  the API `SpinLockMutex` and all other SDK locks are unchanged.
+  [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
+
 * [OTLP/HTTP] Honor `Retry-After` response header when retrying exports,
   supporting both delay-seconds and HTTP-date formats per RFC 7231 §7.1.3.
   [#4172](https://github.com/open-telemetry/opentelemetry-cpp/issues/4172)
