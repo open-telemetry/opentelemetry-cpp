@@ -30,7 +30,6 @@
 #include <chrono>
 #include <initializer_list>
 #include <iostream>
-#include <memory>
 #include <utility>
 
 #include "opentelemetry/exporters/ostream/metric_exporter_factory.h"

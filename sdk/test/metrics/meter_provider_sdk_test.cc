@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <atomic>
 #include <future>
-#include <memory>
+#include <initializer_list>
 #include <set>
 #include <string>
 #include <thread>
@@ -16,6 +16,7 @@
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/sync_instruments.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
@@ -26,6 +27,7 @@
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_config.h"
+#include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
@@ -38,7 +40,6 @@
 #include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <initializer_list>
 #  include <map>
 #  include <unordered_map>
 
@@ -572,4 +573,48 @@ TEST(MeterProvider, UpdateMeterConfiguratorConcurrentGetMeter)
   auto counter = meter->CreateUInt64Counter("counter.final");
   counter->Add(1);
   EXPECT_FALSE(CollectScopeNames(reader).empty());
+}
+
+TEST(MeterProvider, SetMeterConfiguratorNullIgnoredOnContext)
+{
+  ScopedTestLogHandler log_handler{LogLevel::Error};
+
+  auto context = std::make_shared<MeterContext>(std::unique_ptr<ViewRegistry>(new ViewRegistry()),
+                                                opentelemetry::sdk::resource::Resource::Create({}),
+                                                DisableAll());
+
+  context->SetMeterConfigurator(nullptr);
+
+  auto logs = log_handler.Drain();
+  ASSERT_EQ(logs.size(), 1);
+  EXPECT_NE(logs[0].msg.find("must not be null"), std::string::npos);
+
+  // The configurator passed at construction is retained.
+  auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("scope");
+  EXPECT_FALSE(context->GetMeterConfigurator().ComputeConfig(*scope).IsEnabled());
+}
+
+TEST(MeterProvider, MeterWithExpiredContextIsEnabledByDefault)
+{
+  ScopedTestLogHandler log_handler{LogLevel::Error};
+
+  std::weak_ptr<MeterContext> expired_context;
+  {
+    auto context = std::make_shared<MeterContext>(
+        std::unique_ptr<ViewRegistry>(new ViewRegistry()),
+        opentelemetry::sdk::resource::Resource::Create({}), DisableAll());
+    expired_context = context;
+  }
+  ASSERT_TRUE(expired_context.expired());
+
+  // A Meter cannot compute its config without a context, so it falls back to the default config.
+  Meter meter{expired_context,
+              opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("scope")};
+
+  auto logs = log_handler.Drain();
+  ASSERT_EQ(logs.size(), 1);
+  EXPECT_NE(logs[0].msg.find("The metric context is invalid"), std::string::npos);
+
+  // MeterConfig::Default() is enabled, so instrument creation is not short circuited.
+  EXPECT_NE(nullptr, meter.CreateUInt64Counter("counter"));
 }
