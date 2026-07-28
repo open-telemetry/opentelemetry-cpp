@@ -45,6 +45,15 @@ public:
   void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override;
 
   /**
+   * OnEmitWithContext forwards the context to child processors.
+   */
+  void OnEmitWithContext(
+      std::unique_ptr<Recordable> &&record,
+      const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
+                                          opentelemetry::context::Context> &context)
+      noexcept override;
+
+  /**
    * Exports all log records that have not yet been exported to the configured Exporter.
    * @param timeout that the forceflush is required to finish within.
    * @return a result code indicating whether it succeeded, failed or timed out

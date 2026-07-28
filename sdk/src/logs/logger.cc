@@ -197,8 +197,10 @@ void Logger::EmitLogRecord(
 
   auto &processor = context_->GetProcessor();
 
-  // Send the log recordable to the processor
-  processor.OnEmit(std::move(recordable));
+  // Send the log recordable to the processor with the resolved context
+  const nostd::variant<trace_api::SpanContext, context::Context> resolved_context{
+      context::RuntimeContext::GetCurrent()};
+  processor.OnEmitWithContext(std::move(recordable), resolved_context);
 }
 
 bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,

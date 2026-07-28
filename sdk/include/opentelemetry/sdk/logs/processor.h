@@ -61,6 +61,26 @@ public:
   virtual void OnEmit(std::unique_ptr<Recordable> &&record) noexcept = 0;
 
   /**
+   * OnEmitWithContext is called by the SDK once a log record has been successfully created,
+   * with access to the resolved context (explicit if provided, else ambient).
+   * The resolved context is valid only for the duration of this call and must not be retained.
+   *
+   * The default implementation forwards to OnEmit() for backward compatibility.
+   * Processors that need access to the log's resolved context should override this method.
+   *
+   * @param record the log recordable object
+   * @param context the resolved context (SpanContext or Context variant)
+   */
+  virtual void OnEmitWithContext(
+      std::unique_ptr<Recordable> &&record,
+      const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
+                                          opentelemetry::context::Context> & /*context*/)
+      noexcept
+  {
+    OnEmit(std::move(record));
+  }
+
+  /**
    * Enabled returns whether this processor is interested in a log with the given inputs.
    * The default implementation is permissive and returns true.
    */
