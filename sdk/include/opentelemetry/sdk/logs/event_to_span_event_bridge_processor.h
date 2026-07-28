@@ -18,14 +18,16 @@ namespace logs
 
 /**
  * A log record processor that bridges log records representing events (i.e. log records with a
- * non-empty event name) onto the current active span as span events.
+ * non-empty event name) onto the corresponding span as span events.
  *
  * A log record is bridged to a span event if and only if:
  *  - the log record has a non-empty event name,
  *  - the log record carries a valid trace id and span id,
- *  - the current active span (from the ambient context at the time OnEmit is called) is
- *    recording, and
- *  - the current active span's trace id and span id match those on the log record.
+ *  - the span with those IDs is the current active span (from the log's resolved context), and
+ *  - that span is currently recording.
+ *
+ * The resolved context (explicit if provided to the logger, else ambient) is used to determine
+ * which span to bridge to, ensuring spec compliance for explicitly-supplied contexts.
  *
  * This processor does not export log records and does not stop the log record from continuing
  * through the rest of the configured processing pipeline.
@@ -43,6 +45,12 @@ public:
   std::unique_ptr<Recordable> MakeRecordable() noexcept override;
 
   void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override;
+
+  void OnEmitWithContext(
+      std::unique_ptr<Recordable> &&record,
+      const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
+                                          opentelemetry::context::Context> &context)
+      noexcept override;
 
   bool ForceFlush(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;

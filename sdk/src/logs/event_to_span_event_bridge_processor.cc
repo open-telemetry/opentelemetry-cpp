@@ -219,6 +219,80 @@ void EventToSpanEventBridgeProcessor::OnEmit(std::unique_ptr<Recordable> &&recor
   current_span->AddEvent(event_name, event_timestamp, attributes);
 }
 
+void EventToSpanEventBridgeProcessor::OnEmitWithContext(
+    std::unique_ptr<Recordable> &&record,
+    const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
+                                        opentelemetry::context::Context> &context) noexcept
+{
+  std::unique_ptr<ReadWriteLogRecord> log_record(
+      static_cast<ReadWriteLogRecord *>(std::move(record).release()));
+  if (!log_record)
+  {
+    return;
+  }
+
+  nostd::string_view event_name = log_record->GetEventName();
+  if (event_name.empty())
+  {
+    return;
+  }
+
+  const opentelemetry::trace::TraceId &log_trace_id = log_record->GetTraceId();
+  const opentelemetry::trace::SpanId &log_span_id   = log_record->GetSpanId();
+  if (!log_trace_id.IsValid() || !log_span_id.IsValid())
+  {
+    return;
+  }
+
+  // Extract span context from the resolved context
+  opentelemetry::trace::SpanContext resolved_span_context{};
+  if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(context))
+  {
+    resolved_span_context = nostd::get<opentelemetry::trace::SpanContext>(context);
+  }
+  else
+  {
+    // Context variant contains a Context object; get the active span from it
+    const auto &ctx = nostd::get<opentelemetry::context::Context>(context);
+    auto span = opentelemetry::trace::GetSpan(ctx);
+    if (!span)
+    {
+      return;
+    }
+    resolved_span_context = span->GetContext();
+  }
+
+  // Check if the resolved span context matches the log's trace/span IDs
+  if (!(resolved_span_context.trace_id() == log_trace_id) ||
+      !(resolved_span_context.span_id() == log_span_id))
+  {
+    return;
+  }
+
+  // Get the span object for the resolved context and add the event
+  auto current_span = opentelemetry::trace::Tracer::GetCurrentSpan();
+  if (!current_span || !current_span->IsRecording())
+  {
+    return;
+  }
+
+  // Verify that the current span matches the resolved context
+  if (!(current_span->GetContext().trace_id() == log_trace_id) ||
+      !(current_span->GetContext().span_id() == log_span_id))
+  {
+    return;
+  }
+
+  opentelemetry::common::SystemTimestamp event_timestamp = log_record->GetTimestamp();
+  if (event_timestamp.time_since_epoch().count() == 0)
+  {
+    event_timestamp = log_record->GetObservedTimestamp();
+  }
+
+  EventAttributesKeyValueIterable attributes(log_record->GetAttributes());
+  current_span->AddEvent(event_name, event_timestamp, attributes);
+}
+
 bool EventToSpanEventBridgeProcessor::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
   return true;
