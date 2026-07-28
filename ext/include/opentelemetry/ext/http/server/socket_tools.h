@@ -165,13 +165,13 @@ struct SocketAddr
 {
   static u_long const Loopback = 0x7F000001;
 
-  sockaddr m_data;
+  sockaddr m_data{};
 
   /// <summary>
   /// SocketAddr constructor
   /// </summary>
   /// <returns>SocketAddr</returns>
-  SocketAddr() { memset(&m_data, 0, sizeof(m_data)); }
+  SocketAddr() {}
 
   SocketAddr(u_long addr, int port)
   {
@@ -717,6 +717,7 @@ public:
     m_sockets.clear();
   }
 
+protected:
   /// <summary>
   /// Thread Loop for async events processing
   /// </summary>

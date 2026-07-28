@@ -925,7 +925,7 @@ meter_provider:
       stream:
         aggregation:
           base2_exponential_bucket_histogram:
-            max_scale: 40
+            max_scale: 10
             max_size: 320
             record_min_max: false
 )";
@@ -943,10 +943,106 @@ meter_provider:
   auto *base2_exponential_bucket_histogram = reinterpret_cast<
       opentelemetry::sdk::configuration::Base2ExponentialBucketHistogramAggregationConfiguration *>(
       aggregation);
-  ASSERT_EQ(base2_exponential_bucket_histogram->max_scale, 40);
+  ASSERT_EQ(base2_exponential_bucket_histogram->max_scale, 10);
   ASSERT_EQ(base2_exponential_bucket_histogram->max_size, 320);
   ASSERT_EQ(base2_exponential_bucket_histogram->record_min_max, false);
   ASSERT_EQ(view->stream->attribute_keys, nullptr);
+}
+
+TEST(YamlMetrics, stream_aggregation_base2_exponential_bucket_histogram_min_values)
+{
+  std::string yaml = R"(
+file_format: "1.0-metrics"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+      stream:
+        aggregation:
+          base2_exponential_bucket_histogram:
+            max_scale: -10
+            max_size: 2
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->stream, nullptr);
+  ASSERT_NE(view->stream->aggregation, nullptr);
+  auto *base2_exponential_bucket_histogram = reinterpret_cast<
+      opentelemetry::sdk::configuration::Base2ExponentialBucketHistogramAggregationConfiguration *>(
+      view->stream->aggregation.get());
+  ASSERT_EQ(base2_exponential_bucket_histogram->max_scale, -10);
+  ASSERT_EQ(base2_exponential_bucket_histogram->max_size, 2);
+}
+
+TEST(YamlMetrics, stream_aggregation_base2_exponential_bucket_histogram_max_scale_too_small)
+{
+  std::string yaml = R"(
+file_format: "1.0-metrics"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+      stream:
+        aggregation:
+          base2_exponential_bucket_histogram:
+            max_scale: -11
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(YamlMetrics, stream_aggregation_base2_exponential_bucket_histogram_max_scale_too_large)
+{
+  std::string yaml = R"(
+file_format: "1.0-metrics"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+      stream:
+        aggregation:
+          base2_exponential_bucket_histogram:
+            max_scale: 21
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(YamlMetrics, stream_aggregation_base2_exponential_bucket_histogram_max_size_too_small)
+{
+  std::string yaml = R"(
+file_format: "1.0-metrics"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+      stream:
+        aggregation:
+          base2_exponential_bucket_histogram:
+            max_size: 1
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
 }
 
 TEST(YamlMetrics, stream_aggregation_last_value)

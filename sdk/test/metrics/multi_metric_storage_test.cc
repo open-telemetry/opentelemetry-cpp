@@ -46,8 +46,8 @@ public:
     num_calls_double++;
   }
 
-  size_t num_calls_long;
-  size_t num_calls_double;
+  size_t num_calls_long{0};
+  size_t num_calls_double{0};
 };
 
 TEST(MultiMetricStorageTest, BasicTests)

@@ -69,6 +69,48 @@ TEST(TraceContextTest, GetSpan)
   }
 }
 
+TEST(TraceContextTest, GetSpanContext)
+{
+  {
+    context_api::Context context;
+    EXPECT_FALSE(trace_api::GetSpanContext(context).IsValid());
+  }
+
+  {
+    context_api::Context context;
+    auto input_span        = MakeValidSpan();
+    auto context_with_span = trace_api::SetSpan(context, input_span);
+    auto span_context      = trace_api::GetSpanContext(context_with_span);
+    EXPECT_TRUE(span_context.IsValid());
+    EXPECT_EQ(span_context, input_span->GetContext());
+  }
+
+  {
+    context_api::Context context;
+    auto context_with_null_span =
+        context.SetValue(trace_api::kSpanKey, nostd::shared_ptr<trace_api::Span>{});
+    EXPECT_FALSE(trace_api::GetSpanContext(context_with_null_span).IsValid());
+  }
+
+  {
+    context_api::Context context;
+    const auto input_span_context  = MakeValidSpan()->GetContext();
+    auto context_with_span_context = context.SetValue(
+        trace_api::kSpanKey,
+        nostd::shared_ptr<trace_api::SpanContext>{new trace_api::SpanContext{input_span_context}});
+    auto span_context = trace_api::GetSpanContext(context_with_span_context);
+    EXPECT_TRUE(span_context.IsValid());
+    EXPECT_EQ(span_context, input_span_context);
+  }
+
+  {
+    context_api::Context context;
+    auto context_with_null_span_context =
+        context.SetValue(trace_api::kSpanKey, nostd::shared_ptr<trace_api::SpanContext>{});
+    EXPECT_FALSE(trace_api::GetSpanContext(context_with_null_span_context).IsValid());
+  }
+}
+
 TEST(TraceContextTest, SetSpan)
 {
   context_api::Context context;

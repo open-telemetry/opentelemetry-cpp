@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <stddef.h>
+#include <cstdint>
 #include <memory>
 #include <ostream>
 #include <ryml.hpp>
@@ -279,6 +280,32 @@ size_t RymlDocumentNode::GetInteger(const std::string &name, size_t default_valu
   }
 
   return IntegerFromString(value);
+}
+
+std::int64_t RymlDocumentNode::GetSignedInteger(const std::string &name,
+                                                std::int64_t default_value) const
+{
+  OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetSignedInteger(" << name << ", " << default_value
+                                                                << ")");
+
+  auto ryml_child = GetRymlChildNode(name);
+
+  if (ryml_child.invalid())
+  {
+    return default_value;
+  }
+
+  ryml::csubstr view = ryml_child.val();
+  std::string value(view.str, view.len);
+
+  value = DoSubstitution(value);
+
+  if (value.empty())
+  {
+    return default_value;
+  }
+
+  return SignedIntegerFromString(value);
 }
 
 double RymlDocumentNode::GetRequiredDouble(const std::string &name) const

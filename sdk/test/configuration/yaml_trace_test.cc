@@ -593,6 +593,79 @@ tracer_provider:
   ASSERT_EQ(config->tracer_provider->limits->link_attribute_count_limit, 6666);
 }
 
+TEST(YamlTrace, limits_with_invalid_values)
+{
+  std::string invalid_attribute_count_yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_count_limit: 4294967296
+)";
+
+  std::string invalid_event_count_yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    event_count_limit: 4294967296
+)";
+
+  std::string invalid_link_count_yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    link_count_limit: 4294967296
+)";
+
+  std::string invalid_event_attribute_count_yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    event_attribute_count_limit: 4294967296
+)";
+
+  std::string invalid_link_attribute_count_yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    link_attribute_count_limit: 4294967296
+)";
+
+  auto config = DoParse(invalid_attribute_count_yaml);
+  EXPECT_TRUE(config == nullptr);
+
+  config = DoParse(invalid_event_count_yaml);
+  EXPECT_TRUE(config == nullptr);
+
+  config = DoParse(invalid_link_count_yaml);
+  EXPECT_TRUE(config == nullptr);
+
+  config = DoParse(invalid_event_attribute_count_yaml);
+  EXPECT_TRUE(config == nullptr);
+
+  config = DoParse(invalid_link_attribute_count_yaml);
+  EXPECT_TRUE(config == nullptr);
+}
+
 TEST(YamlTrace, no_sampler)
 {
   std::string yaml = R"(

@@ -69,7 +69,7 @@ if(OPENTELEMETRY_INSTALL)
     otlp_recordable
     "OpenTelemetry OTLP - Recordable"
     "OTLP recordable implementation for spans, metrics, and logs."
-    "opentelemetry_trace opentelemetry_metrics opentelemetry_logs opentelemetry_resources"
+    "opentelemetry_trace opentelemetry_metrics opentelemetry_logs opentelemetry_resources opentelemetry_proto"
   )
 
   opentelemetry_add_pkgconfig(
@@ -897,6 +897,10 @@ if(BUILD_TESTING)
   target_link_libraries(
     otlp_populate_attribute_utils_test ${GTEST_BOTH_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable)
+  if(WITH_OTLP_UTF8_VALIDITY AND TARGET utf8_range::utf8_validity)
+    target_compile_definitions(otlp_populate_attribute_utils_test
+                               PRIVATE ENABLE_OTLP_UTF8_VALIDITY)
+  endif()
   gtest_add_tests(
     TARGET otlp_populate_attribute_utils_test
     TEST_PREFIX exporter.otlp.

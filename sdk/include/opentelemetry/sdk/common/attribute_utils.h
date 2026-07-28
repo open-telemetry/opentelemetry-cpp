@@ -10,6 +10,7 @@
 #include <limits>
 #include <map>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -20,6 +21,10 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/version.h"
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  include <new>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -277,6 +282,107 @@ struct AttributeEqualToVisitor
 };
 
 /**
+ * Insert or assign a key-value pair into a map using map.insert_or_assign if available, or
+ * map.emplace otherwise.
+ * @param map The map to insert or assign the key-value pair into.
+ * @param key The key to insert or assign.
+ * @param value The value to insert or assign.
+ * @return A pair of an iterator to the element and a bool (true if the insertion took place).
+ */
+template <typename Map, typename Value>
+inline std::pair<typename Map::iterator, bool>
+AttributeInsertOrAssign(Map &map, opentelemetry::nostd::string_view key, Value &&value) noexcept
+{
+#if __cplusplus >= 201703L
+  // Use insert_or_assign if C++17 is available
+  return map.insert_or_assign(std::string(key), std::forward<Value>(value));
+#else
+  auto result          = map.emplace(std::string(key), typename Map::mapped_type{});
+  result.first->second = std::forward<Value>(value);
+  return result;
+#endif
+}
+
+// Variant visitor utility.
+
+// VisitVariantResult is a pair of the visitor return value (or nostd::monostate for void visitors)
+// and a bool that is true for success and false if an exception was caught
+template <typename T>
+using VisitVariantResult = std::pair<T, bool>;
+
+namespace detail
+{
+
+/*
+ * VisitVariantImpl is a helper for VisitVariant to handle void and non-void visitors.
+ * ValueType is the VisitorReturnType for non-void visitors, and
+ * nostd::monostate for visitors that do not return a value.
+ */
+
+// VisitVariantImpl for visitors that do not return values
+template <typename Visitor, typename Variant, typename ValueType>
+inline std::pair<ValueType, bool> VisitVariantImpl(Visitor &&visitor,
+                                                   const Variant &value,
+                                                   std::true_type)
+{
+  opentelemetry::nostd::visit(std::forward<Visitor>(visitor), value);
+  return VisitVariantResult<ValueType>{ValueType{}, true};
+}
+
+// VisitVariantImpl for visitors that return values
+template <typename Visitor, typename Variant, typename ValueType>
+inline std::pair<ValueType, bool> VisitVariantImpl(Visitor &&visitor,
+                                                   const Variant &value,
+                                                   std::false_type)
+{
+  return VisitVariantResult<ValueType>{
+      opentelemetry::nostd::visit(std::forward<Visitor>(visitor), value), true};
+}
+}  // namespace detail
+
+/**
+ * VisitVariant
+ *
+ * Invokes nostd::visit(visitor, value) with exception-safe handling.
+ * Returns pair<ResultValueType, bool> where bool is true on success and false if an
+ * exception was caught.
+ *
+ * ResultValueType is VisitorReturnType for non-void visitors, and nostd::monostate for void
+ * visitors.
+ *
+ */
+template <typename Visitor, typename Variant>
+inline auto VisitVariant(Visitor &&visitor, const Variant &value) noexcept
+{
+  using VisitorReturnType =
+      decltype(opentelemetry::nostd::visit(std::forward<Visitor>(visitor), value));
+  using ResultValueType =
+      typename std::conditional<std::is_void<VisitorReturnType>::value,
+                                opentelemetry::nostd::monostate, VisitorReturnType>::type;
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    return detail::VisitVariantImpl<Visitor, Variant, ResultValueType>(
+        std::forward<Visitor>(visitor), value, std::is_void<VisitorReturnType>{});
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+#  if defined(OPENTELEMETRY_HAVE_STD_VARIANT)
+  catch (const std::bad_variant_access &)
+#  else
+  catch (const opentelemetry::nostd::bad_variant_access &)
+#  endif
+  {
+    return VisitVariantResult<ResultValueType>{ResultValueType{}, false};
+  }
+  catch (const std::bad_alloc &)
+  {
+    return VisitVariantResult<ResultValueType>{ResultValueType{}, false};
+  }
+#endif
+}
+
+/**
  * Class for storing attributes.
  */
 class AttributeMap : public std::unordered_map<std::string, OwnedAttributeValue>
@@ -328,10 +434,18 @@ public:
   }
 
   // Convert non-owning key-value to owning std::string(key) and OwnedAttributeValue(value)
-  void SetAttribute(nostd::string_view key,
-                    const opentelemetry::common::AttributeValue &value) noexcept
+  bool SetAttribute(nostd::string_view key,
+                    const opentelemetry::common::AttributeValue &value,
+                    std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept
   {
-    (*this)[std::string(key)] = nostd::visit(AttributeConverter(), value);
+    std::pair<OwnedAttributeValue, bool> result =
+        VisitVariant(AttributeConverter(max_length), value);
+    if (result.second)
+    {
+      AttributeInsertOrAssign(*this, key, std::move(result.first));
+      return true;
+    }
+    return false;
   }
 
   // Compare the attributes of this map with another KeyValueIterable
@@ -403,9 +517,15 @@ public:
 
   // Convert non-owning key-value to owning std::string(key) and OwnedAttributeValue(value)
   void SetAttribute(nostd::string_view key,
-                    const opentelemetry::common::AttributeValue &value) noexcept
+                    const opentelemetry::common::AttributeValue &value,
+                    std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept
   {
-    (*this)[std::string(key)] = nostd::visit(AttributeConverter(), value);
+    std::pair<OwnedAttributeValue, bool> result =
+        VisitVariant(AttributeConverter(max_length), value);
+    if (result.second)
+    {
+      AttributeInsertOrAssign(*this, key, std::move(result.first));
+    }
   }
 };
 

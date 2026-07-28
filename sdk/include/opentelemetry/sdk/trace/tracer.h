@@ -15,6 +15,7 @@
 #include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/noop.h"
@@ -82,6 +83,9 @@ public:
 
   /** Returns the configured span processor. */
   SpanProcessor &GetProcessor() noexcept { return context_->GetProcessor(); }
+
+  /** Returns the configured span limits. */
+  const SpanLimits &GetSpanLimits() const noexcept { return context_->GetSpanLimits(); }
 
   /** Returns the configured Id generator */
   IdGenerator &GetIdGenerator() const noexcept { return context_->GetIdGenerator(); }

@@ -2,13 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <array>
 #include <chrono>
+#include <cstdint>
+#include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_metric_utils.h"
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -22,6 +27,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include <google/protobuf/repeated_ptr_field.h>
 #include "opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/metrics/v1/metrics.pb.h"
@@ -450,6 +456,140 @@ TEST(OtlpMetricSerializationTest, PopulateExportMetricsServiceRequest)
   const auto &scope_attributes_proto = scope_proto.attributes(0);
   EXPECT_EQ("scope_key", scope_attributes_proto.key());
   EXPECT_EQ("scope_value", scope_attributes_proto.value().string_value());
+}
+
+TEST(OtlpMetricSerializationTest, AttributeTypes)
+{
+  metrics_sdk::MetricData data;
+  data.start_ts = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
+  data.end_ts   = data.start_ts;
+  data.aggregation_temporality = metrics_sdk::AggregationTemporality::kCumulative;
+  data.instrument_descriptor   = {"TypesCounter", "desc", "unit",
+                                  metrics_sdk::InstrumentType::kCounter,
+                                  metrics_sdk::InstrumentValueType::kDouble};
+
+  metrics_sdk::SumPointData point;
+  point.value_ = 1.0;
+
+  const std::array<uint8_t, 4> byte_values                             = {0xDE, 0xAD, 0xBE, 0xEF};
+  const std::array<bool, 3> bool_values                                = {true, false, true};
+  const std::array<int32_t, 3> int32_values                            = {-1, 0, 1};
+  const std::array<int64_t, 2> int64_values                            = {-100, 200};
+  const std::array<uint32_t, 2> uint32_values                          = {10u, 20u};
+  const std::array<uint64_t, 2> uint64_values                          = {300u, 400u};
+  const std::array<double, 2> double_values                            = {1.1, 2.2};
+  const std::array<opentelemetry::nostd::string_view, 2> string_values = {"foo", "bar"};
+
+  namespace nostd = opentelemetry::nostd;
+
+  metrics_sdk::PointDataAttributes point_data_attributes;
+  point_data_attributes.point_data = point;
+  point_data_attributes.attributes = {
+      {"bool_attr", bool{true}},
+      {"int32_attr", int32_t{-7}},
+      {"int64_attr", int64_t{-99}},
+      {"uint32_attr", uint32_t{42u}},
+      {"uint64_attr", uint64_t{1000u}},
+      {"double_attr", 3.14},
+      {"string_attr", "hello"},
+      {"bytes_attr", nostd::span<const uint8_t>{byte_values.data(), byte_values.size()}},
+      {"bool_array_attr", nostd::span<const bool>{bool_values.data(), bool_values.size()}},
+      {"int32_array_attr", nostd::span<const int32_t>{int32_values.data(), int32_values.size()}},
+      {"int64_array_attr", nostd::span<const int64_t>{int64_values.data(), int64_values.size()}},
+      {"uint32_array_attr",
+       nostd::span<const uint32_t>{uint32_values.data(), uint32_values.size()}},
+      {"uint64_array_attr",
+       nostd::span<const uint64_t>{uint64_values.data(), uint64_values.size()}},
+      {"double_array_attr", nostd::span<const double>{double_values.data(), double_values.size()}},
+      {"string_array_attr",
+       nostd::span<const nostd::string_view>{string_values.data(), string_values.size()}},
+  };
+  data.point_data_attr_ = {point_data_attributes};
+
+  const auto resource = resource::Resource::Create({{"service.name", "svc"}});
+  const auto scope =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("lib", "1");
+
+  metrics_sdk::ScopeMetrics scope_metrics{scope.get(), std::move(data)};
+  metrics_sdk::ResourceMetrics resource_metrics{&resource, scope_metrics};
+
+  proto::collector::metrics::v1::ExportMetricsServiceRequest request;
+  otlp_exporter::OtlpMetricUtils::PopulateRequest(resource_metrics, &request);
+
+  ASSERT_EQ(1, request.resource_metrics_size());
+  ASSERT_EQ(1, request.resource_metrics(0).scope_metrics_size());
+  ASSERT_EQ(1, request.resource_metrics(0).scope_metrics(0).metrics_size());
+  const auto &data_point =
+      request.resource_metrics(0).scope_metrics(0).metrics(0).sum().data_points(0);
+
+  std::map<std::string, proto::common::v1::AnyValue> attributes;
+  for (const auto &kv : data_point.attributes())
+  {
+    attributes[kv.key()] = kv.value();
+  }
+
+  ASSERT_EQ(attributes.size(), 15u);
+
+  EXPECT_TRUE(attributes.at("bool_attr").bool_value());
+  EXPECT_EQ(attributes.at("int32_attr").int_value(), -7);
+  EXPECT_EQ(attributes.at("int64_attr").int_value(), -99);
+  EXPECT_EQ(attributes.at("uint32_attr").int_value(), 42);
+  EXPECT_EQ(attributes.at("uint64_attr").int_value(), 1000);
+  EXPECT_DOUBLE_EQ(attributes.at("double_attr").double_value(), 3.14);
+  EXPECT_EQ(attributes.at("string_attr").string_value(), "hello");
+
+  {
+    const std::string &bytes = attributes.at("bytes_attr").bytes_value();
+    ASSERT_EQ(bytes.size(), 4u);
+    EXPECT_EQ(static_cast<uint8_t>(bytes[0]), byte_values[0]);
+    EXPECT_EQ(static_cast<uint8_t>(bytes[1]), byte_values[1]);
+    EXPECT_EQ(static_cast<uint8_t>(bytes[2]), byte_values[2]);
+    EXPECT_EQ(static_cast<uint8_t>(bytes[3]), byte_values[3]);
+  }
+  {
+    const auto &array_value = attributes.at("bool_array_attr").array_value();
+    ASSERT_EQ(array_value.values_size(), 3);
+    EXPECT_EQ(array_value.values(0).bool_value(), bool_values[0]);
+    EXPECT_EQ(array_value.values(1).bool_value(), bool_values[1]);
+    EXPECT_EQ(array_value.values(2).bool_value(), bool_values[2]);
+  }
+  {
+    const auto &array_value = attributes.at("int32_array_attr").array_value();
+    ASSERT_EQ(array_value.values_size(), 3);
+    EXPECT_EQ(array_value.values(0).int_value(), int32_values[0]);
+    EXPECT_EQ(array_value.values(1).int_value(), int32_values[1]);
+    EXPECT_EQ(array_value.values(2).int_value(), int32_values[2]);
+  }
+  {
+    const auto &array_value = attributes.at("int64_array_attr").array_value();
+    ASSERT_EQ(array_value.values_size(), 2);
+    EXPECT_EQ(array_value.values(0).int_value(), int64_values[0]);
+    EXPECT_EQ(array_value.values(1).int_value(), int64_values[1]);
+  }
+  {
+    const auto &array_value = attributes.at("uint32_array_attr").array_value();
+    ASSERT_EQ(array_value.values_size(), 2);
+    EXPECT_EQ(array_value.values(0).int_value(), uint32_values[0]);
+    EXPECT_EQ(array_value.values(1).int_value(), uint32_values[1]);
+  }
+  {
+    const auto &array_value = attributes.at("uint64_array_attr").array_value();
+    ASSERT_EQ(array_value.values_size(), 2);
+    EXPECT_EQ(array_value.values(0).int_value(), static_cast<int64_t>(uint64_values[0]));
+    EXPECT_EQ(array_value.values(1).int_value(), static_cast<int64_t>(uint64_values[1]));
+  }
+  {
+    const auto &array_value = attributes.at("double_array_attr").array_value();
+    ASSERT_EQ(array_value.values_size(), 2);
+    EXPECT_DOUBLE_EQ(array_value.values(0).double_value(), double_values[0]);
+    EXPECT_DOUBLE_EQ(array_value.values(1).double_value(), double_values[1]);
+  }
+  {
+    const auto &array_value = attributes.at("string_array_attr").array_value();
+    ASSERT_EQ(array_value.values_size(), 2);
+    EXPECT_EQ(array_value.values(0).string_value(), string_values[0]);
+    EXPECT_EQ(array_value.values(1).string_value(), string_values[1]);
+  }
 }
 
 }  // namespace otlp

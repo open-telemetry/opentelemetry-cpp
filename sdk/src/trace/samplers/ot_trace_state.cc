@@ -139,7 +139,7 @@ OtelTraceState OtelTraceState::Parse(const std::string &ot_value) noexcept
       std::size_t value_len   = end - value_start;
       if (ot_value.compare(pos, colon - pos, "th") == 0)
       {
-        uint64_t threshold_value;
+        uint64_t threshold_value{0};
         if (value_len <= 14 && ParseHex(ot_value, value_start, value_len, threshold_value))
         {
           state.has_threshold = true;
@@ -148,7 +148,7 @@ OtelTraceState OtelTraceState::Parse(const std::string &ot_value) noexcept
       }
       else if (ot_value.compare(pos, colon - pos, "rv") == 0)
       {
-        uint64_t random_value;
+        uint64_t random_value{0};
         if (value_len == 14 && ParseHex(ot_value, value_start, value_len, random_value))
         {
           state.has_random_value = true;
