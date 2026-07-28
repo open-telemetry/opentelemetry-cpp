@@ -35,11 +35,14 @@
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
@@ -320,6 +323,23 @@ TEST(SdkBuilder, AddViewHistogramCardinalityLimitOnly)
         {
           EXPECT_EQ(aggregation_config->GetType(), metrics_sdk::AggregationType::kHistogram);
           EXPECT_EQ(aggregation_config->cardinality_limit_, 42u);
+
+          // Pin what users actually receive: building the aggregation from this config
+          // must keep the SDK's default bucket boundaries, not silently collapse to a
+          // single bucket. A default-constructed HistogramAggregationConfig has empty
+          // boundaries_, which the aggregation takes literally (as opposed to a null
+          // config pointer, which falls back to the default boundaries), so AddView()
+          // must populate boundaries_ explicitly.
+          auto aggregation = metrics_sdk::DefaultAggregation::CreateAggregation(
+              metrics_sdk::AggregationType::kHistogram, instrument_descriptor, aggregation_config);
+          EXPECT_NE(aggregation, nullptr);
+          if (aggregation)
+          {
+            auto histogram_data =
+                opentelemetry::nostd::get<metrics_sdk::HistogramPointData>(aggregation->ToPoint());
+            EXPECT_EQ(histogram_data.boundaries_.size(), 15u);
+            EXPECT_EQ(histogram_data.counts_.size(), 16u);
+          }
         }
         return true;
       });

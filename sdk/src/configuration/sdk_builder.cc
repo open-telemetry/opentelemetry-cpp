@@ -1762,11 +1762,21 @@ void SdkBuilder::AddView(
 
       switch (effective_aggregation_type)
       {
-        case opentelemetry::sdk::metrics::AggregationType::kHistogram:
-          sdk_aggregation_config =
+        case opentelemetry::sdk::metrics::AggregationType::kHistogram: {
+          auto histogram_config =
               std::make_shared<opentelemetry::sdk::metrics::HistogramAggregationConfig>(
                   stream->aggregation_cardinality_limit);
+          // A default-constructed HistogramAggregationConfig has empty boundaries_, which
+          // LongHistogramAggregation/DoubleHistogramAggregation interpret as "use these zero
+          // boundaries" rather than "no boundaries configured" (that distinction only exists
+          // when the config pointer itself is null). Since this config is synthesized here
+          // rather than coming from an explicit `aggregation` block, it must carry the SDK's
+          // default boundaries to preserve the instrument's default histogram shape.
+          histogram_config->boundaries_ =
+              opentelemetry::sdk::metrics::HistogramAggregationConfig::DefaultBoundaries();
+          sdk_aggregation_config = histogram_config;
           break;
+        }
 
         default:
           sdk_aggregation_config = std::make_shared<opentelemetry::sdk::metrics::AggregationConfig>(
