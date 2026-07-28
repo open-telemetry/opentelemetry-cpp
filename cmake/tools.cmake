@@ -387,10 +387,9 @@ function(_otelcpp_get_legacy_option_name __OPTION_NAME __OUTPUT_VARIABLE)
       PARENT_SCOPE)
 endfunction()
 
-function(_otelcpp_get_option_default __OPTION_NAME __DEFAULT_VALUE
-         __OUTPUT_VARIABLE)
+function(_otelcpp_get_option_default __OPTION_NAME __LEGACY_OPTION_NAME
+         __DEFAULT_VALUE __OUTPUT_VARIABLE)
   set(__RESOLVED_DEFAULT "${__DEFAULT_VALUE}")
-  _otelcpp_get_legacy_option_name("${__OPTION_NAME}" __LEGACY_OPTION_NAME)
 
   if(NOT __LEGACY_OPTION_NAME STREQUAL "")
     if(DEFINED ${__LEGACY_OPTION_NAME})
@@ -425,6 +424,8 @@ function(otelcpp_option_flag __OPTION_NAME __HELP_TEXT __DEFAULT_VALUE)
   cmake_parse_arguments(_otelcpp_option_flag "${optionArgs}" "${oneValueArgs}"
                         "${multiValueArgs}" "${ARGN}")
 
+  _otelcpp_get_legacy_option_name("${__OPTION_NAME}" __LEGACY_OPTION_NAME)
+
   if(_otelcpp_option_flag_AVAILABLE_CONDITION)
     set(_option_available 0)
     foreach(__cond ${_otelcpp_option_flag_AVAILABLE_CONDITION})
@@ -435,7 +436,6 @@ function(otelcpp_option_flag __OPTION_NAME __HELP_TEXT __DEFAULT_VALUE)
       endif()
     endforeach()
     if(_option_available EQUAL 0)
-      _otelcpp_get_legacy_option_name("${__OPTION_NAME}" __LEGACY_OPTION_NAME)
       unset(_option_fatal_error_message)
       if(NOT __LEGACY_OPTION_NAME STREQUAL "" AND DEFINED
                                                   ${__LEGACY_OPTION_NAME})
@@ -460,26 +460,44 @@ function(otelcpp_option_flag __OPTION_NAME __HELP_TEXT __DEFAULT_VALUE)
     endif()
   endif()
 
-  _otelcpp_get_option_default("${__OPTION_NAME}" "${__DEFAULT_VALUE}"
-                              __RESOLVED_DEFAULT)
+  _otelcpp_get_option_default("${__OPTION_NAME}" "${__LEGACY_OPTION_NAME}"
+                              "${__DEFAULT_VALUE}" __RESOLVED_DEFAULT)
   option(${__OPTION_NAME} "${__HELP_TEXT}" "${__RESOLVED_DEFAULT}")
+
+  # Set the legacy option variable to the same value as the new option, so that
+  # user can use the legacy option name to access the same value.
+  if(NOT __LEGACY_OPTION_NAME STREQUAL "")
+    set(${__LEGACY_OPTION_NAME}
+        "${${__OPTION_NAME}}"
+        PARENT_SCOPE)
+  endif()
 endfunction()
 
 function(otelcpp_option_variable __OPTION_NAME __DEFAULT_VALUE __CACHE_TYPE
          __DOC_STRING)
-  _otelcpp_get_option_default("${__OPTION_NAME}" "${__DEFAULT_VALUE}"
-                              __RESOLVED_DEFAULT)
+  _otelcpp_get_legacy_option_name("${__OPTION_NAME}" __LEGACY_OPTION_NAME)
+  _otelcpp_get_option_default("${__OPTION_NAME}" "${__LEGACY_OPTION_NAME}"
+                              "${__DEFAULT_VALUE}" __RESOLVED_DEFAULT)
   set(${__OPTION_NAME}
       "${__RESOLVED_DEFAULT}"
       CACHE "${__CACHE_TYPE}" "${__DOC_STRING}" ${ARGN})
+
+  # Set the legacy option variable to the same value as the new option, so that
+  # user can use the legacy option name to access the same value.
+  if(NOT __LEGACY_OPTION_NAME STREQUAL "")
+    set(${__LEGACY_OPTION_NAME}
+        "${${__OPTION_NAME}}"
+        PARENT_SCOPE)
+  endif()
 endfunction()
 
 include(CMakeDependentOption)
 
 function(otelcpp_dependent_option __OPTION_NAME __HELP_TEXT
          __CONDITION_TRUE_VALUE __CONDITION_RULE __CONDITION_FALSE_VALUE)
-  _otelcpp_get_option_default("${__OPTION_NAME}" "${__CONDITION_TRUE_VALUE}"
-                              __RESOLVED_DEFAULT)
+  _otelcpp_get_legacy_option_name("${__OPTION_NAME}" __LEGACY_OPTION_NAME)
+  _otelcpp_get_option_default("${__OPTION_NAME}" "${__LEGACY_OPTION_NAME}"
+                              "${__CONDITION_TRUE_VALUE}" __RESOLVED_DEFAULT)
   cmake_dependent_option(
     ${__OPTION_NAME} "${__HELP_TEXT}" "${__RESOLVED_DEFAULT}"
     "${__CONDITION_RULE}" "${__CONDITION_FALSE_VALUE}")
@@ -488,4 +506,12 @@ function(otelcpp_dependent_option __OPTION_NAME __HELP_TEXT
   set(${__OPTION_NAME}
       "${${__OPTION_NAME}}"
       PARENT_SCOPE)
+
+  # Set the legacy option variable to the same value as the new option, so that
+  # user can use the legacy option name to access the same value.
+  if(NOT __LEGACY_OPTION_NAME STREQUAL "")
+    set(${__LEGACY_OPTION_NAME}
+        "${${__OPTION_NAME}}"
+        PARENT_SCOPE)
+  endif()
 endfunction()
