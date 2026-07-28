@@ -4,7 +4,7 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
-    name = "example_explicit_parent",
+    name = "example_environment_carrier",
     srcs = [
         "main.cc",
     ],
@@ -12,6 +12,10 @@ cc_test(
         "ostream",
         "tested_example",
     ],
+    target_compatible_with = select({
+        "//bazel:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
     deps = [
         "//api",
         "//exporters/ostream:ostream_span_exporter",
