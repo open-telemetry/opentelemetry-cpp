@@ -13,7 +13,6 @@
 #include "common.h"
 
 #include "opentelemetry/common/key_value_iterable_view.h"
-#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
@@ -34,6 +33,9 @@
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
+
+namespace
+{
 
 class WritableMetricStorageHistogramTestFixture
     : public ::testing::TestWithParam<AggregationTemporality>
@@ -539,3 +541,5 @@ INSTANTIATE_TEST_SUITE_P(WritableMetricStorageHistogramTestBase2ExponentialDoubl
                          WritableMetricStorageHistogramTestFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
                                            AggregationTemporality::kDelta));
+
+}  // namespace

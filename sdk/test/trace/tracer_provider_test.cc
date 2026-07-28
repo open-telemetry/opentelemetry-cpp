@@ -2,14 +2,23 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stdlib.h>
+#include <atomic>
+#include <cstddef>
+#include <cstdint>
+#include <future>
+#include <limits>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
@@ -17,16 +26,25 @@
 #include "opentelemetry/sdk/trace/random_id_generator.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off.h"
+#include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer.h"
+#include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
 
+#if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
+#endif
+
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <stdint.h>
 #  include <initializer_list>
 #  include <map>
 #  include <unordered_map>
@@ -38,6 +56,7 @@
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
+using opentelemetry::sdk::instrumentationscope::ScopeConfigurator;
 
 TEST(TracerProvider, GetTracer)
 {
@@ -341,4 +360,342 @@ TEST(TracerProvider, ForceFlush)
   TracerProvider tp1(std::move(processor1));
 
   EXPECT_TRUE(tp1.ForceFlush());
+}
+
+TEST(TracerProvider, UpdateTracerConfiguratorDisableByName)
+{
+  auto processor = SimpleSpanProcessorFactory::Create(
+      std::make_unique<opentelemetry::exporter::memory::InMemorySpanExporter>());
+
+  // Start with all tracers enabled (the default configurator enables everything).
+  TracerProvider provider(std::move(processor));
+
+  auto tracer_disabled_by_update = provider.GetTracer("scope.disabled");
+  auto tracer_unaffected         = provider.GetTracer("scope.unaffected");
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  ASSERT_TRUE(tracer_disabled_by_update->Enabled());
+  ASSERT_TRUE(tracer_unaffected->Enabled());
+#endif
+  ASSERT_TRUE(tracer_disabled_by_update->StartSpan("op")->IsRecording());
+  ASSERT_TRUE(tracer_unaffected->StartSpan("op")->IsRecording());
+
+  // Disable "scope.disabled" by name; "scope.unaffected" must remain enabled.
+  auto configurator_with_one_scope_disabled = std::make_unique<ScopeConfigurator<TracerConfig>>(
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default())
+          .AddConditionNameEquals("scope.disabled", TracerConfig::Disabled())
+          .Build());
+
+  provider.UpdateTracerConfigurator(std::move(configurator_with_one_scope_disabled));
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  EXPECT_FALSE(tracer_disabled_by_update->Enabled());
+  EXPECT_TRUE(tracer_unaffected->Enabled());
+#endif
+  EXPECT_FALSE(tracer_disabled_by_update->StartSpan("op")->IsRecording());
+  EXPECT_TRUE(tracer_unaffected->StartSpan("op")->IsRecording());
+}
+
+TEST(TracerProvider, UpdateTracerConfiguratorReEnable)
+{
+  auto processor = SimpleSpanProcessorFactory::Create(
+      std::make_unique<opentelemetry::exporter::memory::InMemorySpanExporter>());
+
+  // Start with all tracers disabled via the initial configurator.
+  auto all_disabled_configurator = std::make_unique<ScopeConfigurator<TracerConfig>>(
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Disabled()).Build());
+  TracerProvider provider(
+      std::move(processor), Resource::Create({}), std::make_unique<AlwaysOnSampler>(),
+      std::make_unique<RandomIdGenerator>(), std::move(all_disabled_configurator));
+
+  auto existing_tracer = provider.GetTracer("scope.existing");
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  ASSERT_FALSE(existing_tracer->Enabled());
+#endif
+  ASSERT_FALSE(existing_tracer->StartSpan("op")->IsRecording());
+
+  // Re-enable all tracers by installing a default (all-enabled) configurator.
+  auto all_enabled_configurator = std::make_unique<ScopeConfigurator<TracerConfig>>(
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default()).Build());
+  provider.UpdateTracerConfigurator(std::move(all_enabled_configurator));
+
+  // The existing tracer handle must immediately reflect the updated config.
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  EXPECT_TRUE(existing_tracer->Enabled());
+#endif
+  EXPECT_TRUE(existing_tracer->StartSpan("op")->IsRecording());
+
+  // Tracers obtained after the update also reflect the new configurator.
+  auto tracer_obtained_after_update = provider.GetTracer("scope.new");
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  EXPECT_TRUE(tracer_obtained_after_update->Enabled());
+#endif
+  EXPECT_TRUE(tracer_obtained_after_update->StartSpan("op")->IsRecording());
+}
+
+TEST(TracerProvider, UpdateTracerConfiguratorNewTracerUsesUpdatedConfig)
+{
+  auto processor = SimpleSpanProcessorFactory::Create(
+      std::make_unique<opentelemetry::exporter::memory::InMemorySpanExporter>());
+  TracerProvider provider(std::move(processor));
+
+  // Install a configurator that disables "scope.disabled" before any tracer
+  // for that scope has been obtained.
+  auto configurator_with_one_scope_disabled = std::make_unique<ScopeConfigurator<TracerConfig>>(
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default())
+          .AddConditionNameEquals("scope.disabled", TracerConfig::Disabled())
+          .Build());
+  provider.UpdateTracerConfigurator(std::move(configurator_with_one_scope_disabled));
+
+  // A tracer obtained after the update must already reflect the new config.
+  auto tracer_for_disabled_scope = provider.GetTracer("scope.disabled");
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  EXPECT_FALSE(tracer_for_disabled_scope->Enabled());
+#endif
+  EXPECT_FALSE(tracer_for_disabled_scope->StartSpan("op")->IsRecording());
+
+  // Scopes not named in the disable by name configurator remain enabled.
+  auto tracer_for_unaffected_scope = provider.GetTracer("scope.unaffected");
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  EXPECT_TRUE(tracer_for_unaffected_scope->Enabled());
+#endif
+  EXPECT_TRUE(tracer_for_unaffected_scope->StartSpan("op")->IsRecording());
+}
+
+TEST(TracerProvider, UpdateTracerConfiguratorConcurrentStartSpan)
+{
+  auto processor = SimpleSpanProcessorFactory::Create(
+      std::make_unique<opentelemetry::exporter::memory::InMemorySpanExporter>());
+  TracerProvider provider(std::move(processor));
+
+  auto tracer = provider.GetTracer("scope.concurrent");
+
+  std::atomic<bool> stop{false};
+  std::atomic<bool> worker_saw_disabled{false};
+  std::atomic<bool> worker_saw_enabled{false};
+
+  std::promise<void> worker_ready;
+  std::future<void> worker_ready_future = worker_ready.get_future();
+
+  // Worker: call StartSpan in a tight loop and flag each observed state.
+  std::thread worker([&] {
+    worker_ready.set_value();
+    while (!stop.load(std::memory_order_relaxed))
+    {
+      auto span = tracer->StartSpan("op");
+      if (span->IsRecording())
+      {
+        worker_saw_enabled.store(true, std::memory_order_relaxed);
+      }
+      else
+      {
+        worker_saw_disabled.store(true, std::memory_order_relaxed);
+      }
+      span->End();
+    }
+  });
+
+  worker_ready_future.wait();
+
+  // Disable all, then wait for the worker to actually observe a disabled span.
+  // This synchronisation guarantees the worker ran while the tracer was disabled.
+  auto disable_all = std::make_unique<ScopeConfigurator<TracerConfig>>(
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Disabled()).Build());
+  provider.UpdateTracerConfigurator(std::move(disable_all));
+  while (!worker_saw_disabled.load(std::memory_order_relaxed))
+  {
+    std::this_thread::yield();
+  }
+
+  // Re-enable all, then wait for the worker to observe an enabled span.
+  auto enable_all = std::make_unique<ScopeConfigurator<TracerConfig>>(
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default()).Build());
+  provider.UpdateTracerConfigurator(std::move(enable_all));
+  while (!worker_saw_enabled.load(std::memory_order_relaxed))
+  {
+    std::this_thread::yield();
+  }
+
+  stop.store(true, std::memory_order_relaxed);
+  worker.join();
+
+  EXPECT_TRUE(worker_saw_disabled.load());
+  EXPECT_TRUE(worker_saw_enabled.load());
+
+  EXPECT_TRUE(tracer->StartSpan("op")->IsRecording());
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  EXPECT_TRUE(tracer->Enabled());
+#endif
+}
+
+TEST(TracerProvider, SpanLimitsSpecDefaults)
+{
+  SpanLimits limits;
+  EXPECT_EQ(limits.attribute_count_limit, 128u);
+  EXPECT_EQ(limits.event_count_limit, 128u);
+  EXPECT_EQ(limits.link_count_limit, 128u);
+  EXPECT_EQ(limits.event_attribute_count_limit, 128u);
+  EXPECT_EQ(limits.link_attribute_count_limit, 128u);
+  EXPECT_EQ(limits.attribute_value_length_limit, (std::numeric_limits<std::size_t>::max)());
+}
+
+TEST(TracerProvider, SpanLimitsNoLimits)
+{
+  SpanLimits limits = SpanLimits::NoLimits();
+  EXPECT_EQ(limits.attribute_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+  EXPECT_EQ(limits.attribute_value_length_limit, (std::numeric_limits<std::size_t>::max)());
+  EXPECT_EQ(limits.event_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+  EXPECT_EQ(limits.link_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+  EXPECT_EQ(limits.event_attribute_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+  EXPECT_EQ(limits.link_attribute_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+}
+
+TEST(TracerProvider, SpanLimitsTracerProviderFactoryCreate)
+{
+  SpanLimits limits;
+  limits.attribute_count_limit        = 5;
+  limits.attribute_value_length_limit = 10;
+  limits.event_count_limit            = 3;
+  limits.link_count_limit             = 2;
+  limits.event_attribute_count_limit  = 4;
+  limits.link_attribute_count_limit   = 4;
+
+  auto provider = TracerProviderFactory::Create(
+      std::make_unique<SimpleSpanProcessor>(nullptr), Resource::Create({}),
+      std::make_unique<AlwaysOnSampler>(), std::make_unique<RandomIdGenerator>(),
+      std::make_unique<ScopeConfigurator<TracerConfig>>(
+          ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default()).Build()),
+      limits);
+
+  const auto &stored = provider->GetSpanLimits();
+  EXPECT_EQ(stored.attribute_count_limit, limits.attribute_count_limit);
+  EXPECT_EQ(stored.attribute_value_length_limit, limits.attribute_value_length_limit);
+  EXPECT_EQ(stored.event_count_limit, limits.event_count_limit);
+  EXPECT_EQ(stored.link_count_limit, limits.link_count_limit);
+  EXPECT_EQ(stored.event_attribute_count_limit, limits.event_attribute_count_limit);
+  EXPECT_EQ(stored.link_attribute_count_limit, limits.link_attribute_count_limit);
+}
+
+namespace
+{
+
+void UnsetSpanLimitsEnv()
+{
+  unsetenv("OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT");
+  unsetenv("OTEL_ATTRIBUTE_COUNT_LIMIT");
+  unsetenv("OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT");
+  unsetenv("OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT");
+  unsetenv("OTEL_SPAN_EVENT_COUNT_LIMIT");
+  unsetenv("OTEL_SPAN_LINK_COUNT_LIMIT");
+  unsetenv("OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT");
+  unsetenv("OTEL_LINK_ATTRIBUTE_COUNT_LIMIT");
+}
+
+}  // namespace
+
+TEST(TracerProvider, SpanLimitsFromEnvUnsetIsNoLimits)
+{
+  UnsetSpanLimitsEnv();
+
+  const SpanLimits limits    = span_limits_env::GetSpanLimitsFromEnv();
+  const SpanLimits no_limits = SpanLimits::NoLimits();
+  EXPECT_EQ(limits.attribute_count_limit, no_limits.attribute_count_limit);
+  EXPECT_EQ(limits.attribute_value_length_limit, no_limits.attribute_value_length_limit);
+  EXPECT_EQ(limits.event_count_limit, no_limits.event_count_limit);
+  EXPECT_EQ(limits.link_count_limit, no_limits.link_count_limit);
+  EXPECT_EQ(limits.event_attribute_count_limit, no_limits.event_attribute_count_limit);
+  EXPECT_EQ(limits.link_attribute_count_limit, no_limits.link_attribute_count_limit);
+}
+
+TEST(TracerProvider, SpanLimitsFromEnvReadsVariables)
+{
+  UnsetSpanLimitsEnv();
+  setenv("OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT", "100", 1);
+  setenv("OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT", "5", 1);
+  setenv("OTEL_SPAN_EVENT_COUNT_LIMIT", "3", 1);
+  setenv("OTEL_SPAN_LINK_COUNT_LIMIT", "2", 1);
+  setenv("OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT", "4", 1);
+  setenv("OTEL_LINK_ATTRIBUTE_COUNT_LIMIT", "6", 1);
+
+  const SpanLimits limits = span_limits_env::GetSpanLimitsFromEnv();
+  EXPECT_EQ(limits.attribute_value_length_limit, 100u);
+  EXPECT_EQ(limits.attribute_count_limit, 5u);
+  EXPECT_EQ(limits.event_count_limit, 3u);
+  EXPECT_EQ(limits.link_count_limit, 2u);
+  EXPECT_EQ(limits.event_attribute_count_limit, 4u);
+  EXPECT_EQ(limits.link_attribute_count_limit, 6u);
+
+  UnsetSpanLimitsEnv();
+}
+
+TEST(TracerProvider, SpanLimitsFromEnvCustomFallbackDefaults)
+{
+  UnsetSpanLimitsEnv();
+  setenv("OTEL_SPAN_EVENT_COUNT_LIMIT", "42", 1);
+
+  const SpanLimits limits = span_limits_env::GetSpanLimitsFromEnv(SpanLimits{});
+  EXPECT_EQ(limits.event_count_limit, 42u);
+  EXPECT_EQ(limits.attribute_count_limit, 128u);
+  EXPECT_EQ(limits.link_count_limit, 128u);
+
+  UnsetSpanLimitsEnv();
+}
+
+TEST(TracerProvider, SpanLimitsFromEnvGeneralAttributeVariablesApply)
+{
+  UnsetSpanLimitsEnv();
+  setenv("OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT", "50", 1);
+  setenv("OTEL_ATTRIBUTE_COUNT_LIMIT", "10", 1);
+
+  const SpanLimits limits = span_limits_env::GetSpanLimitsFromEnv();
+  EXPECT_EQ(limits.attribute_value_length_limit, 50u);
+  EXPECT_EQ(limits.attribute_count_limit, 10u);
+  EXPECT_EQ(limits.event_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+
+  UnsetSpanLimitsEnv();
+}
+
+TEST(TracerProvider, SpanLimitsFromEnvSpanSpecificTakesPrecedence)
+{
+  UnsetSpanLimitsEnv();
+  setenv("OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT", "50", 1);
+  setenv("OTEL_ATTRIBUTE_COUNT_LIMIT", "10", 1);
+  setenv("OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT", "100", 1);
+  setenv("OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT", "20", 1);
+
+  const SpanLimits limits = span_limits_env::GetSpanLimitsFromEnv();
+  EXPECT_EQ(limits.attribute_value_length_limit, 100u);
+  EXPECT_EQ(limits.attribute_count_limit, 20u);
+
+  UnsetSpanLimitsEnv();
+}
+
+TEST(TracerProvider, SpanLimitsTracerProviderFactoryCreateDefaultReadsEnv)
+{
+  UnsetSpanLimitsEnv();
+  setenv("OTEL_SPAN_EVENT_COUNT_LIMIT", "42", 1);
+
+  auto provider = TracerProviderFactory::Create(std::make_unique<SimpleSpanProcessor>(nullptr));
+
+  const auto &limits = provider->GetSpanLimits();
+  EXPECT_EQ(limits.event_count_limit, 42u);
+  EXPECT_EQ(limits.attribute_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+  EXPECT_EQ(limits.link_count_limit, (std::numeric_limits<std::uint32_t>::max)());
+
+  UnsetSpanLimitsEnv();
+}
+
+TEST(TracerProvider, SpanLimitsTracerProviderFactoryCreateDefault)
+{
+  auto provider = TracerProviderFactory::Create(std::make_unique<SimpleSpanProcessor>(nullptr));
+
+  const auto no_limits = SpanLimits::NoLimits();
+
+  const auto &limits = provider->GetSpanLimits();
+  EXPECT_EQ(limits.attribute_count_limit, no_limits.attribute_count_limit);
+  EXPECT_EQ(limits.event_count_limit, no_limits.event_count_limit);
+  EXPECT_EQ(limits.link_count_limit, no_limits.link_count_limit);
+  EXPECT_EQ(limits.event_attribute_count_limit, no_limits.event_attribute_count_limit);
+  EXPECT_EQ(limits.link_attribute_count_limit, no_limits.link_attribute_count_limit);
+  EXPECT_EQ(limits.attribute_value_length_limit, no_limits.attribute_value_length_limit);
 }

@@ -59,6 +59,27 @@ templates:
         filter: $filter
       })
     application_mode: each
+  - pattern: semantic_events-h.j2
+    # TODO: once a weaver release, replace the
+    # inlined filter body below with the first-class helper:
+    #   semconv_grouped_events({
+    #     "exclude_root_namespace": $excluded_namespaces,
+    #     "stable_only": if $filter == "stable" then true else false end,
+    #   })
+    filter: >
+      semconv_signal("event"; {
+        "exclude_root_namespace": $excluded_namespaces,
+        "stable_only": if $filter == "stable" then true else false end,
+      })
+      | group_by(.root_namespace)
+      | map({
+        root_namespace: .[0].root_namespace,
+        events: (. | sort_by(.name)),
+        output: $output,
+        stable_package_name: $stable_package_name + ".events",
+        filter: $filter
+      })
+    application_mode: each
 
 text_maps:
   cpp_types:

@@ -143,8 +143,6 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   {
     for (const auto &metric_data : instrumentation_info.metric_data_)
     {
-      auto origin_name = metric_data.instrument_descriptor.name_;
-      auto unit        = metric_data.instrument_descriptor.unit_;
       prometheus_client::MetricFamily metric_family;
       metric_family.help = metric_data.instrument_descriptor.description_;
       auto front         = metric_data.point_data_attr_.front();
@@ -290,14 +288,6 @@ std::string PrometheusExporterUtils::SanitizeNames(std::string name)
   return name;
 }
 
-#if OPENTELEMETRY_HAVE_WORKING_REGEX
-const std::regex INVALID_CHARACTERS_PATTERN("[^a-zA-Z0-9]");
-const std::regex CHARACTERS_BETWEEN_BRACES_PATTERN("\\{(.*?)\\}");
-const std::regex SANITIZE_LEADING_UNDERSCORES("^_+");
-const std::regex SANITIZE_TRAILING_UNDERSCORES("_+$");
-const std::regex SANITIZE_CONSECUTIVE_UNDERSCORES("[_]{2,}");
-#endif
-
 std::string PrometheusExporterUtils::GetEquivalentPrometheusUnit(
     const std::string &raw_metric_unit_name)
 {
@@ -373,6 +363,7 @@ std::string PrometheusExporterUtils::GetPrometheusPerUnit(const std::string &per
 std::string PrometheusExporterUtils::RemoveUnitPortionInBraces(const std::string &unit)
 {
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
+  static const std::regex CHARACTERS_BETWEEN_BRACES_PATTERN("\\{(.*?)\\}");
   return std::regex_replace(unit, CHARACTERS_BETWEEN_BRACES_PATTERN, "");
 #else
   bool in_braces = false;
@@ -427,6 +418,10 @@ std::string PrometheusExporterUtils::ConvertRateExpressedToPrometheusUnit(
 std::string PrometheusExporterUtils::CleanUpString(const std::string &str)
 {
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
+  static const std::regex INVALID_CHARACTERS_PATTERN("[^a-zA-Z0-9]");
+  static const std::regex SANITIZE_LEADING_UNDERSCORES("^_+");
+  static const std::regex SANITIZE_TRAILING_UNDERSCORES("_+$");
+  static const std::regex SANITIZE_CONSECUTIVE_UNDERSCORES("[_]{2,}");
   std::string cleaned_string = std::regex_replace(str, INVALID_CHARACTERS_PATTERN, "_");
   cleaned_string = std::regex_replace(cleaned_string, SANITIZE_CONSECUTIVE_UNDERSCORES, "_");
   cleaned_string = std::regex_replace(cleaned_string, SANITIZE_TRAILING_UNDERSCORES, "");

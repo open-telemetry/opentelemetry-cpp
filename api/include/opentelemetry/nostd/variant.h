@@ -18,7 +18,7 @@
 // Header-only. Without compiling the actual Abseil binary. As Abseil moves on to new
 // toolchains, it may drop support for Visual Studio 2015 in future versions.
 
-#  if defined(__EXCEPTIONS)
+#  if OPENTELEMETRY_HAVE_EXCEPTIONS
 #    include <exception>
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace nostd

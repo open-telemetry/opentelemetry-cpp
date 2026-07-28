@@ -98,7 +98,7 @@ private:
   explicit FixedSizeExemplarReservoir() = default;
   std::vector<ReservoirCell> storage_;
   std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector_;
-  MapAndResetCellType map_and_reset_cell_;
+  MapAndResetCellType map_and_reset_cell_{nullptr};
 };
 
 }  // namespace metrics

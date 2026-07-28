@@ -8,6 +8,7 @@
 #include <string>
 #include <utility>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/string_view.h"
 
 using opentelemetry::nostd::string_view;
@@ -74,7 +75,7 @@ TEST(StringViewTest, SubstrPortion)
 TEST(StringViewTest, SubstrOutOfRange)
 {
   string_view s = "abc123";
-#if __EXCEPTIONS || (defined(OPENTELEMETRY_STL_VERSION) && (OPENTELEMETRY_STL_VERSION >= 2017))
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
   EXPECT_THROW((void)s.substr(10), std::out_of_range);
 #else
   EXPECT_DEATH({ s.substr(10); }, "");

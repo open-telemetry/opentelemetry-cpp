@@ -124,7 +124,7 @@ void InitMetrics(const std::string &name)
           new metrics_sdk::Base2ExponentialHistogramAggregationConfig);
   histogram_base2_aggregation_config->max_scale_      = 3;
   histogram_base2_aggregation_config->record_min_max_ = true;
-  histogram_base2_aggregation_config->max_buckets_    = 100;
+  histogram_base2_aggregation_config->max_size_       = 100;
 
   std::shared_ptr<metrics_sdk::AggregationConfig> base2_aggregation_config(
       std::move(histogram_base2_aggregation_config));

@@ -16,6 +16,7 @@
 #include "opentelemetry/exporters/zipkin/recordable.h"
 #include "opentelemetry/exporters/zipkin/zipkin_exporter.h"
 #include "opentelemetry/exporters/zipkin/zipkin_exporter_options.h"
+#include "opentelemetry/ext/http/client/detail/default_factory.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
@@ -36,30 +37,30 @@ namespace zipkin
 // -------------------------------- Constructors --------------------------------
 
 ZipkinExporter::ZipkinExporter(const ZipkinExporterOptions &options)
-    : options_(options),
-      http_client_(ext::http::client::HttpClientFactory::CreateSync()),
-      url_parser_(options_.endpoint)
-{
-  InitializeLocalEndpoint();
-}
+    : ZipkinExporter(options, ext::http::client::detail::GetDefaultHttpClientFactory())
+{}
 
 ZipkinExporter::ZipkinExporter()
-    : options_(ZipkinExporterOptions()),
-      http_client_(ext::http::client::HttpClientFactory::CreateSync()),
-      url_parser_(options_.endpoint)
+    : ZipkinExporter(ZipkinExporterOptions(),
+                     ext::http::client::detail::GetDefaultHttpClientFactory())
+{}
+
+ZipkinExporter::ZipkinExporter(const ZipkinExporterOptions &options,
+                               const std::shared_ptr<ext::http::client::HttpClientFactory> &factory)
+    : ZipkinExporter(options, factory->CreateSync())
+{}
+
+ZipkinExporter::ZipkinExporter(const ZipkinExporterOptions &options,
+                               std::shared_ptr<ext::http::client::HttpClientSync> http_client)
+    : options_(options), http_client_(std::move(http_client)), url_parser_(options_.endpoint)
 {
   InitializeLocalEndpoint();
 }
 
 ZipkinExporter::ZipkinExporter(
     std::shared_ptr<opentelemetry::ext::http::client::HttpClientSync> http_client)
-    : options_(ZipkinExporterOptions()),
-      http_client_(std::move(http_client)),
-      url_parser_(options_.endpoint)
-{
-
-  InitializeLocalEndpoint();
-}
+    : ZipkinExporter(ZipkinExporterOptions(), std::move(http_client))
+{}
 
 // ----------------------------- Exporter methods ------------------------------
 

@@ -14,7 +14,6 @@
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
@@ -287,6 +286,8 @@ TEST(PrometheusExporterUtils, TranslateToPrometheusHistogramNormal)
   ASSERT_EQ(checked_label_num, 3);
 }
 
+namespace
+{
 class SanitizeTest : public ::testing::Test
 {
   Resource resource_ = Resource::Create({});
@@ -309,6 +310,7 @@ protected:
     EXPECT_EQ(result.begin()->metric.begin()->label.begin()->name, sanitized);
   }
 };
+}  // namespace
 
 TEST_F(SanitizeTest, Label)
 {
@@ -322,6 +324,8 @@ TEST_F(SanitizeTest, Label)
 
 TEST_F(SanitizeTest, Name) {}
 
+namespace
+{
 class AttributeCollisionTest : public ::testing::Test
 {
   Resource resource_ = Resource::Create(ResourceAttributes{});
@@ -357,6 +361,7 @@ protected:
     }
   }
 };
+}  // namespace
 
 TEST_F(AttributeCollisionTest, SeparatesDistinctKeys)
 {

@@ -3,7 +3,9 @@
 
 #pragma once
 
+#include <cerrno>
 #include <cstdint>
+#include <cstdlib>
 #include <functional>
 #include <list>
 #include <map>
@@ -40,7 +42,7 @@ struct HttpRequest
 
 struct HttpResponse
 {
-  int code;
+  int code{0};
   std::string message;
   std::map<std::string, std::string> headers;
   std::string body;
@@ -106,9 +108,9 @@ protected:
       SendingHeaders,
       SendingBody,
       Closing
-    } state;
-    size_t contentLength;
-    bool keepalive;
+    } state{Idle};
+    size_t contentLength{0};
+    bool keepalive{false};
     HttpRequest request;
     HttpResponse response;
   };
@@ -242,7 +244,7 @@ public:
 
   void stop() { m_reactor.stop(); }
 
-protected:
+private:
   void onSocketAcceptable(SocketTools::Socket socket) override
   {
     LOG_TRACE("HttpServer: accepting socket fd=0x%llx", socket.m_sock);
@@ -329,6 +331,7 @@ protected:
     handleConnectionClosed(conn);
   }
 
+protected:
   bool sendMore(Connection &conn)
   {
     if (conn.sendBuffer.empty())
@@ -354,7 +357,6 @@ protected:
     return false;
   }
 
-protected:
   void handleConnectionClosed(Connection &conn)
   {
     LOG_TRACE("HttpServer: [%s] closed", conn.request.client.c_str());
@@ -433,7 +435,21 @@ protected:
         auto const contentLength = conn.request.headers.find("Content-Length");
         if (contentLength != conn.request.headers.end())
         {
-          conn.contentLength = atoi(contentLength->second.c_str());
+          char *lengthEnd     = nullptr;
+          errno               = 0;
+          auto const declared = std::strtol(contentLength->second.c_str(), &lengthEnd, 10);
+          // Reject a non-numeric, negative, or out-of-range Content-Length; tolerate trailing
+          // characters (e.g. optional whitespace) after a valid leading count.
+          if (errno != 0 || lengthEnd == contentLength->second.c_str() || declared < 0)
+          {
+            LOG_WARN("HttpServer: [%s] invalid Content-Length - %s", conn.request.client.c_str(),
+                     contentLength->second.c_str());
+            conn.response.code = 400;  // Bad Request
+            conn.keepalive     = false;
+            conn.state         = Connection::Processing;
+            continue;
+          }
+          conn.contentLength = static_cast<size_t>(declared);
         }
         else
         {
@@ -767,7 +783,7 @@ protected:
 
   static std::string formatTimestamp(time_t time)
   {
-    tm tm;
+    tm tm{};
 #ifdef _WIN32
     gmtime_s(&tm, &time);
 #else

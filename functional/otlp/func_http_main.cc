@@ -50,10 +50,14 @@ static bool opt_list   = false;
 static bool opt_debug  = false;
 static bool opt_secure = false;
 // HTTPS by default
-static std::string opt_endpoint = "https://localhost:4318/v1/traces";
+constexpr char kDefaultOptEndpoint[] = "https://localhost:4318/v1/traces";
+static std::string opt_endpoint;
 static std::string opt_cert_dir;
 static std::string opt_test_name;
 static test_mode opt_mode = MODE_NONE;
+
+namespace
+{
 
 /*
   Log parsing
@@ -332,9 +336,11 @@ typedef int (*test_func_t)();
 
 struct test_case
 {
-  std::string m_name;
-  test_func_t m_func;
+  nostd::string_view m_name;
+  test_func_t m_func{nullptr};
 };
+
+}  // namespace
 
 static int test_basic();
 
@@ -456,6 +462,8 @@ int main(int argc, char *argv[])
   // Program name
   argc--;
   argv++;
+
+  opt_endpoint = kDefaultOptEndpoint;
 
   int rc = parse_args(argc, argv);
 

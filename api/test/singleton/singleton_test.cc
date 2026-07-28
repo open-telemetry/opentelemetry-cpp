@@ -163,6 +163,9 @@ static void reset_counts()
   unknown_span_count = 0;
 }
 
+namespace
+{
+
 class MyTracer : public trace::Tracer
 {
 public:
@@ -458,3 +461,5 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_h_f2_count, 0);
   EXPECT_EQ(unknown_span_count, 0);
 }
+
+}  // namespace

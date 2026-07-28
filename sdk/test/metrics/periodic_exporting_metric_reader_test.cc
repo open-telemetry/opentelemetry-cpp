@@ -29,6 +29,9 @@ using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
 
+namespace
+{
+
 class MockPushMetricExporter : public PushMetricExporter
 {
 public:
@@ -168,3 +171,5 @@ TEST(PeriodicExportingMetricReaderOptions, UsesDefault)
   EXPECT_EQ(options.export_interval_millis, std::chrono::milliseconds(60000));
   EXPECT_EQ(options.export_timeout_millis, std::chrono::milliseconds(30000));
 }
+
+}  // namespace

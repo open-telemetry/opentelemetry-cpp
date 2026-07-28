@@ -1,6 +1,8 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+include_guard(GLOBAL)
+
 # Unlike functions, macros do not introduce a scope. This is an advantage when
 # trying to set global variables, as we do here.
 macro (opentelemetry_set_pkgconfig_paths)

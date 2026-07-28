@@ -126,6 +126,7 @@
 // which exports opentelemetry/common/macros.h
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
 #  include <exception>
+#  include <string_view>
 #endif
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
@@ -1457,8 +1458,10 @@ private:
       std::shared_ptr<FileStats> concurrency_file = file_;
       std::chrono::microseconds flush_interval    = options_.flush_interval;
       auto thread_instrumentation                 = runtime_options_.thread_instrumentation;
-      file_->background_flush_thread.reset(new std::thread([concurrency_file, flush_interval,
-                                                            thread_instrumentation]() {
+
+      file_->background_flush_thread = std::make_unique<std::thread>([concurrency_file,
+                                                                      flush_interval,
+                                                                      thread_instrumentation]() {
         std::chrono::system_clock::time_point last_free_job_timepoint =
             std::chrono::system_clock::now();
         std::size_t last_record_count = 0;
@@ -1543,7 +1546,7 @@ private:
         {
           background_flush_thread->detach();
         }
-      }));
+      });
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
     }
     catch (std::exception &e)
@@ -1566,16 +1569,16 @@ private:
 
   struct FileStats
   {
-    std::atomic<bool> is_shutdown;
-    std::size_t rotate_index;
-    std::size_t written_size;
-    std::size_t left_flush_record_count;
+    std::atomic<bool> is_shutdown{false};
+    std::size_t rotate_index{0};
+    std::size_t written_size{0};
+    std::size_t left_flush_record_count{0};
     std::shared_ptr<std::FILE> current_file;
     std::mutex file_lock;
-    std::time_t last_checkpoint;
+    std::time_t last_checkpoint{0};
     std::string file_path;
-    std::atomic<std::size_t> record_count;
-    std::atomic<std::size_t> flushed_record_count;
+    std::atomic<std::size_t> record_count{0};
+    std::atomic<std::size_t> flushed_record_count{0};
 
     std::unique_ptr<std::thread> background_flush_thread;
     std::mutex background_thread_lock;

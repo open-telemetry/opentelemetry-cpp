@@ -6,10 +6,14 @@
 #include <ostream>
 #include <string>
 #include <tuple>
+#include <variant>
 
 #include "opentelemetry/ext/http/common/url_parser.h"
 
 namespace http_common = opentelemetry::ext::http::common;
+
+namespace
+{
 
 struct ParsedUrl
 {
@@ -137,3 +141,5 @@ TEST_P(UrlDecoderTests, BasicTests)
 
   EXPECT_EQ(actual, expected);
 }
+
+}  // namespace

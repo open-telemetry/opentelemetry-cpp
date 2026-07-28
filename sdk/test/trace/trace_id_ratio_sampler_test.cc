@@ -10,7 +10,6 @@
 
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio.h"

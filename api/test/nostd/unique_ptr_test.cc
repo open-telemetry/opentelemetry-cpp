@@ -10,6 +10,9 @@
 
 using opentelemetry::nostd::unique_ptr;
 
+namespace
+{
+
 class A
 {
 public:
@@ -174,3 +177,5 @@ TEST(UniquePtrTest, Comparison)
   EXPECT_EQ(ptr3, nullptr);
   EXPECT_EQ(nullptr, ptr3);
 }
+
+}  // namespace

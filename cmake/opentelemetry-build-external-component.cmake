@@ -13,37 +13,16 @@ endfunction()
 # Enable building external components through otel-cpp build
 # The config options are
 #  - OPENTELEMETRY_EXTERNAL_COMPONENT_PATH - Setting local paths of the external
-# component as env variable. Multiple paths can be set by separating them with.
-#  - OPENTELEMETRY_EXTERNAL_COMPONENT_URL Setting github-repo of external component
-#  as env variable
+# component. Multiple paths can be set by separating them with semicolons.
 
-# Add custom vendor component from local path, or GitHub repo
-# Prefer CMake option, then env variable, then URL.
+# Add custom vendor component from local path
+# CMake option.
 if(OPENTELEMETRY_EXTERNAL_COMPONENT_PATH)
+  message(STATUS "Building external components from local path(s): ${OPENTELEMETRY_EXTERNAL_COMPONENT_PATH}")
   # Add custom component path to build tree and consolidate binary artifacts in
   # current project binary output directory.
   foreach(DIR IN LISTS OPENTELEMETRY_EXTERNAL_COMPONENT_PATH)
     get_directory_name_in_path(${DIR} EXTERNAL_EXPORTER_DIR_NAME)
     add_subdirectory(${DIR} ${PROJECT_BINARY_DIR}/external/${EXTERNAL_EXPORTER_DIR_NAME})
   endforeach()
-elseif(DEFINED ENV{OPENTELEMETRY_EXTERNAL_COMPONENT_PATH})
-  # Add custom component path to build tree and consolidate binary artifacts in
-  # current project binary output directory.
-  set(OPENTELEMETRY_EXTERNAL_COMPONENT_PATH_VAR $ENV{OPENTELEMETRY_EXTERNAL_COMPONENT_PATH})
-  foreach(DIR IN LISTS OPENTELEMETRY_EXTERNAL_COMPONENT_PATH_VAR)
-    get_directory_name_in_path(${DIR} EXTERNAL_EXPORTER_DIR_NAME)
-    add_subdirectory(${DIR} ${PROJECT_BINARY_DIR}/external/${EXTERNAL_EXPORTER_DIR_NAME})
-  endforeach()
-elseif(DEFINED $ENV{OPENTELEMETRY_EXTERNAL_COMPONENT_URL})
-  # This option requires CMake 3.11+: add standard remote repo to build tree.
-  include(FetchContent)
-  FetchContent_Declare(
-    external
-    GIT_REPOSITORY $ENV{OPENTELEMETRY_EXTERNAL_COMPONENT_URL}
-    GIT_TAG "main")
-  FetchContent_GetProperties(external)
-  if(NOT external_POPULATED)
-    FetchContent_Populate(external)
-    add_subdirectory(${external_SOURCE_DIR})
-  endif()
 endif()

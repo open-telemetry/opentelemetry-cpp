@@ -124,8 +124,26 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
     ac = &default_config;
   }
 
-  point_data_.max_buckets_    = (std::max)(ac->max_buckets_, static_cast<size_t>(2));
-  point_data_.scale_          = ac->max_scale_;
+  size_t max_size = ac->max_size_;
+  if (max_size < kMaxSizeMin)
+  {
+    OTEL_INTERNAL_LOG_WARN("[Base2ExponentialHistogramAggregation] max_size "
+                           << max_size << " is less than " << kMaxSizeMin << "; using default "
+                           << default_config.max_size_);
+    max_size = default_config.max_size_;
+  }
+
+  int32_t max_scale = ac->max_scale_;
+  if (max_scale < kMaxScaleMin || max_scale > kMaxScaleMax)
+  {
+    OTEL_INTERNAL_LOG_WARN("[Base2ExponentialHistogramAggregation] max_scale "
+                           << max_scale << " is out of range [" << kMaxScaleMin << ", "
+                           << kMaxScaleMax << "]; using default " << default_config.max_scale_);
+    max_scale = default_config.max_scale_;
+  }
+
+  point_data_.max_buckets_    = max_size;
+  point_data_.scale_          = max_scale;
   point_data_.record_min_max_ = ac->record_min_max_;
   point_data_.min_            = (std::numeric_limits<double>::max)();
   point_data_.max_            = (std::numeric_limits<double>::min)();

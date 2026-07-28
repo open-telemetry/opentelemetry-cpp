@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <chrono>
 #include <map>
+#include <mutex>
 #include <new>
 #include <utility>
 
@@ -36,18 +37,13 @@ namespace sdk
 {
 namespace trace
 {
-const std::shared_ptr<opentelemetry::trace::NoopTracer> Tracer::kNoopTracer =
-    std::make_shared<opentelemetry::trace::NoopTracer>();
-
 Tracer::Tracer(std::shared_ptr<TracerContext> context,
                std::unique_ptr<InstrumentationScope> instrumentation_scope) noexcept
     : instrumentation_scope_{std::move(instrumentation_scope)},
       context_{std::move(context)},
       tracer_config_(context_->GetTracerConfigurator().ComputeConfig(*instrumentation_scope_))
 {
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
   UpdateEnabled(tracer_config_.IsEnabled());
-#endif
 }
 
 nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
@@ -56,8 +52,11 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     const opentelemetry::trace::SpanContextKeyValueIterable &links,
     const opentelemetry::trace::StartSpanOptions &options) noexcept
 {
-  if (!tracer_config_.IsEnabled())
+  // Check if the tracer is enabled using the API Tracer::Enabled() accessor if available.
+  if (!Enabled())
   {
+    static const std::shared_ptr<opentelemetry::trace::NoopTracer> kNoopTracer =
+        std::make_shared<opentelemetry::trace::NoopTracer>();
     return kNoopTracer->StartSpan(name, attributes, links, options);
   }
 
@@ -76,7 +75,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   else if (const context::Context *context = nostd::get_if<context::Context>(&options.parent))
   {
     // fetch span context from parent span stored in the context
-    auto parent_span_context = opentelemetry::trace::GetSpan(*context)->GetContext();
+    auto parent_span_context = opentelemetry::trace::GetSpanContext(*context);
     if (parent_span_context.IsValid())
     {
       parent_context      = parent_span_context;
@@ -197,6 +196,17 @@ void Tracer::CloseWithMicroseconds(uint64_t timeout) noexcept
         std::chrono::microseconds{static_cast<std::chrono::microseconds::rep>(timeout)});
   }
 }
+
+void Tracer::UpdateTracerConfig(TracerConfig config) noexcept
+{
+  const bool enabled = config.IsEnabled();
+  {
+    std::lock_guard<std::mutex> lock(tracer_config_mutex_);
+    tracer_config_ = config;
+  }
+  UpdateEnabled(enabled);
+}
+
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

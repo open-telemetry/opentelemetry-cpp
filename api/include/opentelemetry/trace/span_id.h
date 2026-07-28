@@ -20,7 +20,7 @@ public:
   static constexpr size_t kSize = 8;
 
   // An invalid SpanId (all zeros).
-  SpanId() noexcept : rep_{0} {}
+  SpanId() noexcept = default;
 
   // Creates a SpanId with the given ID.
   explicit SpanId(nostd::span<const uint8_t, kSize> id) noexcept { memcpy(rep_, id.data(), kSize); }
@@ -60,7 +60,7 @@ public:
   }
 
 private:
-  uint8_t rep_[kSize];
+  uint8_t rep_[kSize]{};
 };
 
 }  // namespace trace

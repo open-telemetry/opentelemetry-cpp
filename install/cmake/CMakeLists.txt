@@ -103,6 +103,14 @@ set(CMAKE_OPTIONS
     "-DCMAKE_CXX_EXTENSIONS=OFF"
     "-DCMAKE_POSITION_INDEPENDENT_CODE=ON")
 
+# Forward CMAKE_CXX_FLAGS (set via CXXFLAGS env var or -DCMAKE_CXX_FLAGS=) to
+# inner ExternalProject builds so callers can suppress compiler warnings that
+# upstream packages can't tolerate (e.g., benchmark v1.9.4 vs clang-22's new
+# -Wc2y-extensions on __COUNTER__).
+if(CMAKE_CXX_FLAGS)
+  list(APPEND CMAKE_OPTIONS "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}")
+endif()
+
 message(STATUS "Installing third-party packages....")
 message(STATUS "  opentelemetry-cpp_SOURCE_DIR = ${OTELCPP_SOURCE_DIR}")
 message(STATUS "  third-party packages = ${_THIRDPARTY_PACKAGE_LIST}")
@@ -215,7 +223,6 @@ if(grpc IN_LIST _THIRDPARTY_PACKAGE_LIST)
     GIT_TAG ${grpc_GIT_TAG}
     GIT_SHALLOW ON
     GIT_SUBMODULES "third_party/re2" "third_party/cares/cares"
-                   "third_party/boringssl-with-bazel"
     PREFIX ${CMAKE_BINARY_DIR}/external/grpc
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
     CMAKE_ARGS "${CMAKE_OPTIONS}"
@@ -230,6 +237,7 @@ if(grpc IN_LIST _THIRDPARTY_PACKAGE_LIST)
                "-DgRPC_BUILD_GRPC_RUBY_PLUGIN=OFF"
                "-DgRPC_BUILD_GRPCPP_OTEL_PLUGIN=OFF"
                "-DRE2_BUILD_TESTING=OFF"
+               "-DgRPC_SSL_PROVIDER=package"
                "-DgRPC_ZLIB_PROVIDER=package"
                "-DgRPC_PROTOBUF_PROVIDER=package"
                "-DgRPC_PROTOBUF_PACKAGE_TYPE=CONFIG"

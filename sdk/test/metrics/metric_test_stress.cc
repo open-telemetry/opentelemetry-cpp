@@ -19,7 +19,6 @@
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
@@ -35,6 +34,9 @@
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
+
+namespace
+{
 
 class MockMetricExporterForStress : public opentelemetry::sdk::metrics::PushMetricExporter
 {
@@ -176,3 +178,5 @@ TEST(HistogramStress, UnsignedInt64)
   ASSERT_EQ(expected_count, collected_count);
   ASSERT_EQ(*expected_sum, collected_sum);
 }
+
+}  // namespace

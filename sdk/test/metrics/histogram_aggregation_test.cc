@@ -15,7 +15,6 @@
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/utility.h"  // IWYU pragma: keep
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -196,8 +195,8 @@ std::shared_ptr<MeterProvider> MakeBase2ExponentialHistogramViewProvider(
   meter_provider->AddMetricReader(reader);
 
   Base2ExponentialHistogramAggregationConfig config;
-  config.max_scale_   = 5;
-  config.max_buckets_ = 160;
+  config.max_scale_ = 5;
+  config.max_size_  = 160;
   auto view =
       std::make_unique<View>("exponential_histogram", "exponential_histogram_description",
                              AggregationType::kBase2ExponentialHistogram,

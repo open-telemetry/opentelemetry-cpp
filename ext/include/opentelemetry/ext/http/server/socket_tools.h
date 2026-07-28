@@ -5,8 +5,10 @@
 #include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <map>
@@ -163,13 +165,13 @@ struct SocketAddr
 {
   static u_long const Loopback = 0x7F000001;
 
-  sockaddr m_data;
+  sockaddr m_data{};
 
   /// <summary>
   /// SocketAddr constructor
   /// </summary>
   /// <returns>SocketAddr</returns>
-  SocketAddr() { memset(&m_data, 0, sizeof(m_data)); }
+  SocketAddr() {}
 
   SocketAddr(u_long addr, int port)
   {
@@ -196,7 +198,18 @@ struct SocketAddr
     char const *colon  = strchr(addr, ':');
     if (colon)
     {
-      inet4.sin_port = htons(atoi(colon + 1));
+      char *portEnd     = nullptr;
+      errno             = 0;
+      auto const parsed = std::strtol(colon + 1, &portEnd, 10);
+      // Accept only a converted, in-range port value; fall back to 0 otherwise.
+      if (errno == 0 && portEnd != colon + 1 && parsed >= 0 && parsed <= 65535)
+      {
+        inet4.sin_port = htons(static_cast<uint16_t>(parsed));
+      }
+      else
+      {
+        inet4.sin_port = 0;
+      }
       char buf[16];
       memcpy(buf, addr, (std::min<ptrdiff_t>)(15, colon - addr));
       buf[15] = '\0';
@@ -704,6 +717,7 @@ public:
     m_sockets.clear();
   }
 
+protected:
   /// <summary>
   /// Thread Loop for async events processing
   /// </summary>

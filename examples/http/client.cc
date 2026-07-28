@@ -5,8 +5,8 @@
 #include "opentelemetry/context/propagation/global_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
+#include "opentelemetry/ext/http/client/curl/http_client_factory_curl.h"
 #include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -21,7 +21,7 @@
 #include "tracer_common.h"
 
 #include <stdint.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <map>
 #include <string>
 #include <type_traits>
@@ -40,7 +40,7 @@ namespace semconv     = opentelemetry::semconv;
 
 void sendRequest(const std::string &url)
 {
-  auto http_client = http_client::HttpClientFactory::CreateSync();
+  auto http_client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->CreateSync();
 
   // start active span
   StartSpanOptions options;
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
   {
-    port = static_cast<uint16_t>(atoi(argv[1]));
+    port = static_cast<uint16_t>(std::strtol(argv[1], nullptr, 10));
   }
 
   std::string url = "http://" + std::string(default_host) + ":" + std::to_string(port) +

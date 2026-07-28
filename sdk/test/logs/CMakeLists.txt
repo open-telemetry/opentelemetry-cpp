@@ -7,6 +7,7 @@ foreach(
   logger_provider_sdk_test
   logger_sdk_test
   log_record_test
+  log_record_limits_test
   simple_log_record_processor_test
   batch_log_record_processor_test
   logger_config_test)

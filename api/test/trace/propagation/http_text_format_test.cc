@@ -32,6 +32,9 @@
 
 using namespace opentelemetry;
 
+namespace
+{
+
 class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
 public:
@@ -266,3 +269,5 @@ TEST(GlobalPropagator, SetAndGet)
   EXPECT_EQ(fields[0], trace::propagation::kTraceParent);
   EXPECT_EQ(fields[1], trace::propagation::kTraceState);
 }
+
+}  // namespace

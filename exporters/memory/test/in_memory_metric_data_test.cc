@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "opentelemetry/exporters/memory/in_memory_metric_data.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"

@@ -1,0 +1,16 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+add_library(custom_http_client_stub STATIC custom_http_client.cc)
+target_link_libraries(custom_http_client_stub PUBLIC opentelemetry-cpp::ext
+                                                     opentelemetry-cpp::sdk)
+
+add_executable(example_custom_http_client main.cc)
+target_link_libraries(
+  example_custom_http_client PRIVATE custom_http_client_stub
+                                     opentelemetry-cpp::otlp_http_exporter)
+
+if(BUILD_TESTING)
+  add_test(NAME examples.custom_http_client
+           COMMAND "$<TARGET_FILE:example_custom_http_client>")
+endif()

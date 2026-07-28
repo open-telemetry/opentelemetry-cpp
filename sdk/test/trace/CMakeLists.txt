@@ -12,6 +12,7 @@ foreach(
   always_on_sampler_test
   parent_sampler_test
   trace_id_ratio_sampler_test
+  composable_sampler_test
   batch_span_processor_test
   tracer_config_test)
   add_executable(${testname} "${testname}.cc")
@@ -35,4 +36,14 @@ if(WITH_BENCHMARK)
     sampler_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_trace opentelemetry_resources
     opentelemetry_exporter_in_memory)
+
+  add_executable(span_data_benchmark span_data_benchmark.cc)
+  target_link_libraries(
+    span_data_benchmark
+    benchmark::benchmark
+    ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_trace
+    opentelemetry_resources
+    opentelemetry_exporter_in_memory
+    opentelemetry_test_common)
 endif()

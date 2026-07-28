@@ -197,6 +197,8 @@ public:
         provHandle(initProvHandle())
   {}
 
+  using opentelemetry::logs::Logger::CreateLogRecord;
+
   nostd::unique_ptr<opentelemetry::logs::LogRecord> CreateLogRecord() noexcept
   {
     nostd::unique_ptr<LogRecord> log_record(new LogRecord());

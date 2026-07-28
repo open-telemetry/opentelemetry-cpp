@@ -45,6 +45,8 @@ namespace exporter
 namespace otlp
 {
 
+namespace
+{
 class ProtobufGlobalSymbolGuard
 {
 public:
@@ -55,6 +57,7 @@ public:
   ProtobufGlobalSymbolGuard(ProtobufGlobalSymbolGuard &&)                 = delete;
   ProtobufGlobalSymbolGuard &operator=(ProtobufGlobalSymbolGuard &&)      = delete;
 };
+}  // namespace
 
 template <class T, size_t N>
 static nostd::span<T, N> MakeSpan(T (&array)[N])
@@ -62,6 +65,8 @@ static nostd::span<T, N> MakeSpan(T (&array)[N])
   return nostd::span<T, N>(array);
 }
 
+namespace
+{
 class OtlpFileLogRecordExporterTestPeer : public ::testing::Test
 {
 public:
@@ -85,9 +90,8 @@ public:
 
     auto provider = nostd::shared_ptr<sdk::logs::LoggerProvider>(new sdk::logs::LoggerProvider());
 
-    provider->AddProcessor(
-        std::unique_ptr<sdk::logs::LogRecordProcessor>(new sdk::logs::BatchLogRecordProcessor(
-            std::move(exporter), 5, std::chrono::milliseconds(256), 5)));
+    provider->AddProcessor(std::make_unique<sdk::logs::BatchLogRecordProcessor>(
+        std::move(exporter), 5, std::chrono::milliseconds(256), 5));
 
     std::string report_trace_id;
     std::string report_span_id;
@@ -169,11 +173,12 @@ public:
     }
   }
 };
+}  // namespace
 
 TEST(OtlpFileLogRecordExporterTest, Shutdown)
 {
-  auto exporter =
-      std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>(new OtlpFileLogRecordExporter());
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> exporter =
+      std::make_unique<OtlpFileLogRecordExporter>();
   ASSERT_TRUE(exporter->Shutdown());
 
   nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>> logs = {};

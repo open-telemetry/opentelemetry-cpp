@@ -38,6 +38,9 @@ static std::string Hex(const T &id_item)
   return std::string(buf, sizeof(buf));
 }
 
+namespace
+{
+
 class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
 public:
@@ -147,3 +150,5 @@ TEST_F(CompositePropagatorTest, Inject)
   EXPECT_EQ(fields[1], trace::propagation::kTraceState);
   EXPECT_EQ(fields[2], trace::propagation::kB3CombinedHeader);
 }
+
+}  // namespace
