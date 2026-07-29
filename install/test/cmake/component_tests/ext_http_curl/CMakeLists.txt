@@ -22,11 +22,16 @@ gtest_discover_tests(ext_http_curl_test)
 
 include(${CMAKE_CURRENT_LIST_DIR}/../../otel_header_probes.cmake)
 
+# These headers include <curl/curl.h> and name CURL and curl_slist. curl is a
+# private dependency of the installed target, since the factory design keeps the
+# client implementation away from users of the OTLP HTTP exporter, so the probes
+# ask for curl themselves.
 otel_add_header_probes(
   TARGET
   ext_http_curl_header_probes
   LINK
   opentelemetry-cpp::http_client_curl
+  CURL::libcurl
   HEADERS
   opentelemetry/ext/http/client/curl/http_client_curl.h
   opentelemetry/ext/http/client/curl/http_client_factory_curl.h

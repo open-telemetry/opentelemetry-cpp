@@ -11,13 +11,10 @@ set_target_version(opentelemetry_http_client_curl)
 target_link_libraries(opentelemetry_http_client_curl
                       PUBLIC opentelemetry_common)
 
-# http_client_curl.h and http_operation_curl.h are installed and include
-# <curl/curl.h>, and their class definitions use CURL and curl_slist, so curl is
-# part of what a consumer of these headers compiles against. As a private
-# dependency it was exported as a link requirement only, and a consumer whose
-# curl lives outside the default include path could not compile them.
-target_link_libraries(opentelemetry_http_client_curl PUBLIC opentelemetry_ext
-                                                            CURL::libcurl)
+target_link_libraries(
+  opentelemetry_http_client_curl
+  PUBLIC opentelemetry_ext
+  PRIVATE CURL::libcurl)
 
 if(WITH_CURL_LOGGING)
   target_compile_definitions(opentelemetry_http_client_curl
