@@ -47,6 +47,7 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
+        "//sdk/src/metrics",
         "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],

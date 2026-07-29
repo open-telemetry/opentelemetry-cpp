@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Add missing opentelemetry_proto dependency to otlp_recordable
+  pkg-config
+  [#4316](https://github.com/open-telemetry/opentelemetry-cpp/pull/4316)
+
 * [CODE HEALTH] Move SDK trace and metrics test helpers into anonymous
   namespaces
   [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)
@@ -34,6 +38,11 @@ Increment the:
 * [RELEASE] Bump main branch to 1.29.0-dev
   [#4259](https://github.com/open-telemetry/opentelemetry-cpp/pull/4259)
 
+* [ETW] Ensure spans own their names until they are ended
+  [#4247](https://github.com/open-telemetry/opentelemetry-cpp/pull/4247)
+
+* [Metrics SDK] Implement configurable cardinality limit
+  [#4188](https://github.com/open-telemetry/opentelemetry-cpp/pull/4188)
 * [CONFIGURATION] Programmatic configuration use case tests and fixes
   [#4243](https://github.com/open-telemetry/opentelemetry-cpp/pull/4243)
 
@@ -53,6 +62,10 @@ Increment the:
 
 * [CODE HEALTH] Fix remaining misc-override-with-different-visibility warnings
   [#4280](https://github.com/open-telemetry/opentelemetry-cpp/pull/4280)
+
+* [CODE HEALTH] Move SDK common and logs test helpers into anonymous
+  namespaces
+  [#4302](https://github.com/open-telemetry/opentelemetry-cpp/pull/4302)
 
 Breaking changes:
 
