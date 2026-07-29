@@ -18,6 +18,10 @@ Increment the:
 * [BUILD] Compile each installed ext header on its own in the install tests
   [#4315](https://github.com/open-telemetry/opentelemetry-cpp/pull/4315)
 
+* [BUILD] Add missing opentelemetry_proto dependency to otlp_recordable
+  pkg-config
+  [#4316](https://github.com/open-telemetry/opentelemetry-cpp/pull/4316)
+
 * [CODE HEALTH] Move SDK trace and metrics test helpers into anonymous
   namespaces
   [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)

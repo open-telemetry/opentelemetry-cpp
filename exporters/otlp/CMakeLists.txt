@@ -69,7 +69,7 @@ if(OPENTELEMETRY_INSTALL)
     otlp_recordable
     "OpenTelemetry OTLP - Recordable"
     "OTLP recordable implementation for spans, metrics, and logs."
-    "opentelemetry_trace opentelemetry_metrics opentelemetry_logs opentelemetry_resources"
+    "opentelemetry_trace opentelemetry_metrics opentelemetry_logs opentelemetry_resources opentelemetry_proto"
   )
 
   opentelemetry_add_pkgconfig(
