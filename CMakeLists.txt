@@ -70,9 +70,10 @@ endif()
 
 include(CMakeDependentOption)
 
-# Experimental: bound synchronous metric instruments (Counter, Histogram).
+# Experimental: bound synchronous metric instruments (Counter, UpDownCounter,
+# Histogram, Gauge).
 # Requires WITH_ABI_VERSION_2. Context-bearing bound operations, exemplar
-# parity, Gauge, and UpDownCounter bound support are follow-ups.
+# parity are follow-ups.
 cmake_dependent_option(
   WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
   "EXPERIMENTAL: bound synchronous metric instruments preview" OFF

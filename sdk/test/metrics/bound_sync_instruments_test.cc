@@ -427,6 +427,150 @@ TEST(BoundSyncInstruments, BoundHistogramBindInitializerList)
   EXPECT_TRUE(seen);
 }
 
+TEST(BoundSyncInstruments, BoundUpDownCounterAcceptsPositiveAndNegativeValues)
+{
+  InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kUpDownCounter,
+                            InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
+  AggregationConfig cfg;
+  std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
+      desc, AggregationType::kSum, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  SyncMetricStorage *storage_ptr = storage.get();
+  LongUpDownCounter updown(desc, std::move(storage));
+  opentelemetry::metrics::UpDownCounter<int64_t> &api_updown = updown;
+
+  auto bound = api_updown.Bind({{"key", "v"}});
+  ASSERT_NE(bound, nullptr);
+  bound->Add(12);
+  bound->Add(-5);
+  api_updown.Add(-2, {{"key", "v"}});
+
+  M attrs = {{"key", "v"}};
+  EXPECT_EQ(SumLongFor(*storage_ptr, AggregationTemporality::kCumulative, attrs), 5);
+}
+
+TEST(BoundSyncInstruments, BoundDoubleUpDownCounterAcceptsNegativeValues)
+{
+  InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kUpDownCounter,
+                            InstrumentValueType::kDouble};
+  std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
+  AggregationConfig cfg;
+  std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
+      desc, AggregationType::kSum, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  SyncMetricStorage *storage_ptr = storage.get();
+  DoubleUpDownCounter updown(desc, std::move(storage));
+  M attrs    = {{"key", "v"}};
+  auto bound = updown.Bind(KeyValueIterableView<M>(attrs));
+  ASSERT_NE(bound, nullptr);
+  bound->Add(7.5);
+  bound->Add(-10.0);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kCumulative));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+  bool seen = false;
+  storage_ptr->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
+                       std::chrono::system_clock::now(), [&](const MetricData &md) {
+                         for (const auto &p : md.point_data_attr_)
+                         {
+                           const auto &sum = opentelemetry::nostd::get<SumPointData>(p.point_data);
+                           EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(sum.value_), -2.5);
+                           seen = true;
+                         }
+                         return true;
+                       });
+  EXPECT_TRUE(seen);
+}
+
+TEST(BoundSyncInstruments, BoundGaugeKeepsLastValueAndMatchesUnbound)
+{
+  InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kGauge,
+                            InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
+  AggregationConfig cfg;
+  std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
+      desc, AggregationType::kLastValue, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  SyncMetricStorage *storage_ptr = storage.get();
+  LongGauge gauge(desc, std::move(storage));
+  opentelemetry::metrics::Gauge<int64_t> &api_gauge = gauge;
+
+  auto bound = api_gauge.Bind({{"key", "v"}});
+  ASSERT_NE(bound, nullptr);
+  bound->Record(-4);
+  api_gauge.Record(11, {{"key", "v"}});
+  bound->Record(-9);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kCumulative));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+  bool seen = false;
+  storage_ptr->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
+                       std::chrono::system_clock::now(), [&](const MetricData &md) {
+                         EXPECT_EQ(md.point_data_attr_.size(), 1u);
+                         if (md.point_data_attr_.size() == 1u)
+                         {
+                           const auto &last = opentelemetry::nostd::get<LastValuePointData>(
+                               md.point_data_attr_[0].point_data);
+                           EXPECT_TRUE(last.is_lastvalue_valid_);
+                           EXPECT_EQ(opentelemetry::nostd::get<int64_t>(last.value_), -9);
+                           seen = true;
+                         }
+                         return true;
+                       });
+  EXPECT_TRUE(seen);
+}
+
+TEST(BoundSyncInstruments, BoundDoubleGaugeKeepsLastValue)
+{
+  InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kGauge,
+                            InstrumentValueType::kDouble};
+  std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
+  AggregationConfig cfg;
+  std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
+      desc, AggregationType::kLastValue, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  SyncMetricStorage *storage_ptr = storage.get();
+  DoubleGauge gauge(desc, std::move(storage));
+  M attrs    = {{"key", "v"}};
+  auto bound = gauge.Bind(KeyValueIterableView<M>(attrs));
+  ASSERT_NE(bound, nullptr);
+  bound->Record(3.5);
+  bound->Record(-1.25);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+  bool seen = false;
+  storage_ptr->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
+                       std::chrono::system_clock::now(), [&](const MetricData &md) {
+                         EXPECT_EQ(md.point_data_attr_.size(), 1u);
+                         if (md.point_data_attr_.size() == 1u)
+                         {
+                           const auto &last = opentelemetry::nostd::get<LastValuePointData>(
+                               md.point_data_attr_[0].point_data);
+                           EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(last.value_), -1.25);
+                           seen = true;
+                         }
+                         return true;
+                       });
+  EXPECT_TRUE(seen);
+}
+
 // Bound counter must respect non-default aggregation overrides.
 TEST(BoundSyncInstruments, BoundCounterRespectsDropAggregation)
 {
@@ -694,6 +838,16 @@ TEST(BoundSyncInstruments, NoopBoundCompilesAndNoOps)
   auto hb = hist.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(hb, nullptr);
   hb->Record(3.14);
+
+  opentelemetry::metrics::NoopUpDownCounter<int64_t> updown("name", "", "");
+  auto ub = updown.Bind(KeyValueIterableView<M>(attrs));
+  ASSERT_NE(ub, nullptr);
+  ub->Add(-42);
+
+  opentelemetry::metrics::NoopGauge<double> gauge("name", "", "");
+  auto gb = gauge.Bind(KeyValueIterableView<M>(attrs));
+  ASSERT_NE(gb, nullptr);
+  gb->Record(-3.14);
 }
 
 // Bonus: SyncMultiMetricStorage::Bind fans out to children.

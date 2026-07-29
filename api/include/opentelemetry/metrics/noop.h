@@ -30,6 +30,22 @@ public:
   NoopBoundHistogram() noexcept = default;
   void Record(T /* value */) noexcept override {}
 };
+
+template <class T>
+class NoopBoundUpDownCounter : public BoundUpDownCounter<T>
+{
+public:
+  NoopBoundUpDownCounter() noexcept = default;
+  void Add(T /* value */) noexcept override {}
+};
+
+template <class T>
+class NoopBoundGauge : public BoundGauge<T>
+{
+public:
+  NoopBoundGauge() noexcept = default;
+  void Record(T /* value */) noexcept override {}
+};
 #endif
 
 template <class T>
@@ -101,6 +117,13 @@ public:
            const common::KeyValueIterable & /* attributes */,
            const context::Context & /* context */) noexcept override
   {}
+#ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  nostd::unique_ptr<BoundUpDownCounter<T>> Bind(
+      const common::KeyValueIterable & /* attributes */) noexcept override
+  {
+    return nostd::unique_ptr<BoundUpDownCounter<T>>{new NoopBoundUpDownCounter<T>()};
+  }
+#endif
 };
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -119,6 +142,13 @@ public:
               const common::KeyValueIterable & /* attributes */,
               const context::Context & /* context */) noexcept override
   {}
+#  ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  nostd::unique_ptr<BoundGauge<T>> Bind(
+      const common::KeyValueIterable & /* attributes */) noexcept override
+  {
+    return nostd::unique_ptr<BoundGauge<T>>{new NoopBoundGauge<T>()};
+  }
+#  endif
 };
 #endif
 
