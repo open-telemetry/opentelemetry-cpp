@@ -21,6 +21,7 @@
 #include "opentelemetry/sdk/logs/event_to_span_event_bridge_processor.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
 #include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_id.h"

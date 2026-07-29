@@ -6,8 +6,11 @@
 #include <chrono>
 #include <memory>
 
+#include "opentelemetry/context/context.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
