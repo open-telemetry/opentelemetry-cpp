@@ -144,12 +144,12 @@ otelcpp_option_flag(
   OTELCPP_WITH_GSL
   "Whether to use Guidelines Support Library for C++ latest features" OFF)
 
-set(OTELCPP_INSTALL_DEFAULT ON)
+set(_OTELCPP_INSTALL_DEFAULT ON)
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-  set(OTELCPP_INSTALL_DEFAULT OFF)
+  set(_OTELCPP_INSTALL_DEFAULT OFF)
 endif()
 otelcpp_option_flag(OTELCPP_INSTALL "Whether to install opentelemetry targets"
-                    ${OTELCPP_INSTALL_DEFAULT})
+                    ${_OTELCPP_INSTALL_DEFAULT})
 
 if(NOT OTELCPP_WITH_STL STREQUAL "OFF")
   # These definitions are needed for test projects that do not link against
