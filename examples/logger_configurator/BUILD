@@ -4,7 +4,7 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
-    name = "example_explicit_parent",
+    name = "example_logger_configurator",
     srcs = [
         "main.cc",
     ],
@@ -14,7 +14,7 @@ cc_test(
     ],
     deps = [
         "//api",
-        "//exporters/ostream:ostream_span_exporter",
-        "//sdk/src/trace",
+        "//exporters/ostream:ostream_log_record_exporter",
+        "//sdk/src/logs",
     ],
 )
