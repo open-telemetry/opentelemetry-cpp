@@ -56,7 +56,10 @@ add_executable(
   fetch_content_src_test
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_api.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_sdk.cc
+  ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_configuration.cc
+  ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_resource_detectors.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_ext_common.cc
+  ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_ext_http.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_ext_http_curl.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_ostream.cc
   ${OPENTELEMETRY_CPP_SRC_DIR}/install/test/src/test_exporters_in_memory.cc
@@ -75,22 +78,39 @@ target_link_libraries(
           opentelemetry-cpp::metrics
           opentelemetry-cpp::trace
           opentelemetry-cpp::logs
+          opentelemetry-cpp::configuration_core
+          opentelemetry-cpp::configuration
+          opentelemetry-cpp::resource_detectors
+          opentelemetry-cpp::http_client
           opentelemetry-cpp::http_client_curl
           opentelemetry-cpp::in_memory_span_exporter
           opentelemetry-cpp::in_memory_metric_exporter
           opentelemetry-cpp::ostream_log_record_exporter
+          opentelemetry-cpp::ostream_log_record_exporter_builder
           opentelemetry-cpp::ostream_metrics_exporter
+          opentelemetry-cpp::ostream_metrics_exporter_builder
           opentelemetry-cpp::ostream_span_exporter
+          opentelemetry-cpp::ostream_span_exporter_builder
           opentelemetry-cpp::otlp_file_exporter
+          opentelemetry-cpp::otlp_file_exporter_builder
           opentelemetry-cpp::otlp_file_log_record_exporter
+          opentelemetry-cpp::otlp_file_log_record_exporter_builder
           opentelemetry-cpp::otlp_file_metric_exporter
+          opentelemetry-cpp::otlp_file_metric_exporter_builder
           opentelemetry-cpp::otlp_grpc_exporter
+          opentelemetry-cpp::otlp_grpc_exporter_builder
           opentelemetry-cpp::otlp_grpc_log_record_exporter
+          opentelemetry-cpp::otlp_grpc_log_record_exporter_builder
           opentelemetry-cpp::otlp_grpc_metrics_exporter
+          opentelemetry-cpp::otlp_grpc_metric_exporter_builder
           opentelemetry-cpp::otlp_http_exporter
+          opentelemetry-cpp::otlp_http_exporter_builder
           opentelemetry-cpp::otlp_http_log_record_exporter
+          opentelemetry-cpp::otlp_http_log_record_exporter_builder
           opentelemetry-cpp::otlp_http_metric_exporter
+          opentelemetry-cpp::otlp_http_metric_exporter_builder
           opentelemetry-cpp::prometheus_exporter
+          opentelemetry-cpp::prometheus_exporter_builder
           opentelemetry-cpp::zipkin_trace_exporter
           opentelemetry-cpp::elasticsearch_log_record_exporter
           GTest::gtest
