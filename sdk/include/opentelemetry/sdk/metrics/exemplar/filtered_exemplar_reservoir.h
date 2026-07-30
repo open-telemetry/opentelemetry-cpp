@@ -40,23 +40,21 @@ public:
 
   void OfferMeasurement(int64_t value,
                         const MetricAttributes &attributes,
-                        const opentelemetry::context::Context &context,
-                        const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
+                        const opentelemetry::context::Context &context) noexcept override
   {
     if (should_sample_(context))
     {
-      reservoir_->OfferMeasurement(value, attributes, context, timestamp);
+      reservoir_->OfferMeasurement(value, attributes, context);
     }
   }
 
   void OfferMeasurement(double value,
                         const MetricAttributes &attributes,
-                        const opentelemetry::context::Context &context,
-                        const opentelemetry::common::SystemTimestamp &timestamp) noexcept override
+                        const opentelemetry::context::Context &context) noexcept override
   {
     if (should_sample_(context))
     {
-      reservoir_->OfferMeasurement(value, attributes, context, timestamp);
+      reservoir_->OfferMeasurement(value, attributes, context);
     }
   }
 

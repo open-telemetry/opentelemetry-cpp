@@ -5,11 +5,9 @@
 
 #  include <gtest/gtest.h>
 #  include <stdint.h>
-#  include <chrono>
 #  include <string>
 #  include <vector>
 
-#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/nostd/span.h"
@@ -36,16 +34,14 @@ class CountingReservoir : public metrics_sdk::ExemplarReservoir
 public:
   void OfferMeasurement(int64_t,
                         const metrics_sdk::MetricAttributes &,
-                        const context_api::Context &,
-                        const opentelemetry::common::SystemTimestamp &) noexcept override
+                        const context_api::Context &) noexcept override
   {
     ++offered;
   }
 
   void OfferMeasurement(double,
                         const metrics_sdk::MetricAttributes &,
-                        const context_api::Context &,
-                        const opentelemetry::common::SystemTimestamp &) noexcept override
+                        const context_api::Context &) noexcept override
   {
     ++offered;
   }
@@ -78,8 +74,7 @@ int ForwardedCount(metrics_sdk::ExemplarFilterType filter_type, const context_ap
   auto *spy     = new CountingReservoir();
   auto filtered = metrics_sdk::ExemplarReservoir::GetSimpleFilteredExemplarReservoir(
       filter_type, nostd::shared_ptr<metrics_sdk::ExemplarReservoir>(spy));
-  filtered->OfferMeasurement(1.0, metrics_sdk::MetricAttributes{}, context,
-                             std::chrono::system_clock::now());
+  filtered->OfferMeasurement(1.0, metrics_sdk::MetricAttributes{}, context);
   return spy->offered;
 }
 }  // namespace
@@ -96,7 +91,7 @@ TEST(FilteredExemplarReservoir, AlwaysOnOffersLongMeasurement)
       metrics_sdk::ExemplarFilterType::kAlwaysOn,
       nostd::shared_ptr<metrics_sdk::ExemplarReservoir>(spy));
   filtered->OfferMeasurement(static_cast<int64_t>(1), metrics_sdk::MetricAttributes{},
-                             context_api::Context{}, std::chrono::system_clock::now());
+                             context_api::Context{});
   EXPECT_EQ(spy->offered, 1);
 }
 

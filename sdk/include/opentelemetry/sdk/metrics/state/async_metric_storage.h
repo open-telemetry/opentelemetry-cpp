@@ -63,8 +63,7 @@ public:
     for (auto &measurement : measurements)
     {
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      exemplar_reservoir_->OfferMeasurement(measurement.second, {}, {},
-                                            std::chrono::system_clock::now());
+      exemplar_reservoir_->OfferMeasurement(measurement.second, {}, {});
 #endif
 
       auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);

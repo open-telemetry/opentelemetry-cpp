@@ -81,7 +81,7 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
+    exemplar_reservoir_->OfferMeasurement(value, {}, context);
 #endif
     static MetricAttributes attr = MetricAttributes{};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
@@ -104,8 +104,7 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, attributes, context,
-                                          std::chrono::system_clock::now());
+    exemplar_reservoir_->OfferMeasurement(value, attributes, context);
 #endif
 
     MetricAttributes attr{attributes, attributes_processor_.get()};
@@ -133,7 +132,7 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
+    exemplar_reservoir_->OfferMeasurement(value, {}, context);
 #endif
     static MetricAttributes attr = MetricAttributes{};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
@@ -156,8 +155,7 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, attributes, context,
-                                          std::chrono::system_clock::now());
+    exemplar_reservoir_->OfferMeasurement(value, attributes, context);
 #endif
     MetricAttributes attr{attributes, attributes_processor_.get()};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
