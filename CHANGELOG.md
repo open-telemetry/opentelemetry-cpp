@@ -78,6 +78,19 @@ Breaking changes:
   * The public configuration member `max_buckets_` was renamed to `max_size_` to
     match the configuration schema. Please adjust SDK configuration accordingly.
 
+* [LOGS SDK] `LogRecordProcessor` gained the virtual methods
+  `OnEmitWithContext()` and `ConsumesResolvedContext()`
+  [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
+  * Source compatible: both methods have default implementations, so existing
+    processors continue to compile and behave as before. `OnEmitWithContext()`
+    forwards to `OnEmit()` and `ConsumesResolvedContext()` returns `false`.
+  * Not ABI compatible: the added virtuals change the vtable layout of
+    `LogRecordProcessor`, so code that subclasses it must be recompiled against
+    this version of the SDK.
+  * `LogRecordProcessorConfigurationVisitor::VisitEventToSpanEventBridge()` was
+    added with a default no-op implementation, so existing visitor
+    implementations remain source compatible.
+
 ## [1.28.0] 2026-07-16
 
 * [RELEASE] Bump main branch to 1.28.0-dev

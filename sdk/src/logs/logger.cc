@@ -197,10 +197,19 @@ void Logger::EmitLogRecord(
 
   auto &processor = context_->GetProcessor();
 
-  // Send the log recordable to the processor with the resolved context
-  const nostd::variant<trace_api::SpanContext, context::Context> resolved_context{
-      context::RuntimeContext::GetCurrent()};
-  processor.OnEmitWithContext(std::move(recordable), resolved_context);
+  // Only resolve the context when a processor will actually read it: resolving means a
+  // RuntimeContext::GetCurrent() call, which would otherwise be pure overhead on every log for
+  // the common pipelines (simple/batch) that ignore the context entirely.
+  if (context_->ConsumesResolvedContext())
+  {
+    const nostd::variant<trace_api::SpanContext, context::Context> resolved_context{
+        context::RuntimeContext::GetCurrent()};
+    processor.OnEmitWithContext(std::move(recordable), resolved_context);
+    return;
+  }
+
+  // Send the log recordable to the processor
+  processor.OnEmit(std::move(recordable));
 }
 
 bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,

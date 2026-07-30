@@ -94,6 +94,15 @@ public:
   bool RecordableEnforcesLogRecordLimits() const noexcept;
 
   /**
+   * Whether any configured processor reads the resolved context passed to
+   * LogRecordProcessor::OnEmitWithContext(). Computed once at construction (and refreshed by
+   * AddProcessor) so the Logger hot path can dispatch through plain OnEmit() -- and skip
+   * resolving the ambient context entirely -- when no processor needs it.
+   * @return true if at least one processor consumes the resolved context.
+   */
+  bool ConsumesResolvedContext() const noexcept;
+
+  /**
    * Replace the ScopeConfigurator for this logger context.
    * @param logger_configurator The new configurator.
    */
@@ -124,6 +133,11 @@ private:
   // recordable enforces the LogRecord attribute limits. Refreshed by
   // AddProcessor so the Logger hot path reads a plain bool.
   bool recordable_enforces_limits_{false};
+
+  // Cached capability flag: true when at least one configured processor reads the resolved
+  // context. Refreshed by AddProcessor so the Logger hot path reads a plain bool and only
+  // resolves the ambient context when some processor will actually look at it.
+  bool consumes_resolved_context_{false};
 };
 }  // namespace logs
 }  // namespace sdk

@@ -33,7 +33,8 @@ LoggerContext::LoggerContext(
           std::unique_ptr<LogRecordProcessor>(new MultiLogRecordProcessor(std::move(processors)))),
       logger_configurator_(std::move(logger_configurator)),
       log_record_limits_(log_record_limits),
-      recordable_enforces_limits_(processor_->RecordableEnforcesLogRecordLimits())
+      recordable_enforces_limits_(processor_->RecordableEnforcesLogRecordLimits()),
+      consumes_resolved_context_(processor_->ConsumesResolvedContext())
 {}
 
 void LoggerContext::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept
@@ -41,6 +42,7 @@ void LoggerContext::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) 
   auto multi_processor = static_cast<MultiLogRecordProcessor *>(processor_.get());
   multi_processor->AddProcessor(std::move(processor));
   recordable_enforces_limits_ = processor_->RecordableEnforcesLogRecordLimits();
+  consumes_resolved_context_  = processor_->ConsumesResolvedContext();
 }
 
 LogRecordProcessor &LoggerContext::GetProcessor() const noexcept
@@ -67,6 +69,11 @@ const LogRecordLimits &LoggerContext::GetLogRecordLimits() const noexcept
 bool LoggerContext::RecordableEnforcesLogRecordLimits() const noexcept
 {
   return recordable_enforces_limits_;
+}
+
+bool LoggerContext::ConsumesResolvedContext() const noexcept
+{
+  return consumes_resolved_context_;
 }
 
 void LoggerContext::SetLoggerConfigurator(

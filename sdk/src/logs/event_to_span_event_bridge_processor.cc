@@ -14,6 +14,7 @@
 #include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
@@ -169,6 +170,55 @@ private:
       *attributes_;
 };
 
+// Bridges `record` onto `span` as a span event, provided every precondition holds:
+// the record is an event (non-empty event name), it carries a valid trace id and span id,
+// `span` is a live recording span, and `span`'s ids match the ones on the record.
+// Any failed precondition means the record is not an event for this span, and it is left
+// to continue through the rest of the pipeline untouched.
+void BridgeRecordToSpan(const ReadWriteLogRecord *log_record,
+                        const nostd::shared_ptr<opentelemetry::trace::Span> &span) noexcept
+{
+  if (log_record == nullptr)
+  {
+    return;
+  }
+
+  nostd::string_view event_name = log_record->GetEventName();
+  if (event_name.empty())
+  {
+    return;
+  }
+
+  const opentelemetry::trace::TraceId &log_trace_id = log_record->GetTraceId();
+  const opentelemetry::trace::SpanId &log_span_id   = log_record->GetSpanId();
+  if (!log_trace_id.IsValid() || !log_span_id.IsValid())
+  {
+    return;
+  }
+
+  // trace::GetSpan() yields a non-recording DefaultSpan when the context carries no span,
+  // so the IsRecording() check also covers the "no span in context" case.
+  if (!span || !span->IsRecording())
+  {
+    return;
+  }
+
+  const opentelemetry::trace::SpanContext span_context = span->GetContext();
+  if (!(span_context.trace_id() == log_trace_id) || !(span_context.span_id() == log_span_id))
+  {
+    return;
+  }
+
+  opentelemetry::common::SystemTimestamp event_timestamp = log_record->GetTimestamp();
+  if (event_timestamp.time_since_epoch().count() == 0)
+  {
+    event_timestamp = log_record->GetObservedTimestamp();
+  }
+
+  EventAttributesKeyValueIterable attributes(log_record->GetAttributes());
+  span->AddEvent(event_name, event_timestamp, attributes);
+}
+
 }  // namespace
 
 std::unique_ptr<Recordable> EventToSpanEventBridgeProcessor::MakeRecordable() noexcept
@@ -178,46 +228,11 @@ std::unique_ptr<Recordable> EventToSpanEventBridgeProcessor::MakeRecordable() no
 
 void EventToSpanEventBridgeProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexcept
 {
-  std::unique_ptr<ReadWriteLogRecord> log_record(
+  const std::unique_ptr<ReadWriteLogRecord> log_record(
       static_cast<ReadWriteLogRecord *>(std::move(record).release()));
-  if (!log_record)
-  {
-    return;
-  }
 
-  nostd::string_view event_name = log_record->GetEventName();
-  if (event_name.empty())
-  {
-    return;
-  }
-
-  const opentelemetry::trace::TraceId &log_trace_id = log_record->GetTraceId();
-  const opentelemetry::trace::SpanId &log_span_id   = log_record->GetSpanId();
-  if (!log_trace_id.IsValid() || !log_span_id.IsValid())
-  {
-    return;
-  }
-
-  auto current_span = opentelemetry::trace::Tracer::GetCurrentSpan();
-  if (!current_span || !current_span->IsRecording())
-  {
-    return;
-  }
-
-  opentelemetry::trace::SpanContext current_context = current_span->GetContext();
-  if (!(current_context.trace_id() == log_trace_id) || !(current_context.span_id() == log_span_id))
-  {
-    return;
-  }
-
-  opentelemetry::common::SystemTimestamp event_timestamp = log_record->GetTimestamp();
-  if (event_timestamp.time_since_epoch().count() == 0)
-  {
-    event_timestamp = log_record->GetObservedTimestamp();
-  }
-
-  EventAttributesKeyValueIterable attributes(log_record->GetAttributes());
-  current_span->AddEvent(event_name, event_timestamp, attributes);
+  // No resolved context supplied, so the ambient span is the only span reachable here.
+  BridgeRecordToSpan(log_record.get(), opentelemetry::trace::Tracer::GetCurrentSpan());
 }
 
 void EventToSpanEventBridgeProcessor::OnEmitWithContext(
@@ -225,73 +240,23 @@ void EventToSpanEventBridgeProcessor::OnEmitWithContext(
     const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
                                         opentelemetry::context::Context> &context) noexcept
 {
-  std::unique_ptr<ReadWriteLogRecord> log_record(
+  const std::unique_ptr<ReadWriteLogRecord> log_record(
       static_cast<ReadWriteLogRecord *>(std::move(record).release()));
-  if (!log_record)
+
+  if (nostd::holds_alternative<opentelemetry::context::Context>(context))
   {
+    // The resolved context carries the live Span the record belongs to. Add the event to that
+    // span directly, which is what makes an explicitly supplied context work even when a
+    // different span is ambient.
+    BridgeRecordToSpan(log_record.get(), opentelemetry::trace::GetSpan(
+                                             nostd::get<opentelemetry::context::Context>(context)));
     return;
   }
 
-  nostd::string_view event_name = log_record->GetEventName();
-  if (event_name.empty())
-  {
-    return;
-  }
-
-  const opentelemetry::trace::TraceId &log_trace_id = log_record->GetTraceId();
-  const opentelemetry::trace::SpanId &log_span_id   = log_record->GetSpanId();
-  if (!log_trace_id.IsValid() || !log_span_id.IsValid())
-  {
-    return;
-  }
-
-  // Extract span context from the resolved context
-  opentelemetry::trace::SpanContext resolved_span_context{};
-  if (nostd::holds_alternative<opentelemetry::trace::SpanContext>(context))
-  {
-    resolved_span_context = nostd::get<opentelemetry::trace::SpanContext>(context);
-  }
-  else
-  {
-    // Context variant contains a Context object; get the active span from it
-    const auto &ctx = nostd::get<opentelemetry::context::Context>(context);
-    auto span = opentelemetry::trace::GetSpan(ctx);
-    if (!span)
-    {
-      return;
-    }
-    resolved_span_context = span->GetContext();
-  }
-
-  // Check if the resolved span context matches the log's trace/span IDs
-  if (!(resolved_span_context.trace_id() == log_trace_id) ||
-      !(resolved_span_context.span_id() == log_span_id))
-  {
-    return;
-  }
-
-  // Get the span object for the resolved context and add the event
-  auto current_span = opentelemetry::trace::Tracer::GetCurrentSpan();
-  if (!current_span || !current_span->IsRecording())
-  {
-    return;
-  }
-
-  // Verify that the current span matches the resolved context
-  if (!(current_span->GetContext().trace_id() == log_trace_id) ||
-      !(current_span->GetContext().span_id() == log_span_id))
-  {
-    return;
-  }
-
-  opentelemetry::common::SystemTimestamp event_timestamp = log_record->GetTimestamp();
-  if (event_timestamp.time_since_epoch().count() == 0)
-  {
-    event_timestamp = log_record->GetObservedTimestamp();
-  }
-
-  EventAttributesKeyValueIterable attributes(log_record->GetAttributes());
-  current_span->AddEvent(event_name, event_timestamp, attributes);
+  // A bare SpanContext carries only ids, not a live Span, and the SDK offers no way to look up
+  // a Span by id. The ambient span is therefore the only span that can be written to; the id
+  // check in BridgeRecordToSpan drops the record when it is not the one the ids refer to.
+  BridgeRecordToSpan(log_record.get(), opentelemetry::trace::Tracer::GetCurrentSpan());
 }
 
 bool EventToSpanEventBridgeProcessor::ForceFlush(std::chrono::microseconds /* timeout */) noexcept

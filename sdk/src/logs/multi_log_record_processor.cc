@@ -144,6 +144,18 @@ bool MultiLogRecordProcessor::RecordableEnforcesLogRecordLimits() const noexcept
   return false;
 }
 
+bool MultiLogRecordProcessor::ConsumesResolvedContext() const noexcept
+{
+  for (const auto &processor : processors_)
+  {
+    if (processor != nullptr && processor->ConsumesResolvedContext())
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool MultiLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   return InternalForceFlush(timeout);

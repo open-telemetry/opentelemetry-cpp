@@ -49,11 +49,10 @@ public:
 
   void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override;
 
-  void OnEmitWithContext(
-      std::unique_ptr<Recordable> &&record,
-      const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
-                                          opentelemetry::context::Context> &context)
-      noexcept override;
+  void OnEmitWithContext(std::unique_ptr<Recordable> &&record,
+                         const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
+                                                             opentelemetry::context::Context>
+                             &context) noexcept override;
 
   bool ForceFlush(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
@@ -62,6 +61,8 @@ public:
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
   bool HasEnabledFilter() const noexcept override { return false; }
+
+  bool ConsumesResolvedContext() const noexcept override { return true; }
 };
 
 }  // namespace logs

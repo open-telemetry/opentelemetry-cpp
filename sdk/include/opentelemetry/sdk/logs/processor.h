@@ -61,12 +61,24 @@ public:
   virtual void OnEmit(std::unique_ptr<Recordable> &&record) noexcept = 0;
 
   /**
-   * OnEmitWithContext is called by the SDK once a log record has been successfully created,
-   * with access to the resolved context (explicit if provided, else ambient).
-   * The resolved context is valid only for the duration of this call and must not be retained.
+   * OnEmitWithContext is called by the SDK instead of OnEmit() when some processor in the
+   * configured pipeline reports ConsumesResolvedContext(), giving the processor access to the
+   * log record's resolved context: the explicitly supplied context when one was provided to the
+   * Logger, otherwise the ambient context.
    *
-   * The default implementation forwards to OnEmit() for backward compatibility.
-   * Processors that need access to the log's resolved context should override this method.
+   * The supplied context is valid only for the duration of this call. Implementations must not
+   * retain it (or anything obtained from it, such as a Span) beyond the call, because doing so
+   * would keep the referenced span alive past its intended lifetime.
+   *
+   * Compatibility notes:
+   * - Source compatibility is preserved. This method has a default implementation that forwards
+   *   to OnEmit(), so existing processors continue to compile and behave exactly as before.
+   *   A distinct name (rather than an OnEmit() overload) is used so that a derived class
+   *   overriding only OnEmit() does not hide this method.
+   * - ABI compatibility is NOT preserved. Adding a virtual method changes the vtable layout of
+   *   LogRecordProcessor, so downstream code that subclasses LogRecordProcessor must be
+   *   recompiled against this version of the SDK. Mixing a processor built against an older
+   *   header with this SDK is undefined behavior.
    *
    * @param record the log recordable object
    * @param context the resolved context (SpanContext or Context variant)
@@ -74,11 +86,20 @@ public:
   virtual void OnEmitWithContext(
       std::unique_ptr<Recordable> &&record,
       const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
-                                          opentelemetry::context::Context> & /*context*/)
-      noexcept
+                                          opentelemetry::context::Context> & /*context*/) noexcept
   {
     OnEmit(std::move(record));
   }
+
+  /**
+   * Returns true when this processor reads the resolved context passed to
+   * OnEmitWithContext(). The default returns false, so the SDK Logger keeps dispatching through
+   * OnEmit() and does not resolve the ambient context on the emit path.
+   *
+   * Only processors that override OnEmitWithContext() should return true. Composite processors
+   * return true if any child does.
+   */
+  virtual bool ConsumesResolvedContext() const noexcept { return false; }
 
   /**
    * Enabled returns whether this processor is interested in a log with the given inputs.

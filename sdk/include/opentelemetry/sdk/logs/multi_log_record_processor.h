@@ -47,11 +47,10 @@ public:
   /**
    * OnEmitWithContext forwards the context to child processors.
    */
-  void OnEmitWithContext(
-      std::unique_ptr<Recordable> &&record,
-      const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
-                                          opentelemetry::context::Context> &context)
-      noexcept override;
+  void OnEmitWithContext(std::unique_ptr<Recordable> &&record,
+                         const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
+                                                             opentelemetry::context::Context>
+                             &context) noexcept override;
 
   /**
    * Exports all log records that have not yet been exported to the configured Exporter.
@@ -74,6 +73,8 @@ public:
   bool HasEnabledFilter() const noexcept override;
 
   bool RecordableEnforcesLogRecordLimits() const noexcept override;
+
+  bool ConsumesResolvedContext() const noexcept override;
 
 protected:
   /**
