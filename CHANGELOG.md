@@ -142,33 +142,24 @@ Breaking changes:
 * [CMAKE] Rename cmake options with prefix `OTELCPP_`
   [#4268](https://github.com/open-telemetry/opentelemetry-cpp/pull/4268)
   * All CMake build options were renamed with the `OTELCPP_` prefix to avoid
-    name collisions with user and third-party project variables:
-    * `WITH_*` options are renamed to `OTELCPP_WITH_*`, for example
-      `WITH_OTLP_HTTP` becomes `OTELCPP_WITH_OTLP_HTTP`
-    * `BUILD_TESTING` becomes `OTELCPP_BUILD_TESTING`. Unlike the other renamed
-      options, `BUILD_TESTING` is not treated as a deprecated alias:
-      * When opentelemetry-cpp is the top-level project, `BUILD_TESTING` sets
-        the default value of `OTELCPP_BUILD_TESTING`.
-      * When opentelemetry-cpp is a subproject, the parent project's
-        `BUILD_TESTING` no longer controls opentelemetry-cpp tests, which
-        default to `OFF`.
-      * Set `OTELCPP_BUILD_TESTING` explicitly to enable or disable
-        opentelemetry-cpp tests in either top-level or subproject builds.
-    * `BUILD_W3CTRACECONTEXT_TEST` becomes
-      `OTELCPP_BUILD_W3CTRACECONTEXT_TEST`
-    * `BUILD_PACKAGE` becomes `OTELCPP_BUILD_PACKAGE`
-    * `TARBALL` becomes `OTELCPP_TARBALL`
-    * `OPENTELEMETRY_BUILD_DLL` becomes `OTELCPP_BUILD_DLL`
-    * `OPENTELEMETRY_INSTALL` becomes `OTELCPP_INSTALL`
-    * `OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS` becomes
-      `OTELCPP_SKIP_DYNAMIC_LOADING_TESTS`
-    * `OPENTELEMETRY_EXTERNAL_COMPONENT_PATH` becomes
-      `OTELCPP_EXTERNAL_COMPONENT_PATH`
+    name collisions with user and third-party project variables. For example,
+    `WITH_OTLP_HTTP`, `WITH_CONFIGURATION`, and `WITH_OTLP_RETRY_PREVIEW` are
+    now `OTELCPP_WITH_OTLP_HTTP`, `OTELCPP_WITH_CONFIGURATION`, and
+    `OTELCPP_WITH_OTLP_RETRY_PREVIEW`.
+  * `BUILD_TESTING` becomes `OTELCPP_BUILD_TESTING`, but is not treated as a
+    deprecated alias:
+    * When opentelemetry-cpp is the top-level project, `BUILD_TESTING` sets the
+      default value of `OTELCPP_BUILD_TESTING`.
+    * When opentelemetry-cpp is a subproject, the parent project's
+      `BUILD_TESTING` no longer controls opentelemetry-cpp tests, which default
+      to `OFF`.
+    * Set `OTELCPP_BUILD_TESTING` explicitly to enable or disable
+      opentelemetry-cpp tests in either top-level or subproject builds.
+  * `OTELCPP_WITH_BENCHMARK` now defaults to the value of
+    `OTELCPP_BUILD_TESTING` instead of always defaulting to `ON`.
   * The other legacy option names are still accepted but deprecated: a
     deprecation warning is emitted at configure time, and the `OTELCPP_` name
     takes precedence when both names are set.
-  * Please update build scripts and CI configurations to use the new option
-    names.
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
