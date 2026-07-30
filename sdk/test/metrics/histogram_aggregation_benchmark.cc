@@ -199,15 +199,29 @@ Base2ExponentialHistogramAggregationConfig MakeBase2Config(size_t max_size, int3
 // distribution used by BM_HistogramAggregation covers a single bucket range, so
 // once the aggregation has adapted its scale the recorded indices never leave
 // the window again and the bucket layout is barely exercised.
+//
+// The exponents come from a golden ratio (Weyl) sequence instead of a seeded
+// random number generator. It is equidistributed and visits the range in a
+// non-monotonic order, and unlike std::uniform_real_distribution, whose
+// algorithm the standard leaves unspecified, it yields the same measurements on
+// every standard library implementation, so numbers taken on different
+// platforms describe the same workload.
 std::vector<double> MakeWideRangeMeasurements(size_t count)
 {
-  std::mt19937 generator(1729);
-  std::uniform_real_distribution<double> exponent(-120.0, 120.0);
+  // Fractional part of the golden ratio. Any irrational number is
+  // equidistributed modulo one; this one is the hardest to approximate with a
+  // fraction, which gives the most even spread for a finite count.
+  constexpr double kGoldenRatioConjugate = 0.6180339887498949;
+  constexpr double kMinExponent          = -120.0;
+  constexpr double kExponentRange        = 240.0;
+
   std::vector<double> measurements;
   measurements.reserve(count);
   for (size_t i = 0; i < count; ++i)
   {
-    measurements.push_back(std::exp2(exponent(generator)));
+    const double position = static_cast<double>(i + 1) * kGoldenRatioConjugate;
+    const double fraction = position - std::floor(position);
+    measurements.push_back(std::exp2(kMinExponent + kExponentRange * fraction));
   }
   return measurements;
 }
