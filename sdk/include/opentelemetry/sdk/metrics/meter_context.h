@@ -89,6 +89,15 @@ public:
   const instrumentationscope::ScopeConfigurator<MeterConfig> &GetMeterConfigurator() const noexcept;
 
   /**
+   * Replace the ScopeConfigurator for this meter context.
+   *
+   * Note: This method is not thread safe.
+   * @param meter_configurator The new configurator.
+   */
+  void SetMeterConfigurator(std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>
+                                meter_configurator) noexcept;
+
+  /**
    * NOTE - INTERNAL method, can change in the future.
    * Process callback for each meter in thread-safe manner
    */

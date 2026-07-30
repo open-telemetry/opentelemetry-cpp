@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <atomic>
 #include <cstdint>
 #include <functional>
 #include <mutex>
@@ -101,18 +102,23 @@ Meter::Meter(
     std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
     : scope_{std::move(instrumentation_scope)},
       meter_context_{std::move(meter_context)},
-      observable_registry_(new ObservableRegistry()),
-      meter_config_(MeterConfig::Default())
+      observable_registry_(new ObservableRegistry())
 {
   if (auto meter_context_locked_ptr = meter_context_.lock())
   {
-    meter_config_ = meter_context_locked_ptr->GetMeterConfigurator().ComputeConfig(*scope_);
+    UpdateMeterConfig(meter_context_locked_ptr->GetMeterConfigurator().ComputeConfig(*scope_));
   }
   else
   {
+    UpdateMeterConfig(MeterConfig::Default());
     OTEL_INTERNAL_LOG_ERROR("[Meter::Meter()] - Error during initialization."
                             << "The metric context is invalid")
   }
+}
+
+void Meter::UpdateMeterConfig(MeterConfig config) noexcept
+{
+  meter_enabled_.store(config.IsEnabled(), std::memory_order_relaxed);
 }
 
 opentelemetry::nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64Counter(
@@ -120,7 +126,7 @@ opentelemetry::nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateUInt64Counter(name, description, unit);
   }
@@ -146,7 +152,7 @@ opentelemetry::nostd::unique_ptr<metrics::Counter<double>> Meter::CreateDoubleCo
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateDoubleCounter(name, description, unit);
   }
@@ -173,7 +179,7 @@ Meter::CreateInt64ObservableCounter(opentelemetry::nostd::string_view name,
                                     opentelemetry::nostd::string_view description,
                                     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateInt64ObservableCounter(name, description, unit);
   }
@@ -199,7 +205,7 @@ Meter::CreateDoubleObservableCounter(opentelemetry::nostd::string_view name,
                                      opentelemetry::nostd::string_view description,
                                      opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateDoubleObservableCounter(name, description, unit);
   }
@@ -225,7 +231,7 @@ opentelemetry::nostd::unique_ptr<metrics::Histogram<uint64_t>> Meter::CreateUInt
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateUInt64Histogram(name, description, unit);
   }
@@ -252,7 +258,7 @@ opentelemetry::nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDouble
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateDoubleHistogram(name, description, unit);
   }
@@ -280,7 +286,7 @@ opentelemetry::nostd::unique_ptr<metrics::Gauge<int64_t>> Meter::CreateInt64Gaug
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateInt64Gauge(name, description, unit);
   }
@@ -306,7 +312,7 @@ opentelemetry::nostd::unique_ptr<metrics::Gauge<double>> Meter::CreateDoubleGaug
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateDoubleGauge(name, description, unit);
   }
@@ -333,7 +339,7 @@ Meter::CreateInt64ObservableGauge(opentelemetry::nostd::string_view name,
                                   opentelemetry::nostd::string_view description,
                                   opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateInt64ObservableGauge(name, description, unit);
   }
@@ -359,7 +365,7 @@ Meter::CreateDoubleObservableGauge(opentelemetry::nostd::string_view name,
                                    opentelemetry::nostd::string_view description,
                                    opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateDoubleObservableGauge(name, description, unit);
   }
@@ -385,7 +391,7 @@ opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<int64_t>> Meter::CreateI
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateInt64UpDownCounter(name, description, unit);
   }
@@ -412,7 +418,7 @@ opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<double>> Meter::CreateDo
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateDoubleUpDownCounter(name, description, unit);
   }
@@ -439,7 +445,7 @@ Meter::CreateInt64ObservableUpDownCounter(opentelemetry::nostd::string_view name
                                           opentelemetry::nostd::string_view description,
                                           opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateInt64ObservableUpDownCounter(name, description, unit);
   }
@@ -465,7 +471,7 @@ Meter::CreateDoubleObservableUpDownCounter(opentelemetry::nostd::string_view nam
                                            opentelemetry::nostd::string_view description,
                                            opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return kNoopMeter.CreateDoubleObservableUpDownCounter(name, description, unit);
   }
@@ -642,7 +648,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
 std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
                                        opentelemetry::common::SystemTimestamp collect_ts) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  if (!IsMeterEnabled())
   {
     return std::vector<MetricData>();
   }

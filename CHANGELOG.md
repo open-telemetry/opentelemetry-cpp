@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add `MeterProvider::UpdateMeterConfigurator()` and example
+  [#4256](https://github.com/open-telemetry/opentelemetry-cpp/issues/4256)
+
 * [BUILD] Add missing opentelemetry_proto dependency to otlp_recordable
   pkg-config
   [#4316](https://github.com/open-telemetry/opentelemetry-cpp/pull/4316)

@@ -66,6 +66,19 @@ const instrumentationscope::ScopeConfigurator<MeterConfig> &MeterContext::GetMet
   return *meter_configurator_;
 }
 
+void MeterContext::SetMeterConfigurator(
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>
+        meter_configurator) noexcept
+{
+  if (!meter_configurator)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[MeterContext::SetMeterConfigurator] meter_configurator must not be null, ignoring.");
+    return;
+  }
+  meter_configurator_ = std::move(meter_configurator);
+}
+
 bool MeterContext::ForEachMeter(
     nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback) noexcept
 {
