@@ -8,7 +8,6 @@
 #include <cmath>
 #include <functional>
 #include <initializer_list>  // IWYU pragma: keep
-#include <memory>
 #include <random>
 #include <string>
 #include <thread>
@@ -337,7 +336,7 @@ public:
     {
       return;
     }
-    provider_ = std::make_unique<MeterProvider>(MakeBase2ExponentialViewRegistry(kBase2MaxScale));
+    provider_.reset(new MeterProvider(MakeBase2ExponentialViewRegistry(kBase2MaxScale)));
     std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
     reader_ = std::shared_ptr<MetricReader>(new MockMetricReader(std::move(exporter)));
     provider_->AddMetricReader(reader_);
