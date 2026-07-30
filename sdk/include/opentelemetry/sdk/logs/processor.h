@@ -6,6 +6,7 @@
 #include <chrono>
 #include <memory>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -83,10 +84,10 @@ public:
    * @param record the log recordable object
    * @param context the resolved context (SpanContext or Context variant)
    */
-  virtual void OnEmitWithContext(
-      std::unique_ptr<Recordable> &&record,
-      const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
-                                          opentelemetry::context::Context> & /*context*/) noexcept
+  virtual void OnEmitWithContext(std::unique_ptr<Recordable> &&record,
+                                 OPENTELEMETRY_MAYBE_UNUSED const opentelemetry::nostd::variant<
+                                     opentelemetry::trace::SpanContext,
+                                     opentelemetry::context::Context> &context) noexcept
   {
     OnEmit(std::move(record));
   }
