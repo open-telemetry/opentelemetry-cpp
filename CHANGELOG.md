@@ -26,6 +26,9 @@ Increment the:
 * [CODE HEALTH] Move remaining API test helpers into anonymous namespaces
   [#4301](https://github.com/open-telemetry/opentelemetry-cpp/pull/4301)
 
+* [BUG] Fix use-after-free when an HTTP handler closes the connection
+  [#4289](https://github.com/open-telemetry/opentelemetry-cpp/pull/4289)
+
 * [CODE HEALTH] Move metrics storage test fixtures into anonymous namespace
   [#4286](https://github.com/open-telemetry/opentelemetry-cpp/pull/4286)
 
