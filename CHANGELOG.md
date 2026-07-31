@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] Extend preview bound instruments to UpDownCounter and Gauge
+
 * [BUILD] Add missing opentelemetry_proto dependency to otlp_recordable
   pkg-config
   [#4316](https://github.com/open-telemetry/opentelemetry-cpp/pull/4316)

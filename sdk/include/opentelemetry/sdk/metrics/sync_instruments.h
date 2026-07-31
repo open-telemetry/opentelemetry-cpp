@@ -51,6 +51,7 @@ public:
   void Add(uint64_t value, const opentelemetry::context::Context &context) noexcept override;
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  using opentelemetry::metrics::Counter<uint64_t>::Bind;
   opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<uint64_t>> Bind(
       const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 #endif
@@ -73,6 +74,7 @@ public:
   void Add(double value, const opentelemetry::context::Context &context) noexcept override;
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  using opentelemetry::metrics::Counter<double>::Bind;
   opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<double>> Bind(
       const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 #endif
@@ -93,6 +95,7 @@ public:
   void Add(int64_t value) noexcept override;
   void Add(int64_t value, const opentelemetry::context::Context &context) noexcept override;
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  using opentelemetry::metrics::UpDownCounter<int64_t>::Bind;
   opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundUpDownCounter<int64_t>> Bind(
       const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 #endif
@@ -113,6 +116,7 @@ public:
   void Add(double value) noexcept override;
   void Add(double value, const opentelemetry::context::Context &context) noexcept override;
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  using opentelemetry::metrics::UpDownCounter<double>::Bind;
   opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundUpDownCounter<double>> Bind(
       const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 #endif
@@ -134,6 +138,7 @@ public:
   void Record(int64_t value) noexcept override;
   void Record(int64_t value, const opentelemetry::context::Context &context) noexcept override;
 #  ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  using opentelemetry::metrics::Gauge<int64_t>::Bind;
   opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundGauge<int64_t>> Bind(
       const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 #  endif
@@ -154,6 +159,7 @@ public:
   void Record(double value) noexcept override;
   void Record(double value, const opentelemetry::context::Context &context) noexcept override;
 #  ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  using opentelemetry::metrics::Gauge<double>::Bind;
   opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundGauge<double>> Bind(
       const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 #  endif
@@ -174,6 +180,7 @@ public:
 #endif
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  using opentelemetry::metrics::Histogram<uint64_t>::Bind;
   opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<uint64_t>> Bind(
       const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 #endif
@@ -199,6 +206,7 @@ public:
 #endif
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  using opentelemetry::metrics::Histogram<double>::Bind;
   opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<double>> Bind(
       const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 #endif

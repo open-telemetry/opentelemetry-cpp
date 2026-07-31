@@ -72,7 +72,7 @@ include(CMakeDependentOption)
 
 # Experimental: bound synchronous metric instruments (Counter, UpDownCounter,
 # Histogram, Gauge).
-# Requires WITH_ABI_VERSION_2. Context-bearing bound operations, exemplar
+# Requires WITH_ABI_VERSION_2. Context-bearing bound operations and exemplar
 # parity are follow-ups.
 cmake_dependent_option(
   WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW

@@ -75,6 +75,36 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.api_only.test
 
+  cmake_bound_metrics_preview_test:
+    name: CMake bound metrics preview test
+    runs-on: ubuntu-24.04
+    env:
+      CXX_STANDARD: '17'
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+      with:
+        egress-policy: audit
+
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: configure bound metrics preview
+      run: |
+        cmake -S . -B build \
+          -DWITH_ABI_VERSION_1=OFF \
+          -DWITH_ABI_VERSION_2=ON \
+          -DWITH_METRICS_BOUND_INSTRUMENTS_PREVIEW=ON \
+          -DWITH_BENCHMARK=OFF \
+          -DWITH_EXAMPLES=OFF
+    - name: build and test bound metrics preview
+      run: |
+        cmake --build build --target bound_sync_instruments_test -j2
+        ctest --test-dir build --output-on-failure -R '^metrics\.BoundSyncInstruments'
+
   cmake_fetch_content_test:
     name: CMake FetchContent usage with opentelemetry-cpp
     runs-on: ubuntu-24.04
