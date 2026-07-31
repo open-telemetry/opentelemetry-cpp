@@ -238,6 +238,15 @@ class DISABLED_BasicCurlHttpTests : public BasicCurlHttpTests
 
 TEST_F(BasicCurlHttpTests, DoNothing) {}
 
+TEST(HttpServerTest, RejectsOutOfRangeListeningPorts)
+{
+  HTTP_SERVER_NS::HttpServer server;
+
+  EXPECT_EQ(server.addListeningPort(-1), -1);
+  EXPECT_EQ(server.addListeningPort(65536), -1);
+  EXPECT_EQ(server.addListeningPort(99999), -1);
+}
+
 TEST_F(BasicCurlHttpTests, HttpRequest)
 {
   curl::Request req;
