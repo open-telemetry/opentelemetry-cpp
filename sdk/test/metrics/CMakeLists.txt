@@ -94,6 +94,12 @@ if(WITH_BENCHMARK)
     base2_exponential_histogram_indexer_benchmark benchmark::benchmark
     opentelemetry_metrics ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
 
+  add_executable(circular_buffer_counter_benchmark
+                 circular_buffer_counter_benchmark.cc)
+  target_link_libraries(
+    circular_buffer_counter_benchmark benchmark::benchmark
+    opentelemetry_metrics ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+
   add_executable(histogram_aggregation_benchmark
                  histogram_aggregation_benchmark.cc)
   target_link_libraries(
