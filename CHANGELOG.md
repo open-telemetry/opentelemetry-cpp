@@ -15,8 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
-* [SDK] Implement the ProbabilitySampler
-  [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
+* [BENCHMARK] Add multi-threaded base2 exponential histogram benchmarks
+  [#4319](https://github.com/open-telemetry/opentelemetry-cpp/pull/4319)
 
 * [BUILD] Add missing opentelemetry_proto dependency to otlp_recordable
   pkg-config
@@ -72,6 +72,9 @@ Increment the:
 * [CODE HEALTH] Move SDK common and logs test helpers into anonymous
   namespaces
   [#4302](https://github.com/open-telemetry/opentelemetry-cpp/pull/4302)
+
+* [SDK] Implement the ProbabilitySampler
+  [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
 
 Breaking changes:
 

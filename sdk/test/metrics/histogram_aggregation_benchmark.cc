@@ -3,7 +3,9 @@
 
 #include <benchmark/benchmark.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <chrono>
+#include <cmath>
 #include <functional>
 #include <initializer_list>  // IWYU pragma: keep
 #include <random>
@@ -18,9 +20,11 @@
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -104,7 +108,7 @@ BENCHMARK(BM_HistogramAggregation);
 
 // Add this helper function before your benchmark functions
 
-void RunBase2ExponentialHistogramAggregation(benchmark::State &state, int scale)
+std::unique_ptr<ViewRegistry> MakeBase2ExponentialViewRegistry(int32_t max_scale)
 {
   std::string instrument_unit = "histogram1_unit";
   std::unique_ptr<InstrumentSelector> histogram_instrument_selector{
@@ -113,7 +117,7 @@ void RunBase2ExponentialHistogramAggregation(benchmark::State &state, int scale)
       new MeterSelector("meter1", "version1", "schema1")};
 
   Base2ExponentialHistogramAggregationConfig config;
-  config.max_scale_ = scale;
+  config.max_scale_ = max_scale;
 
   std::unique_ptr<View> histogram_view{
       new View("base2_expohisto", "description", AggregationType::kBase2ExponentialHistogram,
@@ -122,8 +126,13 @@ void RunBase2ExponentialHistogramAggregation(benchmark::State &state, int scale)
   std::unique_ptr<ViewRegistry> views{new ViewRegistry()};
   views->AddView(std::move(histogram_instrument_selector), std::move(histogram_meter_selector),
                  std::move(histogram_view));
+  return views;
+}
 
-  HistogramAggregation<Base2ExponentialHistogramPointData>(state, std::move(views));
+void RunBase2ExponentialHistogramAggregation(benchmark::State &state, int32_t scale)
+{
+  HistogramAggregation<Base2ExponentialHistogramPointData>(state,
+                                                           MakeBase2ExponentialViewRegistry(scale));
 }
 
 void BM_Base2ExponentialHistogramAggregationZeroScale(benchmark::State &state)
@@ -161,6 +170,215 @@ void BM_Base2ExponentialHistogramAggregationSixteenScale(benchmark::State &state
   RunBase2ExponentialHistogramAggregation(state, 16);
 }
 BENCHMARK(BM_Base2ExponentialHistogramAggregationSixteenScale);
+
+// ---------------------------------------------------------------------------
+// Multi-threaded aggregation throughput for the base2 exponential histogram.
+// See https://github.com/open-telemetry/opentelemetry-cpp/issues/3366.
+//
+// These benchmarks deliberately do not follow the shape of
+// HistogramAggregation() above: measurement generation, thread management,
+// collection and sleeps all stay out of the timed region, so the reported time
+// covers aggregation only. Concurrency is expressed with the Google Benchmark
+// thread support, which starts and joins the workers outside of the measured
+// interval and reports wall-clock time for the parallel region.
+// ---------------------------------------------------------------------------
+
+constexpr int32_t kBase2MaxScale        = 20;
+constexpr size_t kBase2MeasurementCount = 4096;
+
+Base2ExponentialHistogramAggregationConfig MakeBase2Config(size_t max_size, int32_t max_scale)
+{
+  Base2ExponentialHistogramAggregationConfig config;
+  config.max_size_  = max_size;
+  config.max_scale_ = max_scale;
+  return config;
+}
+
+// Values spread over roughly 240 binary orders of magnitude. The uniform
+// distribution used by BM_HistogramAggregation covers a single bucket range, so
+// once the aggregation has adapted its scale the recorded indices never leave
+// the window again and the bucket layout is barely exercised.
+//
+// The exponents come from a golden ratio (Weyl) sequence instead of a seeded
+// random number generator. It is equidistributed and visits the range in a
+// non-monotonic order, and unlike std::uniform_real_distribution, whose
+// algorithm the standard leaves unspecified, it yields the same measurements on
+// every standard library implementation, so numbers taken on different
+// platforms describe the same workload.
+std::vector<double> MakeWideRangeMeasurements(size_t count)
+{
+  // Fractional part of the golden ratio. Any irrational number is
+  // equidistributed modulo one; this one is the hardest to approximate with a
+  // fraction, which gives the most even spread for a finite count.
+  constexpr double kGoldenRatioConjugate = 0.6180339887498949;
+  constexpr double kMinExponent          = -120.0;
+  constexpr double kExponentRange        = 240.0;
+
+  std::vector<double> measurements;
+  measurements.reserve(count);
+  for (size_t i = 0; i < count; ++i)
+  {
+    const double position = static_cast<double>(i + 1) * kGoldenRatioConjugate;
+    const double fraction = position - std::floor(position);
+    measurements.push_back(std::exp2(kMinExponent + kExponentRange * fraction));
+  }
+  return measurements;
+}
+
+const std::vector<double> &WideRangeMeasurements()
+{
+  static const std::vector<double> measurements = MakeWideRangeMeasurements(kBase2MeasurementCount);
+  return measurements;
+}
+
+// One measurement per bucket at the configured max scale, offset by half a
+// bucket to stay away from the boundaries where ComputeIndex() is documented to
+// be inaccurate for positive scales. The first max_size values fill the
+// circular buffer, and value 2 * max_size forces the recorded index range past
+// max_size a second time, so a full buffer is folded twice per aggregation.
+//
+// A fresh aggregation is required for that: a scale can only ever decrease, so
+// a long-lived aggregation stops downscaling once it has adapted to the input.
+std::vector<double> MakeDenseBucketMeasurements(size_t max_size, int32_t max_scale)
+{
+  const double index_step = std::exp2(-static_cast<double>(max_scale));
+  const size_t count      = 2 * max_size + 1;
+  std::vector<double> measurements;
+  measurements.reserve(count);
+  for (size_t i = 0; i < count; ++i)
+  {
+    measurements.push_back(std::exp2((static_cast<double>(i) + 0.5) * index_step));
+  }
+  return measurements;
+}
+
+// Number of scales the input actually consumes, so the benchmark output shows
+// that downscaling is being exercised rather than assumed.
+double ObservedScaleReduction(const std::vector<double> &measurements,
+                              const Base2ExponentialHistogramAggregationConfig &config)
+{
+  Base2ExponentialHistogramAggregation aggregation(&config);
+  const PointAttributes attributes;
+  for (double value : measurements)
+  {
+    aggregation.Aggregate(value, attributes);
+  }
+  const PointType point  = aggregation.ToPoint();
+  const auto &point_data = opentelemetry::nostd::get<Base2ExponentialHistogramPointData>(point);
+  return static_cast<double>(config.max_scale_ - point_data.scale_);
+}
+
+// Each thread aggregates into its own aggregation, so no metric storage lock,
+// attribute hashmap or collection is involved. Anything short of linear scaling
+// comes from the aggregation itself.
+void BM_Base2ExponentialHistogramAggregate(benchmark::State &state)
+{
+  const Base2ExponentialHistogramAggregationConfig config =
+      MakeBase2Config(static_cast<size_t>(state.range(0)), kBase2MaxScale);
+  const std::vector<double> &measurements = WideRangeMeasurements();
+  const PointAttributes attributes;
+  Base2ExponentialHistogramAggregation aggregation(&config);
+
+  for (auto _ : state)
+  {
+    for (double value : measurements)
+    {
+      aggregation.Aggregate(value, attributes);
+    }
+  }
+  state.SetItemsProcessed(state.iterations() * static_cast<int64_t>(measurements.size()));
+}
+BENCHMARK(BM_Base2ExponentialHistogramAggregate)->Arg(160)->ThreadRange(1, 8);
+
+// Downscaling-dominated counterpart of the benchmark above: every iteration
+// folds a completely full bucket buffer twice. This is the workload that shows
+// the cost of the buffer that DownscaleBuckets() allocates per downscale, and
+// the added threads show how much of that cost is allocator contention.
+void BM_Base2ExponentialHistogramDownscale(benchmark::State &state)
+{
+  const size_t max_size = static_cast<size_t>(state.range(0));
+  const Base2ExponentialHistogramAggregationConfig config =
+      MakeBase2Config(max_size, kBase2MaxScale);
+  const std::vector<double> measurements = MakeDenseBucketMeasurements(max_size, kBase2MaxScale);
+  const PointAttributes attributes;
+
+  for (auto _ : state)
+  {
+    Base2ExponentialHistogramAggregation aggregation(&config);
+    for (double value : measurements)
+    {
+      aggregation.Aggregate(value, attributes);
+    }
+  }
+  state.SetItemsProcessed(state.iterations() * static_cast<int64_t>(measurements.size()));
+  state.counters["scale_reduction"] = benchmark::Counter(
+      ObservedScaleReduction(measurements, config), benchmark::Counter::kAvgThreads);
+}
+BENCHMARK(BM_Base2ExponentialHistogramDownscale)->Arg(20)->Arg(160)->Arg(640)->ThreadRange(1, 8);
+
+// All threads record on one shared instrument, so every measurement contends on
+// the same SyncMetricStorage entry. Same scenario as
+// BM_MeasurementsThreadsShareCounterTest in measurements_benchmark.cc, but the
+// provider is built outside the timed region and nothing is collected while the
+// timer runs.
+class SharedBase2InstrumentFixture : public benchmark::Fixture
+{
+public:
+  using benchmark::Fixture::SetUp;
+  using benchmark::Fixture::TearDown;
+
+  // Google Benchmark synchronizes every thread before the first iteration and
+  // after the last one, so building and destroying the shared state on thread 0
+  // is safe as long as the other threads only touch it inside the loop.
+  void SetUp(benchmark::State &state) override
+  {
+    if (state.thread_index() != 0)
+    {
+      return;
+    }
+    provider_.reset(new MeterProvider(MakeBase2ExponentialViewRegistry(kBase2MaxScale)));
+    std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
+    reader_ = std::shared_ptr<MetricReader>(new MockMetricReader(std::move(exporter)));
+    provider_->AddMetricReader(reader_);
+    meter_ = provider_->GetMeter("meter1", "version1", "schema1");
+    histogram_ =
+        meter_->CreateDoubleHistogram("histogram1", "histogram1_description", "histogram1_unit");
+  }
+
+  void TearDown(benchmark::State &state) override
+  {
+    if (state.thread_index() != 0)
+    {
+      return;
+    }
+    histogram_.reset();
+    meter_ = opentelemetry::nostd::shared_ptr<opentelemetry::metrics::Meter>();
+    reader_.reset();
+    provider_.reset();
+  }
+
+protected:
+  std::unique_ptr<MeterProvider> provider_;
+  std::shared_ptr<MetricReader> reader_;
+  opentelemetry::nostd::shared_ptr<opentelemetry::metrics::Meter> meter_;
+  opentelemetry::nostd::unique_ptr<opentelemetry::metrics::Histogram<double>> histogram_;
+};
+
+BENCHMARK_DEFINE_F(SharedBase2InstrumentFixture, Record)(benchmark::State &state)
+{
+  const std::vector<double> &measurements = WideRangeMeasurements();
+  // Start each thread at a different offset so they do not walk the buffer in
+  // lockstep, which would understate the cost of a shared bucket layout.
+  size_t index = static_cast<size_t>(state.thread_index()) * 64;
+
+  for (auto _ : state)
+  {
+    histogram_->Record(measurements[index % measurements.size()], {});
+    ++index;
+  }
+  state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK_REGISTER_F(SharedBase2InstrumentFixture, Record)->ThreadRange(1, 8);
 
 }  // namespace
 BENCHMARK_MAIN();
