@@ -102,7 +102,7 @@ jobs:
           -DWITH_EXAMPLES=OFF
     - name: build and test bound metrics preview
       run: |
-        cmake --build build --target bound_sync_instruments_test -j2
+        cmake --build build --target bound_sync_instruments_test --parallel 2
         ctest --test-dir build --output-on-failure -R '^metrics\.BoundSyncInstruments'
 
   cmake_fetch_content_test:

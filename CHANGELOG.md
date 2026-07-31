@@ -16,6 +16,7 @@ Increment the:
 ## [Unreleased]
 
 * [METRICS] Extend preview bound instruments to UpDownCounter and Gauge
+  [#4321](https://github.com/open-telemetry/opentelemetry-cpp/pull/4321)
 
 * [BENCHMARK] Add multi-threaded base2 exponential histogram benchmarks
   [#4319](https://github.com/open-telemetry/opentelemetry-cpp/pull/4319)
