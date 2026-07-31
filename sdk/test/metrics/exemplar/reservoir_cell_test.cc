@@ -14,6 +14,7 @@
 #  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
+#  include "opentelemetry/trace/span_context.h"
 #  include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -72,6 +73,16 @@ TEST_F(ReservoirCellTestPeer, GetAndReset)
   auto long_data = reservoir_cell.GetAndResetLong(MetricAttributes{});
   ASSERT_TRUE(GetRecordTime(reservoir_cell) == opentelemetry::common::SystemTimestamp{});
   ASSERT_TRUE(long_data == nullptr);
+}
+
+TEST_F(ReservoirCellTestPeer, ProducesExemplarWithoutSpanContext)
+{
+  opentelemetry::sdk::metrics::ReservoirCell reservoir_cell;
+  reservoir_cell.RecordLongMeasurement(static_cast<int64_t>(42), MetricAttributes{},
+                                       opentelemetry::context::Context{});
+  auto data = reservoir_cell.GetAndResetLong(MetricAttributes{});
+  ASSERT_NE(data, nullptr);
+  EXPECT_FALSE(data->GetSpanContext().IsValid());
 }
 
 TEST_F(ReservoirCellTestPeer, Filtered)
