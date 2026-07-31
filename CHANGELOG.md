@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Downscale base2 exponential histogram buckets in place
+  [#3366](https://github.com/open-telemetry/opentelemetry-cpp/issues/3366)
+
 * [BENCHMARK] Add multi-threaded base2 exponential histogram benchmarks
   [#4319](https://github.com/open-telemetry/opentelemetry-cpp/pull/4319)
 
