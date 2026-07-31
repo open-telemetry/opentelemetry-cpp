@@ -832,7 +832,13 @@ protected:
       for (int i = 0; i < result; i++)
       {
         auto it = std::find(m_sockets.begin(), m_sockets.end(), events[i].data.fd);
-        assert(it != m_sockets.end());
+        if (it == m_sockets.end())
+        {
+          // epoll_wait() fills a batch, and handling one event can remove a socket that a later
+          // entry in the same batch still names. Such an entry is stale, and reading it->socket
+          // would dereference end().
+          continue;
+        }
         Socket socket = it->socket;
         int flags     = it->flags;
 
@@ -870,7 +876,13 @@ protected:
         struct kevent &event = m_events[i];
         int fd               = (int)event.ident;
         auto it              = std::find(m_sockets.begin(), m_sockets.end(), fd);
-        assert(it != m_sockets.end());
+        if (it == m_sockets.end())
+        {
+          // kevent() reports a batch, and handling one event can remove a socket that a later
+          // entry in the same batch still names. Such an entry is stale, and reading it->socket
+          // would dereference end().
+          continue;
+        }
         Socket socket = it->socket;
         int flags     = it->flags;
 

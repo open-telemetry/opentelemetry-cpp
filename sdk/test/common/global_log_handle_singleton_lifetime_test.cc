@@ -11,6 +11,9 @@
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
+namespace
+{
+
 class GlobalLogHandlerChecker
 {
 public:
@@ -19,9 +22,12 @@ public:
   {
     using opentelemetry::sdk::common::internal_log::GlobalLogHandler;
     auto handle = GlobalLogHandler::GetLogHandler();
-    if (handle && custom_handler_destroyed)
+    // The checker must outlive the global handler. Fail if it is destroyed first
+    // (custom_handler_destroyed still false) or if the handler is somehow still reachable
+    // (handle non-null).
+    if (!custom_handler_destroyed || handle)
     {
-      OTEL_INTERNAL_LOG_ERROR("GlobalLogHandler should be destroyed here");
+      OTEL_INTERNAL_LOG_ERROR("GlobalLogHandler must be destroyed before the checker");
       abort();
     }
     std::cout << "GlobalLogHandlerChecker destroyed and check pass.\n";
@@ -38,14 +44,11 @@ public:
 };
 bool GlobalLogHandlerChecker::custom_handler_destroyed = false;
 
-namespace
-{
 static GlobalLogHandlerChecker &ConstructChecker()
 {
   static GlobalLogHandlerChecker checker;
   return checker;
 }
-}  // namespace
 
 class CustomLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
 {
@@ -112,3 +115,5 @@ TEST(GlobalLogHandleSingletonTest, Lifetime)
     EXPECT_TRUE(!!handle);
   }
 }
+
+}  // namespace

@@ -116,6 +116,21 @@ otel_cc_benchmark(
 )
 
 otel_cc_benchmark(
+    name = "circular_buffer_counter_benchmark",
+    srcs = [
+        "circular_buffer_counter_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+    ],
+)
+
+otel_cc_benchmark(
     name = "histogram_aggregation_benchmark",
     srcs = [
         "histogram_aggregation_benchmark.cc",
