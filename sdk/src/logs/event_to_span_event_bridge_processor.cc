@@ -242,13 +242,12 @@ void EventToSpanEventBridgeProcessor::OnEmitWithContext(
   const std::unique_ptr<ReadWriteLogRecord> log_record(
       static_cast<ReadWriteLogRecord *>(std::move(record).release()));
 
-  if (nostd::holds_alternative<opentelemetry::context::Context>(context))
+  if (const auto *resolved_context = nostd::get_if<opentelemetry::context::Context>(&context))
   {
     // The resolved context carries the live Span the record belongs to. Add the event to that
     // span directly, which is what makes an explicitly supplied context work even when a
     // different span is ambient.
-    BridgeRecordToSpan(log_record.get(), opentelemetry::trace::GetSpan(
-                                             nostd::get<opentelemetry::context::Context>(context)));
+    BridgeRecordToSpan(log_record.get(), opentelemetry::trace::GetSpan(*resolved_context));
     return;
   }
 

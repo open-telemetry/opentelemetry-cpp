@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>
+#include <stddef.h>  // IWYU pragma: keep
 #include <stdint.h>
 #include <array>
 #include <chrono>
@@ -13,7 +13,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/context/context.h"
+#include "opentelemetry/context/context.h"  // IWYU pragma: keep
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
@@ -1011,9 +1011,11 @@ public:
     return std::unique_ptr<Recordable>(new MockLogRecordable());
   }
 
-  void OnEmit(std::unique_ptr<Recordable> && /* record */) noexcept override
+  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override
   {
     ++state_->on_emit_calls;
+    // Deliberately does not chain to OnEmitWithContext(), so the two counters stay independent.
+    static_cast<void>(std::move(record));
   }
 
   void OnEmitWithContext(
