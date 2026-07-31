@@ -13,6 +13,8 @@
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/filter_predicate.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
@@ -37,6 +39,7 @@ public:
                      const AggregationType aggregation_type,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
                      nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
+                     ExemplarFilterType exemplar_filter_type,
 #endif
                      const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
@@ -48,6 +51,7 @@ public:
             std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_reservoir_(std::move(exemplar_reservoir)),
+        exemplar_filter_type_(exemplar_filter_type),
 #endif
         temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
   {}
@@ -63,7 +67,10 @@ public:
     for (auto &measurement : measurements)
     {
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      exemplar_reservoir_->OfferMeasurement(measurement.second, {}, {});
+      if (ExemplarFilterEnabled(exemplar_filter_type_, opentelemetry::context::Context{}))
+      {
+        exemplar_reservoir_->OfferMeasurement(measurement.second, {}, {});
+      }
 #endif
 
       auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
@@ -140,6 +147,7 @@ private:
   opentelemetry::common::SpinLockMutex hashmap_lock_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
+  ExemplarFilterType exemplar_filter_type_;
 #endif
   TemporalMetricStorage temporal_metric_storage_;
 };

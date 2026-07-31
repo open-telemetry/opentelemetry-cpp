@@ -547,6 +547,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
                                    view_instr_desc, exemplar_filter_type),
+              exemplar_filter_type,
 #endif
               view.GetAggregationConfig()));
           storage_registry_.insert({view_instr_desc, sync_storage});
@@ -619,6 +620,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
                                    view_instr_desc, exemplar_filter_type),
+              exemplar_filter_type,
 #endif
               view.GetAggregationConfig()));
           storage_registry_.insert({view_instr_desc, async_storage});

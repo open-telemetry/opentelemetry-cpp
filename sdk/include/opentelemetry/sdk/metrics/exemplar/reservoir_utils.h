@@ -53,6 +53,11 @@ static inline nostd::shared_ptr<ExemplarReservoir> GetExemplarReservoir(
     const InstrumentDescriptor &instrument_descriptor,
     ExemplarFilterType filter_type)
 {
+  if (filter_type == ExemplarFilterType::kAlwaysOff)
+  {
+    return ExemplarReservoir::GetNoExemplarReservoir();
+  }
+
   if (agg_type == AggregationType::kHistogram)
   {
     const auto *histogram_agg_config = static_cast<const HistogramAggregationConfig *>(agg_config);
@@ -64,21 +69,18 @@ static inline nostd::shared_ptr<ExemplarReservoir> GetExemplarReservoir(
     //
     if (histogram_agg_config != nullptr && histogram_agg_config->boundaries_.size() > 1)
     {
-      return ExemplarReservoir::GetSimpleFilteredExemplarReservoir(
-          filter_type,
-          nostd::shared_ptr<ExemplarReservoir>(new AlignedHistogramBucketExemplarReservoir(
-              histogram_agg_config->boundaries_.size(),
-              AlignedHistogramBucketExemplarReservoir::GetHistogramCellSelector(
-                  histogram_agg_config->boundaries_),
-              GetMapAndResetCellMethod(instrument_descriptor))));
+      return ExemplarReservoir::GetAlignedHistogramBucketExemplarReservoir(
+          histogram_agg_config->boundaries_.size(),
+          AlignedHistogramBucketExemplarReservoir::GetHistogramCellSelector(
+              histogram_agg_config->boundaries_),
+          GetMapAndResetCellMethod(instrument_descriptor));
     }
   }
 
-  return ExemplarReservoir::GetSimpleFilteredExemplarReservoir(
-      filter_type, nostd::shared_ptr<ExemplarReservoir>(new SimpleFixedSizeExemplarReservoir(
-                       GetSimpleFixedReservoirDefaultSize(agg_type, agg_config),
-                       SimpleFixedSizeExemplarReservoir::GetSimpleFixedSizeCellSelector(),
-                       GetMapAndResetCellMethod(instrument_descriptor))));
+  return ExemplarReservoir::GetSimpleFixedSizeExemplarReservoir(
+      GetSimpleFixedReservoirDefaultSize(agg_type, agg_config),
+      SimpleFixedSizeExemplarReservoir::GetSimpleFixedSizeCellSelector(),
+      GetMapAndResetCellMethod(instrument_descriptor));
 }
 }  // namespace metrics
 }  // namespace sdk

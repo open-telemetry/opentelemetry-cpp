@@ -26,6 +26,7 @@
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
@@ -55,7 +56,7 @@ TEST_P(UpDownCounterWritableMetricStorageTestFixture, LongUpDownCounterSumAggreg
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
 #endif
       nullptr);
 
@@ -205,7 +206,7 @@ TEST_P(UpDownCounterWritableMetricStorageTestFixture, DoubleUpDownCounterSumAggr
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
 #endif
       nullptr);
 

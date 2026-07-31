@@ -36,6 +36,8 @@
 #endif
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/filter_predicate.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
 
@@ -53,6 +55,7 @@ public:
                     std::shared_ptr<const AttributesProcessor> attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
+                    ExemplarFilterType exemplar_filter_type,
 #endif
                     const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
@@ -62,6 +65,7 @@ public:
         attributes_processor_(std::move(attributes_processor)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_reservoir_(std::move(exemplar_reservoir)),
+        exemplar_filter_type_(exemplar_filter_type),
 #endif
         temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
   {
@@ -81,7 +85,10 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, {}, context);
+    if (ExemplarFilterEnabled(exemplar_filter_type_, context))
+    {
+      exemplar_reservoir_->OfferMeasurement(value, {}, context);
+    }
 #endif
     static MetricAttributes attr = MetricAttributes{};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
@@ -104,7 +111,10 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, attributes, context);
+    if (ExemplarFilterEnabled(exemplar_filter_type_, context))
+    {
+      exemplar_reservoir_->OfferMeasurement(value, attributes, context);
+    }
 #endif
 
     MetricAttributes attr{attributes, attributes_processor_.get()};
@@ -132,7 +142,10 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, {}, context);
+    if (ExemplarFilterEnabled(exemplar_filter_type_, context))
+    {
+      exemplar_reservoir_->OfferMeasurement(value, {}, context);
+    }
 #endif
     static MetricAttributes attr = MetricAttributes{};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
@@ -155,7 +168,10 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    exemplar_reservoir_->OfferMeasurement(value, attributes, context);
+    if (ExemplarFilterEnabled(exemplar_filter_type_, context))
+    {
+      exemplar_reservoir_->OfferMeasurement(value, attributes, context);
+    }
 #endif
     MetricAttributes attr{attributes, attributes_processor_.get()};
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
@@ -267,6 +283,7 @@ private:
   std::shared_ptr<const AttributesProcessor> attributes_processor_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
+  ExemplarFilterType exemplar_filter_type_;
 #endif
   TemporalMetricStorage temporal_metric_storage_;
   opentelemetry::common::SpinLockMutex attribute_hashmap_lock_;

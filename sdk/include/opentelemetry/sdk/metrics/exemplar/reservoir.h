@@ -8,7 +8,6 @@
 #  include <memory>
 #  include <vector>
 
-#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
 #  include "opentelemetry/version.h"
 
@@ -68,10 +67,6 @@ public:
    */
   virtual std::vector<std::shared_ptr<ExemplarData>> CollectAndReset(
       const MetricAttributes &pointAttributes) noexcept = 0;
-
-  static nostd::shared_ptr<ExemplarReservoir> GetSimpleFilteredExemplarReservoir(
-      ExemplarFilterType filter_type,
-      nostd::shared_ptr<ExemplarReservoir> reservoir);
 
   static nostd::shared_ptr<ExemplarReservoir> GetSimpleFixedSizeExemplarReservoir(
       size_t size,

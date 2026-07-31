@@ -55,9 +55,9 @@ cc_test(
 )
 
 cc_test(
-    name = "filtered_exemplar_reservoir_test",
+    name = "filter_predicate_test",
     srcs = [
-        "filtered_exemplar_reservoir_test.cc",
+        "filter_predicate_test.cc",
     ],
     tags = [
         "metrics",
