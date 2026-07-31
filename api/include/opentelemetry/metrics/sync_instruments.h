@@ -56,7 +56,7 @@ public:
   virtual ~BoundCounter()                           = default;
 
   /**
-   * Record a value against the bound attribute set.
+   * Add a value against the bound attribute set.
    *
    * @param value The increment amount. MUST be non-negative.
    */
@@ -102,7 +102,7 @@ public:
   virtual ~BoundUpDownCounter()                                 = default;
 
   /**
-   * Record a value against the bound attribute set.
+   * Add a value against the bound attribute set.
    *
    * @param value The increment amount. May be positive, negative, or zero.
    */
