@@ -120,8 +120,8 @@ TEST_P(WritableMetricStorageCardinalityLimitTestFixture, LongCounterSumAggregati
       new DefaultAttributesProcessor{}};
   SyncMetricStorage storage(instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                            ExemplarReservoir::GetNoExemplarReservoir(),
                             ExemplarFilterType::kAlwaysOff,
+                            ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
                             &aggConfig);
 

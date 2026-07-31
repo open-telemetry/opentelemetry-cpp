@@ -38,8 +38,8 @@ public:
   AsyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
                      const AggregationType aggregation_type,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
                      ExemplarFilterType exemplar_filter_type,
+                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
                      const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
@@ -50,8 +50,8 @@ public:
         delta_hash_map_(
             std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-        exemplar_reservoir_(std::move(exemplar_reservoir)),
         exemplar_filter_type_(exemplar_filter_type),
+        exemplar_reservoir_(std::move(exemplar_reservoir)),
 #endif
         temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
   {}
@@ -64,10 +64,14 @@ public:
     // exporter/reader can request either for delta or cumulative value.
     // So we convert the async counter value to delta before passing it to temporal storage.
     std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+    const bool offer_exemplars =
+        ExemplarFilterEnabled(exemplar_filter_type_, opentelemetry::context::Context{});
+#endif
     for (auto &measurement : measurements)
     {
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      if (ExemplarFilterEnabled(exemplar_filter_type_, opentelemetry::context::Context{}))
+      if (offer_exemplars)
       {
         exemplar_reservoir_->OfferMeasurement(measurement.second, {}, {});
       }
@@ -146,8 +150,8 @@ private:
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
   opentelemetry::common::SpinLockMutex hashmap_lock_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-  nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
   ExemplarFilterType exemplar_filter_type_;
+  nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 #endif
   TemporalMetricStorage temporal_metric_storage_;
 };

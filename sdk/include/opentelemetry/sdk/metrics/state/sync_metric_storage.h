@@ -54,8 +54,8 @@ public:
                     const AggregationType aggregation_type,
                     std::shared_ptr<const AttributesProcessor> attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                    nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
                     ExemplarFilterType exemplar_filter_type,
+                    nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
                     const AggregationConfig *aggregation_config)
       : instrument_descriptor_(instrument_descriptor),
@@ -64,8 +64,8 @@ public:
             std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
         attributes_processor_(std::move(attributes_processor)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-        exemplar_reservoir_(std::move(exemplar_reservoir)),
         exemplar_filter_type_(exemplar_filter_type),
+        exemplar_reservoir_(std::move(exemplar_reservoir)),
 #endif
         temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
   {
@@ -282,8 +282,8 @@ private:
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
   std::shared_ptr<const AttributesProcessor> attributes_processor_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-  nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
   ExemplarFilterType exemplar_filter_type_;
+  nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 #endif
   TemporalMetricStorage temporal_metric_storage_;
   opentelemetry::common::SpinLockMutex attribute_hashmap_lock_;

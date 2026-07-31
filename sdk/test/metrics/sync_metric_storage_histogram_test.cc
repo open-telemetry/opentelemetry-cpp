@@ -57,7 +57,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kHistogram, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 
@@ -198,7 +198,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, DoubleHistogram)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kHistogram, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 
@@ -346,7 +346,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kBase2ExponentialHistogram, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 

@@ -62,7 +62,7 @@ TEST_P(GaugeWritableMetricStorageTestFixture, LongGaugeLastValueAggregation)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       nullptr);
 
@@ -146,7 +146,7 @@ TEST_P(GaugeWritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       nullptr);
 
@@ -240,7 +240,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       nullptr);
   auto after_creation = std::chrono::system_clock::now();
@@ -421,7 +421,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue, default_attributes_processor,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       nullptr);
   auto after_creation = std::chrono::system_clock::now();

@@ -56,7 +56,7 @@ TEST_P(UpDownCounterWritableMetricStorageTestFixture, LongUpDownCounterSumAggreg
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 
@@ -206,7 +206,7 @@ TEST_P(UpDownCounterWritableMetricStorageTestFixture, DoubleUpDownCounterSumAggr
   opentelemetry::sdk::metrics::SyncMetricStorage storage(
       instr_desc, AggregationType::kSum, default_attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
 

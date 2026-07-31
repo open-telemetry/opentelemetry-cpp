@@ -70,7 +70,7 @@ TEST_P(AsyncWritableMetricStorageTestFixture, TestAggregation)
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kSum,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
   int64_t get_count1                                                                  = 20;
@@ -165,7 +165,7 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kDefault,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
   int64_t get_count1                                                                  = 20;
@@ -261,7 +261,7 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
       instr_desc, AggregationType::kLastValue,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
       nullptr);
   int64_t freq_cpu0                                                                   = 3;

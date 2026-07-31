@@ -75,8 +75,8 @@ public:
     }
     storage_ = std::make_shared<SyncMetricStorage>(desc, agg_type, proc_,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                                                   ExemplarReservoir::GetNoExemplarReservoir(),
                                                    ExemplarFilterType::kAlwaysOff,
+                                                   ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
                                                    cfg_);
   }
@@ -189,7 +189,7 @@ TEST(BoundSyncInstruments, BoundCounterBindInitializerList)
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kSum, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
@@ -241,7 +241,7 @@ TEST(BoundSyncInstruments, UnboundCounterDropsValueAboveInt64Max)
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kSum, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
@@ -264,7 +264,7 @@ TEST(BoundSyncInstruments, BoundCounterDropsValueAboveInt64Max)
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kSum, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
@@ -318,7 +318,7 @@ TEST(BoundSyncInstruments, UnboundHistogramDropsValueAboveInt64Max)
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kHistogram, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
@@ -357,7 +357,7 @@ TEST(BoundSyncInstruments, BoundHistogramDropsValueAboveInt64Max)
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kHistogram, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
@@ -397,7 +397,7 @@ TEST(BoundSyncInstruments, BoundHistogramBindInitializerList)
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kHistogram, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-      ExemplarReservoir::GetNoExemplarReservoir(), ExemplarFilterType::kAlwaysOff,
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
@@ -436,8 +436,8 @@ TEST(BoundSyncInstruments, BoundCounterRespectsDropAggregation)
   AggregationConfig cfg;
   SyncMetricStorage storage(desc, AggregationType::kDrop, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                            ExemplarReservoir::GetNoExemplarReservoir(),
                             ExemplarFilterType::kAlwaysOff,
+                            ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
                             &cfg);
   M attrs    = {{"k", "v"}};
@@ -472,8 +472,8 @@ TEST(BoundSyncInstruments, BoundCounterRespectsLastValueAggregation)
   AggregationConfig cfg;
   SyncMetricStorage storage(desc, AggregationType::kLastValue, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                            ExemplarReservoir::GetNoExemplarReservoir(),
                             ExemplarFilterType::kAlwaysOff,
+                            ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
                             &cfg);
   M attrs    = {{"k", "v"}};
@@ -511,8 +511,8 @@ TEST(BoundSyncInstruments, BoundHistogramRespectsCustomBuckets)
   cfg.boundaries_ = {10.0, 20.0};
   SyncMetricStorage storage(desc, AggregationType::kHistogram, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                            ExemplarReservoir::GetNoExemplarReservoir(),
                             ExemplarFilterType::kAlwaysOff,
+                            ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
                             &cfg);
   M attrs    = {{"k", "v"}};
