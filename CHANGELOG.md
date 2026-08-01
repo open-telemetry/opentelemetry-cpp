@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BENCHMARK] Add multi-threaded base2 exponential histogram benchmarks
+  [#4319](https://github.com/open-telemetry/opentelemetry-cpp/pull/4319)
+
 * [BUILD] Add missing opentelemetry_proto dependency to otlp_recordable
   pkg-config
   [#4316](https://github.com/open-telemetry/opentelemetry-cpp/pull/4316)
@@ -25,6 +28,9 @@ Increment the:
 
 * [CODE HEALTH] Move remaining API test helpers into anonymous namespaces
   [#4301](https://github.com/open-telemetry/opentelemetry-cpp/pull/4301)
+
+* [BUG] Make SocketAddr string parsing safe and reject malformed addresses
+  [#4292](https://github.com/open-telemetry/opentelemetry-cpp/pull/4292)
 
 * [BUG] Fix use-after-free when an HTTP handler closes the connection
   [#4289](https://github.com/open-telemetry/opentelemetry-cpp/pull/4289)
