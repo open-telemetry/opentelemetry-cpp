@@ -356,6 +356,16 @@ TEST(AdaptingCircularBufferCounterTest, DownscaleAtMaximumIndex)
   EXPECT_EQ(counter.StartIndex(), kMaxIndex >> 1);
   EXPECT_EQ(counter.EndIndex(), kMaxIndex >> 1);
   EXPECT_EQ(counter.Get(kMaxIndex >> 1), 2);
+
+  AdaptingCircularBufferCounter reverse_order{2};
+  EXPECT_TRUE(reverse_order.Increment(kMaxIndex, 1));
+  EXPECT_TRUE(reverse_order.Increment(kMaxIndex - 1, 1));
+
+  reverse_order.Downscale(1);
+
+  EXPECT_EQ(reverse_order.StartIndex(), kMaxIndex >> 1);
+  EXPECT_EQ(reverse_order.EndIndex(), kMaxIndex >> 1);
+  EXPECT_EQ(reverse_order.Get(kMaxIndex >> 1), 2);
 }
 
 TEST(AdaptingCircularBufferCounterTest, DownscaleFullBuffer)
