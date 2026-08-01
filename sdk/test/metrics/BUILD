@@ -47,6 +47,7 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
+        "//sdk/src/metrics",
         "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
@@ -111,6 +112,21 @@ otel_cc_benchmark(
     ],
     deps = [
         "metrics_common_test_utils",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "circular_buffer_counter_benchmark",
+    srcs = [
+        "circular_buffer_counter_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
     ],
 )
 

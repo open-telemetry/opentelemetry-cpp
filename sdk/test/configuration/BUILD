@@ -15,7 +15,7 @@ cc_test(
     ],
     deps = [
         "//sdk:headers",
-        "//sdk/src/configuration",
+        "//sdk/src/configuration:configuration_core",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/resource",
@@ -36,7 +36,7 @@ cc_test(
     ],
     deps = [
         "//sdk:headers",
-        "//sdk/src/configuration",
+        "//sdk/src/configuration:configuration_core",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/resource",
@@ -57,7 +57,7 @@ cc_test(
     ],
     deps = [
         "//sdk:headers",
-        "//sdk/src/configuration",
+        "//sdk/src/configuration:configuration_core",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/resource",
