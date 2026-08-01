@@ -61,8 +61,10 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
-target_link_libraries(opentelemetry_exporter_otlp_builder_utils
-                      PUBLIC opentelemetry_otlp_recordable)
+target_link_libraries(
+  opentelemetry_exporter_otlp_builder_utils
+  PUBLIC opentelemetry_otlp_recordable
+  PRIVATE opentelemetry_configuration_core)
 
 if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(
