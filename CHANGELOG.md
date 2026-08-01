@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Run the ext_http component install test on Windows
+  [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
+
+* [BENCHMARK] Add multi-threaded base2 exponential histogram benchmarks
+  [#4319](https://github.com/open-telemetry/opentelemetry-cpp/pull/4319)
+
 * [BUILD] Add missing opentelemetry_proto dependency to otlp_recordable
   pkg-config
   [#4316](https://github.com/open-telemetry/opentelemetry-cpp/pull/4316)
@@ -28,6 +34,12 @@ Increment the:
 
 * [BUG] Stop embedded HTTP server writes from raising SIGPIPE
   [#4294](https://github.com/open-telemetry/opentelemetry-cpp/pull/4294)
+
+* [BUG] Make SocketAddr string parsing safe and reject malformed addresses
+  [#4292](https://github.com/open-telemetry/opentelemetry-cpp/pull/4292)
+
+* [BUG] Fix use-after-free when an HTTP handler closes the connection
+  [#4289](https://github.com/open-telemetry/opentelemetry-cpp/pull/4289)
 
 * [CODE HEALTH] Move metrics storage test fixtures into anonymous namespace
   [#4286](https://github.com/open-telemetry/opentelemetry-cpp/pull/4286)
