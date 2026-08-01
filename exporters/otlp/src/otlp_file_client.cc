@@ -1569,16 +1569,16 @@ private:
 
   struct FileStats
   {
-    std::atomic<bool> is_shutdown;
-    std::size_t rotate_index;
-    std::size_t written_size;
-    std::size_t left_flush_record_count;
+    std::atomic<bool> is_shutdown{false};
+    std::size_t rotate_index{0};
+    std::size_t written_size{0};
+    std::size_t left_flush_record_count{0};
     std::shared_ptr<std::FILE> current_file;
     std::mutex file_lock;
-    std::time_t last_checkpoint;
+    std::time_t last_checkpoint{0};
     std::string file_path;
-    std::atomic<std::size_t> record_count;
-    std::atomic<std::size_t> flushed_record_count;
+    std::atomic<std::size_t> record_count{0};
+    std::atomic<std::size_t> flushed_record_count{0};
 
     std::unique_ptr<std::thread> background_flush_thread;
     std::mutex background_thread_lock;

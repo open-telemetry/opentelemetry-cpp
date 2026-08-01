@@ -32,6 +32,9 @@ using opentelemetry::sdk::common::unsetenv;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
+namespace
+{
+
 /**
  * Returns a mock span exporter meant exclusively for testing only
  */
@@ -498,5 +501,7 @@ TEST(BatchSpanProcessorOptionsEnvTest, TestDesignatedInitializers)
   EXPECT_EQ(partial_options.max_export_batch_size, static_cast<size_t>(50));
 }
 #endif
+
+}  // namespace
 
 OPENTELEMETRY_END_NAMESPACE

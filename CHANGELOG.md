@@ -18,12 +18,46 @@ Increment the:
 * [OTLP/HTTP] Honor `Retry-After` response header when retrying exports,
   supporting both delay-seconds and HTTP-date formats per RFC 7231 §7.1.3.
   [#4172](https://github.com/open-telemetry/opentelemetry-cpp/issues/4172)
+* [BUILD] Run the ext_http component install test on Windows
+  [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
+
+* [BENCHMARK] Add multi-threaded base2 exponential histogram benchmarks
+  [#4319](https://github.com/open-telemetry/opentelemetry-cpp/pull/4319)
+
+* [BUILD] Add missing opentelemetry_proto dependency to otlp_recordable
+  pkg-config
+  [#4316](https://github.com/open-telemetry/opentelemetry-cpp/pull/4316)
+
+* [CODE HEALTH] Move SDK trace and metrics test helpers into anonymous
+  namespaces
+  [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)
+
+* [CODE HEALTH] Move remaining API test helpers into anonymous namespaces
+  [#4301](https://github.com/open-telemetry/opentelemetry-cpp/pull/4301)
+
+* [BUG] Make SocketAddr string parsing safe and reject malformed addresses
+  [#4292](https://github.com/open-telemetry/opentelemetry-cpp/pull/4292)
+
+* [BUG] Fix use-after-free when an HTTP handler closes the connection
+  [#4289](https://github.com/open-telemetry/opentelemetry-cpp/pull/4289)
+
+* [CODE HEALTH] Move metrics storage test fixtures into anonymous namespace
+  [#4286](https://github.com/open-telemetry/opentelemetry-cpp/pull/4286)
+
+* [CODE HEALTH] Fix more clang tidy warnings (member initialization)
+  [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
+
 * docs: update supported development platforms
   [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
 
 * [RELEASE] Bump main branch to 1.29.0-dev
   [#4259](https://github.com/open-telemetry/opentelemetry-cpp/pull/4259)
 
+* [ETW] Ensure spans own their names until they are ended
+  [#4247](https://github.com/open-telemetry/opentelemetry-cpp/pull/4247)
+
+* [Metrics SDK] Implement configurable cardinality limit
+  [#4188](https://github.com/open-telemetry/opentelemetry-cpp/pull/4188)
 * [CONFIGURATION] Programmatic configuration use case tests and fixes
   [#4243](https://github.com/open-telemetry/opentelemetry-cpp/pull/4243)
 
@@ -34,6 +68,19 @@ Increment the:
 
 * [METRICS SDK] Validate Base2 Exponential Histogram Aggregation config
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
+
+* [SDK] Read span limits from the environment variables defined in the
+        specification (OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, OTEL_SPAN_EVENT_COUNT_LIMIT,
+        OTEL_SPAN_LINK_COUNT_LIMIT, ...) in the TracerProviderFactory overloads
+        that do not receive explicit SpanLimits
+  [#4258](https://github.com/open-telemetry/opentelemetry-cpp/pull/4258)
+
+* [CODE HEALTH] Fix remaining misc-override-with-different-visibility warnings
+  [#4280](https://github.com/open-telemetry/opentelemetry-cpp/pull/4280)
+
+* [CODE HEALTH] Move SDK common and logs test helpers into anonymous
+  namespaces
+  [#4302](https://github.com/open-telemetry/opentelemetry-cpp/pull/4302)
 
 Breaking changes:
 

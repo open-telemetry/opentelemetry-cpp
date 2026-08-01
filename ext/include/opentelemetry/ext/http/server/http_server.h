@@ -42,7 +42,7 @@ struct HttpRequest
 
 struct HttpResponse
 {
-  int code;
+  int code{0};
   std::string message;
   std::map<std::string, std::string> headers;
   std::string body;
@@ -108,9 +108,9 @@ protected:
       SendingHeaders,
       SendingBody,
       Closing
-    } state;
-    size_t contentLength;
-    bool keepalive;
+    } state{Idle};
+    size_t contentLength{0};
+    bool keepalive{false};
     HttpRequest request;
     HttpResponse response;
   };
@@ -244,7 +244,7 @@ public:
 
   void stop() { m_reactor.stop(); }
 
-protected:
+private:
   void onSocketAcceptable(SocketTools::Socket socket) override
   {
     LOG_TRACE("HttpServer: accepting socket fd=0x%llx", socket.m_sock);
@@ -331,6 +331,7 @@ protected:
     handleConnectionClosed(conn);
   }
 
+protected:
   bool sendMore(Connection &conn)
   {
     if (conn.sendBuffer.empty())
@@ -356,7 +357,6 @@ protected:
     return false;
   }
 
-protected:
   void handleConnectionClosed(Connection &conn)
   {
     LOG_TRACE("HttpServer: [%s] closed", conn.request.client.c_str());
@@ -367,7 +367,16 @@ protected:
     m_reactor.removeSocket(conn.socket);
     auto connIt = m_connections.find(conn.socket);
     conn.socket.close();
-    m_connections.erase(connIt);
+    // Every caller passes a connection that is in the map. The guard keeps a broken invariant
+    // from turning into erase(end()), and the assert keeps it from passing unnoticed in a
+    // debug build. This does not make the function idempotent: the reactor removal and the
+    // socket close above have already run.
+    assert(connIt != m_connections.end());
+    if (connIt != m_connections.end())
+    {
+      // Destroys the Connection that conn refers to: callers must not use conn afterwards.
+      m_connections.erase(connIt);
+    }
   }
 
   void handleConnection(Connection &conn)
@@ -522,7 +531,14 @@ protected:
 
       if (conn.state == Connection::Processing)
       {
-        processRequest(conn);
+        if (processRequest(conn) == RequestOutcome::CloseConnection)
+        {
+          // Mark the close as intentional so it is not reported as unexpected, then stop:
+          // handleConnectionClosed() erases conn, so it must not be touched afterwards.
+          conn.state = Connection::Closing;
+          handleConnectionClosed(conn);
+          return;
+        }
 
         std::ostringstream os;
         os << conn.request.protocol << ' ' << conn.response.code << ' ' << conn.response.message
@@ -736,7 +752,18 @@ protected:
     return result;
   }
 
-  void processRequest(Connection &conn)
+  enum class RequestOutcome : std::uint8_t
+  {
+    SendResponse,
+    CloseConnection
+  };
+
+  /**
+   * Run the registered handlers for a request and fill in the response.
+   * @return CloseConnection if a handler asked for the connection to be terminated. Closing is
+   *         left to the caller, which owns the connection's lifetime.
+   */
+  RequestOutcome processRequest(Connection &conn)
   {
     conn.response.message.clear();
     conn.response.headers.clear();
@@ -766,7 +793,7 @@ protected:
       if (conn.response.code == -1)
       {
         LOG_TRACE("HttpServer: [%s] closing by request", conn.request.client.c_str());
-        handleConnectionClosed(conn);
+        return RequestOutcome::CloseConnection;
       }
     }
 
@@ -779,11 +806,13 @@ protected:
     conn.response.headers["Connection"]     = (conn.keepalive ? "keep-alive" : "close");
     conn.response.headers["Date"]           = formatTimestamp(time(nullptr));
     conn.response.headers["Content-Length"] = std::to_string(conn.response.body.size());
+
+    return RequestOutcome::SendResponse;
   }
 
   static std::string formatTimestamp(time_t time)
   {
-    tm tm;
+    tm tm{};
 #ifdef _WIN32
     gmtime_s(&tm, &time);
 #else

@@ -320,7 +320,7 @@ typedef int (*test_func_t)();
 struct test_case
 {
   nostd::string_view m_name;
-  test_func_t m_func;
+  test_func_t m_func{nullptr};
 };
 
 }  // namespace
