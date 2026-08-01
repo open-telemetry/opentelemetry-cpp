@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Install an explicit list of ext headers instead of the whole
+  directory. The curl client and curl operation implementation headers and
+  the internal default factory header are no longer installed
+  [#4327](https://github.com/open-telemetry/opentelemetry-cpp/pull/4327)
+
 * [BENCHMARK] Add multi-threaded base2 exponential histogram benchmarks
   [#4319](https://github.com/open-telemetry/opentelemetry-cpp/pull/4319)
 
