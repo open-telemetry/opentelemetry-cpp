@@ -5,7 +5,6 @@
 
 #include <cctype>
 #include <chrono>
-#include <cstdint>
 #include <ctime>
 #include <iomanip>
 #include <limits>
