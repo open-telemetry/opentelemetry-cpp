@@ -348,18 +348,18 @@ TEST(ComposableSampler, PreservesOtherSubkeysAndIgnoresInvalidValues)
   EXPECT_NE(std::string::npos, ot.find("keep:me"));
 }
 
-TEST(ComposableSampler, DropsTrailingSubkeysOverSizeLimit)
+TEST(ComposableSampler, ThresholdOmittedOverSizeLimit)
 {
   auto sampler = CompositeSamplerFactory::Create(std::make_shared<ComposableAlwaysOnSampler>());
-  // Fits in 256 on input, but once th:0 is prepended the trailing subkey no
-  // longer fits and is dropped.
+  // Fits in 256 on input, but once th:0 is prepended the value no longer
+  // fits; the inherited subkeys must be preserved, so th is omitted.
   std::string parent_ot = "rv:ffffffffffffff;x:" + std::string(236, 'a');
   auto parent           = MakeParent(false, parent_ot);
   opentelemetry::sdk::trace::SamplingResult result;
   EXPECT_EQ(Decision::RECORD_AND_SAMPLE, Sample(*sampler, parent, MakeTraceId(0x00), &result));
   std::string ot = OtOf(result);
-  EXPECT_NE(std::string::npos, ot.find("th:0"));
-  EXPECT_EQ(std::string::npos, ot.find("x:aaa"));
+  EXPECT_EQ(std::string::npos, ot.find("th:"));
+  EXPECT_EQ(parent_ot, ot);
 }
 
 TEST(ComposableSampler, RatioClampedToValidRange)

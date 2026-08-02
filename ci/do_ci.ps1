@@ -432,6 +432,7 @@ switch ($action) {
       "api",
       "sdk",
       "ext_common",
+      "ext_http",
       "ext_http_curl",
       "exporters_in_memory",
       "exporters_ostream",
