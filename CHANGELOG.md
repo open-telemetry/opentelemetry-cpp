@@ -32,6 +32,9 @@ Increment the:
 * [CODE HEALTH] Move remaining API test helpers into anonymous namespaces
   [#4301](https://github.com/open-telemetry/opentelemetry-cpp/pull/4301)
 
+* [BUG] Wait on a completion state in the Elasticsearch exporter
+  [#4298](https://github.com/open-telemetry/opentelemetry-cpp/pull/4298)
+
 * [BUG] Stop embedded HTTP server writes from raising SIGPIPE
   [#4294](https://github.com/open-telemetry/opentelemetry-cpp/pull/4294)
 
@@ -81,6 +84,13 @@ Increment the:
 * [CODE HEALTH] Move SDK common and logs test helpers into anonymous
   namespaces
   [#4302](https://github.com/open-telemetry/opentelemetry-cpp/pull/4302)
+
+* [METRICS SDK] Fix histogram views being rejected when only
+  `aggregation_cardinality_limit` is set
+  [#4314](https://github.com/open-telemetry/opentelemetry-cpp/pull/4314)
+
+* [SDK] Implement the ProbabilitySampler
+  [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
 
 Breaking changes:
 
