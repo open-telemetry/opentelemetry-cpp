@@ -55,6 +55,17 @@ if("ext_common" IN_LIST OPENTELEMETRY_CPP_COMPONENTS_INSTALLED)
   get_target_property(OTEL_API_INCLUDE_DIRS opentelemetry-cpp::api
                       INTERFACE_INCLUDE_DIRECTORIES)
   list(GET OTEL_API_INCLUDE_DIRS 0 OTEL_INSTALLED_INCLUDE_DIR)
+
+  # A check whose only job is to fail loudly must not pass by looking in
+  # nowhere. An unset property yields <VAR>-NOTFOUND, which list(GET) returns
+  # happily and every EXISTS below would then answer false.
+  if(NOT IS_DIRECTORY "${OTEL_INSTALLED_INCLUDE_DIR}")
+    message(
+      FATAL_ERROR
+        "Cannot find the installed include directory to check, got '${OTEL_INSTALLED_INCLUDE_DIR}'"
+    )
+  endif()
+
   message(
     STATUS
       "Checking ${OTEL_INSTALLED_INCLUDE_DIR} for headers that must not ship")
