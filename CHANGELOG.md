@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Run the ext_http component install test on Windows
+  [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
+
 * [BENCHMARK] Add multi-threaded base2 exponential histogram benchmarks
   [#4319](https://github.com/open-telemetry/opentelemetry-cpp/pull/4319)
 
@@ -76,10 +79,17 @@ Increment the:
   namespaces
   [#4302](https://github.com/open-telemetry/opentelemetry-cpp/pull/4302)
 
+* [METRICS SDK] Fix histogram views being rejected when only
+  `aggregation_cardinality_limit` is set
+  [#4314](https://github.com/open-telemetry/opentelemetry-cpp/pull/4314)
+
+* [SDK] Implement the ProbabilitySampler
+  [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
+
 * [METRICS SDK] Support `OTEL_METRICS_EXEMPLAR_FILTER` when metrics exemplars
   are enabled. The default exemplar filter changes from `always_off` to
   `trace_based` to match the specification.
-  [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328)
+  [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328
 
 Breaking changes:
 
@@ -89,7 +99,6 @@ Breaking changes:
   and SDK ABI change. Applications using the preview exemplar feature must be
   rebuilt.
   [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328)
-
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
