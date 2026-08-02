@@ -173,7 +173,10 @@
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off_factory.h"
 #include "opentelemetry/sdk/trace/samplers/always_on_factory.h"
+#include "opentelemetry/sdk/trace/samplers/composable_probability.h"
+#include "opentelemetry/sdk/trace/samplers/composite_sampler_factory.h"
 #include "opentelemetry/sdk/trace/samplers/parent_factory.h"
+#include "opentelemetry/sdk/trace/samplers/probability_factory.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
@@ -460,6 +463,12 @@ public:
     sampler = sdk_builder_->CreateParentBasedSampler(model);
   }
 
+  void VisitProbability(
+      const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model) override
+  {
+    sampler = sdk_builder_->CreateProbabilitySampler(model);
+  }
+
   void VisitTraceIdRatioBased(
       const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model)
       override
@@ -491,7 +500,8 @@ public:
       const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
       override
   {
-    sampler = opentelemetry::sdk::trace::TraceIdRatioBasedSamplerFactory::Create(model->ratio);
+    sampler = opentelemetry::sdk::trace::CompositeSamplerFactory::Create(
+        std::make_shared<opentelemetry::sdk::trace::ComposableProbabilitySampler>(model->ratio));
   }
 
   void VisitComposableParentThreshold(
@@ -951,6 +961,16 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateParentBase
   sdk = opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create(
       shared_root, shared_remote_parent_sampled, shared_remote_parent_not_sampled,
       shared_local_parent_sampled, shared_local_parent_not_sampled);
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateProbabilitySampler(
+    const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> sdk;
+
+  sdk = opentelemetry::sdk::trace::ProbabilitySamplerFactory::Create(model->ratio);
 
   return sdk;
 }

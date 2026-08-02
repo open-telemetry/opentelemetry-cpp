@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Add the probability sampler to file configuration
+  [#4334](https://github.com/open-telemetry/opentelemetry-cpp/pull/4334)
+
 * [BUILD] Run the ext_http component install test on Windows
   [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
 
