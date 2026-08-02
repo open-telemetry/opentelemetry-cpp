@@ -920,21 +920,29 @@ TEST(BoundSyncInstruments, NoopBoundCompilesAndNoOps)
   ASSERT_NE(bound, nullptr);
   bound->Add(1);
   bound->Add(42);
+  ASSERT_NE(counter.Bind(attrs), nullptr);
+  ASSERT_NE(counter.Bind({{"k", "v"}}), nullptr);
 
   opentelemetry::metrics::NoopHistogram<double> hist("name", "", "");
   auto hb = hist.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(hb, nullptr);
   hb->Record(3.14);
+  ASSERT_NE(hist.Bind(attrs), nullptr);
+  ASSERT_NE(hist.Bind({{"k", "v"}}), nullptr);
 
   opentelemetry::metrics::NoopUpDownCounter<int64_t> updown("name", "", "");
   auto ub = updown.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(ub, nullptr);
   ub->Add(-42);
+  ASSERT_NE(updown.Bind(attrs), nullptr);
+  ASSERT_NE(updown.Bind({{"k", "v"}}), nullptr);
 
   opentelemetry::metrics::NoopGauge<double> gauge("name", "", "");
   auto gb = gauge.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(gb, nullptr);
   gb->Record(-3.14);
+  ASSERT_NE(gauge.Bind(attrs), nullptr);
+  ASSERT_NE(gauge.Bind({{"k", "v"}}), nullptr);
 }
 
 // Bonus: SyncMultiMetricStorage::Bind fans out to children.

@@ -64,6 +64,8 @@ public:
            const context::Context & /* context */) noexcept override
   {}
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  using Counter<T>::Bind;
+
   nostd::unique_ptr<BoundCounter<T>> Bind(
       const common::KeyValueIterable & /* attributes */) noexcept override
   {
@@ -94,6 +96,8 @@ public:
 #endif
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  using Histogram<T>::Bind;
+
   nostd::unique_ptr<BoundHistogram<T>> Bind(
       const common::KeyValueIterable & /* attributes */) noexcept override
   {
@@ -118,6 +122,8 @@ public:
            const context::Context & /* context */) noexcept override
   {}
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  using UpDownCounter<T>::Bind;
+
   nostd::unique_ptr<BoundUpDownCounter<T>> Bind(
       const common::KeyValueIterable & /* attributes */) noexcept override
   {
@@ -143,6 +149,8 @@ public:
               const context::Context & /* context */) noexcept override
   {}
 #  ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  using Gauge<T>::Bind;
+
   nostd::unique_ptr<BoundGauge<T>> Bind(
       const common::KeyValueIterable & /* attributes */) noexcept override
   {
