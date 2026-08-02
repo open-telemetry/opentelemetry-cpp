@@ -17,6 +17,11 @@ target_link_libraries(opentelemetry_ext INTERFACE opentelemetry_api)
 # http_client_factory.h alone. server/http_server.h and server/socket_tools.h
 # are the embedded server used by tests and the http example.
 #
+# The two directory excludes are what keeps client/detail and server out of the
+# install tree entirely: install(DIRECTORY) creates a destination directory for
+# every source directory it walks, so filtering on file names alone would leave
+# both behind, empty.
+#
 # TODO: the embedded server headers do not belong beside the user facing ones
 # under ext/include. Move them to an internal location such as test_common, see
 # #4332.
@@ -37,7 +42,13 @@ otel_add_component(
   PATTERN
   "http_client_factory_curl.h"
   PATTERN
-  "url_parser.h")
+  "url_parser.h"
+  PATTERN
+  "detail"
+  EXCLUDE
+  PATTERN
+  "server"
+  EXCLUDE)
 
 add_subdirectory(src)
 

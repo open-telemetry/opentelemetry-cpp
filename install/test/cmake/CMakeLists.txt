@@ -90,6 +90,25 @@ if("ext_common" IN_LIST OPENTELEMETRY_CPP_COMPONENTS_INSTALLED)
         "The ext_common component installed headers it is meant to leave out: ${OTEL_UNEXPECTED_HEADERS}"
     )
   endif()
+
+  # Excluding only file names would still create these two directories, empty,
+  # because install(DIRECTORY) walks the source tree before it filters.
+  set(OTEL_EXT_DIRS_NOT_INSTALLED "opentelemetry/ext/http/client/detail"
+                                  "opentelemetry/ext/http/server")
+
+  set(OTEL_UNEXPECTED_DIRS "")
+  foreach(dir ${OTEL_EXT_DIRS_NOT_INSTALLED})
+    if(IS_DIRECTORY "${OTEL_INSTALLED_INCLUDE_DIR}/${dir}")
+      list(APPEND OTEL_UNEXPECTED_DIRS ${dir})
+    endif()
+  endforeach()
+
+  if(OTEL_UNEXPECTED_DIRS)
+    message(
+      FATAL_ERROR
+        "The ext_common component left directories behind in the install tree: ${OTEL_UNEXPECTED_DIRS}"
+    )
+  endif()
 endif()
 
 set(INSTALL_TEST_SRC_DIR "${CMAKE_SOURCE_DIR}/../src")
