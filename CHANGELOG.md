@@ -35,10 +35,6 @@ Increment the:
 * [BUG] Wait on a completion state in the Elasticsearch exporter
   [#4298](https://github.com/open-telemetry/opentelemetry-cpp/pull/4298)
 
-* [BUG] Fix transient would-block send/recv handling in the ext/http embedded
-  server
-  [#4283](https://github.com/open-telemetry/opentelemetry-cpp/pull/4283)
-
 * [BUG] Make SocketAddr string parsing safe and reject malformed addresses
   [#4292](https://github.com/open-telemetry/opentelemetry-cpp/pull/4292)
 
@@ -47,6 +43,10 @@ Increment the:
 
 * [CODE HEALTH] Move metrics storage test fixtures into anonymous namespace
   [#4286](https://github.com/open-telemetry/opentelemetry-cpp/pull/4286)
+
+* [BUG] Fix transient would-block send/recv handling in the ext/http embedded
+  server
+  [#4283](https://github.com/open-telemetry/opentelemetry-cpp/pull/4283)
 
 * [CODE HEALTH] Fix more clang tidy warnings (member initialization)
   [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
