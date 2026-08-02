@@ -420,8 +420,10 @@ struct Socket
       if (::setsockopt(m_sock, SOL_SOCKET, SO_NOSIGPIPE, reinterpret_cast<char *>(&value),
                        sizeof(value)) != 0)
       {
-        // Best effort: MSG_NOSIGNAL already guards send() wherever it is defined, so a failure here
-        // is logged where a logger is configured rather than failing the socket.
+        // Best effort. On the platforms that offer SO_NOSIGPIPE, macOS chief among them,
+        // MSG_NOSIGNAL is not defined, so this option is the only mechanism and a failure here
+        // leaves writes unprotected. It is logged where a logger is configured rather than
+        // failing the socket, since the caller asked for a socket and not for this guarantee.
         // This wrapper does not own the descriptor's lifetime and does not promise to protect a
         // platform whose only defence would be SO_NOSIGPIPE.
         const int saved_errno = errno;  // capture before LOG_WARN, which may clobber errno

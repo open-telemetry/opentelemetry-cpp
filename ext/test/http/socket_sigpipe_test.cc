@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <string>
 
 #include "opentelemetry/ext/http/server/socket_tools.h"
 
