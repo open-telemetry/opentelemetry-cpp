@@ -52,6 +52,15 @@ public:
 
   AggregationType GetType() const noexcept override { return AggregationType::kHistogram; }
 
+  // The SDK-specified default bucket boundaries, used when no boundaries are configured.
+  static const std::vector<double> &DefaultBoundaries()
+  {
+    static const std::vector<double> boundaries = {0.0,    5.0,    10.0,   25.0,   50.0,
+                                                   75.0,   100.0,  250.0,  500.0,  750.0,
+                                                   1000.0, 2500.0, 5000.0, 7500.0, 10000.0};
+    return boundaries;
+  }
+
   std::vector<double> boundaries_;
   bool record_min_max_ = true;
 };
