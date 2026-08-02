@@ -16,8 +16,9 @@ Increment the:
 ## [Unreleased]
 
 * [BUILD] Install an explicit list of ext headers instead of the whole
-  directory. The curl client and curl operation implementation headers and
-  the internal default factory header are no longer installed
+  directory. The curl client and curl operation implementation headers, the
+  internal default factory header, and the embedded HTTP server headers
+  (`http_server.h` and `socket_tools.h`) are no longer installed
   [#4327](https://github.com/open-telemetry/opentelemetry-cpp/pull/4327)
 
 * [BUILD] Run the ext_http component install test on Windows

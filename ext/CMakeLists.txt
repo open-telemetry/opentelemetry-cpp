@@ -10,25 +10,16 @@ target_include_directories(
 set_target_properties(opentelemetry_ext PROPERTIES EXPORT_NAME "ext")
 target_link_libraries(opentelemetry_ext INTERFACE opentelemetry_api)
 
-# The embedded HTTP server headers (socket_tools.h) call Winsock, so declare the
-# dependency on the interface target. MSVC also autolinks via #pragma
-# comment(lib), but MinGW/GCC ignore that, so consumers there would otherwise
-# fail to resolve inet_pton/WSAStartup.
-if(WIN32)
-  target_link_libraries(opentelemetry_ext INTERFACE ws2_32)
-endif()
-
-# The patterns below are the manifest of headers this component installs. They
-# replace a "*.h" glob over include/opentelemetry/ext, so a header reaches the
-# package only when it is named here, and one that exists for the build tree
-# alone stays out of it.
-#
-# Three headers the glob used to install are deliberately absent.
 # client/detail/default_factory.h is an internal helper included by exporter
 # sources rather than by any public header. client/curl/http_client_curl.h and
-# client/curl/http_operation_curl.h are the curl implementation, and a consumer
-# creates a curl client through http_client_factory_curl.h, which depends on the
-# abstract http_client_factory.h alone.
+# client/curl/http_operation_curl.h are the curl implementation, reached through
+# http_client_factory_curl.h, which depends on the abstract
+# http_client_factory.h alone. server/http_server.h and server/socket_tools.h
+# are the embedded server used by tests and the http example.
+#
+# TODO: the embedded server headers do not belong beside the user facing ones
+# under ext/include. Move them to an internal location such as test_common, see
+# #4332.
 otel_add_component(
   COMPONENT
   ext_common
@@ -46,11 +37,7 @@ otel_add_component(
   PATTERN
   "http_client_factory_curl.h"
   PATTERN
-  "url_parser.h"
-  PATTERN
-  "http_server.h"
-  PATTERN
-  "socket_tools.h")
+  "url_parser.h")
 
 add_subdirectory(src)
 
