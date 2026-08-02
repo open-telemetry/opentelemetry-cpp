@@ -86,6 +86,9 @@ Increment the:
   `aggregation_cardinality_limit` is set
   [#4314](https://github.com/open-telemetry/opentelemetry-cpp/pull/4314)
 
+* [SDK] Implement the ProbabilitySampler
+  [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
+
 Breaking changes:
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
