@@ -89,7 +89,7 @@ Increment the:
 * [METRICS SDK] Support `OTEL_METRICS_EXEMPLAR_FILTER` when metrics exemplars
   are enabled. The default exemplar filter changes from `always_off` to
   `trace_based` to match the specification.
-  [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328
+  [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328)
 
 Breaking changes:
 

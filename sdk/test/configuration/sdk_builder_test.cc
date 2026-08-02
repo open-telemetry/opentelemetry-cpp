@@ -7,7 +7,6 @@
 #  include <cstdlib>
 #endif
 
-
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -63,8 +62,8 @@
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/configuration/exemplar_filter.h"
 #  include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
-#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 #  include "opentelemetry/sdk/metrics/meter_provider.h"
+#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 
 #  if defined(_MSC_VER)
 #    include "opentelemetry/sdk/common/env_variables.h"
