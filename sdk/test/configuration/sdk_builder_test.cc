@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <utility>
@@ -16,6 +17,7 @@
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
@@ -30,11 +32,23 @@
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/view_configuration.h"
+#include "opentelemetry/sdk/configuration/view_selector_configuration.h"
+#include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 
+#include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
@@ -259,4 +273,111 @@ TEST(SdkBuilder, CreatePeriodicMetricReader)
   EXPECT_EQ(captured->interval, model.interval);
   EXPECT_EQ(captured->timeout, model.timeout);
   EXPECT_TRUE(captured->exporter != nullptr);
+}
+
+namespace
+{
+
+// Builds a ViewConfiguration selecting the given instrument type, with only
+// aggregation_cardinality_limit set on the stream (no explicit `aggregation` block).
+std::unique_ptr<config_sdk::ViewConfiguration> MakeCardinalityOnlyViewConfig(
+    config_sdk::InstrumentType instrument_type,
+    std::size_t cardinality_limit)
+{
+  auto model                       = std::make_unique<config_sdk::ViewConfiguration>();
+  model->selector                  = std::make_unique<config_sdk::ViewSelectorConfiguration>();
+  model->selector->instrument_type = instrument_type;
+
+  model->stream = std::make_unique<config_sdk::ViewStreamConfiguration>();
+  model->stream->aggregation_cardinality_limit = cardinality_limit;
+
+  return model;
+}
+
+}  // namespace
+
+TEST(SdkBuilder, AddViewHistogramCardinalityLimitOnly)
+{
+  namespace metrics_sdk = opentelemetry::sdk::metrics;
+
+  auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::histogram, 42);
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  config_sdk::SdkBuilder builder(registry);
+
+  metrics_sdk::ViewRegistry view_registry;
+  builder.AddView(&view_registry, model);
+
+  metrics_sdk::InstrumentDescriptor instrument_descriptor{
+      "", "", "", metrics_sdk::InstrumentType::kHistogram, metrics_sdk::InstrumentValueType::kLong};
+  auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
+
+  int matched = 0;
+  view_registry.FindViews(
+      instrument_descriptor, *instrumentation_scope, [&](const metrics_sdk::View &view) {
+        matched++;
+        // The view must not be rejected: it should carry a
+        // HistogramAggregationConfig (not a plain AggregationConfig), since
+        // the instrument's default aggregation for kHistogram is kHistogram.
+        auto *aggregation_config = view.GetAggregationConfig();
+        EXPECT_NE(aggregation_config, nullptr);
+        if (aggregation_config)
+        {
+          EXPECT_EQ(aggregation_config->GetType(), metrics_sdk::AggregationType::kHistogram);
+          EXPECT_EQ(aggregation_config->cardinality_limit_, 42u);
+
+          // Pin what users actually receive: building the aggregation from this config
+          // must keep the SDK's default bucket boundaries, not silently collapse to a
+          // single bucket. A default-constructed HistogramAggregationConfig has empty
+          // boundaries_, which the aggregation takes literally (as opposed to a null
+          // config pointer, which falls back to the default boundaries), so AddView()
+          // must populate boundaries_ explicitly.
+          auto aggregation = metrics_sdk::DefaultAggregation::CreateAggregation(
+              metrics_sdk::AggregationType::kHistogram, instrument_descriptor, aggregation_config);
+          EXPECT_NE(aggregation, nullptr);
+          if (aggregation)
+          {
+            auto histogram_data =
+                opentelemetry::nostd::get<metrics_sdk::HistogramPointData>(aggregation->ToPoint());
+            EXPECT_EQ(histogram_data.boundaries_.size(), 15u);
+            EXPECT_EQ(histogram_data.counts_.size(), 16u);
+          }
+        }
+        return true;
+      });
+
+  EXPECT_EQ(matched, 1);
+}
+
+TEST(SdkBuilder, AddViewCounterCardinalityLimitOnly)
+{
+  namespace metrics_sdk = opentelemetry::sdk::metrics;
+
+  auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::counter, 7);
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  config_sdk::SdkBuilder builder(registry);
+
+  metrics_sdk::ViewRegistry view_registry;
+  builder.AddView(&view_registry, model);
+
+  metrics_sdk::InstrumentDescriptor instrument_descriptor{
+      "", "", "", metrics_sdk::InstrumentType::kCounter, metrics_sdk::InstrumentValueType::kLong};
+  auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
+
+  int matched = 0;
+  view_registry.FindViews(
+      instrument_descriptor, *instrumentation_scope, [&](const metrics_sdk::View &view) {
+        matched++;
+        auto *aggregation_config = view.GetAggregationConfig();
+        EXPECT_NE(aggregation_config, nullptr);
+        if (aggregation_config)
+        {
+          EXPECT_EQ(aggregation_config->GetType(), metrics_sdk::AggregationType::kDefault);
+          EXPECT_EQ(aggregation_config->cardinality_limit_, 7u);
+        }
+        return true;
+      });
+
+  EXPECT_EQ(matched, 1);
 }
