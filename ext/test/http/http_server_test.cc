@@ -193,3 +193,17 @@ TEST(HttpServer100ContinueTest, CompletedInterimResponseRestoresReadInterest)
 }  // namespace
 
 #endif  // _WIN32
+
+// The cases above drive POSIX socketpairs, so the Windows build of this target would otherwise
+// contain no tests at all and pass vacuously. This one is declared on every platform to keep the
+// binary non-empty and to give gtest_add_tests, which scans the source, a case the binary
+// contains everywhere.
+TEST(HttpServerNonBlockingIo, NotApplicableOnWindows)
+{
+#ifdef _WIN32
+  GTEST_SKIP() << "the would-block paths are driven with a POSIX socketpair";
+#else
+  GTEST_SKIP() << "covered by the HttpServerSendMoreTest, HttpServerReadableTest and "
+                  "HttpServer100ContinueTest cases above";
+#endif
+}
