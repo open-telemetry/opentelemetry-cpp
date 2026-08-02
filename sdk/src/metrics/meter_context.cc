@@ -40,14 +40,23 @@ namespace sdk
 namespace metrics
 {
 
-MeterContext::MeterContext(std::unique_ptr<ViewRegistry> views,
-                           const opentelemetry::sdk::resource::Resource &resource,
-                           std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>
-                               meter_configurator) noexcept
+MeterContext::MeterContext(
+    std::unique_ptr<ViewRegistry> views,
+    const opentelemetry::sdk::resource::Resource &resource,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>> meter_configurator
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+    ,
+    ExemplarFilterType exemplar_filter_type
+#endif
+    ) noexcept
     : resource_{resource},
       views_(std::move(views)),
       sdk_start_ts_{std::chrono::system_clock::now()},
       meter_configurator_(std::move(meter_configurator))
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ,
+      exemplar_filter_type_(exemplar_filter_type)
+#endif
 {}
 
 const resource::Resource &MeterContext::GetResource() const noexcept

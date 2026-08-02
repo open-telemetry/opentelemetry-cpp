@@ -68,7 +68,12 @@ public:
       std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>> meter_configurator =
           std::make_unique<instrumentationscope::ScopeConfigurator<MeterConfig>>(
               instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(MeterConfig::Default())
-                  .Build())) noexcept;
+                  .Build())
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+          ,
+      ExemplarFilterType exemplar_filter_type = ExemplarFilterType::kTraceBased
+#endif
+      ) noexcept;
 
   /**
    * Obtain the resource associated with this meter context.
@@ -185,7 +190,7 @@ private:
   std::vector<std::shared_ptr<Meter>> meters_;
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-  metrics::ExemplarFilterType exemplar_filter_type_ = metrics::ExemplarFilterType::kAlwaysOff;
+  metrics::ExemplarFilterType exemplar_filter_type_ = metrics::ExemplarFilterType::kTraceBased;
 #endif
 
 #if defined(__cpp_lib_atomic_value_initialization) && \

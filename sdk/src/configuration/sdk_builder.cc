@@ -1810,17 +1810,38 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
     AddView(view_registry.get(), view_configuration);
   }
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+  auto sdk_exemplar_filter = ConvertExemplarFilter(model->exemplar_filter);
+#endif
+
   std::unique_ptr<opentelemetry::sdk::metrics::MeterContext> meter_context;
   if (model->meter_configurator)
   {
     auto meter_configurator = CreateMeterConfigurator(model->meter_configurator);
-    meter_context           = opentelemetry::sdk::metrics::MeterContextFactory::Create(
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+    meter_context = opentelemetry::sdk::metrics::MeterContextFactory::Create(
+        std::move(view_registry), resource, std::move(meter_configurator), sdk_exemplar_filter);
+#else
+    meter_context = opentelemetry::sdk::metrics::MeterContextFactory::Create(
         std::move(view_registry), resource, std::move(meter_configurator));
+#endif
   }
   else
   {
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+    auto meter_configurator =
+        std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+            opentelemetry::sdk::metrics::MeterConfig>>(
+            opentelemetry::sdk::instrumentationscope::
+                ScopeConfigurator<opentelemetry::sdk::metrics::MeterConfig>::Builder(
+                    opentelemetry::sdk::metrics::MeterConfig::Default())
+                    .Build());
+    meter_context = opentelemetry::sdk::metrics::MeterContextFactory::Create(
+        std::move(view_registry), resource, std::move(meter_configurator), sdk_exemplar_filter);
+#else
     meter_context = opentelemetry::sdk::metrics::MeterContextFactory::Create(
         std::move(view_registry), resource);
+#endif
   }
 
   for (const auto &reader_configuration : model->readers)
@@ -1830,10 +1851,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMe
     meter_context->AddMetricReader(metric_reader);
   }
 
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-  auto sdk_exemplar_filter = ConvertExemplarFilter(model->exemplar_filter);
-  meter_context->SetExemplarFilter(sdk_exemplar_filter);
-#else
+#ifndef ENABLE_METRICS_EXEMPLAR_PREVIEW
   /* Do not spam with warnings if disabled anyway. */
   if (model->exemplar_filter != ExemplarFilter::always_off)
   {
