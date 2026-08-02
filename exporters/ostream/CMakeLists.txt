@@ -155,29 +155,10 @@ list(APPEND OPENTELEMETRY_OSTREAM_BUILDER_TARGETS
 otel_add_component(
   COMPONENT
   exporters_ostream
-  TARGETS
-  ${OPENTELEMETRY_OSTREAM_TARGETS}
-  FILES_DIRECTORY
-  "include/opentelemetry/exporters/ostream"
-  FILES_DESTINATION
-  "include/opentelemetry/exporters"
-  FILES_MATCHING
-  PATTERN
-  "*.h"
-  PATTERN
-  "console_log_record_builder.h"
-  EXCLUDE
-  PATTERN
-  "console_push_metric_builder.h"
-  EXCLUDE
-  PATTERN
-  "console_span_builder.h"
-  EXCLUDE)
-
-otel_add_component(
-  COMPONENT
+  DEPRECATED_NAMES
   exporters_ostream_builder
   TARGETS
+  ${OPENTELEMETRY_OSTREAM_TARGETS}
   ${OPENTELEMETRY_OSTREAM_BUILDER_TARGETS}
   FILES_DIRECTORY
   "include/opentelemetry/exporters/ostream"
@@ -185,11 +166,7 @@ otel_add_component(
   "include/opentelemetry/exporters"
   FILES_MATCHING
   PATTERN
-  "console_log_record_builder.h"
-  PATTERN
-  "console_push_metric_builder.h"
-  PATTERN
-  "console_span_builder.h")
+  "*.h")
 
 if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(

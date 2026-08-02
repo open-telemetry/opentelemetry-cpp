@@ -708,9 +708,12 @@ target_link_libraries(
 otel_add_component(
   COMPONENT
   exporters_otlp_common
+  DEPRECATED_NAMES
+  exporters_otlp_builder_utils
   TARGETS
   opentelemetry_otlp_recordable
   opentelemetry_proto
+  opentelemetry_exporter_otlp_builder_utils
   FILES_DIRECTORY
   "include/opentelemetry/exporters/otlp"
   FILES_DESTINATION
@@ -718,9 +721,6 @@ otel_add_component(
   FILES_MATCHING
   PATTERN
   "*.h"
-  PATTERN
-  "otlp_builder_utils*.h"
-  EXCLUDE
   PATTERN
   "otlp_http*.h"
   EXCLUDE
@@ -731,46 +731,14 @@ otel_add_component(
   "otlp_file*.h"
   EXCLUDE)
 
-otel_add_component(
-  COMPONENT
-  exporter_otlp_builder_utils
-  TARGETS
-  opentelemetry_exporter_otlp_builder_utils
-  FILES_DIRECTORY
-  "include/opentelemetry/exporters/otlp"
-  FILES_DESTINATION
-  "include/opentelemetry/exporters"
-  FILES_MATCHING
-  PATTERN
-  "otlp_builder_utils.h")
-
 if(WITH_OTLP_GRPC)
   otel_add_component(
     COMPONENT
     exporters_otlp_grpc
-    TARGETS
-    ${OPENTELEMETRY_OTLP_GRPC_TARGETS}
-    FILES_DIRECTORY
-    "include/opentelemetry/exporters/otlp"
-    FILES_DESTINATION
-    "include/opentelemetry/exporters"
-    FILES_MATCHING
-    PATTERN
-    "otlp_grpc*.h"
-    PATTERN
-    "otlp_grpc_span_builder.h"
-    EXCLUDE
-    PATTERN
-    "otlp_grpc_log_record_builder.h"
-    EXCLUDE
-    PATTERN
-    "otlp_grpc_push_metric_builder.h"
-    EXCLUDE)
-
-  otel_add_component(
-    COMPONENT
+    DEPRECATED_NAMES
     exporters_otlp_grpc_builder
     TARGETS
+    ${OPENTELEMETRY_OTLP_GRPC_TARGETS}
     ${OPENTELEMETRY_OTLP_GRPC_BUILDER_TARGETS}
     FILES_DIRECTORY
     "include/opentelemetry/exporters/otlp"
@@ -778,11 +746,7 @@ if(WITH_OTLP_GRPC)
     "include/opentelemetry/exporters"
     FILES_MATCHING
     PATTERN
-    "otlp_grpc_span_builder.h"
-    PATTERN
-    "otlp_grpc_log_record_builder.h"
-    PATTERN
-    "otlp_grpc_push_metric_builder.h")
+    "otlp_grpc*.h")
 
 endif()
 
@@ -790,29 +754,10 @@ if(WITH_OTLP_HTTP)
   otel_add_component(
     COMPONENT
     exporters_otlp_http
-    TARGETS
-    ${OPENTELEMETRY_OTLP_HTTP_TARGETS}
-    FILES_DIRECTORY
-    "include/opentelemetry/exporters/otlp"
-    FILES_DESTINATION
-    "include/opentelemetry/exporters"
-    FILES_MATCHING
-    PATTERN
-    "otlp_http*.h"
-    PATTERN
-    "otlp_http_span_builder.h"
-    EXCLUDE
-    PATTERN
-    "otlp_http_log_record_builder.h"
-    EXCLUDE
-    PATTERN
-    "otlp_http_push_metric_builder.h"
-    EXCLUDE)
-
-  otel_add_component(
-    COMPONENT
+    DEPRECATED_NAMES
     exporters_otlp_http_builder
     TARGETS
+    ${OPENTELEMETRY_OTLP_HTTP_TARGETS}
     ${OPENTELEMETRY_OTLP_HTTP_BUILDER_TARGETS}
     FILES_DIRECTORY
     "include/opentelemetry/exporters/otlp"
@@ -820,11 +765,7 @@ if(WITH_OTLP_HTTP)
     "include/opentelemetry/exporters"
     FILES_MATCHING
     PATTERN
-    "otlp_http_span_builder.h"
-    PATTERN
-    "otlp_http_log_record_builder.h"
-    PATTERN
-    "otlp_http_push_metric_builder.h")
+    "otlp_http*.h")
 
 endif()
 
@@ -832,29 +773,10 @@ if(WITH_OTLP_FILE)
   otel_add_component(
     COMPONENT
     exporters_otlp_file
-    TARGETS
-    ${OPENTELEMETRY_OTLP_FILE_TARGETS}
-    FILES_DIRECTORY
-    "include/opentelemetry/exporters/otlp"
-    FILES_DESTINATION
-    "include/opentelemetry/exporters"
-    FILES_MATCHING
-    PATTERN
-    "otlp_file*.h"
-    PATTERN
-    "otlp_file_span_builder.h"
-    EXCLUDE
-    PATTERN
-    "otlp_file_log_record_builder.h"
-    EXCLUDE
-    PATTERN
-    "otlp_file_push_metric_builder.h"
-    EXCLUDE)
-
-  otel_add_component(
-    COMPONENT
+    DEPRECATED_NAMES
     exporters_otlp_file_builder
     TARGETS
+    ${OPENTELEMETRY_OTLP_FILE_TARGETS}
     ${OPENTELEMETRY_OTLP_FILE_BUILDER_TARGETS}
     FILES_DIRECTORY
     "include/opentelemetry/exporters/otlp"
@@ -862,11 +784,7 @@ if(WITH_OTLP_FILE)
     "include/opentelemetry/exporters"
     FILES_MATCHING
     PATTERN
-    "otlp_file_span_builder.h"
-    PATTERN
-    "otlp_file_log_record_builder.h"
-    PATTERN
-    "otlp_file_push_metric_builder.h")
+    "otlp_file*.h")
 
 endif()
 
