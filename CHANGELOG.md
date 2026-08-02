@@ -15,12 +15,6 @@ Increment the:
 
 ## [Unreleased]
 
-* [BUILD] Install an explicit list of ext headers instead of the whole
-  directory. The curl client and curl operation implementation headers, the
-  internal default factory header, and the embedded HTTP server headers
-  (`http_server.h` and `socket_tools.h`) are no longer installed
-  [#4327](https://github.com/open-telemetry/opentelemetry-cpp/pull/4327)
-
 * [BUILD] Run the ext_http component install test on Windows
   [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
 
@@ -96,6 +90,23 @@ Increment the:
   [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
 
 Breaking changes:
+
+* [BUILD] Install an explicit list of ext headers instead of the whole
+  directory
+  [#4327](https://github.com/open-telemetry/opentelemetry-cpp/pull/4327)
+  * The `ext_common` component installed `include/opentelemetry/ext` with a
+    `*.h` glob. It now installs a named list, and these five headers are no
+    longer part of the package:
+    * `opentelemetry/ext/http/client/curl/http_client_curl.h`
+    * `opentelemetry/ext/http/client/curl/http_operation_curl.h`
+    * `opentelemetry/ext/http/client/detail/default_factory.h`
+    * `opentelemetry/ext/http/server/http_server.h`
+    * `opentelemetry/ext/http/server/socket_tools.h`
+  * Code that included any of them from an installed package will no longer
+    compile. A curl client is created through `http_client_factory_curl.h`,
+    which needs only the abstract `http_client_factory.h`. The two server
+    headers are an embedded test server; moving them out of `ext` is tracked
+    in #4332.
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
