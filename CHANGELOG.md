@@ -89,6 +89,9 @@ Increment the:
 * [SDK] Implement the ProbabilitySampler
   [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
 
+* [CONFIGURATION] file configuration - yaml schema 1.1.0
+  [#4340](https://github.com/open-telemetry/opentelemetry-cpp/pull/4340)
+
 Breaking changes:
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
