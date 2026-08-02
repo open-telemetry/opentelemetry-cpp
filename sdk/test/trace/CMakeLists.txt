@@ -11,6 +11,7 @@ foreach(
   always_off_sampler_test
   always_on_sampler_test
   parent_sampler_test
+  probability_sampler_test
   trace_id_ratio_sampler_test
   composable_sampler_test
   batch_span_processor_test

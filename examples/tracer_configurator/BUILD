@@ -4,7 +4,7 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
-    name = "example_explicit_parent",
+    name = "example_tracer_configurator",
     srcs = [
         "main.cc",
     ],

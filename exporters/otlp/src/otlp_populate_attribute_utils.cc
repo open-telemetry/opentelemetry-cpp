@@ -28,7 +28,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
-#include <google/protobuf/repeated_ptr_field.h>
+// IWYU pragma: no_include <google/protobuf/repeated_ptr_field.h>
 // IWYU pragma: no_include "net/proto2/public/repeated_field.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
