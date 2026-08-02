@@ -27,7 +27,7 @@ public:
   static constexpr const char *kDefaultHost       = "localhost";
   static constexpr std::size_t kDefaultPort       = 9464;
   static constexpr bool kDefaultScopeInfoEnabled  = true;
-  static constexpr bool kDefaultTargetInfoEnabled = false;
+  static constexpr bool kDefaultTargetInfoEnabled = true;
   static constexpr TranslationStrategy kDefaultTranslationStrategy =
       TranslationStrategy::UnderscoreEscapingWithSuffixes;
 
@@ -40,7 +40,7 @@ public:
   std::size_t port{kDefaultPort};
   bool scope_info_enabled{kDefaultScopeInfoEnabled};
   bool target_info_enabled{kDefaultTargetInfoEnabled};
-  std::unique_ptr<IncludeExcludeConfiguration> with_resource_constant_labels;
+  std::unique_ptr<IncludeExcludeConfiguration> resource_constant_labels;
   TranslationStrategy translation_strategy{kDefaultTranslationStrategy};
 };
 

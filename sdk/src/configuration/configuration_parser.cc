@@ -933,9 +933,9 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
   model->host = node->GetString("host", Config::kDefaultHost);
   model->port = node->GetInteger("port", Config::kDefaultPort);
 
-  // Properties renamed in schema 1.1.0
   if ((version_major_ == 1) && (version_minor_ >= 1))
   {
+    // Properties renamed in schema 1.1.0
     model->scope_info_enabled =
         node->GetBoolean("scope_info_enabled", Config::kDefaultScopeInfoEnabled);
     model->target_info_enabled =
@@ -944,11 +944,12 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
     child = node->GetChildNode("resource_constant_labels");
     if (child)
     {
-      model->with_resource_constant_labels = ParseIncludeExcludeConfiguration(child);
+      model->resource_constant_labels = ParseIncludeExcludeConfiguration(child);
     }
   }
   else
   {
+    // Old properties name in schema 1.0.0
     bool without_scope_info  = node->GetBoolean("without_scope_info", false);
     bool without_target_info = node->GetBoolean("without_target_info", false);
 
@@ -958,7 +959,7 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
     child = node->GetChildNode("with_resource_constant_labels");
     if (child)
     {
-      model->with_resource_constant_labels = ParseIncludeExcludeConfiguration(child);
+      model->resource_constant_labels = ParseIncludeExcludeConfiguration(child);
     }
   }
 

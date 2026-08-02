@@ -65,10 +65,10 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> PrometheusPullBuilder
       break;
   }
 
-  if (model->with_resource_constant_labels != nullptr)
+  if (model->resource_constant_labels != nullptr)
   {
-    // FIXME: with_resource_constant_labels
-    OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] with_resource_constant_labels not supported");
+    // FIXME: resource_constant_labels
+    OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] resource_constant_labels not supported");
   }
 
   return PrometheusExporterFactory::Create(options);
