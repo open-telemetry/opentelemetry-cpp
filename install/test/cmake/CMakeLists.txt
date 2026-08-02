@@ -46,6 +46,41 @@ endif()
 
 message(STATUS "INSTALL_TEST_COMPONENTS = ${INSTALL_TEST_COMPONENTS}")
 
+# The ext_common component installs a named list of headers rather than a glob
+# over include/opentelemetry/ext. Every other test here compiles against headers
+# that are present, so putting the glob back would leave them all passing. These
+# are the headers the component is meant to leave out, checked against the
+# prefix that was actually installed.
+if("ext_common" IN_LIST OPENTELEMETRY_CPP_COMPONENTS_INSTALLED)
+  get_target_property(OTEL_API_INCLUDE_DIRS opentelemetry-cpp::api
+                      INTERFACE_INCLUDE_DIRECTORIES)
+  list(GET OTEL_API_INCLUDE_DIRS 0 OTEL_INSTALLED_INCLUDE_DIR)
+  message(
+    STATUS
+      "Checking ${OTEL_INSTALLED_INCLUDE_DIR} for headers that must not ship")
+
+  set(OTEL_EXT_HEADERS_NOT_INSTALLED
+      "opentelemetry/ext/http/client/curl/http_client_curl.h"
+      "opentelemetry/ext/http/client/curl/http_operation_curl.h"
+      "opentelemetry/ext/http/client/detail/default_factory.h"
+      "opentelemetry/ext/http/server/http_server.h"
+      "opentelemetry/ext/http/server/socket_tools.h")
+
+  set(OTEL_UNEXPECTED_HEADERS "")
+  foreach(header ${OTEL_EXT_HEADERS_NOT_INSTALLED})
+    if(EXISTS "${OTEL_INSTALLED_INCLUDE_DIR}/${header}")
+      list(APPEND OTEL_UNEXPECTED_HEADERS ${header})
+    endif()
+  endforeach()
+
+  if(OTEL_UNEXPECTED_HEADERS)
+    message(
+      FATAL_ERROR
+        "The ext_common component installed headers it is meant to leave out: ${OTEL_UNEXPECTED_HEADERS}"
+    )
+  endif()
+endif()
+
 set(INSTALL_TEST_SRC_DIR "${CMAKE_SOURCE_DIR}/../src")
 
 enable_testing()
