@@ -79,6 +79,10 @@ Increment the:
   namespaces
   [#4302](https://github.com/open-telemetry/opentelemetry-cpp/pull/4302)
 
+* [METRICS SDK] Fix histogram views being rejected when only
+  `aggregation_cardinality_limit` is set
+  [#4314](https://github.com/open-telemetry/opentelemetry-cpp/pull/4314)
+
 Breaking changes:
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
