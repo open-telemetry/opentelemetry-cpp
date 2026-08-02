@@ -18,6 +18,9 @@ Increment the:
 * [METRICS] Extend preview bound instruments to UpDownCounter and Gauge
   [#4321](https://github.com/open-telemetry/opentelemetry-cpp/pull/4321)
 
+* [BUILD] Run the ext_http component install test on Windows
+  [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
+
 * [BENCHMARK] Add multi-threaded base2 exponential histogram benchmarks
   [#4319](https://github.com/open-telemetry/opentelemetry-cpp/pull/4319)
 
@@ -31,6 +34,9 @@ Increment the:
 
 * [CODE HEALTH] Move remaining API test helpers into anonymous namespaces
   [#4301](https://github.com/open-telemetry/opentelemetry-cpp/pull/4301)
+
+* [BUG] Wait on a completion state in the Elasticsearch exporter
+  [#4298](https://github.com/open-telemetry/opentelemetry-cpp/pull/4298)
 
 * [BUG] Make SocketAddr string parsing safe and reject malformed addresses
   [#4292](https://github.com/open-telemetry/opentelemetry-cpp/pull/4292)
@@ -78,6 +84,13 @@ Increment the:
 * [CODE HEALTH] Move SDK common and logs test helpers into anonymous
   namespaces
   [#4302](https://github.com/open-telemetry/opentelemetry-cpp/pull/4302)
+
+* [METRICS SDK] Fix histogram views being rejected when only
+  `aggregation_cardinality_limit` is set
+  [#4314](https://github.com/open-telemetry/opentelemetry-cpp/pull/4314)
+
+* [SDK] Implement the ProbabilitySampler
+  [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
 
 Breaking changes:
 
