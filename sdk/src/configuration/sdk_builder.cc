@@ -101,6 +101,7 @@
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
