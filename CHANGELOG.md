@@ -32,6 +32,9 @@ Increment the:
 * [CODE HEALTH] Move remaining API test helpers into anonymous namespaces
   [#4301](https://github.com/open-telemetry/opentelemetry-cpp/pull/4301)
 
+* [BUG] Wait on a completion state in the Elasticsearch exporter
+  [#4298](https://github.com/open-telemetry/opentelemetry-cpp/pull/4298)
+
 * [BUG] Make SocketAddr string parsing safe and reject malformed addresses
   [#4292](https://github.com/open-telemetry/opentelemetry-cpp/pull/4292)
 
