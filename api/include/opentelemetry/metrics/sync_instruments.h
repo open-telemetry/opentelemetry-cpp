@@ -31,9 +31,9 @@ public:
 };
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
-// Bound synchronous instrument support intentionally covers Counter and
-// Histogram only. UpDownCounter, Gauge, exemplar parity, and context-bearing
-// bound operations are follow-ups. This API is experimental and is gated
+// Bound synchronous instrument support covers Counter, UpDownCounter,
+// Histogram, and Gauge. Exemplar parity and context-bearing bound operations
+// are follow-ups. This API is experimental and is gated
 // behind both ABI v2 and ENABLE_METRICS_BOUND_INSTRUMENTS_PREVIEW
 // (see OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW in version.h).
 /**
@@ -56,7 +56,7 @@ public:
   virtual ~BoundCounter()                           = default;
 
   /**
-   * Record a value against the bound attribute set.
+   * Add a value against the bound attribute set.
    *
    * @param value The increment amount. MUST be non-negative.
    */
@@ -82,6 +82,52 @@ public:
    * Record a value against the bound attribute set.
    *
    * @param value The measurement value. MUST be non-negative.
+   */
+  virtual void Record(T value) noexcept = 0;
+};
+
+/**
+ * @since ABI_VERSION 2
+ * A bound up-down counter handle obtained via UpDownCounter<T>::Bind(...).
+ */
+template <class T>
+class BoundUpDownCounter
+{
+public:
+  BoundUpDownCounter()                                          = default;
+  BoundUpDownCounter(const BoundUpDownCounter &)                = delete;
+  BoundUpDownCounter(BoundUpDownCounter &&) noexcept            = delete;
+  BoundUpDownCounter &operator=(const BoundUpDownCounter &)     = delete;
+  BoundUpDownCounter &operator=(BoundUpDownCounter &&) noexcept = delete;
+  virtual ~BoundUpDownCounter()                                 = default;
+
+  /**
+   * Add a value against the bound attribute set.
+   *
+   * @param value The increment amount. May be positive, negative, or zero.
+   */
+  virtual void Add(T value) noexcept = 0;
+};
+
+/**
+ * @since ABI_VERSION 2
+ * A bound gauge handle obtained via Gauge<T>::Bind(...).
+ */
+template <class T>
+class BoundGauge
+{
+public:
+  BoundGauge()                                  = default;
+  BoundGauge(const BoundGauge &)                = delete;
+  BoundGauge(BoundGauge &&) noexcept            = delete;
+  BoundGauge &operator=(const BoundGauge &)     = delete;
+  BoundGauge &operator=(BoundGauge &&) noexcept = delete;
+  virtual ~BoundGauge()                         = default;
+
+  /**
+   * Record a value against the bound attribute set.
+   *
+   * @param value The measurement value. May be positive, negative, or zero.
    */
   virtual void Record(T value) noexcept = 0;
 };
@@ -365,6 +411,30 @@ public:
                   attributes.begin(), attributes.end()},
               context);
   }
+
+#ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  /**
+   * @since ABI_VERSION 2
+   * Returns a bound up-down counter handle for the given attribute set.
+   */
+  virtual nostd::unique_ptr<BoundUpDownCounter<T>> Bind(
+      const common::KeyValueIterable &attributes) noexcept = 0;
+
+  template <class U,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+  nostd::unique_ptr<BoundUpDownCounter<T>> Bind(const U &attributes) noexcept
+  {
+    return this->Bind(common::KeyValueIterableView<U>{attributes});
+  }
+
+  nostd::unique_ptr<BoundUpDownCounter<T>> Bind(
+      std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
+          attributes) noexcept
+  {
+    return this->Bind(nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+        attributes.begin(), attributes.end()});
+  }
+#endif
 };
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -441,6 +511,30 @@ public:
                      attributes.begin(), attributes.end()},
                  context);
   }
+
+#  ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+  /**
+   * @since ABI_VERSION 2
+   * Returns a bound gauge handle for the given attribute set.
+   */
+  virtual nostd::unique_ptr<BoundGauge<T>> Bind(
+      const common::KeyValueIterable &attributes) noexcept = 0;
+
+  template <class U,
+            nostd::enable_if_t<common::detail::is_key_value_iterable<U>::value> * = nullptr>
+  nostd::unique_ptr<BoundGauge<T>> Bind(const U &attributes) noexcept
+  {
+    return this->Bind(common::KeyValueIterableView<U>{attributes});
+  }
+
+  nostd::unique_ptr<BoundGauge<T>> Bind(
+      std::initializer_list<std::pair<nostd::string_view, common::AttributeValue>>
+          attributes) noexcept
+  {
+    return this->Bind(nostd::span<const std::pair<nostd::string_view, common::AttributeValue>>{
+        attributes.begin(), attributes.end()});
+  }
+#  endif
 };
 #endif
 
