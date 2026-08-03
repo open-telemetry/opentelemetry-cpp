@@ -41,6 +41,8 @@ namespace exporter
 {
 namespace logs
 {
+namespace
+{
 /**
  * This class handles the response message from the Elasticsearch request
  */
@@ -349,6 +351,7 @@ private:
   bool console_debug_ = false;
 };
 #endif
+}  // namespace
 
 ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter()
     : ElasticsearchLogRecordExporter(ElasticsearchExporterOptions())
