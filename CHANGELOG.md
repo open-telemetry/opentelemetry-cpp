@@ -35,6 +35,7 @@ Increment the:
 * [OTLP/HTTP] Honor `Retry-After` response header when retrying exports,
   supporting both delay-seconds and HTTP-date formats per RFC 7231 §7.1.3.
   [#4172](https://github.com/open-telemetry/opentelemetry-cpp/issues/4172)
+
 * [BUILD] Run the ext_http component install test on Windows
   [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
 
@@ -111,6 +112,9 @@ Increment the:
 
 * [SDK] Implement the ProbabilitySampler
   [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
+
+* [SDK] Downscale base2 exponential histogram buckets in place
+  [#4324](https://github.com/open-telemetry/opentelemetry-cpp/pull/4324)
 
 Breaking changes:
 
