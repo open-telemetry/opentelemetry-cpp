@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <cstddef>
-#include <cstdint>
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <initializer_list>  // IWYU pragma: keep
 #include <iostream>
 #include <string>

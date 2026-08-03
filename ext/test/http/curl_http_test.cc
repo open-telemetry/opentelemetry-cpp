@@ -13,10 +13,10 @@
 #  include <numeric>
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
-#include <cstring>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstring>
 #include <map>
 #include <memory>
 #include <mutex>

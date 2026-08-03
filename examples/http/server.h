@@ -5,8 +5,8 @@
 
 #include "opentelemetry/ext/http/server/http_server.h"
 
-#include <cstdint>
 #include <atomic>
+#include <cstdint>
 #include <string>
 
 namespace http_example

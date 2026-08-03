@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <cstddef>
 #include <algorithm>
+#include <cstddef>
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/context/context.h"

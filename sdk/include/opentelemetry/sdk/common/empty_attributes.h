@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <cstdint>
 #include <array>
+#include <cstdint>
 #include <string>
 #include <utility>
 

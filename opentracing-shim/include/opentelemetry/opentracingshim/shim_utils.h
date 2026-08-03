@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <cstdint>
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <initializer_list>
 #include <string>
 #include <utility>

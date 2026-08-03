@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <cctype>
 #include <algorithm>
+#include <cctype>
 #include <chrono>
 #include <map>
 #include <string>

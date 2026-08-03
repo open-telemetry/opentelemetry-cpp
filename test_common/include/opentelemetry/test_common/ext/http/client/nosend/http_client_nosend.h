@@ -4,9 +4,9 @@
 #pragma once
 
 #include <gmock/gmock.h>
-#include <cstdint>
 #include <chrono>
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
