@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <prometheus/metric_family.h>
-#include <stddef.h>
+#include <cstddef>
 #include <chrono>
 #include <string>
 #include <thread>

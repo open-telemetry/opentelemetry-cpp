@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <assert.h>
+#include <cassert>
 #include <gtest/gtest.h>
 #include <chrono>
 #include <cstdint>

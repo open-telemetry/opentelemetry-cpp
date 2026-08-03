@@ -4,8 +4,8 @@
 #include <grpc/support/port_platform.h>
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/support/status.h>
-#include <stdint.h>
-#include <stdlib.h>
+#include <cstdint>
+#include <cstdlib>
 #include <algorithm>
 #include <chrono>
 #include <functional>

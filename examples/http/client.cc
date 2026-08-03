@@ -20,7 +20,7 @@
 #include "opentelemetry/trace/tracer.h"
 #include "tracer_common.h"
 
-#include <stdint.h>
+#include <cstdint>
 #include <cstdlib>
 #include <map>
 #include <string>

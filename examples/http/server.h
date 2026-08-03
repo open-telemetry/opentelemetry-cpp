@@ -5,7 +5,7 @@
 
 #include "opentelemetry/ext/http/server/http_server.h"
 
-#include <stdint.h>
+#include <cstdint>
 #include <atomic>
 #include <string>
 

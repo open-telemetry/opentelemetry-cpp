@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <benchmark/benchmark.h>
-#include <stddef.h>
+#include <cstddef>
 #include <chrono>
 #include <functional>
 #include <initializer_list>

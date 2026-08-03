@@ -8,7 +8,7 @@
 #  include <array>
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
-#include <stdint.h>
+#include <cstdint>
 #include <algorithm>
 #include <atomic>
 #include <chrono>

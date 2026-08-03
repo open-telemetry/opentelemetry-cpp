@@ -7,7 +7,7 @@
 #include <grpcpp/resource_quota.h>
 #include <grpcpp/security/credentials.h>
 #include <grpcpp/support/channel_arguments.h>
-#include <stdint.h>
+#include <cstdint>
 #include <atomic>
 #include <chrono>
 #include <fstream>

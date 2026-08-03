@@ -3,7 +3,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include <limits.h>
+#include <climits>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>

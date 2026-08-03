@@ -4,7 +4,7 @@
 #pragma once
 
 #include <gmock/gmock.h>
-#include <stdint.h>
+#include <cstdint>
 #include <chrono>
 #include <cstddef>
 #include <memory>

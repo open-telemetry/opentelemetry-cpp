@@ -13,7 +13,7 @@
 #  include <numeric>
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
-#include <string.h>
+#include <cstring>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>

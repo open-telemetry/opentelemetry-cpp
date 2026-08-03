@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <algorithm>
 #include <cstddef>
 #include <initializer_list>

@@ -35,7 +35,7 @@
 #ifndef OTABSL_META_TYPE_TRAITS_H_
 #define OTABSL_META_TYPE_TRAITS_H_
 
-#include <stddef.h>
+#include <cstddef>
 #include <functional>
 #include <type_traits>
 

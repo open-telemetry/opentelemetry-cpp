@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <stddef.h>
+#include <cstddef>
 #include <algorithm>
 
 #include "opentelemetry/common/macros.h"

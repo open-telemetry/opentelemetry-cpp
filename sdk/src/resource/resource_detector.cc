@@ -8,7 +8,7 @@
 #include "opentelemetry/semconv/service_attributes.h"
 #include "opentelemetry/version.h"
 
-#include <stddef.h>
+#include <cstddef>
 #include <sstream>
 #include <string>
 
