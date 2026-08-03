@@ -5,9 +5,10 @@
 
 #if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
 #  include <cstdlib>
+#else
+#  include <cstddef>
 #endif
 
-#include <cstddef>
 #include <memory>
 #include <string>
 #include <utility>

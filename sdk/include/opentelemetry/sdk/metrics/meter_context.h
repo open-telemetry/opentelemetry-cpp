@@ -47,6 +47,20 @@ class Meter;
 class MetricReader;
 class MeterSelector;
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+namespace exemplar_filter_env
+{
+
+/**
+ * Returns the exemplar filter configured by OTEL_METRICS_EXEMPLAR_FILTER.
+ *
+ * Unset, empty, and invalid values return the specification default, trace_based.
+ */
+OPENTELEMETRY_EXPORT ExemplarFilterType GetExemplarFilterFromEnv();
+
+}  // namespace exemplar_filter_env
+#endif
+
 /**
  * A class which stores the MeterProvider context.
 
@@ -71,9 +85,9 @@ public:
                   .Build())
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
           ,
-      ExemplarFilterType exemplar_filter_type = ExemplarFilterType::kTraceBased
+      ExemplarFilterType exemplar_filter_type = exemplar_filter_env::GetExemplarFilterFromEnv()
 #endif
-      ) noexcept;
+          ) noexcept;
 
   /**
    * Obtain the resource associated with this meter context.
@@ -190,7 +204,7 @@ private:
   std::vector<std::shared_ptr<Meter>> meters_;
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-  metrics::ExemplarFilterType exemplar_filter_type_ = metrics::ExemplarFilterType::kTraceBased;
+  metrics::ExemplarFilterType exemplar_filter_type_;
 #endif
 
 #if defined(__cpp_lib_atomic_value_initialization) && \

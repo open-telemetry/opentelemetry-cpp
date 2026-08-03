@@ -116,6 +116,14 @@ TEST_F(ExemplarFilterEnvironmentTest, UsesSupportedValuesCaseInsensitively)
   }
 }
 
+TEST_F(ExemplarFilterEnvironmentTest, DirectMeterContextReadsEnvironment)
+{
+  setenv(kMetricsExemplarFilterEnv, "always_off", 1);
+
+  MeterContext context;
+  EXPECT_EQ(context.GetExemplarFilter(), ExemplarFilterType::kAlwaysOff);
+}
+
 TEST_F(ExemplarFilterEnvironmentTest, EmptyValueUsesTraceBasedDefault)
 {
   setenv(kMetricsExemplarFilterEnv, "", 1);
@@ -126,7 +134,8 @@ TEST_F(ExemplarFilterEnvironmentTest, EmptyValueUsesTraceBasedDefault)
 
 TEST_F(ExemplarFilterEnvironmentTest, ExplicitConfigurationOverridesEnvironment)
 {
-  setenv(kMetricsExemplarFilterEnv, "always_on", 1);
+  ScopedTestLogHandler log_handler{LogLevel::Warning};
+  setenv(kMetricsExemplarFilterEnv, "invalid", 1);
 
   auto views    = std::unique_ptr<ViewRegistry>(new ViewRegistry());
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
@@ -139,6 +148,7 @@ TEST_F(ExemplarFilterEnvironmentTest, ExplicitConfigurationOverridesEnvironment)
   auto context = MeterContextFactory::Create(
       std::move(views), resource, std::move(meter_configurator), ExemplarFilterType::kAlwaysOff);
   EXPECT_EQ(context->GetExemplarFilter(), ExemplarFilterType::kAlwaysOff);
+  EXPECT_TRUE(log_handler.Drain().empty());
 }
 
 TEST_F(ExemplarFilterEnvironmentTest, InvalidValueWarnsAndUsesTraceBasedDefault)
@@ -164,6 +174,21 @@ TEST_F(ExemplarFilterEnvironmentTest, MeterProviderFactoryReadsEnvironment)
 
   auto provider = MeterProviderFactory::Create();
   ASSERT_NE(provider, nullptr);
+
+  auto logs = log_handler.Drain();
+  ASSERT_EQ(logs.size(), 1);
+  EXPECT_EQ(logs[0].level, LogLevel::Warning);
+  EXPECT_EQ(logs[0].msg,
+            "Environment variable <OTEL_METRICS_EXEMPLAR_FILTER> has an invalid value <invalid>, "
+            "ignoring");
+}
+
+TEST_F(ExemplarFilterEnvironmentTest, DirectMeterProviderReadsEnvironment)
+{
+  ScopedTestLogHandler log_handler{LogLevel::Warning};
+  setenv(kMetricsExemplarFilterEnv, "invalid", 1);
+
+  MeterProvider provider;
 
   auto logs = log_handler.Drain();
   ASSERT_EQ(logs.size(), 1);
