@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Add the probability sampler to file configuration
+  [#4334](https://github.com/open-telemetry/opentelemetry-cpp/pull/4334)
+
 * [OTLP/HTTP] Honor `Retry-After` response header when retrying exports,
   supporting both delay-seconds and HTTP-date formats per RFC 7231 §7.1.3.
   [#4172](https://github.com/open-telemetry/opentelemetry-cpp/issues/4172)
