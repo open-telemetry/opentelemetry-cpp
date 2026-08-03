@@ -101,6 +101,7 @@
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
@@ -144,11 +145,11 @@
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/cardinality_limits.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
@@ -174,6 +175,7 @@
 #include "opentelemetry/sdk/trace/samplers/always_off_factory.h"
 #include "opentelemetry/sdk/trace/samplers/always_on_factory.h"
 #include "opentelemetry/sdk/trace/samplers/parent_factory.h"
+#include "opentelemetry/sdk/trace/samplers/probability_factory.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
@@ -458,6 +460,12 @@ public:
       const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *model) override
   {
     sampler = sdk_builder_->CreateParentBasedSampler(model);
+  }
+
+  void VisitProbability(
+      const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model) override
+  {
+    sampler = sdk_builder_->CreateProbabilitySampler(model);
   }
 
   void VisitTraceIdRatioBased(
@@ -951,6 +959,16 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateParentBase
   sdk = opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create(
       shared_root, shared_remote_parent_sampled, shared_remote_parent_not_sampled,
       shared_local_parent_sampled, shared_local_parent_not_sampled);
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateProbabilitySampler(
+    const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> sdk;
+
+  sdk = opentelemetry::sdk::trace::ProbabilitySamplerFactory::Create(model->ratio);
 
   return sdk;
 }
