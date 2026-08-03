@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Enable clang-tidy `modernize-deprecated-headers` and replace
+  deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
+  `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
+  ([#4349](https://github.com/open-telemetry/opentelemetry-cpp/pull/4349))
 * [METRICS SDK] Fix Windows metrics tail latency on the synchronous record path:
   `SyncMetricStorage::attribute_hashmap_lock_` now uses `std::mutex` instead of
   `common::SpinLockMutex`. The spin lock's final `sleep_for(1ms)` back-off is
