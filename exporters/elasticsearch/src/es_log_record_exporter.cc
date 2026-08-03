@@ -59,7 +59,7 @@ public:
     ss << "Status:" << response.GetStatusCode() << ", Header:";
     response.ForEachHeader([&ss](opentelemetry::nostd::string_view header_name,
                                  opentelemetry::nostd::string_view header_value) {
-      ss << "\t" << header_name.data() << ": " << header_value.data() << ",";
+      ss << "\t" << header_name << ": " << header_value << ",";
       return true;
     });
     ss << "Body:" << body;
