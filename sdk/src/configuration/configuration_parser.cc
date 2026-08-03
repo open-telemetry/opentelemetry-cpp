@@ -1765,6 +1765,12 @@ ConfigurationParser::ParseProbabilitySamplerConfiguration(const std::unique_ptr<
   auto model   = std::make_unique<ProbabilitySamplerConfiguration>();
 
   model->ratio = node->GetDouble("ratio", Config::kDefaultRatio);
+  if (!(model->ratio >= Config::kMinRatio && model->ratio <= Config::kMaxRatio))
+  {
+    std::string message("Illegal ratio: ");
+    message.append(std::to_string(model->ratio));
+    throw InvalidSchemaException(node->Location(), message);
+  }
 
   return model;
 }

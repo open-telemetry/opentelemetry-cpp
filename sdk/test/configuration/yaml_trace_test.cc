@@ -986,6 +986,60 @@ tracer_provider:
   EXPECT_DOUBLE_EQ(visitor.ratio, 0.25);
 }
 
+TEST(YamlTrace, probability_sampler_ratio_too_small)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    probability/development:
+      ratio: -0.5
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(YamlTrace, probability_sampler_ratio_nan)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    probability/development:
+      ratio: nan
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(YamlTrace, probability_sampler_ratio_too_large)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    probability/development:
+      ratio: 1.5
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
 TEST(YamlTrace, no_tracer_configurator)
 {
   std::string yaml = R"(
