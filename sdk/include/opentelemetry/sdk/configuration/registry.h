@@ -4,30 +4,9 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 
-#include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
-#include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/extension_sampler_builder.h"
-#include "opentelemetry/sdk/configuration/extension_span_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/extension_span_processor_builder.h"
-#include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/otlp_file_span_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/otlp_http_span_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
-#include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -36,7 +15,31 @@ namespace sdk
 namespace configuration
 {
 
-class Registry
+// Forward declarations
+class ConsoleLogRecordExporterBuilder;
+class ConsolePushMetricExporterBuilder;
+class ConsoleSpanExporterBuilder;
+class ExtensionLogRecordExporterBuilder;
+class ExtensionLogRecordProcessorBuilder;
+class ExtensionPullMetricExporterBuilder;
+class ExtensionPushMetricExporterBuilder;
+class ExtensionSamplerBuilder;
+class ExtensionSpanExporterBuilder;
+class ExtensionSpanProcessorBuilder;
+class OtlpFileLogRecordExporterBuilder;
+class OtlpFilePushMetricExporterBuilder;
+class OtlpFileSpanExporterBuilder;
+class OtlpGrpcLogRecordExporterBuilder;
+class OtlpGrpcPushMetricExporterBuilder;
+class OtlpGrpcSpanExporterBuilder;
+class OtlpHttpLogRecordExporterBuilder;
+class OtlpHttpPushMetricExporterBuilder;
+class OtlpHttpSpanExporterBuilder;
+class PeriodicMetricReaderBuilder;
+class PrometheusPullMetricExporterBuilder;
+class TextMapPropagatorBuilder;
+
+class OPENTELEMETRY_EXPORT Registry
 {
 public:
   Registry();
@@ -45,7 +48,7 @@ public:
   Registry &operator=(Registry &&)           = delete;
   Registry &operator=(const Registry &other) = delete;
 
-  ~Registry() = default;
+  ~Registry();
 
   /* Core optional components. */
 
@@ -54,40 +57,28 @@ public:
     return otlp_http_span_builder_.get();
   }
 
-  void SetOtlpHttpSpanBuilder(std::unique_ptr<OtlpHttpSpanExporterBuilder> &&builder)
-  {
-    otlp_http_span_builder_ = std::move(builder);
-  }
+  void SetOtlpHttpSpanBuilder(std::unique_ptr<OtlpHttpSpanExporterBuilder> &&builder);
 
   const OtlpGrpcSpanExporterBuilder *GetOtlpGrpcSpanBuilder() const
   {
     return otlp_grpc_span_builder_.get();
   }
 
-  void SetOtlpGrpcSpanBuilder(std::unique_ptr<OtlpGrpcSpanExporterBuilder> &&builder)
-  {
-    otlp_grpc_span_builder_ = std::move(builder);
-  }
+  void SetOtlpGrpcSpanBuilder(std::unique_ptr<OtlpGrpcSpanExporterBuilder> &&builder);
 
   const OtlpFileSpanExporterBuilder *GetOtlpFileSpanBuilder() const
   {
     return otlp_file_span_builder_.get();
   }
 
-  void SetOtlpFileSpanBuilder(std::unique_ptr<OtlpFileSpanExporterBuilder> &&builder)
-  {
-    otlp_file_span_builder_ = std::move(builder);
-  }
+  void SetOtlpFileSpanBuilder(std::unique_ptr<OtlpFileSpanExporterBuilder> &&builder);
 
   const ConsoleSpanExporterBuilder *GetConsoleSpanBuilder() const
   {
     return console_span_builder_.get();
   }
 
-  void SetConsoleSpanBuilder(std::unique_ptr<ConsoleSpanExporterBuilder> &&builder)
-  {
-    console_span_builder_ = std::move(builder);
-  }
+  void SetConsoleSpanBuilder(std::unique_ptr<ConsoleSpanExporterBuilder> &&builder);
 
   const OtlpHttpPushMetricExporterBuilder *GetOtlpHttpPushMetricExporterBuilder() const
   {
@@ -95,10 +86,7 @@ public:
   }
 
   void SetOtlpHttpPushMetricExporterBuilder(
-      std::unique_ptr<OtlpHttpPushMetricExporterBuilder> &&builder)
-  {
-    otlp_http_push_metric_builder_ = std::move(builder);
-  }
+      std::unique_ptr<OtlpHttpPushMetricExporterBuilder> &&builder);
 
   const OtlpGrpcPushMetricExporterBuilder *GetOtlpGrpcPushMetricExporterBuilder() const
   {
@@ -106,10 +94,7 @@ public:
   }
 
   void SetOtlpGrpcPushMetricExporterBuilder(
-      std::unique_ptr<OtlpGrpcPushMetricExporterBuilder> &&builder)
-  {
-    otlp_grpc_push_metric_builder_ = std::move(builder);
-  }
+      std::unique_ptr<OtlpGrpcPushMetricExporterBuilder> &&builder);
 
   const OtlpFilePushMetricExporterBuilder *GetOtlpFilePushMetricExporterBuilder() const
   {
@@ -117,10 +102,7 @@ public:
   }
 
   void SetOtlpFilePushMetricExporterBuilder(
-      std::unique_ptr<OtlpFilePushMetricExporterBuilder> &&builder)
-  {
-    otlp_file_push_metric_builder_ = std::move(builder);
-  }
+      std::unique_ptr<OtlpFilePushMetricExporterBuilder> &&builder);
 
   const ConsolePushMetricExporterBuilder *GetConsolePushMetricExporterBuilder() const
   {
@@ -128,10 +110,7 @@ public:
   }
 
   void SetConsolePushMetricExporterBuilder(
-      std::unique_ptr<ConsolePushMetricExporterBuilder> &&builder)
-  {
-    console_metric_builder_ = std::move(builder);
-  }
+      std::unique_ptr<ConsolePushMetricExporterBuilder> &&builder);
 
   const PrometheusPullMetricExporterBuilder *GetPrometheusPullMetricExporterBuilder() const
   {
@@ -139,60 +118,42 @@ public:
   }
 
   void SetPrometheusPullMetricExporterBuilder(
-      std::unique_ptr<PrometheusPullMetricExporterBuilder> &&builder)
-  {
-    prometheus_metric_builder_ = std::move(builder);
-  }
+      std::unique_ptr<PrometheusPullMetricExporterBuilder> &&builder);
 
   const PeriodicMetricReaderBuilder *GetPeriodicMetricReaderBuilder() const
   {
     return periodic_metric_reader_builder_.get();
   }
 
-  void SetPeriodicMetricReaderBuilder(std::unique_ptr<PeriodicMetricReaderBuilder> &&builder)
-  {
-    periodic_metric_reader_builder_ = std::move(builder);
-  }
+  void SetPeriodicMetricReaderBuilder(std::unique_ptr<PeriodicMetricReaderBuilder> &&builder);
 
   const OtlpHttpLogRecordExporterBuilder *GetOtlpHttpLogRecordBuilder() const
   {
     return otlp_http_log_record_builder_.get();
   }
 
-  void SetOtlpHttpLogRecordBuilder(std::unique_ptr<OtlpHttpLogRecordExporterBuilder> &&builder)
-  {
-    otlp_http_log_record_builder_ = std::move(builder);
-  }
+  void SetOtlpHttpLogRecordBuilder(std::unique_ptr<OtlpHttpLogRecordExporterBuilder> &&builder);
 
   const OtlpGrpcLogRecordExporterBuilder *GetOtlpGrpcLogRecordBuilder() const
   {
     return otlp_grpc_log_record_builder_.get();
   }
 
-  void SetOtlpGrpcLogRecordBuilder(std::unique_ptr<OtlpGrpcLogRecordExporterBuilder> &&builder)
-  {
-    otlp_grpc_log_record_builder_ = std::move(builder);
-  }
+  void SetOtlpGrpcLogRecordBuilder(std::unique_ptr<OtlpGrpcLogRecordExporterBuilder> &&builder);
 
   const OtlpFileLogRecordExporterBuilder *GetOtlpFileLogRecordBuilder() const
   {
     return otlp_file_log_record_builder_.get();
   }
 
-  void SetOtlpFileLogRecordBuilder(std::unique_ptr<OtlpFileLogRecordExporterBuilder> &&builder)
-  {
-    otlp_file_log_record_builder_ = std::move(builder);
-  }
+  void SetOtlpFileLogRecordBuilder(std::unique_ptr<OtlpFileLogRecordExporterBuilder> &&builder);
 
   const ConsoleLogRecordExporterBuilder *GetConsoleLogRecordBuilder() const
   {
     return console_log_record_builder_.get();
   }
 
-  void SetConsoleLogRecordBuilder(std::unique_ptr<ConsoleLogRecordExporterBuilder> &&builder)
-  {
-    console_log_record_builder_ = std::move(builder);
-  }
+  void SetConsoleLogRecordBuilder(std::unique_ptr<ConsoleLogRecordExporterBuilder> &&builder);
 
   /* Extension points */
 
