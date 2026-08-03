@@ -82,7 +82,7 @@ TEST(HttpServerSendMoreTest, WouldBlockPreservesTheSendBuffer)
     {
       continue;
     }
-    if (sent < 0 && errno == SocketTools::Socket::ErrorWouldBlock)
+    if (sent < 0 && SocketTools::Socket::IsWouldBlock(errno))
     {
       blocked = true;
       break;

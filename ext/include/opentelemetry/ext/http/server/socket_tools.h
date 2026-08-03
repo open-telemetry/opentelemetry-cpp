@@ -473,6 +473,25 @@ struct Socket
 #endif
   };
 
+  /**
+   * Whether an error() value means the nonblocking operation would have blocked.
+   *
+   * POSIX allows a nonblocking send() or recv() to report either EAGAIN or EWOULDBLOCK, and does
+   * not require the two constants to be equal, so a single comparison is not portable. Where they
+   * are equal, which is every platform this repository builds on today, only one comparison is
+   * compiled: writing both unconditionally would be a redundant expression.
+   */
+  static bool IsWouldBlock(int error) noexcept
+  {
+#ifdef _WIN32
+    return error == WSAEWOULDBLOCK;
+#elif EAGAIN == EWOULDBLOCK
+    return error == EWOULDBLOCK;
+#else
+    return error == EAGAIN || error == EWOULDBLOCK;
+#endif
+  }
+
   enum  // NOLINT(performance-enum-size)
   {
 #ifdef _WIN32

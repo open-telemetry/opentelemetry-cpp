@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <cerrno>
 #include <string>
 #ifndef _WIN32
 #  include <sys/socket.h>  // for sockaddr, AF_UNSPEC, AF_INET
@@ -146,6 +147,20 @@ TEST(SocketAddrTest, RejectsPortOverflow)
 TEST(SocketAddrTest, RejectsShorthandHost)
 {
   ExpectInvalid(SocketTools::SocketAddr("127.1:80"));
+}
+
+// POSIX lets a nonblocking send() or recv() report either EAGAIN or EWOULDBLOCK and does not
+// require the two to be equal, so both have to classify as would-block wherever they are defined.
+TEST(SocketToolsTests, RecognizesWouldBlockErrors)
+{
+  EXPECT_TRUE(SocketTools::Socket::IsWouldBlock(SocketTools::Socket::ErrorWouldBlock));
+  EXPECT_FALSE(SocketTools::Socket::IsWouldBlock(0));
+
+#ifndef _WIN32
+  EXPECT_TRUE(SocketTools::Socket::IsWouldBlock(EAGAIN));
+  EXPECT_TRUE(SocketTools::Socket::IsWouldBlock(EWOULDBLOCK));
+  EXPECT_FALSE(SocketTools::Socket::IsWouldBlock(EPIPE));
+#endif
 }
 
 }  // namespace

@@ -289,7 +289,7 @@ private:
       conn.receiveBuffer.append(buffer, buffer + received);
       handleConnection(conn);
     }
-    else if (received == 0 || recvError != SocketTools::Socket::ErrorWouldBlock)
+    else if (received == 0 || !SocketTools::Socket::IsWouldBlock(recvError))
     {
       // Orderly shutdown (received == 0) or a real error; a transient would-block is
       // retried on the next readable event.
@@ -348,7 +348,7 @@ protected:
     LOG_TRACE("HttpServer: [%s] sent %d", conn.request.client.c_str(), sent);
     if (sent < 0)
     {
-      if (sendError == SocketTools::Socket::ErrorWouldBlock)
+      if (SocketTools::Socket::IsWouldBlock(sendError))
       {
         // Backpressure: keep the unsent data and wait for the socket to become writable.
         m_reactor.addSocket(conn.socket,
