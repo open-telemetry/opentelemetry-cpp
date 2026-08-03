@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <string>
@@ -480,14 +480,14 @@ TEST(AdaptingCircularBufferCounterTest, DownscaleMatchesReferenceImplementation)
 
   for (uint32_t trial = 0; trial < 2000; ++trial)
   {
-    const size_t max_size = 2 + next(30);
-    const int32_t base    = static_cast<int32_t>(next(41)) - 20;
+    const std::size_t max_size = 2 + next(30);
+    const int32_t base         = static_cast<int32_t>(next(41)) - 20;
 
     AdaptingCircularBufferCounter counter{max_size};
     // The first recording fixes the base index and therefore how the populated
     // range wraps around the backing array.
     EXPECT_TRUE(counter.Increment(base, magnitudes[next(4)] + next(97)));
-    for (size_t i = 0; i < 4 * max_size; ++i)
+    for (std::size_t i = 0; i < 4 * max_size; ++i)
     {
       const int32_t index = base + static_cast<int32_t>(next(2 * static_cast<uint32_t>(max_size))) -
                             static_cast<int32_t>(max_size);
