@@ -21,6 +21,9 @@ Increment the:
 * [BUILD] Run the ext_http component install test on Windows
   [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
 
+* [CONFIGURATION] Decouple config registry and builder headers
+  [#4335](https://github.com/open-telemetry/opentelemetry-cpp/pull/4335)
+
 * [BENCHMARK] Add multi-threaded base2 exponential histogram benchmarks
   [#4319](https://github.com/open-telemetry/opentelemetry-cpp/pull/4319)
 
