@@ -15,12 +15,29 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Move remaining `misc-use-internal-linkage` classes/enums into
+  anonymous namespaces: `OtlpFileSystemBackend`/`OtlpFileOstreamBackend` in
+  the OTLP file exporter, `ResponseHandler`/`AsyncResponseHandler`/
+  `json_assign_visitor` in the Elasticsearch log exporter, and the
+  `TestMode`/`test_mode` enums in the OTLP functional test binaries.
+  [#4196](https://github.com/open-telemetry/opentelemetry-cpp/issues/4196)
+* [METRICS SDK] Fix Windows metrics tail latency on the synchronous record path:
+  `SyncMetricStorage::attribute_hashmap_lock_` now uses `std::mutex` instead of
+  `common::SpinLockMutex`. The spin lock's final `sleep_for(1ms)` back-off is
+  rounded up to the Windows timer quantum (~15.6 ms), so a waiter contending
+  on a hot instrument could stall for a full quantum, inflating tail latency.
+  `std::mutex` blocks the waiter instead. Only this one contended lock changes;
+  the API `SpinLockMutex` and all other SDK locks are unchanged.
+  [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
 * [CONFIGURATION] Add the probability sampler to file configuration
   [#4334](https://github.com/open-telemetry/opentelemetry-cpp/pull/4334)
+* [BUG] Stop reading past a `nostd::string_view` that is not NUL terminated
+  [#4346](https://github.com/open-telemetry/opentelemetry-cpp/pull/4346)
 
 * [OTLP/HTTP] Honor `Retry-After` response header when retrying exports,
   supporting both delay-seconds and HTTP-date formats per RFC 7231 §7.1.3.
   [#4172](https://github.com/open-telemetry/opentelemetry-cpp/issues/4172)
+
 * [BUILD] Run the ext_http component install test on Windows
   [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
 
@@ -98,6 +115,9 @@ Increment the:
 * [SDK] Implement the ProbabilitySampler
   [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
 
+* [SDK] Downscale base2 exponential histogram buckets in place
+  [#4324](https://github.com/open-telemetry/opentelemetry-cpp/pull/4324)
+
 * [METRICS SDK] Support `OTEL_METRICS_EXEMPLAR_FILTER` when metrics exemplars
   are enabled. The default exemplar filter changes from `always_off` to
   `trace_based` to match the specification.
@@ -105,17 +125,34 @@ Increment the:
 
 Breaking changes:
 
+* [BUILD] Install an explicit list of ext headers instead of the whole
+  directory
+  [#4327](https://github.com/open-telemetry/opentelemetry-cpp/pull/4327)
+  * The `ext_common` component installed `include/opentelemetry/ext` with a
+    `*.h` glob. It now installs a named list, and these five headers are no
+    longer part of the package:
+    * `opentelemetry/ext/http/client/curl/http_client_curl.h`
+    * `opentelemetry/ext/http/client/curl/http_operation_curl.h`
+    * `opentelemetry/ext/http/client/detail/default_factory.h`
+    * `opentelemetry/ext/http/server/http_server.h`
+    * `opentelemetry/ext/http/server/socket_tools.h`
+  * Code that included any of them from an installed package will no longer
+    compile. A curl client is created through `http_client_factory_curl.h`,
+    which needs only the abstract `http_client_factory.h`. The two server
+    headers are an embedded test server; moving them out of `ext` is tracked
+    in #4332.
+
+* [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
+  [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
+  * The public configuration member `max_buckets_` was renamed to `max_size_` to
+    match the configuration schema. Please adjust SDK configuration accordingly.
+
 * [METRICS SDK] Add an `ExemplarFilterType` parameter to the `MeterContext`
   constructor when metrics exemplars are enabled. The parameter has a default
   value, so existing source calls remain valid, but the constructor signature
   and SDK ABI change. Applications using the preview exemplar feature must be
   rebuilt.
   [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328)
-
-* [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
-  [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
-  * The public configuration member `max_buckets_` was renamed to `max_size_` to
-    match the configuration schema. Please adjust SDK configuration accordingly.
 
 ## [1.28.0] 2026-07-16
 

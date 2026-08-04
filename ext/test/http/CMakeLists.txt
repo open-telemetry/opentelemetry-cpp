@@ -8,6 +8,9 @@ if(WITH_HTTP_CLIENT_CURL)
     ${FILENAME}
     PRIVATE ${GMOCK_LIB} ${GTEST_BOTH_LIBRARIES} opentelemetry_http_client_curl
             opentelemetry_common CURL::libcurl)
+  if(WIN32)
+    target_link_libraries(${FILENAME} PRIVATE ws2_32)
+  endif()
   gtest_add_tests(
     TARGET ${FILENAME}
     TEST_PREFIX ext.http.curl.
@@ -18,9 +21,11 @@ set(SOCKET_TOOLS_FILENAME socket_tools_test)
 add_executable(${SOCKET_TOOLS_FILENAME} ${SOCKET_TOOLS_FILENAME}.cc)
 target_link_libraries(${SOCKET_TOOLS_FILENAME} opentelemetry_ext ${GMOCK_LIB}
                       ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-# ws2_32 is now an interface dependency of opentelemetry_ext, so it is inherited
-# here; the test thus verifies the public target's usage requirements rather
-# than papering over them locally.
+# socket_tools.h calls Winsock, and the ext interface target no longer carries
+# that link because it is only needed where the embedded server is compiled.
+if(WIN32)
+  target_link_libraries(${SOCKET_TOOLS_FILENAME} ws2_32)
+endif()
 gtest_add_tests(
   TARGET ${SOCKET_TOOLS_FILENAME}
   TEST_PREFIX ext.http.sockettools.
