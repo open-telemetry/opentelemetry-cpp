@@ -10,7 +10,7 @@
 #include "opentelemetry/semconv/incubating/process_attributes.h"
 #include "opentelemetry/version.h"
 
-#include <stdint.h>
+#include <cstdint>
 #include <exception>
 #include <ostream>
 #include <string>

@@ -5,7 +5,7 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#  include <stdint.h>
+#  include <cstdint>
 #  include <memory>
 #  include <vector>
 
