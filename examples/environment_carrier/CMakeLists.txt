@@ -4,7 +4,7 @@
 if(NOT WIN32)
   add_executable(example_environment_carrier main.cc)
 
-  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(OTELCPP_BUILD_DLL)
     target_compile_definitions(example_environment_carrier
                                PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
     target_link_libraries(example_environment_carrier
@@ -15,7 +15,7 @@ if(NOT WIN32)
       PRIVATE opentelemetry-cpp::trace opentelemetry-cpp::ostream_span_exporter)
   endif()
 
-  if(BUILD_TESTING)
+  if(OTELCPP_BUILD_TESTING)
     add_test(NAME examples.environment_carrier
              COMMAND "$<TARGET_FILE:example_environment_carrier>")
   endif()

@@ -114,10 +114,10 @@ if [[ "$1" == "cmake.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_PROMETHEUS=ON \
-        -DWITH_ZIPKIN=ON \
-        -DWITH_ELASTICSEARCH=ON \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DOTELCPP_WITH_PROMETHEUS=ON \
+        -DOTELCPP_WITH_ZIPKIN=ON \
+        -DOTELCPP_WITH_ELASTICSEARCH=ON \
+        -DOTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
@@ -128,10 +128,10 @@ elif [[ "$1" == "cmake.maintainer.sync.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
-        -DWITH_OPENTRACING=OFF \
-        -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
+        -DOTELCPP_WITH_OPENTRACING=OFF \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_NO_DEPRECATED_CODE=ON \
+        -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -141,9 +141,9 @@ elif [[ "$1" == "cmake.maintainer.async.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
-        -DWITH_OPENTRACING=OFF \
+        -DOTELCPP_WITH_OPENTRACING=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_NO_DEPRECATED_CODE=ON \
+        -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -153,10 +153,10 @@ elif [[ "$1" == "cmake.maintainer.abiv2.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -C ${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake \
-        -DWITH_OPENTRACING=OFF \
-        -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
+        -DOTELCPP_WITH_OPENTRACING=OFF \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_NO_DEPRECATED_CODE=ON \
+        -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -165,23 +165,23 @@ elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_GRPC=ON \
-        -DWITH_OTLP_FILE=ON \
-        -DWITH_PROMETHEUS=ON \
-        -DWITH_EXAMPLES=ON \
-        -DWITH_EXAMPLES_HTTP=ON \
-        -DWITH_ZIPKIN=ON \
-        -DBUILD_W3CTRACECONTEXT_TEST=ON \
-        -DWITH_ELASTICSEARCH=ON \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=OFF \
+        -DOTELCPP_WITH_OTLP_HTTP=ON \
+        -DOTELCPP_WITH_OTLP_GRPC=ON \
+        -DOTELCPP_WITH_OTLP_FILE=ON \
+        -DOTELCPP_WITH_PROMETHEUS=ON \
+        -DOTELCPP_WITH_EXAMPLES=ON \
+        -DOTELCPP_WITH_EXAMPLES_HTTP=ON \
+        -DOTELCPP_WITH_ZIPKIN=ON \
+        -DOTELCPP_BUILD_W3CTRACECONTEXT_TEST=ON \
+        -DOTELCPP_WITH_ELASTICSEARCH=ON \
+        -DOTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=OFF \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_NO_DEPRECATED_CODE=ON \
-        -DWITH_OTLP_HTTP_COMPRESSION=ON \
-        -DWITH_OTLP_RETRY_PREVIEW=ON \
-        -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
-        -DWITH_CONFIGURATION=ON \
+        -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON \
+        -DOTELCPP_WITH_OTLP_HTTP_COMPRESSION=ON \
+        -DOTELCPP_WITH_OTLP_RETRY_PREVIEW=ON \
+        -DOTELCPP_WITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
+        -DOTELCPP_WITH_CONFIGURATION=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -190,12 +190,12 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_PROMETHEUS=ON \
-        -DWITH_ZIPKIN=ON \
-        -DWITH_ELASTICSEARCH=ON \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DOTELCPP_WITH_PROMETHEUS=ON \
+        -DOTELCPP_WITH_ZIPKIN=ON \
+        -DOTELCPP_WITH_ELASTICSEARCH=ON \
+        -DOTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_FLAGS="-Werror $CXXFLAGS" \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -205,7 +205,7 @@ elif [[ "$1" == "cmake.opentracing_shim.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}" \
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
-        -DWITH_OPENTRACING=ON \
+        -DOTELCPP_WITH_OPENTRACING=ON \
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
@@ -217,7 +217,7 @@ elif [[ "$1" == "cmake.opentracing_shim.install.test" ]]; then
   rm -rf ${INSTALL_TEST_DIR}/*
   cmake "${CMAKE_OPTIONS[@]}" \
         -DCMAKE_CXX_FLAGS="-Werror -Wno-error=redundant-move $CXXFLAGS" \
-        -DWITH_OPENTRACING=ON \
+        -DOTELCPP_WITH_OPENTRACING=ON \
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
         "${SRC_DIR}"
@@ -250,8 +250,8 @@ elif [[ "$1" == "cmake.opentracing_shim.install.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_STANDARD=14 \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_STL=OFF \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_WITH_STL=OFF \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -262,8 +262,8 @@ elif [[ "$1" == "cmake.c++17.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_STANDARD=17 \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_STL=OFF \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_WITH_STL=OFF \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -274,8 +274,8 @@ elif [[ "$1" == "cmake.c++20.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_STANDARD=20 \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_STL=OFF \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_WITH_STL=OFF \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -286,8 +286,8 @@ elif [[ "$1" == "cmake.c++23.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_STANDARD=23 \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_STL=OFF \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_WITH_STL=OFF \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -296,11 +296,11 @@ elif [[ "$1" == "cmake.c++14.stl.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DOTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_STANDARD=14 \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_STL=CXX14 \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_WITH_STL=CXX14 \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -309,11 +309,11 @@ elif [[ "$1" == "cmake.c++17.stl.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DOTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_STANDARD=17 \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_STL=CXX17 \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_WITH_STL=CXX17 \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -322,11 +322,11 @@ elif [[ "$1" == "cmake.c++20.stl.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DOTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_STANDARD=20 \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_STL=CXX20 \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_WITH_STL=CXX20 \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -335,11 +335,11 @@ elif [[ "$1" == "cmake.c++23.stl.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DOTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=ON \
         -DCMAKE_CXX_STANDARD=23 \
         -DOTELCPP_MAINTAINER_MODE=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DWITH_STL=CXX23 \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_WITH_STL=CXX23 \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -353,7 +353,7 @@ elif [[ "$1" == "cmake.clang_tidy.test" ]]; then
     -S ${SRC_DIR} \
     -B ${BUILD_DIR} \
     -C ${OTELCPP_CMAKE_CACHE_FILE_PATH} \
-    -DWITH_OPENTRACING=OFF \
+    -DOTELCPP_WITH_OPENTRACING=OFF \
     -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
     -DCMAKE_CXX_CLANG_TIDY="clang-tidy;--header-filter=.*/opentelemetry-cpp/.*;--exclude-header-filter=.*(internal/absl|third_party|third-party|build.*|/usr|/opt)/.*|.*\.pb\.h;--quiet"
@@ -380,7 +380,7 @@ elif [[ "$1" == "cmake.iwyu.test" ]]; then
     -B "${BUILD_DIR}" \
     -C "${OTELCPP_CMAKE_CACHE_FILE_PATH}" \
     -DCMAKE_CXX_STANDARD=14 \
-    -DWITH_STL=CXX14 \
+    -DOTELCPP_WITH_STL=CXX14 \
     -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
     -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${SRC_DIR}/.iwyu.imp;"
   if command -v ninja >/dev/null 2>&1; then
@@ -399,12 +399,12 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_OTLP_GRPC=ON \
-        -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_FILE=ON \
-        -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
-        -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
-        -DWITH_OTLP_RETRY_PREVIEW=ON \
+        -DOTELCPP_WITH_OTLP_GRPC=ON \
+        -DOTELCPP_WITH_OTLP_HTTP=ON \
+        -DOTELCPP_WITH_OTLP_FILE=ON \
+        -DOTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
+        -DOTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
+        -DOTELCPP_WITH_OTLP_RETRY_PREVIEW=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -413,9 +413,9 @@ elif [[ "$1" == "cmake.exporter.otprotocol.shared_libs.with_static_grpc.test" ]]
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_OTLP_GRPC=ON \
-        -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_FILE=ON \
+        -DOTELCPP_WITH_OTLP_GRPC=ON \
+        -DOTELCPP_WITH_OTLP_HTTP=ON \
+        -DOTELCPP_WITH_OTLP_FILE=ON \
         -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
         "${SRC_DIR}"
@@ -426,10 +426,10 @@ elif [[ "$1" == "cmake.exporter.otprotocol.with_async_export.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_OTLP_GRPC=ON \
-        -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_FILE=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_WITH_OTLP_GRPC=ON \
+        -DOTELCPP_WITH_OTLP_HTTP=ON \
+        -DOTELCPP_WITH_OTLP_FILE=ON \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -439,7 +439,7 @@ elif [[ "$1" == "cmake.w3c.trace-context.build-server" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-          -DBUILD_W3CTRACECONTEXT_TEST=ON \
+          -DOTELCPP_BUILD_W3CTRACECONTEXT_TEST=ON \
           -DCMAKE_CXX_STANDARD=${CXX_STANDARD} \
           "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
@@ -448,11 +448,11 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
-        -DWITH_OTLP_GRPC=ON \
-        -DWITH_OTLP_HTTP=ON \
-        -DWITH_OTLP_FILE=ON \
-        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
-        -DOPENTELEMETRY_INSTALL=OFF \
+        -DOTELCPP_WITH_OTLP_GRPC=ON \
+        -DOTELCPP_WITH_OTLP_HTTP=ON \
+        -DOTELCPP_WITH_OTLP_FILE=ON \
+        -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DOTELCPP_INSTALL=OFF \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -474,7 +474,7 @@ elif [[ "$1" == "cmake.install.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
         -C ${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake \
-        -DOPENTELEMETRY_INSTALL=ON \
+        -DOTELCPP_INSTALL=ON \
         "${SRC_DIR}"
 
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
@@ -532,7 +532,7 @@ elif [[ "$1" == "cmake.fetch_content.test" ]]; then
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_INSTALL_PREFIX=${INSTALL_TEST_DIR} \
         -C ${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake \
-        -DOPENTELEMETRY_INSTALL=OFF \
+        -DOTELCPP_INSTALL=OFF \
         -DOPENTELEMETRY_CPP_SRC_DIR="${SRC_DIR}" \
         "${SRC_DIR}/install/test/cmake/fetch_content_test"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
@@ -543,11 +543,199 @@ elif [[ "$1" == "cmake.api_only.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -C ${SRC_DIR}/test_common/cmake/all-options-abiv1-preview.cmake \
-        -DOPENTELEMETRY_INSTALL=OFF \
+        -DOTELCPP_INSTALL=OFF \
         -DOPENTELEMETRY_CPP_SRC_DIR="${SRC_DIR}" \
         "${SRC_DIR}/install/test/cmake/api_only_test"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
+  exit 0
+elif [[ "$1" == "cmake.legacy_options.test" ]]; then
+  # Ensure the legacy (pre "OTELCPP_" prefix) CMake option names still drive
+  # the new OTELCPP_* options with unchanged semantics. See
+  # https://github.com/open-telemetry/opentelemetry-cpp/issues/4184
+  #
+  # Pass 1: only the legacy names are given. Every legacy name must trigger a
+  # deprecation warning, and the legacy values must be resolved into the new
+  # OTELCPP_* cache entries. All values differ from the documented defaults so
+  # that propagation cannot succeed by accident.
+  cd "${BUILD_DIR}"
+  rm -rf *
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DOTELCPP_BUILD_TESTING=OFF \
+        -DWITH_ABI_VERSION_1=OFF \
+        -DWITH_ABI_VERSION_2=ON \
+        -DWITH_METRICS_BOUND_INSTRUMENTS_PREVIEW=ON \
+        -DWITH_CONFIGURATION=ON \
+        -DWITH_NO_DEPRECATED_CODE=ON \
+        -DWITH_STL=ON \
+        -DWITH_GSL=ON \
+        -DWITH_OTLP_RETRY_PREVIEW=OFF \
+        -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF \
+        -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
+        -DWITH_OTLP_GRPC=ON \
+        -DWITH_OTLP_HTTP=ON \
+        -DWITH_OTLP_FILE=ON \
+        -DWITH_OTLP_HTTP_COMPRESSION=ON \
+        -DWITH_OTLP_UTF8_VALIDITY=OFF \
+        -DWITH_CURL_LOGGING=ON \
+        -DWITH_ZIPKIN=ON \
+        -DWITH_PROMETHEUS=ON \
+        -DWITH_ELASTICSEARCH=ON \
+        -DWITH_NO_GETENV=ON \
+        -DWITH_BENCHMARK=ON \
+        -DWITH_OPENTRACING=ON \
+        -DWITH_EXAMPLES=OFF \
+        -DWITH_FUNC_TESTS=OFF \
+        -DWITH_ASYNC_EXPORT_PREVIEW=ON \
+        -DWITH_METRICS_EXEMPLAR_PREVIEW=ON \
+        -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
+        -DWITH_RESOURCE_DETECTORS_PREVIEW=ON \
+        -DWITH_HTTP_CLIENT_CURL=OFF \
+        -DOPENTELEMETRY_INSTALL=ON \
+        -DBUILD_PACKAGE=ON \
+        -DTARBALL=ON \
+        -DBUILD_W3CTRACECONTEXT_TEST=ON \
+        -DOPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS=ON \
+        "${SRC_DIR}" 2>&1 | tee configure.log
+
+  # Each legacy option name must be reported as deprecated.
+  for legacy_option in \
+      WITH_ABI_VERSION_1 \
+      WITH_ABI_VERSION_2 \
+      WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW \
+      WITH_CONFIGURATION \
+      WITH_NO_DEPRECATED_CODE \
+      WITH_STL \
+      WITH_GSL \
+      WITH_OTLP_RETRY_PREVIEW \
+      WITH_OTLP_GRPC_SSL_MTLS_PREVIEW \
+      WITH_OTLP_GRPC_CREDENTIAL_PREVIEW \
+      WITH_OTLP_GRPC \
+      WITH_OTLP_HTTP \
+      WITH_OTLP_FILE \
+      WITH_OTLP_HTTP_COMPRESSION \
+      WITH_OTLP_UTF8_VALIDITY \
+      WITH_CURL_LOGGING \
+      WITH_ZIPKIN \
+      WITH_PROMETHEUS \
+      WITH_ELASTICSEARCH \
+      WITH_NO_GETENV \
+      WITH_BENCHMARK \
+      WITH_OPENTRACING \
+      WITH_EXAMPLES \
+      WITH_FUNC_TESTS \
+      WITH_ASYNC_EXPORT_PREVIEW \
+      WITH_METRICS_EXEMPLAR_PREVIEW \
+      WITH_THREAD_INSTRUMENTATION_PREVIEW \
+      WITH_RESOURCE_DETECTORS_PREVIEW \
+      WITH_HTTP_CLIENT_CURL \
+      OPENTELEMETRY_INSTALL \
+      BUILD_PACKAGE \
+      TARBALL \
+      BUILD_W3CTRACECONTEXT_TEST \
+      OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS; do
+    grep -q "CMake option ${legacy_option} is deprecated" configure.log || {
+      echo "ERROR: missing deprecation warning for option ${legacy_option}"
+      exit 1
+    }
+  done
+
+  # The legacy values must be resolved into the new OTELCPP_* cache entries.
+  for expected_entry in \
+      "OTELCPP_WITH_ABI_VERSION_1:BOOL=OFF" \
+      "OTELCPP_WITH_ABI_VERSION_2:BOOL=ON" \
+      "OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW:BOOL=ON" \
+      "OTELCPP_WITH_CONFIGURATION:BOOL=ON" \
+      "OTELCPP_WITH_NO_DEPRECATED_CODE:BOOL=ON" \
+      "OTELCPP_WITH_STL:STRING=ON" \
+      "OTELCPP_WITH_GSL:BOOL=ON" \
+      "OTELCPP_WITH_OTLP_RETRY_PREVIEW:BOOL=OFF" \
+      "OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW:BOOL=OFF" \
+      "OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW:BOOL=ON" \
+      "OTELCPP_WITH_OTLP_GRPC:BOOL=ON" \
+      "OTELCPP_WITH_OTLP_HTTP:BOOL=ON" \
+      "OTELCPP_WITH_OTLP_FILE:BOOL=ON" \
+      "OTELCPP_WITH_OTLP_HTTP_COMPRESSION:BOOL=ON" \
+      "OTELCPP_WITH_OTLP_UTF8_VALIDITY:BOOL=OFF" \
+      "OTELCPP_WITH_CURL_LOGGING:BOOL=ON" \
+      "OTELCPP_WITH_ZIPKIN:BOOL=ON" \
+      "OTELCPP_WITH_PROMETHEUS:BOOL=ON" \
+      "OTELCPP_WITH_ELASTICSEARCH:BOOL=ON" \
+      "OTELCPP_WITH_NO_GETENV:BOOL=ON" \
+      "OTELCPP_WITH_BENCHMARK:BOOL=ON" \
+      "OTELCPP_WITH_OPENTRACING:BOOL=ON" \
+      "OTELCPP_WITH_EXAMPLES:BOOL=OFF" \
+      "OTELCPP_WITH_FUNC_TESTS:BOOL=OFF" \
+      "OTELCPP_WITH_ASYNC_EXPORT_PREVIEW:BOOL=ON" \
+      "OTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW:BOOL=ON" \
+      "OTELCPP_WITH_THREAD_INSTRUMENTATION_PREVIEW:BOOL=ON" \
+      "OTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW:BOOL=ON" \
+      "OTELCPP_WITH_HTTP_CLIENT_CURL:BOOL=OFF" \
+      "OTELCPP_INSTALL:BOOL=ON" \
+      "OTELCPP_BUILD_PACKAGE:BOOL=ON" \
+      "OTELCPP_TARBALL:BOOL=ON" \
+      "OTELCPP_BUILD_W3CTRACECONTEXT_TEST:BOOL=ON" \
+      "OTELCPP_SKIP_DYNAMIC_LOADING_TESTS:BOOL=ON"; do
+    grep -q "^${expected_entry}$" CMakeCache.txt || {
+      echo "ERROR: expected CMakeCache.txt entry missing: ${expected_entry}"
+      exit 1
+    }
+  done
+
+  # Pass 2: when both names are provided, the new OTELCPP_* name takes
+  # precedence over the legacy one.
+  mkdir -p precedence
+  cd precedence
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DOTELCPP_BUILD_TESTING=OFF \
+        -DWITH_EXAMPLES=ON \
+        -DOTELCPP_WITH_EXAMPLES=OFF \
+        -DWITH_STL=ON \
+        -DOTELCPP_WITH_STL=OFF \
+        -DOPENTELEMETRY_INSTALL=OFF \
+        -DOTELCPP_INSTALL=ON \
+        "${SRC_DIR}"
+  for expected_entry in \
+      "OTELCPP_WITH_EXAMPLES:BOOL=OFF" \
+      "OTELCPP_WITH_STL:STRING=OFF" \
+      "OTELCPP_INSTALL:BOOL=ON"; do
+    grep -q "^${expected_entry}$" CMakeCache.txt || {
+      echo "ERROR: expected CMakeCache.txt entry missing: ${expected_entry}"
+      exit 1
+    }
+  done
+
+  # Pass 3: options that require a dedicated configuration.
+  # WITH_API_ONLY disables most of the build, WITH_EXAMPLES_HTTP requires
+  # WITH_EXAMPLES=ON, and OTELCPP_INSTALL=OFF is the non-default value that
+  # could not be combined with TARBALL in pass 1.
+  mkdir -p ../extra
+  cd ../extra
+  cmake "${CMAKE_OPTIONS[@]}"  \
+        -DOTELCPP_BUILD_TESTING=OFF \
+        -DWITH_API_ONLY=ON \
+        -DWITH_EXAMPLES=ON \
+        -DWITH_EXAMPLES_HTTP=ON \
+        -DOPENTELEMETRY_INSTALL=OFF \
+        "${SRC_DIR}" 2>&1 | tee configure.log
+  for legacy_option in \
+      WITH_API_ONLY \
+      WITH_EXAMPLES_HTTP \
+      OPENTELEMETRY_INSTALL; do
+    grep -q "CMake option ${legacy_option} is deprecated" configure.log || {
+      echo "ERROR: missing deprecation warning for option ${legacy_option}"
+      exit 1
+    }
+  done
+  for expected_entry in \
+      "OTELCPP_WITH_API_ONLY:BOOL=ON" \
+      "OTELCPP_WITH_EXAMPLES_HTTP:BOOL=ON" \
+      "OTELCPP_INSTALL:BOOL=OFF"; do
+    grep -q "^${expected_entry}$" CMakeCache.txt || {
+      echo "ERROR: expected CMakeCache.txt entry missing: ${expected_entry}"
+      exit 1
+    }
+  done
   exit 0
 elif [[ "$1" == "cmake.test_example_plugin" ]]; then
   # Build the plugin
@@ -663,9 +851,9 @@ elif [[ "$1" == "code.coverage" ]]; then
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DCMAKE_CXX_FLAGS="-Werror --coverage -fprofile-update=atomic $CXXFLAGS" \
         -C "${SRC_DIR}/test_common/cmake/all-options-abiv2-preview.cmake" \
-        -DWITH_EXAMPLES=OFF \
-        -DWITH_EXAMPLES_HTTP=OFF \
-        -DWITH_BENCHMARK=OFF \
+        -DOTELCPP_WITH_EXAMPLES=OFF \
+        -DOTELCPP_WITH_EXAMPLES_HTTP=OFF \
+        -DOTELCPP_WITH_BENCHMARK=OFF \
         "${SRC_DIR}"
 
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
