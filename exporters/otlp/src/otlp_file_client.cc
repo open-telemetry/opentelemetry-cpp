@@ -973,7 +973,6 @@ void ConvertListFieldToJson(nlohmann::json &value,
 
 // NOLINTEND(misc-no-recursion) suppressing for performance as if implemented with stack needs
 // Dynamic memory allocation
-}  // namespace
 
 class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileSystemBackend : public OtlpFileAppender
 {
@@ -1615,6 +1614,7 @@ public:
 private:
   std::reference_wrapper<std::ostream> os_;
 };
+}  // namespace
 
 OtlpFileClient::OtlpFileClient(OtlpFileClientOptions &&options,
                                OtlpFileClientRuntimeOptions &&runtime_options)
