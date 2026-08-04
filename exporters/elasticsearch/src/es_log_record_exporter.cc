@@ -110,8 +110,8 @@ public:
 
   /**
    * A method the user calls to block their thread until the request has either produced a
-   * response or failed. The longest duration is the timeout of the request, set by
-   * SetTimeoutMs(), which arrives here as a TimedOut session event.
+   * response or failed. It has no deadline of its own and relies on the HTTP client reporting
+   * one of the terminal session states.
    */
   bool waitForResponse()
   {
@@ -135,12 +135,18 @@ public:
   // Callback method when an http event occurs
   void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
   {
-    // If any failure event occurs, release the condition variable to unblock main thread
+    // If any failure event occurs, release the condition variable to unblock main thread.
+    //
+    // A failure is reported only by the event that decided the outcome. Recording is first writer
+    // wins, so any of these can arrive after a response has already succeeded, and an error line
+    // there would describe a failure the caller was never told about.
     switch (state)
     {
       case http_client::SessionState::CreateFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed to create session");
-        recordCompletion(CompletionState::Failure);
+        if (recordCompletion(CompletionState::Failure))
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed to create session");
+        }
         break;
       case http_client::SessionState::Created:
         OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Session created");
@@ -155,8 +161,10 @@ public:
         OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Connecting to peer");
         break;
       case http_client::SessionState::ConnectFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed to connect to peer");
-        recordCompletion(CompletionState::Failure);
+        if (recordCompletion(CompletionState::Failure))
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed to connect to peer");
+        }
         break;
       case http_client::SessionState::Connected:
         OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Connected to peer");
@@ -165,33 +173,49 @@ public:
         OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Sending request");
         break;
       case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed to send request");
-        recordCompletion(CompletionState::Failure);
+        if (recordCompletion(CompletionState::Failure))
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed to send request");
+        }
         break;
       case http_client::SessionState::Response:
         OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Received response");
         break;
       case http_client::SessionState::SSLHandshakeFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed SSL Handshake");
-        recordCompletion(CompletionState::Failure);
+        if (recordCompletion(CompletionState::Failure))
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed SSL Handshake");
+        }
         break;
       case http_client::SessionState::TimedOut:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request timed out");
-        recordCompletion(CompletionState::Failure);
+        if (recordCompletion(CompletionState::Failure))
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request timed out");
+        }
         break;
       case http_client::SessionState::NetworkError:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error");
-        recordCompletion(CompletionState::Failure);
+        if (recordCompletion(CompletionState::Failure))
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error");
+        }
         break;
       case http_client::SessionState::ReadError:
-        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Read error");
+        if (recordCompletion(CompletionState::Failure))
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Read error");
+        }
         break;
       case http_client::SessionState::WriteError:
-        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Write error");
+        if (recordCompletion(CompletionState::Failure))
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Write error");
+        }
         break;
       case http_client::SessionState::Cancelled:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] (manually) cancelled");
-        recordCompletion(CompletionState::Failure);
+        if (recordCompletion(CompletionState::Failure))
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] (manually) cancelled");
+        }
         break;
     }
   }
@@ -208,22 +232,27 @@ private:
    * Record the outcome of the request, first writer wins, then release any waiter. Keeping the
    * first outcome means a session destroyed after a successful response does not overwrite it.
    */
-  void recordCompletion(CompletionState state)
+  /// Returns whether this call is the one that decided the outcome.
+  bool recordCompletion(CompletionState state)
   {
+    bool recorded = false;
     {
       std::unique_lock<std::mutex> lk(mutex_);
-      recordCompletionLocked(state);
+      recorded = recordCompletionLocked(state);
     }
     cv_.notify_all();
+    return recorded;
   }
 
   /// As recordCompletion(), for callers that already hold mutex_ and notify themselves.
-  void recordCompletionLocked(CompletionState state)
+  bool recordCompletionLocked(CompletionState state)
   {
-    if (completion_ == CompletionState::Pending)
+    if (completion_ != CompletionState::Pending)
     {
-      completion_ = state;
+      return false;
     }
+    completion_ = state;
+    return true;
   }
 
   // Define a condition variable and mutex
