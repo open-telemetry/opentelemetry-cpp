@@ -5,6 +5,8 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
+#include <cctype>
+
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
 #  include <regex>
 #else
@@ -46,14 +48,14 @@ bool InstrumentMetaDataValidator::ValidateName(nostd::string_view name) const
     return false;
   }
   // first char should be alpha
-  if (!isalpha(name[0]))
+  if (!std::isalpha(name[0]))
   {
     return false;
   }
   // subsequent chars should be either of alphabets, digits, underscore,
   // minus, dot, slash
   return !std::any_of(std::next(name.begin()), name.end(), [](char c) {
-    return !isalnum(c) && (c != '-') && (c != '_') && (c != '.') && (c != '/');
+    return !std::isalnum(c) && (c != '-') && (c != '_') && (c != '.') && (c != '/');
   });
 #endif
 }

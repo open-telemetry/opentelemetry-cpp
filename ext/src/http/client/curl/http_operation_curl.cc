@@ -329,7 +329,7 @@ size_t HttpOperation::ReadMemoryCallback(char *buffer, size_t size, size_t nitem
     nwrite = self->request_body_.size() - self->request_nwrite_;
   }
 
-  memcpy(buffer, &self->request_body_[self->request_nwrite_], nwrite);
+  std::memcpy(buffer, &self->request_body_[self->request_nwrite_], nwrite);
   self->request_nwrite_ += nwrite;
   return nwrite;
 }
