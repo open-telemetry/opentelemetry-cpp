@@ -1,9 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdio.h>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <fstream>
 #include <limits>
 #include <map>
@@ -98,6 +98,7 @@
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
@@ -1768,6 +1769,24 @@ ConfigurationParser::ParseParentBasedSamplerConfiguration(const std::unique_ptr<
 }
 // NOLINTEND(misc-no-recursion)
 
+std::unique_ptr<ProbabilitySamplerConfiguration>
+ConfigurationParser::ParseProbabilitySamplerConfiguration(const std::unique_ptr<DocumentNode> &node,
+                                                          size_t /* depth */) const
+{
+  using Config = ProbabilitySamplerConfiguration;
+  auto model   = std::make_unique<ProbabilitySamplerConfiguration>();
+
+  model->ratio = node->GetDouble("ratio", Config::kDefaultRatio);
+  if (!(model->ratio >= Config::kMinRatio && model->ratio <= Config::kMaxRatio))
+  {
+    std::string message("Illegal ratio: ");
+    message.append(std::to_string(model->ratio));
+    throw InvalidSchemaException(node->Location(), message);
+  }
+
+  return model;
+}
+
 std::unique_ptr<TraceIdRatioBasedSamplerConfiguration>
 ConfigurationParser::ParseTraceIdRatioBasedSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node,
@@ -2059,6 +2078,10 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
   else if (name == "parent_based")
   {
     model = ParseParentBasedSamplerConfiguration(child, depth);
+  }
+  else if (name == "probability/development")
+  {
+    model = ParseProbabilitySamplerConfiguration(child, depth);
   }
   else if (name == "trace_id_ratio_based")
   {

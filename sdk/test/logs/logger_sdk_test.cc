@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>  // IWYU pragma: keep
-#include <stdint.h>
 #include <array>
 #include <chrono>
+#include <cstddef>  // IWYU pragma: keep
+#include <cstdint>
 #include <functional>
 #include <string>
 #include <utility>
@@ -49,7 +49,7 @@
 #include "opentelemetry/trace/tracer.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <stddef.h>
+#  include <cstddef>
 
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/nostd/span.h"

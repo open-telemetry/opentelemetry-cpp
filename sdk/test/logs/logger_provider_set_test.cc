@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
