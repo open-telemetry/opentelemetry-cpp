@@ -31,6 +31,8 @@ Increment the:
   [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
 * [CONFIGURATION] Add the probability sampler to file configuration
   [#4334](https://github.com/open-telemetry/opentelemetry-cpp/pull/4334)
+* [BUG] Stop reading past a `nostd::string_view` that is not NUL terminated
+  [#4346](https://github.com/open-telemetry/opentelemetry-cpp/pull/4346)
 
 * [OTLP/HTTP] Honor `Retry-After` response header when retrying exports,
   supporting both delay-seconds and HTTP-date formats per RFC 7231 §7.1.3.
