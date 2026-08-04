@@ -109,5 +109,38 @@ BENCHMARK(BM_AdaptingCircularBufferCounterGetWrapped)
     ->Arg(kDefaultWindow)
     ->Arg(kLargeWindow);
 
+// Folds a full, wrapped buffer in half. This is the operation the base2
+// exponential histogram runs whenever a recording falls outside the current
+// window, and it is the one that used to allocate a replacement buffer per
+// call.
+//
+// Downscaling is destructive, so an iteration cannot start from the previous
+// result. The buffer is restored by copy-assigning a pristine one, which for
+// equally sized buffers of the same cell width is a copy of the counts with no
+// allocation, rather than by replaying the recordings.
+void BM_AdaptingCircularBufferCounterDownscale(benchmark::State &state)
+{
+  const int32_t window = static_cast<int32_t>(state.range(0));
+  AdaptingCircularBufferCounter filled(static_cast<size_t>(window));
+  filled.Increment(0, 1);
+  for (int32_t index = -1; index > -window; --index)
+  {
+    filled.Increment(index, 1);
+  }
+
+  AdaptingCircularBufferCounter counter(static_cast<size_t>(window));
+  for (auto _ : state)
+  {
+    counter = filled;
+    counter.Downscale(1);
+    benchmark::DoNotOptimize(counter);
+  }
+  state.SetItemsProcessed(state.iterations() * window);
+}
+BENCHMARK(BM_AdaptingCircularBufferCounterDownscale)
+    ->Arg(kSmallWindow)
+    ->Arg(kDefaultWindow)
+    ->Arg(kLargeWindow);
+
 }  // namespace
 BENCHMARK_MAIN();

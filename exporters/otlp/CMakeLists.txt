@@ -1014,6 +1014,9 @@ if(BUILD_TESTING)
       nlohmann_json::nlohmann_json
       protobuf::libprotobuf
       opentelemetry_test_common)
+    if(WIN32)
+      target_link_libraries(otlp_http_exporter_test ws2_32)
+    endif()
     gtest_add_tests(
       TARGET otlp_http_exporter_test
       TEST_PREFIX exporter.otlp.
@@ -1041,6 +1044,9 @@ if(BUILD_TESTING)
       opentelemetry_http_client_nosend
       nlohmann_json::nlohmann_json
       opentelemetry_test_common)
+    if(WIN32)
+      target_link_libraries(otlp_http_log_record_exporter_test ws2_32)
+    endif()
     gtest_add_tests(
       TARGET otlp_http_log_record_exporter_test
       TEST_PREFIX exporter.otlp.

@@ -30,6 +30,8 @@
 
 namespace nlohmann
 {
+namespace
+{
 template <class T>
 struct json_assign_visitor
 {
@@ -52,6 +54,7 @@ struct json_assign_visitor
     }
   }
 };
+}  // namespace
 
 template <>
 struct adl_serializer<opentelemetry::sdk::common::OwnedAttributeValue>
