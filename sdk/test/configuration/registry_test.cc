@@ -57,8 +57,7 @@
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_builder.h"
-// Complete types required: the mock builders return std::unique_ptr<T>{nullptr},
-// which instantiates ~unique_ptr<T> and needs sizeof(T).
+
 #include "opentelemetry/context/propagation/text_map_propagator.h"      // IWYU pragma: keep
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/logs/exporter.h"                            // IWYU pragma: keep
@@ -79,6 +78,9 @@ namespace configuration = opentelemetry::sdk::configuration;
 
 namespace
 {
+
+// ----------------------------------------------------------------------------------
+// Test SDK Component Builders
 
 class TestAlwaysOnSamplerBuilder : public configuration::AlwaysOnSamplerBuilder
 {
@@ -593,7 +595,9 @@ public:
 
 }  // namespace
 
-// Exercises the empty → set → replace lifecycle for a typed (non-named-map) registry slot.
+// ----------------------------------------------------------------------------------
+// Test Helpers
+
 template <typename MockType, typename GetBuilderFn, typename SetBuilderFn>
 void TestTypedSlot(GetBuilderFn getter, SetBuilderFn setter)
 {
@@ -611,7 +615,6 @@ void TestTypedSlot(GetBuilderFn getter, SetBuilderFn setter)
   ASSERT_EQ(std::invoke(getter, registry), second_ptr);
 }
 
-// Exercises the empty → set → replace lifecycle for a named-map registry slot.
 template <typename MockType, typename GetBuilderFn, typename SetBuilderFn>
 void TestNamedSlot(GetBuilderFn getter, SetBuilderFn setter, const std::string &key)
 {
@@ -629,6 +632,9 @@ void TestNamedSlot(GetBuilderFn getter, SetBuilderFn setter, const std::string &
   std::invoke(setter, registry, key, std::move(second));
   ASSERT_EQ(std::invoke(getter, registry, key), second_ptr);
 }
+
+// ----------------------------------------------------------------------------------
+// Test Cases
 
 TEST(Registry, AlwaysOnSamplerBuilder)
 {
