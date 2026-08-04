@@ -58,7 +58,6 @@ Checks: >
   -modernize-use-nodiscard,
   -modernize-use-scoped-lock,
   -modernize-use-trailing-return-type,
-  -modernize-deprecated-headers,
   -modernize-loop-convert,
   -modernize-pass-by-value,
   -modernize-use-equals-default,
