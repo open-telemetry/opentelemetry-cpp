@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 #include <utility>
-#include <vector>
+#include <vector>  // IWYU pragma: keep
 
 #include "opentelemetry/sdk/configuration/always_off_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_builder.h"
@@ -35,19 +35,21 @@
 #include "opentelemetry/sdk/configuration/simple_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_builder.h"
-#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
-#include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/logger_config.h"
-#include "opentelemetry/sdk/logs/processor.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#include "opentelemetry/sdk/metrics/meter_config.h"
-#include "opentelemetry/sdk/metrics/metric_reader.h"
-#include "opentelemetry/sdk/resource/resource_detector.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/sampler.h"
-#include "opentelemetry/sdk/trace/samplers/composable_sampler.h"
-#include "opentelemetry/sdk/trace/tracer_config.h"
+// Complete types required: the mock builders return std::unique_ptr<T>{nullptr},
+// which instantiates ~unique_ptr<T> and needs sizeof(T).
+#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"  // IWYU pragma: keep
+#include "opentelemetry/sdk/logs/exporter.h"                            // IWYU pragma: keep
+#include "opentelemetry/sdk/logs/logger_config.h"                       // IWYU pragma: keep
+#include "opentelemetry/sdk/logs/processor.h"                           // IWYU pragma: keep
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"           // IWYU pragma: keep
+#include "opentelemetry/sdk/metrics/meter_config.h"                     // IWYU pragma: keep
+#include "opentelemetry/sdk/metrics/metric_reader.h"                    // IWYU pragma: keep
+#include "opentelemetry/sdk/resource/resource_detector.h"               // IWYU pragma: keep
+#include "opentelemetry/sdk/trace/exporter.h"                           // IWYU pragma: keep
+#include "opentelemetry/sdk/trace/processor.h"                          // IWYU pragma: keep
+#include "opentelemetry/sdk/trace/sampler.h"                            // IWYU pragma: keep
+#include "opentelemetry/sdk/trace/samplers/composable_sampler.h"        // IWYU pragma: keep
+#include "opentelemetry/sdk/trace/tracer_config.h"                      // IWYU pragma: keep
 
 namespace configuration = opentelemetry::sdk::configuration;
 
