@@ -38,12 +38,15 @@ const int TEST_FAILED = 1;
   Command line parameters.
 */
 
+namespace
+{
 enum test_mode : std::uint8_t
 {
   MODE_NONE,
   MODE_HTTP,
   MODE_HTTPS
 };
+}  // namespace
 
 static bool opt_help   = false;
 static bool opt_list   = false;
