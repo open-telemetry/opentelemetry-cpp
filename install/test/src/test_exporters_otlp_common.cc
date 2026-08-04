@@ -17,6 +17,7 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h"  // IWYU pragma: keep
 // clang-format on
 
+#include <opentelemetry/exporters/otlp/otlp_environment.h>
 #include <opentelemetry/exporters/otlp/otlp_log_recordable.h>
 #include <opentelemetry/exporters/otlp/otlp_metric_utils.h>
 #include <opentelemetry/exporters/otlp/otlp_recordable.h>
@@ -57,6 +58,11 @@ static metrics_sdk::MetricData CreateSumAggregationData()
   point_data_attr.push_back(point_data_attr_2);
   data.point_data_attr_ = std::move(point_data_attr);
   return data;
+}
+
+TEST(ExportersOtlpCommon, OtlpEnvironmentDefaults)
+{
+  EXPECT_FALSE(otlp_exporter::GetOtlpDefaultGrpcTracesEndpoint().empty());
 }
 
 TEST(ExportersOtlpCommon, OtlpSpanRecordable)
