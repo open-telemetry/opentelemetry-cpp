@@ -39,12 +39,15 @@ const int TEST_FAILED = 1;
   Command line parameters.
 */
 
+namespace
+{
 enum class TestMode : std::uint8_t
 {
   kNone,
   kHttp,
   kHttps
 };
+}  // namespace
 
 static bool opt_help   = false;
 static bool opt_list   = false;
