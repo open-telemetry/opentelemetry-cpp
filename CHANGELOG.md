@@ -16,19 +16,8 @@ Increment the:
 ## [Unreleased]
 
 * [METRICS SDK] Enforce a runtime minimum scale for
-  `Base2ExponentialHistogramAggregation`. Automatic downscaling now stops at
-  `kMinRuntimeScale` (-10, the declarative-configuration minimum for
-  `max_scale`) instead of driving `scale_` below the range the configuration
-  validator accepts. Every scale mutation on the record, merge and diff paths
-  goes through one clamped helper, so bucket indices and `scale_` always move by
-  the same amount. Bucket buffers are allocated with at least three slots
-  (`kMinBucketsAtFloor`) because every finite double maps to an index in
-  `[-2, 0]` at the floor; this only widens the degenerate `max_size == 2`
-  configuration, whose reported `max_buckets_` stays the configured value, and
-  guarantees no recording is dropped once the floor is reached. The indexer now
-  saturates its right shift so an out-of-range scale supplied through the
-  point-data constructors cannot trigger undefined behaviour.
-  [#4325](https://github.com/open-telemetry/opentelemetry-cpp/issues/4325)
+  `Base2ExponentialHistogramAggregation`.
+  [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
 
 * [CODE HEALTH] Move remaining `misc-use-internal-linkage` classes/enums into
   anonymous namespaces: `OtlpFileSystemBackend`/`OtlpFileOstreamBackend` in
