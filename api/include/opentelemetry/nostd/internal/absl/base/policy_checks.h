@@ -25,7 +25,7 @@
 #define OTABSL_BASE_POLICY_CHECKS_H_
 
 // Included for the __GLIBC_PREREQ macro used below.
-#include <climits>
+#include <limits.h>
 
 // Included for the _STLPORT_VERSION macro used below.
 #if defined(__cplusplus)

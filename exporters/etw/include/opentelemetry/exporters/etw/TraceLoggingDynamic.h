@@ -21,7 +21,7 @@ Environment:
 #pragma once
 #include <windows.h>
 #include <evntprov.h>
-#include <cstdlib> // byteswap
+#include <stdlib.h> // byteswap
 
 namespace tld
 {
