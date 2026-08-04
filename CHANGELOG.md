@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Move remaining `misc-use-internal-linkage` classes/enums into
+  anonymous namespaces: `OtlpFileSystemBackend`/`OtlpFileOstreamBackend` in
+  the OTLP file exporter, `ResponseHandler`/`AsyncResponseHandler`/
+  `json_assign_visitor` in the Elasticsearch log exporter, and the
+  `TestMode`/`test_mode` enums in the OTLP functional test binaries.
+  [#4196](https://github.com/open-telemetry/opentelemetry-cpp/issues/4196)
 * [METRICS SDK] Fix Windows metrics tail latency on the synchronous record path:
   `SyncMetricStorage::attribute_hashmap_lock_` now uses `std::mutex` instead of
   `common::SpinLockMutex`. The spin lock's final `sleep_for(1ms)` back-off is
@@ -113,6 +119,23 @@ Increment the:
   [#4324](https://github.com/open-telemetry/opentelemetry-cpp/pull/4324)
 
 Breaking changes:
+
+* [BUILD] Install an explicit list of ext headers instead of the whole
+  directory
+  [#4327](https://github.com/open-telemetry/opentelemetry-cpp/pull/4327)
+  * The `ext_common` component installed `include/opentelemetry/ext` with a
+    `*.h` glob. It now installs a named list, and these five headers are no
+    longer part of the package:
+    * `opentelemetry/ext/http/client/curl/http_client_curl.h`
+    * `opentelemetry/ext/http/client/curl/http_operation_curl.h`
+    * `opentelemetry/ext/http/client/detail/default_factory.h`
+    * `opentelemetry/ext/http/server/http_server.h`
+    * `opentelemetry/ext/http/server/socket_tools.h`
+  * Code that included any of them from an installed package will no longer
+    compile. A curl client is created through `http_client_factory_curl.h`,
+    which needs only the abstract `http_client_factory.h`. The two server
+    headers are an embedded test server; moving them out of `ext` is tracked
+    in #4332.
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
