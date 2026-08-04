@@ -37,6 +37,8 @@ Increment the:
   [#4334](https://github.com/open-telemetry/opentelemetry-cpp/pull/4334)
 * [BUG] Stop reading past a `nostd::string_view` that is not NUL terminated
   [#4346](https://github.com/open-telemetry/opentelemetry-cpp/pull/4346)
+* [BUG] End the Elasticsearch exporter's wait on a read or write error
+  [#4331](https://github.com/open-telemetry/opentelemetry-cpp/pull/4331)
 
 * [OTLP/HTTP] Honor `Retry-After` response header when retrying exports,
   supporting both delay-seconds and HTTP-date formats per RFC 7231 §7.1.3.

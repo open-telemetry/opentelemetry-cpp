@@ -55,4 +55,8 @@ if(BUILD_TESTING)
     TARGET es_log_record_exporter_test
     TEST_PREFIX exporter.
     TEST_LIST es_log_record_exporter_test)
+
+  # These cases exist to catch a wait that never returns. Without a per test
+  # bound a regression stalls the job instead of failing it.
+  set_tests_properties(${es_log_record_exporter_test} PROPERTIES TIMEOUT 30)
 endif() # BUILD_TESTING
