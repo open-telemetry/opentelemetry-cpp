@@ -1117,3 +1117,178 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationRecordPathRepeatedDownscal
   ExpectBucketsMatchIndexer(recorded, *point.positive_buckets_, point.scale_, 1.0, "positive");
   ExpectBucketsMatchIndexer(recorded, *point.negative_buckets_, point.scale_, -1.0, "negative");
 }
+
+namespace
+{
+// The widest span a double can produce: the smallest subnormal and the largest finite value.
+constexpr double kTiny = (std::numeric_limits<double>::denorm_min)();
+constexpr double kHuge = (std::numeric_limits<double>::max)();
+
+// The most demanding configuration: the scale already starts at the runtime floor and only two
+// buckets are budgeted, while the full double range needs three at that scale.
+Base2ExponentialHistogramAggregationConfig FloorConfig()
+{
+  return MakeAggregationConfig(kMinRuntimeScale, kMaxSizeMin);
+}
+
+int32_t BucketSpan(const AdaptingCircularBufferCounter &buckets)
+{
+  return buckets.Empty() ? 0 : buckets.EndIndex() - buckets.StartIndex() + 1;
+}
+}  // namespace
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationScaleFloorFullRange)
+{
+  const auto config = FloorConfig();
+  Base2ExponentialHistogramAggregation aggr(&config);
+
+  aggr.Aggregate(kTiny, {});
+  aggr.Aggregate(kHuge, {});
+
+  const auto point = MakePointData(aggr);
+  EXPECT_EQ(point.scale_, kMinRuntimeScale);
+  EXPECT_EQ(point.max_buckets_, kMaxSizeMin);
+  ExpectCountInvariant(2u, point, "ScaleFloorFullRange");
+  EXPECT_TRUE(point.negative_buckets_->Empty());
+  EXPECT_EQ(BucketSpan(*point.positive_buckets_), static_cast<int32_t>(kMinBucketsAtFloor));
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationScaleFloorFullRangeNegative)
+{
+  const auto config = FloorConfig();
+  Base2ExponentialHistogramAggregation aggr(&config);
+
+  aggr.Aggregate(-kTiny, {});
+  aggr.Aggregate(-kHuge, {});
+
+  const auto point = MakePointData(aggr);
+  EXPECT_EQ(point.scale_, kMinRuntimeScale);
+  ExpectCountInvariant(2u, point, "ScaleFloorFullRangeNegative");
+  EXPECT_TRUE(point.positive_buckets_->Empty());
+  EXPECT_EQ(BucketSpan(*point.negative_buckets_), static_cast<int32_t>(kMinBucketsAtFloor));
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationScaleFloorMixedSign)
+{
+  const auto config = FloorConfig();
+  Base2ExponentialHistogramAggregation aggr(&config);
+
+  // Both bucket arrays are driven to the floor while sharing a single scale_.
+  aggr.Aggregate(kTiny, {});
+  aggr.Aggregate(-kHuge, {});
+  aggr.Aggregate(kHuge, {});
+  aggr.Aggregate(-kTiny, {});
+  aggr.Aggregate(0.0, {});
+
+  const auto point = MakePointData(aggr);
+  EXPECT_EQ(point.scale_, kMinRuntimeScale);
+  ExpectCountInvariant(5u, point, "ScaleFloorMixedSign");
+  EXPECT_EQ(point.zero_count_, 1u);
+  EXPECT_EQ(BucketSpan(*point.positive_buckets_), static_cast<int32_t>(kMinBucketsAtFloor));
+  EXPECT_EQ(BucketSpan(*point.negative_buckets_), static_cast<int32_t>(kMinBucketsAtFloor));
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationScaleFloorIsIdempotent)
+{
+  const auto config = FloorConfig();
+  Base2ExponentialHistogramAggregation aggr(&config);
+
+  for (int i = 0; i < 10; ++i)
+  {
+    aggr.Aggregate(kTiny, {});
+    aggr.Aggregate(kHuge, {});
+    aggr.Aggregate(1.0, {});
+    EXPECT_EQ(MakePointData(aggr).scale_, kMinRuntimeScale) << "iteration " << i;
+  }
+
+  ExpectCountInvariant(30u, MakePointData(aggr), "ScaleFloorIsIdempotent");
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationMergeAtScaleFloor)
+{
+  const auto config = FloorConfig();
+
+  Base2ExponentialHistogramAggregation tiny(&config);
+  tiny.Aggregate(kTiny, {});
+  Base2ExponentialHistogramAggregation huge(&config);
+  huge.Aggregate(-kHuge, {});
+  huge.Aggregate(kHuge, {});
+
+  ASSERT_EQ(MakePointData(tiny).scale_, kMinRuntimeScale);
+  ASSERT_EQ(MakePointData(huge).scale_, kMinRuntimeScale);
+
+  const auto merged = MakePointData(*tiny.Merge(huge));
+  EXPECT_GE(merged.scale_, kMinRuntimeScale);
+  ExpectCountInvariant(3u, merged, "MergeAtScaleFloor");
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationMergeFloorWithHighScale)
+{
+  const auto floor_config = FloorConfig();
+  Base2ExponentialHistogramAggregation at_floor(&floor_config);
+  at_floor.Aggregate(kTiny, {});
+  at_floor.Aggregate(kHuge, {});
+
+  const Base2ExponentialHistogramAggregationConfig default_config;
+  Base2ExponentialHistogramAggregation fine_grained(&default_config);
+  // Both recordings land in the same bucket, so this operand keeps its configured max_scale.
+  fine_grained.Aggregate(1.0, {});
+  fine_grained.Aggregate(1.0, {});
+
+  const auto floor_point = MakePointData(at_floor);
+  const auto fine_point  = MakePointData(fine_grained);
+  ASSERT_EQ(floor_point.scale_, kMinRuntimeScale);
+  ASSERT_EQ(fine_point.scale_, default_config.max_scale_);
+
+  // The finer-grained operand is folded onto the coarser scale by exactly the scale delta.
+  const auto merged = MakePointData(*at_floor.Merge(fine_grained));
+  EXPECT_EQ(merged.scale_, kMinRuntimeScale);
+  ExpectCountInvariant(4u, merged, "MergeFloorWithHighScale");
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationDiffAtScaleFloor)
+{
+  const auto config = FloorConfig();
+
+  Base2ExponentialHistogramAggregation left(&config);
+  left.Aggregate(kTiny, {});
+
+  Base2ExponentialHistogramAggregation extra(&config);
+  extra.Aggregate(kHuge, {});
+
+  const auto right = left.Merge(extra);
+  ASSERT_EQ(MakePointData(*right).scale_, kMinRuntimeScale);
+
+  const auto diffed = MakePointData(*left.Diff(*right));
+  EXPECT_GE(diffed.scale_, kMinRuntimeScale);
+  ExpectCountInvariant(1u, diffed, "DiffAtScaleFloor");
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationDefaultConfigStaysAboveFloor)
+{
+  // The default budget is wide enough to hold the full double range well above the floor, so the
+  // floor capacity guarantee must not change the scale a normal configuration settles on.
+  const Base2ExponentialHistogramAggregationConfig config;
+  Base2ExponentialHistogramAggregation aggr(&config);
+
+  aggr.Aggregate(kTiny, {});
+  aggr.Aggregate(kHuge, {});
+
+  const auto point = MakePointData(aggr);
+  EXPECT_GT(point.scale_, kMinRuntimeScale);
+  EXPECT_LT(point.scale_, config.max_scale_);
+  EXPECT_EQ(point.max_buckets_, config.max_size_);
+  ExpectCountInvariant(2u, point, "DefaultConfigStaysAboveFloor");
+  EXPECT_LE(BucketSpan(*point.positive_buckets_), static_cast<int32_t>(config.max_size_));
+}
+
+TEST(Aggregation, Base2ExponentialHistogramIndexerSaturatesShiftAtExtremeNegativeScale)
+{
+  // Scales this low are only reachable through the point data constructors, but the shift must
+  // stay defined: every index has collapsed to -1 or 0 by then.
+  const Base2ExponentialHistogramIndexer indexer(-40);
+  EXPECT_EQ(indexer.ComputeIndex(1.0), -1);
+  EXPECT_EQ(indexer.ComputeIndex(kTiny), -1);
+  EXPECT_EQ(indexer.ComputeIndex(4.0), 0);
+  EXPECT_EQ(indexer.ComputeIndex(kHuge), 0);
+}

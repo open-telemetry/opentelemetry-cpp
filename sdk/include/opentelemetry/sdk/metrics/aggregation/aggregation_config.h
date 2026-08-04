@@ -72,6 +72,16 @@ constexpr std::int32_t kMaxScaleMin = -10;
 constexpr std::int32_t kMaxScaleMax = 20;
 constexpr std::size_t kMaxSizeMin   = 2;
 
+// Lower bound for the scale chosen at runtime by automatic downscaling. The specification only
+// requires a "reasonable minimum", so this SDK aligns the runtime floor with the declarative
+// configuration minimum for max_scale.
+constexpr std::int32_t kMinRuntimeScale = kMaxScaleMin;
+
+// Bucket slots needed to keep every finite double representable at kMinRuntimeScale, where all
+// values map to an index in [-2, 0]. Bucket buffers are never allocated smaller than this, so a
+// histogram pinned at the floor never has to drop a recording.
+constexpr std::size_t kMinBucketsAtFloor = 3;
+
 class Base2ExponentialHistogramAggregationConfig : public AggregationConfig
 {
 public:

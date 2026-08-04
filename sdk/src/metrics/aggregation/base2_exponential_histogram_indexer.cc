@@ -4,6 +4,7 @@
 #include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h"
 
 #include <cmath>
+#include <cstdint>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -62,8 +63,10 @@ int32_t Base2ExponentialHistogramIndexer::ComputeIndex(double value) const
   }
   // For scale zero, compute the exact index by extracting the exponent.
   // For negative scales, compute the exact index by extracting the exponent and shifting it to
-  // the right by -scale
-  return MapToIndexScaleZero(abs_value) >> -scale_;
+  // the right by -scale. The shift saturates at 31 because shifting an int32_t by 32 or more is
+  // undefined, and every index has already collapsed to -1 or 0 at that point.
+  const int64_t shift = -static_cast<int64_t>(scale_);
+  return MapToIndexScaleZero(abs_value) >> (shift > 31 ? 31 : static_cast<int32_t>(shift));
 }
 
 }  // namespace metrics
