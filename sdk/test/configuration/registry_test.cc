@@ -17,26 +17,49 @@
 #include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/container_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/extension_metric_producer_builder.h"
+#include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/extension_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/extension_span_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/extension_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/host_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_builder.h"
 #include "opentelemetry/sdk/configuration/meter_configurator_builder.h"
 #include "opentelemetry/sdk/configuration/open_census_metric_producer_builder.h"
+#include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/otlp_file_span_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/otlp_http_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/probability_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/process_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/service_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_builder.h"
+#include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_builder.h"
 // Complete types required: the mock builders return std::unique_ptr<T>{nullptr},
 // which instantiates ~unique_ptr<T> and needs sizeof(T).
+#include "opentelemetry/context/propagation/text_map_propagator.h"      // IWYU pragma: keep
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/logs/exporter.h"                            // IWYU pragma: keep
 #include "opentelemetry/sdk/logs/logger_config.h"                       // IWYU pragma: keep
@@ -44,6 +67,7 @@
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"           // IWYU pragma: keep
 #include "opentelemetry/sdk/metrics/meter_config.h"                     // IWYU pragma: keep
 #include "opentelemetry/sdk/metrics/metric_reader.h"                    // IWYU pragma: keep
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"             // IWYU pragma: keep
 #include "opentelemetry/sdk/resource/resource_detector.h"               // IWYU pragma: keep
 #include "opentelemetry/sdk/trace/exporter.h"                           // IWYU pragma: keep
 #include "opentelemetry/sdk/trace/processor.h"                          // IWYU pragma: keep
@@ -338,6 +362,235 @@ public:
   }
 };
 
+class TestConsoleSpanExporterBuilder : public configuration::ConsoleSpanExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+      const configuration::ConsoleSpanExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestConsolePushMetricExporterBuilder : public configuration::ConsolePushMetricExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Build(
+      const configuration::ConsolePushMetricExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestConsoleLogRecordExporterBuilder : public configuration::ConsoleLogRecordExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(
+      const configuration::ConsoleLogRecordExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestOtlpHttpSpanExporterBuilder : public configuration::OtlpHttpSpanExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+      const configuration::OtlpHttpSpanExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestOtlpGrpcSpanExporterBuilder : public configuration::OtlpGrpcSpanExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+      const configuration::OtlpGrpcSpanExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestOtlpFileSpanExporterBuilder : public configuration::OtlpFileSpanExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+      const configuration::OtlpFileSpanExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestOtlpHttpPushMetricExporterBuilder
+    : public configuration::OtlpHttpPushMetricExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Build(
+      const configuration::OtlpHttpPushMetricExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestOtlpGrpcPushMetricExporterBuilder
+    : public configuration::OtlpGrpcPushMetricExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Build(
+      const configuration::OtlpGrpcPushMetricExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestOtlpFilePushMetricExporterBuilder
+    : public configuration::OtlpFilePushMetricExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Build(
+      const configuration::OtlpFilePushMetricExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestOtlpHttpLogRecordExporterBuilder : public configuration::OtlpHttpLogRecordExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(
+      const configuration::OtlpHttpLogRecordExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestOtlpGrpcLogRecordExporterBuilder : public configuration::OtlpGrpcLogRecordExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(
+      const configuration::OtlpGrpcLogRecordExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestOtlpFileLogRecordExporterBuilder : public configuration::OtlpFileLogRecordExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(
+      const configuration::OtlpFileLogRecordExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestPeriodicMetricReaderBuilder : public configuration::PeriodicMetricReaderBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(
+      const configuration::PeriodicMetricReaderConfiguration * /* model */,
+      std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> && /* exporter */)
+      const override
+  {
+    return nullptr;
+  }
+};
+
+class TestPrometheusPullMetricExporterBuilder
+    : public configuration::PrometheusPullMetricExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(
+      const configuration::PrometheusPullMetricExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestTextMapPropagatorBuilder : public configuration::TextMapPropagatorBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> Build() const override
+  {
+    return nullptr;
+  }
+};
+
+class TestExtensionSamplerBuilder : public configuration::ExtensionSamplerBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> Build(
+      const configuration::ExtensionSamplerConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestExtensionSpanExporterBuilder : public configuration::ExtensionSpanExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> Build(
+      const configuration::ExtensionSpanExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestExtensionSpanProcessorBuilder : public configuration::ExtensionSpanProcessorBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> Build(
+      const configuration::ExtensionSpanProcessorConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestExtensionPushMetricExporterBuilder
+    : public configuration::ExtensionPushMetricExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> Build(
+      const configuration::ExtensionPushMetricExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestExtensionPullMetricExporterBuilder
+    : public configuration::ExtensionPullMetricExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(
+      const configuration::ExtensionPullMetricExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestExtensionLogRecordExporterBuilder
+    : public configuration::ExtensionLogRecordExporterBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> Build(
+      const configuration::ExtensionLogRecordExporterConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestExtensionLogRecordProcessorBuilder
+    : public configuration::ExtensionLogRecordProcessorBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> Build(
+      const configuration::ExtensionLogRecordProcessorConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
 }  // namespace
 
 // Exercises the empty → set → replace lifecycle for a typed (non-named-map) registry slot.
@@ -554,4 +807,175 @@ TEST(Registry, ExtensionResourceDetectorBuilder)
   TestNamedSlot<TestExtensionResourceDetectorBuilder>(
       &configuration::Registry::GetExtensionResourceDetectorBuilder,
       &configuration::Registry::SetExtensionResourceDetectorBuilder, "my_detector");
+}
+
+TEST(Registry, ConsoleSpanBuilder)
+{
+  TestTypedSlot<TestConsoleSpanExporterBuilder>(&configuration::Registry::GetConsoleSpanBuilder,
+                                                &configuration::Registry::SetConsoleSpanBuilder);
+}
+
+TEST(Registry, ConsolePushMetricExporterBuilder)
+{
+  TestTypedSlot<TestConsolePushMetricExporterBuilder>(
+      &configuration::Registry::GetConsolePushMetricExporterBuilder,
+      &configuration::Registry::SetConsolePushMetricExporterBuilder);
+}
+
+TEST(Registry, ConsoleLogRecordBuilder)
+{
+  TestTypedSlot<TestConsoleLogRecordExporterBuilder>(
+      &configuration::Registry::GetConsoleLogRecordBuilder,
+      &configuration::Registry::SetConsoleLogRecordBuilder);
+}
+
+TEST(Registry, OtlpHttpSpanBuilder)
+{
+  TestTypedSlot<TestOtlpHttpSpanExporterBuilder>(&configuration::Registry::GetOtlpHttpSpanBuilder,
+                                                 &configuration::Registry::SetOtlpHttpSpanBuilder);
+}
+
+TEST(Registry, OtlpGrpcSpanBuilder)
+{
+  TestTypedSlot<TestOtlpGrpcSpanExporterBuilder>(&configuration::Registry::GetOtlpGrpcSpanBuilder,
+                                                 &configuration::Registry::SetOtlpGrpcSpanBuilder);
+}
+
+TEST(Registry, OtlpFileSpanBuilder)
+{
+  TestTypedSlot<TestOtlpFileSpanExporterBuilder>(&configuration::Registry::GetOtlpFileSpanBuilder,
+                                                 &configuration::Registry::SetOtlpFileSpanBuilder);
+}
+
+TEST(Registry, OtlpHttpPushMetricExporterBuilder)
+{
+  TestTypedSlot<TestOtlpHttpPushMetricExporterBuilder>(
+      &configuration::Registry::GetOtlpHttpPushMetricExporterBuilder,
+      &configuration::Registry::SetOtlpHttpPushMetricExporterBuilder);
+}
+
+TEST(Registry, OtlpGrpcPushMetricExporterBuilder)
+{
+  TestTypedSlot<TestOtlpGrpcPushMetricExporterBuilder>(
+      &configuration::Registry::GetOtlpGrpcPushMetricExporterBuilder,
+      &configuration::Registry::SetOtlpGrpcPushMetricExporterBuilder);
+}
+
+TEST(Registry, OtlpFilePushMetricExporterBuilder)
+{
+  TestTypedSlot<TestOtlpFilePushMetricExporterBuilder>(
+      &configuration::Registry::GetOtlpFilePushMetricExporterBuilder,
+      &configuration::Registry::SetOtlpFilePushMetricExporterBuilder);
+}
+
+TEST(Registry, OtlpHttpLogRecordBuilder)
+{
+  TestTypedSlot<TestOtlpHttpLogRecordExporterBuilder>(
+      &configuration::Registry::GetOtlpHttpLogRecordBuilder,
+      &configuration::Registry::SetOtlpHttpLogRecordBuilder);
+}
+
+TEST(Registry, OtlpGrpcLogRecordBuilder)
+{
+  TestTypedSlot<TestOtlpGrpcLogRecordExporterBuilder>(
+      &configuration::Registry::GetOtlpGrpcLogRecordBuilder,
+      &configuration::Registry::SetOtlpGrpcLogRecordBuilder);
+}
+
+TEST(Registry, OtlpFileLogRecordBuilder)
+{
+  TestTypedSlot<TestOtlpFileLogRecordExporterBuilder>(
+      &configuration::Registry::GetOtlpFileLogRecordBuilder,
+      &configuration::Registry::SetOtlpFileLogRecordBuilder);
+}
+
+TEST(Registry, PeriodicMetricReaderBuilder)
+{
+  // Registry pre-populates this slot; test replace lifecycle only.
+  configuration::Registry registry;
+  ASSERT_NE(registry.GetPeriodicMetricReaderBuilder(), nullptr);
+
+  auto first            = std::make_unique<TestPeriodicMetricReaderBuilder>();
+  const auto *first_ptr = first.get();
+  registry.SetPeriodicMetricReaderBuilder(std::move(first));
+  ASSERT_EQ(registry.GetPeriodicMetricReaderBuilder(), first_ptr);
+
+  auto second            = std::make_unique<TestPeriodicMetricReaderBuilder>();
+  const auto *second_ptr = second.get();
+  registry.SetPeriodicMetricReaderBuilder(std::move(second));
+  ASSERT_EQ(registry.GetPeriodicMetricReaderBuilder(), second_ptr);
+}
+
+TEST(Registry, PrometheusPullMetricExporterBuilder)
+{
+  TestTypedSlot<TestPrometheusPullMetricExporterBuilder>(
+      &configuration::Registry::GetPrometheusPullMetricExporterBuilder,
+      &configuration::Registry::SetPrometheusPullMetricExporterBuilder);
+}
+
+TEST(Registry, TextMapPropagatorBuilder)
+{
+  // Registry pre-populates known propagator names; use an unknown key.
+  configuration::Registry registry;
+  ASSERT_EQ(registry.GetTextMapPropagatorBuilder("custom_propagator"), nullptr);
+
+  auto first            = std::make_unique<TestTextMapPropagatorBuilder>();
+  const auto *first_ptr = first.get();
+  registry.SetTextMapPropagatorBuilder("custom_propagator", std::move(first));
+  ASSERT_EQ(registry.GetTextMapPropagatorBuilder("custom_propagator"), first_ptr);
+  ASSERT_EQ(registry.GetTextMapPropagatorBuilder("other"), nullptr);
+
+  auto second            = std::make_unique<TestTextMapPropagatorBuilder>();
+  const auto *second_ptr = second.get();
+  registry.SetTextMapPropagatorBuilder("custom_propagator", std::move(second));
+  ASSERT_EQ(registry.GetTextMapPropagatorBuilder("custom_propagator"), second_ptr);
+}
+
+TEST(Registry, ExtensionSamplerBuilder)
+{
+  TestNamedSlot<TestExtensionSamplerBuilder>(&configuration::Registry::GetExtensionSamplerBuilder,
+                                             &configuration::Registry::SetExtensionSamplerBuilder,
+                                             "my_sampler");
+}
+
+TEST(Registry, ExtensionSpanExporterBuilder)
+{
+  TestNamedSlot<TestExtensionSpanExporterBuilder>(
+      &configuration::Registry::GetExtensionSpanExporterBuilder,
+      &configuration::Registry::SetExtensionSpanExporterBuilder, "my_exporter");
+}
+
+TEST(Registry, ExtensionSpanProcessorBuilder)
+{
+  TestNamedSlot<TestExtensionSpanProcessorBuilder>(
+      &configuration::Registry::GetExtensionSpanProcessorBuilder,
+      &configuration::Registry::SetExtensionSpanProcessorBuilder, "my_processor");
+}
+
+TEST(Registry, ExtensionPushMetricExporterBuilder)
+{
+  TestNamedSlot<TestExtensionPushMetricExporterBuilder>(
+      &configuration::Registry::GetExtensionPushMetricExporterBuilder,
+      &configuration::Registry::SetExtensionPushMetricExporterBuilder, "my_exporter");
+}
+
+TEST(Registry, ExtensionPullMetricExporterBuilder)
+{
+  TestNamedSlot<TestExtensionPullMetricExporterBuilder>(
+      &configuration::Registry::GetExtensionPullMetricExporterBuilder,
+      &configuration::Registry::SetExtensionPullMetricExporterBuilder, "my_exporter");
+}
+
+TEST(Registry, ExtensionLogRecordExporterBuilder)
+{
+  TestNamedSlot<TestExtensionLogRecordExporterBuilder>(
+      &configuration::Registry::GetExtensionLogRecordExporterBuilder,
+      &configuration::Registry::SetExtensionLogRecordExporterBuilder, "my_exporter");
+}
+
+TEST(Registry, ExtensionLogRecordProcessorBuilder)
+{
+  TestNamedSlot<TestExtensionLogRecordProcessorBuilder>(
+      &configuration::Registry::GetExtensionLogRecordProcessorBuilder,
+      &configuration::Registry::SetExtensionLogRecordProcessorBuilder, "my_processor");
 }
