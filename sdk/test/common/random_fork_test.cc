@@ -7,10 +7,10 @@
 // See https://github.com/opentracing-contrib/nginx-opentracing/issues/52
 #  include "src/common/random.h"
 
-#  include <stdint.h>
 #  include <sys/mman.h>
 #  include <sys/wait.h>
 #  include <unistd.h>
+#  include <cstdint>
 #  include <cstdlib>
 #  include <iostream>
 
