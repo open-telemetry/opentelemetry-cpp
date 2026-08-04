@@ -150,6 +150,10 @@ Increment the:
 * [BUG] Wait on a completion state in the Elasticsearch exporter
   [#4298](https://github.com/open-telemetry/opentelemetry-cpp/pull/4298)
 
+* [BUG] Decide Elasticsearch bulk export success from the HTTP status, the
+  errors flag, and one acknowledgement per record
+  [#4297](https://github.com/open-telemetry/opentelemetry-cpp/pull/4297)
+
 * [BUG] Make SocketAddr string parsing safe and reject malformed addresses
   [#4292](https://github.com/open-telemetry/opentelemetry-cpp/pull/4292)
 
