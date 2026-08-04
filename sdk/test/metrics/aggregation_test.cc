@@ -1135,6 +1135,36 @@ int32_t BucketSpan(const AdaptingCircularBufferCounter &buckets)
 {
   return buckets.Empty() ? 0 : buckets.EndIndex() - buckets.StartIndex() + 1;
 }
+
+// Point data as an external caller may legitimately supply it: already at the runtime floor, with
+// the configured two-bucket budget and a matching two-slot buffer that holds kTiny at index -2.
+Base2ExponentialHistogramPointData MakeFloorPointDataWithNarrowBuckets()
+{
+  Base2ExponentialHistogramPointData point;
+  point.max_buckets_    = kMaxSizeMin;
+  point.scale_          = kMinRuntimeScale;
+  point.count_          = 1;
+  point.sum_            = kTiny;
+  point.min_            = kTiny;
+  point.max_            = kTiny;
+  point.record_min_max_ = true;
+
+  point.positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(kMaxSizeMin);
+  point.negative_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(kMaxSizeMin);
+  EXPECT_TRUE(point.positive_buckets_->Increment(-2, 1));
+  return point;
+}
+
+void ExpectFloorPointDataAcceptsFullRange(const Base2ExponentialHistogramPointData &point,
+                                          nostd::string_view label)
+{
+  SCOPED_TRACE(label);
+  EXPECT_EQ(point.scale_, kMinRuntimeScale);
+  EXPECT_EQ(point.max_buckets_, kMaxSizeMin);
+  ExpectCountInvariant(2u, point, label);
+  EXPECT_GE(point.positive_buckets_->MaxSize(), kMinBucketsAtFloor);
+  EXPECT_EQ(BucketSpan(*point.positive_buckets_), static_cast<int32_t>(kMinBucketsAtFloor));
+}
 }  // namespace
 
 TEST(Aggregation, Base2ExponentialHistogramAggregationScaleFloorFullRange)
@@ -1291,4 +1321,26 @@ TEST(Aggregation, Base2ExponentialHistogramIndexerSaturatesShiftAtExtremeNegativ
   EXPECT_EQ(indexer.ComputeIndex(kTiny), -1);
   EXPECT_EQ(indexer.ComputeIndex(4.0), 0);
   EXPECT_EQ(indexer.ComputeIndex(kHuge), 0);
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationCopiedPointDataKeepsFloorCapacity)
+{
+  // The caller's two-slot buffer cannot hold the three buckets the floor needs, so the copy has to
+  // be widened or the next full-range recording is dropped.
+  const auto point_data = MakeFloorPointDataWithNarrowBuckets();
+  Base2ExponentialHistogramAggregation aggr(point_data);
+
+  aggr.Aggregate(kHuge, {});
+
+  ExpectFloorPointDataAcceptsFullRange(MakePointData(aggr), "CopiedPointDataKeepsFloorCapacity");
+  EXPECT_EQ(point_data.positive_buckets_->MaxSize(), kMaxSizeMin);
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationMovedPointDataKeepsFloorCapacity)
+{
+  Base2ExponentialHistogramAggregation aggr(MakeFloorPointDataWithNarrowBuckets());
+
+  aggr.Aggregate(kHuge, {});
+
+  ExpectFloorPointDataAcceptsFullRange(MakePointData(aggr), "MovedPointDataKeepsFloorCapacity");
 }

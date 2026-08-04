@@ -105,6 +105,34 @@ size_t BucketCapacity(size_t max_buckets) noexcept
   return (std::max)(max_buckets, kMinBucketsAtFloor);
 }
 
+// Point data handed to the public constructors carries buffers the caller sized, which can be
+// narrower than the capacity this class guarantees; move the counts into a wide enough buffer.
+void EnsureBucketCapacity(std::unique_ptr<AdaptingCircularBufferCounter> &buckets,
+                          size_t capacity) noexcept
+{
+  if (!buckets || buckets->MaxSize() >= capacity)
+  {
+    return;
+  }
+
+  auto widened = std::make_unique<AdaptingCircularBufferCounter>(capacity);
+  if (!buckets->Empty())
+  {
+    for (int32_t index = buckets->StartIndex(); index <= buckets->EndIndex(); ++index)
+    {
+      const uint64_t count = buckets->Get(index);
+      if (count > 0 && !widened->Increment(index, count))
+      {
+        OTEL_INTERNAL_LOG_ERROR(
+            "[Base2ExponentialHistogramAggregation::EnsureBucketCapacity] bucket index "
+            << index << " out of range; count " << count << " dropped. SDK invariant violation");
+        assert(false && "EnsureBucketCapacity: bucket index out of range");
+      }
+    }
+  }
+  buckets = std::move(widened);
+}
+
 // Truncates `requested` to the reduction that can be applied without pushing `current_scale` below
 // kMinRuntimeScale. Returns 0 once the floor is reached.
 uint32_t ClampScaleReduction(int32_t current_scale, uint32_t requested) noexcept
@@ -235,6 +263,9 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
     point_data_.negative_buckets_ =
         std::make_unique<AdaptingCircularBufferCounter>(*point_data.negative_buckets_);
   }
+
+  EnsureBucketCapacity(point_data_.positive_buckets_, BucketCapacity(point_data_.max_buckets_));
+  EnsureBucketCapacity(point_data_.negative_buckets_, BucketCapacity(point_data_.max_buckets_));
 }
 
 Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
@@ -242,7 +273,10 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
     : point_data_{std::move(point_data)},
       indexer_(point_data_.scale_),
       record_min_max_{point_data_.record_min_max_}
-{}
+{
+  EnsureBucketCapacity(point_data_.positive_buckets_, BucketCapacity(point_data_.max_buckets_));
+  EnsureBucketCapacity(point_data_.negative_buckets_, BucketCapacity(point_data_.max_buckets_));
+}
 
 void Base2ExponentialHistogramAggregation::Aggregate(
     int64_t value,
