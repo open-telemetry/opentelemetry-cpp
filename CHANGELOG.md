@@ -33,6 +33,9 @@ Increment the:
   [#4334](https://github.com/open-telemetry/opentelemetry-cpp/pull/4334)
 * [BUG] Stop reading past a `nostd::string_view` that is not NUL terminated
   [#4346](https://github.com/open-telemetry/opentelemetry-cpp/pull/4346)
+* [BUG] Stop OTLP `ForceFlush` returning on the first notification and
+  overrunning the caller's deadline
+  [#4357](https://github.com/open-telemetry/opentelemetry-cpp/pull/4357)
 
 * [OTLP/HTTP] Honor `Retry-After` response header when retrying exports,
   supporting both delay-seconds and HTTP-date formats per RFC 7231 §7.1.3.
