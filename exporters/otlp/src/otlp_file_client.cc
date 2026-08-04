@@ -24,11 +24,10 @@
 #if defined(HAVE_GSL)
 #  include <gsl/gsl>
 #else
-#  include <assert.h>
+#  include <cassert>
 #endif
 
 #ifdef _MSC_VER
-#  include <string.h>
 #  define strcasecmp _stricmp
 #else
 #  include <strings.h>
@@ -100,7 +99,7 @@
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L)
 #  define OTLP_FILE_OPEN(f, path, mode) fopen_s(&f, path, mode)
 #else
-#  include <errno.h>
+#  include <cerrno>
 #  define OTLP_FILE_OPEN(f, path, mode) f = fopen(path, mode)
 #endif
 

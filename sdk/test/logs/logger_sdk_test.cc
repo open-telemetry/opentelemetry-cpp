@@ -45,7 +45,7 @@
 #include "opentelemetry/trace/tracer.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <stddef.h>
+#  include <cstddef>
 
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/nostd/span.h"

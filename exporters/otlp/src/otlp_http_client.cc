@@ -19,7 +19,7 @@
 #if defined(HAVE_GSL)
 #  include <gsl/gsl>
 #else
-#  include <assert.h>
+#  include <cassert>
 #endif
 
 #include "nlohmann/json.hpp"

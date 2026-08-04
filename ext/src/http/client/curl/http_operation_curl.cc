@@ -25,7 +25,6 @@
 #include <vector>
 
 #ifdef _MSC_VER
-#  include <string.h>
 #  define strncasecmp _strnicmp
 #else
 #  include <strings.h>
