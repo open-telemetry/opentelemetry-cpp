@@ -403,7 +403,7 @@ function(_otelcpp_get_option_default __OPTION_NAME __LEGACY_OPTION_NAME
       # The namespaced option takes precedence when both names are provided.
       if(NOT DEFINED ${__OPTION_NAME})
         set(__RESOLVED_DEFAULT "${__LEGACY_VALUE}")
-      elseif(NOT "${${__OPTION_NAME}}" EQUAL "${__LEGACY_VALUE}")
+      elseif(NOT "${${__OPTION_NAME}}" STREQUAL "${__LEGACY_VALUE}")
         message(
           WARNING
             "CMake option ${__LEGACY_OPTION_NAME} is deprecated. Use ${__OPTION_NAME} instead. The values of these options differ: ${__LEGACY_OPTION_NAME}=${__LEGACY_VALUE}, ${__OPTION_NAME}=${${__OPTION_NAME}}"
@@ -512,6 +512,22 @@ function(otelcpp_dependent_option __OPTION_NAME __HELP_TEXT
   if(NOT __LEGACY_OPTION_NAME STREQUAL "")
     set(${__LEGACY_OPTION_NAME}
         "${${__OPTION_NAME}}"
+        PARENT_SCOPE)
+  endif()
+endfunction()
+
+# Override the value of an already-defined OTELCPP_ option and keep its
+# deprecated legacy option name in sync, so that code reading either name
+# observes the same value.
+function(otelcpp_set_option __OPTION_NAME __VALUE)
+  set(${__OPTION_NAME}
+      "${__VALUE}"
+      PARENT_SCOPE)
+
+  _otelcpp_get_legacy_option_name("${__OPTION_NAME}" __LEGACY_OPTION_NAME)
+  if(NOT __LEGACY_OPTION_NAME STREQUAL "")
+    set(${__LEGACY_OPTION_NAME}
+        "${__VALUE}"
         PARENT_SCOPE)
   endif()
 endfunction()
