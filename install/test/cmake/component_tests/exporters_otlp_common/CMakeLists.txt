@@ -17,7 +17,7 @@ add_executable(exporters_otlp_common_test
                ${INSTALL_TEST_SRC_DIR}/test_exporters_otlp_common.cc)
 target_link_libraries(
   exporters_otlp_common_test
-  PRIVATE opentelemetry-cpp::proto opentelemetry-cpp::otlp_recordable
-          GTest::gtest GTest::gtest_main)
+  PRIVATE opentelemetry-cpp::otlp_common opentelemetry-cpp::proto
+          opentelemetry-cpp::otlp_recordable GTest::gtest GTest::gtest_main)
 
 gtest_discover_tests(exporters_otlp_common_test)

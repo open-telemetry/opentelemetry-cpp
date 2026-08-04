@@ -22,9 +22,24 @@ cc_library(
 )
 
 cc_library(
-    name = "otlp_recordable",
+    name = "otlp_common",
     srcs = [
         "src/otlp_environment.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_environment.h",
+    ],
+    strip_include_prefix = "include",
+    tags = ["otlp"],
+    deps = [
+        "//api",
+        "//sdk/src/common:env_variables",
+    ],
+)
+
+cc_library(
+    name = "otlp_recordable",
+    srcs = [
         "src/otlp_log_recordable.cc",
         "src/otlp_metric_utils.cc",
         "src/otlp_populate_attribute_utils.cc",
@@ -32,7 +47,6 @@ cc_library(
         "src/otlp_recordable_utils.cc",
     ],
     hdrs = [
-        "include/opentelemetry/exporters/otlp/otlp_environment.h",
         "include/opentelemetry/exporters/otlp/otlp_log_recordable.h",
         "include/opentelemetry/exporters/otlp/otlp_metric_utils.h",
         "include/opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h",
@@ -99,6 +113,7 @@ cc_library(
         "otlp_grpc",
     ],
     deps = [
+        ":otlp_common",
         "//ext:headers",
         "//sdk/src/common:env_variables",
         "//sdk/src/common:global_log_handler",
@@ -146,6 +161,7 @@ cc_library(
         "otlp_grpc",
     ],
     deps = [
+        ":otlp_common",
         ":otlp_recordable",
         ":otlp_grpc_client",
         "//ext:headers",
@@ -239,6 +255,7 @@ cc_library(
         "otlp_http",
     ],
     deps = [
+        ":otlp_common",
         ":otlp_http_client",
         ":otlp_recordable",
         "//sdk/src/trace",
@@ -315,6 +332,7 @@ cc_library(
         "otlp_file",
     ],
     deps = [
+        ":otlp_common",
         ":otlp_file_client",
         ":otlp_recordable",
         "//sdk/src/trace",
@@ -363,6 +381,7 @@ cc_library(
         "otlp_grpc_metric",
     ],
     deps = [
+        ":otlp_common",
         ":otlp_recordable",
         ":otlp_grpc_client",
         "//ext:headers",
@@ -415,6 +434,7 @@ cc_library(
         "otlp_http_metric",
     ],
     deps = [
+        ":otlp_common",
         ":otlp_http_client",
         ":otlp_recordable",
         "//sdk/src/metrics",
@@ -463,6 +483,7 @@ cc_library(
         "otlp_file_metric",
     ],
     deps = [
+        ":otlp_common",
         ":otlp_file_client",
         ":otlp_recordable",
         "//sdk/src/metrics",
@@ -511,6 +532,7 @@ cc_library(
         "otlp_http_log",
     ],
     deps = [
+        ":otlp_common",
         ":otlp_http_client",
         ":otlp_recordable",
         "//sdk/src/logs",
@@ -559,6 +581,7 @@ cc_library(
         "otlp_file_log",
     ],
     deps = [
+        ":otlp_common",
         ":otlp_file_client",
         ":otlp_recordable",
         "//sdk/src/logs",
@@ -608,6 +631,7 @@ cc_library(
         "otlp_grpc_log",
     ],
     deps = [
+        ":otlp_common",
         ":otlp_recordable",
         ":otlp_grpc_client",
         "//ext:headers",

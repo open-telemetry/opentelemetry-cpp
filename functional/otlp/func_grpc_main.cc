@@ -1,10 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdio.h>
-#include <string.h>
 #include <chrono>
 #include <cstdint>
+#include <cstdio>
+#include <cstring>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -39,12 +39,15 @@ const int TEST_FAILED = 1;
   Command line parameters.
 */
 
+namespace
+{
 enum class TestMode : std::uint8_t
 {
   kNone,
   kHttp,
   kHttps
 };
+}  // namespace
 
 static bool opt_help   = false;
 static bool opt_list   = false;
@@ -320,7 +323,7 @@ typedef int (*test_func_t)();
 struct test_case
 {
   nostd::string_view m_name;
-  test_func_t m_func;
+  test_func_t m_func{nullptr};
 };
 
 }  // namespace

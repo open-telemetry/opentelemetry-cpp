@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
@@ -27,6 +27,9 @@ using opentelemetry::nostd::shared_ptr;
 namespace nostd    = opentelemetry::nostd;
 namespace logs_api = opentelemetry::logs;
 namespace logs_sdk = opentelemetry::sdk::logs;
+
+namespace
+{
 
 class TestProvider : public LoggerProvider
 {
@@ -86,3 +89,5 @@ TEST(Provider, MultipleLoggerProviders)
 
   ASSERT_NE(logs_api::Provider::GetLoggerProvider(), tf);
 }
+
+}  // namespace

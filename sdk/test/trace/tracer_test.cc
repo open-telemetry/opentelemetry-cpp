@@ -1,8 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <assert.h>
 #include <gtest/gtest.h>
+#include <cassert>
 #include <chrono>
 #include <cstdint>
 #include <functional>
@@ -66,6 +66,9 @@ namespace trace_api = opentelemetry::trace;
 using opentelemetry::exporter::memory::InMemorySpanData;
 using opentelemetry::exporter::memory::InMemorySpanExporter;
 using opentelemetry::trace::SpanContext;
+
+namespace
+{
 
 /**
  * A mock sampler with ShouldSample returning:
@@ -171,8 +174,6 @@ public:
   uint8_t buf_trace[16] = {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 5, 4, 3, 2, 1};
 };
 
-namespace
-{
 std::shared_ptr<opentelemetry::trace::Tracer> initTracer(std::unique_ptr<SpanExporter> &&exporter)
 {
   auto processor = std::unique_ptr<SpanProcessor>(new SimpleSpanProcessor(std::move(exporter)));
