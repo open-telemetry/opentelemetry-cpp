@@ -5,7 +5,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
-#include <map>
+#include <map>     // IWYU pragma: keep
 #include <memory>  // IWYU pragma: keep
 #include <mutex>
 #include <nlohmann/json.hpp>
@@ -27,9 +27,13 @@
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/version.h"
 
+// Half this file only exists under ENABLE_ASYNC_EXPORT, and include-what-you-use asks for these
+// in the configurations that build it and asks for them to go in the ones that do not.
 #ifdef ENABLE_ASYNC_EXPORT
 #  include <cstddef>
 #  include <functional>
+#  include <set>
+
 #  include "opentelemetry/common/timestamp.h"
 #endif
 
@@ -267,7 +271,31 @@ public:
   /**
    * Cleans up the session in the destructor.
    */
-  ~AsyncResponseHandler() override { session_->FinishSession(); }
+  ~AsyncResponseHandler() override
+  {
+    // A handler that goes away without an outcome would leave ForceFlush() waiting on a session
+    // that can no longer finish. Report before tearing the session down, since FinishSession()
+    // can block.
+    CompleteOnce(sdk::common::ExportResult::kFailure);
+    session_->FinishSession();
+  }
+
+  /**
+   * Report the outcome of this export, at most once. The HTTP client can deliver both a response
+   * and a terminal session event for one request, and the exporter counts one finished session
+   * per export, so only the first outcome is reported.
+   * @return whether this call is the one that reported.
+   */
+  bool CompleteOnce(sdk::common::ExportResult result) noexcept
+  {
+    bool expected = false;
+    if (!completed_.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
+    {
+      return false;
+    }
+    result_callback_(result);
+    return true;
+  }
 
   /**
    * Automatically called when the response is received
@@ -275,66 +303,95 @@ public:
   void OnResponse(http_client::Response &response) noexcept override
   {
 
-    // Store the body of the response
-    body_ = std::string(response.GetBody().begin(), response.GetBody().end());
+    const std::string body(response.GetBody().begin(), response.GetBody().end());
+    const bool written = body.find("\"failed\" : 0") != std::string::npos;
+
+    // Reported before anything is logged. CompleteOnce() retires the session and wakes
+    // ForceFlush() before it returns, and the log handler is replaceable, so one that calls
+    // ForceFlush() would otherwise wait for the session this call has not let go of. A response
+    // that loses the exchange says nothing either, since the outcome it would describe is not the
+    // one the caller was given.
+    if (!CompleteOnce(written ? sdk::common::ExportResult::kSuccess
+                              : sdk::common::ExportResult::kFailure))
+    {
+      return;
+    }
+
     if (console_debug_)
     {
       OTEL_INTERNAL_LOG_DEBUG(
-          "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body_);
+          "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body);
     }
-    if (body_.find("\"failed\" : 0") == std::string::npos)
+    if (!written)
     {
       OTEL_INTERNAL_LOG_ERROR(
           "[ES Log Exporter] Logs were not written to Elasticsearch correctly, response body: "
-          << body_);
-      result_callback_(sdk::common::ExportResult::kFailure);
-    }
-    else
-    {
-      result_callback_(sdk::common::ExportResult::kSuccess);
+          << body);
     }
   }
 
   // Callback method when an http event occurs
   void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
   {
-    bool need_stop = false;
+    // Every state is listed so that -Wswitch reports a new one rather than it being swallowed by
+    // a default label and silently leaving the session uncounted.
+    const char *failure = nullptr;
     switch (state)
     {
       case http_client::SessionState::CreateFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Create request to elasticsearch failed");
-        need_stop = true;
+        failure = "[ES Log Exporter] Create request to elasticsearch failed";
+        break;
+      case http_client::SessionState::Created:
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Session created");
+        break;
+      case http_client::SessionState::Destroyed:
+        failure = "[ES Log Exporter] Session to elasticsearch destroyed before a response";
+        break;
+      case http_client::SessionState::Connecting:
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Connecting to elasticsearch");
         break;
       case http_client::SessionState::ConnectFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Connection to elasticsearch failed");
-        need_stop = true;
+        failure = "[ES Log Exporter] Connection to elasticsearch failed";
+        break;
+      case http_client::SessionState::Connected:
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Connected to elasticsearch");
+        break;
+      case http_client::SessionState::Sending:
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Sending request to elasticsearch");
         break;
       case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request failed to be sent to elasticsearch");
-        need_stop = true;
+        failure = "[ES Log Exporter] Request failed to be sent to elasticsearch";
+        break;
+      case http_client::SessionState::Response:
+        // The body arrives through OnResponse(), which is what reports the outcome.
+        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Response received from elasticsearch");
         break;
       case http_client::SessionState::SSLHandshakeFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] SSL handshake to elasticsearch failed");
-        need_stop = true;
+        failure = "[ES Log Exporter] SSL handshake to elasticsearch failed";
         break;
       case http_client::SessionState::TimedOut:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch timed out");
-        need_stop = true;
+        failure = "[ES Log Exporter] Request to elasticsearch timed out";
         break;
       case http_client::SessionState::NetworkError:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error to elasticsearch");
-        need_stop = true;
+        failure = "[ES Log Exporter] Network error to elasticsearch";
+        break;
+      case http_client::SessionState::ReadError:
+        failure = "[ES Log Exporter] Read error";
+        break;
+      case http_client::SessionState::WriteError:
+        failure = "[ES Log Exporter] Write error";
         break;
       case http_client::SessionState::Cancelled:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch cancelled");
-        need_stop = true;
-        break;
-      default:
+        failure = "[ES Log Exporter] Request to elasticsearch cancelled";
         break;
     }
-    if (need_stop)
+
+    // Reported only when this event is the outcome. Any of these can arrive after a response has
+    // already been reported, and an error line there would describe a failure the exporter never
+    // told the caller about.
+    if (failure != nullptr && CompleteOnce(sdk::common::ExportResult::kFailure))
     {
-      result_callback_(sdk::common::ExportResult::kFailure);
+      OTEL_INTERNAL_LOG_ERROR(failure);
     }
   }
 
@@ -344,8 +401,8 @@ private:
   // Callback to call to on receiving events
   std::function<bool(opentelemetry::sdk::common::ExportResult)> result_callback_;
 
-  // A string to store the response body
-  std::string body_ = "";
+  // Whether the outcome has already been reported
+  std::atomic<bool> completed_{false};
 
   // Whether to print the results from the callback
   bool console_debug_ = false;
@@ -378,12 +435,7 @@ ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter(
       ,
       synchronization_data_(new SynchronizationData())
 #endif
-{
-#ifdef ENABLE_ASYNC_EXPORT
-  synchronization_data_->finished_session_counter_.store(0);
-  synchronization_data_->session_counter_.store(0);
-#endif
-}
+{}
 
 std::unique_ptr<sdklogs::Recordable> ElasticsearchLogRecordExporter::MakeRecordable() noexcept
 {
@@ -393,6 +445,70 @@ std::unique_ptr<sdklogs::Recordable> ElasticsearchLogRecordExporter::MakeRecorda
 sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
     const nostd::span<std::unique_ptr<sdklogs::Recordable>> &records) noexcept
 {
+#ifdef ENABLE_ASYNC_EXPORT
+  // Registered before anything that can return, so a flush asked from the moment these records
+  // arrive waits for them, and every exit below reports through the guard.
+  const std::size_t span_count = records.size();
+  auto synchronization_data    = synchronization_data_;
+
+  std::uint64_t session_id = 0;
+  {
+    std::lock_guard<std::mutex> lock(synchronization_data_->force_flush_cv_m);
+    session_id = synchronization_data_->next_session_id++;
+    synchronization_data_->running_sessions.insert(session_id);
+  }
+
+  using Completion    = std::function<bool(opentelemetry::sdk::common::ExportResult)>;
+  Completion complete = [span_count, session_id,
+                         synchronization_data](opentelemetry::sdk::common::ExportResult result) {
+    {
+      // Published under the mutex ForceFlush() waits on. A waiter that has evaluated its
+      // predicate but not yet parked would otherwise not see this until the next wakeup.
+      std::lock_guard<std::mutex> lock(synchronization_data->force_flush_cv_m);
+      synchronization_data->running_sessions.erase(session_id);
+    }
+    synchronization_data->force_flush_cv.notify_all();
+
+    // Logged after the session is retired. The log handler is replaceable, and one that calls
+    // ForceFlush() would otherwise wait for the very session this call has not let go of yet.
+    if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
+    {
+      OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] ERROR: Export "
+                              << span_count
+                              << " log record(s) error: " << static_cast<int>(result));
+    }
+    else
+    {
+      OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Export " << span_count
+                                                          << " log record(s) success");
+    }
+    return true;
+  };
+
+  // A return added between here and SendRequest() would otherwise strand a waiter on a session
+  // that can never finish. Reporting through the same completion leaves a session one way out,
+  // and says so in the log rather than dropping the batch silently.
+  struct GiveUpGuard
+  {
+    Completion *report = nullptr;
+
+    GiveUpGuard()                               = default;
+    GiveUpGuard(const GiveUpGuard &)            = delete;
+    GiveUpGuard &operator=(const GiveUpGuard &) = delete;
+    GiveUpGuard(GiveUpGuard &&)                 = delete;
+    GiveUpGuard &operator=(GiveUpGuard &&)      = delete;
+
+    ~GiveUpGuard()
+    {
+      if (report != nullptr)
+      {
+        (*report)(opentelemetry::sdk::common::ExportResult::kFailure);
+      }
+    }
+  } guard;
+  guard.report = &complete;
+#endif
+
   // Return failure if this exporter has been shutdown
   if (isShutdown())
   {
@@ -436,30 +552,10 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
 
 #ifdef ENABLE_ASYNC_EXPORT
   // Send the request
-  synchronization_data_->session_counter_.fetch_add(1, std::memory_order_release);
-  std::size_t span_count    = records.size();
-  auto synchronization_data = synchronization_data_;
-  auto handler              = std::make_shared<AsyncResponseHandler>(
-      session,
-      [span_count, synchronization_data](opentelemetry::sdk::common::ExportResult result) {
-        if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
-        {
-          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] ERROR: Export "
-                                               << span_count
-                                               << " trace span(s) error: " << static_cast<int>(result));
-        }
-        else
-        {
-          OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Export " << span_count
-                                                                           << " trace span(s) success");
-        }
-
-        synchronization_data->finished_session_counter_.fetch_add(1, std::memory_order_release);
-        synchronization_data->force_flush_cv.notify_all();
-        return true;
-      },
-      options_.console_debug_);
+  auto handler = std::make_shared<AsyncResponseHandler>(session, Completion(complete),
+                                                        options_.console_debug_);
   session->SendRequest(handler);
+  guard.report = nullptr;  // the handler reports this session from here on
   return sdk::common::ExportResult::kSuccess;
 #else
   // Send the request
@@ -503,41 +599,39 @@ bool ElasticsearchLogRecordExporter::ForceFlush(std::chrono::microseconds timeou
                                                 OPENTELEMETRY_MAYBE_UNUSED) noexcept
 {
 #ifdef ENABLE_ASYNC_EXPORT
-  std::lock_guard<std::recursive_mutex> lock_guard{synchronization_data_->force_flush_m};
-  std::size_t running_counter =
-      synchronization_data_->session_counter_.load(std::memory_order_acquire);
   // ASAN will report chrono: runtime error: signed integer overflow: A + B cannot be represented
-  //   in type 'long int' here. So we reset timeout to meet signed long int limit here.
+  //   in type 'long int' here. So we reset timeout to meet signed long int limit here. Zero is
+  //   what that returns for a timeout there is no point waiting against, which is also how a
+  //   caller asks for no deadline.
   timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
       timeout, std::chrono::microseconds::zero());
 
-  std::chrono::steady_clock::duration timeout_steady =
+  std::unique_lock<std::mutex> lock(synchronization_data_->force_flush_cv_m);
+
+  // The snapshot is the next id, not a count: a session started after it takes a larger id and
+  // cannot stand in for one of these. Ids are issued in order, so the smallest one still running
+  // decides. Callers are not serialised, so two deadlines never queue behind one another.
+  const std::uint64_t watermark = synchronization_data_->next_session_id;
+  const auto flushed            = [this, watermark]() {
+    const auto &running = synchronization_data_->running_sessions;
+    return running.empty() || *running.begin() >= watermark;
+  };
+
+  if (timeout <= std::chrono::microseconds::zero())
+  {
+    // wait() only returns once the predicate holds, so the flush has completed.
+    synchronization_data_->force_flush_cv.wait(lock, flushed);
+    return true;
+  }
+
+  // One deadline for the call, so a wakeup that is not a completion resumes against what is left
+  // rather than starting the wait again. wait_until() returns the predicate, so a flush that ran
+  // out of time cannot report success.
+  const std::chrono::steady_clock::time_point deadline =
+      std::chrono::steady_clock::now() +
       std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
-  if (timeout_steady <= std::chrono::steady_clock::duration::zero())
-  {
-    timeout_steady = (std::chrono::steady_clock::duration::max)();
-  }
 
-  std::unique_lock<std::mutex> lk_cv(synchronization_data_->force_flush_cv_m);
-  // Wait for all the sessions to finish
-  while (timeout_steady > std::chrono::steady_clock::duration::zero())
-  {
-    if (synchronization_data_->finished_session_counter_.load(std::memory_order_acquire) >=
-        running_counter)
-    {
-      break;
-    }
-
-    std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
-    if (std::cv_status::no_timeout != synchronization_data_->force_flush_cv.wait_for(
-                                          lk_cv, std::chrono::seconds{options_.response_timeout_}))
-    {
-      break;
-    }
-    timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
-  }
-
-  return timeout_steady > std::chrono::steady_clock::duration::zero();
+  return synchronization_data_->force_flush_cv.wait_until(lock, deadline, flushed);
 #else
   return true;
 #endif
