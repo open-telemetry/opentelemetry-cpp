@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <functional>
 #include <memory>
 #include <string>
 #include <utility>
@@ -127,13 +126,17 @@ class TestParentBasedSamplerBuilder : public configuration::ParentBasedSamplerBu
 public:
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> Build(
       const configuration::ParentBasedSamplerConfiguration * /* model */,
-      std::unique_ptr<opentelemetry::sdk::trace::Sampler> && /* root */,
-      std::unique_ptr<opentelemetry::sdk::trace::Sampler> && /* remote_parent_sampled */,
-      std::unique_ptr<opentelemetry::sdk::trace::Sampler> && /* remote_parent_not_sampled */,
-      std::unique_ptr<opentelemetry::sdk::trace::Sampler> && /* local_parent_sampled */,
-      std::unique_ptr<opentelemetry::sdk::trace::Sampler> && /* local_parent_not_sampled */)
-      const override
+      std::unique_ptr<opentelemetry::sdk::trace::Sampler> &&root,
+      std::unique_ptr<opentelemetry::sdk::trace::Sampler> &&remote_parent_sampled,
+      std::unique_ptr<opentelemetry::sdk::trace::Sampler> &&remote_parent_not_sampled,
+      std::unique_ptr<opentelemetry::sdk::trace::Sampler> &&local_parent_sampled,
+      std::unique_ptr<opentelemetry::sdk::trace::Sampler> &&local_parent_not_sampled) const override
   {
+    auto unused_root                      = std::move(root);
+    auto unused_remote_parent_sampled     = std::move(remote_parent_sampled);
+    auto unused_remote_parent_not_sampled = std::move(remote_parent_not_sampled);
+    auto unused_local_parent_sampled      = std::move(local_parent_sampled);
+    auto unused_local_parent_not_sampled  = std::move(local_parent_not_sampled);
     return nullptr;
   }
 };
@@ -143,8 +146,9 @@ class TestJaegerRemoteSamplerBuilder : public configuration::JaegerRemoteSampler
 public:
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> Build(
       const configuration::JaegerRemoteSamplerConfiguration * /* model */,
-      std::unique_ptr<opentelemetry::sdk::trace::Sampler> && /* initial_sampler */) const override
+      std::unique_ptr<opentelemetry::sdk::trace::Sampler> &&initial_sampler) const override
   {
+    auto unused = std::move(initial_sampler);
     return nullptr;
   }
 };
@@ -187,8 +191,9 @@ class TestComposableParentThresholdSamplerBuilder
 public:
   std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> Build(
       const configuration::ComposableParentThresholdSamplerConfiguration * /* model */,
-      std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> && /* root */) const override
+      std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> &&root) const override
   {
+    auto unused = std::move(root);
     return nullptr;
   }
 };
@@ -199,9 +204,10 @@ class TestComposableRuleBasedSamplerBuilder
 public:
   std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> Build(
       const configuration::ComposableRuleBasedSamplerConfiguration * /* model */,
-      std::vector<std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>>
-          && /* rule_samplers */) const override
+      std::vector<std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>> &&rule_samplers)
+      const override
   {
+    auto unused = std::move(rule_samplers);
     return nullptr;
   }
 };
@@ -211,8 +217,9 @@ class TestBatchSpanProcessorBuilder : public configuration::BatchSpanProcessorBu
 public:
   std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> Build(
       const configuration::BatchSpanProcessorConfiguration * /* model */,
-      std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> && /* exporter */) const override
+      std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> &&exporter) const override
   {
+    auto unused = std::move(exporter);
     return nullptr;
   }
 };
@@ -222,8 +229,9 @@ class TestSimpleSpanProcessorBuilder : public configuration::SimpleSpanProcessor
 public:
   std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> Build(
       const configuration::SimpleSpanProcessorConfiguration * /* model */,
-      std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> && /* exporter */) const override
+      std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> &&exporter) const override
   {
+    auto unused = std::move(exporter);
     return nullptr;
   }
 };
@@ -233,8 +241,9 @@ class TestBatchLogRecordProcessorBuilder : public configuration::BatchLogRecordP
 public:
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> Build(
       const configuration::BatchLogRecordProcessorConfiguration * /* model */,
-      std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> && /* exporter */) const override
+      std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> &&exporter) const override
   {
+    auto unused = std::move(exporter);
     return nullptr;
   }
 };
@@ -244,8 +253,9 @@ class TestSimpleLogRecordProcessorBuilder : public configuration::SimpleLogRecor
 public:
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> Build(
       const configuration::SimpleLogRecordProcessorConfiguration * /* model */,
-      std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> && /* exporter */) const override
+      std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> &&exporter) const override
   {
+    auto unused = std::move(exporter);
     return nullptr;
   }
 };
@@ -255,8 +265,9 @@ class TestPullMetricReaderBuilder : public configuration::PullMetricReaderBuilde
 public:
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(
       const configuration::PullMetricReaderConfiguration * /* model */,
-      std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> && /* exporter */) const override
+      std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> &&reader) const override
   {
+    auto unused = std::move(reader);
     return nullptr;
   }
 };
@@ -492,9 +503,9 @@ class TestPeriodicMetricReaderBuilder : public configuration::PeriodicMetricRead
 public:
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(
       const configuration::PeriodicMetricReaderConfiguration * /* model */,
-      std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> && /* exporter */)
-      const override
+      std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> &&exporter) const override
   {
+    auto unused = std::move(exporter);
     return nullptr;
   }
 };
@@ -598,40 +609,45 @@ public:
 // ----------------------------------------------------------------------------------
 // Test Helpers
 
+namespace
+{
+
 template <typename MockType, typename GetBuilderFn, typename SetBuilderFn>
 void TestTypedSlot(GetBuilderFn getter, SetBuilderFn setter)
 {
   configuration::Registry registry;
-  ASSERT_EQ(std::invoke(getter, registry), nullptr);
+  ASSERT_EQ((registry.*getter)(), nullptr);
 
   auto first            = std::make_unique<MockType>();
   const auto *first_ptr = first.get();
-  std::invoke(setter, registry, std::move(first));
-  ASSERT_EQ(std::invoke(getter, registry), first_ptr);
+  (registry.*setter)(std::move(first));
+  ASSERT_EQ((registry.*getter)(), first_ptr);
 
   auto second            = std::make_unique<MockType>();
   const auto *second_ptr = second.get();
-  std::invoke(setter, registry, std::move(second));
-  ASSERT_EQ(std::invoke(getter, registry), second_ptr);
+  (registry.*setter)(std::move(second));
+  ASSERT_EQ((registry.*getter)(), second_ptr);
 }
 
 template <typename MockType, typename GetBuilderFn, typename SetBuilderFn>
 void TestNamedSlot(GetBuilderFn getter, SetBuilderFn setter, const std::string &key)
 {
   configuration::Registry registry;
-  ASSERT_EQ(std::invoke(getter, registry, key), nullptr);
+  ASSERT_EQ((registry.*getter)(key), nullptr);
 
   auto first            = std::make_unique<MockType>();
   const auto *first_ptr = first.get();
-  std::invoke(setter, registry, key, std::move(first));
-  ASSERT_EQ(std::invoke(getter, registry, key), first_ptr);
-  ASSERT_EQ(std::invoke(getter, registry, "other"), nullptr);
+  (registry.*setter)(key, std::move(first));
+  ASSERT_EQ((registry.*getter)(key), first_ptr);
+  ASSERT_EQ((registry.*getter)("other"), nullptr);
 
   auto second            = std::make_unique<MockType>();
   const auto *second_ptr = second.get();
-  std::invoke(setter, registry, key, std::move(second));
-  ASSERT_EQ(std::invoke(getter, registry, key), second_ptr);
+  (registry.*setter)(key, std::move(second));
+  ASSERT_EQ((registry.*getter)(key), second_ptr);
 }
+
+}  // namespace
 
 // ----------------------------------------------------------------------------------
 // Test Cases
