@@ -13,6 +13,7 @@
 #include "opentelemetry/sdk/trace/multi_span_processor.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/version.h"
@@ -24,17 +25,19 @@ namespace trace
 {
 namespace resource = opentelemetry::sdk::resource;
 
-TracerContext::TracerContext(std::vector<std::unique_ptr<SpanProcessor>> &&processors,
-                             const resource::Resource &resource,
-                             std::unique_ptr<Sampler> sampler,
-                             std::unique_ptr<IdGenerator> id_generator,
-                             std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
-                                 tracer_configurator) noexcept
+TracerContext::TracerContext(
+    std::vector<std::unique_ptr<SpanProcessor>> &&processors,
+    const resource::Resource &resource,
+    std::unique_ptr<Sampler> sampler,
+    std::unique_ptr<IdGenerator> id_generator,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator,
+    SpanLimits span_limits) noexcept
     : resource_(resource),
       sampler_(std::move(sampler)),
       id_generator_(std::move(id_generator)),
       processor_(std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors)))),
-      tracer_configurator_(std::move(tracer_configurator))
+      tracer_configurator_(std::move(tracer_configurator)),
+      span_limits_(span_limits)
 {}
 
 Sampler &TracerContext::GetSampler() const noexcept
@@ -58,9 +61,13 @@ opentelemetry::sdk::trace::IdGenerator &TracerContext::GetIdGenerator() const no
   return *id_generator_;
 }
 
+const SpanLimits &TracerContext::GetSpanLimits() const noexcept
+{
+  return span_limits_;
+}
+
 void TracerContext::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
 {
-
   auto multi_processor = static_cast<MultiSpanProcessor *>(processor_.get());
   multi_processor->AddProcessor(std::move(processor));
 }

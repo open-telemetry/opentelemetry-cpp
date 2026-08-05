@@ -94,6 +94,13 @@ public:
   bool RecordableEnforcesLogRecordLimits() const noexcept;
 
   /**
+   * Replace the ScopeConfigurator for this logger context.
+   * @param logger_configurator The new configurator.
+   */
+  void SetLoggerConfigurator(std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
+                                 logger_configurator) noexcept;
+
+  /**
    * Force all active LogProcessors to flush any buffered logs
    * within the given timeout.
    */

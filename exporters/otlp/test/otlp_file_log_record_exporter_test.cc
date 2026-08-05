@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <nlohmann/json.hpp>
 #include <sstream>

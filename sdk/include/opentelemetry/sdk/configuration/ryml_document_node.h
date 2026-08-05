@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include <stddef.h>
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <ryml.hpp>
 #include <string>
@@ -49,6 +50,8 @@ public:
   std::size_t GetRequiredInteger(const std::string &name) const override;
   std::size_t GetInteger(const std::string &name, std::size_t default_value) const override;
 
+  std::int64_t GetSignedInteger(const std::string &name, std::int64_t default_value) const override;
+
   double GetRequiredDouble(const std::string &name) const override;
   double GetDouble(const std::string &name, double default_value) const override;
 
@@ -70,7 +73,7 @@ private:
 
   const RymlDocument *doc_;
   ryml::ConstNodeRef node_;
-  std::size_t depth_;
+  std::size_t depth_{};
 };
 
 class RymlDocumentNodeConstIteratorImpl : public DocumentNodeConstIteratorImpl

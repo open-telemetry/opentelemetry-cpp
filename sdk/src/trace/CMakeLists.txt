@@ -16,10 +16,13 @@ add_library(
   batch_span_processor_options.cc
   simple_processor_factory.cc
   span_data.cc
+  span_limits.cc
   samplers/always_on_factory.cc
   samplers/always_off_factory.cc
   samplers/parent.cc
   samplers/parent_factory.cc
+  samplers/probability.cc
+  samplers/probability_factory.cc
   samplers/trace_id_ratio.cc
   samplers/trace_id_ratio_factory.cc
   samplers/ot_trace_state.cc

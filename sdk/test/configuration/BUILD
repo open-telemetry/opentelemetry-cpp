@@ -4,6 +4,89 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
+    name = "registry_test",
+    srcs = [
+        "registry_test.cc",
+    ],
+    tags = [
+        "config",
+        "test",
+    ],
+    deps = [
+        "//sdk:headers",
+        "//sdk/src/configuration:configuration_core",
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "sdk_builder_test",
+    srcs = [
+        "config_test_common.h",
+        "sdk_builder_test.cc",
+    ],
+    tags = [
+        "config",
+        "test",
+    ],
+    deps = [
+        "//sdk:headers",
+        "//sdk/src/configuration:configuration_core",
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "configured_sdk_test",
+    srcs = [
+        "config_test_common.h",
+        "configured_sdk_test.cc",
+    ],
+    tags = [
+        "config",
+        "test",
+    ],
+    deps = [
+        "//sdk:headers",
+        "//sdk/src/configuration:configuration_core",
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "programmatic_configuration_test",
+    srcs = [
+        "config_test_common.h",
+        "programmatic_configuration_test.cc",
+    ],
+    tags = [
+        "config",
+        "test",
+    ],
+    deps = [
+        "//sdk:headers",
+        "//sdk/src/configuration:configuration_core",
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "yaml_logs_test",
     srcs = [
         "yaml_logs_test.cc",

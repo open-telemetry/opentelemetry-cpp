@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>
 #include <array>
 #include <chrono>
+#include <cstdint>
 #include <functional>
 #include <string>
 #include <utility>
@@ -45,7 +45,7 @@
 #include "opentelemetry/trace/tracer.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <stddef.h>
+#  include <cstddef>
 
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/nostd/span.h"
@@ -230,7 +230,7 @@ public:
 private:
   opentelemetry::logs::Severity severity_ = opentelemetry::logs::Severity::kInvalid;
   std::string body_;
-  int64_t event_id_;
+  int64_t event_id_{0};
   std::string log_record_event_name_;
   opentelemetry::trace::TraceId trace_id_;
   opentelemetry::trace::SpanId span_id_;

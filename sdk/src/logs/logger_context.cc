@@ -6,6 +6,8 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/sdk/common/global_log_handler.h"
+
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
@@ -65,6 +67,19 @@ const LogRecordLimits &LoggerContext::GetLogRecordLimits() const noexcept
 bool LoggerContext::RecordableEnforcesLogRecordLimits() const noexcept
 {
   return recordable_enforces_limits_;
+}
+
+void LoggerContext::SetLoggerConfigurator(
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
+        logger_configurator) noexcept
+{
+  if (!logger_configurator)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[LoggerContext::SetLoggerConfigurator] logger_configurator must not be null, ignoring.");
+    return;
+  }
+  logger_configurator_ = std::move(logger_configurator);
 }
 
 bool LoggerContext::ForceFlush(std::chrono::microseconds timeout) noexcept

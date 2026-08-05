@@ -17,9 +17,13 @@ namespace configuration
 class LoggerConfigConfiguration
 {
 public:
-  bool enabled{true};
-  SeverityNumber minimum_severity{SeverityNumber::trace};
-  bool trace_based{false};
+  static constexpr bool kDefaultEnabled                   = true;
+  static constexpr SeverityNumber kDefaultMinimumSeverity = SeverityNumber::trace;
+  static constexpr bool kDefaultTraceBased                = false;
+
+  bool enabled{kDefaultEnabled};
+  SeverityNumber minimum_severity{kDefaultMinimumSeverity};
+  bool trace_based{kDefaultTraceBased};
 };
 
 }  // namespace configuration

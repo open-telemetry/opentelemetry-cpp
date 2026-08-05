@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>
 #include <array>
+#include <cstdint>
 #include <initializer_list>
 #include <map>
 #include <string>
@@ -193,6 +193,26 @@ TEST(AttributeMapTest, EqualTo)
   EXPECT_FALSE(attribute_map.EqualTo(kv_iterable_different_type));
   EXPECT_FALSE(attribute_map.EqualTo(kv_iterable_different_size));
   EXPECT_FALSE(attribute_map.EqualTo(kv_iterable_different_all));
+}
+
+TEST(AttributeMapTest, SetAttributeTruncation)
+{
+  opentelemetry::sdk::common::AttributeMap attribute_map;
+  opentelemetry::nostd::string_view value("abcdefghijk");
+  attribute_map.SetAttribute("key", value, 5);
+  auto stored_value = attribute_map.GetAttributes().at("key");
+  auto string_value = opentelemetry::nostd::get<std::string>(stored_value);
+  EXPECT_EQ(string_value, "abcde");
+}
+
+TEST(OrderedAttributeMapTest, SetAttributeTruncation)
+{
+  opentelemetry::sdk::common::OrderedAttributeMap attribute_map;
+  opentelemetry::nostd::string_view value("abcdefghijk");
+  attribute_map.SetAttribute("key", value, 5);
+  auto stored_value = attribute_map.GetAttributes().at("key");
+  auto string_value = opentelemetry::nostd::get<std::string>(stored_value);
+  EXPECT_EQ(string_value, "abcde");
 }
 
 // ---------------------------------------------------------------------------

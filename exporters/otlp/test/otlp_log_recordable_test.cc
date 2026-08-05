@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>
 #include <chrono>
+#include <cstdint>
 #include <cstring>
 #include <memory>
 #include <string>
@@ -87,9 +87,9 @@ TEST(OtlpLogRecordable, Basic)
   common::AttributeValue byte_val(
       nostd::span<const uint8_t>{reinterpret_cast<const uint8_t *>(byte_arr), 5});
   rec.SetBody(byte_val);
-  EXPECT_TRUE(0 ==
-              memcmp(reinterpret_cast<const void *>(rec.log_record().body().bytes_value().data()),
-                     reinterpret_cast<const void *>(byte_arr), 5));
+  EXPECT_TRUE(
+      0 == std::memcmp(reinterpret_cast<const void *>(rec.log_record().body().bytes_value().data()),
+                       reinterpret_cast<const void *>(byte_arr), 5));
   EXPECT_EQ(rec.log_record().body().bytes_value().size(), 5);
 
 #if defined(ENABLE_OTLP_UTF8_VALIDITY)
@@ -97,9 +97,9 @@ TEST(OtlpLogRecordable, Basic)
   const char byte_body[] = {'\x80', '\x81', '\x82', '\x83', '\x84'};
   nostd::string_view byte_body_view(byte_body, 5);
   rec.SetBody(byte_body_view);
-  EXPECT_TRUE(0 ==
-              memcmp(reinterpret_cast<const void *>(rec.log_record().body().bytes_value().data()),
-                     reinterpret_cast<const void *>(byte_body), 5));
+  EXPECT_TRUE(
+      0 == std::memcmp(reinterpret_cast<const void *>(rec.log_record().body().bytes_value().data()),
+                       reinterpret_cast<const void *>(byte_body), 5));
   EXPECT_EQ(rec.log_record().body().bytes_value().size(), 5);
 #endif
 }
@@ -175,18 +175,18 @@ TEST(OtlpLogRecordable, SetSingleAttribute)
     else if (attribute.key() == byte_key)
     {
       ++checked_attributes;
-      EXPECT_TRUE(0 ==
-                  memcmp(reinterpret_cast<const void *>(attribute.value().bytes_value().data()),
-                         reinterpret_cast<const void *>(byte_arr), 4));
+      EXPECT_TRUE(
+          0 == std::memcmp(reinterpret_cast<const void *>(attribute.value().bytes_value().data()),
+                           reinterpret_cast<const void *>(byte_arr), 4));
       EXPECT_EQ(attribute.value().bytes_value().size(), 4);
     }
 #if defined(ENABLE_OTLP_UTF8_VALIDITY)
     else if (attribute.key() == non_utf8_string_key)
     {
       ++checked_attributes;
-      EXPECT_TRUE(0 ==
-                  memcmp(reinterpret_cast<const void *>(attribute.value().bytes_value().data()),
-                         reinterpret_cast<const void *>(non_utf8_string_arr), 4));
+      EXPECT_TRUE(
+          0 == std::memcmp(reinterpret_cast<const void *>(attribute.value().bytes_value().data()),
+                           reinterpret_cast<const void *>(non_utf8_string_arr), 4));
       EXPECT_EQ(attribute.value().bytes_value().size(), 4);
     }
 #endif
@@ -548,8 +548,19 @@ TEST(OtlpLogRecordable, DefaultRecordAppliesNoLimitUntilConfigured)
   {
     rec.SetAttribute("attr_" + std::to_string(i), static_cast<int64_t>(i));
   }
-  EXPECT_EQ(rec.log_record().attributes_size(), 200);
-  EXPECT_EQ(rec.log_record().dropped_attributes_count(), 0u);
+  const auto &proto_log_record = rec.log_record();
+  EXPECT_EQ(proto_log_record.attributes_size(), 200);
+  EXPECT_EQ(proto_log_record.dropped_attributes_count(), 0u);
+}
+
+// Test that an empty key is rejected and not stored.
+TEST(OtlpLogRecordable, SetAttributeEmptyKeyIsRejected)
+{
+  OtlpLogRecordable rec;
+  rec.SetAttribute("", opentelemetry::common::AttributeValue{static_cast<int64_t>(1)});
+
+  const auto &proto_log_record = rec.log_record();
+  EXPECT_EQ(proto_log_record.attributes_size(), 0);
 }
 
 }  // namespace otlp

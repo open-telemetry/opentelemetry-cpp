@@ -15,8 +15,10 @@ namespace configuration
 class ComposableProbabilitySamplerConfiguration : public ComposableSamplerConfiguration
 {
 public:
+  static constexpr double kDefaultRatio = 1.0;
+
   ComposableProbabilitySamplerConfiguration() = default;
-  double ratio{1.0};
+  double ratio{kDefaultRatio};
   void Accept(SamplerConfigurationVisitor *visitor) const override;
 };
 
