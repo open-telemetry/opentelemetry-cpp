@@ -550,8 +550,18 @@ ConfigurationParser::ParseBatchLogRecordProcessorConfiguration(
   model->schedule_delay = node->GetInteger("schedule_delay", Config::kDefaultScheduleDelayMs);
   model->export_timeout = node->GetInteger("export_timeout", Config::kDefaultExportTimeoutMs);
   model->max_queue_size = node->GetInteger("max_queue_size", Config::kDefaultMaxQueueSize);
-  model->max_export_batch_size =
-      node->GetInteger("max_export_batch_size", Config::kDefaultMaxExportBatchSize);
+
+  // max_export_batch_size/development added in schema 1.1.0
+  if ((version_major_ == 1) && (version_minor_ >= 1))
+  {
+    model->max_export_batch_size =
+        node->GetInteger("max_export_batch_size/development", Config::kDefaultMaxExportBatchSize);
+  }
+  else
+  {
+    // Not configurable in yaml 1.0.0
+    model->max_export_batch_size = Config::kDefaultMaxExportBatchSize;
+  }
 
   child           = node->GetRequiredChildNode("exporter");
   model->exporter = ParseLogRecordExporterConfiguration(child);
@@ -935,15 +945,35 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
 
   model->host = node->GetString("host", Config::kDefaultHost);
   model->port = node->GetInteger("port", Config::kDefaultPort);
-  model->without_scope_info =
-      node->GetBoolean("without_scope_info", Config::kDefaultWithoutScopeInfo);
-  model->without_target_info =
-      node->GetBoolean("without_target_info", Config::kDefaultWithoutTargetInfo);
 
-  child = node->GetChildNode("with_resource_constant_labels");
-  if (child)
+  if ((version_major_ == 1) && (version_minor_ >= 1))
   {
-    model->with_resource_constant_labels = ParseIncludeExcludeConfiguration(child);
+    // Properties renamed in schema 1.1.0
+    model->scope_info_enabled =
+        node->GetBoolean("scope_info_enabled", Config::kDefaultScopeInfoEnabled);
+    model->target_info_enabled =
+        node->GetBoolean("target_info_enabled/development", Config::kDefaultTargetInfoEnabled);
+
+    child = node->GetChildNode("resource_constant_labels");
+    if (child)
+    {
+      model->resource_constant_labels = ParseIncludeExcludeConfiguration(child);
+    }
+  }
+  else
+  {
+    // Old properties name in schema 1.0.0
+    bool without_scope_info  = node->GetBoolean("without_scope_info", false);
+    bool without_target_info = node->GetBoolean("without_target_info", false);
+
+    model->scope_info_enabled  = !without_scope_info;
+    model->target_info_enabled = !without_target_info;
+
+    child = node->GetChildNode("with_resource_constant_labels");
+    if (child)
+    {
+      model->resource_constant_labels = ParseIncludeExcludeConfiguration(child);
+    }
   }
 
   std::string translation_strategy =
@@ -2253,8 +2283,18 @@ ConfigurationParser::ParseBatchSpanProcessorConfiguration(
   model->schedule_delay = node->GetInteger("schedule_delay", Config::kDefaultScheduleDelayMs);
   model->export_timeout = node->GetInteger("export_timeout", Config::kDefaultExportTimeoutMs);
   model->max_queue_size = node->GetInteger("max_queue_size", Config::kDefaultMaxQueueSize);
-  model->max_export_batch_size =
-      node->GetInteger("max_export_batch_size", Config::kDefaultMaxExportBatchSize);
+
+  // max_export_batch_size/development added in schema 1.1.0
+  if ((version_major_ == 1) && (version_minor_ >= 1))
+  {
+    model->max_export_batch_size =
+        node->GetInteger("max_export_batch_size/development", Config::kDefaultMaxExportBatchSize);
+  }
+  else
+  {
+    // Not configurable in yaml 1.0.0
+    model->max_export_batch_size = Config::kDefaultMaxExportBatchSize;
+  }
 
   child           = node->GetRequiredChildNode("exporter");
   model->exporter = ParseSpanExporterConfiguration(child);
@@ -2814,7 +2854,7 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
       throw InvalidSchemaException(node->Location(), message);
     }
 
-    if (minor != 0)
+    if (minor > 1)
     {
       std::string message("Unsupported file_format, major = ");
       message.append(std::to_string(major));
