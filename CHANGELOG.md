@@ -19,6 +19,10 @@ Increment the:
   deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
   `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
   ([#4349](https://github.com/open-telemetry/opentelemetry-cpp/pull/4349))
+
+* [CONFIGURATION] Add SDK component builder interfaces to the registry
+  [#4358](https://github.com/open-telemetry/opentelemetry-cpp/issues/4358)
+
 * [CODE HEALTH] Move remaining `misc-use-internal-linkage` classes/enums into
   anonymous namespaces: `OtlpFileSystemBackend`/`OtlpFileOstreamBackend` in
   the OTLP file exporter, `ResponseHandler`/`AsyncResponseHandler`/
@@ -129,6 +133,9 @@ Increment the:
 
 * [SDK] Downscale base2 exponential histogram buckets in place
   [#4324](https://github.com/open-telemetry/opentelemetry-cpp/pull/4324)
+
+* [CONFIGURATION] file configuration - yaml schema 1.1.0
+  [#4340](https://github.com/open-telemetry/opentelemetry-cpp/pull/4340)
 
 * [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
   `AlwaysOff`/`TraceBased`)
