@@ -103,7 +103,7 @@ logger_provider:
 TEST(YamlLogs, default_batch_processor)
 {
   std::string yaml = R"(
-file_format: "1.0-logs"
+file_format: "1.1-logs"
 logger_provider:
   processors:
     - batch:
@@ -132,14 +132,14 @@ logger_provider:
 TEST(YamlLogs, batch_processor)
 {
   std::string yaml = R"(
-file_format: "1.0-logs"
+file_format: "1.1-logs"
 logger_provider:
   processors:
     - batch:
         schedule_delay: 5555
         export_timeout: 33333
         max_queue_size: 1234
-        max_export_batch_size: 256
+        max_export_batch_size/development: 256
         exporter:
           console:
 )";

@@ -37,6 +37,7 @@
 #include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
@@ -90,6 +91,9 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateParentBasedSampler(
       const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateProbabilitySampler(
+      const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model) const;
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateTraceIdRatioBasedSampler(
       const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model) const;

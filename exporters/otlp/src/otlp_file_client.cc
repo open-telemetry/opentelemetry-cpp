@@ -3,9 +3,9 @@
 
 #include <nlohmann/json.hpp>
 
-#include <limits.h>
 #include <atomic>
 #include <chrono>
+#include <climits>
 #include <condition_variable>
 #include <cstdint>
 #include <cstdio>
@@ -24,11 +24,10 @@
 #if defined(HAVE_GSL)
 #  include <gsl/gsl>
 #else
-#  include <assert.h>
+#  include <cassert>
 #endif
 
 #ifdef _MSC_VER
-#  include <string.h>
 #  define strcasecmp _stricmp
 #else
 #  include <strings.h>
@@ -100,7 +99,7 @@
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L)
 #  define OTLP_FILE_OPEN(f, path, mode) fopen_s(&f, path, mode)
 #else
-#  include <errno.h>
+#  include <cerrno>
 #  define OTLP_FILE_OPEN(f, path, mode) f = fopen(path, mode)
 #endif
 
@@ -973,7 +972,6 @@ void ConvertListFieldToJson(nlohmann::json &value,
 
 // NOLINTEND(misc-no-recursion) suppressing for performance as if implemented with stack needs
 // Dynamic memory allocation
-}  // namespace
 
 class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileSystemBackend : public OtlpFileAppender
 {
@@ -1615,6 +1613,7 @@ public:
 private:
   std::reference_wrapper<std::ostream> os_;
 };
+}  // namespace
 
 OtlpFileClient::OtlpFileClient(OtlpFileClientOptions &&options,
                                OtlpFileClientRuntimeOptions &&runtime_options)

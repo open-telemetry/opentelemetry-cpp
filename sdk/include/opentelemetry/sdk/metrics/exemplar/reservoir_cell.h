@@ -5,8 +5,8 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#  include <stdint.h>
 #  include <chrono>
+#  include <cstdint>
 #  include <map>
 #  include <memory>
 #  include <utility>

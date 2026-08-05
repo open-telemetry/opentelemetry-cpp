@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <ctype.h>
+#include <cctype>
 #include <cstddef>
 #include <string>
 #include <vector>

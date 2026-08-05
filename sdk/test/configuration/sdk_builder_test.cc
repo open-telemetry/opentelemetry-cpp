@@ -24,6 +24,7 @@
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
@@ -244,6 +245,31 @@ TEST(SdkBuilder, CreateParentBasedSampler)
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()},
               R"(ParentBased{TraceIdRatioBasedSampler{0.250000}})");
+  }
+}
+
+TEST(SdkBuilder, CreateProbabilitySampler)
+{
+  // default ratio is 1.0
+  {
+    config_sdk::ProbabilitySamplerConfiguration probability_sampler_config;
+    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    auto sampler = builder.CreateProbabilitySampler(&probability_sampler_config);
+    ASSERT_NE(sampler, nullptr);
+    EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ProbabilitySampler{1.000000})");
+  }
+
+  // explicit ratio, dispatched through CreateSampler
+  {
+    auto probability_sampler_config =
+        std::make_unique<config_sdk::ProbabilitySamplerConfiguration>();
+    probability_sampler_config->ratio = 0.5;
+    std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config =
+        std::move(probability_sampler_config);
+    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    auto sampler = builder.CreateSampler(sampler_config);
+    ASSERT_NE(sampler, nullptr);
+    EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ProbabilitySampler{0.500000})");
   }
 }
 
