@@ -35,9 +35,10 @@ unsigned char HexDigitValue(unsigned char c) noexcept
 }
 
 // Percent-decodes a value from OTEL_RESOURCE_ATTRIBUTES, per the W3C Baggage value grammar
-// the resource spec defers to (https://github.com/open-telemetry/opentelemetry-specification/pull/2670).
-// A malformed escape sequence is left in the output as-is rather than dropping the attribute,
-// since this parser has never validated attribute syntax.
+// the resource spec defers to
+// (https://github.com/open-telemetry/opentelemetry-specification/pull/2670). A malformed escape
+// sequence is left in the output as-is rather than dropping the attribute, since this parser has
+// never validated attribute syntax.
 std::string PercentDecode(const std::string &value)
 {
   std::string decoded;
@@ -48,9 +49,9 @@ std::string PercentDecode(const std::string &value)
         IsHexDigit(static_cast<unsigned char>(value[i + 1])) &&
         IsHexDigit(static_cast<unsigned char>(value[i + 2])))
     {
-      decoded.push_back(static_cast<char>((HexDigitValue(static_cast<unsigned char>(value[i + 1]))
-                                           << 4) |
-                                          HexDigitValue(static_cast<unsigned char>(value[i + 2]))));
+      decoded.push_back(
+          static_cast<char>((HexDigitValue(static_cast<unsigned char>(value[i + 1])) << 4) |
+                            HexDigitValue(static_cast<unsigned char>(value[i + 2]))));
       i += 2;
     }
     else
