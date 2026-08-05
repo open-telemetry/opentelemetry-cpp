@@ -29,7 +29,7 @@ int main()
   if (fork() == 0)
   {
     *child_id = Random::GenerateRandom64();
-    exit(EXIT_SUCCESS);
+    std::exit(EXIT_SUCCESS);
   }
   else
   {
