@@ -174,12 +174,8 @@ struct SocketAddr
   /// <returns>SocketAddr</returns>
   SocketAddr() {}
 
-  SocketAddr(u_long addr, int port)
+  SocketAddr(u_long addr, u_int16_t port)
   {
-    if (port < 0 || port > 65535)
-    {
-      return;
-    }
 
     sockaddr_in &inet4    = reinterpret_cast<sockaddr_in &>(m_data);
     inet4.sin_family      = AF_INET;

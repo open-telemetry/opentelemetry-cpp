@@ -199,7 +199,7 @@ public:
 
   void setServerName(std::string const &name) { m_serverHost = name; }
 
-  int addListeningPort(int port)
+  int addListeningPort(uint16_t port)
   {
 
 
