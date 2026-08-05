@@ -1,23 +1,29 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-# composite-sampler.yaml exercises all composite/development sampler builder types.
+# Exercises the composite/development sampler builder types.
+#
+# The Registry provides one builder per SDK component type. Each builder constructs its component from the parsed configuration model.
+# RegistryFactory::Create() pre-loads all the SDK default builders shown in this file.
+# Call Set*Builder() on the Registry to swap in your own implementation before calling ConfiguredSdk::Create:
+#
+#   auto registry = RegistryFactory::Create();
+#   registry->SetComposableRuleBasedSamplerBuilder(std::make_unique<MyComposableRuleBasedSamplerBuilder>());
+#   auto sdk = ConfiguredSdk::Create(registry, model);
 
 file_format: "1.0"
 log_level: info
 
 tracer_provider:
   processors:
-    - simple:
+    - simple:  # SimpleSpanProcessorBuilder
         exporter:
-          console:
+          console:  # ConsoleSpanExporterBuilder
   sampler:
-    # parent_based sampler
-    parent_based:
+    parent_based:  # ParentBasedSamplerBuilder
       root:
-        # rule_based composable sampler
         composite/development:
-          rule_based:
+          rule_based:  # ComposableRuleBasedSamplerBuilder
             rules:
               - attribute_values:
                   key: http.method
@@ -41,22 +47,18 @@ tracer_provider:
               - sampler:
                   always_off:
       remote_parent_sampled:
-        # always_on composable sampler
         composite/development:
-          always_on:
+          always_on:  # ComposableAlwaysOnSamplerBuilder
       remote_parent_not_sampled:
-        # always_off composable sampler
         composite/development:
-          always_off:
+          always_off:  # ComposableAlwaysOffSamplerBuilder
       local_parent_sampled:
-        # probability composable sampler
         composite/development:
-          probability:
+          probability:  # ComposableProbabilitySamplerBuilder
             ratio: 0.5
       local_parent_not_sampled:
-        # parent_threshold composable sampler
         composite/development:
-          parent_threshold:
+          parent_threshold:  # ComposableParentThresholdSamplerBuilder
             root:
               probability:
                 ratio: 0.1
