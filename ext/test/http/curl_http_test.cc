@@ -70,10 +70,11 @@ public:
   std::atomic<bool> got_response_;
 };
 
-// Cancels from inside the Response event, which is the one moment both arms of the completion
-// callback are eligible: DispatchEvent notifies the handler before it stores the new state, and
-// the callback runs after both, so it sees an aborted operation that also has a response.
-class CancelAtResponseHandler : public CustomEventHandler
+// Counts the terminal notifications one request produces. Set cancel_at_response_ to cancel from
+// inside the Response event, which is the one moment both arms of the completion callback are
+// eligible: DispatchEvent notifies the handler before it stores the new state, and the callback
+// runs after both, so it sees an aborted operation that also has a response.
+class TerminalCountingHandler : public CustomEventHandler
 {
 public:
   void OnResponse(http_client::Response & /* response */) noexcept override
@@ -88,15 +89,15 @@ public:
     {
       terminal_count_.fetch_add(1, std::memory_order_release);
     }
-    else if (state == http_client::SessionState::Response && session_ != nullptr)
+    else if (state == http_client::SessionState::Response && cancel_at_response_ != nullptr)
     {
-      auto *session = session_;
-      session_      = nullptr;
+      auto *session       = cancel_at_response_;
+      cancel_at_response_ = nullptr;
       session->CancelSession();
     }
   }
 
-  http_client::Session *session_ = nullptr;
+  http_client::Session *cancel_at_response_ = nullptr;
   std::atomic<int> terminal_count_{0};
 };
 
@@ -503,8 +504,8 @@ TEST_F(BasicCurlHttpTests, ACancelAfterTheResponseReportsOneOutcome)
   auto request = session->CreateRequest();
   request->SetUri("get/");
 
-  auto handler      = std::make_shared<CancelAtResponseHandler>();
-  handler->session_ = session.get();
+  auto handler                 = std::make_shared<TerminalCountingHandler>();
+  handler->cancel_at_response_ = session.get();
 
   session->SendRequest(handler);
   ASSERT_TRUE(waitForRequests(30, 1));
@@ -512,6 +513,36 @@ TEST_F(BasicCurlHttpTests, ACancelAfterTheResponseReportsOneOutcome)
 
   EXPECT_TRUE(handler->got_response_.load(std::memory_order_acquire));
   EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire));
+
+  session_manager->FinishAllSessions();
+}
+
+// The other arm of the same callback, which nothing exercised. The server handler takes
+// mtx_requests before it answers, so holding it keeps a response from racing the cancel, and the
+// abort is torn down through Session::FinishOperation while the transfer is still in flight.
+TEST_F(BasicCurlHttpTests, ACancelBeforeTheResponseReportsCancelled)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler = std::make_shared<TerminalCountingHandler>();
+
+  {
+    std::unique_lock<std::mutex> lock_requests(mtx_requests);
+    session->SendRequest(handler);
+    session->CancelSession();
+    session->FinishSession();
+  }
+
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  // At least one, not exactly one: Cleanup dispatches Cancelled itself while the state is still
+  // in flight, and this callback adds another. That doubling is not what this change decides.
+  EXPECT_GE(handler->terminal_count_.load(std::memory_order_acquire), 1);
 
   session_manager->FinishAllSessions();
 }
