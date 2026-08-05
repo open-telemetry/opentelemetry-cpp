@@ -27,6 +27,7 @@
 #include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/registry_factory.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
@@ -55,7 +56,7 @@
 #include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 
-using opentelemetry::sdk::configuration::Registry;
+using opentelemetry::sdk::configuration::RegistryFactory;
 using opentelemetry::sdk::configuration::SdkBuilder;
 using opentelemetry::sdk::configuration::SpanLimitsConfiguration;
 using opentelemetry::sdk::configuration::TracerProviderConfiguration;
@@ -76,7 +77,7 @@ TEST(SdkBuilder, SpanLimitsDefaults)
   auto model    = std::make_unique<TracerProviderConfiguration>();
   model->limits = nullptr;
 
-  SdkBuilder builder(std::make_shared<Registry>());
+  SdkBuilder builder(RegistryFactory::Create());
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
   auto provider = builder.CreateTracerProvider(model, resource);
   ASSERT_NE(provider, nullptr);
@@ -103,7 +104,7 @@ TEST(SdkBuilder, SpanLimitsConfiguration)
   model->limits->event_attribute_count_limit  = 5555;
   model->limits->link_attribute_count_limit   = 6666;
 
-  SdkBuilder builder(std::make_shared<Registry>());
+  SdkBuilder builder(RegistryFactory::Create());
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
   auto provider = builder.CreateTracerProvider(model, resource);
   ASSERT_NE(provider, nullptr);
@@ -141,7 +142,7 @@ TEST(SdkBuilder, CreateLoggerConfigurator)
   model->loggers.push_back(matcher1);
   model->loggers.push_back(matcher2);
 
-  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
 
   auto logger_configurator = builder.CreateLoggerConfigurator(model);
   ASSERT_NE(logger_configurator, nullptr);
@@ -175,7 +176,7 @@ TEST(SdkBuilder, CreateParentBasedSampler)
   {
     config_sdk::ParentBasedSamplerConfiguration parent_based_sampler_config;
     parent_based_sampler_config.root = nullptr;
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ParentBased{AlwaysOnSampler})");
@@ -185,7 +186,7 @@ TEST(SdkBuilder, CreateParentBasedSampler)
   {
     config_sdk::ParentBasedSamplerConfiguration parent_based_sampler_config;
     parent_based_sampler_config.root = std::make_unique<config_sdk::AlwaysOnSamplerConfiguration>();
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ParentBased{AlwaysOnSampler})");
@@ -196,7 +197,7 @@ TEST(SdkBuilder, CreateParentBasedSampler)
     config_sdk::ParentBasedSamplerConfiguration parent_based_sampler_config;
     parent_based_sampler_config.root =
         std::make_unique<config_sdk::AlwaysOffSamplerConfiguration>();
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ParentBased{AlwaysOffSampler})");
@@ -209,7 +210,7 @@ TEST(SdkBuilder, CreateParentBasedSampler)
         std::make_unique<config_sdk::TraceIdRatioBasedSamplerConfiguration>();
     trace_id_ratio_based_sampler_config->ratio = 0.5;
     parent_based_sampler_config.root           = std::move(trace_id_ratio_based_sampler_config);
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()},
@@ -240,7 +241,7 @@ TEST(SdkBuilder, CreateParentBasedSampler)
         std::make_unique<config_sdk::AlwaysOffSamplerConfiguration>();
     parent_based_sampler_config.local_parent_not_sampled = std::move(always_off_sampler_config_2);
 
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()},
@@ -253,7 +254,7 @@ TEST(SdkBuilder, CreateProbabilitySampler)
   // default ratio is 1.0
   {
     config_sdk::ProbabilitySamplerConfiguration probability_sampler_config;
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateProbabilitySampler(&probability_sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ProbabilitySampler{1.000000})");
@@ -266,7 +267,7 @@ TEST(SdkBuilder, CreateProbabilitySampler)
     probability_sampler_config->ratio = 0.5;
     std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config =
         std::move(probability_sampler_config);
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateSampler(sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ProbabilitySampler{0.500000})");

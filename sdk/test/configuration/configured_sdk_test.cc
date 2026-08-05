@@ -36,6 +36,7 @@
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/registry_factory.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
@@ -113,7 +114,7 @@ protected:
 
   void MakeRegistry()
   {
-    registry_ = std::make_shared<config_sdk::Registry>();
+    registry_ = config_sdk::RegistryFactory::Create();
     registry_->SetExtensionSpanExporterBuilder(
         "noop", std::make_unique<config_test::NoopSpanExporterBuilder>());
     registry_->SetExtensionLogRecordExporterBuilder(
@@ -122,6 +123,10 @@ protected:
         "noop", std::make_unique<config_test::NoopPushMetricExporterBuilder>());
     registry_->SetPeriodicMetricReaderBuilder(
         std::make_unique<config_test::NoopPeriodicMetricReaderBuilder>());
+    registry_->SetBatchSpanProcessorBuilder(
+        std::make_unique<config_test::MockBatchSpanProcessorBuilder>());
+    registry_->SetBatchLogRecordProcessorBuilder(
+        std::make_unique<config_test::MockBatchLogRecordProcessorBuilder>());
   }
 
   static std::unique_ptr<config_sdk::TracerProviderConfiguration> MakeTracerProviderConfig()

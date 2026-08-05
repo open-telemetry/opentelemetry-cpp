@@ -43,7 +43,9 @@
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
@@ -73,6 +75,7 @@
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/registry_factory.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
@@ -152,7 +155,7 @@ protected:
 
   void MakeRegistry()
   {
-    registry_ = std::make_shared<config_sdk::Registry>();
+    registry_ = config_sdk::RegistryFactory::Create();
     registry_->SetExtensionSpanExporterBuilder(
         "recording", std::make_unique<config_test::RecordingSpanExporterBuilder>(span_buffer_));
     registry_->SetExtensionLogRecordExporterBuilder(
@@ -162,6 +165,10 @@ protected:
         std::make_unique<config_test::RecordingPushMetricExporterBuilder>(metric_buffer_));
     registry_->SetPeriodicMetricReaderBuilder(
         std::make_unique<config_test::SyncPeriodicMetricReaderBuilder>());
+    registry_->SetBatchSpanProcessorBuilder(
+        std::make_unique<config_test::MockBatchSpanProcessorBuilder>());
+    registry_->SetBatchLogRecordProcessorBuilder(
+        std::make_unique<config_test::MockBatchLogRecordProcessorBuilder>());
   }
 
   static std::unique_ptr<config_sdk::TracerProviderConfiguration> MakeTracerProviderConfig()
@@ -367,10 +374,7 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLoggerConfigurator)
   EXPECT_EQ(log_buffer_->size(), 2);
 }
 
-// TODO: Re-enable this test once a mock BatchSpanProcessor can be configured.
-// All tests that use a BatchProcessor may timeout due to the a race between the background thread
-// and the ForceFlush call.
-TEST_F(ProgrammaticConfigTest, DISABLED_LoggerProviderWithBatchProcessorDefaults)
+TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorDefaults)
 {
   auto exporter       = std::make_unique<config_sdk::ExtensionLogRecordExporterConfiguration>();
   exporter->name      = "recording";
@@ -392,8 +396,7 @@ TEST_F(ProgrammaticConfigTest, DISABLED_LoggerProviderWithBatchProcessorDefaults
   EXPECT_GE(log_buffer_->size(), 1);
 }
 
-// TODO: Re-enable this test once a mock BatchProcessor can be configured.
-TEST_F(ProgrammaticConfigTest, DISABLED_LoggerProviderWithBatchProcessorConfigured)
+TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorConfigured)
 {
   auto exporter       = std::make_unique<config_sdk::ExtensionLogRecordExporterConfiguration>();
   exporter->name      = "recording";
@@ -659,8 +662,7 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithParentBasedSamplerNullRoot)
   EXPECT_EQ(span_buffer_->size(), 1);
 }
 
-// TODO: Re-enable this test once a mock BatchSpanProcessor can be configured.
-TEST_F(ProgrammaticConfigTest, DISABLED_TracerProviderWithBatchProcessor)
+TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessor)
 {
   auto exporter               = std::make_unique<config_sdk::ExtensionSpanExporterConfiguration>();
   exporter->name              = "recording";
@@ -681,8 +683,7 @@ TEST_F(ProgrammaticConfigTest, DISABLED_TracerProviderWithBatchProcessor)
   EXPECT_GE(span_buffer_->size(), 1);
 }
 
-// TODO: Re-enable this test once a mock BatchSpanProcessor can be configured.
-TEST_F(ProgrammaticConfigTest, DISABLED_TracerProviderWithBatchProcessorConfigured)
+TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessorConfigured)
 {
   auto exporter             = std::make_unique<config_sdk::ExtensionSpanExporterConfiguration>();
   exporter->name            = "recording";
