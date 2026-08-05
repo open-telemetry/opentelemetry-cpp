@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -13,12 +14,15 @@
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/context/propagation/composite_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"
@@ -33,7 +37,15 @@
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_patterns_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
@@ -174,7 +186,15 @@
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off_factory.h"
 #include "opentelemetry/sdk/trace/samplers/always_on_factory.h"
+#include "opentelemetry/sdk/trace/samplers/composable_always_off.h"
+#include "opentelemetry/sdk/trace/samplers/composable_always_on.h"
+#include "opentelemetry/sdk/trace/samplers/composable_parent_threshold.h"
+#include "opentelemetry/sdk/trace/samplers/composable_probability.h"
+#include "opentelemetry/sdk/trace/samplers/composable_rule_based.h"
+#include "opentelemetry/sdk/trace/samplers/composable_sampler.h"
+#include "opentelemetry/sdk/trace/samplers/composite_sampler_factory.h"
 #include "opentelemetry/sdk/trace/samplers/parent_factory.h"
+#include "opentelemetry/sdk/trace/samplers/predicate.h"
 #include "opentelemetry/sdk/trace/samplers/probability_factory.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
@@ -182,6 +202,8 @@
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/version.h"
 #include "src/common/wildcard_match.h"
 
@@ -428,6 +450,325 @@ private:
   std::string name_;
 };
 
+class RuleBasedPredicate : public opentelemetry::sdk::trace::Predicate
+{
+public:
+  explicit RuleBasedPredicate(
+      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerRuleConfiguration *rule)
+  {
+    if (rule->attribute_values != nullptr)
+    {
+      match_values_ = true;
+      values_key_   = rule->attribute_values->key;
+      values_       = rule->attribute_values->values;
+    }
+    if (rule->attribute_patterns != nullptr)
+    {
+      match_patterns_ = true;
+      patterns_key_   = rule->attribute_patterns->key;
+      included_       = rule->attribute_patterns->included;
+      excluded_       = rule->attribute_patterns->excluded;
+    }
+    match_parent_none_   = rule->match_parent_none;
+    match_parent_remote_ = rule->match_parent_remote;
+    match_parent_local_  = rule->match_parent_local;
+
+    match_span_kind_internal_ = rule->match_span_kind_internal;
+    match_span_kind_server_   = rule->match_span_kind_server;
+    match_span_kind_client_   = rule->match_span_kind_client;
+    match_span_kind_producer_ = rule->match_span_kind_producer;
+    match_span_kind_consumer_ = rule->match_span_kind_consumer;
+  }
+
+  bool SpanMatches(
+      const opentelemetry::trace::SpanContext &parent_context,
+      nostd::string_view /* name */,
+      opentelemetry::trace::SpanKind span_kind,
+      const opentelemetry::common::KeyValueIterable &attributes,
+      const opentelemetry::trace::SpanContextKeyValueIterable & /* links */) const noexcept override
+  {
+    if (!ParentMatches(parent_context))
+    {
+      return false;
+    }
+    if (!SpanKindMatches(span_kind))
+    {
+      return false;
+    }
+    if (match_values_ &&
+        !AttributeMatches(attributes, values_key_, [this](const std::string &candidate) {
+          return std::find(values_.begin(), values_.end(), candidate) != values_.end();
+        }))
+    {
+      return false;
+    }
+    if (match_patterns_ &&
+        !AttributeMatches(attributes, patterns_key_, [this](const std::string &candidate) {
+          for (const auto &pattern : excluded_)
+          {
+            if (WildcardMatch(pattern, candidate))
+            {
+              return false;
+            }
+          }
+          if (included_.empty())
+          {
+            return true;
+          }
+          for (const auto &pattern : included_)
+          {
+            if (WildcardMatch(pattern, candidate))
+            {
+              return true;
+            }
+          }
+          return false;
+        }))
+    {
+      return false;
+    }
+    return true;
+  }
+
+  nostd::string_view GetDescription() const noexcept override { return "RuleBasedPredicate"; }
+
+private:
+  // Checks every string form of an attribute value; array values match if any item matches.
+  class ValueMatcher
+  {
+  public:
+    explicit ValueMatcher(nostd::function_ref<bool(const std::string &)> check) : check_(check) {}
+
+    bool operator()(bool v) const { return check_(v ? "true" : "false"); }
+    bool operator()(int32_t v) const { return check_(std::to_string(v)); }
+    bool operator()(int64_t v) const { return check_(std::to_string(v)); }
+    bool operator()(uint32_t v) const { return check_(std::to_string(v)); }
+    bool operator()(uint64_t v) const { return check_(std::to_string(v)); }
+    bool operator()(double v) const { return check_(std::to_string(v)); }
+    bool operator()(const char *v) const { return v != nullptr && check_(std::string(v)); }
+    bool operator()(nostd::string_view v) const { return check_(std::string(v)); }
+    // Array values match when any item matches.
+    template <typename T>
+    bool operator()(nostd::span<const T> v) const
+    {
+      for (const auto &value : v)
+      {
+        if ((*this)(value))
+        {
+          return true;
+        }
+      }
+      return false;
+    }
+    // Byte arrays have no string form to match.
+    bool operator()(nostd::span<const uint8_t> /* v */) const { return false; }
+
+  private:
+    nostd::function_ref<bool(const std::string &)> check_;
+  };
+
+  static bool AttributeMatches(const opentelemetry::common::KeyValueIterable &attributes,
+                               const std::string &key,
+                               nostd::function_ref<bool(const std::string &)> check) noexcept
+  {
+    bool matched = false;
+    attributes.ForEachKeyValue(
+        [&](nostd::string_view attr_key, opentelemetry::common::AttributeValue value) {
+          if (attr_key != key)
+          {
+            return true;
+          }
+          matched = nostd::visit(ValueMatcher(check), value);
+          return false;
+        });
+    return matched;
+  }
+
+  bool ParentMatches(const opentelemetry::trace::SpanContext &parent_context) const noexcept
+  {
+    if (!(match_parent_none_ || match_parent_remote_ || match_parent_local_))
+    {
+      return true;
+    }
+    if (!parent_context.IsValid())
+    {
+      return match_parent_none_;
+    }
+    return parent_context.IsRemote() ? match_parent_remote_ : match_parent_local_;
+  }
+
+  bool SpanKindMatches(opentelemetry::trace::SpanKind span_kind) const noexcept
+  {
+    if (!(match_span_kind_internal_ || match_span_kind_server_ || match_span_kind_client_ ||
+          match_span_kind_producer_ || match_span_kind_consumer_))
+    {
+      return true;
+    }
+    switch (span_kind)
+    {
+      case opentelemetry::trace::SpanKind::kInternal:
+        return match_span_kind_internal_;
+      case opentelemetry::trace::SpanKind::kServer:
+        return match_span_kind_server_;
+      case opentelemetry::trace::SpanKind::kClient:
+        return match_span_kind_client_;
+      case opentelemetry::trace::SpanKind::kProducer:
+        return match_span_kind_producer_;
+      case opentelemetry::trace::SpanKind::kConsumer:
+        return match_span_kind_consumer_;
+    }
+    return false;
+  }
+
+  bool match_values_{false};
+  std::string values_key_;
+  std::vector<std::string> values_;
+
+  bool match_patterns_{false};
+  std::string patterns_key_;
+  std::vector<std::string> included_;
+  std::vector<std::string> excluded_;
+
+  bool match_parent_none_{false};
+  bool match_parent_remote_{false};
+  bool match_parent_local_{false};
+
+  bool match_span_kind_internal_{false};
+  bool match_span_kind_server_{false};
+  bool match_span_kind_client_{false};
+  bool match_span_kind_producer_{false};
+  bool match_span_kind_consumer_{false};
+};
+
+class ComposableSamplerBuilder
+    : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
+{
+public:
+  // NOLINTBEGIN(misc-no-recursion)
+  static std::shared_ptr<opentelemetry::sdk::trace::ComposableSampler> Build(
+      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model)
+  {
+    ComposableSamplerBuilder builder;
+    model->Accept(&builder);
+    return std::move(builder.sampler);
+  }
+
+  ComposableSamplerBuilder()                                                 = default;
+  ComposableSamplerBuilder(ComposableSamplerBuilder &&)                      = delete;
+  ComposableSamplerBuilder(const ComposableSamplerBuilder &)                 = delete;
+  ComposableSamplerBuilder &operator=(ComposableSamplerBuilder &&)           = delete;
+  ComposableSamplerBuilder &operator=(const ComposableSamplerBuilder &other) = delete;
+  ~ComposableSamplerBuilder() override                                       = default;
+
+  void VisitComposableAlwaysOff(
+      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration
+          * /* model */) override
+  {
+    sampler = std::make_shared<opentelemetry::sdk::trace::ComposableAlwaysOffSampler>();
+  }
+
+  void VisitComposableAlwaysOn(
+      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration * /* model */)
+      override
+  {
+    sampler = std::make_shared<opentelemetry::sdk::trace::ComposableAlwaysOnSampler>();
+  }
+
+  void VisitComposableProbability(
+      const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
+      override
+  {
+    sampler =
+        std::make_shared<opentelemetry::sdk::trace::ComposableProbabilitySampler>(model->ratio);
+  }
+
+  void VisitComposableParentThreshold(
+      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *model)
+      override
+  {
+    std::shared_ptr<opentelemetry::sdk::trace::ComposableSampler> root;
+    if (model->root != nullptr)
+    {
+      root = Build(model->root.get());
+    }
+    else
+    {
+      root = std::make_shared<opentelemetry::sdk::trace::ComposableAlwaysOnSampler>();
+    }
+    sampler = std::make_shared<opentelemetry::sdk::trace::ComposableParentThresholdSampler>(root);
+  }
+
+  void VisitComposableRuleBased(
+      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *model)
+      override
+  {
+    std::vector<opentelemetry::sdk::trace::PredicatedSampler> rules;
+    rules.reserve(model->rules.size());
+    for (const auto &rule : model->rules)
+    {
+      if (rule == nullptr || rule->sampler == nullptr)
+      {
+        OTEL_INTERNAL_LOG_WARN("Ignoring a rule with no sampler");
+        continue;
+      }
+      opentelemetry::sdk::trace::PredicatedSampler predicated;
+      predicated.predicate = std::make_shared<RuleBasedPredicate>(rule.get());
+      predicated.sampler   = Build(rule->sampler.get());
+      rules.push_back(std::move(predicated));
+    }
+    sampler =
+        std::make_shared<opentelemetry::sdk::trace::ComposableRuleBasedSampler>(std::move(rules));
+  }
+  // NOLINTEND(misc-no-recursion)
+
+  // The model only ever nests ComposableSamplerConfiguration here, so the
+  // plain sampler visits are unreachable.
+  void VisitAlwaysOff(
+      const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  void VisitAlwaysOn(
+      const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  void VisitJaegerRemote(const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration
+                             * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  void VisitParentBased(const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration
+                            * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  void VisitProbability(const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration
+                            * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  void VisitTraceIdRatioBased(
+      const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration * /* model */)
+      override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  void VisitExtension(
+      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  std::shared_ptr<opentelemetry::sdk::trace::ComposableSampler> sampler;
+};
+
 class SamplerBuilder : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
 {
 public:
@@ -482,42 +823,43 @@ public:
   }
 
   void VisitComposableAlwaysOff(
-      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration
-          * /* model */) override
+      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *model)
+      override
   {
-    sampler = opentelemetry::sdk::trace::AlwaysOffSamplerFactory::Create();
+    sampler = opentelemetry::sdk::trace::CompositeSamplerFactory::Create(
+        ComposableSamplerBuilder::Build(model));
   }
 
   void VisitComposableAlwaysOn(
-      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration * /* model */)
+      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration *model)
       override
   {
-    sampler = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+    sampler = opentelemetry::sdk::trace::CompositeSamplerFactory::Create(
+        ComposableSamplerBuilder::Build(model));
   }
 
   void VisitComposableProbability(
       const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
       override
   {
-    sampler = opentelemetry::sdk::trace::TraceIdRatioBasedSamplerFactory::Create(model->ratio);
+    sampler = opentelemetry::sdk::trace::CompositeSamplerFactory::Create(
+        ComposableSamplerBuilder::Build(model));
   }
 
   void VisitComposableParentThreshold(
-      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration
-          * /* model */) override
+      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *model)
+      override
   {
-    // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/4028
-    OTEL_INTERNAL_LOG_WARN("ComposableParentThresholdSampler not yet fully supported by SDK");
-    sampler = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+    sampler = opentelemetry::sdk::trace::CompositeSamplerFactory::Create(
+        ComposableSamplerBuilder::Build(model));
   }
 
   void VisitComposableRuleBased(
-      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration
-          * /* model */) override
+      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *model)
+      override
   {
-    // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/4028
-    OTEL_INTERNAL_LOG_WARN("ComposableRuleBasedSampler not yet fully supported by SDK");
-    sampler = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+    sampler = opentelemetry::sdk::trace::CompositeSamplerFactory::Create(
+        ComposableSamplerBuilder::Build(model));
   }
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sampler;

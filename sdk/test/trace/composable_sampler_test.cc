@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <map>
 #include <string>
 #include <utility>
@@ -372,4 +373,10 @@ TEST(ComposableSampler, RatioClampedToValidRange)
       CompositeSamplerFactory::Create(std::make_shared<ComposableProbabilitySampler>(-1.0));
   EXPECT_EQ(Decision::DROP,
             Sample(*under, trace_api::SpanContext::GetInvalid(), MakeTraceId(0xFF)));
+}
+
+TEST(ComposableSampler, ProbabilityNanRatioUsesDefault)
+{
+  ComposableProbabilitySampler sampler(std::numeric_limits<double>::quiet_NaN());
+  EXPECT_EQ(std::string{sampler.GetDescription()}, "ComposableProbabilitySampler{1.000000}");
 }
