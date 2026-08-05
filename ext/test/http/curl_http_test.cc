@@ -83,11 +83,17 @@ public:
     got_response_.store(true, std::memory_order_release);
   }
 
-  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
   {
     if (state == http_client::SessionState::Cancelled)
     {
       terminal_count_.fetch_add(1, std::memory_order_release);
+      // Cleanup dispatches its own Cancelled carrying a curl message, and GetCurlErrorMessage
+      // never yields an empty one, so an empty reason is the completion callback and only it.
+      if (reason.empty())
+      {
+        cancelled_from_callback_.fetch_add(1, std::memory_order_release);
+      }
     }
     else if (state == http_client::SessionState::Response && cancel_at_response_ != nullptr)
     {
@@ -99,6 +105,7 @@ public:
 
   http_client::Session *cancel_at_response_ = nullptr;
   std::atomic<int> terminal_count_{0};
+  std::atomic<int> cancelled_from_callback_{0};
 };
 
 class GetEventHandler : public CustomEventHandler
@@ -540,9 +547,10 @@ TEST_F(BasicCurlHttpTests, ACancelBeforeTheResponseReportsCancelled)
   }
 
   EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
-  // At least one, not exactly one: Cleanup dispatches Cancelled itself while the state is still
-  // in flight, and this callback adds another. That doubling is not what this change decides.
-  EXPECT_GE(handler->terminal_count_.load(std::memory_order_acquire), 1);
+  // Counted by its empty reason so the assertion holds the arm this covers rather than whatever
+  // else reports a cancel. Two arrive in all, the other from Cleanup, and the total is left
+  // unasserted because that doubling is not what this change decides.
+  EXPECT_EQ(1, handler->cancelled_from_callback_.load(std::memory_order_acquire));
 
   session_manager->FinishAllSessions();
 }
