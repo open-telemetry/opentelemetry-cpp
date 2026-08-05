@@ -85,6 +85,15 @@ TEST_F(ReservoirCellTestPeer, ProducesExemplarWithoutSpanContext)
   EXPECT_FALSE(data->GetSpanContext().IsValid());
 }
 
+TEST_F(ReservoirCellTestPeer, GetAndResetClearsCell)
+{
+  opentelemetry::sdk::metrics::ReservoirCell reservoir_cell;
+  reservoir_cell.RecordLongMeasurement(static_cast<int64_t>(42), MetricAttributes{},
+                                       opentelemetry::context::Context{});
+  ASSERT_NE(reservoir_cell.GetAndResetLong(MetricAttributes{}), nullptr);
+  EXPECT_EQ(reservoir_cell.GetAndResetLong(MetricAttributes{}), nullptr);
+}
+
 TEST_F(ReservoirCellTestPeer, Filtered)
 {
   FilteredTest();

@@ -73,7 +73,7 @@ public:
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       if (offer_exemplars)
       {
-        exemplar_reservoir_->OfferMeasurement(measurement.second, {}, {});
+        exemplar_reservoir_->OfferMeasurement(measurement.second, measurement.first, {});
       }
 #endif
 
