@@ -48,6 +48,11 @@ Increment the:
 * [BUILD] Run the ext_http component install test on Windows
   [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
 
+* [SDK] Convert SpinLockMutex to std::mutex part 1
+  Replace SpinLockMutex with std::mutex in SimpleProcessor,
+  SimpleLogRecordProcessor, MeterContext and Meter.
+  [#4323](https://github.com/open-telemetry/opentelemetry-cpp/pull/4323)
+
 * [CONFIGURATION] Decouple config registry and builder headers
   [#4335](https://github.com/open-telemetry/opentelemetry-cpp/pull/4335)
 
