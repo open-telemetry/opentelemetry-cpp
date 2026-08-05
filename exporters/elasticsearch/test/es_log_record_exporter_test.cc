@@ -366,6 +366,33 @@ TEST(ElasticsearchBulkResponseTests, RejectsAnAcknowledgedFailureUnderErrorsFals
   EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(
       200, R"({"errors":false,"items":[{"index":{"status":300}}]})", 1, reason));
 }
+
+// An operation that did not apply says so through its status and through an "error" member. The
+// errors:true path already reads the second one, so reading it here as well is what stops the same
+// body from being accepted or rejected according to a flag the responder also controls.
+TEST(ElasticsearchBulkResponseTests, RejectsAnItemErrorUnderErrorsFalse)
+{
+  std::string reason;
+  EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(
+      200,
+      R"({"errors":false,"items":[{"index":{"_index":"logs","status":201,)"
+      R"("error":{"type":"mapper_parsing_exception","reason":"rejected"}}}]})",
+      1, reason));
+  EXPECT_NE(reason.find("mapper_parsing_exception"), std::string::npos)
+      << "the reason names what the server said: " << reason;
+
+  // A conforming server sends the flag and the member together, and that reads the same way.
+  EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(
+      200,
+      R"({"errors":true,"items":[{"index":{"_index":"logs","status":400,)"
+      R"("error":{"type":"mapper_parsing_exception"}}}]})",
+      1, reason));
+  EXPECT_NE(reason.find("mapper_parsing_exception"), std::string::npos) << reason;
+
+  // Only the member decides. An acknowledgement without one stays a success.
+  EXPECT_TRUE(logs_exporter::detail::IsBulkResponseSuccessful(
+      200, R"({"errors":false,"items":[{"index":{"_index":"logs","status":201}}]})", 1, reason));
+}
 // ---------------------------------------------------------------------------
 // The response travelling from the HTTP callback to the verdict.
 //

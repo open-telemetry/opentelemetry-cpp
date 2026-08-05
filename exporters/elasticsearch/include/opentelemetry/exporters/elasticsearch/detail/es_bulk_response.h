@@ -49,7 +49,7 @@ inline bool IsAcknowledgedStatus(const nlohmann::json &status) noexcept
  * @param expected_items the number of index operations the request submitted
  * @param failure_reason a best-effort explanation when this returns false
  * @return true only when the status is 2xx, "errors" is false, and "items" holds exactly
- *         expected_items index results that each acknowledge a 2xx status
+ *         expected_items index results that each acknowledge a 2xx status and carry no error
  */
 inline bool IsBulkResponseSuccessful(int status_code,
                                      const std::string &body,
@@ -100,7 +100,11 @@ inline bool IsBulkResponseSuccessful(int status_code,
 
     // Each entry is keyed by the action it answers, and every record goes out as an index
     // operation. Read before "errors", which a body that is not this answer does not get to decide.
-    const nlohmann::json *rejected = nullptr;
+    // An operation that was not applied says so twice, through its status and through an "error"
+    // member. Both are read here so that neither reading depends on the "errors" flag, which a
+    // response that contradicts itself also controls.
+    const nlohmann::json *rejected   = nullptr;
+    const nlohmann::json *item_error = nullptr;
     for (const auto &item : *items)
     {
       if (!item.is_object() || item.size() != 1)
@@ -127,6 +131,12 @@ inline bool IsBulkResponseSuccessful(int status_code,
       {
         rejected = &(*status);
       }
+
+      const auto error = operation->find("error");
+      if (item_error == nullptr && error != operation->end())
+      {
+        item_error = &(*error);
+      }
     }
 
     if (!errors->get<bool>())
@@ -138,20 +148,20 @@ inline bool IsBulkResponseSuccessful(int status_code,
             "the response reports no errors but acknowledges operation status " + rejected->dump();
         return false;
       }
+      if (item_error != nullptr)
+      {
+        failure_reason =
+            "the response reports no errors but an item carries error " + item_error->dump();
+        return false;
+      }
       return true;
     }
 
-    // Name the first item error rather than only saying that something failed. Every entry is one
-    // index result by now, so its single member is the result to look in.
-    for (const auto &item : *items)
+    // Name the first item error rather than only saying that something failed.
+    if (item_error != nullptr)
     {
-      const auto &result = *item.begin();
-      const auto error   = result.find("error");
-      if (error != result.end())
-      {
-        failure_reason = "at least one item failed, first error: " + error->dump();
-        return false;
-      }
+      failure_reason = "at least one item failed, first error: " + item_error->dump();
+      return false;
     }
 
     failure_reason = "the response reports errors";
