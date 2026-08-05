@@ -353,7 +353,8 @@ TEST_F(OtlpGrpcExporterFlushTestPeer, ForceFlushReturnsWithinTheCallerDeadline)
       std::chrono::steady_clock::now() - started);
 
   EXPECT_FALSE(flushed);
-  EXPECT_LT(elapsed.count(), 5000);
+  EXPECT_LT(elapsed.count(), 1000)
+      << "waited on the export timeout rather than the one it was given";
 }
 
 // A completion for one request used to end the wait for every other request, and the leftover
