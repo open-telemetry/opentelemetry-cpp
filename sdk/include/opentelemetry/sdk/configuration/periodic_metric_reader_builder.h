@@ -6,13 +6,17 @@
 #include <memory>
 
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
-#include "opentelemetry/sdk/metrics/metric_reader.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace metrics
+{
+class MetricReader;
+class PushMetricExporter;
+}  // namespace metrics
+
 namespace configuration
 {
 

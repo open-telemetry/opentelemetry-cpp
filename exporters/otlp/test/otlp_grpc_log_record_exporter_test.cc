@@ -4,10 +4,10 @@
 #include <grpc/support/port_platform.h>
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/support/status.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <algorithm>
 #include <chrono>
+#include <cstdint>
+#include <cstdlib>
 #include <functional>
 #include <string>
 #include <unordered_map>

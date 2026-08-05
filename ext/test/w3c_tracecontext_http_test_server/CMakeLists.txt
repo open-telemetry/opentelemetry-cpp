@@ -8,4 +8,7 @@ if(WITH_HTTP_CLIENT_CURL)
     PRIVATE ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace
             opentelemetry_http_client_curl opentelemetry_exporter_ostream_span
             CURL::libcurl nlohmann_json::nlohmann_json)
+  if(WIN32)
+    target_link_libraries(w3c_tracecontext_http_test_server PRIVATE ws2_32)
+  endif()
 endif()

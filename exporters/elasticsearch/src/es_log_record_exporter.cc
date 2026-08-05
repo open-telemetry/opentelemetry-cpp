@@ -41,6 +41,8 @@ namespace exporter
 {
 namespace logs
 {
+namespace
+{
 /**
  * This class handles the response message from the Elasticsearch request
  */
@@ -59,7 +61,7 @@ public:
     ss << "Status:" << response.GetStatusCode() << ", Header:";
     response.ForEachHeader([&ss](opentelemetry::nostd::string_view header_name,
                                  opentelemetry::nostd::string_view header_value) {
-      ss << "\t" << header_name.data() << ": " << header_value.data() << ",";
+      ss << "\t" << header_name << ": " << header_value << ",";
       return true;
     });
     ss << "Body:" << body;
@@ -349,6 +351,7 @@ private:
   bool console_debug_ = false;
 };
 #endif
+}  // namespace
 
 ElasticsearchLogRecordExporter::ElasticsearchLogRecordExporter()
     : ElasticsearchLogRecordExporter(ElasticsearchExporterOptions())
