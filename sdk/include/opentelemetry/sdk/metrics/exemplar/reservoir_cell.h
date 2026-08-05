@@ -63,7 +63,7 @@ public:
    */
   std::shared_ptr<ExemplarData> GetAndResetLong(const MetricAttributes &point_attributes)
   {
-    if (!context_)
+    if (!populated_)
     {
       return nullptr;
     }
@@ -88,7 +88,7 @@ public:
    */
   std::shared_ptr<ExemplarData> GetAndResetDouble(const MetricAttributes &point_attributes)
   {
-    if (!context_)
+    if (!populated_)
     {
       return nullptr;
     }
@@ -109,6 +109,7 @@ public:
   {
     value_       = 0.0;
     record_time_ = opentelemetry::common::SystemTimestamp{};
+    populated_   = false;
   }
 
 private:
@@ -134,12 +135,13 @@ private:
   {
     attributes_  = attributes;
     record_time_ = opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now());
-    context_.reset(
-        new opentelemetry::trace::SpanContext{opentelemetry::trace::GetSpanContext(context)});
+    context_     = opentelemetry::trace::GetSpanContext(context);
+    populated_   = true;
   }
 
   // Cell stores either long or double values, but must not store both
-  std::shared_ptr<opentelemetry::trace::SpanContext> context_;
+  bool populated_                            = false;
+  opentelemetry::trace::SpanContext context_ = opentelemetry::trace::SpanContext::GetInvalid();
   nostd::variant<int64_t, double> value_;
   opentelemetry::common::SystemTimestamp record_time_;
   MetricAttributes attributes_;
