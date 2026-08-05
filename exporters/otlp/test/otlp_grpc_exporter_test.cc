@@ -174,6 +174,23 @@ private:
   async_interface async_interface_;
 };
 
+// Completes whatever is still deferred on the way out. ~OtlpGrpcClient waits for
+// running_requests to reach zero with no deadline, and TryCancel() cannot move it for a request
+// the stub is holding, so an assertion that ends a case early would hang the binary instead of
+// failing it. Declare after the exporter, so this runs first.
+class DrainDeferredCompletions
+{
+public:
+  explicit DrainDeferredCompletions(OtlpMockTraceServiceStub *stub) noexcept : stub_(stub) {}
+  ~DrainDeferredCompletions() { stub_->CompleteAllDeferred(); }
+
+  DrainDeferredCompletions(const DrainDeferredCompletions &)            = delete;
+  DrainDeferredCompletions &operator=(const DrainDeferredCompletions &) = delete;
+
+private:
+  OtlpMockTraceServiceStub *stub_;
+};
+
 using opentelemetry::test_common::ScopedTestLogHandler;
 }  // namespace
 
@@ -318,6 +335,7 @@ TEST_F(OtlpGrpcExporterFlushTestPeer, ForceFlushReturnsWithinTheCallerDeadline)
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
       mock_stub);
   auto exporter = GetExporter(stub_interface);
+  DrainDeferredCompletions drain{mock_stub};
 
   auto recordable = exporter->MakeRecordable();
   recordable->SetName("Test span");
@@ -332,8 +350,6 @@ TEST_F(OtlpGrpcExporterFlushTestPeer, ForceFlushReturnsWithinTheCallerDeadline)
 
   EXPECT_FALSE(flushed);
   EXPECT_LT(elapsed.count(), 5000);
-
-  mock_stub->CompleteAllDeferred();
 }
 
 // A completion for one request used to end the wait for every other request, and the leftover
@@ -345,6 +361,7 @@ TEST_F(OtlpGrpcExporterFlushTestPeer, ForceFlushKeepsWaitingWhenAnotherRequestCo
   std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
       mock_stub);
   auto exporter = GetExporter(stub_interface);
+  DrainDeferredCompletions drain{mock_stub};
 
   auto first = exporter->MakeRecordable();
   first->SetName("Test span 1");
@@ -375,8 +392,6 @@ TEST_F(OtlpGrpcExporterFlushTestPeer, ForceFlushKeepsWaitingWhenAnotherRequestCo
   // Ran its own deadline down rather than returning on the notification.
   EXPECT_GE(elapsed.count(), 500);
   EXPECT_EQ(1u, mock_stub->DeferredCount());
-
-  mock_stub->CompleteAllDeferred();
 }
 
 // Create spans, let processor call Export()
