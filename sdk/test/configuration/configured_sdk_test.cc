@@ -18,6 +18,8 @@
 #include "opentelemetry/trace/provider.h"
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
+#include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"

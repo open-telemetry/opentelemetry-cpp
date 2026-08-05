@@ -128,8 +128,9 @@ class DefaultJaegerRemoteSamplerBuilder : public JaegerRemoteSamplerBuilder
 public:
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> Build(
       const JaegerRemoteSamplerConfiguration * /* model */,
-      std::unique_ptr<opentelemetry::sdk::trace::Sampler> && /* initial_sampler */) const override
+      std::unique_ptr<opentelemetry::sdk::trace::Sampler> &&initial_sampler) const override
   {
+    auto unused = std::move(initial_sampler);
     static const std::string die("JaegerRemoteSampler not supported");
     throw UnsupportedException(die);
   }
@@ -212,9 +213,10 @@ class DefaultComposableRuleBasedSamplerBuilder : public ComposableRuleBasedSampl
 public:
   std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> Build(
       const ComposableRuleBasedSamplerConfiguration * /* model */,
-      std::vector<std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>>
-          && /* rule_samplers */) const override
+      std::vector<std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>> &&rule_samplers)
+      const override
   {
+    auto unused = std::move(rule_samplers);
     // TODO: implement once a concrete Predicate can be built from rule config
     static const std::string die("ComposableRuleBasedSampler not supported");
     throw UnsupportedException(die);

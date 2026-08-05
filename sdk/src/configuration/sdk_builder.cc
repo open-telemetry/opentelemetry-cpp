@@ -174,7 +174,6 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/version.h"
-#include "src/common/wildcard_match.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
@@ -185,8 +184,6 @@ namespace sdk
 {
 namespace configuration
 {
-
-using common::WildcardMatch;
 
 namespace
 {
