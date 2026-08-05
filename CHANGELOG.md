@@ -15,6 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Enable clang-tidy `modernize-deprecated-headers` and replace
+  deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
+  `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
+  ([#4349](https://github.com/open-telemetry/opentelemetry-cpp/pull/4349))
+
+* [CONFIGURATION] Add SDK component builder interfaces to the registry
+  [#4358](https://github.com/open-telemetry/opentelemetry-cpp/issues/4358)
+
 * [CODE HEALTH] Move remaining `misc-use-internal-linkage` classes/enums into
   anonymous namespaces: `OtlpFileSystemBackend`/`OtlpFileOstreamBackend` in
   the OTLP file exporter, `ResponseHandler`/`AsyncResponseHandler`/
@@ -34,12 +42,20 @@ Increment the:
 * [BUG] Stop reading past a `nostd::string_view` that is not NUL terminated
   [#4346](https://github.com/open-telemetry/opentelemetry-cpp/pull/4346)
 
+* [OTLP EXPORTERS] add otlp_common target for shared otlp utils
+  [#4333](https://github.com/open-telemetry/opentelemetry-cpp/pull/4333)
+
 * [OTLP/HTTP] Honor `Retry-After` response header when retrying exports,
   supporting both delay-seconds and HTTP-date formats per RFC 7231 §7.1.3.
   [#4172](https://github.com/open-telemetry/opentelemetry-cpp/issues/4172)
 
 * [BUILD] Run the ext_http component install test on Windows
   [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
+
+* [SDK] Convert SpinLockMutex to std::mutex part 1
+  Replace SpinLockMutex with std::mutex in SimpleProcessor,
+  SimpleLogRecordProcessor, MeterContext and Meter.
+  [#4323](https://github.com/open-telemetry/opentelemetry-cpp/pull/4323)
 
 * [CONFIGURATION] Decouple config registry and builder headers
   [#4335](https://github.com/open-telemetry/opentelemetry-cpp/pull/4335)
@@ -117,6 +133,9 @@ Increment the:
 
 * [SDK] Downscale base2 exponential histogram buckets in place
   [#4324](https://github.com/open-telemetry/opentelemetry-cpp/pull/4324)
+
+* [CONFIGURATION] file configuration - yaml schema 1.1.0
+  [#4340](https://github.com/open-telemetry/opentelemetry-cpp/pull/4340)
 
 * [METRICS SDK] Support `OTEL_METRICS_EXEMPLAR_FILTER` when metrics exemplars
   are enabled. The default exemplar filter changes from `always_off` to

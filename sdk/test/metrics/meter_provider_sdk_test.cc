@@ -47,7 +47,7 @@ using opentelemetry::sdk::common::unsetenv;
 #endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <stdint.h>
+#  include <cstdint>
 #  include <initializer_list>
 #  include <map>
 #  include <unordered_map>

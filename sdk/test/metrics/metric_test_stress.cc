@@ -3,10 +3,10 @@
 
 #include <gtest/gtest.h>
 
-#include <stdint.h>
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <initializer_list>  // IWYU pragma: keep
 #include <random>
 #include <string>

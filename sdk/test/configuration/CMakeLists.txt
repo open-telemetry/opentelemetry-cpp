@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-foreach(testname sdk_builder_test configured_sdk_test
+foreach(testname registry_test sdk_builder_test configured_sdk_test
                  programmatic_configuration_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
