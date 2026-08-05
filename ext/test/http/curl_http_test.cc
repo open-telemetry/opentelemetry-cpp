@@ -70,6 +70,36 @@ public:
   std::atomic<bool> got_response_;
 };
 
+// Cancels from inside the Response event, which is the one moment both arms of the completion
+// callback are eligible: DispatchEvent notifies the handler before it stores the new state, and
+// the callback runs after both, so it sees an aborted operation that also has a response.
+class CancelAtResponseHandler : public CustomEventHandler
+{
+public:
+  void OnResponse(http_client::Response & /* response */) noexcept override
+  {
+    terminal_count_.fetch_add(1, std::memory_order_release);
+    got_response_.store(true, std::memory_order_release);
+  }
+
+  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
+  {
+    if (state == http_client::SessionState::Cancelled)
+    {
+      terminal_count_.fetch_add(1, std::memory_order_release);
+    }
+    else if (state == http_client::SessionState::Response && session_ != nullptr)
+    {
+      auto *session = session_;
+      session_      = nullptr;
+      session->CancelSession();
+    }
+  }
+
+  http_client::Session *session_ = nullptr;
+  std::atomic<int> terminal_count_{0};
+};
+
 class GetEventHandler : public CustomEventHandler
 {
 public:
@@ -460,6 +490,31 @@ TEST_F(BasicCurlHttpTests, ExponentialBackoffRetry)
   ASSERT_FALSE(operation.IsRetryable());
 }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
+
+// A cancel that arrives once the server has answered used to deliver Cancelled and the response,
+// so a handler treating either as terminal saw one request finish twice.
+TEST_F(BasicCurlHttpTests, ACancelAfterTheResponseReportsOneOutcome)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler      = std::make_shared<CancelAtResponseHandler>();
+  handler->session_ = session.get();
+
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+
+  EXPECT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire));
+
+  session_manager->FinishAllSessions();
+}
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 {
