@@ -4,6 +4,26 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
+    name = "registry_test",
+    srcs = [
+        "registry_test.cc",
+    ],
+    tags = [
+        "config",
+        "test",
+    ],
+    deps = [
+        "//sdk:headers",
+        "//sdk/src/configuration:configuration_core",
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "sdk_builder_test",
     srcs = [
         "config_test_common.h",
