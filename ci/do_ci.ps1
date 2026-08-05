@@ -323,6 +323,35 @@ switch ($action) {
       exit $exit
     }
   }
+  "cmake.different_std.test" {
+    cd "$BUILD_DIR"
+    cmake $SRC_DIR `
+      "-DCMAKE_PREFIX_PATH=$HOME/otel-third_party" `
+      "-DCMAKE_FIND_ROOT_PATH=$HOME/otel-third_party" `
+      -DCMAKE_BUILD_TYPE=Debug `
+      -DWITH_METRICS_EXEMPLAR_PREVIEW=ON `
+      -DWITH_ASYNC_EXPORT_PREVIEW=ON `
+      -DWITH_STL=CXX23 `
+      -DCMAKE_CXX_STANDARD=23 `
+      -DCMAKE_CXX_STANDARD_REQUIRED=ON `
+      -DWITH_OTLP_GRPC=ON `
+      -DWITH_OTLP_HTTP=ON `
+      -DWITH_OTLP_FILE=ON
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    cmake --build . -j $nproc --config Debug
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    ctest -C Debug
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+  }
   "cmake.build_example_plugin" {
     cd "$BUILD_DIR"
     cmake $SRC_DIR `
