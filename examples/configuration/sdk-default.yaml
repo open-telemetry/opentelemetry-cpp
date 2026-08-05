@@ -1,0 +1,185 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+# Exercises the built-in SDK component builders.
+#
+# The Registry provides one builder per SDK component type. Each builder constructs its component from the parsed configuration model.
+# RegistryFactory::Create() pre-loads all the SDK default builders shown in this file.
+# Call Set*Builder() on the Registry to swap in your own implementation before calling ConfiguredSdk::Create:
+#
+#   auto registry = RegistryFactory::Create();
+#   registry->SetBatchSpanProcessorBuilder(std::make_unique<MyBatchSpanProcessorBuilder>());
+#   auto sdk = ConfiguredSdk::Create(registry, model);
+
+file_format: "1.0"
+disabled: false
+log_level: debug
+
+# Global attribute limits; signal-specific limits below override these.
+attribute_limits:
+  attribute_value_length_limit: 4096
+  attribute_count_limit: 128
+
+# --- Logs ---
+logger_provider:
+  processors:
+    - batch:  # BatchLogRecordProcessorBuilder
+        schedule_delay: 1000
+        export_timeout: 5000
+        max_queue_size: 512
+        max_export_batch_size: 128
+        exporter:
+          console:  # ConsoleLogRecordExporterBuilder
+    - simple:  # SimpleLogRecordProcessorBuilder
+        exporter:
+          console:
+  limits:  # overrides attribute_limits for log records
+    attribute_value_length_limit: 4096
+    attribute_count_limit: 128
+  logger_configurator/development:  # LoggerConfiguratorBuilder
+    default_config:
+      enabled: true
+      minimum_severity: trace
+      trace_based: false
+    loggers:
+      - name: "io.opentelemetry.*"
+        config:
+          enabled: true
+          minimum_severity: trace
+          trace_based: false
+      - name: "noisy.*"
+        config:
+          enabled: false
+
+# --- Metrics ---
+meter_provider:
+  readers:
+    - periodic:  # PeriodicMetricReaderBuilder
+        interval: 10000
+        timeout: 5000
+        exporter:
+          console:  # ConsolePushMetricExporterBuilder
+        cardinality_limits:
+          default: 2000
+          counter: 1000
+          histogram: 500
+  views:
+    # explicit_bucket_histogram aggregation
+    - selector:
+        instrument_name: "my.histogram.*"
+        instrument_type: histogram
+      stream:
+        aggregation:
+          explicit_bucket_histogram:
+            boundaries: [0, 5, 10, 25, 50, 100, 250, 500, 1000]
+            record_min_max: true
+        aggregation_cardinality_limit: 500
+    # base2_exponential_bucket_histogram aggregation
+    - selector:
+        instrument_name: "my.exp_histogram.*"
+        instrument_type: histogram
+      stream:
+        aggregation:
+          base2_exponential_bucket_histogram:
+            max_size: 160
+            max_scale: 20
+            record_min_max: true
+    # drop aggregation
+    - selector:
+        instrument_name: "my.dropped.*"
+        instrument_type: counter
+      stream:
+        aggregation:
+          drop:
+    # last_value aggregation
+    - selector:
+        instrument_name: "my.gauge.*"
+        instrument_type: observable_gauge
+      stream:
+        aggregation:
+          last_value:
+    # sum aggregation
+    - selector:
+        instrument_name: "my.sum.*"
+        instrument_type: up_down_counter
+      stream:
+        aggregation:
+          sum:
+    # default aggregation
+    - selector:
+        instrument_name: "my.default.*"
+        instrument_type: counter
+      stream:
+        aggregation:
+          default:
+  meter_configurator/development:  # MeterConfiguratorBuilder
+    default_config:
+      enabled: true
+    meters:
+      - name: "io.opentelemetry.*"
+        config:
+          enabled: true
+      - name: "noisy.*"
+        config:
+          enabled: false
+
+# --- Propagators ---
+propagator:
+  composite:
+    - tracecontext:
+    - baggage:
+    - b3:
+    - b3multi:
+    - jaeger:
+
+# --- Traces ---
+tracer_provider:
+  processors:
+    - batch:  # BatchSpanProcessorBuilder
+        schedule_delay: 1000
+        export_timeout: 5000
+        max_queue_size: 512
+        max_export_batch_size: 128
+        exporter:
+          console:  # ConsoleSpanExporterBuilder
+    - simple:  # SimpleSpanProcessorBuilder
+        exporter:
+          console:  # ConsoleSpanExporterBuilder
+  limits:  # overrides attribute_limits for spans
+    attribute_value_length_limit: 4096
+    attribute_count_limit: 128
+    event_count_limit: 128
+    link_count_limit: 128
+    event_attribute_count_limit: 128
+    link_attribute_count_limit: 128
+  sampler:
+    parent_based:  # ParentBasedSamplerBuilder
+      root:
+        probability/development:  # ProbabilitySamplerBuilder
+          ratio: 0.25
+      remote_parent_sampled:
+        always_on:  # AlwaysOnSamplerBuilder
+      remote_parent_not_sampled:
+        always_off:  # AlwaysOffSamplerBuilder
+      local_parent_sampled:
+        always_on:  # AlwaysOnSamplerBuilder
+      local_parent_not_sampled:
+        always_off:  # AlwaysOffSamplerBuilder
+  tracer_configurator/development:  # TracerConfiguratorBuilder
+    default_config:
+      enabled: false
+    tracers:
+      - name: "io.opentelemetry.*"
+        config:
+          enabled: true
+      - name: "noisy.*"
+        config:
+          enabled: false
+
+# Resource identifies this service instance.
+resource:
+  attributes:
+    - name: service.name
+      value: sdk-builtin-test
+  attributes_list: "service.namespace=my-namespace,service.version=1.0.0"
+  schema_url: https://opentelemetry.io/schemas/1.43.0

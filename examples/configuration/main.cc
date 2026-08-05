@@ -14,6 +14,7 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/registry_factory.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 
 #include "custom_log_record_exporter_builder.h"
@@ -165,8 +166,8 @@ void InitOtel(const std::string &config_file)
 
   /* 1 - Create a registry */
 
-  std::shared_ptr<opentelemetry::sdk::configuration::Registry> registry(
-      new opentelemetry::sdk::configuration::Registry);
+  std::shared_ptr<opentelemetry::sdk::configuration::Registry> registry =
+      opentelemetry::sdk::configuration::RegistryFactory::Create();
 
   /* 2 - Populate the registry with the core components supported */
 

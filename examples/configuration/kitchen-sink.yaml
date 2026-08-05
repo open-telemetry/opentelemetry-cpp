@@ -859,7 +859,7 @@ resource:
         service:
   # Configure resource schema URL.
   # If omitted or null, no schema URL is used.
-  schema_url: https://opentelemetry.io/schemas/1.16.0
+  schema_url: https://opentelemetry.io/schemas/1.43.0
 # Configure instrumentation.
 # This type is in development and subject to breaking changes in minor versions.
 instrumentation/development:

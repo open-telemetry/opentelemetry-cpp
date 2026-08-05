@@ -16,29 +16,14 @@ disabled: false
 # Environment variable: OTEL_PROPAGATORS
 propagator:
   # composite: [tracecontext, baggage, b3, b3multi, jaeger, xray, ottrace]
-  composite: tracecontext
+  composite:
+    - tracecontext:
 
 # Configure tracer provider.
 tracer_provider:
   # Configure span processors.
   processors:
-    # Configure a batch span processor.
-    - batch:
-        # Configure exporter.
-        #
-        # Environment variable: OTEL_TRACES_EXPORTER
-        exporter:
-          # Configure exporter to be zipkin.
-          zipkin:
-            # Configure endpoint.
-            #
-            # Environment variable: OTEL_EXPORTER_ZIPKIN_ENDPOINT
-            endpoint: http://localhost:9411/api/v2/spans
-            # Configure max time (in milliseconds) to wait for each export.
-            #
-            # Environment variable: OTEL_EXPORTER_ZIPKIN_TIMEOUT
-            timeout: 10000
-    # Configure a simple span processor.
+     # Configure a simple span processor.
     - simple:
         # Configure exporter.
         exporter:
@@ -58,6 +43,11 @@ tracer_provider:
 
 meter_provider:
   readers:
+    - periodic:
+        interval: 60000
+        timeout: 30000
+        exporter:
+          console: {}
     - pull:
         exporter:
           my_custom_pull_metric_exporter:
@@ -66,6 +56,9 @@ meter_provider:
         exporter:
           my_custom_push_metric_exporter:
             comment: "This is a push metric exporter extension point, with properties."
+        producers:
+          - my_custom_metric_producer:
+              comment: "This is a metric producer extension point, with properties."
 
 logger_provider:
   processors:
@@ -80,3 +73,9 @@ logger_provider:
         exporter:
           my_custom_log_record_exporter:
             comment: "This is a log record exporter extension point, with properties."
+
+resource:
+  detection/development:
+    detectors:
+      - my_custom_detector:
+          comment: "This is a resource detector extension point, with properties."

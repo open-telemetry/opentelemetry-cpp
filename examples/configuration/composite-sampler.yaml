@@ -1,0 +1,62 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+# composite-sampler.yaml exercises all composite/development sampler builder types.
+
+file_format: "1.0"
+log_level: info
+
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    # parent_based sampler
+    parent_based:
+      root:
+        # rule_based composable sampler
+        composite/development:
+          rule_based:
+            rules:
+              - attribute_values:
+                  key: http.method
+                  values:
+                    - GET
+                    - POST
+                attribute_patterns:
+                  key: http.url
+                  included:
+                    - .*/api/.*
+                  excluded:
+                    - .*/healthz
+                parent:
+                  - remote
+                  - local
+                span_kinds:
+                  - server
+                  - client
+                sampler:
+                  always_on:
+              - sampler:
+                  always_off:
+      remote_parent_sampled:
+        # always_on composable sampler
+        composite/development:
+          always_on:
+      remote_parent_not_sampled:
+        # always_off composable sampler
+        composite/development:
+          always_off:
+      local_parent_sampled:
+        # probability composable sampler
+        composite/development:
+          probability:
+            ratio: 0.5
+      local_parent_not_sampled:
+        # parent_threshold composable sampler
+        composite/development:
+          parent_threshold:
+            root:
+              probability:
+                ratio: 0.1
