@@ -186,6 +186,8 @@ public:
 
   DrainDeferredCompletions(const DrainDeferredCompletions &)            = delete;
   DrainDeferredCompletions &operator=(const DrainDeferredCompletions &) = delete;
+  DrainDeferredCompletions(DrainDeferredCompletions &&)                 = delete;
+  DrainDeferredCompletions &operator=(DrainDeferredCompletions &&)      = delete;
 
 private:
   OtlpMockTraceServiceStub *stub_;
@@ -312,6 +314,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ExportPartialSuccess)
   EXPECT_TRUE(contains("too many spans!!"));
 }
 
+namespace
+{
 // ForceFlush() only has requests to wait for when the client tracks them, which it does under
 // ENABLE_ASYNC_EXPORT. gtest_add_tests registers by source text, so the cases below have to exist
 // in every build and opt out here rather than be compiled away.
@@ -393,6 +397,7 @@ TEST_F(OtlpGrpcExporterFlushTestPeer, ForceFlushKeepsWaitingWhenAnotherRequestCo
   EXPECT_GE(elapsed.count(), 500);
   EXPECT_EQ(1u, mock_stub->DeferredCount());
 }
+}  // namespace
 
 // Create spans, let processor call Export()
 TEST_F(OtlpGrpcExporterTestPeer, ExportIntegrationTest)
