@@ -14,4 +14,7 @@ if(WITH_HTTP_CLIENT_CURL)
     http_server
     PRIVATE opentelemetry-cpp::trace opentelemetry-cpp::http_client_curl
             opentelemetry-cpp::ostream_span_exporter)
+  if(WIN32)
+    target_link_libraries(http_server PRIVATE ws2_32)
+  endif()
 endif()

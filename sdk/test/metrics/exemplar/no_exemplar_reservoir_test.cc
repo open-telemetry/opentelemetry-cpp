@@ -5,6 +5,8 @@
 
 #  include <gtest/gtest.h>
 #  include <stdint.h>
+#  include <chrono>
+#  include <cstdint>
 #  include <memory>
 #  include <string>
 #  include <vector>

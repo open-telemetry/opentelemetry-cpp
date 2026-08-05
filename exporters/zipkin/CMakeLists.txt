@@ -74,6 +74,9 @@ if(BUILD_TESTING)
       opentelemetry_resources
       opentelemetry_http_client_nosend
       CURL::libcurl)
+    if(WIN32)
+      target_link_libraries(zipkin_exporter_test ws2_32)
+    endif()
 
     gtest_add_tests(
       TARGET zipkin_exporter_test
