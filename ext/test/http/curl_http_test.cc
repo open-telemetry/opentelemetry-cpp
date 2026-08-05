@@ -242,7 +242,7 @@ TEST_F(BasicCurlHttpTests, HttpRequest)
 {
   curl::Request req;
   const char *b           = "test-data";
-  http_client::Body body  = {b, b + strlen(b)};
+  http_client::Body body  = {b, b + std::strlen(b)};
   http_client::Body body1 = body;
   req.SetBody(body);
   ASSERT_EQ(req.body_, body1);
@@ -266,7 +266,7 @@ TEST_F(BasicCurlHttpTests, HttpResponse)
   res.headers_ = m1;
 
   const char *b          = "test-data";
-  http_client::Body body = {b, b + strlen(b)};
+  http_client::Body body = {b, b + std::strlen(b)};
   int count              = 0;
   res.ForEachHeader("name1", [&count](nostd::string_view name, nostd::string_view value) {
     if (name != "name1")
@@ -318,7 +318,7 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   request->SetMethod(http_client::Method::Post);
 
   const char *b          = "test-data";
-  http_client::Body body = {b, b + strlen(b)};
+  http_client::Body body = {b, b + std::strlen(b)};
   request->SetBody(body);
   request->AddHeader("Content-Type", "text/plain");
   auto handler = std::make_shared<PostEventHandler>();
@@ -355,7 +355,7 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   GetEventHandler *handler = new GetEventHandler();
 
   const char *b          = "test-data";
-  http_client::Body body = {b, b + strlen(b)};
+  http_client::Body body = {b, b + std::strlen(b)};
 
   http_client::Headers headers = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
