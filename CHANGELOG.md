@@ -130,6 +130,9 @@ Increment the:
 * [SDK] Downscale base2 exponential histogram buckets in place
   [#4324](https://github.com/open-telemetry/opentelemetry-cpp/pull/4324)
 
+* [CONFIGURATION] file configuration - yaml schema 1.1.0
+  [#4340](https://github.com/open-telemetry/opentelemetry-cpp/pull/4340)
+
 Breaking changes:
 
 * [BUILD] Install an explicit list of ext headers instead of the whole
