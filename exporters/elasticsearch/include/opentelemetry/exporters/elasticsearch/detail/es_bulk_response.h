@@ -132,8 +132,10 @@ inline bool IsBulkResponseSuccessful(int status_code,
         rejected = &(*status);
       }
 
+      // A null holds no cause, and a serialiser that writes absent optionals as null is saying
+      // the operation applied, which is what the flag says too. Only a cause contradicts it.
       const auto error = operation->find("error");
-      if (item_error == nullptr && error != operation->end())
+      if (item_error == nullptr && error != operation->end() && !error->is_null())
       {
         item_error = &(*error);
       }
