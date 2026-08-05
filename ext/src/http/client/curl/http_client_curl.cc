@@ -207,8 +207,8 @@ void Session::SendRequest(
                         http_request_->is_log_enabled_, http_request_->retry_policy_));
   bool success =
       CURLE_OK == curl_operation_->SendAsync(this, [this, callback](HttpOperation &operation) {
-        // Both can hold at once. Cancelling only raises a flag, and the transfer may already
-        // have been answered, so the response is reported and one request finishes once.
+        // Both can hold at once: cancelling only raises a flag, and the transfer may already
+        // have been answered. A request that was answered is reported as answered.
         if (operation.GetSessionState() == opentelemetry::ext::http::client::SessionState::Response)
         {
           // we have a http response
