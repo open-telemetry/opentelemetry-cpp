@@ -389,9 +389,13 @@ TEST(ElasticsearchBulkResponseTests, RejectsAnItemErrorUnderErrorsFalse)
       1, reason));
   EXPECT_NE(reason.find("mapper_parsing_exception"), std::string::npos) << reason;
 
-  // Only the member decides. An acknowledgement without one stays a success.
+  // Only a cause decides. An acknowledgement without the member stays a success, and so does one
+  // whose member is null, which is what a serialiser writing absent optionals produces.
   EXPECT_TRUE(logs_exporter::detail::IsBulkResponseSuccessful(
       200, R"({"errors":false,"items":[{"index":{"_index":"logs","status":201}}]})", 1, reason));
+  EXPECT_TRUE(logs_exporter::detail::IsBulkResponseSuccessful(
+      200, R"({"errors":false,"items":[{"index":{"_index":"logs","status":201,"error":null}}]})", 1,
+      reason));
 }
 // ---------------------------------------------------------------------------
 // The response travelling from the HTTP callback to the verdict.
