@@ -29,6 +29,10 @@ Increment the:
   `json_assign_visitor` in the Elasticsearch log exporter, and the
   `TestMode`/`test_mode` enums in the OTLP functional test binaries.
   [#4196](https://github.com/open-telemetry/opentelemetry-cpp/issues/4196)
+
+* [CMAKE] Add support for CMake component deprecation and update the policy
+  [#4272](https://github.com/open-telemetry/opentelemetry-cpp/pull/4272)
+
 * [METRICS SDK] Fix Windows metrics tail latency on the synchronous record path:
   `SyncMetricStorage::attribute_hashmap_lock_` now uses `std::mutex` instead of
   `common::SpinLockMutex`. The spin lock's final `sleep_for(1ms)` back-off is
