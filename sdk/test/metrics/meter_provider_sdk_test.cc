@@ -24,7 +24,7 @@
 #include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <stdint.h>
+#  include <cstdint>
 #  include <initializer_list>
 #  include <map>
 #  include <unordered_map>

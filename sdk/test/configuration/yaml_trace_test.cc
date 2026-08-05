@@ -24,6 +24,7 @@
 #include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
@@ -56,7 +57,8 @@ enum class SamplerType : std::uint8_t
   kComposableProbability     = 7,
   kComposableRuleBased       = 8,
   kComposableAlwaysOff       = 9,
-  kComposableParentThreshold = 10
+  kComposableParentThreshold = 10,
+  kProbability               = 11
 };
 
 class TestSamplerVisitor : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
@@ -84,6 +86,12 @@ public:
       const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *) override
   {
     type_matched = SamplerType::kParentBased;
+  }
+  void VisitProbability(
+      const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model) override
+  {
+    type_matched = SamplerType::kProbability;
+    ratio        = model->ratio;
   }
   void VisitTraceIdRatioBased(
       const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model)
@@ -198,7 +206,7 @@ tracer_provider:
 TEST(YamlTrace, default_batch_processor)
 {
   std::string yaml = R"(
-file_format: "1.0-trace"
+file_format: "1.1-trace"
 tracer_provider:
   processors:
     - batch:
@@ -227,14 +235,14 @@ tracer_provider:
 TEST(YamlTrace, batch_processor)
 {
   std::string yaml = R"(
-file_format: "1.0-trace"
+file_format: "1.1-trace"
 tracer_provider:
   processors:
     - batch:
         schedule_delay: 5555
         export_timeout: 33333
         max_queue_size: 1234
-        max_export_batch_size: 256
+        max_export_batch_size/development: 256
         exporter:
           console:
 )";
@@ -925,6 +933,111 @@ tracer_provider:
       reinterpret_cast<opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *>(
           sampler);
   ASSERT_EQ(ratio->ratio, 3.14);
+}
+
+TEST(YamlTrace, default_probability_sampler)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    probability/development:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+
+  EXPECT_EQ(visitor.type_matched, SamplerType::kProbability);
+  EXPECT_DOUBLE_EQ(visitor.ratio, 1.0);
+}
+
+TEST(YamlTrace, probability_sampler)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    probability/development:
+      ratio: 0.25
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->sampler, nullptr);
+
+  TestSamplerVisitor visitor;
+  config->tracer_provider->sampler->Accept(&visitor);
+
+  EXPECT_EQ(visitor.type_matched, SamplerType::kProbability);
+  EXPECT_DOUBLE_EQ(visitor.ratio, 0.25);
+}
+
+TEST(YamlTrace, probability_sampler_ratio_too_small)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    probability/development:
+      ratio: -0.5
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(YamlTrace, probability_sampler_ratio_nan)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    probability/development:
+      ratio: nan
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
+}
+
+TEST(YamlTrace, probability_sampler_ratio_too_large)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    probability/development:
+      ratio: 1.5
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
 }
 
 TEST(YamlTrace, no_tracer_configurator)

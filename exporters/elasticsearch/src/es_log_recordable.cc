@@ -15,7 +15,6 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
 
-#include <stdint.h>
 #include <chrono>
 #include <cstdint>
 #include <cstdio>
@@ -30,6 +29,8 @@
 #endif
 
 namespace nlohmann
+{
+namespace
 {
 template <class T>
 struct json_assign_visitor
@@ -53,6 +54,7 @@ struct json_assign_visitor
     }
   }
 };
+}  // namespace
 
 template <>
 struct adl_serializer<opentelemetry::sdk::common::OwnedAttributeValue>

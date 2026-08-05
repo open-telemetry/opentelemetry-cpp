@@ -1,9 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdio.h>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <fstream>
 #include <limits>
 #include <map>
@@ -97,6 +97,7 @@
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
@@ -548,8 +549,18 @@ ConfigurationParser::ParseBatchLogRecordProcessorConfiguration(
   model->schedule_delay = node->GetInteger("schedule_delay", Config::kDefaultScheduleDelayMs);
   model->export_timeout = node->GetInteger("export_timeout", Config::kDefaultExportTimeoutMs);
   model->max_queue_size = node->GetInteger("max_queue_size", Config::kDefaultMaxQueueSize);
-  model->max_export_batch_size =
-      node->GetInteger("max_export_batch_size", Config::kDefaultMaxExportBatchSize);
+
+  // max_export_batch_size/development added in schema 1.1.0
+  if ((version_major_ == 1) && (version_minor_ >= 1))
+  {
+    model->max_export_batch_size =
+        node->GetInteger("max_export_batch_size/development", Config::kDefaultMaxExportBatchSize);
+  }
+  else
+  {
+    // Not configurable in yaml 1.0.0
+    model->max_export_batch_size = Config::kDefaultMaxExportBatchSize;
+  }
 
   child           = node->GetRequiredChildNode("exporter");
   model->exporter = ParseLogRecordExporterConfiguration(child);
@@ -922,15 +933,35 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
 
   model->host = node->GetString("host", Config::kDefaultHost);
   model->port = node->GetInteger("port", Config::kDefaultPort);
-  model->without_scope_info =
-      node->GetBoolean("without_scope_info", Config::kDefaultWithoutScopeInfo);
-  model->without_target_info =
-      node->GetBoolean("without_target_info", Config::kDefaultWithoutTargetInfo);
 
-  child = node->GetChildNode("with_resource_constant_labels");
-  if (child)
+  if ((version_major_ == 1) && (version_minor_ >= 1))
   {
-    model->with_resource_constant_labels = ParseIncludeExcludeConfiguration(child);
+    // Properties renamed in schema 1.1.0
+    model->scope_info_enabled =
+        node->GetBoolean("scope_info_enabled", Config::kDefaultScopeInfoEnabled);
+    model->target_info_enabled =
+        node->GetBoolean("target_info_enabled/development", Config::kDefaultTargetInfoEnabled);
+
+    child = node->GetChildNode("resource_constant_labels");
+    if (child)
+    {
+      model->resource_constant_labels = ParseIncludeExcludeConfiguration(child);
+    }
+  }
+  else
+  {
+    // Old properties name in schema 1.0.0
+    bool without_scope_info  = node->GetBoolean("without_scope_info", false);
+    bool without_target_info = node->GetBoolean("without_target_info", false);
+
+    model->scope_info_enabled  = !without_scope_info;
+    model->target_info_enabled = !without_target_info;
+
+    child = node->GetChildNode("with_resource_constant_labels");
+    if (child)
+    {
+      model->resource_constant_labels = ParseIncludeExcludeConfiguration(child);
+    }
   }
 
   std::string translation_strategy =
@@ -1756,6 +1787,24 @@ ConfigurationParser::ParseParentBasedSamplerConfiguration(const std::unique_ptr<
 }
 // NOLINTEND(misc-no-recursion)
 
+std::unique_ptr<ProbabilitySamplerConfiguration>
+ConfigurationParser::ParseProbabilitySamplerConfiguration(const std::unique_ptr<DocumentNode> &node,
+                                                          size_t /* depth */) const
+{
+  using Config = ProbabilitySamplerConfiguration;
+  auto model   = std::make_unique<ProbabilitySamplerConfiguration>();
+
+  model->ratio = node->GetDouble("ratio", Config::kDefaultRatio);
+  if (!(model->ratio >= Config::kMinRatio && model->ratio <= Config::kMaxRatio))
+  {
+    std::string message("Illegal ratio: ");
+    message.append(std::to_string(model->ratio));
+    throw InvalidSchemaException(node->Location(), message);
+  }
+
+  return model;
+}
+
 std::unique_ptr<TraceIdRatioBasedSamplerConfiguration>
 ConfigurationParser::ParseTraceIdRatioBasedSamplerConfiguration(
     const std::unique_ptr<DocumentNode> &node,
@@ -2048,6 +2097,10 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
   {
     model = ParseParentBasedSamplerConfiguration(child, depth);
   }
+  else if (name == "probability/development")
+  {
+    model = ParseProbabilitySamplerConfiguration(child, depth);
+  }
   else if (name == "trace_id_ratio_based")
   {
     model = ParseTraceIdRatioBasedSamplerConfiguration(child, depth);
@@ -2218,8 +2271,18 @@ ConfigurationParser::ParseBatchSpanProcessorConfiguration(
   model->schedule_delay = node->GetInteger("schedule_delay", Config::kDefaultScheduleDelayMs);
   model->export_timeout = node->GetInteger("export_timeout", Config::kDefaultExportTimeoutMs);
   model->max_queue_size = node->GetInteger("max_queue_size", Config::kDefaultMaxQueueSize);
-  model->max_export_batch_size =
-      node->GetInteger("max_export_batch_size", Config::kDefaultMaxExportBatchSize);
+
+  // max_export_batch_size/development added in schema 1.1.0
+  if ((version_major_ == 1) && (version_minor_ >= 1))
+  {
+    model->max_export_batch_size =
+        node->GetInteger("max_export_batch_size/development", Config::kDefaultMaxExportBatchSize);
+  }
+  else
+  {
+    // Not configurable in yaml 1.0.0
+    model->max_export_batch_size = Config::kDefaultMaxExportBatchSize;
+  }
 
   child           = node->GetRequiredChildNode("exporter");
   model->exporter = ParseSpanExporterConfiguration(child);
@@ -2779,7 +2842,7 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
       throw InvalidSchemaException(node->Location(), message);
     }
 
-    if (minor != 0)
+    if (minor > 1)
     {
       std::string message("Unsupported file_format, major = ");
       message.append(std::to_string(major));

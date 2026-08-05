@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <stddef.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -103,7 +103,7 @@ public:
     }
 #endif
     static MetricAttributes attr = MetricAttributes{};
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
     MetricAttributes resolved = ResolveCardinality(attr);
     attributes_hashmap_->GetOrSetDefault(std::move(resolved), create_default_aggregation_)
@@ -131,7 +131,7 @@ public:
 #endif
 
     MetricAttributes attr{attributes, attributes_processor_.get()};
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
     // Resolve via the unified cardinality policy so unbound and bound paths
     // share one combined limit (see ResolveCardinality()).
@@ -161,7 +161,7 @@ public:
     }
 #endif
     static MetricAttributes attr = MetricAttributes{};
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
     MetricAttributes resolved = ResolveCardinality(attr);
     attributes_hashmap_->GetOrSetDefault(std::move(resolved), create_default_aggregation_)
@@ -188,7 +188,7 @@ public:
     }
 #endif
     MetricAttributes attr{attributes, attributes_processor_.get()};
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
     MetricAttributes resolved = ResolveCardinality(std::move(attr));
     // cppcheck-suppress accessMoved
@@ -300,7 +300,7 @@ private:
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 #endif
   TemporalMetricStorage temporal_metric_storage_;
-  opentelemetry::common::SpinLockMutex attribute_hashmap_lock_;
+  std::mutex attribute_hashmap_lock_;
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
   // NOTE: ENABLE_METRICS_BOUND_INSTRUMENTS_PREVIEW changes the layout and
   // vtable of SyncMetricStorage (these conditional members and the virtual
