@@ -128,9 +128,10 @@ public:
    * caller's timeout rather than by the exporter's response timeout.
    *
    * @param timeout an option timeout, default to max.
-   * @return true when each of those sessions has settled, false on timeout. Settled means the
-   *         session ended, not that its batch reached Elasticsearch: a failed export settles too,
-   *         and reports through the internal log. Surfacing that here is
+   * @return true when each of those exports has reported a terminal outcome, false on timeout.
+   *         The outcome is published before the session is torn down, so a true return does not
+   *         mean FinishSession() has run. Nor does it mean the batch reached Elasticsearch: a
+   *         failed export reports too, through the internal log. Surfacing that here is
    *         [#3075](https://github.com/open-telemetry/opentelemetry-cpp/issues/3075).
    */
   bool ForceFlush(

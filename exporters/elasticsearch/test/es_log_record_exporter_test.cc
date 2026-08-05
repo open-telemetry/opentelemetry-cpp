@@ -553,9 +553,9 @@ TEST_F(ElasticsearchForceFlushTests, AnIndefiniteFlushReturnsOnceEverythingIsFin
   EXPECT_TRUE(fixture.exporter->ForceFlush());
 }
 
-// What true means, pinned so that it cannot drift unnoticed: the snapshotted sessions have
-// settled, not that their batches were delivered. Elasticsearch rejected this one and the flush
-// still reports success. Surfacing an export failure through this return value is
+// What true means, pinned so that it cannot drift unnoticed: the snapshotted exports have
+// reported an outcome, not that their batches were delivered. Elasticsearch rejected this one
+// and the flush still reports success. Surfacing an export failure through this return value is
 // https://github.com/open-telemetry/opentelemetry-cpp/issues/3075, which is a repository wide
 // decision rather than one for this exporter: the OTLP HTTP client's ForceFlush reports the same
 // way today, and changing one of them alone would leave the two disagreeing.
