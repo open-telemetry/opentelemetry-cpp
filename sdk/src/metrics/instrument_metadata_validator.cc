@@ -5,12 +5,11 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
-#include <cctype>
-
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
 #  include <regex>
 #else
 #  include <algorithm>
+#  include <cctype>
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
