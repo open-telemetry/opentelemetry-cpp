@@ -913,19 +913,9 @@ TEST(Registry, OtlpFileLogRecordBuilder)
 
 TEST(Registry, PeriodicMetricReaderBuilder)
 {
-  // Registry pre-populates this slot; test replace lifecycle only.
-  configuration::Registry registry;
-  ASSERT_NE(registry.GetPeriodicMetricReaderBuilder(), nullptr);
-
-  auto first            = std::make_unique<TestPeriodicMetricReaderBuilder>();
-  const auto *first_ptr = first.get();
-  registry.SetPeriodicMetricReaderBuilder(std::move(first));
-  ASSERT_EQ(registry.GetPeriodicMetricReaderBuilder(), first_ptr);
-
-  auto second            = std::make_unique<TestPeriodicMetricReaderBuilder>();
-  const auto *second_ptr = second.get();
-  registry.SetPeriodicMetricReaderBuilder(std::move(second));
-  ASSERT_EQ(registry.GetPeriodicMetricReaderBuilder(), second_ptr);
+  TestTypedSlot<TestPeriodicMetricReaderBuilder>(
+      &configuration::Registry::GetPeriodicMetricReaderBuilder,
+      &configuration::Registry::SetPeriodicMetricReaderBuilder);
 }
 
 TEST(Registry, PrometheusPullMetricExporterBuilder)
