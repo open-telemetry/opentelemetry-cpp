@@ -90,6 +90,23 @@ public:
     auto http_client = http_client::HttpClientTestFactory::Create();
     return {new OtlpHttpClient(MakeOtlpHttpClientOptions(), http_client), http_client};
   }
+
+  // A non-zero request budget keeps the export asynchronous, so it returns while the session runs.
+  static void ExportOneRequest(OtlpHttpClient &otlp_client)
+  {
+    auto arena = std::make_unique<google::protobuf::Arena>();
+    auto *request =
+        google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
+            arena.get());
+    auto *response =
+        google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceResponse>(
+            arena.get());
+
+    otlp_client.Export(
+        *request, std::move(arena), response,
+        [](opentelemetry::sdk::common::ExportResult, google::protobuf::Message *) { return true; },
+        1);
+  }
 };
 
 TEST_F(OtlpHttpExporterCustomClientTestPeer, FactoryInjectionCreatesExporter)
@@ -175,19 +192,7 @@ TEST_F(OtlpHttpExporterCustomClientTestPeer, ForceFlushReturnsWithinTheCallerDea
   // A client timeout far longer than the deadline ForceFlush is given below.
   OtlpHttpClient otlp_client(MakeOtlpHttpClientOptions(std::chrono::seconds{30}), client);
 
-  auto arena = std::make_unique<google::protobuf::Arena>();
-  auto *request =
-      google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
-          arena.get());
-  auto *response =
-      google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceResponse>(
-          arena.get());
-
-  // A non-zero request budget keeps the export asynchronous, so it returns while the session runs.
-  otlp_client.Export(
-      *request, std::move(arena), response,
-      [](opentelemetry::sdk::common::ExportResult, google::protobuf::Message *) { return true; },
-      1);
+  ExportOneRequest(otlp_client);
   ASSERT_NE(pending, nullptr);
 
   const auto started = std::chrono::steady_clock::now();
@@ -202,6 +207,32 @@ TEST_F(OtlpHttpExporterCustomClientTestPeer, ForceFlushReturnsWithinTheCallerDea
   // Complete the export, or the client destructor waits on it.
   http_client::nosend::Response sent;
   sent.Finish(*pending);
+}
+
+// The result is the finished counter alone, so a flush with nothing left to wait for has to say
+// so. Guards the counter against the session bookkeeping it is derived from.
+TEST_F(OtlpHttpExporterCustomClientTestPeer, ForceFlushReportsSuccessOnceTheSessionIsDone)
+{
+  auto client         = http_client::HttpClientTestFactory::Create();
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto session = std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> pending;
+  EXPECT_CALL(*session, SendRequest)
+      .WillRepeatedly(
+          [&pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+            pending = std::move(callback);
+          });
+
+  OtlpHttpClient otlp_client(MakeOtlpHttpClientOptions(std::chrono::seconds{30}), client);
+
+  ExportOneRequest(otlp_client);
+  ASSERT_NE(pending, nullptr);
+
+  http_client::nosend::Response sent;
+  sent.Finish(*pending);
+
+  EXPECT_TRUE(otlp_client.ForceFlush(std::chrono::milliseconds{50}));
 }
 
 }  // namespace otlp

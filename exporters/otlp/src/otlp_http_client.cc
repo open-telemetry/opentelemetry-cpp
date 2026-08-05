@@ -878,13 +878,6 @@ bool OtlpHttpClient::ForceFlush(std::chrono::microseconds timeout) noexcept
   // What the wait was for, rather than what is left of the deadline. A session that finishes
   // between the last check and the last wait takes its notification with it, and the flush it was
   // holding up has happened.
-  {
-    std::lock_guard<std::recursive_mutex> guard{session_manager_lock_};
-    if (running_sessions_.empty())
-    {
-      return true;
-    }
-  }
   return finished_session_counter_.load(std::memory_order_acquire) >= wait_counter;
 }
 
