@@ -46,10 +46,10 @@ if("exporters_etw" IN_LIST OPENTELEMETRY_CPP_COMPONENTS_INSTALLED)
   set(WITH_ETW ON)
 endif()
 
-if("ext_http_curl" IN_LIST OPENTELEMETRY_CPP_COMPONENTS_INSTALLED)
-  set(WITH_EXAMPLES_HTTP ON)
-  set(WITH_HTTP_CLIENT_CURL ON)
-endif()
+# The http example uses the embedded server headers, which the package no longer
+# installs. The ext headers it does use are covered by
+# install/test/src/test_ext_*.cc.
+set(WITH_EXAMPLES_HTTP OFF)
 
 if("configuration" IN_LIST OPENTELEMETRY_CPP_COMPONENTS_INSTALLED)
   set(WITH_CONFIGURATION ON)

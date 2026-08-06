@@ -108,6 +108,7 @@
 #   opentelemetry-cpp::ostream_metrics_exporter          - Imported target of COMPONENT exporters_ostream
 #   opentelemetry-cpp::ostream_span_exporter             - Imported target of COMPONENT exporters_ostream
 #   opentelemetry-cpp::proto                             - Imported target of COMPONENT exporters_otlp_common
+#   opentelemetry-cpp::otlp_common                       - Imported target of COMPONENT exporters_otlp_common
 #   opentelemetry-cpp::otlp_recordable                   - Imported target of COMPONENT exporters_otlp_common
 #   opentelemetry-cpp::otlp_file_client                  - Imported target of COMPONENT exporters_otlp_file
 #   opentelemetry-cpp::otlp_file_exporter                - Imported target of COMPONENT exporters_otlp_file

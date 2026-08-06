@@ -1,10 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <ctype.h>
-#include <stdint.h>
 #include <atomic>
+#include <cctype>
 #include <chrono>
+#include <cstdint>
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -55,7 +55,7 @@ static bool equalsIgnoreCase(const std::string &str1, const std::string &str2)
   }
   for (size_t i = 0; i < str1.length(); i++)
   {
-    if (tolower(str1[i]) != tolower(str2[i]))
+    if (std::tolower(str1[i]) != std::tolower(str2[i]))
     {
       return false;
     }
