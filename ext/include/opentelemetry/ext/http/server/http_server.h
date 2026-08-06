@@ -5,7 +5,10 @@
 
 #include <cerrno>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <functional>
 #include <list>
 #include <map>
@@ -15,7 +18,7 @@
 #ifdef HAVE_HTTP_DEBUG
 #  ifdef LOG_TRACE
 #    undef LOG_TRACE
-#    define LOG_TRACE(x, ...) printf(x "\n", __VA_ARGS__)
+#    define LOG_TRACE(x, ...) std::printf(x "\n", __VA_ARGS__)
 #  endif
 #endif
 
@@ -775,7 +778,8 @@ protected:
       for (auto &handler : m_handlers)
       {
         if (conn.request.uri.length() >= handler.first.length() &&
-            strncmp(conn.request.uri.c_str(), handler.first.c_str(), handler.first.length()) == 0)
+            std::strncmp(conn.request.uri.c_str(), handler.first.c_str(), handler.first.length()) ==
+                0)
         {
           LOG_TRACE("HttpServer: [%s] using handler for %s", conn.request.client.c_str(),
                     handler.first.c_str());
@@ -804,22 +808,22 @@ protected:
 
     conn.response.headers["Host"]           = m_serverHost;
     conn.response.headers["Connection"]     = (conn.keepalive ? "keep-alive" : "close");
-    conn.response.headers["Date"]           = formatTimestamp(time(nullptr));
+    conn.response.headers["Date"]           = formatTimestamp(std::time(nullptr));
     conn.response.headers["Content-Length"] = std::to_string(conn.response.body.size());
 
     return RequestOutcome::SendResponse;
   }
 
-  static std::string formatTimestamp(time_t time)
+  static std::string formatTimestamp(std::time_t time)
   {
-    tm tm{};
+    std::tm tm{};
 #ifdef _WIN32
     gmtime_s(&tm, &time);
 #else
     gmtime_r(&time, &tm);
 #endif
     char buf[32];
-    strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", &tm);
+    std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", &tm);
     return buf;
   }
 

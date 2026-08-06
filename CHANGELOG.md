@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Report one outcome per request when a curl session is cancelled after
+  the response arrives
+  ([#4363](https://github.com/open-telemetry/opentelemetry-cpp/pull/4363))
+
 * [CODE HEALTH] Enable clang-tidy `modernize-deprecated-headers` and replace
   deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
   `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
