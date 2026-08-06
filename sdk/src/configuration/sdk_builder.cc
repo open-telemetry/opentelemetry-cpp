@@ -1,7 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -14,15 +13,12 @@
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/context/propagation/composite_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/logs/severity.h"
-#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"
@@ -194,8 +190,8 @@
 #include "opentelemetry/sdk/trace/samplers/composable_sampler.h"
 #include "opentelemetry/sdk/trace/samplers/composite_sampler_factory.h"
 #include "opentelemetry/sdk/trace/samplers/parent_factory.h"
-#include "opentelemetry/sdk/trace/samplers/predicate.h"
 #include "opentelemetry/sdk/trace/samplers/probability_factory.h"
+#include "opentelemetry/sdk/trace/samplers/rule_based_predicate.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
@@ -450,196 +446,6 @@ private:
   std::string name_;
 };
 
-class RuleBasedPredicate : public opentelemetry::sdk::trace::Predicate
-{
-public:
-  explicit RuleBasedPredicate(
-      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerRuleConfiguration *rule)
-  {
-    if (rule->attribute_values != nullptr)
-    {
-      match_values_ = true;
-      values_key_   = rule->attribute_values->key;
-      values_       = rule->attribute_values->values;
-    }
-    if (rule->attribute_patterns != nullptr)
-    {
-      match_patterns_ = true;
-      patterns_key_   = rule->attribute_patterns->key;
-      included_       = rule->attribute_patterns->included;
-      excluded_       = rule->attribute_patterns->excluded;
-    }
-    match_parent_none_   = rule->match_parent_none;
-    match_parent_remote_ = rule->match_parent_remote;
-    match_parent_local_  = rule->match_parent_local;
-
-    match_span_kind_internal_ = rule->match_span_kind_internal;
-    match_span_kind_server_   = rule->match_span_kind_server;
-    match_span_kind_client_   = rule->match_span_kind_client;
-    match_span_kind_producer_ = rule->match_span_kind_producer;
-    match_span_kind_consumer_ = rule->match_span_kind_consumer;
-  }
-
-  bool SpanMatches(
-      const opentelemetry::trace::SpanContext &parent_context,
-      nostd::string_view /* name */,
-      opentelemetry::trace::SpanKind span_kind,
-      const opentelemetry::common::KeyValueIterable &attributes,
-      const opentelemetry::trace::SpanContextKeyValueIterable & /* links */) const noexcept override
-  {
-    if (!ParentMatches(parent_context))
-    {
-      return false;
-    }
-    if (!SpanKindMatches(span_kind))
-    {
-      return false;
-    }
-    if (match_values_ &&
-        !AttributeMatches(attributes, values_key_, [this](const std::string &candidate) {
-          return std::find(values_.begin(), values_.end(), candidate) != values_.end();
-        }))
-    {
-      return false;
-    }
-    if (match_patterns_ &&
-        !AttributeMatches(attributes, patterns_key_, [this](const std::string &candidate) {
-          for (const auto &pattern : excluded_)
-          {
-            if (WildcardMatch(pattern, candidate))
-            {
-              return false;
-            }
-          }
-          if (included_.empty())
-          {
-            return true;
-          }
-          for (const auto &pattern : included_)
-          {
-            if (WildcardMatch(pattern, candidate))
-            {
-              return true;
-            }
-          }
-          return false;
-        }))
-    {
-      return false;
-    }
-    return true;
-  }
-
-  nostd::string_view GetDescription() const noexcept override { return "RuleBasedPredicate"; }
-
-private:
-  // Checks every string form of an attribute value; array values match if any item matches.
-  class ValueMatcher
-  {
-  public:
-    explicit ValueMatcher(nostd::function_ref<bool(const std::string &)> check) : check_(check) {}
-
-    bool operator()(bool v) const { return check_(v ? "true" : "false"); }
-    bool operator()(int32_t v) const { return check_(std::to_string(v)); }
-    bool operator()(int64_t v) const { return check_(std::to_string(v)); }
-    bool operator()(uint32_t v) const { return check_(std::to_string(v)); }
-    bool operator()(uint64_t v) const { return check_(std::to_string(v)); }
-    bool operator()(double v) const { return check_(std::to_string(v)); }
-    bool operator()(const char *v) const { return v != nullptr && check_(std::string(v)); }
-    bool operator()(nostd::string_view v) const { return check_(std::string(v)); }
-    // Array values match when any item matches.
-    template <typename T>
-    bool operator()(nostd::span<const T> v) const
-    {
-      for (const auto &value : v)
-      {
-        if ((*this)(value))
-        {
-          return true;
-        }
-      }
-      return false;
-    }
-    // Byte arrays have no string form to match.
-    bool operator()(nostd::span<const uint8_t> /* v */) const { return false; }
-
-  private:
-    nostd::function_ref<bool(const std::string &)> check_;
-  };
-
-  static bool AttributeMatches(const opentelemetry::common::KeyValueIterable &attributes,
-                               const std::string &key,
-                               nostd::function_ref<bool(const std::string &)> check) noexcept
-  {
-    bool matched = false;
-    attributes.ForEachKeyValue(
-        [&](nostd::string_view attr_key, opentelemetry::common::AttributeValue value) {
-          if (attr_key != key)
-          {
-            return true;
-          }
-          matched = nostd::visit(ValueMatcher(check), value);
-          return false;
-        });
-    return matched;
-  }
-
-  bool ParentMatches(const opentelemetry::trace::SpanContext &parent_context) const noexcept
-  {
-    if (!(match_parent_none_ || match_parent_remote_ || match_parent_local_))
-    {
-      return true;
-    }
-    if (!parent_context.IsValid())
-    {
-      return match_parent_none_;
-    }
-    return parent_context.IsRemote() ? match_parent_remote_ : match_parent_local_;
-  }
-
-  bool SpanKindMatches(opentelemetry::trace::SpanKind span_kind) const noexcept
-  {
-    if (!(match_span_kind_internal_ || match_span_kind_server_ || match_span_kind_client_ ||
-          match_span_kind_producer_ || match_span_kind_consumer_))
-    {
-      return true;
-    }
-    switch (span_kind)
-    {
-      case opentelemetry::trace::SpanKind::kInternal:
-        return match_span_kind_internal_;
-      case opentelemetry::trace::SpanKind::kServer:
-        return match_span_kind_server_;
-      case opentelemetry::trace::SpanKind::kClient:
-        return match_span_kind_client_;
-      case opentelemetry::trace::SpanKind::kProducer:
-        return match_span_kind_producer_;
-      case opentelemetry::trace::SpanKind::kConsumer:
-        return match_span_kind_consumer_;
-    }
-    return false;
-  }
-
-  bool match_values_{false};
-  std::string values_key_;
-  std::vector<std::string> values_;
-
-  bool match_patterns_{false};
-  std::string patterns_key_;
-  std::vector<std::string> included_;
-  std::vector<std::string> excluded_;
-
-  bool match_parent_none_{false};
-  bool match_parent_remote_{false};
-  bool match_parent_local_{false};
-
-  bool match_span_kind_internal_{false};
-  bool match_span_kind_server_{false};
-  bool match_span_kind_client_{false};
-  bool match_span_kind_producer_{false};
-  bool match_span_kind_consumer_{false};
-};
-
 class ComposableSamplerBuilder
     : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
 {
@@ -712,8 +518,9 @@ public:
         continue;
       }
       opentelemetry::sdk::trace::PredicatedSampler predicated;
-      predicated.predicate = std::make_shared<RuleBasedPredicate>(rule.get());
-      predicated.sampler   = Build(rule->sampler.get());
+      predicated.predicate = std::make_shared<opentelemetry::sdk::trace::RuleBasedPredicate>(
+          MakePredicateOptions(rule.get()));
+      predicated.sampler = Build(rule->sampler.get());
       rules.push_back(std::move(predicated));
     }
     sampler =
@@ -767,6 +574,36 @@ public:
   }
 
   std::shared_ptr<opentelemetry::sdk::trace::ComposableSampler> sampler;
+
+private:
+  static opentelemetry::sdk::trace::RuleBasedPredicateOptions MakePredicateOptions(
+      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerRuleConfiguration *rule)
+  {
+    opentelemetry::sdk::trace::RuleBasedPredicateOptions options;
+    if (rule->attribute_values != nullptr)
+    {
+      options.match_values = true;
+      options.values_key   = rule->attribute_values->key;
+      options.values       = rule->attribute_values->values;
+    }
+    if (rule->attribute_patterns != nullptr)
+    {
+      options.match_patterns = true;
+      options.patterns_key   = rule->attribute_patterns->key;
+      options.included       = rule->attribute_patterns->included;
+      options.excluded       = rule->attribute_patterns->excluded;
+    }
+    options.match_parent_none   = rule->match_parent_none;
+    options.match_parent_remote = rule->match_parent_remote;
+    options.match_parent_local  = rule->match_parent_local;
+
+    options.match_span_kind_internal = rule->match_span_kind_internal;
+    options.match_span_kind_server   = rule->match_span_kind_server;
+    options.match_span_kind_client   = rule->match_span_kind_client;
+    options.match_span_kind_producer = rule->match_span_kind_producer;
+    options.match_span_kind_consumer = rule->match_span_kind_consumer;
+    return options;
+  }
 };
 
 class SamplerBuilder : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor

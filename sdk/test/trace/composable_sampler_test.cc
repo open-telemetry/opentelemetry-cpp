@@ -11,6 +11,7 @@
 
 #include <gtest/gtest.h>
 
+#include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
@@ -27,6 +28,7 @@
 #include "opentelemetry/sdk/trace/samplers/composite_sampler.h"
 #include "opentelemetry/sdk/trace/samplers/composite_sampler_factory.h"
 #include "opentelemetry/sdk/trace/samplers/predicate.h"
+#include "opentelemetry/sdk/trace/samplers/rule_based_predicate.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_context_kv_iterable_view.h"
 #include "opentelemetry/trace/span_id.h"
@@ -49,6 +51,8 @@ using opentelemetry::sdk::trace::CompositeSamplerFactory;
 using opentelemetry::sdk::trace::Decision;
 using opentelemetry::sdk::trace::Predicate;
 using opentelemetry::sdk::trace::PredicatedSampler;
+using opentelemetry::sdk::trace::RuleBasedPredicate;
+using opentelemetry::sdk::trace::RuleBasedPredicateOptions;
 using opentelemetry::sdk::trace::SamplingIntent;
 
 namespace
@@ -80,6 +84,25 @@ trace_api::SpanContext MakeParent(bool sampled, const std::string &ot_value)
   }
   return trace_api::SpanContext(trace_api::TraceId(trace_buf), trace_api::SpanId(span_buf),
                                 trace_api::TraceFlags(sampled ? 1 : 0), true, trace_state);
+}
+
+trace_api::SpanContext MakeParent(bool remote)
+{
+  constexpr uint8_t trace_bytes[16] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+  constexpr uint8_t span_bytes[8]   = {1, 2, 3, 4, 5, 6, 7, 8};
+  return trace_api::SpanContext(trace_api::TraceId(trace_bytes), trace_api::SpanId(span_bytes),
+                                trace_api::TraceFlags(trace_api::TraceFlags::kIsSampled), remote);
+}
+
+bool Matches(const RuleBasedPredicate &pred,
+             const std::map<std::string, common::AttributeValue> &attrs,
+             trace_api::SpanContext parent = trace_api::SpanContext::GetInvalid(),
+             trace_api::SpanKind kind      = trace_api::SpanKind::kInternal)
+{
+  common::KeyValueIterableView<std::map<std::string, common::AttributeValue>> attributes(attrs);
+  LinkVec link_vec;
+  trace_api::SpanContextKeyValueIterableView<LinkVec> links(link_vec);
+  return pred.SpanMatches(parent, "span", kind, attributes, links);
 }
 
 std::string OtOf(const opentelemetry::sdk::trace::SamplingResult &result)
@@ -363,20 +386,117 @@ TEST(ComposableSampler, ThresholdOmittedOverSizeLimit)
   EXPECT_EQ(parent_ot, ot);
 }
 
-TEST(ComposableSampler, RatioClampedToValidRange)
+TEST(ComposableSampler, InvalidRatioUsesDefault)
 {
-  auto over = CompositeSamplerFactory::Create(std::make_shared<ComposableProbabilitySampler>(2.0));
-  EXPECT_EQ(Decision::RECORD_AND_SAMPLE,
-            Sample(*over, trace_api::SpanContext::GetInvalid(), MakeTraceId(0x00)));
-
-  auto under =
+  for (double ratio : {2.0, -1.0, 1e-20})
+  {
+    ComposableProbabilitySampler sampler(ratio);
+    EXPECT_EQ(std::string{sampler.GetDescription()}, "ComposableProbabilitySampler{1.000000}");
+  }
+  auto invalid =
       CompositeSamplerFactory::Create(std::make_shared<ComposableProbabilitySampler>(-1.0));
-  EXPECT_EQ(Decision::DROP,
-            Sample(*under, trace_api::SpanContext::GetInvalid(), MakeTraceId(0xFF)));
+  EXPECT_EQ(Decision::RECORD_AND_SAMPLE,
+            Sample(*invalid, trace_api::SpanContext::GetInvalid(), MakeTraceId(0xFF)));
+}
+
+TEST(ComposableSampler, ZeroRatioIsValidAndDrops)
+{
+  ComposableProbabilitySampler sampler(0.0);
+  EXPECT_EQ(std::string{sampler.GetDescription()}, "ComposableProbabilitySampler{0.000000}");
+  auto zero = CompositeSamplerFactory::Create(std::make_shared<ComposableProbabilitySampler>(0.0));
+  EXPECT_EQ(Decision::DROP, Sample(*zero, trace_api::SpanContext::GetInvalid(), MakeTraceId(0xFF)));
 }
 
 TEST(ComposableSampler, ProbabilityNanRatioUsesDefault)
 {
   ComposableProbabilitySampler sampler(std::numeric_limits<double>::quiet_NaN());
   EXPECT_EQ(std::string{sampler.GetDescription()}, "ComposableProbabilitySampler{1.000000}");
+}
+
+TEST(RuleBasedPredicate, EmptyOptionsMatchEverySpan)
+{
+  RuleBasedPredicate pred(RuleBasedPredicateOptions{});
+  EXPECT_TRUE(Matches(pred, {}));
+  EXPECT_TRUE(Matches(pred, {{"any", "value"}}, MakeParent(true), trace_api::SpanKind::kServer));
+  EXPECT_EQ(std::string{pred.GetDescription()}, "RuleBasedPredicate");
+}
+
+TEST(RuleBasedPredicate, ParentMatching)
+{
+  RuleBasedPredicateOptions none;
+  none.match_parent_none = true;
+  RuleBasedPredicate root_only(std::move(none));
+  EXPECT_TRUE(Matches(root_only, {}));
+  EXPECT_FALSE(Matches(root_only, {}, MakeParent(true)));
+
+  RuleBasedPredicateOptions remote;
+  remote.match_parent_remote = true;
+  RuleBasedPredicate remote_only(std::move(remote));
+  EXPECT_TRUE(Matches(remote_only, {}, MakeParent(true)));
+  EXPECT_FALSE(Matches(remote_only, {}, MakeParent(false)));
+  EXPECT_FALSE(Matches(remote_only, {}));
+}
+
+TEST(RuleBasedPredicate, SpanKindMatching)
+{
+  RuleBasedPredicateOptions options;
+  options.match_span_kind_server = true;
+  RuleBasedPredicate server_only(std::move(options));
+  EXPECT_TRUE(
+      Matches(server_only, {}, trace_api::SpanContext::GetInvalid(), trace_api::SpanKind::kServer));
+  EXPECT_FALSE(
+      Matches(server_only, {}, trace_api::SpanContext::GetInvalid(), trace_api::SpanKind::kClient));
+}
+
+TEST(RuleBasedPredicate, AttributeValues)
+{
+  RuleBasedPredicateOptions options;
+  options.match_values = true;
+  options.values_key   = "service";
+  options.values       = {"a", "42"};
+  RuleBasedPredicate pred(std::move(options));
+  EXPECT_TRUE(Matches(pred, {{"service", "a"}}));
+  EXPECT_FALSE(Matches(pred, {{"service", "b"}}));
+  EXPECT_FALSE(Matches(pred, {{"other", "a"}}));
+  EXPECT_TRUE(Matches(pred, {{"service", static_cast<int32_t>(42)}}));
+
+  static const opentelemetry::nostd::string_view items[] = {"x", "a"};
+  EXPECT_TRUE(Matches(
+      pred,
+      {{"service", opentelemetry::nostd::span<const opentelemetry::nostd::string_view>(items)}}));
+}
+
+TEST(RuleBasedPredicate, AttributePatterns)
+{
+  RuleBasedPredicateOptions options;
+  options.match_patterns = true;
+  options.patterns_key   = "url";
+  options.included       = {"/api/*"};
+  options.excluded       = {"/api/health"};
+  RuleBasedPredicate pred(std::move(options));
+  EXPECT_TRUE(Matches(pred, {{"url", "/api/users"}}));
+  EXPECT_FALSE(Matches(pred, {{"url", "/api/health"}}));
+  EXPECT_FALSE(Matches(pred, {{"url", "/other"}}));
+
+  RuleBasedPredicateOptions excluded_only;
+  excluded_only.match_patterns = true;
+  excluded_only.patterns_key   = "url";
+  excluded_only.excluded       = {"/internal/*"};
+  RuleBasedPredicate not_internal(std::move(excluded_only));
+  EXPECT_TRUE(Matches(not_internal, {{"url", "/public"}}));
+  EXPECT_FALSE(Matches(not_internal, {{"url", "/internal/x"}}));
+}
+
+TEST(RuleBasedPredicate, ActiveGroupsAreAnded)
+{
+  RuleBasedPredicateOptions options;
+  options.match_values           = true;
+  options.values_key             = "service";
+  options.values                 = {"a"};
+  options.match_span_kind_server = true;
+  RuleBasedPredicate pred(std::move(options));
+  EXPECT_TRUE(Matches(pred, {{"service", "a"}}, trace_api::SpanContext::GetInvalid(),
+                      trace_api::SpanKind::kServer));
+  EXPECT_FALSE(Matches(pred, {{"service", "a"}}, trace_api::SpanContext::GetInvalid(),
+                       trace_api::SpanKind::kClient));
 }

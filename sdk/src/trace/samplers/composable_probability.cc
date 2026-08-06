@@ -3,12 +3,10 @@
 
 #include "opentelemetry/sdk/trace/samplers/composable_probability.h"
 
-#include <cmath>
 #include <cstdint>
 #include <string>
 
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/version.h"
 
@@ -22,19 +20,7 @@ namespace trace
 
 ComposableProbabilitySampler::ComposableProbabilitySampler(double ratio)
 {
-  if (std::isnan(ratio))
-  {
-    OTEL_INTERNAL_LOG_WARN("[ComposableProbabilitySampler] ratio is NaN, using the default 1.0");
-    ratio = 1.0;
-  }
-  if (ratio > 1.0)
-  {
-    ratio = 1.0;
-  }
-  if (ratio < 0.0)
-  {
-    ratio = 0.0;
-  }
+  ratio              = ValidateRatio(ratio, "ComposableProbabilitySampler");
   uint64_t threshold = CalculateThreshold(ratio);
   // A threshold of kMaxThreshold means 0% sampling. The specification asks for
   // this to behave like ComposableAlwaysOff: a non-probabilistic drop.

@@ -15,11 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
-* [CONFIGURATION] Build composable samplers from file configuration. An
-  out-of-range ratio on the composable probability sampler now fails
-  configuration parsing instead of being silently clamped; a NaN ratio
-  passed programmatically to `ComposableProbabilitySampler` falls back to
-  the default 1.0 with a warning.
+* [CONFIGURATION] Add support for the composite sampler configuration
+  (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
 
 * [BUG] Report one outcome per request when a curl session is cancelled after
