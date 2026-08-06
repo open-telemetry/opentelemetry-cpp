@@ -4,7 +4,6 @@
 #include <atomic>
 #include <cstdint>
 #include <map>
-#include <ostream>
 #include <string>
 
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -30,9 +29,9 @@ namespace trace
 
 ProbabilitySampler::ProbabilitySampler(double ratio)
 {
-  ratio        = ValidateRatio(ratio, "ProbabilitySampler");
-  description_ = "ProbabilitySampler{" + std::to_string(ratio) + "}";
-  threshold_   = CalculateThreshold(ratio);
+  const double valid_ratio = ValidateRatio(ratio, "ProbabilitySampler");
+  description_             = "ProbabilitySampler{" + std::to_string(valid_ratio) + "}";
+  threshold_               = CalculateThreshold(valid_ratio);
 }
 
 SamplingResult ProbabilitySampler::ShouldSample(

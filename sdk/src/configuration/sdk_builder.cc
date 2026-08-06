@@ -198,8 +198,6 @@
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/version.h"
 #include "src/common/wildcard_match.h"
 

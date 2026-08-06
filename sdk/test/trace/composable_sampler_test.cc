@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <initializer_list>
 #include <limits>
 #include <map>
 #include <string>
@@ -96,8 +97,8 @@ trace_api::SpanContext MakeParent(bool remote)
 
 bool Matches(const RuleBasedPredicate &pred,
              const std::map<std::string, common::AttributeValue> &attrs,
-             trace_api::SpanContext parent = trace_api::SpanContext::GetInvalid(),
-             trace_api::SpanKind kind      = trace_api::SpanKind::kInternal)
+             const trace_api::SpanContext &parent = trace_api::SpanContext::GetInvalid(),
+             trace_api::SpanKind kind             = trace_api::SpanKind::kInternal)
 {
   common::KeyValueIterableView<std::map<std::string, common::AttributeValue>> attributes(attrs);
   LinkVec link_vec;
