@@ -1321,6 +1321,20 @@ TEST(Aggregation, Base2ExponentialHistogramIndexerSaturatesShiftAtExtremeNegativ
   EXPECT_EQ(indexer.ComputeIndex(kTiny), -1);
   EXPECT_EQ(indexer.ComputeIndex(4.0), 0);
   EXPECT_EQ(indexer.ComputeIndex(kHuge), 0);
+
+  // -11 still shifts while the lower scales return the collapsed index directly; the two paths
+  // have to agree, otherwise the saturation would change results instead of just defining them.
+  const std::vector<double> values = {kTiny, 1e-300, 0.5, 1.0, 4.0, 1e300, kHuge};
+  const Base2ExponentialHistogramIndexer shifted(-11);
+  for (int32_t scale : {-12, -20, -31, -40})
+  {
+    const Base2ExponentialHistogramIndexer collapsed(scale);
+    for (double value : values)
+    {
+      EXPECT_EQ(collapsed.ComputeIndex(value), shifted.ComputeIndex(value))
+          << "scale " << scale << ", value " << value;
+    }
+  }
 }
 
 TEST(Aggregation, Base2ExponentialHistogramAggregationCopiedPointDataKeepsFloorCapacity)
