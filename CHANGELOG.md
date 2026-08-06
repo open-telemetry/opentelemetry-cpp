@@ -45,6 +45,9 @@ Increment the:
   [#4334](https://github.com/open-telemetry/opentelemetry-cpp/pull/4334)
 * [BUG] Stop reading past a `nostd::string_view` that is not NUL terminated
   [#4346](https://github.com/open-telemetry/opentelemetry-cpp/pull/4346)
+* [BUG] Stop the Elasticsearch async ForceFlush reporting success without
+  waiting for the sessions it was asked about
+  [#4337](https://github.com/open-telemetry/opentelemetry-cpp/pull/4337)
 
 * [OTLP EXPORTERS] add otlp_common target for shared otlp utils
   [#4333](https://github.com/open-telemetry/opentelemetry-cpp/pull/4333)
