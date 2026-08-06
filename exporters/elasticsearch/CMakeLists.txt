@@ -34,6 +34,12 @@ otel_add_component(
   "*.h"
   PATTERN
   "es_log_recordable.h"
+  EXCLUDE
+  PATTERN
+  "es_bulk_response.h"
+  EXCLUDE
+  PATTERN
+  "detail"
   EXCLUDE)
 
 if(OPENTELEMETRY_INSTALL)
