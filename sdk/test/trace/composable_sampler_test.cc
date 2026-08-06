@@ -440,13 +440,33 @@ TEST(RuleBasedPredicate, ParentMatching)
 
 TEST(RuleBasedPredicate, SpanKindMatching)
 {
-  RuleBasedPredicateOptions options;
-  options.match_span_kind_server = true;
-  RuleBasedPredicate server_only(std::move(options));
-  EXPECT_TRUE(
-      Matches(server_only, {}, trace_api::SpanContext::GetInvalid(), trace_api::SpanKind::kServer));
-  EXPECT_FALSE(
-      Matches(server_only, {}, trace_api::SpanContext::GetInvalid(), trace_api::SpanKind::kClient));
+  struct KindCase
+  {
+    trace_api::SpanKind kind;
+    bool RuleBasedPredicateOptions::*flag;
+  };
+  const KindCase cases[] = {
+      {trace_api::SpanKind::kInternal, &RuleBasedPredicateOptions::match_span_kind_internal},
+      {trace_api::SpanKind::kServer, &RuleBasedPredicateOptions::match_span_kind_server},
+      {trace_api::SpanKind::kClient, &RuleBasedPredicateOptions::match_span_kind_client},
+      {trace_api::SpanKind::kProducer, &RuleBasedPredicateOptions::match_span_kind_producer},
+      {trace_api::SpanKind::kConsumer, &RuleBasedPredicateOptions::match_span_kind_consumer}};
+
+  RuleBasedPredicate any_kind(RuleBasedPredicateOptions{});
+  for (const auto &selected : cases)
+  {
+    EXPECT_TRUE(Matches(any_kind, {}, trace_api::SpanContext::GetInvalid(), selected.kind));
+
+    RuleBasedPredicateOptions options;
+    options.*selected.flag = true;
+    RuleBasedPredicate pred(std::move(options));
+    for (const auto &other : cases)
+    {
+      EXPECT_EQ(selected.kind == other.kind,
+                Matches(pred, {}, trace_api::SpanContext::GetInvalid(), other.kind))
+          << "span kind " << static_cast<int>(other.kind);
+    }
+  }
 }
 
 TEST(RuleBasedPredicate, AttributeValues)
@@ -454,17 +474,70 @@ TEST(RuleBasedPredicate, AttributeValues)
   RuleBasedPredicateOptions options;
   options.match_values = true;
   options.values_key   = "service";
-  options.values       = {"a", "42"};
+  options.values       = {"a",          "42",
+                          "true",       "-2147483648",
+                          "4294967295", "9223372036854775807",
+                          "0.5",        "18446744073709551615"};
   RuleBasedPredicate pred(std::move(options));
   EXPECT_TRUE(Matches(pred, {{"service", "a"}}));
   EXPECT_FALSE(Matches(pred, {{"service", "b"}}));
   EXPECT_FALSE(Matches(pred, {{"other", "a"}}));
+  EXPECT_FALSE(Matches(pred, {{"service", static_cast<const char *>(nullptr)}}));
+  EXPECT_TRUE(Matches(pred, {{"service", opentelemetry::nostd::string_view("a")}}));
+  EXPECT_FALSE(Matches(pred, {{"service", opentelemetry::nostd::string_view("b")}}));
+  EXPECT_TRUE(Matches(pred, {{"service", true}}));
+  EXPECT_FALSE(Matches(pred, {{"service", false}}));
   EXPECT_TRUE(Matches(pred, {{"service", static_cast<int32_t>(42)}}));
+  EXPECT_TRUE(Matches(pred, {{"service", std::numeric_limits<int32_t>::min()}}));
+  EXPECT_FALSE(Matches(pred, {{"service", static_cast<int32_t>(43)}}));
+  EXPECT_TRUE(Matches(pred, {{"service", std::numeric_limits<int64_t>::max()}}));
+  EXPECT_FALSE(Matches(pred, {{"service", std::numeric_limits<int64_t>::min()}}));
+  EXPECT_TRUE(Matches(pred, {{"service", std::numeric_limits<uint32_t>::max()}}));
+  EXPECT_FALSE(Matches(pred, {{"service", static_cast<uint32_t>(0)}}));
+  EXPECT_TRUE(Matches(pred, {{"service", std::numeric_limits<uint64_t>::max()}}));
+  EXPECT_FALSE(Matches(pred, {{"service", static_cast<uint64_t>(0)}}));
+  EXPECT_TRUE(Matches(pred, {{"service", 0.5}}));
+  EXPECT_FALSE(Matches(pred, {{"service", 0.25}}));
 
-  static const opentelemetry::nostd::string_view items[] = {"x", "a"};
+  // Arrays match when any item matches.
+  static const bool bools[]          = {false, true};
+  static const bool no_bools[]       = {false};
+  static const int32_t int32s[]      = {1, 42};
+  static const int32_t no_int32s[]   = {1, 2};
+  static const int64_t int64s[]      = {1, std::numeric_limits<int64_t>::max()};
+  static const int64_t no_int64s[]   = {1, 2};
+  static const uint32_t uint32s[]    = {1, std::numeric_limits<uint32_t>::max()};
+  static const uint32_t no_uint32s[] = {1, 2};
+  static const uint64_t uint64s[]    = {1, std::numeric_limits<uint64_t>::max()};
+  static const uint64_t no_uint64s[] = {1, 2};
+  static const double doubles[]      = {0.25, 0.5};
+  static const double no_doubles[]   = {0.25, 0.75};
+  static const opentelemetry::nostd::string_view items[]    = {"x", "a"};
+  static const opentelemetry::nostd::string_view no_items[] = {"x", "y"};
+  EXPECT_TRUE(Matches(pred, {{"service", opentelemetry::nostd::span<const bool>(bools)}}));
+  EXPECT_FALSE(Matches(pred, {{"service", opentelemetry::nostd::span<const bool>(no_bools)}}));
+  EXPECT_TRUE(Matches(pred, {{"service", opentelemetry::nostd::span<const int32_t>(int32s)}}));
+  EXPECT_FALSE(Matches(pred, {{"service", opentelemetry::nostd::span<const int32_t>(no_int32s)}}));
+  EXPECT_TRUE(Matches(pred, {{"service", opentelemetry::nostd::span<const int64_t>(int64s)}}));
+  EXPECT_FALSE(Matches(pred, {{"service", opentelemetry::nostd::span<const int64_t>(no_int64s)}}));
+  EXPECT_TRUE(Matches(pred, {{"service", opentelemetry::nostd::span<const uint32_t>(uint32s)}}));
+  EXPECT_FALSE(
+      Matches(pred, {{"service", opentelemetry::nostd::span<const uint32_t>(no_uint32s)}}));
+  EXPECT_TRUE(Matches(pred, {{"service", opentelemetry::nostd::span<const uint64_t>(uint64s)}}));
+  EXPECT_FALSE(
+      Matches(pred, {{"service", opentelemetry::nostd::span<const uint64_t>(no_uint64s)}}));
+  EXPECT_TRUE(Matches(pred, {{"service", opentelemetry::nostd::span<const double>(doubles)}}));
+  EXPECT_FALSE(Matches(pred, {{"service", opentelemetry::nostd::span<const double>(no_doubles)}}));
   EXPECT_TRUE(Matches(
       pred,
       {{"service", opentelemetry::nostd::span<const opentelemetry::nostd::string_view>(items)}}));
+  EXPECT_FALSE(Matches(
+      pred, {{"service",
+              opentelemetry::nostd::span<const opentelemetry::nostd::string_view>(no_items)}}));
+
+  // A byte array has no string representation, so it never matches.
+  static const uint8_t bytes[] = {42};
+  EXPECT_FALSE(Matches(pred, {{"service", opentelemetry::nostd::span<const uint8_t>(bytes)}}));
 }
 
 TEST(RuleBasedPredicate, AttributePatterns)
@@ -478,6 +551,16 @@ TEST(RuleBasedPredicate, AttributePatterns)
   EXPECT_TRUE(Matches(pred, {{"url", "/api/users"}}));
   EXPECT_FALSE(Matches(pred, {{"url", "/api/health"}}));
   EXPECT_FALSE(Matches(pred, {{"url", "/other"}}));
+  EXPECT_TRUE(Matches(pred, {{"url", opentelemetry::nostd::string_view("/api/users")}}));
+  EXPECT_FALSE(Matches(pred, {{"url", opentelemetry::nostd::string_view("/other")}}));
+
+  static const opentelemetry::nostd::string_view urls[]    = {"/other", "/api/users"};
+  static const opentelemetry::nostd::string_view no_urls[] = {"/other", "/api/health"};
+  EXPECT_TRUE(Matches(
+      pred, {{"url", opentelemetry::nostd::span<const opentelemetry::nostd::string_view>(urls)}}));
+  EXPECT_FALSE(Matches(
+      pred,
+      {{"url", opentelemetry::nostd::span<const opentelemetry::nostd::string_view>(no_urls)}}));
 
   RuleBasedPredicateOptions excluded_only;
   excluded_only.match_patterns = true;
@@ -486,6 +569,85 @@ TEST(RuleBasedPredicate, AttributePatterns)
   RuleBasedPredicate not_internal(std::move(excluded_only));
   EXPECT_TRUE(Matches(not_internal, {{"url", "/public"}}));
   EXPECT_FALSE(Matches(not_internal, {{"url", "/internal/x"}}));
+
+  // A pattern of "4*" matches any http.response.status_code in 400-499, whatever numeric type
+  // carries it.
+  RuleBasedPredicateOptions status;
+  status.match_patterns = true;
+  status.patterns_key   = "http.response.status_code";
+  status.included       = {"4*"};
+  RuleBasedPredicate client_error(std::move(status));
+  auto status_code = [&client_error](common::AttributeValue value) {
+    return Matches(client_error, {{"http.response.status_code", value}});
+  };
+  EXPECT_TRUE(status_code(static_cast<int32_t>(404)));
+  EXPECT_TRUE(status_code(static_cast<int64_t>(451)));
+  EXPECT_TRUE(status_code(static_cast<uint32_t>(400)));
+  EXPECT_TRUE(status_code(static_cast<uint64_t>(499)));
+  EXPECT_TRUE(status_code(404.0));
+  EXPECT_FALSE(status_code(static_cast<int32_t>(200)));
+  EXPECT_FALSE(status_code(200.0));
+
+  // Arrays match when any item matches.
+  static const int32_t int32s[]      = {200, 404};
+  static const int32_t no_int32s[]   = {200, 500};
+  static const int64_t int64s[]      = {200, 451};
+  static const int64_t no_int64s[]   = {200, 500};
+  static const uint32_t uint32s[]    = {200, 400};
+  static const uint32_t no_uint32s[] = {200, 500};
+  static const uint64_t uint64s[]    = {200, 499};
+  static const uint64_t no_uint64s[] = {200, 500};
+  static const double doubles[]      = {200.0, 404.0};
+  static const double no_doubles[]   = {200.0, 500.0};
+  EXPECT_TRUE(status_code(opentelemetry::nostd::span<const int32_t>(int32s)));
+  EXPECT_FALSE(status_code(opentelemetry::nostd::span<const int32_t>(no_int32s)));
+  EXPECT_TRUE(status_code(opentelemetry::nostd::span<const int64_t>(int64s)));
+  EXPECT_FALSE(status_code(opentelemetry::nostd::span<const int64_t>(no_int64s)));
+  EXPECT_TRUE(status_code(opentelemetry::nostd::span<const uint32_t>(uint32s)));
+  EXPECT_FALSE(status_code(opentelemetry::nostd::span<const uint32_t>(no_uint32s)));
+  EXPECT_TRUE(status_code(opentelemetry::nostd::span<const uint64_t>(uint64s)));
+  EXPECT_FALSE(status_code(opentelemetry::nostd::span<const uint64_t>(no_uint64s)));
+  EXPECT_TRUE(status_code(opentelemetry::nostd::span<const double>(doubles)));
+  EXPECT_FALSE(status_code(opentelemetry::nostd::span<const double>(no_doubles)));
+
+  static const uint8_t bytes[] = {4};
+  EXPECT_FALSE(status_code(opentelemetry::nostd::span<const uint8_t>(bytes)));
+
+  RuleBasedPredicateOptions truthy;
+  truthy.match_patterns = true;
+  truthy.patterns_key   = "enabled";
+  truthy.included       = {"tr*"};
+  RuleBasedPredicate enabled(std::move(truthy));
+  EXPECT_TRUE(Matches(enabled, {{"enabled", true}}));
+  EXPECT_FALSE(Matches(enabled, {{"enabled", false}}));
+
+  static const bool flags[]    = {false, true};
+  static const bool no_flags[] = {false, false};
+  EXPECT_TRUE(Matches(enabled, {{"enabled", opentelemetry::nostd::span<const bool>(flags)}}));
+  EXPECT_FALSE(Matches(enabled, {{"enabled", opentelemetry::nostd::span<const bool>(no_flags)}}));
+
+  // Doubles use the shortest representation that reads back as the same value, so 404.0 is "404"
+  // rather than "404.000000", and negative zero keeps its sign.
+  RuleBasedPredicateOptions numbers;
+  numbers.match_patterns = true;
+  numbers.patterns_key   = "value";
+  numbers.included       = {"404",   "0.1",      "1234567.89",         "1e+20",
+                            "1e-20", "-0",       "0.6666666666666666", "1.7976931348623157e+308",
+                            "NaN",   "Infinity", "-Infinity"};
+  RuleBasedPredicate number(std::move(numbers));
+  EXPECT_TRUE(Matches(number, {{"value", 404.0}}));
+  EXPECT_TRUE(Matches(number, {{"value", 0.1}}));
+  EXPECT_TRUE(Matches(number, {{"value", 1234567.89}}));
+  EXPECT_TRUE(Matches(number, {{"value", 1e20}}));
+  EXPECT_TRUE(Matches(number, {{"value", 1e-20}}));
+  EXPECT_TRUE(Matches(number, {{"value", -0.0}}));
+  EXPECT_FALSE(Matches(number, {{"value", 0.0}}));
+  EXPECT_TRUE(Matches(number, {{"value", 2.0 / 3.0}}));
+  EXPECT_TRUE(Matches(number, {{"value", std::numeric_limits<double>::max()}}));
+  EXPECT_TRUE(Matches(number, {{"value", std::numeric_limits<double>::quiet_NaN()}}));
+  EXPECT_TRUE(Matches(number, {{"value", std::numeric_limits<double>::infinity()}}));
+  EXPECT_TRUE(Matches(number, {{"value", -std::numeric_limits<double>::infinity()}}));
+  EXPECT_FALSE(Matches(number, {{"value", 0.2}}));
 }
 
 TEST(RuleBasedPredicate, ActiveGroupsAreAnded)

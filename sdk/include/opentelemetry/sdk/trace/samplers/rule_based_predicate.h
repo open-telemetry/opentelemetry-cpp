@@ -47,7 +47,9 @@ struct RuleBasedPredicateOptions
  * RuleBasedPredicate matches a span when every active criteria group in its
  * options matches: parent kind, span kind, an attribute equal to one of the
  * given values, and an attribute matching the included/excluded wildcard
- * patterns (excluded wins).
+ * patterns (excluded wins). Non-string attributes are matched by their string
+ * representation; doubles use the shortest form that reads back as the same
+ * value, so 404.0 matches "404".
  */
 class RuleBasedPredicate : public Predicate
 {

@@ -4,7 +4,10 @@
 #include "opentelemetry/sdk/trace/samplers/rule_based_predicate.h"
 
 #include <algorithm>
-#include <cstdint>
+#include <cinttypes>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
 #include <string>
 #include <utility>
 
@@ -13,7 +16,7 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/version.h"
@@ -27,20 +30,62 @@ using opentelemetry::nostd::function_ref;
 using opentelemetry::sdk::common::WildcardMatch;
 namespace nostd = opentelemetry::nostd;
 
+// Fits the widest value below: a 17 significant digit double takes 24 characters, an int64 20.
+constexpr std::size_t kValueBufferSize = 32;
+
 // Checks every string form of an attribute value; array values match if any item matches.
 class ValueMatcher
 {
 public:
-  explicit ValueMatcher(function_ref<bool(const std::string &)> check) : check_(check) {}
+  explicit ValueMatcher(function_ref<bool(nostd::string_view)> check) : check_(check) {}
 
   bool operator()(bool v) const { return check_(v ? "true" : "false"); }
-  bool operator()(int32_t v) const { return check_(std::to_string(v)); }
-  bool operator()(int64_t v) const { return check_(std::to_string(v)); }
-  bool operator()(uint32_t v) const { return check_(std::to_string(v)); }
-  bool operator()(uint64_t v) const { return check_(std::to_string(v)); }
-  bool operator()(double v) const { return check_(std::to_string(v)); }
-  bool operator()(const char *v) const { return v != nullptr && check_(std::string(v)); }
-  bool operator()(nostd::string_view v) const { return check_(std::string(v)); }
+  bool operator()(int32_t v) const
+  {
+    char buffer[kValueBufferSize];
+    return CheckWritten(buffer, std::snprintf(buffer, sizeof(buffer), "%" PRId32, v));
+  }
+  bool operator()(int64_t v) const
+  {
+    char buffer[kValueBufferSize];
+    return CheckWritten(buffer, std::snprintf(buffer, sizeof(buffer), "%" PRId64, v));
+  }
+  bool operator()(uint32_t v) const
+  {
+    char buffer[kValueBufferSize];
+    return CheckWritten(buffer, std::snprintf(buffer, sizeof(buffer), "%" PRIu32, v));
+  }
+  bool operator()(uint64_t v) const
+  {
+    char buffer[kValueBufferSize];
+    return CheckWritten(buffer, std::snprintf(buffer, sizeof(buffer), "%" PRIu64, v));
+  }
+  bool operator()(double v) const
+  {
+    if (std::isnan(v))
+    {
+      return check_("NaN");
+    }
+    if (std::isinf(v))
+    {
+      return check_(v < 0 ? "-Infinity" : "Infinity");
+    }
+    // Doubles use the shortest of %.15g, %.16g and %.17g that reads back as the same value.
+    char buffer[kValueBufferSize];
+    int length = 0;
+    for (int precision = 15; precision <= 17; ++precision)
+    {
+      length = std::snprintf(buffer, sizeof(buffer), "%.*g", precision, v);
+      if (length > 0 && length < static_cast<int>(kValueBufferSize) &&
+          std::strtod(buffer, nullptr) == v)
+      {
+        break;
+      }
+    }
+    return CheckWritten(buffer, length);
+  }
+  bool operator()(const char *v) const { return v != nullptr && check_(v); }
+  bool operator()(nostd::string_view v) const { return check_(v); }
   // Array values match when any item matches.
   template <typename T>
   bool operator()(nostd::span<const T> v) const
@@ -58,12 +103,22 @@ public:
   bool operator()(nostd::span<const uint8_t> /* v */) const { return false; }
 
 private:
-  function_ref<bool(const std::string &)> check_;
+  // A failed or truncated write cannot match.
+  bool CheckWritten(const char *buffer, int length) const
+  {
+    if (length < 0 || length >= static_cast<int>(kValueBufferSize))
+    {
+      return false;
+    }
+    return check_(nostd::string_view(buffer, static_cast<std::size_t>(length)));
+  }
+
+  function_ref<bool(nostd::string_view)> check_;
 };
 
 bool AttributeMatches(const opentelemetry::common::KeyValueIterable &attributes,
                       const std::string &key,
-                      function_ref<bool(const std::string &)> check) noexcept
+                      function_ref<bool(nostd::string_view)> check) noexcept
 {
   bool matched = false;
   attributes.ForEachKeyValue(
@@ -72,7 +127,8 @@ bool AttributeMatches(const opentelemetry::common::KeyValueIterable &attributes,
         {
           return true;
         }
-        matched = nostd::visit(ValueMatcher(check), value);
+        const auto result = opentelemetry::sdk::common::VisitVariant(ValueMatcher(check), value);
+        matched           = result.second && result.first;
         return false;
       });
   return matched;
@@ -106,7 +162,7 @@ bool RuleBasedPredicate::SpanMatches(
     return false;
   }
   if (options_.match_values &&
-      !AttributeMatches(attributes, options_.values_key, [this](const std::string &candidate) {
+      !AttributeMatches(attributes, options_.values_key, [this](nostd::string_view candidate) {
         return std::find(options_.values.begin(), options_.values.end(), candidate) !=
                options_.values.end();
       }))
@@ -114,7 +170,7 @@ bool RuleBasedPredicate::SpanMatches(
     return false;
   }
   if (options_.match_patterns &&
-      !AttributeMatches(attributes, options_.patterns_key, [this](const std::string &candidate) {
+      !AttributeMatches(attributes, options_.patterns_key, [this](nostd::string_view candidate) {
         for (const auto &pattern : options_.excluded)
         {
           if (WildcardMatch(pattern, candidate))
