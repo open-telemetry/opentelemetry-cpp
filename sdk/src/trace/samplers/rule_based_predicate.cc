@@ -7,7 +7,6 @@
 #include <cinttypes>
 #include <cmath>
 #include <cstdio>
-#include <cstdlib>
 #include <string>
 #include <utility>
 
@@ -37,7 +36,9 @@ constexpr std::size_t kValueBufferSize = 32;
 class ValueMatcher
 {
 public:
-  explicit ValueMatcher(function_ref<bool(nostd::string_view)> check) : check_(check) {}
+  ValueMatcher(function_ref<bool(nostd::string_view)> check, int double_precision)
+      : check_(check), double_precision_(double_precision)
+  {}
 
   bool operator()(bool v) const { return check_(v ? "true" : "false"); }
   bool operator()(int32_t v) const
@@ -70,19 +71,9 @@ public:
     {
       return check_(v < 0 ? "-Infinity" : "Infinity");
     }
-    // Doubles use the shortest of %.15g, %.16g and %.17g that reads back as the same value.
     char buffer[kValueBufferSize];
-    int length = 0;
-    for (int precision = 15; precision <= 17; ++precision)
-    {
-      length = std::snprintf(buffer, sizeof(buffer), "%.*g", precision, v);
-      if (length > 0 && length < static_cast<int>(kValueBufferSize) &&
-          std::strtod(buffer, nullptr) == v)
-      {
-        break;
-      }
-    }
-    return CheckWritten(buffer, length);
+    return CheckWritten(buffer,
+                        std::snprintf(buffer, sizeof(buffer), "%.*g", double_precision_, v));
   }
   bool operator()(const char *v) const { return v != nullptr && check_(v); }
   bool operator()(nostd::string_view v) const { return check_(v); }
@@ -114,10 +105,12 @@ private:
   }
 
   function_ref<bool(nostd::string_view)> check_;
+  int double_precision_;
 };
 
 bool AttributeMatches(const opentelemetry::common::KeyValueIterable &attributes,
                       const std::string &key,
+                      int double_precision,
                       function_ref<bool(nostd::string_view)> check) noexcept
 {
   bool matched = false;
@@ -127,8 +120,9 @@ bool AttributeMatches(const opentelemetry::common::KeyValueIterable &attributes,
         {
           return true;
         }
-        const auto result = opentelemetry::sdk::common::VisitVariant(ValueMatcher(check), value);
-        matched           = result.second && result.first;
+        const auto result =
+            opentelemetry::sdk::common::VisitVariant(ValueMatcher(check, double_precision), value);
+        matched = result.second && result.first;
         return false;
       });
   return matched;
@@ -162,35 +156,37 @@ bool RuleBasedPredicate::SpanMatches(
     return false;
   }
   if (options_.match_values &&
-      !AttributeMatches(attributes, options_.values_key, [this](nostd::string_view candidate) {
-        return std::find(options_.values.begin(), options_.values.end(), candidate) !=
-               options_.values.end();
-      }))
+      !AttributeMatches(attributes, options_.values_key, options_.double_precision,
+                        [this](nostd::string_view candidate) {
+                          return std::find(options_.values.begin(), options_.values.end(),
+                                           candidate) != options_.values.end();
+                        }))
   {
     return false;
   }
   if (options_.match_patterns &&
-      !AttributeMatches(attributes, options_.patterns_key, [this](nostd::string_view candidate) {
-        for (const auto &pattern : options_.excluded)
-        {
-          if (WildcardMatch(pattern, candidate))
-          {
-            return false;
-          }
-        }
-        if (options_.included.empty())
-        {
-          return true;
-        }
-        for (const auto &pattern : options_.included)
-        {
-          if (WildcardMatch(pattern, candidate))
-          {
-            return true;
-          }
-        }
-        return false;
-      }))
+      !AttributeMatches(attributes, options_.patterns_key, options_.double_precision,
+                        [this](nostd::string_view candidate) {
+                          for (const auto &pattern : options_.excluded)
+                          {
+                            if (WildcardMatch(pattern, candidate))
+                            {
+                              return false;
+                            }
+                          }
+                          if (options_.included.empty())
+                          {
+                            return true;
+                          }
+                          for (const auto &pattern : options_.included)
+                          {
+                            if (WildcardMatch(pattern, candidate))
+                            {
+                              return true;
+                            }
+                          }
+                          return false;
+                        }))
   {
     return false;
   }

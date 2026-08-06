@@ -626,14 +626,13 @@ TEST(RuleBasedPredicate, AttributePatterns)
   EXPECT_TRUE(Matches(enabled, {{"enabled", opentelemetry::nostd::span<const bool>(flags)}}));
   EXPECT_FALSE(Matches(enabled, {{"enabled", opentelemetry::nostd::span<const bool>(no_flags)}}));
 
-  // Doubles use the shortest representation that reads back as the same value, so 404.0 is "404"
-  // rather than "404.000000", and negative zero keeps its sign.
+  // Doubles are formatted with %g at 6 significant digits by default, so 404.0 is "404" rather
+  // than "404.000000", and negative zero keeps its sign.
   RuleBasedPredicateOptions numbers;
   numbers.match_patterns = true;
   numbers.patterns_key   = "value";
-  numbers.included       = {"404",   "0.1",      "1234567.89",         "1e+20",
-                            "1e-20", "-0",       "0.6666666666666666", "1.7976931348623157e+308",
-                            "NaN",   "Infinity", "-Infinity"};
+  numbers.included       = {"404",      "0.1",          "1.23457e+06", "1e+20",    "1e-20",    "-0",
+                            "0.666667", "1.79769e+308", "NaN",         "Infinity", "-Infinity"};
   RuleBasedPredicate number(std::move(numbers));
   EXPECT_TRUE(Matches(number, {{"value", 404.0}}));
   EXPECT_TRUE(Matches(number, {{"value", 0.1}}));
@@ -648,6 +647,16 @@ TEST(RuleBasedPredicate, AttributePatterns)
   EXPECT_TRUE(Matches(number, {{"value", std::numeric_limits<double>::infinity()}}));
   EXPECT_TRUE(Matches(number, {{"value", -std::numeric_limits<double>::infinity()}}));
   EXPECT_FALSE(Matches(number, {{"value", 0.2}}));
+
+  // double_precision widens the match beyond the 6 significant digit default.
+  RuleBasedPredicateOptions precise;
+  precise.match_patterns   = true;
+  precise.patterns_key     = "value";
+  precise.included         = {"1234567.89"};
+  precise.double_precision = 15;
+  RuleBasedPredicate wide(std::move(precise));
+  EXPECT_TRUE(Matches(wide, {{"value", 1234567.89}}));
+  EXPECT_FALSE(Matches(wide, {{"value", 1234567.0}}));
 }
 
 TEST(RuleBasedPredicate, ActiveGroupsAreAnded)

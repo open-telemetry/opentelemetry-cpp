@@ -41,6 +41,9 @@ struct RuleBasedPredicateOptions
   bool match_span_kind_client   = false;
   bool match_span_kind_producer = false;
   bool match_span_kind_consumer = false;
+
+  // Significant digits used to format double attribute values for matching.
+  int double_precision = 6;
 };
 
 /**
@@ -48,8 +51,8 @@ struct RuleBasedPredicateOptions
  * options matches: parent kind, span kind, an attribute equal to one of the
  * given values, and an attribute matching the included/excluded wildcard
  * patterns (excluded wins). Non-string attributes are matched by their string
- * representation; doubles use the shortest form that reads back as the same
- * value, so 404.0 matches "404".
+ * representation; doubles are formatted with %g at double_precision significant
+ * digits, so 404.0 matches "404".
  */
 class RuleBasedPredicate : public Predicate
 {
