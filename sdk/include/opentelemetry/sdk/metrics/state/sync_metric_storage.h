@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <stddef.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <mutex>

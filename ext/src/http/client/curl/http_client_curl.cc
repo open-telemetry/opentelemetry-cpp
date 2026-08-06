@@ -207,12 +207,8 @@ void Session::SendRequest(
                         http_request_->is_log_enabled_, http_request_->retry_policy_));
   bool success =
       CURLE_OK == curl_operation_->SendAsync(this, [this, callback](HttpOperation &operation) {
-        if (operation.WasAborted())
-        {
-          // Manually cancelled
-          callback->OnEvent(opentelemetry::ext::http::client::SessionState::Cancelled, "");
-        }
-
+        // Both can hold at once: cancelling only raises a flag, and the transfer may already
+        // have been answered. A request that was answered is reported as answered.
         if (operation.GetSessionState() == opentelemetry::ext::http::client::SessionState::Response)
         {
           // we have a http response
@@ -221,6 +217,11 @@ void Session::SendRequest(
           response->body_        = operation.GetResponseBody();
           response->status_code_ = operation.GetResponseCode();
           callback->OnResponse(*response);
+        }
+        else if (operation.WasAborted())
+        {
+          // Manually cancelled
+          callback->OnEvent(opentelemetry::ext::http::client::SessionState::Cancelled, "");
         }
         is_session_active_.store(false, std::memory_order_release);
       });

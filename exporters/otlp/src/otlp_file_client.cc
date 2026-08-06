@@ -3,9 +3,9 @@
 
 #include <nlohmann/json.hpp>
 
-#include <limits.h>
 #include <atomic>
 #include <chrono>
+#include <climits>
 #include <condition_variable>
 #include <cstdint>
 #include <cstdio>
@@ -24,11 +24,10 @@
 #if defined(HAVE_GSL)
 #  include <gsl/gsl>
 #else
-#  include <assert.h>
+#  include <cassert>
 #endif
 
 #ifdef _MSC_VER
-#  include <string.h>
 #  define strcasecmp _stricmp
 #else
 #  include <strings.h>
@@ -93,15 +92,15 @@
 #  endif
 #else
 #  define OTLP_FILE_SNPRINTF(buffer, bufsz, fmt, args...) \
-    snprintf(buffer, static_cast<size_t>(bufsz), fmt, ##args)
+    std::snprintf(buffer, static_cast<size_t>(bufsz), fmt, ##args)
 #endif
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1600) || \
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L)
 #  define OTLP_FILE_OPEN(f, path, mode) fopen_s(&f, path, mode)
 #else
-#  include <errno.h>
-#  define OTLP_FILE_OPEN(f, path, mode) f = fopen(path, mode)
+#  include <cerrno>
+#  define OTLP_FILE_OPEN(f, path, mode) f = std::fopen(path, mode)
 #endif
 
 #include "opentelemetry/exporters/otlp/otlp_file_client.h"
@@ -417,7 +416,8 @@ static std::size_t FormatPath(char *buff,
             snprintf_s(&buff[ret], bufz - ret, "%llu", static_cast<unsigned long long>(value));
 #  endif
 #else
-        auto res = snprintf(&buff[ret], bufz - ret, "%llu", static_cast<unsigned long long>(value));
+        auto res =
+            std::snprintf(&buff[ret], bufz - ret, "%llu", static_cast<unsigned long long>(value));
 #endif
         if (res < 0)
         {
@@ -552,12 +552,12 @@ public:
     char *token   = SAFE_STRTOK_S(&path_buffer[0], "\\/", &saveptr);
     while (nullptr != token)
     {
-      if (0 != strlen(token))
+      if (0 != std::strlen(token))
       {
         if (normalize)
         {
           // Normalize path
-          if (0 == strcmp("..", token))
+          if (0 == std::strcmp("..", token))
           {
             if (!out.empty() && out.back() != "..")
             {
@@ -568,7 +568,7 @@ public:
               out.push_back(token);
             }
           }
-          else if (0 != strcmp(".", token))
+          else if (0 != std::strcmp(".", token))
           {
             out.push_back(token);
           }
@@ -607,7 +607,7 @@ public:
     std::string current_path;
     if (nullptr != dir_path && ('/' == *dir_path || '\\' == *dir_path))
     {
-      current_path.reserve(strlen(dir_path) + 4);
+      current_path.reserve(std::strlen(dir_path) + 4);
       current_path = *dir_path;
 
       // NFS Supporting
@@ -1269,7 +1269,7 @@ private:
 
     if (destroy_content && FileSystemUtil::IsExist(file_path))
     {
-      FILE *trunc_file = nullptr;
+      std::FILE *trunc_file = nullptr;
       OTLP_FILE_OPEN(trunc_file, file_path, "wb");
       if (nullptr == trunc_file)
       {
@@ -1278,7 +1278,7 @@ private:
                                 << " failed with pattern: " << options_.file_pattern);
         return nullptr;
       }
-      fclose(trunc_file);
+      std::fclose(trunc_file);
     }
 
     std::FILE *new_file = nullptr;
@@ -1343,9 +1343,10 @@ private:
                                                            << alias_file_path
                                                            << " failed, errno: " << res);
 #  else
-        OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Link "
-                                << file_->file_path << " to " << alias_file_path
-                                << " failed, errno: " << res << ", message: " << strerror(res));
+        OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Link " << file_->file_path << " to "
+                                                           << alias_file_path
+                                                           << " failed, errno: " << res
+                                                           << ", message: " << std::strerror(res));
 #  endif
         return file_->current_file;
       }

@@ -8,11 +8,11 @@
 #  include <array>
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
-#include <stdint.h>
 #include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <functional>
 #include <future>
@@ -25,7 +25,6 @@
 #include <vector>
 
 #ifdef _MSC_VER
-#  include <string.h>
 #  define strncasecmp _strnicmp
 #else
 #  include <strings.h>
@@ -330,7 +329,7 @@ size_t HttpOperation::ReadMemoryCallback(char *buffer, size_t size, size_t nitem
     nwrite = self->request_body_.size() - self->request_nwrite_;
   }
 
-  memcpy(buffer, &self->request_body_[self->request_nwrite_], nwrite);
+  std::memcpy(buffer, &self->request_body_[self->request_nwrite_], nwrite);
   self->request_nwrite_ += nwrite;
   return nwrite;
 }
