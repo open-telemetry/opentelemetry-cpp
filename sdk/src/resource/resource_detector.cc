@@ -24,11 +24,6 @@ constexpr const char *kOtelServiceName        = "OTEL_SERVICE_NAME";
 
 namespace
 {
-bool IsHexDigit(unsigned char c) noexcept
-{
-  return std::isdigit(c) || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
-}
-
 unsigned char HexDigitValue(unsigned char c) noexcept
 {
   return static_cast<unsigned char>(std::isdigit(c) ? c - '0' : std::toupper(c) - 'A' + 10);
@@ -45,19 +40,20 @@ std::string PercentDecode(const std::string &value)
   decoded.reserve(value.size());
   for (std::size_t i = 0; i < value.size(); ++i)
   {
-    if (value[i] == '%' && i + 2 < value.size() &&
-        IsHexDigit(static_cast<unsigned char>(value[i + 1])) &&
-        IsHexDigit(static_cast<unsigned char>(value[i + 2])))
+    if (value[i] == '%' && i + 2 < value.size())
     {
-      decoded.push_back(
-          static_cast<char>((HexDigitValue(static_cast<unsigned char>(value[i + 1])) << 4) |
-                            HexDigitValue(static_cast<unsigned char>(value[i + 2]))));
-      i += 2;
+      unsigned char high = static_cast<unsigned char>(value[i + 1]);
+      unsigned char low  = static_cast<unsigned char>(value[i + 2]);
+      if (std::isxdigit(high) && std::isxdigit(low))
+      {
+        unsigned char unescaped_value =
+            static_cast<unsigned char>((HexDigitValue(high) << 4) | HexDigitValue(low));
+        decoded.push_back(static_cast<char>(unescaped_value));
+        i += 2;
+        continue;
+      }
     }
-    else
-    {
-      decoded.push_back(value[i]);
-    }
+    decoded.push_back(value[i]);
   }
   return decoded;
 }
