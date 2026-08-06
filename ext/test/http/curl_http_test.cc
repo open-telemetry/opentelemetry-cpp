@@ -70,6 +70,44 @@ public:
   std::atomic<bool> got_response_;
 };
 
+// Counts the terminal notifications one request produces. Set cancel_at_response_ to cancel from
+// inside the Response event, which is the one moment both arms of the completion callback are
+// eligible: DispatchEvent notifies the handler before it stores the new state, and the callback
+// runs after both, so it sees an aborted operation that also has a response.
+class TerminalCountingHandler : public CustomEventHandler
+{
+public:
+  void OnResponse(http_client::Response & /* response */) noexcept override
+  {
+    terminal_count_.fetch_add(1, std::memory_order_release);
+    got_response_.store(true, std::memory_order_release);
+  }
+
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    if (state == http_client::SessionState::Cancelled)
+    {
+      terminal_count_.fetch_add(1, std::memory_order_release);
+      // Cleanup dispatches its own Cancelled carrying a curl message, and GetCurlErrorMessage
+      // never yields an empty one, so an empty reason is the completion callback and only it.
+      if (reason.empty())
+      {
+        cancelled_from_callback_.fetch_add(1, std::memory_order_release);
+      }
+    }
+    else if (state == http_client::SessionState::Response && cancel_at_response_ != nullptr)
+    {
+      auto *session       = cancel_at_response_;
+      cancel_at_response_ = nullptr;
+      session->CancelSession();
+    }
+  }
+
+  http_client::Session *cancel_at_response_ = nullptr;
+  std::atomic<int> terminal_count_{0};
+  std::atomic<int> cancelled_from_callback_{0};
+};
+
 class GetEventHandler : public CustomEventHandler
 {
 public:
@@ -460,6 +498,62 @@ TEST_F(BasicCurlHttpTests, ExponentialBackoffRetry)
   ASSERT_FALSE(operation.IsRetryable());
 }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
+
+// A cancel that arrives once the server has answered used to deliver Cancelled and the response,
+// so a handler treating either as terminal saw one request finish twice.
+TEST_F(BasicCurlHttpTests, ACancelAfterTheResponseReportsOneOutcome)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler                 = std::make_shared<TerminalCountingHandler>();
+  handler->cancel_at_response_ = session.get();
+
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+
+  EXPECT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire));
+
+  session_manager->FinishAllSessions();
+}
+
+// The other arm of the same callback, which nothing exercised. The server handler takes
+// mtx_requests before it answers, so holding it keeps a response from racing the cancel, and the
+// abort is torn down through Session::FinishOperation while the transfer is still in flight.
+TEST_F(BasicCurlHttpTests, ACancelBeforeTheResponseReportsCancelled)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler = std::make_shared<TerminalCountingHandler>();
+
+  {
+    std::unique_lock<std::mutex> lock_requests(mtx_requests);
+    session->SendRequest(handler);
+    session->CancelSession();
+    session->FinishSession();
+  }
+
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  // Counted by its empty reason so the assertion holds the arm this covers rather than whatever
+  // else reports a cancel. Two arrive in all, the other from Cleanup, and the total is left
+  // unasserted because that doubling is not what this change decides.
+  EXPECT_EQ(1, handler->cancelled_from_callback_.load(std::memory_order_acquire));
+
+  session_manager->FinishAllSessions();
+}
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 {
