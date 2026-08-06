@@ -31,6 +31,21 @@ markdownlint .
 shellcheck --severity=error <path to shell script>.sh
 ```
 
+### OTel Configuration YAML Validation
+
+Validates all OpenTelemetry declarative configuration YAML files in the repo
+against the JSON schema pinned in `third_party_release`:
+
+```sh
+./ci/do_ci.sh validate.otel.config
+```
+
+To use a local schema file:
+
+```sh
+OTEL_CONFIG_SCHEMA=/path/to/opentelemetry_configuration.json ./ci/do_ci.sh validate.otel.config
+```
+
 ### Testing
 
 ```sh

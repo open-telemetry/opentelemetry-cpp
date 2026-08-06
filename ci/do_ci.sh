@@ -657,6 +657,19 @@ elif [[ "$1" == "format" ]]; then
     exit 1
   fi
   exit 0
+elif [[ "$1" == "validate.otel.config" ]]; then
+  OTELCFG_VERSION=$(grep "^opentelemetry-configuration=" "${SRC_DIR}/third_party_release" | cut -d= -f2)
+  if [[ -n "${OTEL_CONFIG_SCHEMA:-}" ]]; then
+    SCHEMA_FILE="${OTEL_CONFIG_SCHEMA}"
+    SCHEMA_TMPFILE=""
+  else
+    SCHEMA_TMPFILE=$(mktemp --suffix=.json)
+    SCHEMA_FILE="${SCHEMA_TMPFILE}"
+    curl -fsSL "https://raw.githubusercontent.com/open-telemetry/opentelemetry-configuration/${OTELCFG_VERSION}/opentelemetry_configuration.json" -o "${SCHEMA_FILE}"
+  fi
+  python3 "${SRC_DIR}/tools/validate_otel_config_yaml.py" --schema "${SCHEMA_FILE}" --schema-version "${OTELCFG_VERSION}"
+  [[ -n "${SCHEMA_TMPFILE}" ]] && rm -f "${SCHEMA_TMPFILE}"
+  exit 0
 elif [[ "$1" == "code.coverage" ]]; then
   cd "${BUILD_DIR}"
   rm -rf *
