@@ -6,6 +6,9 @@
 #include <memory>
 #include <mutex>
 #include <ostream>
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include <string>
+#endif
 #include <utility>
 #include <vector>
 
@@ -30,7 +33,9 @@
 #include "opentelemetry/version.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/common/env_variables.h"
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/instruments.h"
 #endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -39,14 +44,65 @@ namespace sdk
 namespace metrics
 {
 
-MeterContext::MeterContext(std::unique_ptr<ViewRegistry> views,
-                           const opentelemetry::sdk::resource::Resource &resource,
-                           std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>
-                               meter_configurator) noexcept
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+namespace exemplar_filter_env
+{
+namespace
+{
+
+constexpr char kMetricsExemplarFilterEnv[] = "OTEL_METRICS_EXEMPLAR_FILTER";
+
+}  // namespace
+
+ExemplarFilterType GetExemplarFilterFromEnv()
+{
+  std::string value;
+  if (!common::GetStringEnvironmentVariable(kMetricsExemplarFilterEnv, value) || value.empty())
+  {
+    return ExemplarFilterType::kTraceBased;
+  }
+
+  if (InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals(value, "always_on"))
+  {
+    return ExemplarFilterType::kAlwaysOn;
+  }
+
+  if (InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals(value, "always_off"))
+  {
+    return ExemplarFilterType::kAlwaysOff;
+  }
+
+  if (InstrumentDescriptorUtil::CaseInsensitiveAsciiEquals(value, "trace_based"))
+  {
+    return ExemplarFilterType::kTraceBased;
+  }
+
+  OTEL_INTERNAL_LOG_WARN("Environment variable <" << kMetricsExemplarFilterEnv
+                                                  << "> has an invalid value <" << value
+                                                  << ">, ignoring");
+  return ExemplarFilterType::kTraceBased;
+}
+
+}  // namespace exemplar_filter_env
+#endif
+
+MeterContext::MeterContext(
+    std::unique_ptr<ViewRegistry> views,
+    const opentelemetry::sdk::resource::Resource &resource,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>> meter_configurator
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+    ,
+    ExemplarFilterType exemplar_filter_type
+#endif
+    ) noexcept
     : resource_{resource},
       views_(std::move(views)),
       sdk_start_ts_{std::chrono::system_clock::now()},
       meter_configurator_(std::move(meter_configurator))
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ,
+      exemplar_filter_type_(exemplar_filter_type)
+#endif
 {}
 
 const resource::Resource &MeterContext::GetResource() const noexcept

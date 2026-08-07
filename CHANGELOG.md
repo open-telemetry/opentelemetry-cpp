@@ -146,6 +146,11 @@ Increment the:
 * [CONFIGURATION] file configuration - yaml schema 1.1.0
   [#4340](https://github.com/open-telemetry/opentelemetry-cpp/pull/4340)
 
+* [METRICS SDK] Support `OTEL_METRICS_EXEMPLAR_FILTER` when metrics exemplars
+  are enabled. The default exemplar filter changes from `always_off` to
+  `trace_based` to match the specification.
+  [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328)
+
 Breaking changes:
 
 * [BUILD] Install an explicit list of ext headers instead of the whole
@@ -169,6 +174,13 @@ Breaking changes:
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
   * The public configuration member `max_buckets_` was renamed to `max_size_` to
     match the configuration schema. Please adjust SDK configuration accordingly.
+
+* [METRICS SDK] Add an `ExemplarFilterType` parameter to the `MeterContext`
+  constructor when metrics exemplars are enabled. The parameter has a default
+  value, so existing source calls remain valid, but the constructor signature
+  and SDK ABI change. Applications using the preview exemplar feature must be
+  rebuilt.
+  [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328)
 
 ## [1.28.0] 2026-07-16
 

@@ -40,6 +40,7 @@ cc_test(
         "//sdk/src/metrics",
         "//sdk/src/resource",
         "//sdk/src/trace",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
