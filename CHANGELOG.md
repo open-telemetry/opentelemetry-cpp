@@ -65,6 +65,9 @@ Increment the:
 * [BUILD] Run the ext_http component install test on Windows
   [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
 
+* [CONFIGURATION] validate and update config files to yaml schema 1.1.0
+  [#4374](https://github.com/open-telemetry/opentelemetry-cpp/pull/4374)
+
 * [SDK] Convert SpinLockMutex to std::mutex part 1
   Replace SpinLockMutex with std::mutex in SimpleProcessor,
   SimpleLogRecordProcessor, MeterContext and Meter.
