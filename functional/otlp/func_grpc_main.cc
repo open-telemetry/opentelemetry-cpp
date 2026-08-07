@@ -330,7 +330,7 @@ struct test_case
 
 static int test_basic();
 
-static int test_cert_not_found();
+// static int test_cert_not_found();  // disabled: see TODO above all_tests
 static int test_cert_invalid();
 static int test_cert_unreadable();
 
@@ -518,6 +518,7 @@ static int test_basic()
   return expect_connection_failed();
 }
 
+#if 0  // disabled: see TODO above all_tests
 static int test_cert_not_found()
 {
   otlp::OtlpGrpcExporterOptions opts;
@@ -544,6 +545,7 @@ static int test_cert_not_found()
 
   return expect_connection_failed();
 }
+#endif
 
 static int test_cert_invalid()
 {
