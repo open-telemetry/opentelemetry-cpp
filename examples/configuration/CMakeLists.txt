@@ -74,5 +74,10 @@ else()
 endif()
 
 if(BUILD_TESTING)
-  add_test(NAME examples.example_yaml COMMAND "$<TARGET_FILE:example_yaml>")
+  add_test(NAME examples.example_yaml_kitchen_sink
+           COMMAND $<TARGET_FILE:example_yaml> --test --yaml
+                   ${CMAKE_CURRENT_SOURCE_DIR}/kitchen-sink.yaml)
+  add_test(NAME examples.example_yaml_extensions
+           COMMAND $<TARGET_FILE:example_yaml> --test --yaml
+                   ${CMAKE_CURRENT_SOURCE_DIR}/extensions.yaml)
 endif()
