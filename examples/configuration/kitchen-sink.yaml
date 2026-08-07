@@ -227,7 +227,7 @@ meter_provider:
             host: localhost
             # Configure port.
             # If omitted or null, 9464 is used.
-            port: 9464
+            port: 19464
             # Configure if scope info metric is produced.
             # If omitted or null, true is used.
             scope_info_enabled: true
