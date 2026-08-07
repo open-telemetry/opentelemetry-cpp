@@ -75,10 +75,21 @@ else()
 endif()
 
 if(BUILD_TESTING)
-  add_test(NAME examples.example_yaml_kitchen_sink
-           COMMAND $<TARGET_FILE:example_yaml> --test --yaml
-                   ${CMAKE_CURRENT_SOURCE_DIR}/kitchen-sink.yaml)
+
+  if(WITH_OTLP_HTTP
+     AND WITH_OTLP_GRPC
+     AND WITH_OTLP_FILE
+     AND WITH_PROMETHEUS)
+    add_test(NAME examples.example_yaml_kitchen_sink
+             COMMAND $<TARGET_FILE:example_yaml> --test --yaml
+                     ${CMAKE_CURRENT_SOURCE_DIR}/kitchen-sink.yaml)
+  endif()
+
   add_test(NAME examples.example_yaml_extensions
            COMMAND $<TARGET_FILE:example_yaml> --test --yaml
                    ${CMAKE_CURRENT_SOURCE_DIR}/extensions.yaml)
+
+  add_test(NAME examples.example_yaml_sdk_default
+           COMMAND $<TARGET_FILE:example_yaml> --test --yaml
+                   ${CMAKE_CURRENT_SOURCE_DIR}/sdk-default.yaml)
 endif()

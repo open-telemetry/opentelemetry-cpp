@@ -80,3 +80,34 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "example_yaml_sdk_default",
+    size = "medium",
+    srcs = glob(["*.cc"]) + glob(["*.h"]),
+    args = [
+        "--test",
+        "--yaml",
+        "$(location sdk-default.yaml)",
+    ],
+    data = ["sdk-default.yaml"],
+    tags = [
+        "test",
+        "yaml",
+    ],
+    deps = [
+        "//api",
+        "//examples/common/logs_foo_library:common_logs_foo_library",
+        "//examples/common/metrics_foo_library:common_metrics_foo_library",
+        "//exporters/ostream:ostream_log_record_exporter_builder",
+        "//exporters/ostream:ostream_metric_exporter_builder",
+        "//exporters/ostream:ostream_span_exporter_builder",
+        "//sdk:headers",
+        "//sdk/src/configuration",
+        "//sdk/src/configuration:configuration_registry_factory",
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
