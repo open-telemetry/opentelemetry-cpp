@@ -95,15 +95,21 @@ public:
         cancelled_from_callback_.fetch_add(1, std::memory_order_release);
       }
     }
-    else if (state == http_client::SessionState::Response && cancel_at_response_ != nullptr)
+    else if (state == cancel_at_ && cancel_target_ != nullptr)
     {
-      auto *session       = cancel_at_response_;
-      cancel_at_response_ = nullptr;
+      auto *session   = cancel_target_;
+      cancel_target_  = nullptr;
+      cancelled_from_ = std::this_thread::get_id();
       session->CancelSession();
     }
   }
 
-  http_client::Session *cancel_at_response_ = nullptr;
+  // Cancelling reaches curl_easy_setopt through Abort(), so it has to run on the thread that
+  // owns the handle. Both cases below cancel from an event the IO thread dispatches, and assert
+  // on cancelled_from_ so that a later edit cannot quietly move it back to the caller.
+  http_client::Session *cancel_target_ = nullptr;
+  http_client::SessionState cancel_at_ = http_client::SessionState::Response;
+  std::thread::id cancelled_from_{};
   std::atomic<int> terminal_count_{0};
   std::atomic<int> cancelled_from_callback_{0};
 };
@@ -511,8 +517,9 @@ TEST_F(BasicCurlHttpTests, ACancelAfterTheResponseReportsOneOutcome)
   auto request = session->CreateRequest();
   request->SetUri("get/");
 
-  auto handler                 = std::make_shared<TerminalCountingHandler>();
-  handler->cancel_at_response_ = session.get();
+  auto handler            = std::make_shared<TerminalCountingHandler>();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::Response;
 
   session->SendRequest(handler);
   ASSERT_TRUE(waitForRequests(30, 1));
@@ -524,33 +531,33 @@ TEST_F(BasicCurlHttpTests, ACancelAfterTheResponseReportsOneOutcome)
   session_manager->FinishAllSessions();
 }
 
-// The other arm of the same callback, which nothing exercised. The server handler takes
-// mtx_requests before it answers, so holding it keeps a response from racing the cancel, and the
-// abort is torn down through Session::FinishOperation while the transfer is still in flight.
+// The other arm of the same callback, which nothing exercised. Nothing listens on 19937, so the
+// connection fails and PerformCurlMessage dispatches ConnectFailed from the IO thread. Cancelling
+// there leaves the state short of Response with the abort flag raised, which is what the arm
+// needs, and keeps Abort() on the thread that owns the easy handle.
 TEST_F(BasicCurlHttpTests, ACancelBeforeTheResponseReportsCancelled)
 {
   received_requests_.clear();
   auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
   EXPECT_TRUE(session_manager != nullptr);
 
-  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto session = session_manager->CreateSession("http://127.0.0.1:19937");
   auto request = session->CreateRequest();
   request->SetUri("get/");
 
-  auto handler = std::make_shared<TerminalCountingHandler>();
+  auto handler            = std::make_shared<TerminalCountingHandler>();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::ConnectFailed;
 
-  {
-    std::unique_lock<std::mutex> lock_requests(mtx_requests);
-    session->SendRequest(handler);
-    session->CancelSession();
-    session->FinishSession();
-  }
+  session->SendRequest(handler);
+  session->FinishSession();
 
   EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
   // Counted by its empty reason so the assertion holds the arm this covers rather than whatever
-  // else reports a cancel. Two arrive in all, the other from Cleanup, and the total is left
-  // unasserted because that doubling is not what this change decides.
+  // else reports a cancel.
   EXPECT_EQ(1, handler->cancelled_from_callback_.load(std::memory_order_acquire));
+  EXPECT_NE(handler->cancelled_from_, std::this_thread::get_id())
+      << "the cancel has to run on the IO thread, see #4369";
 
   session_manager->FinishAllSessions();
 }
