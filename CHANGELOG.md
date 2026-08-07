@@ -48,6 +48,10 @@ Increment the:
   [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
 * [CONFIGURATION] Add the probability sampler to file configuration
   [#4334](https://github.com/open-telemetry/opentelemetry-cpp/pull/4334)
+
+* [SDK] Make the global internal logger log level atomic
+  [#4368](https://github.com/open-telemetry/opentelemetry-cpp/pull/4368)
+
 * [BUG] Stop reading past a `nostd::string_view` that is not NUL terminated
   [#4346](https://github.com/open-telemetry/opentelemetry-cpp/pull/4346)
 
