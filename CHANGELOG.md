@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Enforce a runtime minimum scale for
+  `Base2ExponentialHistogramAggregation`.
+  [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
+
 * [BUG] Report one outcome per request when a curl session is cancelled after
   the response arrives
   ([#4363](https://github.com/open-telemetry/opentelemetry-cpp/pull/4363))
