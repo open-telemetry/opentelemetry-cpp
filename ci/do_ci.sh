@@ -626,9 +626,10 @@ elif [[ "$1" == "bazel.ubsan" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test --config=ubsan $BAZEL_TEST_OPTIONS_ASYNC //...
   exit 0
 elif [[ "$1" == "bazel.tsan" ]]; then
-# TODO - potential race condition in Civetweb server used by prometheus-cpp during shutdown
-# https://github.com/civetweb/civetweb/issues/861, so removing prometheus from the test
-  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC  -- //... -//exporters/prometheus/...
+# Known intentional race in civetweb (used by prometheus-cpp) during shutdown
+# https://github.com/civetweb/civetweb/issues/1184, so excluding targets that
+# start the civetweb server from the test
+  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/configuration:example_yaml_kitchen_sink
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
