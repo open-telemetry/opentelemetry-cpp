@@ -238,6 +238,51 @@ TEST(ResourceTest, OtelResourceDetector)
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
 }
 
+TEST(ResourceTest, OtelResourceDetectorPercentDecodesValues)
+{
+  std::map<std::string, std::string> expected_attributes = {
+      {"key1", "hello world"}, {"key2", "a,b"}, {"key3", "100%"}};
+
+  setenv("OTEL_RESOURCE_ATTRIBUTES", "key1=hello%20world,key2=a%2Cb,key3=100%25", 1);
+
+  OTELResourceDetector detector;
+  auto resource            = detector.Detect();
+  auto received_attributes = resource.GetAttributes();
+  for (auto &e : received_attributes)
+  {
+    EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
+    if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
+    }
+  }
+  EXPECT_EQ(received_attributes.size(), expected_attributes.size());
+
+  unsetenv("OTEL_RESOURCE_ATTRIBUTES");
+}
+
+TEST(ResourceTest, OtelResourceDetectorMalformedEscapeLeftAsIs)
+{
+  std::map<std::string, std::string> expected_attributes = {{"key", "100%"}, {"bad", "50%z"}};
+
+  setenv("OTEL_RESOURCE_ATTRIBUTES", "key=100%,bad=50%z", 1);
+
+  OTELResourceDetector detector;
+  auto resource            = detector.Detect();
+  auto received_attributes = resource.GetAttributes();
+  for (auto &e : received_attributes)
+  {
+    EXPECT_TRUE(expected_attributes.find(e.first) != expected_attributes.end());
+    if (expected_attributes.find(e.first) != expected_attributes.end())
+    {
+      EXPECT_EQ(expected_attributes.find(e.first)->second, nostd::get<std::string>(e.second));
+    }
+  }
+  EXPECT_EQ(received_attributes.size(), expected_attributes.size());
+
+  unsetenv("OTEL_RESOURCE_ATTRIBUTES");
+}
+
 TEST(ResourceTest, OtelResourceDetectorServiceNameOverride)
 {
   std::map<std::string, std::string> expected_attributes = {{"service.name", "new_name"}};
