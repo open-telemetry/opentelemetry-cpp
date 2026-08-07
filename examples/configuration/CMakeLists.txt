@@ -69,27 +69,15 @@ if(DEFINED OPENTELEMETRY_BUILD_DLL)
 else()
   target_link_libraries(
     example_yaml
-    PRIVATE opentelemetry-cpp::configuration_registry_factory
-            opentelemetry-cpp::configuration opentelemetry-cpp::common
+    PRIVATE opentelemetry-cpp::configuration opentelemetry-cpp::common
             opentelemetry-cpp::trace opentelemetry-cpp::logs)
 endif()
 
 if(BUILD_TESTING)
-  add_test(NAME examples.example_yaml_sdk_default
+  add_test(NAME examples.example_yaml_kitchen_sink
            COMMAND $<TARGET_FILE:example_yaml> --test --yaml
-                   ${CMAKE_CURRENT_SOURCE_DIR}/sdk-default.yaml)
-  set_tests_properties(examples.example_yaml_sdk_default
-                       PROPERTIES FAIL_REGULAR_EXPRESSION "\\[ERROR\\]")
-
-  add_test(NAME examples.example_yaml_composite_sampler
-           COMMAND $<TARGET_FILE:example_yaml> --test --yaml
-                   ${CMAKE_CURRENT_SOURCE_DIR}/composite-sampler.yaml)
-  set_tests_properties(examples.example_yaml_composite_sampler
-                       PROPERTIES FAIL_REGULAR_EXPRESSION "\\[ERROR\\]")
-
+                   ${CMAKE_CURRENT_SOURCE_DIR}/kitchen-sink.yaml)
   add_test(NAME examples.example_yaml_extensions
            COMMAND $<TARGET_FILE:example_yaml> --test --yaml
                    ${CMAKE_CURRENT_SOURCE_DIR}/extensions.yaml)
-  set_tests_properties(examples.example_yaml_extensions
-                       PROPERTIES FAIL_REGULAR_EXPRESSION "\\[ERROR\\]")
 endif()

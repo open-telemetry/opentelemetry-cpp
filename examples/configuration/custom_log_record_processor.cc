@@ -20,18 +20,18 @@ CustomLogRecordProcessor::MakeRecordable() noexcept
 void CustomLogRecordProcessor::OnEmit(
     std::unique_ptr<opentelemetry::sdk::logs::Recordable> &&span) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("CustomLogRecordProcessor::OnEnd(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_ERROR("CustomLogRecordProcessor::OnEnd(): YOUR CODE HERE");
   auto unused = std::move(span);
 }
 
 bool CustomLogRecordProcessor::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("CustomLogRecordProcessor::ForceFlush(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_ERROR("CustomLogRecordProcessor::ForceFlush(): YOUR CODE HERE");
   return false;
 }
 
 bool CustomLogRecordProcessor::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("CustomLogRecordProcessor::Shutdown(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_ERROR("CustomLogRecordProcessor::Shutdown(): YOUR CODE HERE");
   return false;
 }

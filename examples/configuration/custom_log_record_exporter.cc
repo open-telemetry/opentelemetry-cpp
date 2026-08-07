@@ -20,18 +20,18 @@ opentelemetry::sdk::common::ExportResult CustomLogRecordExporter::Export(
     const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>>
         & /* records */) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("CustomLogRecordExporter::Export(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_ERROR("CustomLogRecordExporter::Export(): YOUR CODE HERE");
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 }
 
 bool CustomLogRecordExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("CustomLogRecordExporter::ForceFlush(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_ERROR("CustomLogRecordExporter::ForceFlush(): YOUR CODE HERE");
   return false;
 }
 
 bool CustomLogRecordExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
-  OTEL_INTERNAL_LOG_WARN("CustomLogRecordExporter::Shutdown(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_ERROR("CustomLogRecordExporter::Shutdown(): YOUR CODE HERE");
   return false;
 }

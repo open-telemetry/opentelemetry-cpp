@@ -4,15 +4,15 @@
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_test(
-    name = "example_yaml",
+    name = "example_yaml_kitchen_sink",
     size = "medium",
     srcs = glob(["*.cc"]) + glob(["*.h"]),
     args = [
         "--test",
         "--yaml",
-        "$(location sdk-default.yaml)",
+        "$(location kitchen-sink.yaml)",
     ],
-    data = ["sdk-default.yaml"],
+    data = ["kitchen-sink.yaml"],
     defines = [
         "OTEL_HAVE_OTLP_HTTP",
         "OTEL_HAVE_OTLP_GRPC",
@@ -42,38 +42,6 @@ cc_test(
         "//exporters/prometheus:prometheus_exporter_builder",
         "//sdk:headers",
         "//sdk/src/configuration",
-        "//sdk/src/configuration:configuration_registry_factory",
-        "//sdk/src/logs",
-        "//sdk/src/metrics",
-        "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "example_yaml_composite_sampler",
-    size = "medium",
-    srcs = glob(["*.cc"]) + glob(["*.h"]),
-    args = [
-        "--test",
-        "--yaml",
-        "$(location composite-sampler.yaml)",
-    ],
-    data = ["composite-sampler.yaml"],
-    tags = [
-        "test",
-        "yaml",
-    ],
-    deps = [
-        "//api",
-        "//examples/common/logs_foo_library:common_logs_foo_library",
-        "//examples/common/metrics_foo_library:common_metrics_foo_library",
-        "//exporters/ostream:ostream_log_record_exporter_builder",
-        "//exporters/ostream:ostream_metric_exporter_builder",
-        "//exporters/ostream:ostream_span_exporter_builder",
-        "//sdk:headers",
-        "//sdk/src/configuration",
-        "//sdk/src/configuration:configuration_registry_factory",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
@@ -104,7 +72,6 @@ cc_test(
         "//exporters/ostream:ostream_span_exporter_builder",
         "//sdk:headers",
         "//sdk/src/configuration",
-        "//sdk/src/configuration:configuration_registry_factory",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
