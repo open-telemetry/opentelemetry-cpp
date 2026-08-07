@@ -97,12 +97,12 @@ void DownscaleBuckets(std::unique_ptr<AdaptingCircularBufferCounter> &buckets, u
   buckets->Downscale(by);
 }
 
-// Bucket buffers are never narrower than kMinBucketsAtFloor so that the whole double range stays
-// representable once the scale is pinned at kMinRuntimeScale. This only widens the degenerate
-// max_size_ == 2 configuration, and the extra slot is only reachable at the floor.
+// Guards point data that arrives through the public constructors with a smaller budget than the
+// configuration validator would ever produce. A configured max_size is at least kMaxSizeMin, so
+// this never allocates more buckets than the user asked for.
 size_t BucketCapacity(size_t max_buckets) noexcept
 {
-  return (std::max)(max_buckets, kMinBucketsAtFloor);
+  return (std::max)(max_buckets, kMaxSizeMin);
 }
 
 // Point data handed to the public constructors carries buffers the caller sized, which can be
@@ -338,8 +338,8 @@ void Base2ExponentialHistogramAggregation::AggregateIntoBuckets(
 
   const int32_t index = indexer_.ComputeIndex(value);
 
-  // The backing buffer can be wider than the configured budget (see BucketCapacity), so the
-  // reduction is derived from max_buckets_ instead of relying on Increment() to fail.
+  // The reduction is derived from the configured budget so max_buckets_ is enforced directly
+  // instead of relying on Increment() to fail.
   uint32_t scale_reduction = 0;
   if (!buckets->Empty())
   {
