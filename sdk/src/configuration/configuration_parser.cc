@@ -49,6 +49,7 @@
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/event_to_span_event_bridge_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/exemplar_filter.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
@@ -581,6 +582,13 @@ ConfigurationParser::ParseSimpleLogRecordProcessorConfiguration(
   return model;
 }
 
+std::unique_ptr<EventToSpanEventBridgeLogRecordProcessorConfiguration>
+ConfigurationParser::ParseEventToSpanEventBridgeLogRecordProcessorConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */) const
+{
+  return std::make_unique<EventToSpanEventBridgeLogRecordProcessorConfiguration>();
+}
+
 std::unique_ptr<ExtensionLogRecordProcessorConfiguration>
 ConfigurationParser::ParseExtensionLogRecordProcessorConfiguration(
     const std::string &name,
@@ -625,6 +633,10 @@ ConfigurationParser::ParseLogRecordProcessorConfiguration(
   else if (name == "simple")
   {
     model = ParseSimpleLogRecordProcessorConfiguration(child);
+  }
+  else if (name == "event_to_span_event_bridge/development")
+  {
+    model = ParseEventToSpanEventBridgeLogRecordProcessorConfiguration(child);
   }
   else
   {

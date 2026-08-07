@@ -139,6 +139,7 @@
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
+#include "opentelemetry/sdk/logs/event_to_span_event_bridge_processor_factory.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
@@ -799,6 +800,13 @@ public:
                        *model) override
   {
     processor = sdk_builder_->CreateSimpleLogRecordProcessor(model);
+  }
+
+  void VisitEventToSpanEventBridge(
+      const opentelemetry::sdk::configuration::EventToSpanEventBridgeLogRecordProcessorConfiguration
+          *model) override
+  {
+    processor = sdk_builder_->CreateEventToSpanEventBridgeLogRecordProcessor(model);
   }
 
   void VisitExtension(
@@ -2035,6 +2043,14 @@ SdkBuilder::CreateSimpleLogRecordProcessor(
   sdk = opentelemetry::sdk::logs::SimpleLogRecordProcessorFactory::Create(std::move(exporter_sdk));
 
   return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>
+SdkBuilder::CreateEventToSpanEventBridgeLogRecordProcessor(
+    const opentelemetry::sdk::configuration::EventToSpanEventBridgeLogRecordProcessorConfiguration
+        * /* model */) const
+{
+  return opentelemetry::sdk::logs::EventToSpanEventBridgeProcessorFactory::Create();
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>

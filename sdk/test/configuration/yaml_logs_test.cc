@@ -13,6 +13,8 @@
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/log_record_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
@@ -98,6 +100,101 @@ logger_provider:
   ASSERT_NE(simple->exporter, nullptr);
   auto *exporter = simple->exporter.get();
   ASSERT_NE(exporter, nullptr);
+}
+
+namespace
+{
+
+// Records which LogRecordProcessorConfigurationVisitor callback a parsed model dispatches to.
+// The bridge configuration carries no properties of its own, so there is no parsed field to
+// assert on; dispatching through Accept() is what actually proves the YAML key selected the
+// bridge configuration rather than falling through to the extension configuration. This also
+// avoids needing RTTI.
+class RecordingLogRecordProcessorVisitor final
+    : public opentelemetry::sdk::configuration::LogRecordProcessorConfigurationVisitor
+{
+public:
+  void VisitBatch(
+      const opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration *) override
+  {
+    ++batch_count;
+  }
+
+  void VisitSimple(
+      const opentelemetry::sdk::configuration::SimpleLogRecordProcessorConfiguration *) override
+  {
+    ++simple_count;
+  }
+
+  void VisitEventToSpanEventBridge(
+      const opentelemetry::sdk::configuration::EventToSpanEventBridgeLogRecordProcessorConfiguration
+          *) override
+  {
+    ++bridge_count;
+  }
+
+  void VisitExtension(
+      const opentelemetry::sdk::configuration::ExtensionLogRecordProcessorConfiguration *) override
+  {
+    ++extension_count;
+  }
+
+  int batch_count{0};
+  int simple_count{0};
+  int bridge_count{0};
+  int extension_count{0};
+};
+
+}  // namespace
+
+TEST(YamlLogs, event_to_span_event_bridge_processor)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - event_to_span_event_bridge/development:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_EQ(config->logger_provider->processors.size(), 1);
+  auto *processor = config->logger_provider->processors[0].get();
+  ASSERT_NE(processor, nullptr);
+
+  RecordingLogRecordProcessorVisitor visitor;
+  processor->Accept(&visitor);
+
+  EXPECT_EQ(visitor.bridge_count, 1);
+  EXPECT_EQ(visitor.extension_count, 0);
+  EXPECT_EQ(visitor.batch_count, 0);
+  EXPECT_EQ(visitor.simple_count, 0);
+}
+
+TEST(YamlLogs, event_to_span_event_bridge_processor_misspelled_key_is_not_the_bridge)
+{
+  // A misspelled key falls through to the extension processor configuration. Guards against the
+  // bridge assertion above passing for a model that is not actually the bridge.
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - event_to_span_event_brige/development:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_EQ(config->logger_provider->processors.size(), 1);
+  auto *processor = config->logger_provider->processors[0].get();
+  ASSERT_NE(processor, nullptr);
+
+  RecordingLogRecordProcessorVisitor visitor;
+  processor->Accept(&visitor);
+
+  EXPECT_EQ(visitor.bridge_count, 0);
+  EXPECT_EQ(visitor.extension_count, 1);
 }
 
 TEST(YamlLogs, default_batch_processor)

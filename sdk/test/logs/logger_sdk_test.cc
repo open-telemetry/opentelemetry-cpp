@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include <array>
 #include <chrono>
+#include <cstddef>  // IWYU pragma: keep
 #include <cstdint>
 #include <functional>
 #include <string>
@@ -12,6 +13,8 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/timestamp.h"
+#include "opentelemetry/context/context.h"  // IWYU pragma: keep
+#include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/logs/event_id.h"
 #include "opentelemetry/logs/event_logger.h"           // IWYU pragma: keep
 #include "opentelemetry/logs/event_logger_provider.h"  // IWYU pragma: keep
@@ -22,6 +25,7 @@
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
@@ -985,5 +989,138 @@ TEST(LoggerSDK, EventLog)
   ASSERT_FALSE(shared_recordable->GetSpanId().IsValid());
 }
 #endif
+
+// Records which emit entry point the Logger dispatched through, and whether the processor
+// declares that it reads the resolved context.
+struct EmitDispatchState
+{
+  size_t on_emit_calls              = 0;
+  size_t on_emit_with_context_calls = 0;
+};
+
+class DispatchRecordingProcessor final : public LogRecordProcessor
+{
+public:
+  DispatchRecordingProcessor(bool consumes_resolved_context,
+                             std::shared_ptr<EmitDispatchState> state) noexcept
+      : consumes_resolved_context_(consumes_resolved_context), state_(std::move(state))
+  {}
+
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
+  {
+    return std::unique_ptr<Recordable>(new MockLogRecordable());
+  }
+
+  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override
+  {
+    ++state_->on_emit_calls;
+    // Deliberately does not chain to OnEmitWithContext(), so the two counters stay independent.
+    static_cast<void>(std::move(record));
+  }
+
+  void OnEmitWithContext(
+      std::unique_ptr<Recordable> &&record,
+      const nostd::variant<opentelemetry::trace::SpanContext, opentelemetry::context::Context>
+          & /* context */) noexcept override
+  {
+    ++state_->on_emit_with_context_calls;
+    // Deliberately does not chain to OnEmit(), so the two counters stay independent.
+    static_cast<void>(std::move(record));
+  }
+
+  bool ConsumesResolvedContext() const noexcept override { return consumes_resolved_context_; }
+
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+
+private:
+  bool consumes_resolved_context_;
+  std::shared_ptr<EmitDispatchState> state_;
+};
+
+// A RuntimeContextStorage that counts GetCurrent() calls, so the test can assert that a
+// context-ignoring pipeline adds no context lookups on the emit path.
+class CountingRuntimeContextStorage final : public opentelemetry::context::RuntimeContextStorage
+{
+public:
+  opentelemetry::context::Context GetCurrent() noexcept override
+  {
+    ++get_current_calls;
+    return context_;
+  }
+
+  bool Detach(opentelemetry::context::Token & /* token */) noexcept override { return true; }
+
+  nostd::unique_ptr<opentelemetry::context::Token> Attach(
+      const opentelemetry::context::Context &context) noexcept override
+  {
+    context_ = context;
+    return CreateToken(context);
+  }
+
+  size_t get_current_calls = 0;
+
+private:
+  opentelemetry::context::Context context_;
+};
+
+std::shared_ptr<LoggerProvider> MakeProviderWithProcessor(
+    std::unique_ptr<LogRecordProcessor> processor)
+{
+  return std::shared_ptr<LoggerProvider>(new LoggerProvider(std::move(processor)));
+}
+
+TEST(LoggerSDK, EmitDispatchesThroughOnEmitWhenProcessorIgnoresResolvedContext)
+{
+  auto state  = std::make_shared<EmitDispatchState>();
+  auto lp     = MakeProviderWithProcessor(std::unique_ptr<LogRecordProcessor>(
+      new DispatchRecordingProcessor(/* consumes_resolved_context */ false, state)));
+  auto logger = lp->GetLogger("logger", "opentelemetry_library");
+
+  logger->EmitLogRecord(logger->CreateLogRecord());
+
+  EXPECT_EQ(state->on_emit_calls, 1u);
+  EXPECT_EQ(state->on_emit_with_context_calls, 0u);
+}
+
+TEST(LoggerSDK, EmitDispatchesThroughOnEmitWithContextWhenProcessorConsumesResolvedContext)
+{
+  auto state  = std::make_shared<EmitDispatchState>();
+  auto lp     = MakeProviderWithProcessor(std::unique_ptr<LogRecordProcessor>(
+      new DispatchRecordingProcessor(/* consumes_resolved_context */ true, state)));
+  auto logger = lp->GetLogger("logger", "opentelemetry_library");
+
+  logger->EmitLogRecord(logger->CreateLogRecord());
+
+  EXPECT_EQ(state->on_emit_with_context_calls, 1u);
+  EXPECT_EQ(state->on_emit_calls, 0u);
+}
+
+// A processor that ignores the resolved context must not cause the emit path to resolve the
+// ambient context, so that adding OnEmitWithContext() costs nothing for existing pipelines.
+TEST(LoggerSDK, EmitDoesNotResolveContextWhenProcessorIgnoresResolvedContext)
+{
+  auto *counting_storage = new CountingRuntimeContextStorage();
+  opentelemetry::context::RuntimeContext::SetRuntimeContextStorage(
+      nostd::shared_ptr<opentelemetry::context::RuntimeContextStorage>(counting_storage));
+
+  auto state  = std::make_shared<EmitDispatchState>();
+  auto lp     = MakeProviderWithProcessor(std::unique_ptr<LogRecordProcessor>(
+      new DispatchRecordingProcessor(/* consumes_resolved_context */ false, state)));
+  auto logger = lp->GetLogger("logger", "opentelemetry_library");
+
+  auto record = logger->CreateLogRecord();
+
+  const size_t calls_after_create = counting_storage->get_current_calls;
+  logger->EmitLogRecord(std::move(record));
+
+  EXPECT_EQ(state->on_emit_calls, 1u);
+  // EmitLogRecord() itself must not add a context lookup.
+  EXPECT_EQ(counting_storage->get_current_calls, calls_after_create);
+
+  opentelemetry::context::RuntimeContext::SetRuntimeContextStorage(
+      nostd::shared_ptr<opentelemetry::context::RuntimeContextStorage>(
+          new CountingRuntimeContextStorage()));
+}
 
 }  // namespace

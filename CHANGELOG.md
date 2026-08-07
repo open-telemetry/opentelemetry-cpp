@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Implement EventToSpanEventBridge log record processor for
+  declarative configuration
+  [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
+
 * [SDK] `OTELResourceDetector` now percent-decodes values parsed from the
   `OTEL_RESOURCE_ATTRIBUTES` environment variable, per the W3C Baggage value
   grammar the resource spec defers to. A malformed escape sequence is left
@@ -176,6 +180,19 @@ Breaking changes:
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
   * The public configuration member `max_buckets_` was renamed to `max_size_` to
     match the configuration schema. Please adjust SDK configuration accordingly.
+
+* [LOGS SDK] `LogRecordProcessor` gained the virtual methods
+  `OnEmitWithContext()` and `ConsumesResolvedContext()`
+  [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
+  * Source compatible: both methods have default implementations, so existing
+    processors continue to compile and behave as before. `OnEmitWithContext()`
+    forwards to `OnEmit()` and `ConsumesResolvedContext()` returns `false`.
+  * Not ABI compatible: the added virtuals change the vtable layout of
+    `LogRecordProcessor`, so code that subclasses it must be recompiled against
+    this version of the SDK.
+  * `LogRecordProcessorConfigurationVisitor::VisitEventToSpanEventBridge()` was
+    added with a default no-op implementation, so existing visitor
+    implementations remain source compatible.
 
 ## [1.28.0] 2026-07-16
 
