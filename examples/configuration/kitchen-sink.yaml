@@ -11,7 +11,7 @@
 # The file format version.
 # The yaml format is documented at
 # https://github.com/open-telemetry/opentelemetry-configuration/tree/main/schema
-file_format: "1.0-rc.1"
+file_format: "1.1"
 # Configure if the SDK is disabled or not.
 # If omitted or null, false is used.
 disabled: false
@@ -54,18 +54,20 @@ logger_provider:
           # Configure exporter to be OTLP with HTTP transport.
           otlp_http:
             endpoint: http://localhost:4318/v1/logs
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            # Configure TLS settings.
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              ca_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .cert_file must also be set.
+              # If omitted or null, mTLS is not used.
+              key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .key_file must also be set.
+              # If omitted or null, mTLS is not used.
+              cert_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -96,18 +98,24 @@ logger_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            # Configure TLS settings.
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              ca_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .cert_file must also be set.
+              # If omitted or null, mTLS is not used.
+              key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .key_file must also be set.
+              # If omitted or null, mTLS is not used.
+              cert_file: /app/cert.pem
+              # Configure client transport security for the exporter's connection.
+              # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+              # If omitted or null, false is used.
+              insecure: false
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -125,10 +133,6 @@ logger_provider:
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection.
-            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-            # If omitted or null, false is used.
-            insecure: false
     - # Configure a batch log record processor.
       batch:
         # Configure exporter.
@@ -157,6 +161,9 @@ logger_provider:
         exporter:
           # Configure exporter to be console.
           console:
+    # Configure an event to span event bridge log record processor.
+    # This type is in development and subject to breaking changes in minor versions.
+    #- event_to_span_event_bridge/development:
   # Configure log record limits. See also attribute_limits.
   limits:
     # Configure max attribute value size. Overrides .attribute_limits.attribute_value_length_limit.
@@ -173,7 +180,13 @@ logger_provider:
     # Configure the default logger config used there is no matching entry in .logger_configurator/development.loggers.
     default_config:
       # Configure if the logger is enabled or not.
-      disabled: true
+      enabled: false
+      # Configure minimum severity. Values include: trace, trace2, trace3, trace4, debug, debug2, debug3, debug4, info, info2, info3, info4, warn, warn2, warn3, warn4, error, error2, error3, error4, fatal, fatal2, fatal3, fatal4.
+      # If omitted, severity filtering is not applied.
+      minimum_severity: warn
+      # Configure if trace-based filtering is enabled. A boolean indication of whether the logger should drop log records associated with an unsampled trace.
+      # If omitted or null, false is used.
+      trace_based: false
     # Configure loggers.
     loggers:
       - # Configure logger names to match, evaluated as follows:
@@ -184,7 +197,19 @@ logger_provider:
         # The logger config.
         config:
           # Configure if the logger is enabled or not.
-          disabled: false
+          enabled: true
+      - name: com.example.foo.*
+        config:
+          enabled: true
+          # Configure minimum severity. Values include: trace, trace2, trace3, trace4, debug, debug2, debug3, debug4, info, info2, info3, info4, warn, warn2, warn3, warn4, error, error2, error3, error4, fatal, fatal2, fatal3, fatal4.
+          # If omitted, severity filtering is not applied.
+          minimum_severity: info
+          # Configure if trace-based filtering is enabled. A boolean indication of whether the logger should drop log records associated with an unsampled trace.
+          # If omitted or null, false is used.
+          trace_based: true
+      - name: noisy.*
+        config:
+          enabled: false
 # Configure meter provider.
 # If omitted, a noop meter provider is used.
 meter_provider:
@@ -202,18 +227,15 @@ meter_provider:
             host: localhost
             # Configure port.
             # If omitted or null, 9464 is used.
-            port: 9464
-            # Configure Prometheus Exporter to produce metrics without a unit suffix or UNIT metadata.
-            # If omitted or null, false is used.
-            without_units: false
-            # Configure Prometheus Exporter to produce metrics without a type suffix.
-            # If omitted or null, false is used.
-            without_type_suffix: false
-            # Configure Prometheus Exporter to produce metrics without a scope info metric.
-            # If omitted or null, false is used.
-            without_scope_info: false
-            # Configure Prometheus Exporter to add resource attributes as metrics attributes.
-            with_resource_constant_labels:
+            port: 19464
+            # Configure if scope info metric is produced.
+            # If omitted or null, true is used.
+            scope_info_enabled: true
+            # Configure if target info metric is produced.
+            # If omitted or null, true is used.
+            target_info_enabled/development: true
+            # Configure resource attributes to add as metric attributes.
+            resource_constant_labels:
               # Configure resource attributes to be included.
               # Attribute keys from resources are evaluated to match as follows:
               #  * If the value of the attribute key exactly matches.
@@ -221,7 +243,7 @@ meter_provider:
               # If omitted, no resource attributes are included.
               included:
                 - "service*"
-              # Configure resource attributes to be excluded. Applies after .with_resource_constant_labels.included (i.e. excluded has higher priority than included).
+              # Configure resource attributes to be excluded. Applies after .resource_constant_labels.included (i.e. excluded has higher priority than included).
               # Attribute keys from resources are evaluated to match as follows:
               #  * If the value of the attribute key exactly matches.
               #  * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
@@ -269,6 +291,9 @@ meter_provider:
         # Value must be non-negative. A value of 0 indicates no limit (infinity).
         # If omitted or null, 30000 is used.
         timeout: 30000
+        # Configure maximum export batch size. Added in schema 1.1.0.
+        # If omitted or null, no limit is used.
+        max_export_batch_size/development: 512
         # Configure exporter.
         exporter:
           # Configure exporter to be OTLP with HTTP transport.
@@ -276,18 +301,20 @@ meter_provider:
             # Configure endpoint, including the metric specific path.
             # If omitted or null, http://localhost:4318/v1/metrics is used.
             endpoint: http://localhost:4318/v1/metrics
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            # Configure TLS settings.
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              ca_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .cert_file must also be set.
+              # If omitted or null, mTLS is not used.
+              key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .key_file must also be set.
+              # If omitted or null, mTLS is not used.
+              cert_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -357,18 +384,24 @@ meter_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            # Configure TLS settings.
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              ca_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .cert_file must also be set.
+              # If omitted or null, mTLS is not used.
+              key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .key_file must also be set.
+              # If omitted or null, mTLS is not used.
+              cert_file: /app/cert.pem
+              # Configure client transport security for the exporter's connection.
+              # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+              # If omitted or null, false is used.
+              insecure: false
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -386,10 +419,6 @@ meter_provider:
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection.
-            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-            # If omitted or null, false is used.
-            insecure: false
             # Configure temporality preference.
             # Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
             # If omitted or null, cumulative is used.
@@ -524,7 +553,7 @@ meter_provider:
     # Configure the default meter config used there is no matching entry in .meter_configurator/development.meters.
     default_config:
       # Configure if the meter is enabled or not.
-      disabled: true
+      enabled: false
     # Configure meters.
     meters:
       - # Configure meter names to match, evaluated as follows:
@@ -535,12 +564,12 @@ meter_provider:
         # The meter config.
         config:
           # Configure if the meter is enabled or not.
-          disabled: false
+          enabled: true
 # Configure text map context propagators.
 # If omitted, a noop propagator is used.
 propagator:
   # Configure the propagators in the composite text map propagator. Entries from .composite_list are appended to the list here with duplicates filtered out.
-  # Built-in propagator keys include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party keys include: xray.
+  # Built-in propagator keys include: tracecontext, baggage, b3, b3multi. Known third party keys include: xray.
   # If the resolved list of propagators (from .composite and .composite_list) is empty, a noop propagator is used.
   composite:
     - # Include the w3c trace context propagator.
@@ -560,7 +589,7 @@ propagator:
 
   # Configure the propagators in the composite text map propagator. Entries are appended to .composite with duplicates filtered out.
   # The value is a comma separated list of propagator identifiers matching the format of OTEL_PROPAGATORS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
-  # Built-in propagator identifiers include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party identifiers include: xray.
+  # Built-in propagator identifiers include: tracecontext, baggage, b3, b3multi. Known third party identifiers include: xray.
   # If the resolved list of propagators (from .composite and .composite_list) is empty, a noop propagator is used.
 #  composite_list: "tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray"
 
@@ -595,18 +624,20 @@ tracer_provider:
             # Configure endpoint, including the trace specific path.
             # If omitted or null, http://localhost:4318/v1/traces is used.
             endpoint: http://localhost:4318/v1/traces
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            # Configure TLS settings.
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              ca_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .cert_file must also be set.
+              # If omitted or null, mTLS is not used.
+              key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .key_file must also be set.
+              # If omitted or null, mTLS is not used.
+              cert_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -637,18 +668,24 @@ tracer_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            # Configure TLS settings.
+            tls:
+              # Configure certificate used to verify a server's TLS credentials.
+              # Absolute path to certificate file in PEM format.
+              # If omitted or null, system default certificate verification is used for secure connections.
+              ca_file: /app/cert.pem
+              # Configure mTLS private client key.
+              # Absolute path to client key file in PEM format. If set, .cert_file must also be set.
+              # If omitted or null, mTLS is not used.
+              key_file: /app/cert.pem
+              # Configure mTLS client certificate.
+              # Absolute path to client certificate file in PEM format. If set, .key_file must also be set.
+              # If omitted or null, mTLS is not used.
+              cert_file: /app/cert.pem
+              # Configure client transport security for the exporter's connection.
+              # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+              # If omitted or null, false is used.
+              insecure: false
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -666,10 +703,6 @@ tracer_provider:
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection.
-            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-            # If omitted or null, false is used.
-            insecure: false
     - # Configure a batch span processor.
       batch:
         # Configure exporter.
@@ -692,19 +725,6 @@ tracer_provider:
             # Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
             # If omitted or null, stdout is used.
             output_stream: stdout
-    - # Configure a batch span processor.
-      batch:
-        # Configure exporter.
-        exporter:
-          # Configure exporter to be zipkin.
-          zipkin:
-            # Configure endpoint.
-            # If omitted or null, http://localhost:9411/api/v2/spans is used.
-            endpoint: http://localhost:9411/api/v2/spans
-            # Configure max time (in milliseconds) to wait for each export.
-            # Value must be non-negative. A value of 0 indicates indefinite.
-            # If omitted or null, 10000 is used.
-            timeout: 10000
     - # Configure a simple span processor.
       simple:
         # Configure exporter.
@@ -737,19 +757,86 @@ tracer_provider:
     # Value must be non-negative.
     # If omitted or null, 128 is used.
     link_attribute_count_limit: 128
+  # Configure the trace and span ID generator.
+  # If omitted, RandomIdGenerator is used.
+  id_generator:
+    # Use the built-in random ID generator.
+    random:
   # Configure the sampler.
   # If omitted, parent based sampler with a root of always_on is used.
   sampler:
-    # Configure sampler to be parent_based.
+    # parent_based honors upstream sampling decisions; the root sampler decides new traces.
     parent_based:
-      # Configure root sampler.
+      # Configure root sampler (applies when there is no parent span).
       # If omitted or null, always_on is used.
       root:
-        # Configure sampler to be trace_id_ratio_based.
-        trace_id_ratio_based:
-          # Configure trace_id_ratio.
-          # If omitted or null, 1.0 is used.
-          ratio: 0.0001
+        # Configure sampler to be composite.
+        # This type is in development and subject to breaking changes in minor versions.
+        composite/development:
+          # Configure sampler to be rule_based.
+          # Rules are evaluated in order; the first matching rule's sampler is applied.
+          # Each rule may specify multiple conditions; all conditions must match for the rule to apply.
+          # If no conditions are specified, the rule matches all spans that reach it.
+          # If no rules match, the span is not sampled.
+          rule_based:
+            rules:
+              - # span_kinds: if the span's kind matches any listed value, the condition matches. If omitted, ignore.
+                # Values include: client, consumer, internal, producer, server.
+                span_kinds:
+                  - internal
+                sampler:
+                  # Configure sampler to be always_on.
+                  always_on:
+              - # attribute_patterns: match a single attribute's value against wildcard patterns.
+                # '?' matches any single character, '*' matches any number of characters including none. Matching is case-sensitive.
+                # Non-string attributes use their string representation (e.g., '4*' matches http.response.status_code 400-499).
+                # For array attributes, if any item matches, it is considered a match.
+                attribute_patterns:
+                  key: http.url
+                  # included: value patterns to include. If omitted, all values are included.
+                  included:
+                    - .*/health*
+                  # excluded: value patterns to exclude. Applies after included; excluded has higher priority than included.
+                  excluded:
+                    - .*/healthz/live
+                sampler:
+                  # Configure sampler to be always_off.
+                  always_off:
+              - # attribute_values: match a single attribute against exact string values.
+                # Non-string attributes use their string representation (e.g., "404" matches http.response.status_code 404).
+                # For array attributes, if any item matches, it is considered a match.
+                attribute_values:
+                  key: http.response.status_code
+                  # If the attribute's value matches any of these, the condition matches.
+                  values:
+                    - "500"
+                    - "503"
+                sampler:
+                  # Configure sampler to be always_on.
+                  always_on:
+              - span_kinds:
+                  - server
+                  - consumer
+                # parent: match by parent span type. Values include: local, none (trace root), remote. If omitted, ignore.
+                parent:
+                  - none
+                sampler:
+                  # Configure sampler to be parent_threshold.
+                  parent_threshold:
+                    # Sampler to use when there is no parent.
+                    root:
+                      # Configure sampler to be ratio-based probability sampling using W3C Trace Context Level 2 randomness features.
+                      probability:
+                        # Configure sampling ratio. Value must be in range [0.0, 1.0].
+                        # If omitted or null, 1.0 is used.
+                        ratio: 0.25
+              - # No conditions: matches all spans that reach this rule (catch-all).
+                sampler:
+                  # Configure sampler to be ratio-based probability sampling using W3C Trace Context Level 2 randomness features.
+                  probability:
+                    # Configure sampling ratio. Value must be in range [0.0, 1.0].
+                    # If omitted or null, 1.0 is used.
+                    ratio: 0.01
       # Configure remote_parent_sampled sampler.
       # If omitted or null, always_on is used.
       remote_parent_sampled:
@@ -758,25 +845,33 @@ tracer_provider:
       # Configure remote_parent_not_sampled sampler.
       # If omitted or null, always_off is used.
       remote_parent_not_sampled:
-        # Configure sampler to be always_off.
-        always_off:
+        # trace_id_ratio_based uses trace ID hash for consistent cross-service sampling.
+        # Note: The trace_id_ratio_based sampler is deprecated in favor of the probability sampler
+        trace_id_ratio_based:
+          # Configure sampling ratio. Value must be in range [0.0, 1.0].
+          # If omitted or null, 1.0 is used.
+          ratio: 0.001
       # Configure local_parent_sampled sampler.
       # If omitted or null, always_on is used.
       local_parent_sampled:
-        # Configure sampler to be always_on.
-        always_on:
+        # Configure sampler to be always_off.
+        always_off:
       # Configure local_parent_not_sampled sampler.
       # If omitted or null, always_off is used.
       local_parent_not_sampled:
-        # Configure sampler to be always_off.
-        always_off:
+        # probability/development: ratio-based probability sampling using W3C Trace Context Level 2 randomness features.
+        probability/development:
+          # Configure sampling ratio. Value must be in range [0.0, 1.0].
+          # If omitted or null, 1.0 is used.
+          ratio: 0.001
+
   # Configure tracers.
   # This type is in development and subject to breaking changes in minor versions.
   tracer_configurator/development:
     # Configure the default tracer config used there is no matching entry in .tracer_configurator/development.tracers.
     default_config:
       # Configure if the tracer is enabled or not.
-      disabled: true
+      enabled: false
     # Configure tracers.
     tracers:
       - # Configure tracer names to match, evaluated as follows:
@@ -787,7 +882,7 @@ tracer_provider:
         # The tracer config.
         config:
           # Configure if the tracer is enabled or not.
-          disabled: false
+          enabled: true
 # Configure resource for all signals.
 # If omitted, the default resource is used.
 resource:
@@ -857,6 +952,8 @@ resource:
         process:
       - # Enable the service detector, which populates service.name based on the OTEL_SERVICE_NAME environment variable and service.instance.id.
         service:
+      - # Enable an extension resource detector registered by name.
+        my_custom_detector:
   # Configure resource schema URL.
   # If omitted or null, no schema URL is used.
   schema_url: https://opentelemetry.io/schemas/1.16.0
@@ -866,17 +963,6 @@ instrumentation/development:
   # Configure general SemConv options that may apply to multiple languages and instrumentations.
   # Instrumenation may merge general config options with the language specific configuration at .instrumentation.<language>.
   general:
-    # Configure instrumentations following the peer semantic conventions.
-    # See peer semantic conventions: https://opentelemetry.io/docs/specs/semconv/attributes-registry/peer/
-    peer:
-      # Configure the service mapping for instrumentations following peer.service semantic conventions.
-      # Each entry is a key value pair where "peer" defines the IP address and "service" defines the corresponding logical name of the service.
-      # See peer.service semantic conventions: https://opentelemetry.io/docs/specs/semconv/general/attributes/#general-remote-service-attributes
-      service_mapping:
-        - peer: 1.2.3.4
-          service: FooService
-        - peer: 2.3.4.5
-          service: BarService
     # Configure instrumentations following the http semantic conventions.
     # See http semantic conventions: https://opentelemetry.io/docs/specs/semconv/http/
     http:
