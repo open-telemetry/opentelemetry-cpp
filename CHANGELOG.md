@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Apply metric view `attribute_keys` include and exclude filters
+  when building the SDK, with exclude entries taking precedence.
+  [#3546](https://github.com/open-telemetry/opentelemetry-cpp/issues/3546)
+
 * [CONFIGURATION] Add support for the composite sampler configuration
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))

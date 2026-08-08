@@ -32,6 +32,7 @@
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
 #include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
@@ -46,6 +47,7 @@
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
@@ -721,6 +723,53 @@ TEST(SdkBuilder, CreatePeriodicMetricReader)
   EXPECT_EQ(captured->interval, model.interval);
   EXPECT_EQ(captured->timeout, model.timeout);
   EXPECT_TRUE(captured->exporter != nullptr);
+}
+
+TEST(SdkBuilder, CreateAttributesProcessor)
+{
+  std::map<std::string, int> attributes = {{"included", 1}, {"excluded", 2}, {"unlisted", 3}};
+  opentelemetry::common::KeyValueIterableView<std::map<std::string, int>> iterable(attributes);
+  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+
+  // When both lists are configured, exclusion takes precedence over inclusion.
+  {
+    auto model                    = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+    model->included               = std::make_unique<config_sdk::StringArrayConfiguration>();
+    model->included->string_array = {"included", "excluded"};
+    model->excluded               = std::make_unique<config_sdk::StringArrayConfiguration>();
+    model->excluded->string_array = {"excluded"};
+
+    auto processor = builder.CreateAttributesProcessor(model);
+    ASSERT_NE(processor, nullptr);
+    auto filtered = processor->process(iterable);
+
+    EXPECT_EQ(filtered.size(), 1u);
+    EXPECT_NE(filtered.find("included"), filtered.end());
+  }
+
+  // An exclude-only configuration retains every key that is not excluded.
+  {
+    auto model                    = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+    model->excluded               = std::make_unique<config_sdk::StringArrayConfiguration>();
+    model->excluded->string_array = {"excluded"};
+
+    auto processor = builder.CreateAttributesProcessor(model);
+    ASSERT_NE(processor, nullptr);
+    auto filtered = processor->process(iterable);
+
+    EXPECT_EQ(filtered.size(), 2u);
+    EXPECT_EQ(filtered.find("excluded"), filtered.end());
+  }
+
+  // An empty include/exclude block leaves attributes unchanged.
+  {
+    auto model     = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+    auto processor = builder.CreateAttributesProcessor(model);
+    ASSERT_NE(processor, nullptr);
+    auto filtered = processor->process(iterable);
+
+    EXPECT_EQ(filtered.size(), attributes.size());
+  }
 }
 
 namespace

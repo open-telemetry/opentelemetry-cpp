@@ -1891,16 +1891,43 @@ std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> SdkBuilder::Crea
 
 std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>
 SdkBuilder::CreateAttributesProcessor(
-    const std::unique_ptr<opentelemetry::sdk::configuration::IncludeExcludeConfiguration>
-        & /* model */) const
+    const std::unique_ptr<opentelemetry::sdk::configuration::IncludeExcludeConfiguration> &model)
+    const
 {
-  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk;
+  using opentelemetry::sdk::metrics::DefaultAttributesProcessor;
+  using opentelemetry::sdk::metrics::FilterAttributeMap;
+  using opentelemetry::sdk::metrics::FilteringAttributesProcessor;
+  using opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor;
 
-  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3546
-  // FIXME-SDK: Need a subclass of AttributesProcessor for IncludeExclude
-  OTEL_INTERNAL_LOG_WARN("IncludeExclude attribute processor not supported, ignoring");
+  FilterAttributeMap excluded;
+  if (model->excluded != nullptr)
+  {
+    for (const auto &key : model->excluded->string_array)
+    {
+      excluded.emplace(key, true);
+    }
+  }
 
-  return sdk;
+  if (model->included != nullptr)
+  {
+    FilterAttributeMap included;
+    for (const auto &key : model->included->string_array)
+    {
+      if (excluded.find(key) == excluded.end())
+      {
+        included.emplace(key, true);
+      }
+    }
+
+    return std::make_unique<FilteringAttributesProcessor>(std::move(included));
+  }
+
+  if (model->excluded != nullptr)
+  {
+    return std::make_unique<FilteringExcludeAttributesProcessor>(std::move(excluded));
+  }
+
+  return std::make_unique<DefaultAttributesProcessor>();
 }
 
 void SdkBuilder::AddView(
