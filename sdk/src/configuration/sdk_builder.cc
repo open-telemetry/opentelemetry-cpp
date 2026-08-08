@@ -1563,6 +1563,9 @@ static opentelemetry::sdk::metrics::InstrumentType ConvertInstrumentType(
     case opentelemetry::sdk::configuration::InstrumentType::counter:
       sdk = opentelemetry::sdk::metrics::InstrumentType::kCounter;
       break;
+    case opentelemetry::sdk::configuration::InstrumentType::gauge:
+      sdk = opentelemetry::sdk::metrics::InstrumentType::kGauge;
+      break;
     case opentelemetry::sdk::configuration::InstrumentType::histogram:
       sdk = opentelemetry::sdk::metrics::InstrumentType::kHistogram;
       break;

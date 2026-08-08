@@ -23,7 +23,8 @@ enum class InstrumentType : std::uint8_t
   observable_counter,
   observable_gauge,
   observable_up_down_counter,
-  up_down_counter
+  up_down_counter,
+  gauge
 };
 
 }  // namespace configuration
