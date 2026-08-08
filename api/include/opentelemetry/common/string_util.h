@@ -27,11 +27,11 @@ public:
     {
       return nostd::string_view();
     }
-    while (left <= right && isspace(str[left]))
+    while (left <= right && std::isspace(str[left]))
     {
       left++;
     }
-    while (left <= right && isspace(str[right]))
+    while (left <= right && std::isspace(str[right]))
     {
       right--;
     }

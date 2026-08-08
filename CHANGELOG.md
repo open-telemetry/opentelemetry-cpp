@@ -15,6 +15,18 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Add support for the composite sampler configuration
+  (programmatic and from yaml)
+  ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
+* [SDK] `OTELResourceDetector` now percent-decodes values parsed from the
+  `OTEL_RESOURCE_ATTRIBUTES` environment variable, per the W3C Baggage value
+  grammar the resource spec defers to. A malformed escape sequence is left
+  in the value as-is rather than dropping the attribute.
+  [#1536](https://github.com/open-telemetry/opentelemetry-cpp/issues/1536)
+
+* [BUG] Report one outcome per request when a curl session is cancelled after
+  the response arrives
+  ([#4363](https://github.com/open-telemetry/opentelemetry-cpp/pull/4363))
 * [CODE HEALTH] Enable clang-tidy `modernize-deprecated-headers` and replace
   deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
   `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
@@ -43,8 +55,15 @@ Increment the:
   [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
 * [CONFIGURATION] Add the probability sampler to file configuration
   [#4334](https://github.com/open-telemetry/opentelemetry-cpp/pull/4334)
+
+* [SDK] Make the global internal logger log level atomic
+  [#4368](https://github.com/open-telemetry/opentelemetry-cpp/pull/4368)
+
 * [BUG] Stop reading past a `nostd::string_view` that is not NUL terminated
   [#4346](https://github.com/open-telemetry/opentelemetry-cpp/pull/4346)
+* [BUG] Stop OTLP `ForceFlush` returning on the first notification and
+  overrunning the caller's deadline
+  [#4357](https://github.com/open-telemetry/opentelemetry-cpp/pull/4357)
 
 * [OTLP EXPORTERS] add otlp_common target for shared otlp utils
   [#4333](https://github.com/open-telemetry/opentelemetry-cpp/pull/4333)
@@ -55,6 +74,9 @@ Increment the:
 
 * [BUILD] Run the ext_http component install test on Windows
   [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
+
+* [CONFIGURATION] validate and update config files to yaml schema 1.1.0
+  [#4374](https://github.com/open-telemetry/opentelemetry-cpp/pull/4374)
 
 * [SDK] Convert SpinLockMutex to std::mutex part 1
   Replace SpinLockMutex with std::mutex in SimpleProcessor,
