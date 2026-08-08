@@ -31,6 +31,8 @@ public:
       default;
   virtual ~ComposableRuleBasedSamplerBuilder() = default;
 
+  /// rule_samplers is index-aligned with model->rules. Entries are null for
+  /// rules with no sampler, which implementations must skip.
   virtual std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> Build(
       const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *model,
       std::vector<std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>> &&rule_samplers)

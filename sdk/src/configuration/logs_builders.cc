@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"

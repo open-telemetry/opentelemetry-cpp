@@ -28,6 +28,7 @@ TEST(TraceBuilders, EmptyRegistryHasNoTraceBuilders)
   EXPECT_EQ(registry->GetComposableProbabilitySamplerBuilder(), nullptr);
   EXPECT_EQ(registry->GetComposableParentThresholdSamplerBuilder(), nullptr);
   EXPECT_EQ(registry->GetComposableRuleBasedSamplerBuilder(), nullptr);
+  EXPECT_EQ(registry->GetCompositeSamplerBuilder(), nullptr);
 }
 
 TEST(TraceBuilders, RegisterDefaultTraceBuildersFillsAllTraceSlots)
@@ -50,4 +51,5 @@ TEST(TraceBuilders, RegisterDefaultTraceBuildersFillsAllTraceSlots)
   EXPECT_NE(registry->GetComposableProbabilitySamplerBuilder(), nullptr);
   EXPECT_NE(registry->GetComposableParentThresholdSamplerBuilder(), nullptr);
   EXPECT_NE(registry->GetComposableRuleBasedSamplerBuilder(), nullptr);
+  EXPECT_NE(registry->GetCompositeSamplerBuilder(), nullptr);
 }

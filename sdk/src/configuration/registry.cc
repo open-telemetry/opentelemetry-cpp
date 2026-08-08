@@ -17,6 +17,7 @@
 #include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
@@ -284,6 +285,11 @@ void Registry::SetComposableRuleBasedSamplerBuilder(
     std::unique_ptr<ComposableRuleBasedSamplerBuilder> &&builder)
 {
   composable_rule_based_sampler_builder_ = std::move(builder);
+}
+
+void Registry::SetCompositeSamplerBuilder(std::unique_ptr<CompositeSamplerBuilder> &&builder)
+{
+  composite_sampler_builder_ = std::move(builder);
 }
 
 void Registry::SetBatchSpanProcessorBuilder(std::unique_ptr<BatchSpanProcessorBuilder> &&builder)

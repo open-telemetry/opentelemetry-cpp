@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/configuration/meter_config_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_configurator_builder.h"
 #include "opentelemetry/sdk/configuration/meter_configurator_configuration.h"

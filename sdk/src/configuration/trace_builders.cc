@@ -4,12 +4,14 @@
 #include "opentelemetry/sdk/configuration/trace_builders.h"
 
 #include <chrono>
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
@@ -20,6 +22,11 @@
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_patterns_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/probability_sampler_builder.h"
@@ -45,9 +52,12 @@
 #include "opentelemetry/sdk/trace/samplers/composable_always_on.h"
 #include "opentelemetry/sdk/trace/samplers/composable_parent_threshold.h"
 #include "opentelemetry/sdk/trace/samplers/composable_probability.h"
+#include "opentelemetry/sdk/trace/samplers/composable_rule_based.h"
 #include "opentelemetry/sdk/trace/samplers/composable_sampler.h"
+#include "opentelemetry/sdk/trace/samplers/composite_sampler_factory.h"
 #include "opentelemetry/sdk/trace/samplers/parent_factory.h"
 #include "opentelemetry/sdk/trace/samplers/probability_factory.h"
+#include "opentelemetry/sdk/trace/samplers/rule_based_predicate.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
@@ -212,14 +222,73 @@ class DefaultComposableRuleBasedSamplerBuilder : public ComposableRuleBasedSampl
 {
 public:
   std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> Build(
-      const ComposableRuleBasedSamplerConfiguration * /* model */,
+      const ComposableRuleBasedSamplerConfiguration *model,
       std::vector<std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>> &&rule_samplers)
       const override
   {
-    auto unused = std::move(rule_samplers);
-    // TODO: implement once a concrete Predicate can be built from rule config
-    static const std::string die("ComposableRuleBasedSampler not supported");
-    throw UnsupportedException(die);
+    auto owned_samplers = std::move(rule_samplers);
+    if (owned_samplers.size() != model->rules.size())
+    {
+      throw UnsupportedException("rule_samplers size does not match rules size");
+    }
+    std::vector<opentelemetry::sdk::trace::PredicatedSampler> rules;
+    rules.reserve(model->rules.size());
+    for (std::size_t i = 0; i < owned_samplers.size(); ++i)
+    {
+      // rule_samplers is index-aligned with model->rules; null means no sampler.
+      if (owned_samplers[i] == nullptr)
+      {
+        continue;
+      }
+      opentelemetry::sdk::trace::PredicatedSampler predicated;
+      predicated.predicate = std::make_shared<opentelemetry::sdk::trace::RuleBasedPredicate>(
+          MakePredicateOptions(model->rules[i].get()));
+      predicated.sampler = std::move(owned_samplers[i]);
+      rules.push_back(std::move(predicated));
+    }
+    return std::make_unique<opentelemetry::sdk::trace::ComposableRuleBasedSampler>(
+        std::move(rules));
+  }
+
+private:
+  static opentelemetry::sdk::trace::RuleBasedPredicateOptions MakePredicateOptions(
+      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerRuleConfiguration *rule)
+  {
+    opentelemetry::sdk::trace::RuleBasedPredicateOptions options;
+    if (rule->attribute_values != nullptr)
+    {
+      options.match_values = true;
+      options.values_key   = rule->attribute_values->key;
+      options.values       = rule->attribute_values->values;
+    }
+    if (rule->attribute_patterns != nullptr)
+    {
+      options.match_patterns = true;
+      options.patterns_key   = rule->attribute_patterns->key;
+      options.included       = rule->attribute_patterns->included;
+      options.excluded       = rule->attribute_patterns->excluded;
+    }
+    options.match_parent_none   = rule->match_parent_none;
+    options.match_parent_remote = rule->match_parent_remote;
+    options.match_parent_local  = rule->match_parent_local;
+
+    options.match_span_kind_internal = rule->match_span_kind_internal;
+    options.match_span_kind_server   = rule->match_span_kind_server;
+    options.match_span_kind_client   = rule->match_span_kind_client;
+    options.match_span_kind_producer = rule->match_span_kind_producer;
+    options.match_span_kind_consumer = rule->match_span_kind_consumer;
+    return options;
+  }
+};
+
+class DefaultCompositeSamplerBuilder : public CompositeSamplerBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> Build(
+      std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> &&sampler) const override
+  {
+    return opentelemetry::sdk::trace::CompositeSamplerFactory::Create(
+        std::shared_ptr<opentelemetry::sdk::trace::ComposableSampler>(std::move(sampler)));
   }
 };
 
@@ -279,6 +348,7 @@ void RegisterDefaultTraceBuilders(Registry *registry)
       std::make_unique<DefaultComposableParentThresholdSamplerBuilder>());
   registry->SetComposableRuleBasedSamplerBuilder(
       std::make_unique<DefaultComposableRuleBasedSamplerBuilder>());
+  registry->SetCompositeSamplerBuilder(std::make_unique<DefaultCompositeSamplerBuilder>());
 }
 
 }  // namespace configuration

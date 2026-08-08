@@ -16,6 +16,7 @@
 #include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
@@ -208,6 +209,17 @@ public:
       const override
   {
     auto unused = std::move(rule_samplers);
+    return nullptr;
+  }
+};
+
+class TestCompositeSamplerBuilder : public configuration::CompositeSamplerBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> Build(
+      std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> &&sampler) const override
+  {
+    auto unused = std::move(sampler);
     return nullptr;
   }
 };
@@ -725,6 +737,12 @@ TEST(Registry, ComposableRuleBasedSamplerBuilder)
   TestTypedSlot<TestComposableRuleBasedSamplerBuilder>(
       &configuration::Registry::GetComposableRuleBasedSamplerBuilder,
       &configuration::Registry::SetComposableRuleBasedSamplerBuilder);
+}
+
+TEST(Registry, CompositeSamplerBuilder)
+{
+  TestTypedSlot<TestCompositeSamplerBuilder>(&configuration::Registry::GetCompositeSamplerBuilder,
+                                             &configuration::Registry::SetCompositeSamplerBuilder);
 }
 
 TEST(Registry, BatchSpanProcessorBuilder)

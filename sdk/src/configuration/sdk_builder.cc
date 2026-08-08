@@ -44,8 +44,6 @@
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_patterns_configuration.h"
-#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composite_sampler_builder.h"
@@ -79,7 +77,6 @@
 #include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/integer_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/invalid_configuration_exception.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
@@ -382,6 +379,13 @@ public:
   ComposableSamplerBuilder &operator=(const ComposableSamplerBuilder &other) = delete;
   ~ComposableSamplerBuilder() override                                       = default;
 
+  // The yaml schema supports infinite sampler nesting due to the
+  // ExperimentalComposableRuleBasedSampler containing an array of
+  // ExperimentalComposableRuleBasedSamplerRule which each may contain a
+  // ExperimentalComposableRuleBasedSampler (See: schema/tracer_provider.yaml#L340).
+  // Recursion is used to build the nested samplers, but the depth of recursion is limited to
+  // (max_composable_sampler_depth_).
+  //
   // NOLINTBEGIN(misc-no-recursion)
   void VisitComposableAlwaysOff(
       const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *model)
@@ -420,53 +424,56 @@ public:
   // NOLINTEND(misc-no-recursion)
 
   // The model only ever nests ComposableSamplerConfiguration here, so the
-  // plain sampler visits are unreachable.
+  // plain sampler visits are unreachable. Throw to preserve the invariant
+  // that a null sampler is never returned.
   void VisitAlwaysOff(
       const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration * /* model */) override
   {
-    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+    throw UnsupportedException(kNotComposable);
   }
 
   void VisitAlwaysOn(
       const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration * /* model */) override
   {
-    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+    throw UnsupportedException(kNotComposable);
   }
 
   void VisitJaegerRemote(const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration
                              * /* model */) override
   {
-    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+    throw UnsupportedException(kNotComposable);
   }
 
   void VisitParentBased(const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration
                             * /* model */) override
   {
-    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+    throw UnsupportedException(kNotComposable);
   }
 
   void VisitProbability(const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration
                             * /* model */) override
   {
-    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+    throw UnsupportedException(kNotComposable);
   }
 
   void VisitTraceIdRatioBased(
       const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration * /* model */)
       override
   {
-    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+    throw UnsupportedException(kNotComposable);
   }
 
   void VisitExtension(
       const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration * /* model */) override
   {
-    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+    throw UnsupportedException(kNotComposable);
   }
 
   std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> sampler;
 
 private:
+  static constexpr const char *kNotComposable = "Expecting a composable sampler";
+
   const SdkBuilder *sdk_builder_;
   std::size_t depth_;
 };
@@ -1129,7 +1136,7 @@ std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> SdkBuilder::Create
   {
     std::string die("Composable sampler nesting depth exceeds ");
     die.append(std::to_string(max_composable_sampler_depth_));
-    throw InvalidConfigurationException(die);
+    throw UnsupportedException(die);
   }
   ComposableSamplerBuilder builder(this, depth);
   model->Accept(&builder);
