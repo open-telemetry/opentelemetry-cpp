@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Fix lost-wakeups in BatchSpanProcessor to prevent stalls during
+  shutdown and force flush.
+  [#4382](https://github.com/open-telemetry/opentelemetry-cpp/pull/4382)
+
 * [CONFIGURATION] Add support for the composite sampler configuration
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
