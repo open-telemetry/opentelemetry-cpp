@@ -898,22 +898,23 @@ TranslationStrategy ConfigurationParser::ParseTranslationStrategy(
     const std::unique_ptr<DocumentNode> &node,
     const std::string &name) const
 {
-  if (name == "UnderscoreEscapingWithSuffixes")
+  if (name == "UnderscoreEscapingWithSuffixes" || name == "underscore_escaping_with_suffixes")
   {
     return TranslationStrategy::UnderscoreEscapingWithSuffixes;
   }
 
-  if (name == "UnderscoreEscapingWithoutSuffixes")
+  if (name == "UnderscoreEscapingWithoutSuffixes" ||
+      name == "underscore_escaping_without_suffixes/development")
   {
     return TranslationStrategy::UnderscoreEscapingWithoutSuffixes;
   }
 
-  if (name == "NoUTF8EscapingWithSuffixes")
+  if (name == "NoUTF8EscapingWithSuffixes" || name == "no_utf8_escaping_with_suffixes/development")
   {
     return TranslationStrategy::NoUTF8EscapingWithSuffixes;
   }
 
-  if (name == "NoTranslation")
+  if (name == "NoTranslation" || name == "no_translation/development")
   {
     return TranslationStrategy::NoTranslation;
   }
