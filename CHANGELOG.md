@@ -161,6 +161,13 @@ Increment the:
 
 Breaking changes:
 
+* [CONFIGURATION] SDK default component builder libraries and example
+  [#4367](https://github.com/open-telemetry/opentelemetry-cpp/pull/4367)
+  * The declaritive configuration registry is now empty on construction and
+    the default SDK component builders are provided optionally through
+    the `opentelemetry-cpp::configuration_registry_factory` library and
+    the `opentelemetry::sdk::configuration::RegistryFactory::Create()` method.
+
 * [BUILD] Install an explicit list of ext headers instead of the whole
   directory
   [#4327](https://github.com/open-telemetry/opentelemetry-cpp/pull/4327)
