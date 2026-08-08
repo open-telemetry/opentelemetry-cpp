@@ -298,6 +298,137 @@ and will not be impacted by the removal to come.
 When implementing such logic, document it in the mitigation section,
 in file `DEPRECATED`.
 
+### CMake package component deprecation
+
+The installed opentelemetry-cpp CMake package supports the `COMPONENTS`
+argument to `find_package(opentelemetry-cpp CONFIG ...)`.
+CMake components may need to be deprecated over time.
+
+There are three cases to distinguish:
+
+* a component name is changed,
+* a component is merged (with all its targets) into another component,
+* a component and its targets are deprecated and set for future removal from the
+  package.
+
+#### Component name change
+
+For a component name change, keep the CMake target set unchanged and add the
+deprecated name under the `DEPRECATED_NAMES` list.
+
+Example:
+
+```cmake
+otel_add_component(
+  COMPONENT component_old_name
+  TARGETS opentelemetry_some_target)
+```
+
+The new component receives the new name but must retain the targets unchanged.
+
+```cmake
+otel_add_component(
+  COMPONENT component_new_name
+  DEPRECATED_NAMES component_old_name
+  TARGETS opentelemetry_some_target)
+```
+
+When a user requests `component_old_name`, the installed package config emits a CMake
+deprecation warning and resolves the request to `component_new_name`.
+
+```cmake
+# the following will now resolve `component_old_name` to `component_new_name`
+find_package(opentelemetry-cpp CONFIG COMPONENTS component_old_name)
+```
+
+#### Component merge
+
+For a component merge, add `component_B` to `component_A`'s
+`DEPRECATED_NAMES` list and add `component_B`'s targets to `component_A`'s
+`TARGETS` list:
+
+Example:
+
+Before the merge, two components are defined.
+
+```cmake
+otel_add_component(
+  COMPONENT component_A
+  TARGETS component_A_target)
+
+otel_add_component(
+  COMPONENT component_B
+  TARGETS component_B_target)
+```
+
+After the merge, `component_B`'s definition is removed.
+Its name and targets are added to the deprecated names and targets
+for `component_A` respectively.
+
+```cmake
+otel_add_component(
+  COMPONENT component_A
+  DEPRECATED_NAMES component_B
+  TARGETS
+  component_A_target
+  component_B_target)
+```
+
+When a user requests `component_B`, the installed package config emits a CMake
+deprecation warning and resolves the request to `component_A` importing
+the merged set of targets.
+
+```cmake
+# the following will now resolve deprecated `component_B` to `component_A`
+# all targets from the merged component are imported and remain unchanged
+find_package(opentelemetry-cpp CONFIG COMPONENTS component_B)
+
+target_link_libraries(my_library PRIVATE
+        opentelemetry-cpp::component_A_target
+        opentelemetry-cpp::component_B_target)
+```
+
+Note: The set of targets provided by the independent components before merge
+and from the merged component must not change. Changing target names risks
+breaking the user's CMake configuration. Deprecating and renaming targets
+remains a TODO and is currently not supported.
+
+#### Deprecating a component for removal
+
+[TODO] This use case is not fully implemented in `otel_add_component`
+
+When a component and its targets are set for removal from the package, the
+component must be marked deprecated with the `DEPRECATED` tag and remain in the
+package for a deprecation period. During this time the component and its targets
+must be installed with the package and be imported by `find_package`.
+
+Example:
+
+```cmake
+otel_add_component(
+  COMPONENT component_to_remove
+  DEPRECATED
+  TARGETS component_target
+  )
+```
+
+```cmake
+# the following will import the deprecated component's targets and emit a
+# CMake deprecation warning
+find_package(opentelemetry-cpp CONFIG COMPONENTS component_to_remove)
+```
+
+#### Validate the deprecated component
+
+Add the deprecated component name to the `./ci/do_ci.sh` script's
+`cmake.install.test` target's `DEPRECATED_COMPONENTS` variable.
+
+The install test
+`./install/test/cmake/usage_tests/deprecated_components` verifies that
+requesting deprecated
+component names with `find_package` configures successfully and that
+CMake emits a deprecation warning.
+
 ### C++ deprecation
 
 #### C++ header deprecation
