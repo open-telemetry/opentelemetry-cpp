@@ -19,8 +19,10 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/utility.h"
 
+#include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_configuration.h"
@@ -30,6 +32,7 @@
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/instrument_type.h"
@@ -48,6 +51,7 @@
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/unsupported_exception.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
@@ -701,9 +705,18 @@ TEST(SdkBuilder, CreatePeriodicMetricReader)
   exporter->name = "noop";
 
   config_sdk::PeriodicMetricReaderConfiguration model;
-  model.exporter = std::move(exporter);
-  model.interval = 12345;
-  model.timeout  = 678;
+  model.exporter           = std::move(exporter);
+  model.interval           = 12345;
+  model.timeout            = 678;
+  model.cardinality_limits = std::make_unique<config_sdk::CardinalityLimitsConfiguration>();
+  model.cardinality_limits->default_limit              = 100;
+  model.cardinality_limits->counter                    = 200;
+  model.cardinality_limits->gauge                      = 300;
+  model.cardinality_limits->histogram                  = 400;
+  model.cardinality_limits->observable_counter         = 500;
+  model.cardinality_limits->observable_gauge           = 600;
+  model.cardinality_limits->observable_up_down_counter = 700;
+  model.cardinality_limits->up_down_counter            = 800;
 
   auto captured = std::make_shared<config_test::CapturedPeriodicReaderArgs>();
 
@@ -721,6 +734,23 @@ TEST(SdkBuilder, CreatePeriodicMetricReader)
   EXPECT_EQ(captured->interval, model.interval);
   EXPECT_EQ(captured->timeout, model.timeout);
   EXPECT_TRUE(captured->exporter != nullptr);
+  EXPECT_EQ(reader->GetCardinalityLimit(opentelemetry::sdk::metrics::InstrumentType::kCounter),
+            200u);
+  EXPECT_EQ(reader->GetCardinalityLimit(opentelemetry::sdk::metrics::InstrumentType::kGauge), 300u);
+  EXPECT_EQ(reader->GetCardinalityLimit(opentelemetry::sdk::metrics::InstrumentType::kHistogram),
+            400u);
+  EXPECT_EQ(
+      reader->GetCardinalityLimit(opentelemetry::sdk::metrics::InstrumentType::kObservableCounter),
+      500u);
+  EXPECT_EQ(
+      reader->GetCardinalityLimit(opentelemetry::sdk::metrics::InstrumentType::kObservableGauge),
+      600u);
+  EXPECT_EQ(reader->GetCardinalityLimit(
+                opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter),
+            700u);
+  EXPECT_EQ(
+      reader->GetCardinalityLimit(opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter),
+      800u);
 }
 
 namespace
@@ -744,6 +774,63 @@ std::unique_ptr<config_sdk::ViewConfiguration> MakeCardinalityOnlyViewConfig(
 
 }  // namespace
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+TEST(SdkBuilder, AddViewGaugeUnsupportedWithABIv1)
+{
+  auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::gauge, 42);
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  config_sdk::SdkBuilder builder(registry);
+  opentelemetry::sdk::metrics::ViewRegistry view_registry;
+
+  EXPECT_THROW(builder.AddView(&view_registry, model), config_sdk::UnsupportedException);
+}
+#endif
+
+TEST(SdkBuilder, AddViewEmptySelectorMatchesAllSupportedInstrumentTypes)
+{
+  namespace metrics_sdk = opentelemetry::sdk::metrics;
+
+  auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::none, 42);
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  config_sdk::SdkBuilder builder(registry);
+  metrics_sdk::ViewRegistry view_registry;
+  builder.AddView(&view_registry, model);
+
+  auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
+  std::vector<metrics_sdk::InstrumentType> supported_instrument_types{
+      metrics_sdk::InstrumentType::kCounter,
+      metrics_sdk::InstrumentType::kHistogram,
+      metrics_sdk::InstrumentType::kUpDownCounter,
+      metrics_sdk::InstrumentType::kObservableCounter,
+      metrics_sdk::InstrumentType::kObservableGauge,
+      metrics_sdk::InstrumentType::kObservableUpDownCounter};
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  supported_instrument_types.push_back(metrics_sdk::InstrumentType::kGauge);
+#endif
+
+  for (auto instrument_type : supported_instrument_types)
+  {
+    metrics_sdk::InstrumentDescriptor instrument_descriptor{
+        "test.instrument", "test description", "units", instrument_type,
+        metrics_sdk::InstrumentValueType::kLong};
+    int matched = 0;
+    view_registry.FindViews(instrument_descriptor, *instrumentation_scope,
+                            [&](const metrics_sdk::View &view) {
+                              auto *config = view.GetAggregationConfig();
+                              EXPECT_NE(config, nullptr);
+                              if (config != nullptr)
+                              {
+                                EXPECT_EQ(config->cardinality_limit_, 42u);
+                                matched++;
+                              }
+                              return true;
+                            });
+    EXPECT_EQ(matched, 1);
+  }
+}
+
 TEST(SdkBuilder, AddViewHistogramCardinalityLimitOnly)
 {
   namespace metrics_sdk = opentelemetry::sdk::metrics;
@@ -757,7 +844,8 @@ TEST(SdkBuilder, AddViewHistogramCardinalityLimitOnly)
   builder.AddView(&view_registry, model);
 
   metrics_sdk::InstrumentDescriptor instrument_descriptor{
-      "", "", "", metrics_sdk::InstrumentType::kHistogram, metrics_sdk::InstrumentValueType::kLong};
+      "test.instrument", "test description", "units", metrics_sdk::InstrumentType::kHistogram,
+      metrics_sdk::InstrumentValueType::kLong};
   auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
 
   int matched = 0;
@@ -810,7 +898,8 @@ TEST(SdkBuilder, AddViewCounterCardinalityLimitOnly)
   builder.AddView(&view_registry, model);
 
   metrics_sdk::InstrumentDescriptor instrument_descriptor{
-      "", "", "", metrics_sdk::InstrumentType::kCounter, metrics_sdk::InstrumentValueType::kLong};
+      "test.instrument", "test description", "units", metrics_sdk::InstrumentType::kCounter,
+      metrics_sdk::InstrumentValueType::kLong};
   auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
 
   int matched = 0;
@@ -823,6 +912,47 @@ TEST(SdkBuilder, AddViewCounterCardinalityLimitOnly)
         {
           EXPECT_EQ(aggregation_config->GetType(), metrics_sdk::AggregationType::kDefault);
           EXPECT_EQ(aggregation_config->cardinality_limit_, 7u);
+        }
+        return true;
+      });
+
+  EXPECT_EQ(matched, 1);
+}
+
+TEST(SdkBuilder, AddViewWithCardinalityLimitPreservesExplicitAggregation)
+{
+  namespace metrics_sdk = opentelemetry::sdk::metrics;
+
+  auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::histogram, 42);
+  auto aggregation =
+      std::make_unique<config_sdk::ExplicitBucketHistogramAggregationConfiguration>();
+  aggregation->boundaries    = {1.0, 2.0};
+  model->stream->aggregation = std::move(aggregation);
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  config_sdk::SdkBuilder builder(registry);
+
+  metrics_sdk::ViewRegistry view_registry;
+  builder.AddView(&view_registry, model);
+
+  metrics_sdk::InstrumentDescriptor instrument_descriptor{
+      "test.instrument", "test description", "units", metrics_sdk::InstrumentType::kHistogram,
+      metrics_sdk::InstrumentValueType::kLong};
+  auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
+
+  int matched = 0;
+  view_registry.FindViews(
+      instrument_descriptor, *instrumentation_scope, [&](const metrics_sdk::View &view) {
+        ++matched;
+        auto *aggregation_config = view.GetAggregationConfig();
+        EXPECT_NE(aggregation_config, nullptr);
+        if (aggregation_config)
+        {
+          EXPECT_EQ(aggregation_config->GetType(), metrics_sdk::AggregationType::kHistogram);
+          EXPECT_EQ(aggregation_config->cardinality_limit_, 42u);
+          auto *histogram_config =
+              static_cast<const metrics_sdk::HistogramAggregationConfig *>(aggregation_config);
+          EXPECT_EQ(histogram_config->boundaries_, (std::vector<double>{1.0, 2.0}));
         }
         return true;
       });

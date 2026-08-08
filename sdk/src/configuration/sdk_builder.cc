@@ -1912,94 +1912,124 @@ void SdkBuilder::AddView(
 {
   auto *selector = model->selector.get();
 
-  if (selector->instrument_type == opentelemetry::sdk::configuration::InstrumentType::none)
+  // Synchronous gauge instruments are not supported in ABIv1
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+  if (selector->instrument_type == opentelemetry::sdk::configuration::InstrumentType::gauge)
   {
-    std::string die("Runtime does not support instrument_type: null");
+    std::string die("Runtime does not support instrument_type: gauge with ABI version 1");
     throw UnsupportedException(die);
   }
+#endif
 
-  auto sdk_instrument_type = ConvertInstrumentType(selector->instrument_type);
+  auto add_view = [&](opentelemetry::sdk::metrics::InstrumentType sdk_instrument_type) {
+    // If the instrument name is empty, use "*" to match all instruments of the given type.
+    const std::string instrument_name =
+        selector->instrument_name.empty() ? "*" : selector->instrument_name;
 
-  auto sdk_instrument_selector = std::make_unique<opentelemetry::sdk::metrics::InstrumentSelector>(
-      sdk_instrument_type, selector->instrument_name, selector->unit);
+    auto sdk_instrument_selector =
+        std::make_unique<opentelemetry::sdk::metrics::InstrumentSelector>(
+            sdk_instrument_type, instrument_name, selector->unit);
 
-  auto sdk_meter_selector = std::make_unique<opentelemetry::sdk::metrics::MeterSelector>(
-      selector->meter_name, selector->meter_version, selector->meter_schema_url);
+    auto sdk_meter_selector = std::make_unique<opentelemetry::sdk::metrics::MeterSelector>(
+        selector->meter_name, selector->meter_version, selector->meter_schema_url);
 
-  auto *stream = model->stream.get();
+    auto *stream = model->stream.get();
 
-  opentelemetry::sdk::metrics::AggregationType sdk_aggregation_type =
-      opentelemetry::sdk::metrics::AggregationType::kDefault;
+    opentelemetry::sdk::metrics::AggregationType sdk_aggregation_type =
+        opentelemetry::sdk::metrics::AggregationType::kDefault;
 
-  std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> sdk_aggregation_config;
+    std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> sdk_aggregation_config;
 
-  if (stream->aggregation)
-  {
-    sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
-  }
-
-  // Apply aggregation_cardinality_limit from the view stream configuration
-  if (stream->aggregation_cardinality_limit != 0)
-  {
-    if (sdk_aggregation_config)
+    if (stream->aggregation)
     {
-      sdk_aggregation_config->cardinality_limit_ = stream->aggregation_cardinality_limit;
+      sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
     }
-    else
-    {
-      // No explicit `aggregation` block was configured, so the view falls back to the
-      // instrument's default aggregation. ViewRegistry::AddView() rejects a view whose
-      // AggregationConfig type does not match the (possibly instrument-derived) aggregation
-      // type, so the config created here must match that same default rather than always
-      // being a plain AggregationConfig (which only satisfies kSum/kLastValue/kDrop).
-      auto effective_aggregation_type = sdk_aggregation_type;
-      if (effective_aggregation_type == opentelemetry::sdk::metrics::AggregationType::kDefault)
-      {
-        bool is_monotonic{false};
-        effective_aggregation_type =
-            opentelemetry::sdk::metrics::DefaultAggregation::GetDefaultAggregationType(
-                sdk_instrument_type, is_monotonic);
-      }
 
-      switch (effective_aggregation_type)
+    // Apply aggregation_cardinality_limit from the view stream configuration
+    if (stream->aggregation_cardinality_limit != 0)
+    {
+      if (sdk_aggregation_config)
       {
-        case opentelemetry::sdk::metrics::AggregationType::kHistogram: {
-          auto histogram_config =
-              std::make_shared<opentelemetry::sdk::metrics::HistogramAggregationConfig>(
-                  stream->aggregation_cardinality_limit);
-          // A default-constructed HistogramAggregationConfig has empty boundaries_, which
-          // LongHistogramAggregation/DoubleHistogramAggregation interpret as "use these zero
-          // boundaries" rather than "no boundaries configured" (that distinction only exists
-          // when the config pointer itself is null). Since this config is synthesized here
-          // rather than coming from an explicit `aggregation` block, it must carry the SDK's
-          // default boundaries to preserve the instrument's default histogram shape.
-          histogram_config->boundaries_ =
-              opentelemetry::sdk::metrics::HistogramAggregationConfig::DefaultBoundaries();
-          sdk_aggregation_config = histogram_config;
-          break;
+        sdk_aggregation_config->cardinality_limit_ = stream->aggregation_cardinality_limit;
+      }
+      else
+      {
+        // No explicit `aggregation` block was configured, so the view falls back to the
+        // instrument's default aggregation. ViewRegistry::AddView() rejects a view whose
+        // AggregationConfig type does not match the (possibly instrument-derived) aggregation
+        // type, so the config created here must match that same default rather than always
+        // being a plain AggregationConfig (which only satisfies kSum/kLastValue/kDrop).
+        auto effective_aggregation_type = sdk_aggregation_type;
+        if (effective_aggregation_type == opentelemetry::sdk::metrics::AggregationType::kDefault)
+        {
+          bool is_monotonic{false};
+          effective_aggregation_type =
+              opentelemetry::sdk::metrics::DefaultAggregation::GetDefaultAggregationType(
+                  sdk_instrument_type, is_monotonic);
         }
 
-        default:
-          sdk_aggregation_config = std::make_shared<opentelemetry::sdk::metrics::AggregationConfig>(
-              stream->aggregation_cardinality_limit);
-          break;
+        switch (effective_aggregation_type)
+        {
+          case opentelemetry::sdk::metrics::AggregationType::kHistogram: {
+            auto histogram_config =
+                std::make_shared<opentelemetry::sdk::metrics::HistogramAggregationConfig>(
+                    stream->aggregation_cardinality_limit);
+            // A default-constructed HistogramAggregationConfig has empty boundaries_, which
+            // LongHistogramAggregation/DoubleHistogramAggregation interpret as "use these zero
+            // boundaries" rather than "no boundaries configured" (that distinction only exists
+            // when the config pointer itself is null). Since this config is synthesized here
+            // rather than coming from an explicit `aggregation` block, it must carry the SDK's
+            // default boundaries to preserve the instrument's default histogram shape.
+            histogram_config->boundaries_ =
+                opentelemetry::sdk::metrics::HistogramAggregationConfig::DefaultBoundaries();
+            sdk_aggregation_config = histogram_config;
+            break;
+          }
+
+          default:
+            sdk_aggregation_config =
+                std::make_shared<opentelemetry::sdk::metrics::AggregationConfig>(
+                    stream->aggregation_cardinality_limit);
+            break;
+        }
       }
     }
-  }
 
-  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk_attribute_processor;
+    std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk_attribute_processor;
 
-  if (stream->attribute_keys != nullptr)
+    // FIXME-SDK: The CreateAttributesProcessor method is not implemented yet.
+    if (stream->attribute_keys != nullptr)
+    {
+      sdk_attribute_processor = CreateAttributesProcessor(stream->attribute_keys);
+    }
+
+    auto sdk_view = std::make_unique<opentelemetry::sdk::metrics::View>(
+        stream->name, stream->description, sdk_aggregation_type, sdk_aggregation_config,
+        std::move(sdk_attribute_processor));
+
+    view_registry->AddView(std::move(sdk_instrument_selector), std::move(sdk_meter_selector),
+                           std::move(sdk_view));
+  };  // add_view
+
+  // If the instrument type is "none", add views to select all instrument types.
+  // FIXME-SDK: register a single view instead. InstrumentSelector must support an optional
+  // instrument type (a "match all types" value honored by ViewRegistry::MatchInstrument).
+  if (selector->instrument_type == opentelemetry::sdk::configuration::InstrumentType::none)
   {
-    sdk_attribute_processor = CreateAttributesProcessor(stream->attribute_keys);
+    add_view(opentelemetry::sdk::metrics::InstrumentType::kCounter);
+    add_view(opentelemetry::sdk::metrics::InstrumentType::kHistogram);
+    add_view(opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter);
+    add_view(opentelemetry::sdk::metrics::InstrumentType::kObservableCounter);
+    add_view(opentelemetry::sdk::metrics::InstrumentType::kObservableGauge);
+    add_view(opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter);
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+    add_view(opentelemetry::sdk::metrics::InstrumentType::kGauge);
+#endif
   }
-
-  auto sdk_view = std::make_unique<opentelemetry::sdk::metrics::View>(
-      stream->name, stream->description, sdk_aggregation_type, sdk_aggregation_config,
-      std::move(sdk_attribute_processor));
-
-  view_registry->AddView(std::move(sdk_instrument_selector), std::move(sdk_meter_selector),
-                         std::move(sdk_view));
+  else
+  {
+    add_view(ConvertInstrumentType(selector->instrument_type));
+  }
 }
 
 std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
