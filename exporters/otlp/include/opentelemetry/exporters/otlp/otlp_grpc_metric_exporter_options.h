@@ -28,6 +28,7 @@ struct OPENTELEMETRY_EXPORT OtlpGrpcMetricExporterOptions : public OtlpGrpcClien
   OtlpGrpcMetricExporterOptions();
   /** No defaults. */
   OtlpGrpcMetricExporterOptions(void *);
+  explicit OtlpGrpcMetricExporterOptions(const OtlpGrpcClientOptions &client_options);
   OtlpGrpcMetricExporterOptions(const OtlpGrpcMetricExporterOptions &)            = default;
   OtlpGrpcMetricExporterOptions(OtlpGrpcMetricExporterOptions &&)                 = default;
   OtlpGrpcMetricExporterOptions &operator=(const OtlpGrpcMetricExporterOptions &) = default;
