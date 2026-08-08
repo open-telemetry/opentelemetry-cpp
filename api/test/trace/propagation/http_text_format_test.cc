@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <utility>
@@ -31,6 +31,9 @@
 #include "opentelemetry/trace/trace_state.h"
 
 using namespace opentelemetry;
+
+namespace
+{
 
 class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
@@ -266,3 +269,5 @@ TEST(GlobalPropagator, SetAndGet)
   EXPECT_EQ(fields[0], trace::propagation::kTraceParent);
   EXPECT_EQ(fields[1], trace::propagation::kTraceState);
 }
+
+}  // namespace

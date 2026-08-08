@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_factory.h"
+#include <memory>
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_runtime_options.h"
@@ -32,9 +33,7 @@ OtlpFileLogRecordExporterFactory::Create(
     const OtlpFileLogRecordExporterOptions &options,
     const OtlpFileLogRecordExporterRuntimeOptions &runtime_options)
 {
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> exporter(
-      new OtlpFileLogRecordExporter(options, runtime_options));
-  return exporter;
+  return std::make_unique<OtlpFileLogRecordExporter>(options, runtime_options);
 }
 
 }  // namespace otlp

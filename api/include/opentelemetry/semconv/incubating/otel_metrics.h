@@ -963,7 +963,9 @@ CreateAsyncDoubleMetricOtelSdkSpanEndedCount(metrics::Meter *meter)
 
 /**
   The number of created spans with @code recording=true @endcode for which the end operation has not
-  been called yet. <p> updowncounter
+  been called yet. <p> Non-recording spans are not counted, hence @code otel.span.sampling_result
+  @endcode can only take values @code RECORD_ONLY @endcode and @code RECORD_AND_SAMPLE @endcode, not
+  @code DROP @endcode. <p> updowncounter
  */
 static constexpr const char *kMetricOtelSdkSpanLive = "otel.sdk.span.live";
 static constexpr const char *descrMetricOtelSdkSpanLive =

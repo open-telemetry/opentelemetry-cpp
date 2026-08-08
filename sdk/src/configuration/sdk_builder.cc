@@ -1,9 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stddef.h>
-#include <stdint.h>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
@@ -16,6 +16,7 @@
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/context/propagation/composite_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -31,7 +32,16 @@
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_patterns_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
@@ -42,6 +52,7 @@
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/exemplar_filter.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
@@ -64,6 +75,7 @@
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_exporter_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/log_record_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
@@ -95,7 +107,9 @@
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
@@ -114,6 +128,7 @@
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/string_array_attribute_value_configuration.h"
@@ -133,16 +148,16 @@
 #include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
-#include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#include "opentelemetry/sdk/metrics/export/metric_producer.h"
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
+#include "opentelemetry/sdk/metrics/cardinality_limits.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
@@ -167,9 +182,19 @@
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off_factory.h"
 #include "opentelemetry/sdk/trace/samplers/always_on_factory.h"
+#include "opentelemetry/sdk/trace/samplers/composable_always_off.h"
+#include "opentelemetry/sdk/trace/samplers/composable_always_on.h"
+#include "opentelemetry/sdk/trace/samplers/composable_parent_threshold.h"
+#include "opentelemetry/sdk/trace/samplers/composable_probability.h"
+#include "opentelemetry/sdk/trace/samplers/composable_rule_based.h"
+#include "opentelemetry/sdk/trace/samplers/composable_sampler.h"
+#include "opentelemetry/sdk/trace/samplers/composite_sampler_factory.h"
 #include "opentelemetry/sdk/trace/samplers/parent_factory.h"
+#include "opentelemetry/sdk/trace/samplers/probability_factory.h"
+#include "opentelemetry/sdk/trace/samplers/rule_based_predicate.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
@@ -177,7 +202,7 @@
 #include "src/common/wildcard_match.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#  include "opentelemetry/sdk/configuration/exemplar_filter.h"
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -190,6 +215,102 @@ using common::WildcardMatch;
 
 namespace
 {
+
+static opentelemetry::logs::Severity ToLogSeverity(
+    opentelemetry::sdk::configuration::SeverityNumber severity_number)
+{
+  // Convert configuration::SeverityNumber to opentelemetry::logs::Severity
+  // The configuration::SeverityNumber enum values do not match the opentelemetry::logs::Severity
+  // enum values use a switch statement for conversion.
+  switch (severity_number)
+  {
+    case SeverityNumber::trace:
+      return opentelemetry::logs::Severity::kTrace;
+    case SeverityNumber::trace2:
+      return opentelemetry::logs::Severity::kTrace2;
+    case SeverityNumber::trace3:
+      return opentelemetry::logs::Severity::kTrace3;
+    case SeverityNumber::trace4:
+      return opentelemetry::logs::Severity::kTrace4;
+    case SeverityNumber::debug:
+      return opentelemetry::logs::Severity::kDebug;
+    case SeverityNumber::debug2:
+      return opentelemetry::logs::Severity::kDebug2;
+    case SeverityNumber::debug3:
+      return opentelemetry::logs::Severity::kDebug3;
+    case SeverityNumber::debug4:
+      return opentelemetry::logs::Severity::kDebug4;
+    case SeverityNumber::info:
+      return opentelemetry::logs::Severity::kInfo;
+    case SeverityNumber::info2:
+      return opentelemetry::logs::Severity::kInfo2;
+    case SeverityNumber::info3:
+      return opentelemetry::logs::Severity::kInfo3;
+    case SeverityNumber::info4:
+      return opentelemetry::logs::Severity::kInfo4;
+    case SeverityNumber::warn:
+      return opentelemetry::logs::Severity::kWarn;
+    case SeverityNumber::warn2:
+      return opentelemetry::logs::Severity::kWarn2;
+    case SeverityNumber::warn3:
+      return opentelemetry::logs::Severity::kWarn3;
+    case SeverityNumber::warn4:
+      return opentelemetry::logs::Severity::kWarn4;
+    case SeverityNumber::error:
+      return opentelemetry::logs::Severity::kError;
+    case SeverityNumber::error2:
+      return opentelemetry::logs::Severity::kError2;
+    case SeverityNumber::error3:
+      return opentelemetry::logs::Severity::kError3;
+    case SeverityNumber::error4:
+      return opentelemetry::logs::Severity::kError4;
+    case SeverityNumber::fatal:
+      return opentelemetry::logs::Severity::kFatal;
+    case SeverityNumber::fatal2:
+      return opentelemetry::logs::Severity::kFatal2;
+    case SeverityNumber::fatal3:
+      return opentelemetry::logs::Severity::kFatal3;
+    case SeverityNumber::fatal4:
+      return opentelemetry::logs::Severity::kFatal4;
+    default:
+      break;
+  }
+  return opentelemetry::logs::Severity::kInvalid;
+}
+
+/// Convert a CardinalityLimitsConfiguration (where 0 means "unset, use
+/// default_limit") into a fully-resolved CardinalityLimits struct ready for
+/// MetricReader::SetCardinalityLimits().
+static opentelemetry::sdk::metrics::CardinalityLimits ToCardinalityLimits(
+    const opentelemetry::sdk::configuration::CardinalityLimitsConfiguration &cfg)
+{
+  opentelemetry::sdk::metrics::CardinalityLimits limits;
+  // If the caller supplied a non-zero default, use it; otherwise keep the
+  // SDK default (kDefaultCardinalityLimit = 2000) already in the struct.
+  const std::size_t d  = cfg.default_limit != CardinalityLimitsConfiguration::kInheritDefault
+                             ? cfg.default_limit
+                             : limits.default_limit;
+  limits.default_limit = d;
+  limits.counter = cfg.counter != CardinalityLimitsConfiguration::kInheritDefault ? cfg.counter : d;
+  limits.gauge   = cfg.gauge != CardinalityLimitsConfiguration::kInheritDefault ? cfg.gauge : d;
+  limits.histogram =
+      cfg.histogram != CardinalityLimitsConfiguration::kInheritDefault ? cfg.histogram : d;
+  limits.observable_counter =
+      cfg.observable_counter != CardinalityLimitsConfiguration::kInheritDefault
+          ? cfg.observable_counter
+          : d;
+  limits.observable_gauge = cfg.observable_gauge != CardinalityLimitsConfiguration::kInheritDefault
+                                ? cfg.observable_gauge
+                                : d;
+  limits.observable_up_down_counter =
+      cfg.observable_up_down_counter != CardinalityLimitsConfiguration::kInheritDefault
+          ? cfg.observable_up_down_counter
+          : d;
+  limits.up_down_counter = cfg.up_down_counter != CardinalityLimitsConfiguration::kInheritDefault
+                               ? cfg.up_down_counter
+                               : d;
+  return limits;
+}
 
 class ResourceAttributeValueSetter
     : public opentelemetry::sdk::configuration::AttributeValueConfigurationVisitor
@@ -323,6 +444,166 @@ private:
   std::string name_;
 };
 
+class ComposableSamplerBuilder
+    : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
+{
+public:
+  // NOLINTBEGIN(misc-no-recursion)
+  static std::shared_ptr<opentelemetry::sdk::trace::ComposableSampler> Build(
+      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model)
+  {
+    ComposableSamplerBuilder builder;
+    model->Accept(&builder);
+    return std::move(builder.sampler);
+  }
+
+  ComposableSamplerBuilder()                                                 = default;
+  ComposableSamplerBuilder(ComposableSamplerBuilder &&)                      = delete;
+  ComposableSamplerBuilder(const ComposableSamplerBuilder &)                 = delete;
+  ComposableSamplerBuilder &operator=(ComposableSamplerBuilder &&)           = delete;
+  ComposableSamplerBuilder &operator=(const ComposableSamplerBuilder &other) = delete;
+  ~ComposableSamplerBuilder() override                                       = default;
+
+  void VisitComposableAlwaysOff(
+      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration
+          * /* model */) override
+  {
+    sampler = std::make_shared<opentelemetry::sdk::trace::ComposableAlwaysOffSampler>();
+  }
+
+  void VisitComposableAlwaysOn(
+      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration * /* model */)
+      override
+  {
+    sampler = std::make_shared<opentelemetry::sdk::trace::ComposableAlwaysOnSampler>();
+  }
+
+  void VisitComposableProbability(
+      const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
+      override
+  {
+    sampler =
+        std::make_shared<opentelemetry::sdk::trace::ComposableProbabilitySampler>(model->ratio);
+  }
+
+  void VisitComposableParentThreshold(
+      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *model)
+      override
+  {
+    std::shared_ptr<opentelemetry::sdk::trace::ComposableSampler> root;
+    if (model->root != nullptr)
+    {
+      root = Build(model->root.get());
+    }
+    else
+    {
+      root = std::make_shared<opentelemetry::sdk::trace::ComposableAlwaysOnSampler>();
+    }
+    sampler = std::make_shared<opentelemetry::sdk::trace::ComposableParentThresholdSampler>(root);
+  }
+
+  void VisitComposableRuleBased(
+      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *model)
+      override
+  {
+    std::vector<opentelemetry::sdk::trace::PredicatedSampler> rules;
+    rules.reserve(model->rules.size());
+    for (const auto &rule : model->rules)
+    {
+      if (rule == nullptr || rule->sampler == nullptr)
+      {
+        OTEL_INTERNAL_LOG_WARN("Ignoring a rule with no sampler");
+        continue;
+      }
+      opentelemetry::sdk::trace::PredicatedSampler predicated;
+      predicated.predicate = std::make_shared<opentelemetry::sdk::trace::RuleBasedPredicate>(
+          MakePredicateOptions(rule.get()));
+      predicated.sampler = Build(rule->sampler.get());
+      rules.push_back(std::move(predicated));
+    }
+    sampler =
+        std::make_shared<opentelemetry::sdk::trace::ComposableRuleBasedSampler>(std::move(rules));
+  }
+  // NOLINTEND(misc-no-recursion)
+
+  // The model only ever nests ComposableSamplerConfiguration here, so the
+  // plain sampler visits are unreachable.
+  void VisitAlwaysOff(
+      const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  void VisitAlwaysOn(
+      const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  void VisitJaegerRemote(const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration
+                             * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  void VisitParentBased(const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration
+                            * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  void VisitProbability(const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration
+                            * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  void VisitTraceIdRatioBased(
+      const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration * /* model */)
+      override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  void VisitExtension(
+      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration * /* model */) override
+  {
+    OTEL_INTERNAL_LOG_ERROR("Expecting a composable sampler");
+  }
+
+  std::shared_ptr<opentelemetry::sdk::trace::ComposableSampler> sampler;
+
+private:
+  static opentelemetry::sdk::trace::RuleBasedPredicateOptions MakePredicateOptions(
+      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerRuleConfiguration *rule)
+  {
+    opentelemetry::sdk::trace::RuleBasedPredicateOptions options;
+    if (rule->attribute_values != nullptr)
+    {
+      options.match_values = true;
+      options.values_key   = rule->attribute_values->key;
+      options.values       = rule->attribute_values->values;
+    }
+    if (rule->attribute_patterns != nullptr)
+    {
+      options.match_patterns = true;
+      options.patterns_key   = rule->attribute_patterns->key;
+      options.included       = rule->attribute_patterns->included;
+      options.excluded       = rule->attribute_patterns->excluded;
+    }
+    options.match_parent_none   = rule->match_parent_none;
+    options.match_parent_remote = rule->match_parent_remote;
+    options.match_parent_local  = rule->match_parent_local;
+
+    options.match_span_kind_internal = rule->match_span_kind_internal;
+    options.match_span_kind_server   = rule->match_span_kind_server;
+    options.match_span_kind_client   = rule->match_span_kind_client;
+    options.match_span_kind_producer = rule->match_span_kind_producer;
+    options.match_span_kind_consumer = rule->match_span_kind_consumer;
+    return options;
+  }
+};
+
 class SamplerBuilder : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
 {
 public:
@@ -357,6 +638,12 @@ public:
     sampler = sdk_builder_->CreateParentBasedSampler(model);
   }
 
+  void VisitProbability(
+      const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model) override
+  {
+    sampler = sdk_builder_->CreateProbabilitySampler(model);
+  }
+
   void VisitTraceIdRatioBased(
       const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model)
       override
@@ -371,42 +658,43 @@ public:
   }
 
   void VisitComposableAlwaysOff(
-      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration
-          * /* model */) override
+      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *model)
+      override
   {
-    sampler = opentelemetry::sdk::trace::AlwaysOffSamplerFactory::Create();
+    sampler = opentelemetry::sdk::trace::CompositeSamplerFactory::Create(
+        ComposableSamplerBuilder::Build(model));
   }
 
   void VisitComposableAlwaysOn(
-      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration * /* model */)
+      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration *model)
       override
   {
-    sampler = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+    sampler = opentelemetry::sdk::trace::CompositeSamplerFactory::Create(
+        ComposableSamplerBuilder::Build(model));
   }
 
   void VisitComposableProbability(
       const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
       override
   {
-    sampler = opentelemetry::sdk::trace::TraceIdRatioBasedSamplerFactory::Create(model->ratio);
+    sampler = opentelemetry::sdk::trace::CompositeSamplerFactory::Create(
+        ComposableSamplerBuilder::Build(model));
   }
 
   void VisitComposableParentThreshold(
-      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration
-          * /* model */) override
+      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *model)
+      override
   {
-    // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/4028
-    OTEL_INTERNAL_LOG_WARN("ComposableParentThresholdSampler not yet fully supported by SDK");
-    sampler = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+    sampler = opentelemetry::sdk::trace::CompositeSamplerFactory::Create(
+        ComposableSamplerBuilder::Build(model));
   }
 
   void VisitComposableRuleBased(
-      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration
-          * /* model */) override
+      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *model)
+      override
   {
-    // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/4028
-    OTEL_INTERNAL_LOG_WARN("ComposableRuleBasedSampler not yet fully supported by SDK");
-    sampler = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+    sampler = opentelemetry::sdk::trace::CompositeSamplerFactory::Create(
+        ComposableSamplerBuilder::Build(model));
   }
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sampler;
@@ -659,7 +947,8 @@ public:
     aggregation_type = opentelemetry::sdk::metrics::AggregationType::kSum;
   }
 
-  opentelemetry::sdk::metrics::AggregationType aggregation_type;
+  opentelemetry::sdk::metrics::AggregationType aggregation_type{
+      opentelemetry::sdk::metrics::AggregationType::kDefault};
   std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> aggregation_config;
 
 private:
@@ -788,7 +1077,15 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateParentBase
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> local_parent_sampled_sdk;
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> local_parent_not_sampled_sdk;
 
-  auto root_sdk = SdkBuilder::CreateSampler(model->root);
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> root_sdk;
+  if (model->root)
+  {
+    root_sdk = SdkBuilder::CreateSampler(model->root);
+  }
+  else
+  {
+    root_sdk = opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create();
+  }
 
   if (model->remote_parent_sampled != nullptr)
   {
@@ -839,6 +1136,16 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateParentBase
   sdk = opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create(
       shared_root, shared_remote_parent_sampled, shared_remote_parent_not_sampled,
       shared_local_parent_sampled, shared_local_parent_not_sampled);
+
+  return sdk;
+}
+
+std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateProbabilitySampler(
+    const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model) const
+{
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> sdk;
+
+  sdk = opentelemetry::sdk::trace::ProbabilitySamplerFactory::Create(model->ratio);
 
   return sdk;
 }
@@ -990,11 +1297,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateBatc
   opentelemetry::sdk::trace::BatchSpanProcessorOptions options;
 
   options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
-
-#ifdef LATER
-  options.xxx = model->export_timeout;
-#endif
-
+  options.export_timeout        = std::chrono::milliseconds(model->export_timeout);
   options.max_queue_size        = model->max_queue_size;
   options.max_export_batch_size = model->max_export_batch_size;
 
@@ -1094,6 +1397,12 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
   {
     sampler = CreateSampler(model->sampler);
   }
+  else
+  {
+    // Spec default: parentbased_always_on
+    sampler = opentelemetry::sdk::trace::ParentBasedSamplerFactory::Create(
+        opentelemetry::sdk::trace::AlwaysOnSamplerFactory::Create());
+  }
 
   std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> sdk_processors;
 
@@ -1102,20 +1411,38 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
     sdk_processors.push_back(CreateSpanProcessor(processor_model));
   }
 
-  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3303
-  // FIXME-SDK: use limits, id_generator, ...
+  opentelemetry::sdk::trace::SpanLimits span_limits;
+  if (model->limits)
+  {
+    span_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
+    span_limits.attribute_count_limit        = model->limits->attribute_count_limit;
+    span_limits.event_count_limit            = model->limits->event_count_limit;
+    span_limits.link_count_limit             = model->limits->link_count_limit;
+    span_limits.event_attribute_count_limit  = model->limits->event_attribute_count_limit;
+    span_limits.link_attribute_count_limit   = model->limits->link_attribute_count_limit;
+  }
+
   if (model->tracer_configurator)
   {
     auto tracer_configurator = CreateTracerConfigurator(model->tracer_configurator);
     auto id_generator        = opentelemetry::sdk::trace::RandomIdGeneratorFactory::Create();
     sdk                      = opentelemetry::sdk::trace::TracerProviderFactory::Create(
         std::move(sdk_processors), resource, std::move(sampler), std::move(id_generator),
-        std::move(tracer_configurator));
+        std::move(tracer_configurator), span_limits);
   }
   else
   {
-    sdk = opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sdk_processors),
-                                                                   resource, std::move(sampler));
+    auto id_generator = opentelemetry::sdk::trace::RandomIdGeneratorFactory::Create();
+    auto tracer_configurator =
+        std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+            opentelemetry::sdk::trace::TracerConfig>>(
+            opentelemetry::sdk::instrumentationscope::
+                ScopeConfigurator<opentelemetry::sdk::trace::TracerConfig>::Builder(
+                    opentelemetry::sdk::trace::TracerConfig::Default())
+                    .Build());
+    sdk = opentelemetry::sdk::trace::TracerProviderFactory::Create(
+        std::move(sdk_processors), resource, std::move(sampler), std::move(id_generator),
+        std::move(tracer_configurator), span_limits);
   }
 
   return sdk;
@@ -1459,11 +1786,6 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
 {
   std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
 
-  opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions options;
-
-  options.export_interval_millis = std::chrono::milliseconds(model->interval);
-  options.export_timeout_millis  = std::chrono::milliseconds(model->timeout);
-
   auto exporter_sdk = CreatePushMetricExporter(model->exporter);
 
   if (model->producers.size() > 0)
@@ -1471,13 +1793,23 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
     OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
   }
 
-  if (model->cardinality_limits != nullptr)
+  const PeriodicMetricReaderBuilder *builder = registry_->GetPeriodicMetricReaderBuilder();
+
+  if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_WARN("cardinality limits not supported, ignoring");
+    OTEL_INTERNAL_LOG_DEBUG("CreatePeriodicMetricReader() using registered builder");
+    sdk = builder->Build(model, std::move(exporter_sdk));
+  }
+  else
+  {
+    static const std::string die("No builder for PeriodicMetricReader");
+    throw UnsupportedException(die);
   }
 
-  sdk = opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
-      std::move(exporter_sdk), options);
+  if (model->cardinality_limits != nullptr)
+  {
+    sdk->SetCardinalityLimits(ToCardinalityLimits(*model->cardinality_limits));
+  }
 
   return sdk;
 }
@@ -1496,7 +1828,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePul
 
   if (model->cardinality_limits != nullptr)
   {
-    OTEL_INTERNAL_LOG_WARN("cardinality limits not supported, ignoring");
+    sdk->SetCardinalityLimits(ToCardinalityLimits(*model->cardinality_limits));
   }
 
   return sdk;
@@ -1523,8 +1855,8 @@ SdkBuilder::CreateBase2ExponentialBucketHistogramAggregation(
   auto sdk =
       std::make_unique<opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>();
 
-  sdk->max_buckets_    = model->max_size;
-  sdk->max_scale_      = static_cast<int32_t>(model->max_scale);
+  sdk->max_size_       = model->max_size;
+  sdk->max_scale_      = model->max_scale;
   sdk->record_min_max_ = model->record_min_max;
 
   return sdk;
@@ -1598,7 +1930,59 @@ void SdkBuilder::AddView(
 
   std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> sdk_aggregation_config;
 
-  sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
+  if (stream->aggregation)
+  {
+    sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
+  }
+
+  // Apply aggregation_cardinality_limit from the view stream configuration
+  if (stream->aggregation_cardinality_limit != 0)
+  {
+    if (sdk_aggregation_config)
+    {
+      sdk_aggregation_config->cardinality_limit_ = stream->aggregation_cardinality_limit;
+    }
+    else
+    {
+      // No explicit `aggregation` block was configured, so the view falls back to the
+      // instrument's default aggregation. ViewRegistry::AddView() rejects a view whose
+      // AggregationConfig type does not match the (possibly instrument-derived) aggregation
+      // type, so the config created here must match that same default rather than always
+      // being a plain AggregationConfig (which only satisfies kSum/kLastValue/kDrop).
+      auto effective_aggregation_type = sdk_aggregation_type;
+      if (effective_aggregation_type == opentelemetry::sdk::metrics::AggregationType::kDefault)
+      {
+        bool is_monotonic{false};
+        effective_aggregation_type =
+            opentelemetry::sdk::metrics::DefaultAggregation::GetDefaultAggregationType(
+                sdk_instrument_type, is_monotonic);
+      }
+
+      switch (effective_aggregation_type)
+      {
+        case opentelemetry::sdk::metrics::AggregationType::kHistogram: {
+          auto histogram_config =
+              std::make_shared<opentelemetry::sdk::metrics::HistogramAggregationConfig>(
+                  stream->aggregation_cardinality_limit);
+          // A default-constructed HistogramAggregationConfig has empty boundaries_, which
+          // LongHistogramAggregation/DoubleHistogramAggregation interpret as "use these zero
+          // boundaries" rather than "no boundaries configured" (that distinction only exists
+          // when the config pointer itself is null). Since this config is synthesized here
+          // rather than coming from an explicit `aggregation` block, it must carry the SDK's
+          // default boundaries to preserve the instrument's default histogram shape.
+          histogram_config->boundaries_ =
+              opentelemetry::sdk::metrics::HistogramAggregationConfig::DefaultBoundaries();
+          sdk_aggregation_config = histogram_config;
+          break;
+        }
+
+        default:
+          sdk_aggregation_config = std::make_shared<opentelemetry::sdk::metrics::AggregationConfig>(
+              stream->aggregation_cardinality_limit);
+          break;
+      }
+    }
+  }
 
   std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk_attribute_processor;
 
@@ -1805,6 +2189,7 @@ SdkBuilder::CreateBatchLogRecordProcessor(
   opentelemetry::sdk::logs::BatchLogRecordProcessorOptions options;
 
   options.schedule_delay_millis = std::chrono::milliseconds(model->schedule_delay);
+  options.export_timeout_millis = std::chrono::milliseconds(model->export_timeout);
   options.max_queue_size        = model->max_queue_size;
   options.max_export_batch_size = model->max_export_batch_size;
 
@@ -1874,15 +2259,17 @@ SdkBuilder::CreateLoggerConfigurator(
   using opentelemetry::sdk::instrumentationscope::ScopeConfigurator;
   using opentelemetry::sdk::logs::LoggerConfig;
 
-  LoggerConfig default_config =
-      model->default_config.enabled ? LoggerConfig::Enabled() : LoggerConfig::Disabled();
+  LoggerConfig default_config = LoggerConfig::Create(
+      model->default_config.enabled, ToLogSeverity(model->default_config.minimum_severity),
+      model->default_config.trace_based);
 
   auto builder = ScopeConfigurator<LoggerConfig>::Builder(default_config);
 
   for (const auto &entry : model->loggers)
   {
     LoggerConfig entry_config =
-        entry.config.enabled ? LoggerConfig::Enabled() : LoggerConfig::Disabled();
+        LoggerConfig::Create(entry.config.enabled, ToLogSeverity(entry.config.minimum_severity),
+                             entry.config.trace_based);
     std::string pattern = entry.name;
     builder.AddCondition(
         [pattern](const InstrumentationScope &scope) {
@@ -1907,19 +2294,33 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
     sdk_processors.push_back(CreateLogRecordProcessor(processor_model));
   }
 
-  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3303
-  // FIXME-SDK: use limits
+  opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
+  if (model->limits)
+  {
+    log_record_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
+    log_record_limits.attribute_count_limit        = model->limits->attribute_count_limit;
+  }
+
+  std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+      opentelemetry::sdk::logs::LoggerConfig>>
+      logger_configurator;
   if (model->logger_configurator)
   {
-    auto logger_configurator = CreateLoggerConfigurator(model->logger_configurator);
-    sdk                      = opentelemetry::sdk::logs::LoggerProviderFactory::Create(
-        std::move(sdk_processors), resource, std::move(logger_configurator));
+    logger_configurator = CreateLoggerConfigurator(model->logger_configurator);
   }
   else
   {
-    sdk = opentelemetry::sdk::logs::LoggerProviderFactory::Create(std::move(sdk_processors),
-                                                                  resource);
+    logger_configurator =
+        std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+            opentelemetry::sdk::logs::LoggerConfig>>(
+            opentelemetry::sdk::instrumentationscope::
+                ScopeConfigurator<opentelemetry::sdk::logs::LoggerConfig>::Builder(
+                    opentelemetry::sdk::logs::LoggerConfig::Default())
+                    .Build());
   }
+
+  sdk = opentelemetry::sdk::logs::LoggerProviderFactory::Create(
+      std::move(sdk_processors), resource, std::move(logger_configurator), log_record_limits);
 
   return sdk;
 }

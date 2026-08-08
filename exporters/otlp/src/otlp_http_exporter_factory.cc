@@ -36,17 +36,14 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory
     const OtlpHttpExporterOptions &options,
     const OtlpHttpExporterRuntimeOptions &runtime_options)
 {
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter(
-      new OtlpHttpExporter(options, runtime_options));
-  return exporter;
+  return std::make_unique<OtlpHttpExporter>(options, runtime_options);
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory::Create(
     const OtlpHttpExporterOptions &options,
     const std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> &factory)
 {
-  return std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(
-      new OtlpHttpExporter(options, factory));
+  return std::make_unique<OtlpHttpExporter>(options, factory);
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory::Create(
@@ -54,16 +51,14 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory
     const OtlpHttpExporterRuntimeOptions &runtime_options,
     const std::shared_ptr<opentelemetry::ext::http::client::HttpClientFactory> &factory)
 {
-  return std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(
-      new OtlpHttpExporter(options, runtime_options, factory));
+  return std::make_unique<OtlpHttpExporter>(options, runtime_options, factory);
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory::Create(
     const OtlpHttpExporterOptions &options,
     std::shared_ptr<opentelemetry::ext::http::client::HttpClient> http_client)
 {
-  return std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(
-      new OtlpHttpExporter(options, std::move(http_client)));
+  return std::make_unique<OtlpHttpExporter>(options, std::move(http_client));
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory::Create(
@@ -71,8 +66,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpHttpExporterFactory
     const OtlpHttpExporterRuntimeOptions &runtime_options,
     std::shared_ptr<opentelemetry::ext::http::client::HttpClient> http_client)
 {
-  return std::unique_ptr<opentelemetry::sdk::trace::SpanExporter>(
-      new OtlpHttpExporter(options, runtime_options, std::move(http_client)));
+  return std::make_unique<OtlpHttpExporter>(options, runtime_options, std::move(http_client));
 }
 
 }  // namespace otlp

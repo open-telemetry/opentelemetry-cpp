@@ -69,6 +69,14 @@ void MultiRecordable::SetIdentity(const opentelemetry::trace::SpanContext &span_
   }
 }
 
+void MultiRecordable::SetSpanLimits(const SpanLimits &limits) noexcept
+{
+  for (auto &recordable : recordables_)
+  {
+    recordable.second->SetSpanLimits(limits);
+  }
+}
+
 void MultiRecordable::SetAttribute(nostd::string_view key,
                                    const opentelemetry::common::AttributeValue &value) noexcept
 {

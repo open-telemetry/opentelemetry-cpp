@@ -1,11 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <ctype.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <atomic>
+#include <cctype>
 #include <chrono>
+#include <cstdint>
+#include <cstdlib>
 #include <functional>
 #include <iostream>
 #include <map>
@@ -55,7 +55,7 @@ static bool equalsIgnoreCase(const std::string &str1, const std::string &str2)
   }
   for (size_t i = 0; i < str1.length(); i++)
   {
-    if (tolower(str1[i]) != tolower(str2[i]))
+    if (std::tolower(str1[i]) != std::tolower(str2[i]))
     {
       return false;
     }
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
   {
-    port = static_cast<uint16_t>(atoi(argv[1]));
+    port = static_cast<uint16_t>(std::strtol(argv[1], nullptr, 10));
   }
 
   auto root_span = get_tracer()->StartSpan(__func__);

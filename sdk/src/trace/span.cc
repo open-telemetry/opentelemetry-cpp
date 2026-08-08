@@ -66,6 +66,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   {
     return;
   }
+  recordable_->SetSpanLimits(tracer_->GetSpanLimits());
   recordable_->SetName(name);
   recordable_->SetInstrumentationScope(tracer_->GetInstrumentationScope());
   recordable_->SetIdentity(*span_context_, parent_span_context.IsValid()
@@ -99,6 +100,10 @@ Span::~Span()
 
 void Span::SetAttribute(nostd::string_view key, const common::AttributeValue &value) noexcept
 {
+  if (key.empty())
+  {
+    return;
+  }
   std::lock_guard<std::mutex> lock_guard{mu_};
   if (recordable_ == nullptr)
   {

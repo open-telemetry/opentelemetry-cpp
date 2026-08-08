@@ -110,6 +110,18 @@ bool MultiLogRecordProcessor::HasEnabledFilter() const noexcept
   return false;
 }
 
+bool MultiLogRecordProcessor::RecordableEnforcesLogRecordLimits() const noexcept
+{
+  for (const auto &processor : processors_)
+  {
+    if (processor != nullptr && processor->RecordableEnforcesLogRecordLimits())
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool MultiLogRecordProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   return InternalForceFlush(timeout);

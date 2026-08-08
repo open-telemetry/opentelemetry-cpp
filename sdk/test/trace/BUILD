@@ -146,6 +146,22 @@ cc_test(
 )
 
 cc_test(
+    name = "probability_sampler_test",
+    srcs = [
+        "probability_sampler_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//sdk/src/common:random",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "trace_id_ratio_sampler_test",
     srcs = [
         "trace_id_ratio_sampler_test.cc",
@@ -203,5 +219,21 @@ otel_cc_benchmark(
         "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/resource",
         "//sdk/src/trace",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "span_data_benchmark",
+    srcs = ["span_data_benchmark.cc"],
+    tags = [
+        "benchmark",
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//exporters/memory:in_memory_span_exporter",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "//test_common:headers",
     ],
 )

@@ -5,7 +5,6 @@
 #include <mutex>
 #include <utility>
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
@@ -17,12 +16,13 @@
 #include "opentelemetry/version.h"
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
-#  include <stdint.h>
+#  include <cstdint>
 #  include <functional>
 #  include <unordered_map>
 #  include <unordered_set>
 #  include <vector>
 
+#  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
@@ -51,7 +51,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
   std::vector<std::shared_ptr<BoundEntry>> entry_snapshot;
 #endif
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
     delta_metrics = std::move(attributes_hashmap_);
     attributes_hashmap_.reset(new AttributesHashMap(aggregation_config_->cardinality_limit_));
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
@@ -142,7 +142,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
   // Drop snapshot refs so use_count reflects only storage + user holders.
   entry_snapshot.clear();
   {
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
     for (const auto &k : snapshot_keys)
     {
       auto it = bound_entries_.find(k);
@@ -189,7 +189,7 @@ std::shared_ptr<BoundSyncWritableMetricStorage> SyncMetricStorage::Bind(
   // Filter attributes once, at bind time.
   MetricAttributes filtered{attributes, attributes_processor_.get()};
 
-  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+  std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
 
   // Dedupe: same post-filter attribute set returns the same bound entry.
   auto it = bound_entries_.find(filtered);
@@ -204,7 +204,7 @@ std::shared_ptr<BoundSyncWritableMetricStorage> SyncMetricStorage::Bind(
   MetricAttributes key = ResolveCardinality(filtered);
 
   // If we ended up at overflow, dedupe against an existing overflow entry.
-  if (key == kOverflowAttributes)
+  if (key == GetOverflowAttributes())
   {
     auto ov_it = bound_entries_.find(key);
     if (ov_it != bound_entries_.end())

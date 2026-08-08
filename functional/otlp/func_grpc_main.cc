@@ -1,10 +1,10 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdio.h>
-#include <string.h>
 #include <chrono>
 #include <cstdint>
+#include <cstdio>
+#include <cstring>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -39,19 +39,23 @@ const int TEST_FAILED = 1;
   Command line parameters.
 */
 
+namespace
+{
 enum class TestMode : std::uint8_t
 {
   kNone,
   kHttp,
   kHttps
 };
+}  // namespace
 
 static bool opt_help   = false;
 static bool opt_list   = false;
 static bool opt_debug  = false;
 static bool opt_secure = false;
 // HTTPS by default
-static std::string opt_endpoint = "https://127.0.0.1:4317";
+constexpr char kDefaultOptEndpoint[] = "https://127.0.0.1:4317";
+static std::string opt_endpoint;
 static std::string opt_cert_dir;
 static std::string opt_test_name;
 static TestMode opt_mode = TestMode::kNone;
@@ -205,7 +209,7 @@ static void instrumented_payload(const otlp::OtlpGrpcExporterOptions &opts)
   cleanup();
 }
 
-static void usage(FILE *out)
+static void usage(std::FILE *out)
 {
   static const char *msg =
       "Usage: func_otlp_grpc [options] test_name\n"
@@ -218,7 +222,7 @@ static void usage(FILE *out)
       "                      - none: no endpoint\n"
       "                      - http: http endpoint\n"
       "                      - https: https endpoint\n";
-  fprintf(out, "%s", msg);
+  std::fprintf(out, "%s", msg);
 }
 
 static int parse_args(int argc, char *argv[])
@@ -228,19 +232,19 @@ static int parse_args(int argc, char *argv[])
 
   while (remaining_argc > 0)
   {
-    if (strcmp(*remaining_argv, "--help") == 0)
+    if (std::strcmp(*remaining_argv, "--help") == 0)
     {
       opt_help = true;
       return 0;
     }
 
-    if (strcmp(*remaining_argv, "--list") == 0)
+    if (std::strcmp(*remaining_argv, "--list") == 0)
     {
       opt_list = true;
       return 0;
     }
 
-    if (strcmp(*remaining_argv, "--debug") == 0)
+    if (std::strcmp(*remaining_argv, "--debug") == 0)
     {
       opt_debug = true;
       remaining_argc--;
@@ -250,7 +254,7 @@ static int parse_args(int argc, char *argv[])
 
     if (remaining_argc >= 2)
     {
-      if (strcmp(*remaining_argv, "--cert-dir") == 0)
+      if (std::strcmp(*remaining_argv, "--cert-dir") == 0)
       {
         remaining_argc--;
         remaining_argv++;
@@ -260,7 +264,7 @@ static int parse_args(int argc, char *argv[])
         continue;
       }
 
-      if (strcmp(*remaining_argv, "--endpoint") == 0)
+      if (std::strcmp(*remaining_argv, "--endpoint") == 0)
       {
         remaining_argc--;
         remaining_argv++;
@@ -270,7 +274,7 @@ static int parse_args(int argc, char *argv[])
         continue;
       }
 
-      if (strcmp(*remaining_argv, "--mode") == 0)
+      if (std::strcmp(*remaining_argv, "--mode") == 0)
       {
         remaining_argc--;
         remaining_argv++;
@@ -318,15 +322,15 @@ typedef int (*test_func_t)();
 
 struct test_case
 {
-  std::string m_name;
-  test_func_t m_func;
+  nostd::string_view m_name;
+  test_func_t m_func{nullptr};
 };
 
 }  // namespace
 
 static int test_basic();
 
-static int test_cert_not_found();
+// static int test_cert_not_found();  // disabled: see TODO above all_tests
 static int test_cert_invalid();
 static int test_cert_unreadable();
 
@@ -341,8 +345,10 @@ static int test_client_key_unreadable();
 static int test_mtls_ok();
 #endif  // ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
 
+// TODO: re-enable "cert-not-found" once gRPC releases grpc/grpc#42608 (OpenSSL NO_ATEXIT fix for
+// grpc/grpc#38539).
 static const test_case all_tests[] = {{"basic", test_basic},
-                                      {"cert-not-found", test_cert_not_found},
+                                      // {"cert-not-found", test_cert_not_found},
                                       {"cert-invalid", test_cert_invalid},
                                       {"cert-unreadable", test_cert_unreadable},
 #ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
@@ -391,6 +397,8 @@ int main(int argc, char *argv[])
   // Program name
   argc--;
   argv++;
+
+  opt_endpoint = kDefaultOptEndpoint;
 
   int rc = parse_args(argc, argv);
 
@@ -510,6 +518,7 @@ static int test_basic()
   return expect_connection_failed();
 }
 
+#if 0  // disabled: see TODO above all_tests
 static int test_cert_not_found()
 {
   otlp::OtlpGrpcExporterOptions opts;
@@ -536,6 +545,7 @@ static int test_cert_not_found()
 
   return expect_connection_failed();
 }
+#endif
 
 static int test_cert_invalid()
 {

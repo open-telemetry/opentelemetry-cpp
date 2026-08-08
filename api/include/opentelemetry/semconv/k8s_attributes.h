@@ -98,10 +98,10 @@ static constexpr const char *kK8sCronjobUid = "k8s.cronjob.uid";
 
 /**
   The annotation placed on the DaemonSet, the @code <key> @endcode being the annotation name, the
-  value being the annotation value, even if the value is empty. <p> Examples: <ul> <li>A label @code
-  replicas @endcode with value @code 1 @endcode SHOULD be recorded as the @code
-  k8s.daemonset.annotation.replicas @endcode attribute with value @code "1" @endcode.</li> <li>A
-  label @code data @endcode with empty string value SHOULD be recorded as the @code
+  value being the annotation value, even if the value is empty. <p> Examples: <ul> <li>An annotation
+  @code replicas @endcode with value @code 1 @endcode SHOULD be recorded as the @code
+  k8s.daemonset.annotation.replicas @endcode attribute with value @code "1" @endcode.</li> <li>An
+  annotation @code data @endcode with empty string value SHOULD be recorded as the @code
   k8s.daemonset.annotation.data @endcode attribute with value @code "" @endcode.</li>
   </ul>
  */
@@ -111,7 +111,7 @@ static constexpr const char *kK8sDaemonsetAnnotation = "k8s.daemonset.annotation
   The label placed on the DaemonSet, the @code <key> @endcode being the label name, the value being
   the label value, even if the value is empty. <p> Examples: <ul> <li>A label @code app @endcode
   with value @code guestbook @endcode SHOULD be recorded as the @code k8s.daemonset.label.app
-  @endcode attribute with value @code "guestbook" @endcode.</li> <li>A label @code data @endcode
+  @endcode attribute with value @code "guestbook" @endcode.</li> <li>A label @code injected @endcode
   with empty string value SHOULD be recorded as the @code k8s.daemonset.label.injected @endcode
   attribute with value @code "" @endcode.</li>
   </ul>
@@ -130,10 +130,10 @@ static constexpr const char *kK8sDaemonsetUid = "k8s.daemonset.uid";
 
 /**
   The annotation placed on the Deployment, the @code <key> @endcode being the annotation name, the
-  value being the annotation value, even if the value is empty. <p> Examples: <ul> <li>A label @code
-  replicas @endcode with value @code 1 @endcode SHOULD be recorded as the @code
-  k8s.deployment.annotation.replicas @endcode attribute with value @code "1" @endcode.</li> <li>A
-  label @code data @endcode with empty string value SHOULD be recorded as the @code
+  value being the annotation value, even if the value is empty. <p> Examples: <ul> <li>An annotation
+  @code replicas @endcode with value @code 1 @endcode SHOULD be recorded as the @code
+  k8s.deployment.annotation.replicas @endcode attribute with value @code "1" @endcode.</li> <li>An
+  annotation @code data @endcode with empty string value SHOULD be recorded as the @code
   k8s.deployment.annotation.data @endcode attribute with value @code "" @endcode.</li>
   </ul>
  */
@@ -141,8 +141,8 @@ static constexpr const char *kK8sDeploymentAnnotation = "k8s.deployment.annotati
 
 /**
   The label placed on the Deployment, the @code <key> @endcode being the label name, the value being
-  the label value, even if the value is empty. <p> Examples: <ul> <li>A label @code replicas
-  @endcode with value @code 0 @endcode SHOULD be recorded as the @code k8s.deployment.label.app
+  the label value, even if the value is empty. <p> Examples: <ul> <li>A label @code app @endcode
+  with value @code guestbook @endcode SHOULD be recorded as the @code k8s.deployment.label.app
   @endcode attribute with value @code "guestbook" @endcode.</li> <li>A label @code injected @endcode
   with empty string value SHOULD be recorded as the @code k8s.deployment.label.injected @endcode
   attribute with value @code "" @endcode.</li>
@@ -162,11 +162,11 @@ static constexpr const char *kK8sDeploymentUid = "k8s.deployment.uid";
 
 /**
   The annotation placed on the Job, the @code <key> @endcode being the annotation name, the value
-  being the annotation value, even if the value is empty. <p> Examples: <ul> <li>A label @code
+  being the annotation value, even if the value is empty. <p> Examples: <ul> <li>An annotation @code
   number @endcode with value @code 1 @endcode SHOULD be recorded as the @code
-  k8s.job.annotation.number @endcode attribute with value @code "1" @endcode.</li> <li>A label @code
-  data @endcode with empty string value SHOULD be recorded as the @code k8s.job.annotation.data
-  @endcode attribute with value @code "" @endcode.</li>
+  k8s.job.annotation.number @endcode attribute with value @code "1" @endcode.</li> <li>An annotation
+  @code data @endcode with empty string value SHOULD be recorded as the @code
+  k8s.job.annotation.data @endcode attribute with value @code "" @endcode.</li>
   </ul>
  */
 static constexpr const char *kK8sJobAnnotation = "k8s.job.annotation";
@@ -175,9 +175,9 @@ static constexpr const char *kK8sJobAnnotation = "k8s.job.annotation";
   The label placed on the Job, the @code <key> @endcode being the label name, the value being the
   label value, even if the value is empty. <p> Examples: <ul> <li>A label @code jobtype @endcode
   with value @code ci @endcode SHOULD be recorded as the @code k8s.job.label.jobtype @endcode
-  attribute with value @code "ci" @endcode.</li> <li>A label @code data @endcode with empty string
-  value SHOULD be recorded as the @code k8s.job.label.automated @endcode attribute with value @code
-  "" @endcode.</li>
+  attribute with value @code "ci" @endcode.</li> <li>A label @code automated @endcode with empty
+  string value SHOULD be recorded as the @code k8s.job.label.automated @endcode attribute with value
+  @code "" @endcode.</li>
   </ul>
  */
 static constexpr const char *kK8sJobLabel = "k8s.job.label";
@@ -194,10 +194,10 @@ static constexpr const char *kK8sJobUid = "k8s.job.uid";
 
 /**
   The annotation placed on the Namespace, the @code <key> @endcode being the annotation name, the
-  value being the annotation value, even if the value is empty. <p> Examples: <ul> <li>A label @code
-  ttl @endcode with value @code 0 @endcode SHOULD be recorded as the @code
-  k8s.namespace.annotation.ttl @endcode attribute with value @code "0" @endcode.</li> <li>A label
-  @code data @endcode with empty string value SHOULD be recorded as the @code
+  value being the annotation value, even if the value is empty. <p> Examples: <ul> <li>An annotation
+  @code ttl @endcode with value @code 0 @endcode SHOULD be recorded as the @code
+  k8s.namespace.annotation.ttl @endcode attribute with value @code "0" @endcode.</li> <li>An
+  annotation @code data @endcode with empty string value SHOULD be recorded as the @code
   k8s.namespace.annotation.data @endcode attribute with value @code "" @endcode.</li>
   </ul>
  */
@@ -326,10 +326,10 @@ static constexpr const char *kK8sPodUid = "k8s.pod.uid";
 
 /**
   The annotation placed on the ReplicaSet, the @code <key> @endcode being the annotation name, the
-  value being the annotation value, even if the value is empty. <p> Examples: <ul> <li>A label @code
-  replicas @endcode with value @code 0 @endcode SHOULD be recorded as the @code
-  k8s.replicaset.annotation.replicas @endcode attribute with value @code "0" @endcode.</li> <li>A
-  label @code data @endcode with empty string value SHOULD be recorded as the @code
+  value being the annotation value, even if the value is empty. <p> Examples: <ul> <li>An annotation
+  @code replicas @endcode with value @code 0 @endcode SHOULD be recorded as the @code
+  k8s.replicaset.annotation.replicas @endcode attribute with value @code "0" @endcode.</li> <li>An
+  annotation @code data @endcode with empty string value SHOULD be recorded as the @code
   k8s.replicaset.annotation.data @endcode attribute with value @code "" @endcode.</li>
   </ul>
  */
@@ -358,10 +358,10 @@ static constexpr const char *kK8sReplicasetUid = "k8s.replicaset.uid";
 
 /**
   The annotation placed on the StatefulSet, the @code <key> @endcode being the annotation name, the
-  value being the annotation value, even if the value is empty. <p> Examples: <ul> <li>A label @code
-  replicas @endcode with value @code 1 @endcode SHOULD be recorded as the @code
-  k8s.statefulset.annotation.replicas @endcode attribute with value @code "1" @endcode.</li> <li>A
-  label @code data @endcode with empty string value SHOULD be recorded as the @code
+  value being the annotation value, even if the value is empty. <p> Examples: <ul> <li>An annotation
+  @code replicas @endcode with value @code 1 @endcode SHOULD be recorded as the @code
+  k8s.statefulset.annotation.replicas @endcode attribute with value @code "1" @endcode.</li> <li>An
+  annotation @code data @endcode with empty string value SHOULD be recorded as the @code
   k8s.statefulset.annotation.data @endcode attribute with value @code "" @endcode.</li>
   </ul>
  */
@@ -369,11 +369,11 @@ static constexpr const char *kK8sStatefulsetAnnotation = "k8s.statefulset.annota
 
 /**
   The label placed on the StatefulSet, the @code <key> @endcode being the label name, the value
-  being the label value, even if the value is empty. <p> Examples: <ul> <li>A label @code replicas
-  @endcode with value @code 0 @endcode SHOULD be recorded as the @code k8s.statefulset.label.app
-  @endcode attribute with value @code "guestbook" @endcode.</li> <li>A label @code injected @endcode
-  with empty string value SHOULD be recorded as the @code k8s.statefulset.label.injected @endcode
-  attribute with value @code "" @endcode.</li>
+  being the label value, even if the value is empty. <p> Examples: <ul> <li>A label @code app
+  @endcode with value @code guestbook @endcode SHOULD be recorded as the @code
+  k8s.statefulset.label.app @endcode attribute with value @code "guestbook" @endcode.</li> <li>A
+  label @code injected @endcode with empty string value SHOULD be recorded as the @code
+  k8s.statefulset.label.injected @endcode attribute with value @code "" @endcode.</li>
   </ul>
  */
 static constexpr const char *kK8sStatefulsetLabel = "k8s.statefulset.label";

@@ -35,6 +35,9 @@ using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::common;
 
+namespace
+{
+
 class MockMetricExporter : public MetricReader
 {
 public:
@@ -54,15 +57,12 @@ private:
   void OnInitialized() noexcept override {}
 };
 
-namespace
-{
-
 size_t GetBenchmarkThreads()
 {
   const char *env = std::getenv("BENCHMARK_THREADS");
   if (env != nullptr && env[0] != '\0')
   {
-    int val = std::atoi(env);
+    int val = static_cast<int>(std::strtol(env, nullptr, 10));
     if (val > 0)
     {
       return static_cast<size_t>(val);

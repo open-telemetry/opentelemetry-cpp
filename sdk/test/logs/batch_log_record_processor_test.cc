@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <atomic>
 #include <chrono>
 #include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <thread>
@@ -35,6 +35,9 @@ using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;
 
 namespace nostd = opentelemetry::nostd;
+
+namespace
+{
 
 class MockLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
@@ -474,3 +477,5 @@ TEST_F(BatchLogRecordProcessorTest, TestOptionsReadFromMultipleEnvVars)
   unsetenv("OTEL_BLRP_EXPORT_TIMEOUT");
   unsetenv("OTEL_BLRP_MAX_EXPORT_BATCH_SIZE");
 }
+
+}  // namespace

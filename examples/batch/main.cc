@@ -1,9 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdint.h>
-#include <stdio.h>
 #include <chrono>
+#include <cstdint>
+#include <cstdio>
 #include <iostream>
 #include <string>
 #include <thread>
@@ -102,7 +102,7 @@ int main(int /* argc */, char ** /* argv */)
 
   // Shutdown and drain queue
   StartAndEndSpans();
-  printf("Shutting down and draining queue.... \n");
+  std::printf("Shutting down and draining queue.... \n");
   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
   // We invoke the processor destructor

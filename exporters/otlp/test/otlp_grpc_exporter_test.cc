@@ -40,7 +40,13 @@
 #  include <grpcpp/grpcpp.h>
 #  include <gtest/gtest.h>
 #  include <algorithm>
+#  include <chrono>
+#  include <cstddef>
+#  include <functional>
 #  include <future>
+#  include <memory>
+#  include <mutex>
+#  include <thread>
 #  include <utility>
 #  include <vector>
 
@@ -86,6 +92,13 @@ public:
         ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse *response,
         std::function<void(::grpc::Status)> callback) override
     {
+      if (stub_->defer_completions_)
+      {
+        std::lock_guard<std::mutex> guard(stub_->deferred_lock_);
+        stub_->deferred_.push_back(std::move(callback));
+        return;
+      }
+
       stub_->last_async_status_ = stub_->Export(context, *request, response);
       callback(stub_->last_async_status_);
     }
@@ -118,9 +131,66 @@ public:
 
   ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
 
+  // Keep the completion callbacks instead of running them inline, so a test can call ForceFlush()
+  // with requests still in flight. Call before the first export.
+  void DeferCompletions() noexcept { defer_completions_ = true; }
+
+  std::size_t DeferredCount()
+  {
+    std::lock_guard<std::mutex> guard(deferred_lock_);
+    return deferred_.size();
+  }
+
+  // Completes whichever deferred request has been waiting longest, false when there is none.
+  bool CompleteOneDeferred()
+  {
+    std::function<void(::grpc::Status)> callback;
+    {
+      std::lock_guard<std::mutex> guard(deferred_lock_);
+      if (deferred_.empty())
+      {
+        return false;
+      }
+      callback = std::move(deferred_.front());
+      deferred_.erase(deferred_.begin());
+    }
+
+    callback(::grpc::Status::OK);
+    return true;
+  }
+
+  void CompleteAllDeferred()
+  {
+    while (CompleteOneDeferred())
+    {
+    }
+  }
+
 private:
   ::grpc::Status last_async_status_;
+  bool defer_completions_{false};
+  std::mutex deferred_lock_;
+  std::vector<std::function<void(::grpc::Status)>> deferred_;
   async_interface async_interface_;
+};
+
+// Completes whatever is still deferred on the way out. ~OtlpGrpcClient waits for
+// running_requests to reach zero with no deadline, and TryCancel() cannot move it for a request
+// the stub is holding, so an assertion that ends a case early would hang the binary instead of
+// failing it. Declare after the exporter, so this runs first.
+class DrainDeferredCompletions
+{
+public:
+  explicit DrainDeferredCompletions(OtlpMockTraceServiceStub *stub) noexcept : stub_(stub) {}
+  ~DrainDeferredCompletions() { stub_->CompleteAllDeferred(); }
+
+  DrainDeferredCompletions(const DrainDeferredCompletions &)            = delete;
+  DrainDeferredCompletions &operator=(const DrainDeferredCompletions &) = delete;
+  DrainDeferredCompletions(DrainDeferredCompletions &&)                 = delete;
+  DrainDeferredCompletions &operator=(DrainDeferredCompletions &&)      = delete;
+
+private:
+  OtlpMockTraceServiceStub *stub_;
 };
 
 using opentelemetry::test_common::ScopedTestLogHandler;
@@ -244,6 +314,92 @@ TEST_F(OtlpGrpcExporterTestPeer, ExportPartialSuccess)
   EXPECT_TRUE(contains("too many spans!!"));
 }
 
+namespace
+{
+// ForceFlush() only has requests to wait for when the client tracks them, which it does under
+// ENABLE_ASYNC_EXPORT. gtest_add_tests registers by source text, so the cases below have to exist
+// in every build and opt out here rather than be compiled away.
+class OtlpGrpcExporterFlushTestPeer : public OtlpGrpcExporterTestPeer
+{
+protected:
+  void SetUp() override
+  {
+#  if !defined(ENABLE_ASYNC_EXPORT)
+    GTEST_SKIP() << "ForceFlush has no in-flight requests to wait for without async export";
+#  endif
+  }
+};
+
+// The wait is bounded by the exporter's timeout, so a caller asking for less than that used to
+// wait for the larger of the two.
+TEST_F(OtlpGrpcExporterFlushTestPeer, ForceFlushReturnsWithinTheCallerDeadline)
+{
+  auto *mock_stub = new OtlpMockTraceServiceStub();
+  mock_stub->DeferCompletions();
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(stub_interface);
+  DrainDeferredCompletions drain{mock_stub};
+
+  auto recordable = exporter->MakeRecordable();
+  recordable->SetName("Test span");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
+  exporter->Export(batch);
+  ASSERT_EQ(1u, mock_stub->DeferredCount());
+
+  const auto started = std::chrono::steady_clock::now();
+  const bool flushed = exporter->ForceFlush(std::chrono::milliseconds{50});
+  const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - started);
+
+  EXPECT_FALSE(flushed);
+  EXPECT_LT(elapsed.count(), 1000)
+      << "waited on the export timeout rather than the one it was given";
+}
+
+// A completion for one request used to end the wait for every other request, and the leftover
+// deadline was then reported as success.
+TEST_F(OtlpGrpcExporterFlushTestPeer, ForceFlushKeepsWaitingWhenAnotherRequestCompletes)
+{
+  auto *mock_stub = new OtlpMockTraceServiceStub();
+  mock_stub->DeferCompletions();
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(stub_interface);
+  DrainDeferredCompletions drain{mock_stub};
+
+  auto first = exporter->MakeRecordable();
+  first->SetName("Test span 1");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> first_batch(&first, 1);
+  exporter->Export(first_batch);
+
+  auto second = exporter->MakeRecordable();
+  second->SetName("Test span 2");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> second_batch(&second, 1);
+  exporter->Export(second_batch);
+
+  ASSERT_EQ(2u, mock_stub->DeferredCount());
+
+  // Completed once the flush below is parked, so it arrives as a notification rather than as a
+  // counter the loop condition reads on its way in.
+  std::thread completer([mock_stub] {
+    std::this_thread::sleep_for(std::chrono::milliseconds{100});
+    mock_stub->CompleteOneDeferred();
+  });
+
+  const auto started = std::chrono::steady_clock::now();
+  const bool flushed = exporter->ForceFlush(std::chrono::milliseconds{1000});
+  const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - started);
+  completer.join();
+
+  EXPECT_FALSE(flushed);
+  // Ran its own deadline down rather than returning on the notification.
+  EXPECT_GE(elapsed.count(), 500);
+  EXPECT_EQ(1u, mock_stub->DeferredCount());
+}
+}  // namespace
+
 // Create spans, let processor call Export()
 TEST_F(OtlpGrpcExporterTestPeer, ExportIntegrationTest)
 {
@@ -253,8 +409,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ExportIntegrationTest)
 
   auto exporter = GetExporter(stub_interface);
 
-  auto processor = std::unique_ptr<sdk::trace::SpanProcessor>(
-      new sdk::trace::SimpleSpanProcessor(std::move(exporter)));
+  std::unique_ptr<sdk::trace::SpanProcessor> processor =
+      std::make_unique<sdk::trace::SimpleSpanProcessor>(std::move(exporter));
   auto provider = nostd::shared_ptr<trace::TracerProvider>(
       new sdk::trace::TracerProvider(std::move(processor)));
   auto tracer = provider->GetTracer("test");
@@ -273,8 +429,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ExportIntegrationTest)
 TEST_F(OtlpGrpcExporterTestPeer, ConfigTest)
 {
   OtlpGrpcExporterOptions opts;
-  opts.endpoint = "localhost:45454";
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter(opts));
+  opts.endpoint                              = "localhost:45454";
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).endpoint, "localhost:45454");
 }
 
@@ -283,9 +439,9 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigSslCredentialsTest)
 {
   std::string cacert_str = "--begin and end fake cert--";
   OtlpGrpcExporterOptions opts;
-  opts.use_ssl_credentials              = true;
-  opts.ssl_credentials_cacert_as_string = cacert_str;
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter(opts));
+  opts.use_ssl_credentials                   = true;
+  opts.ssl_credentials_cacert_as_string      = cacert_str;
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>(opts);
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
 }
@@ -303,7 +459,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigFromEnv)
   setenv("OTEL_EXPORTER_OTLP_HEADERS", "k1=v1,k2=v2", 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_HEADERS", "k1=v3,k1=v4", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
   EXPECT_EQ(GetOptions(exporter).ssl_credentials_cacert_as_string, cacert_str);
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
@@ -347,7 +503,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigHttpsSecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "true", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -363,7 +519,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigHttpInsecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "false", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, false);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -378,7 +534,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownSecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "false", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, true);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -393,7 +549,7 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownInsecureFromEnv)
   setenv("OTEL_EXPORTER_OTLP_ENDPOINT", endpoint.c_str(), 1);
   setenv("OTEL_EXPORTER_OTLP_TRACES_INSECURE", "true", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
   EXPECT_EQ(GetOptions(exporter).use_ssl_credentials, false);
   EXPECT_EQ(GetOptions(exporter).endpoint, endpoint);
 
@@ -403,8 +559,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigUnknownInsecureFromEnv)
 
 TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryDefaultValues)
 {
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
-  const auto options = GetOptions(exporter);
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
+  const auto options                         = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 5);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 1.0f);
   ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 5.0f);
@@ -418,8 +574,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF", "6.7", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER", "8.9", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
-  const auto options = GetOptions(exporter);
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
+  const auto options                         = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 123);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 4.5f);
   ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 6.7f);
@@ -438,8 +594,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryGenericValuesFromEnv)
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF", "7.6", 1);
   setenv("OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER", "9.8", 1);
 
-  std::unique_ptr<OtlpGrpcExporter> exporter(new OtlpGrpcExporter());
-  const auto options = GetOptions(exporter);
+  std::unique_ptr<OtlpGrpcExporter> exporter = std::make_unique<OtlpGrpcExporter>();
+  const auto options                         = GetOptions(exporter);
   ASSERT_EQ(options.retry_policy_max_attempts, 321);
   ASSERT_FLOAT_EQ(options.retry_policy_initial_backoff.count(), 5.4f);
   ASSERT_FLOAT_EQ(options.retry_policy_max_backoff.count(), 7.6f);
@@ -453,6 +609,8 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryGenericValuesFromEnv)
 #  endif  // NO_GETENV
 
 #  ifdef ENABLE_OTLP_RETRY_PREVIEW
+namespace
+{
 struct TestTraceService : public opentelemetry::proto::collector::trace::v1::TraceService::Service
 {
   TestTraceService(const std::vector<grpc::StatusCode> &status_codes) : status_codes_(status_codes)
@@ -471,12 +629,16 @@ struct TestTraceService : public opentelemetry::proto::collector::trace::v1::Tra
   size_t index_         = 0UL;
   std::vector<grpc::StatusCode> status_codes_;
 };
+}  // namespace
 
 using StatusCodeVector = std::vector<grpc::StatusCode>;
 
+namespace
+{
 class OtlpGrpcExporterRetryIntegrationTests
     : public ::testing::TestWithParam<std::tuple<bool, StatusCodeVector, std::size_t>>
 {};
+}  // namespace
 
 INSTANTIATE_TEST_SUITE_P(
     StatusCodes,

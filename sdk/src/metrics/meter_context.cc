@@ -9,7 +9,6 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
@@ -69,7 +68,7 @@ const instrumentationscope::ScopeConfigurator<MeterConfig> &MeterContext::GetMet
 bool MeterContext::ForEachMeter(
     nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback) noexcept
 {
-  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);
+  std::lock_guard<std::mutex> guard(meter_lock_);
   for (auto &meter : meters_)
   {
     if (!callback(meter))
@@ -127,7 +126,7 @@ ExemplarFilterType MeterContext::GetExemplarFilter() const noexcept
 
 void MeterContext::AddMeter(const std::shared_ptr<Meter> &meter)
 {
-  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);
+  std::lock_guard<std::mutex> guard(meter_lock_);
   meters_.push_back(meter);
 }
 
@@ -135,7 +134,7 @@ void MeterContext::RemoveMeter(nostd::string_view name,
                                nostd::string_view version,
                                nostd::string_view schema_url)
 {
-  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(meter_lock_);
+  std::lock_guard<std::mutex> guard(meter_lock_);
 
   std::vector<std::shared_ptr<Meter>> filtered_meters;
 
@@ -184,7 +183,7 @@ bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
   bool result = true;
   // Simultaneous flush not allowed.
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(forceflush_lock_);
+  const std::lock_guard<std::mutex> locked(forceflush_lock_);
 
   auto time_remaining = (std::chrono::steady_clock::duration::max)();
   if (std::chrono::duration_cast<std::chrono::microseconds>(time_remaining) > timeout)

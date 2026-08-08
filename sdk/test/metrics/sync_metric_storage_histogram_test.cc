@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
@@ -33,6 +33,9 @@
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::common;
+
+namespace
+{
 
 class WritableMetricStorageHistogramTestFixture
     : public ::testing::TestWithParam<AggregationTemporality>
@@ -538,3 +541,5 @@ INSTANTIATE_TEST_SUITE_P(WritableMetricStorageHistogramTestBase2ExponentialDoubl
                          WritableMetricStorageHistogramTestFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
                                            AggregationTemporality::kDelta));
+
+}  // namespace

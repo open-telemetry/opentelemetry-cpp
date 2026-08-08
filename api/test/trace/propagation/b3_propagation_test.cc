@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <utility>
@@ -26,6 +26,9 @@
 #include "opentelemetry/trace/trace_id.h"
 
 using namespace opentelemetry;
+
+namespace
+{
 
 class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
@@ -219,3 +222,5 @@ TEST(B3PropagationTest, GetCurrentSpanMultiHeader)
   EXPECT_EQ(carrier.headers_["X-B3-SpanId"], "0102030405060708");
   EXPECT_EQ(carrier.headers_["X-B3-Sampled"], "1");
 }
+
+}  // namespace

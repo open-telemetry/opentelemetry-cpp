@@ -788,7 +788,7 @@ protected:
   /**
    * @brief Span name.
    */
-  nostd::string_view name_;
+  std::string name_;
 
   /**
    * @brief Attribute indicating that the span has ended.
@@ -852,7 +852,7 @@ public:
    * @brief Get Span Name.
    * @return Span Name.
    */
-  nostd::string_view GetName() const { return name_; }
+  nostd::string_view GetName() const { return nostd::string_view{name_.data(), name_.size()}; }
 
   /**
    * @brief Span constructor
@@ -870,10 +870,10 @@ public:
       : opentelemetry::trace::Span(),
         start_time_(std::chrono::system_clock::now()),
         owner_(owner),
+        name_(name.data(), name.size()),
         context_(std::move(spanContext)),
         parent_(parent)
   {
-    name_ = name;
     UNREFERENCED_PARAMETER(options);
   }
 

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>  // IWYU pragma: keep
+#include <cstdint>  // IWYU pragma: keep
 #include <string>
 
 #ifdef _WIN32
@@ -162,6 +162,9 @@ static void reset_counts()
   span_h_f2_count    = 0;
   unknown_span_count = 0;
 }
+
+namespace
+{
 
 class MyTracer : public trace::Tracer
 {
@@ -458,3 +461,5 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_h_f2_count, 0);
   EXPECT_EQ(unknown_span_count, 0);
 }
+
+}  // namespace

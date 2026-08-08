@@ -178,7 +178,7 @@ CreateAsyncDoubleMetricCicdSystemErrors(metrics::Meter *meter)
 static constexpr const char *kMetricCicdWorkerCount = "cicd.worker.count";
 static constexpr const char *descrMetricCicdWorkerCount =
     "The number of workers on the CI/CD system by state.";
-static constexpr const char *unitMetricCicdWorkerCount = "{count}";
+static constexpr const char *unitMetricCicdWorkerCount = "{worker}";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
 CreateSyncInt64MetricCicdWorkerCount(metrics::Meter *meter)

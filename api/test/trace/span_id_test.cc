@@ -52,6 +52,6 @@ TEST(SpanIdTest, CopyBytesTo)
   SpanId id(src);
   uint8_t buf[8];
   id.CopyBytesTo(buf);
-  EXPECT_TRUE(memcmp(src, buf, 8) == 0);
+  EXPECT_TRUE(std::memcmp(src, buf, 8) == 0);
 }
 }  // namespace

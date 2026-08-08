@@ -23,7 +23,8 @@ You can link OpenTelemetry C++ SDK with libraries provided in
   repository. To install Git, consult the [Set up
   Git](https://help.github.com/articles/set-up-git/) guide on GitHub.
 - [CMake](https://cmake.org/) for building opentelemetry-cpp API, SDK with their
-  unittests. The minimum CMake version is 3.16.
+  unittests. The minimum CMake version is 3.16 (3.18+ is recommended to support
+  FetchContent with the latest dependencies).
   To install CMake,
   consult the [Installing CMake](https://cmake.org/install/) guide.
 - [GoogleTest](https://github.com/google/googletest) framework to build and run
@@ -241,6 +242,8 @@ build configuration.
 |                            | opentelemetry-cpp::trace                                                                         |
 |                            | opentelemetry-cpp::metrics                                                                       |
 |                            | opentelemetry-cpp::logs                                                                          |
+|                            | opentelemetry-cpp::configuration_core  (EXPERIMENTAL: Programmatic configuration)                |
+| **configuration**          | opentelemetry-cpp::configuration       (EXPERIMENTAL: YAML configuration)                        |
 | **ext_common**             | opentelemetry-cpp::ext                                                                           |
 | **ext_http_curl**          | opentelemetry-cpp::http_client_curl                                                              |
 | **ext_dll**                | opentelemetry-cpp::opentelemetry_cpp                                                             |
@@ -249,7 +252,8 @@ build configuration.
 | **exporters_ostream**      | opentelemetry-cpp::ostream_log_record_exporter                                                   |
 |                            | opentelemetry-cpp::ostream_metrics_exporter                                                      |
 |                            | opentelemetry-cpp::ostream_span_exporter                                                         |
-| **exporters_otlp_common**  | opentelemetry-cpp::proto                                                                         |
+| **exporters_otlp_common**  | opentelemetry-cpp::otlp_common                                                                   |
+|                            | opentelemetry-cpp::proto                                                                         |
 |                            | opentelemetry-cpp::otlp_recordable                                                               |
 | **exporters_otlp_file**    | opentelemetry-cpp::otlp_file_client                                                              |
 |                            | opentelemetry-cpp::otlp_file_exporter                                                            |

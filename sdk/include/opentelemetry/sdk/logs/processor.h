@@ -111,6 +111,16 @@ protected:
   {
     return true;
   }
+
+public:
+  /**
+   * Returns true when records produced through this processor enforce LogRecord
+   * attribute limits (count and value length). The default returns false.
+   * Processors backed by an exporter delegate to the exporter; composite
+   * processors return true if any child does. The SDK Logger consults this once
+   * per context to decide whether to push limits onto each recordable.
+   */
+  virtual bool RecordableEnforcesLogRecordLimits() const noexcept { return false; }
 };
 }  // namespace logs
 }  // namespace sdk

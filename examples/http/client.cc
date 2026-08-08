@@ -20,8 +20,8 @@
 #include "opentelemetry/trace/tracer.h"
 #include "tracer_common.h"
 
-#include <stdint.h>
-#include <stdlib.h>
+#include <cstdint>
+#include <cstdlib>
 #include <map>
 #include <string>
 #include <type_traits>
@@ -71,7 +71,7 @@ void sendRequest(const std::string &url)
     span->SetAttribute(semconv::http::kHttpResponseStatusCode, status_code);
     result.GetResponse().ForEachHeader(
         [&span](nostd::string_view header_name, nostd::string_view header_value) {
-          span->SetAttribute("http.header." + std::string(header_name.data()), header_value);
+          span->SetAttribute("http.header." + std::string(header_name), header_value);
           return true;
         });
 
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
   // The port the validation service listens to can be specified via the command line.
   if (argc > 1)
   {
-    port = static_cast<uint16_t>(atoi(argv[1]));
+    port = static_cast<uint16_t>(std::strtol(argv[1], nullptr, 10));
   }
 
   std::string url = "http://" + std::string(default_host) + ":" + std::to_string(port) +

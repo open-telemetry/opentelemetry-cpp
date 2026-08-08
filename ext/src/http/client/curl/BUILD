@@ -11,6 +11,7 @@ cc_library(
         "http_client_curl.cc",
         "http_client_factory_curl.cc",
         "http_operation_curl.cc",
+        "http_time_util.cc",
     ],
     defines = [
         "ENABLE_HTTP_CLIENT_CURL",

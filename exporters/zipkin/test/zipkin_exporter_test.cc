@@ -60,6 +60,8 @@ public:
   }
 };
 
+namespace
+{
 class MockHttpClient : public opentelemetry::ext::http::client::HttpClientSync
 {
 public:
@@ -80,7 +82,10 @@ public:
                const ext::http::client::Compression &),
               (noexcept, override));
 };
+}  // namespace
 
+namespace
+{
 class IsValidMessageMatcher
 {
 public:
@@ -102,6 +107,7 @@ public:
 private:
   std::string trace_id_;
 };
+}  // namespace
 
 static PolymorphicMatcher<IsValidMessageMatcher> IsValidMessage(const std::string &trace_id)
 {

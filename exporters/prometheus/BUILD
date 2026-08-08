@@ -58,6 +58,7 @@ cc_library(
     deps = [
         "//api",
         "//sdk:headers",
+        "//sdk/src/metrics",
         "@com_github_jupp0r_prometheus_cpp//core",
         "@com_github_jupp0r_prometheus_cpp//pull",
     ],

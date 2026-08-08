@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 #include "opentelemetry/context/context.h"
@@ -13,6 +13,9 @@
 
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::metrics;
+
+namespace
+{
 
 class TestMetricStorage : public SyncWritableMetricStorage
 {
@@ -43,8 +46,8 @@ public:
     num_calls_double++;
   }
 
-  size_t num_calls_long;
-  size_t num_calls_double;
+  size_t num_calls_long{0};
+  size_t num_calls_double{0};
 };
 
 TEST(MultiMetricStorageTest, BasicTests)
@@ -62,3 +65,5 @@ TEST(MultiMetricStorageTest, BasicTests)
   EXPECT_EQ(static_cast<TestMetricStorage *>(storage.get())->num_calls_long, 3);
   EXPECT_EQ(static_cast<TestMetricStorage *>(storage.get())->num_calls_double, 1);
 }
+
+}  // namespace

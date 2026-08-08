@@ -1,9 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <string>
 
 #include "opentelemetry/exporters/ostream/console_log_record_builder.h"
@@ -54,11 +54,11 @@
 #  include "opentelemetry/exporters/prometheus/prometheus_pull_builder.h"
 #endif
 
-static bool opt_help              = false;
-static bool opt_debug             = false;
-static bool opt_test              = false;
-static bool opt_no_registry       = false;
-static std::string yaml_file_path = "";
+static bool opt_help        = false;
+static bool opt_debug       = false;
+static bool opt_test        = false;
+static bool opt_no_registry = false;
+static std::string yaml_file_path;
 
 static std::unique_ptr<opentelemetry::sdk::configuration::ConfiguredSdk> sdk;
 
@@ -83,16 +83,16 @@ public:
       case opentelemetry::sdk::common::internal_log::LogLevel::None:
         break;
       case opentelemetry::sdk::common::internal_log::LogLevel::Error:
-        fprintf(stdout, "[ERROR] %s\n", msg);
+        std::fprintf(stdout, "[ERROR] %s\n", msg);
         break;
       case opentelemetry::sdk::common::internal_log::LogLevel::Warning:
-        fprintf(stdout, "[WARNING] %s\n", msg);
+        std::fprintf(stdout, "[WARNING] %s\n", msg);
         break;
       case opentelemetry::sdk::common::internal_log::LogLevel::Info:
-        fprintf(stdout, "[INFO] %s\n", msg);
+        std::fprintf(stdout, "[INFO] %s\n", msg);
         break;
       case opentelemetry::sdk::common::internal_log::LogLevel::Debug:
-        fprintf(stdout, "[DEBUG] %s\n", msg);
+        std::fprintf(stdout, "[DEBUG] %s\n", msg);
         break;
     }
   }
@@ -115,12 +115,12 @@ void PrintModelParsedForTesting(bool pass)
   {
     if (pass)
     {
-      fprintf(stdout, "MODEL PARSED\n");
+      std::fprintf(stdout, "MODEL PARSED\n");
     }
     else
     {
-      fprintf(stdout, "FAILED TO PARSE MODEL\n");
-      exit(1);
+      std::fprintf(stdout, "FAILED TO PARSE MODEL\n");
+      std::exit(1);
     }
   }
 }
@@ -131,12 +131,12 @@ void PrintSdkCreatedForTesting(bool pass)
   {
     if (pass)
     {
-      fprintf(stdout, "SDK CREATED\n");
+      std::fprintf(stdout, "SDK CREATED\n");
     }
     else
     {
-      fprintf(stdout, "FAILED TO CREATE SDK\n");
-      exit(2);
+      std::fprintf(stdout, "FAILED TO CREATE SDK\n");
+      std::exit(2);
     }
   }
 }
@@ -259,7 +259,7 @@ void CleanupOtel()
 }
 }  // namespace
 
-static void usage(FILE *out)
+static void usage(std::FILE *out)
 {
   static const char *msg =
       "Usage: example_yaml [options]\n"
@@ -284,7 +284,7 @@ static void usage(FILE *out)
       "  --no-registry\n"
       "    Run with an empty registry\n";
 
-  fprintf(out, "%s", msg);
+  std::fprintf(out, "%s", msg);
 }
 
 static int parse_args(int argc, char *argv[])
@@ -294,7 +294,7 @@ static int parse_args(int argc, char *argv[])
 
   while (remaining_argc > 0)
   {
-    if (strcmp(*remaining_argv, "--help") == 0)
+    if (std::strcmp(*remaining_argv, "--help") == 0)
     {
       opt_help = true;
       return 0;
@@ -302,7 +302,7 @@ static int parse_args(int argc, char *argv[])
 
     if (remaining_argc >= 2)
     {
-      if (strcmp(*remaining_argv, "--yaml") == 0)
+      if (std::strcmp(*remaining_argv, "--yaml") == 0)
       {
         remaining_argc--;
         remaining_argv++;
@@ -313,7 +313,7 @@ static int parse_args(int argc, char *argv[])
       }
     }
 
-    if (strcmp(*remaining_argv, "--debug") == 0)
+    if (std::strcmp(*remaining_argv, "--debug") == 0)
     {
       remaining_argc--;
       remaining_argv++;
@@ -321,7 +321,7 @@ static int parse_args(int argc, char *argv[])
       continue;
     }
 
-    if (strcmp(*remaining_argv, "--test") == 0)
+    if (std::strcmp(*remaining_argv, "--test") == 0)
     {
       remaining_argc--;
       remaining_argv++;
@@ -329,7 +329,7 @@ static int parse_args(int argc, char *argv[])
       continue;
     }
 
-    if (strcmp(*remaining_argv, "--no-registry") == 0)
+    if (std::strcmp(*remaining_argv, "--no-registry") == 0)
     {
       remaining_argc--;
       remaining_argv++;

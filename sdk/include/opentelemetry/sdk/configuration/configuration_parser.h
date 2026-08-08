@@ -78,6 +78,7 @@
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
@@ -322,6 +323,10 @@ public:
       const std::unique_ptr<DocumentNode> &node,
       size_t depth) const;
 
+  std::unique_ptr<ProbabilitySamplerConfiguration> ParseProbabilitySamplerConfiguration(
+      const std::unique_ptr<DocumentNode> &node,
+      size_t depth) const;
+
   std::unique_ptr<TraceIdRatioBasedSamplerConfiguration> ParseTraceIdRatioBasedSamplerConfiguration(
       const std::unique_ptr<DocumentNode> &node,
       size_t depth) const;
@@ -474,8 +479,8 @@ public:
 
 private:
   std::string version_;
-  int version_major_;
-  int version_minor_;
+  int version_major_{};
+  int version_minor_{};
 };
 
 }  // namespace configuration

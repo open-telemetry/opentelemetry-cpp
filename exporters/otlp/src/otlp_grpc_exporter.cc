@@ -21,7 +21,6 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/version.h"
 
 // clang-format off
@@ -93,9 +92,9 @@ OtlpGrpcExporter::~OtlpGrpcExporter()
 
 std::unique_ptr<sdk::trace::Recordable> OtlpGrpcExporter::MakeRecordable() noexcept
 {
-  return std::unique_ptr<sdk::trace::Recordable>(
-      new OtlpRecordable(options_.max_attributes, options_.max_events, options_.max_links,
-                         options_.max_attributes_per_event, options_.max_attributes_per_link));
+  return std::make_unique<OtlpRecordable>(options_.max_attributes, options_.max_events,
+                                          options_.max_links, options_.max_attributes_per_event,
+                                          options_.max_attributes_per_link);
 }
 
 sdk::common::ExportResult OtlpGrpcExporter::Export(
@@ -127,7 +126,8 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
   // When in batch mode, it's easy to export a large number of spans at once, we can alloc a larger
   // block to reduce memory fragments.
   arena_options.max_block_size = 65536;
-  std::unique_ptr<google::protobuf::Arena> arena{new google::protobuf::Arena{arena_options}};
+  std::unique_ptr<google::protobuf::Arena> arena =
+      std::make_unique<google::protobuf::Arena>(arena_options);
 
   proto::collector::trace::v1::ExportTraceServiceRequest *request =
       google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(

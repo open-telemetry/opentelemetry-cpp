@@ -13,10 +13,10 @@
 #  include <numeric>
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
-#include <string.h>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstring>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -70,8 +70,53 @@ public:
   std::atomic<bool> got_response_;
 };
 
+// Counts the terminal notifications one request produces. Set cancel_at_response_ to cancel from
+// inside the Response event, which is the one moment both arms of the completion callback are
+// eligible: DispatchEvent notifies the handler before it stores the new state, and the callback
+// runs after both, so it sees an aborted operation that also has a response.
+class TerminalCountingHandler : public CustomEventHandler
+{
+public:
+  void OnResponse(http_client::Response & /* response */) noexcept override
+  {
+    terminal_count_.fetch_add(1, std::memory_order_release);
+    got_response_.store(true, std::memory_order_release);
+  }
+
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    if (state == http_client::SessionState::Cancelled)
+    {
+      terminal_count_.fetch_add(1, std::memory_order_release);
+      // Cleanup dispatches its own Cancelled carrying a curl message, and GetCurlErrorMessage
+      // never yields an empty one, so an empty reason is the completion callback and only it.
+      if (reason.empty())
+      {
+        cancelled_from_callback_.fetch_add(1, std::memory_order_release);
+      }
+    }
+    else if (state == cancel_at_ && cancel_target_ != nullptr)
+    {
+      auto *session   = cancel_target_;
+      cancel_target_  = nullptr;
+      cancelled_from_ = std::this_thread::get_id();
+      session->CancelSession();
+    }
+  }
+
+  // Cancelling reaches curl_easy_setopt through Abort(), so it has to run on the thread that
+  // owns the handle. Both cases below cancel from an event the IO thread dispatches, and assert
+  // on cancelled_from_ so that a later edit cannot quietly move it back to the caller.
+  http_client::Session *cancel_target_ = nullptr;
+  http_client::SessionState cancel_at_ = http_client::SessionState::Response;
+  std::thread::id cancelled_from_{};
+  std::atomic<int> terminal_count_{0};
+  std::atomic<int> cancelled_from_callback_{0};
+};
+
 class GetEventHandler : public CustomEventHandler
 {
+public:
   void OnResponse(http_client::Response &response) noexcept override
   {
     ASSERT_EQ(200, response.GetStatusCode());
@@ -83,6 +128,7 @@ class GetEventHandler : public CustomEventHandler
 
 class PostEventHandler : public CustomEventHandler
 {
+public:
   void OnResponse(http_client::Response &response) noexcept override
   {
     ASSERT_EQ(200, response.GetStatusCode());
@@ -120,6 +166,7 @@ private:
 
 class RetryEventHandler : public CustomEventHandler
 {
+public:
   void OnResponse(http_client::Response &response) noexcept override
   {
     ASSERT_EQ(429, response.GetStatusCode());
@@ -137,6 +184,7 @@ protected:
   std::atomic<bool> is_setup_{false};
   std::atomic<bool> is_running_{false};
   std::vector<HTTP_SERVER_NS::HttpRequest> received_requests_;
+  std::atomic<unsigned> close_requests_{0};
   std::mutex cv_mtx_requests;
   std::mutex mtx_requests;
   std::condition_variable cv_got_events;
@@ -145,6 +193,7 @@ protected:
 public:
   BasicCurlHttpTests() : is_setup_(false), is_running_(false) {}
 
+protected:
   void SetUp() override
   {
     if (is_setup_.exchange(true))
@@ -161,6 +210,7 @@ public:
     server_.addHandler("/get/", *this);
     server_.addHandler("/post/", *this);
     server_.addHandler("/retry/", *this);
+    server_.addHandler("/close/", *this);
     server_.start();
     is_running_ = true;
   }
@@ -173,6 +223,7 @@ public:
     is_running_ = false;
   }
 
+public:
   int onHttpRequest(HTTP_SERVER_NS::HttpRequest const &request,
                     HTTP_SERVER_NS::HttpResponse &response) override
   {
@@ -198,6 +249,13 @@ public:
       received_requests_.push_back(request);
       response.headers["Content-Type"] = "text/plain";
       response_status                  = 429;
+    }
+    else if (request.uri == "/close/")
+    {
+      // -1 is the documented way for a handler to ask the server to terminate the
+      // connection immediately without sending a response.
+      close_requests_.fetch_add(1, std::memory_order_relaxed);
+      response_status = -1;
     }
 
     cv_got_events.notify_one();
@@ -228,7 +286,7 @@ TEST_F(BasicCurlHttpTests, HttpRequest)
 {
   curl::Request req;
   const char *b           = "test-data";
-  http_client::Body body  = {b, b + strlen(b)};
+  http_client::Body body  = {b, b + std::strlen(b)};
   http_client::Body body1 = body;
   req.SetBody(body);
   ASSERT_EQ(req.body_, body1);
@@ -252,7 +310,7 @@ TEST_F(BasicCurlHttpTests, HttpResponse)
   res.headers_ = m1;
 
   const char *b          = "test-data";
-  http_client::Body body = {b, b + strlen(b)};
+  http_client::Body body = {b, b + std::strlen(b)};
   int count              = 0;
   res.ForEachHeader("name1", [&count](nostd::string_view name, nostd::string_view value) {
     if (name != "name1")
@@ -304,7 +362,7 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   request->SetMethod(http_client::Method::Post);
 
   const char *b          = "test-data";
-  http_client::Body body = {b, b + strlen(b)};
+  http_client::Body body = {b, b + std::strlen(b)};
   request->SetBody(body);
   request->AddHeader("Content-Type", "text/plain");
   auto handler = std::make_shared<PostEventHandler>();
@@ -341,7 +399,7 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   GetEventHandler *handler = new GetEventHandler();
 
   const char *b          = "test-data";
-  http_client::Body body = {b, b + strlen(b)};
+  http_client::Body body = {b, b + std::strlen(b)};
 
   http_client::Headers headers = {
       {"name1", "value1_1"}, {"name1", "value1_2"}, {"name2", "value3"}, {"name3", "value3"}};
@@ -447,6 +505,63 @@ TEST_F(BasicCurlHttpTests, ExponentialBackoffRetry)
 }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
+// A cancel that arrives once the server has answered used to deliver Cancelled and the response,
+// so a handler treating either as terminal saw one request finish twice.
+TEST_F(BasicCurlHttpTests, ACancelAfterTheResponseReportsOneOutcome)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<TerminalCountingHandler>();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::Response;
+
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+
+  EXPECT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire));
+
+  session_manager->FinishAllSessions();
+}
+
+// The other arm of the same callback, which nothing exercised. Nothing listens on 19937, so the
+// connection fails and PerformCurlMessage dispatches ConnectFailed from the IO thread. Cancelling
+// there leaves the state short of Response with the abort flag raised, which is what the arm
+// needs, and keeps Abort() on the thread that owns the easy handle.
+TEST_F(BasicCurlHttpTests, ACancelBeforeTheResponseReportsCancelled)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19937");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<TerminalCountingHandler>();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::ConnectFailed;
+
+  session->SendRequest(handler);
+  session->FinishSession();
+
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  // Counted by its empty reason so the assertion holds the arm this covers rather than whatever
+  // else reports a cancel.
+  EXPECT_EQ(1, handler->cancelled_from_callback_.load(std::memory_order_acquire));
+  EXPECT_NE(handler->cancelled_from_, std::this_thread::get_id())
+      << "the cancel has to run on the IO thread, see #4369";
+
+  session_manager->FinishAllSessions();
+}
+
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 {
   received_requests_.clear();
@@ -454,6 +569,28 @@ TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 
   http_client::Headers m1 = {};
   auto result             = http_client.GetNoSsl("http://127.0.0.1:19000/get/", m1);
+  EXPECT_EQ(result, true);
+  EXPECT_EQ(result.GetSessionState(), http_client::SessionState::Response);
+}
+
+TEST_F(BasicCurlHttpTests, HandlerRequestedCloseKeepsServerUsable)
+{
+  curl::HttpClientSync http_client;
+  http_client::Headers m1 = {};
+
+  // A handler returning -1 closes the connection without a response. The server used to keep
+  // reading and writing the Connection it had just erased, which AddressSanitizer reports as
+  // a use-after-free on this request.
+  auto closed = http_client.GetNoSsl("http://127.0.0.1:19000/close/", m1);
+  ASSERT_EQ(closed, false);
+
+  // Prove the request actually reached the handler. Without this, an unregistered route or a
+  // typo would leave the server answering 404 and the assertion above would be measuring the
+  // wrong thing.
+  EXPECT_EQ(close_requests_.load(std::memory_order_relaxed), 1U);
+
+  // The server has to still be serving afterwards.
+  auto result = http_client.GetNoSsl("http://127.0.0.1:19000/get/", m1);
   EXPECT_EQ(result, true);
   EXPECT_EQ(result.GetSessionState(), http_client::SessionState::Response);
 }

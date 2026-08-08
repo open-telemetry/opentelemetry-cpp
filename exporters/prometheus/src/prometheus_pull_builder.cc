@@ -38,8 +38,8 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> PrometheusPullBuilder
   url.append(std::to_string(model->port));
 
   options.url                  = url;
-  options.populate_target_info = !model->without_target_info;
-  options.without_otel_scope   = model->without_scope_info;
+  options.populate_target_info = model->target_info_enabled;
+  options.without_otel_scope   = !model->scope_info_enabled;
 
   switch (model->translation_strategy)
   {
@@ -65,10 +65,10 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> PrometheusPullBuilder
       break;
   }
 
-  if (model->with_resource_constant_labels != nullptr)
+  if (model->resource_constant_labels != nullptr)
   {
-    // FIXME: with_resource_constant_labels
-    OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] with_resource_constant_labels not supported");
+    // FIXME: resource_constant_labels
+    OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] resource_constant_labels not supported");
   }
 
   return PrometheusExporterFactory::Create(options);

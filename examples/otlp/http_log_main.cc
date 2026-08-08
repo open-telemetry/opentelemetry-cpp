@@ -44,11 +44,9 @@ namespace internal_log = opentelemetry::sdk::common::internal_log;
 namespace
 {
 
-opentelemetry::exporter::otlp::OtlpHttpExporterOptions trace_opts;
-
 std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> tracer_provider;
 
-void InitTracer()
+void InitTracer(otlp::OtlpHttpExporterOptions &trace_opts)
 {
   if (trace_opts.url.size() > 9)
   {
@@ -90,11 +88,9 @@ void CleanupTracer()
   trace_sdk::Provider::SetTracerProvider(none);
 }
 
-opentelemetry::exporter::otlp::OtlpHttpLogRecordExporterOptions logger_opts;
-
 std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> logger_provider;
 
-void InitLogger()
+void InitLogger(otlp::OtlpHttpLogRecordExporterOptions &logger_opts)
 {
   std::cout << "Using " << logger_opts.url << " to export log records." << '\n';
   logger_opts.console_debug = true;
@@ -132,6 +128,8 @@ void CleanupLogger()
 */
 int main(int argc, char *argv[])
 {
+  otlp::OtlpHttpExporterOptions trace_opts;
+  otlp::OtlpHttpLogRecordExporterOptions logger_opts;
   if (argc > 1)
   {
     trace_opts.url  = argv[1];
@@ -158,8 +156,8 @@ int main(int argc, char *argv[])
     internal_log::GlobalLogHandler::SetLogLevel(internal_log::LogLevel::Debug);
   }
 
-  InitLogger();
-  InitTracer();
+  InitLogger(logger_opts);
+  InitTracer(trace_opts);
   foo_library();
   CleanupTracer();
   CleanupLogger();
