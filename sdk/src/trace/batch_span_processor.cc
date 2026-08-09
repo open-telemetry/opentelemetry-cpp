@@ -98,7 +98,8 @@ void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
   size_t buffer_size = buffer_.size();
   if (buffer_size >= max_queue_size_ / 2 || buffer_size >= max_export_batch_size_)
   {
-    // Best effort wakeup for worker thread.
+    // Notified without lock to reduce contention for span end. If this notify is lost,
+    // the worker thread may wait until next schedule or until the next notify attempt.
     synchronization_data_->cv.notify_all();
   }
 }
