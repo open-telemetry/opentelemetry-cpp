@@ -63,13 +63,13 @@ template <typename Operation>
 bool CallWithWatchdog(const char *operation_name,
                       const char *stall_hint,
                       int round,
-                      Operation operation)
+                      const Operation &operation)
 {
   auto result = std::async(std::launch::async, operation);
   if (result.wait_for(kWakeupWatchdog) == std::future_status::timeout)
   {
     std::cerr << operation_name << " did not return within " << kWakeupWatchdog.count()
-              << "m at round " << round << ". " << stall_hint << std::endl;
+              << "m at round " << round << ". " << stall_hint << '\n';
     std::abort();
   }
   return result.get();
@@ -95,10 +95,13 @@ void RunWorkerParkRace(const char *operation_name, const char *stall_hint, Opera
 
     // Vary the offset across a sweep so that over the whole set we have a better chance of hitting
     // the race window.
-    int spin_iterations = round * kSpinSweep;
-    for (volatile int s = 0; s < spin_iterations; ++s)
+    int spin_iterations    = round * kSpinSweep;
+    volatile int spin_sink = 0;
+    for (int s = 0; s < spin_iterations; ++s)
     {
       // busy-spin a scheduling-independent increasing amount to sweep the race offset
+      int next  = spin_sink;
+      spin_sink = next + 1;
     }
     processor->OnEnd(processor->MakeRecordable());
 
