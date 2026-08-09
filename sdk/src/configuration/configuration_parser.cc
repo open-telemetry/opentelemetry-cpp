@@ -898,23 +898,22 @@ TranslationStrategy ConfigurationParser::ParseTranslationStrategy(
     const std::unique_ptr<DocumentNode> &node,
     const std::string &name) const
 {
-  if (name == "UnderscoreEscapingWithSuffixes" || name == "underscore_escaping_with_suffixes")
+  if (name == "underscore_escaping_with_suffixes")
   {
     return TranslationStrategy::UnderscoreEscapingWithSuffixes;
   }
 
-  if (name == "UnderscoreEscapingWithoutSuffixes" ||
-      name == "underscore_escaping_without_suffixes/development")
+  if (name == "underscore_escaping_without_suffixes/development")
   {
     return TranslationStrategy::UnderscoreEscapingWithoutSuffixes;
   }
 
-  if (name == "NoUTF8EscapingWithSuffixes" || name == "no_utf8_escaping_with_suffixes/development")
+  if (name == "no_utf8_escaping_with_suffixes/development")
   {
     return TranslationStrategy::NoUTF8EscapingWithSuffixes;
   }
 
-  if (name == "NoTranslation" || name == "no_translation/development")
+  if (name == "no_translation/development")
   {
     return TranslationStrategy::NoTranslation;
   }
@@ -966,7 +965,7 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
   }
 
   std::string translation_strategy =
-      node->GetString("translation_strategy", "UnderscoreEscapingWithSuffixes");
+      node->GetString("translation_strategy", "underscore_escaping_with_suffixes");
   model->translation_strategy = ParseTranslationStrategy(node, translation_strategy);
 
   return model;
