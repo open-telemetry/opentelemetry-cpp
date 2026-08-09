@@ -76,19 +76,11 @@ class ComposableSampler;
 namespace configuration
 {
 
-class ComposableAlwaysOffSamplerConfiguration;
-class ComposableAlwaysOnSamplerConfiguration;
-class ComposableParentThresholdSamplerConfiguration;
-class ComposableProbabilitySamplerConfiguration;
-class ComposableRuleBasedSamplerConfiguration;
 class ComposableSamplerConfiguration;
 
 class SdkBuilder
 {
 public:
-  /// Maximum nesting depth of composable samplers, root included.
-  static constexpr std::size_t kDefaultMaxComposableSamplerDepth = 10;
-
   SdkBuilder(std::shared_ptr<Registry> registry) : registry_(std::move(registry)) {}
   SdkBuilder(SdkBuilder &&)                      = default;
   SdkBuilder(const SdkBuilder &)                 = default;
@@ -119,33 +111,6 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateSampler(
       const std::unique_ptr<opentelemetry::sdk::configuration::SamplerConfiguration> &model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> CreateComposableAlwaysOffSampler(
-      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> CreateComposableAlwaysOnSampler(
-      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> CreateComposableProbabilitySampler(
-      const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>
-  CreateComposableParentThresholdSampler(
-      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *model,
-      std::size_t depth = 1) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> CreateComposableRuleBasedSampler(
-      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *model,
-      std::size_t depth = 1) const;
-
-  /// Throws UnsupportedException when depth exceeds the maximum.
-  std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> CreateComposableSampler(
-      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model,
-      std::size_t depth = 1) const;
-
-  void SetMaxComposableSamplerDepth(std::size_t depth) { max_composable_sampler_depth_ = depth; }
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateCompositeSampler(
       const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model) const;
@@ -332,7 +297,6 @@ public:
 
 private:
   std::shared_ptr<Registry> registry_;
-  std::size_t max_composable_sampler_depth_{kDefaultMaxComposableSamplerDepth};
 };
 
 }  // namespace configuration

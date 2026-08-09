@@ -30,6 +30,7 @@
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/instrument_type.h"
@@ -123,7 +124,9 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> BuildRuleSampler(
   rule->sampler          = std::make_unique<config_sdk::ComposableAlwaysOnSamplerConfiguration>();
   auto rule_based_config = std::make_unique<config_sdk::ComposableRuleBasedSamplerConfiguration>();
   rule_based_config->rules.push_back(std::move(rule));
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(rule_based_config);
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(rule_based_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
   config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   return builder.CreateSampler(sampler_config);
 }
@@ -341,7 +344,9 @@ TEST(SdkBuilder, CreateProbabilitySampler)
 TEST(SdkBuilder, CreateComposableAlwaysOnSampler)
 {
   auto composable_config = std::make_unique<config_sdk::ComposableAlwaysOnSamplerConfiguration>();
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composable_config);
+  auto composite         = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler                                    = std::move(composable_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
   config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
@@ -352,7 +357,9 @@ TEST(SdkBuilder, CreateComposableAlwaysOnSampler)
 TEST(SdkBuilder, CreateComposableAlwaysOffSampler)
 {
   auto composable_config = std::make_unique<config_sdk::ComposableAlwaysOffSamplerConfiguration>();
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composable_config);
+  auto composite         = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler                                    = std::move(composable_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
   config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
@@ -365,8 +372,9 @@ TEST(SdkBuilder, CreateComposableProbabilitySampler)
   auto composable_probability_sampler_config =
       std::make_unique<config_sdk::ComposableProbabilitySamplerConfiguration>();
   composable_probability_sampler_config->ratio = 0.25;
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config =
-      std::move(composable_probability_sampler_config);
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(composable_probability_sampler_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
   config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
@@ -380,8 +388,10 @@ TEST(SdkBuilder, CreateComposableParentThresholdSampler)
   root_config->ratio = 0.25;
   auto parent_config =
       std::make_unique<config_sdk::ComposableParentThresholdSamplerConfiguration>();
-  parent_config->root                                              = std::move(root_config);
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(parent_config);
+  parent_config->root           = std::move(root_config);
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(parent_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
   config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
@@ -394,8 +404,10 @@ TEST(SdkBuilder, CreateComposableParentThresholdSamplerNullRoot)
 {
   auto parent_config =
       std::make_unique<config_sdk::ComposableParentThresholdSamplerConfiguration>();
-  parent_config->root                                              = nullptr;
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(parent_config);
+  parent_config->root           = nullptr;
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(parent_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
   config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
@@ -413,9 +425,10 @@ TEST(SdkBuilder, CreateComposableParentThresholdSamplerNestedDepth3)
   middle_config->root = std::move(innermost_config);
 
   auto outer_config = std::make_unique<config_sdk::ComposableParentThresholdSamplerConfiguration>();
-  outer_config->root = std::move(middle_config);
-
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(outer_config);
+  outer_config->root            = std::move(middle_config);
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(outer_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
   config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
@@ -440,7 +453,9 @@ std::unique_ptr<config_sdk::SamplerConfiguration> MakeNestedComposableConfig(
     parent->root = std::move(node);
     node         = std::move(parent);
   }
-  return node;
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(node);
+  return composite;
 }
 
 }  // namespace
@@ -448,8 +463,7 @@ std::unique_ptr<config_sdk::SamplerConfiguration> MakeNestedComposableConfig(
 TEST(SdkBuilder, CreateComposableSamplerAtMaxDepth)
 {
   // 9 parent nodes + leaf = depth 10, the default maximum.
-  auto sampler_config =
-      MakeNestedComposableConfig(config_sdk::SdkBuilder::kDefaultMaxComposableSamplerDepth - 1);
+  auto sampler_config = MakeNestedComposableConfig(9);
   config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
@@ -458,23 +472,9 @@ TEST(SdkBuilder, CreateComposableSamplerAtMaxDepth)
 TEST(SdkBuilder, CreateComposableSamplerBeyondMaxDepth)
 {
   // 10 parent nodes + leaf = depth 11, exceeding the default maximum.
-  auto sampler_config =
-      MakeNestedComposableConfig(config_sdk::SdkBuilder::kDefaultMaxComposableSamplerDepth);
+  auto sampler_config = MakeNestedComposableConfig(10);
   config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   EXPECT_THROW(builder.CreateSampler(sampler_config), config_sdk::UnsupportedException);
-}
-
-TEST(SdkBuilder, SetMaxComposableSamplerDepth)
-{
-  // 2 parent nodes + leaf = depth 3.
-  auto sampler_config = MakeNestedComposableConfig(2);
-  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
-  builder.SetMaxComposableSamplerDepth(2);
-  EXPECT_THROW(builder.CreateSampler(sampler_config), config_sdk::UnsupportedException);
-
-  auto sampler_config_ok = MakeNestedComposableConfig(1);
-  auto sampler           = builder.CreateSampler(sampler_config_ok);
-  ASSERT_NE(sampler, nullptr);
 }
 
 TEST(SdkBuilder, CreateComposableRuleBasedSampler)
@@ -493,8 +493,9 @@ TEST(SdkBuilder, CreateComposableRuleBasedSampler)
   auto fallback     = std::make_unique<config_sdk::ComposableRuleBasedSamplerRuleConfiguration>();
   fallback->sampler = std::make_unique<config_sdk::ComposableAlwaysOnSamplerConfiguration>();
   rule_based_config->rules.push_back(std::move(fallback));
-
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(rule_based_config);
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(rule_based_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
   config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
@@ -729,7 +730,9 @@ TEST(SdkBuilder, RuleBasedFirstMatchAndDefaults)
     auto second     = std::make_unique<ComposableRuleBasedSamplerRuleConfiguration>();
     second->sampler = std::make_unique<config_sdk::ComposableAlwaysOnSamplerConfiguration>();
     rule_based_config->rules.push_back(std::move(second));
-    std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(rule_based_config);
+    auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+    composite->composable_sampler = std::move(rule_based_config);
+    std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
     config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateSampler(sampler_config);
     ASSERT_NE(sampler, nullptr);
@@ -741,7 +744,9 @@ TEST(SdkBuilder, RuleBasedFirstMatchAndDefaults)
   {
     auto rule_based_config =
         std::make_unique<config_sdk::ComposableRuleBasedSamplerConfiguration>();
-    std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(rule_based_config);
+    auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+    composite->composable_sampler = std::move(rule_based_config);
+    std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
     config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateSampler(sampler_config);
     ASSERT_NE(sampler, nullptr);

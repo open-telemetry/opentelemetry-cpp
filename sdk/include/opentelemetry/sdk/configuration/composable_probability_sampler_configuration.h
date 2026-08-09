@@ -21,7 +21,7 @@ public:
 
   ComposableProbabilitySamplerConfiguration() = default;
   double ratio{kDefaultRatio};
-  void Accept(SamplerConfigurationVisitor *visitor) const override;
+  void Accept(ComposableSamplerConfigurationVisitor *visitor) const override;
 };
 
 }  // namespace configuration

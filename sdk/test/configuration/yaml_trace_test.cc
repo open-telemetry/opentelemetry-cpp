@@ -14,6 +14,9 @@
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_patterns_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_sampler_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
@@ -61,6 +64,43 @@ enum class SamplerType : std::uint8_t
   kProbability               = 11
 };
 
+class TestComposableSamplerVisitor
+    : public opentelemetry::sdk::configuration::ComposableSamplerConfigurationVisitor
+{
+public:
+  SamplerType type_matched = SamplerType::kUnmatched;
+  double ratio             = -1.0;
+
+  void VisitComposableAlwaysOff(
+      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kComposableAlwaysOff;
+  }
+  void VisitComposableAlwaysOn(
+      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kComposableAlwaysOn;
+  }
+  void VisitComposableProbability(
+      const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
+      override
+  {
+    type_matched = SamplerType::kComposableProbability;
+    ratio        = model->ratio;
+  }
+  void VisitComposableParentThreshold(
+      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *)
+      override
+  {
+    type_matched = SamplerType::kComposableParentThreshold;
+  }
+  void VisitComposableRuleBased(
+      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *) override
+  {
+    type_matched = SamplerType::kComposableRuleBased;
+  }
+};
+
 class TestSamplerVisitor : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
 {
 public:
@@ -104,33 +144,13 @@ public:
       const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *) override
   {}
 
-  void VisitComposableAlwaysOff(
-      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *) override
+  void VisitComposite(
+      const opentelemetry::sdk::configuration::CompositeSamplerConfiguration *model) override
   {
-    type_matched = SamplerType::kComposableAlwaysOff;
-  }
-  void VisitComposableAlwaysOn(
-      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration *) override
-  {
-    type_matched = SamplerType::kComposableAlwaysOn;
-  }
-  void VisitComposableProbability(
-      const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
-      override
-  {
-    type_matched = SamplerType::kComposableProbability;
-    ratio        = model->ratio;
-  }
-  void VisitComposableParentThreshold(
-      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *)
-      override
-  {
-    type_matched = SamplerType::kComposableParentThreshold;
-  }
-  void VisitComposableRuleBased(
-      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *) override
-  {
-    type_matched = SamplerType::kComposableRuleBased;
+    TestComposableSamplerVisitor composable_visitor;
+    model->composable_sampler->Accept(&composable_visitor);
+    type_matched = composable_visitor.type_matched;
+    ratio        = composable_visitor.ratio;
   }
 };
 }  // namespace
@@ -1374,9 +1394,12 @@ tracer_provider:
   config->tracer_provider->sampler->Accept(&visitor);
   ASSERT_EQ(visitor.type_matched, SamplerType::kComposableRuleBased);
 
+  auto *composite = static_cast<opentelemetry::sdk::configuration::CompositeSamplerConfiguration *>(
+      config->tracer_provider->sampler.get());
+  ASSERT_NE(composite, nullptr);
   auto *rule_based_sampler =
       static_cast<opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *>(
-          config->tracer_provider->sampler.get());
+          composite->composable_sampler.get());
   ASSERT_NE(rule_based_sampler, nullptr);
   ASSERT_EQ(rule_based_sampler->rules.size(), 1);
 

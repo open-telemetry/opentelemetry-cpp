@@ -234,6 +234,7 @@
 #include <opentelemetry/sdk/configuration/view_configuration.h>
 #include <opentelemetry/sdk/configuration/view_selector_configuration.h>
 #include <opentelemetry/sdk/configuration/view_stream_configuration.h>
+#include "opentelemetry/sdk/configuration/composite_sampler_builder.h"
 
 // SDK configuration builder headers
 #include <opentelemetry/sdk/configuration/always_off_sampler_builder.h>

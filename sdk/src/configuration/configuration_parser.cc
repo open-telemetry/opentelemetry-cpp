@@ -34,6 +34,7 @@
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_parser.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
@@ -2114,7 +2115,9 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
   }
   else if (name == "composite/development")
   {
-    model = ParseComposableSamplerConfiguration(child, depth);
+    auto composite                = std::make_unique<CompositeSamplerConfiguration>();
+    composite->composable_sampler = ParseComposableSamplerConfiguration(child, depth);
+    model                         = std::move(composite);
   }
   else
   {

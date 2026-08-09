@@ -35,18 +35,18 @@
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_builder.h"
-#include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_on_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_builder.h"
-#include "opentelemetry/sdk/configuration/composable_probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composable_sampler_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/composite_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
@@ -368,10 +368,14 @@ private:
 };
 
 class ComposableSamplerBuilder
-    : public opentelemetry::sdk::configuration::SamplerConfigurationVisitor
+    : public opentelemetry::sdk::configuration::ComposableSamplerConfigurationVisitor
 {
 public:
-  ComposableSamplerBuilder(const SdkBuilder *b, std::size_t depth) : sdk_builder_(b), depth_(depth)
+  // Maximum nesting depth of composable samplers, root included.
+  static constexpr std::size_t kMaxDepth = 10;
+
+  ComposableSamplerBuilder(const Registry *registry, std::size_t depth)
+      : registry_(registry), depth_(depth)
   {}
   ComposableSamplerBuilder(ComposableSamplerBuilder &&)                      = delete;
   ComposableSamplerBuilder(const ComposableSamplerBuilder &)                 = delete;
@@ -384,97 +388,139 @@ public:
   // ExperimentalComposableRuleBasedSamplerRule which each may contain a
   // ExperimentalComposableRuleBasedSampler (See: schema/tracer_provider.yaml#L340).
   // Recursion is used to build the nested samplers, but the depth of recursion is limited to
-  // (max_composable_sampler_depth_).
-  //
   // NOLINTBEGIN(misc-no-recursion)
   void VisitComposableAlwaysOff(
       const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *model)
       override
   {
-    sampler = sdk_builder_->CreateComposableAlwaysOffSampler(model);
+    const ComposableAlwaysOffSamplerBuilder *builder =
+        registry_->GetComposableAlwaysOffSamplerBuilder();
+    if (builder != nullptr)
+    {
+      OTEL_INTERNAL_LOG_DEBUG("VisitComposableAlwaysOff() using registered builder");
+      sampler = builder->Build(model);
+      return;
+    }
+    static const std::string die("No builder for ComposableAlwaysOffSampler");
+    throw UnsupportedException(die);
   }
 
   void VisitComposableAlwaysOn(
       const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration *model)
       override
   {
-    sampler = sdk_builder_->CreateComposableAlwaysOnSampler(model);
+    const ComposableAlwaysOnSamplerBuilder *builder =
+        registry_->GetComposableAlwaysOnSamplerBuilder();
+    if (builder != nullptr)
+    {
+      OTEL_INTERNAL_LOG_DEBUG("VisitComposableAlwaysOn() using registered builder");
+      sampler = builder->Build(model);
+      return;
+    }
+    static const std::string die("No builder for ComposableAlwaysOnSampler");
+    throw UnsupportedException(die);
   }
 
   void VisitComposableProbability(
       const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
       override
   {
-    sampler = sdk_builder_->CreateComposableProbabilitySampler(model);
+    const ComposableProbabilitySamplerBuilder *builder =
+        registry_->GetComposableProbabilitySamplerBuilder();
+    if (builder != nullptr)
+    {
+      OTEL_INTERNAL_LOG_DEBUG("VisitComposableProbability() using registered builder");
+      sampler = builder->Build(model);
+      return;
+    }
+    static const std::string die("No builder for ComposableProbabilitySampler");
+    throw UnsupportedException(die);
   }
 
   void VisitComposableParentThreshold(
       const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *model)
       override
   {
-    sampler = sdk_builder_->CreateComposableParentThresholdSampler(model, depth_);
+    std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> root;
+    if (model->root != nullptr)
+    {
+      root = BuildChild(model->root.get());
+    }
+    else
+    {
+      static const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration
+          kAlwaysOn;
+      const ComposableAlwaysOnSamplerBuilder *ao_builder =
+          registry_->GetComposableAlwaysOnSamplerBuilder();
+      if (ao_builder == nullptr)
+      {
+        static const std::string die("No builder for ComposableAlwaysOnSampler");
+        throw UnsupportedException(die);
+      }
+      root = ao_builder->Build(&kAlwaysOn);
+    }
+    const ComposableParentThresholdSamplerBuilder *builder =
+        registry_->GetComposableParentThresholdSamplerBuilder();
+    if (builder != nullptr)
+    {
+      OTEL_INTERNAL_LOG_DEBUG("VisitComposableParentThreshold() using registered builder");
+      sampler = builder->Build(model, std::move(root));
+      return;
+    }
+    static const std::string die("No builder for ComposableParentThresholdSampler");
+    throw UnsupportedException(die);
   }
 
   void VisitComposableRuleBased(
       const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *model)
       override
   {
-    sampler = sdk_builder_->CreateComposableRuleBasedSampler(model, depth_);
+    // Index-aligned with model->rules, null for rules with no sampler.
+    std::vector<std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>> rule_samplers;
+    rule_samplers.reserve(model->rules.size());
+    for (const auto &rule : model->rules)
+    {
+      if (rule == nullptr || rule->sampler == nullptr)
+      {
+        OTEL_INTERNAL_LOG_WARN("Ignoring a rule with no sampler");
+        rule_samplers.push_back(nullptr);
+        continue;
+      }
+      rule_samplers.push_back(BuildChild(rule->sampler.get()));
+    }
+    const ComposableRuleBasedSamplerBuilder *builder =
+        registry_->GetComposableRuleBasedSamplerBuilder();
+    if (builder != nullptr)
+    {
+      OTEL_INTERNAL_LOG_DEBUG("VisitComposableRuleBased() using registered builder");
+      sampler = builder->Build(model, std::move(rule_samplers));
+      return;
+    }
+    static const std::string die("No builder for ComposableRuleBasedSampler");
+    throw UnsupportedException(die);
   }
   // NOLINTEND(misc-no-recursion)
-
-  // The model only ever nests ComposableSamplerConfiguration here, so the
-  // plain sampler visits are unreachable. Throw to preserve the invariant
-  // that a null sampler is never returned.
-  void VisitAlwaysOff(
-      const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration * /* model */) override
-  {
-    throw UnsupportedException(kNotComposable);
-  }
-
-  void VisitAlwaysOn(
-      const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration * /* model */) override
-  {
-    throw UnsupportedException(kNotComposable);
-  }
-
-  void VisitJaegerRemote(const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration
-                             * /* model */) override
-  {
-    throw UnsupportedException(kNotComposable);
-  }
-
-  void VisitParentBased(const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration
-                            * /* model */) override
-  {
-    throw UnsupportedException(kNotComposable);
-  }
-
-  void VisitProbability(const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration
-                            * /* model */) override
-  {
-    throw UnsupportedException(kNotComposable);
-  }
-
-  void VisitTraceIdRatioBased(
-      const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration * /* model */)
-      override
-  {
-    throw UnsupportedException(kNotComposable);
-  }
-
-  void VisitExtension(
-      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration * /* model */) override
-  {
-    throw UnsupportedException(kNotComposable);
-  }
 
   std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> sampler;
 
 private:
-  static constexpr const char *kNotComposable = "Expecting a composable sampler";
+  // NOLINTBEGIN(misc-no-recursion)
+  std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> BuildChild(
+      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *child_model)
+  {
+    if (depth_ + 1 > kMaxDepth)
+    {
+      std::string die("Composable sampler nesting depth exceeds ");
+      die.append(std::to_string(kMaxDepth));
+      throw UnsupportedException(die);
+    }
+    ComposableSamplerBuilder child(registry_, depth_ + 1);
+    child_model->Accept(&child);
+    return std::move(child.sampler);
+  }
+  // NOLINTEND(misc-no-recursion)
 
-  const SdkBuilder *sdk_builder_;
+  const Registry *registry_;
   std::size_t depth_;
 };
 
@@ -531,39 +577,10 @@ public:
     sampler = sdk_builder_->CreateExtensionSampler(model);
   }
 
-  void VisitComposableAlwaysOff(
-      const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *model)
-      override
+  void VisitComposite(
+      const opentelemetry::sdk::configuration::CompositeSamplerConfiguration *model) override
   {
-    sampler = sdk_builder_->CreateCompositeSampler(model);
-  }
-
-  void VisitComposableAlwaysOn(
-      const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration *model)
-      override
-  {
-    sampler = sdk_builder_->CreateCompositeSampler(model);
-  }
-
-  void VisitComposableProbability(
-      const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model)
-      override
-  {
-    sampler = sdk_builder_->CreateCompositeSampler(model);
-  }
-
-  void VisitComposableParentThreshold(
-      const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *model)
-      override
-  {
-    sampler = sdk_builder_->CreateCompositeSampler(model);
-  }
-
-  void VisitComposableRuleBased(
-      const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *model)
-      override
-  {
-    sampler = sdk_builder_->CreateCompositeSampler(model);
+    sampler = sdk_builder_->CreateCompositeSampler(model->composable_sampler.get());
   }
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> sampler;
@@ -1024,126 +1041,7 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateParentBase
   throw UnsupportedException(die);
 }
 
-std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>
-SdkBuilder::CreateComposableAlwaysOffSampler(
-    const opentelemetry::sdk::configuration::ComposableAlwaysOffSamplerConfiguration *model) const
-{
-  const ComposableAlwaysOffSamplerBuilder *builder =
-      registry_->GetComposableAlwaysOffSamplerBuilder();
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG("CreateComposableAlwaysOffSampler() using registered builder");
-    return builder->Build(model);
-  }
-  static const std::string die("No builder for ComposableAlwaysOffSampler");
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>
-SdkBuilder::CreateComposableAlwaysOnSampler(
-    const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration *model) const
-{
-  const ComposableAlwaysOnSamplerBuilder *builder =
-      registry_->GetComposableAlwaysOnSamplerBuilder();
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG("CreateComposableAlwaysOnSampler() using registered builder");
-    return builder->Build(model);
-  }
-  static const std::string die("No builder for ComposableAlwaysOnSampler");
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>
-SdkBuilder::CreateComposableProbabilitySampler(
-    const opentelemetry::sdk::configuration::ComposableProbabilitySamplerConfiguration *model) const
-{
-  const ComposableProbabilitySamplerBuilder *builder =
-      registry_->GetComposableProbabilitySamplerBuilder();
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG("CreateComposableProbabilitySampler() using registered builder");
-    return builder->Build(model);
-  }
-  static const std::string die("No builder for ComposableProbabilitySampler");
-  throw UnsupportedException(die);
-}
-
 // NOLINTBEGIN(misc-no-recursion)
-std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>
-SdkBuilder::CreateComposableParentThresholdSampler(
-    const opentelemetry::sdk::configuration::ComposableParentThresholdSamplerConfiguration *model,
-    std::size_t depth) const
-{
-  std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> root;
-  if (model->root != nullptr)
-  {
-    root = CreateComposableSampler(model->root.get(), depth + 1);
-  }
-  else
-  {
-    static const opentelemetry::sdk::configuration::ComposableAlwaysOnSamplerConfiguration
-        kAlwaysOn;
-    root = CreateComposableAlwaysOnSampler(&kAlwaysOn);
-  }
-
-  const ComposableParentThresholdSamplerBuilder *builder =
-      registry_->GetComposableParentThresholdSamplerBuilder();
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG("CreateComposableParentThresholdSampler() using registered builder");
-    return builder->Build(model, std::move(root));
-  }
-  static const std::string die("No builder for ComposableParentThresholdSampler");
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>
-SdkBuilder::CreateComposableRuleBasedSampler(
-    const opentelemetry::sdk::configuration::ComposableRuleBasedSamplerConfiguration *model,
-    std::size_t depth) const
-{
-  // Index-aligned with model->rules, null for rules with no sampler.
-  std::vector<std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler>> rule_samplers;
-  rule_samplers.reserve(model->rules.size());
-  for (const auto &rule : model->rules)
-  {
-    if (rule == nullptr || rule->sampler == nullptr)
-    {
-      OTEL_INTERNAL_LOG_WARN("Ignoring a rule with no sampler");
-      rule_samplers.push_back(nullptr);
-      continue;
-    }
-    rule_samplers.push_back(CreateComposableSampler(rule->sampler.get(), depth + 1));
-  }
-
-  const ComposableRuleBasedSamplerBuilder *builder =
-      registry_->GetComposableRuleBasedSamplerBuilder();
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG("CreateComposableRuleBasedSampler() using registered builder");
-    return builder->Build(model, std::move(rule_samplers));
-  }
-  static const std::string die("No builder for ComposableRuleBasedSampler");
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> SdkBuilder::CreateComposableSampler(
-    const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model,
-    std::size_t depth) const
-{
-  if (depth > max_composable_sampler_depth_)
-  {
-    std::string die("Composable sampler nesting depth exceeds ");
-    die.append(std::to_string(max_composable_sampler_depth_));
-    throw UnsupportedException(die);
-  }
-  ComposableSamplerBuilder builder(this, depth);
-  model->Accept(&builder);
-  return std::move(builder.sampler);
-}
-// NOLINTEND(misc-no-recursion)
-
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateCompositeSampler(
     const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model) const
 {
@@ -1151,11 +1049,14 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateCompositeS
   if (builder != nullptr)
   {
     OTEL_INTERNAL_LOG_DEBUG("CreateCompositeSampler() using registered builder");
-    return builder->Build(CreateComposableSampler(model));
+    ComposableSamplerBuilder composable_builder(registry_.get(), 1);
+    model->Accept(&composable_builder);
+    return builder->Build(std::move(composable_builder.sampler));
   }
   static const std::string die("No builder for CompositeSampler");
   throw UnsupportedException(die);
 }
+// NOLINTEND(misc-no-recursion)
 
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateProbabilitySampler(
     const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model) const
