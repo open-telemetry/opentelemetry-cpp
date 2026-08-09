@@ -9,7 +9,6 @@
 #include <memory>
 #include <ostream>
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -132,8 +131,8 @@
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"
-#include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/sdk/configuration/string_array_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
@@ -217,6 +216,59 @@ using common::WildcardMatch;
 
 namespace
 {
+
+class IncludeExcludeAttributesProcessor final
+    : public opentelemetry::sdk::metrics::AttributesProcessor
+{
+public:
+  IncludeExcludeAttributesProcessor(bool include_all,
+                                    std::vector<std::string> included_patterns,
+                                    std::vector<std::string> excluded_patterns)
+      : include_all_(include_all),
+        included_patterns_(std::move(included_patterns)),
+        excluded_patterns_(std::move(excluded_patterns))
+  {}
+
+  opentelemetry::sdk::metrics::MetricAttributes process(
+      const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
+  {
+    opentelemetry::sdk::metrics::MetricAttributes result;
+    attributes.ForEachKeyValue(
+        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+          if (isPresent(key))
+          {
+            result.SetAttribute(key, value);
+          }
+          return true;
+        });
+
+    result.UpdateHash();
+    return result;
+  }
+
+  bool isPresent(nostd::string_view key) const noexcept override
+  {
+    return (include_all_ || MatchesAny(included_patterns_, key)) &&
+           !MatchesAny(excluded_patterns_, key);
+  }
+
+private:
+  static bool MatchesAny(const std::vector<std::string> &patterns, nostd::string_view key) noexcept
+  {
+    for (const auto &pattern : patterns)
+    {
+      if (WildcardMatch(pattern, key))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool include_all_;
+  std::vector<std::string> included_patterns_;
+  std::vector<std::string> excluded_patterns_;
+};
 
 static opentelemetry::logs::Severity ToLogSeverity(
     opentelemetry::sdk::configuration::SeverityNumber severity_number)
@@ -1897,39 +1949,26 @@ SdkBuilder::CreateAttributesProcessor(
     const
 {
   using opentelemetry::sdk::metrics::DefaultAttributesProcessor;
-  using opentelemetry::sdk::metrics::FilterAttributeMap;
-  using opentelemetry::sdk::metrics::FilteringAttributesProcessor;
-  using opentelemetry::sdk::metrics::FilteringExcludeAttributesProcessor;
 
-  FilterAttributeMap excluded;
-  if (model->excluded != nullptr)
+  if (model->included == nullptr && model->excluded == nullptr)
   {
-    for (const auto &key : model->excluded->string_array)
-    {
-      excluded.emplace(key, true);
-    }
+    return std::make_unique<DefaultAttributesProcessor>();
   }
 
+  std::vector<std::string> included_patterns;
   if (model->included != nullptr)
   {
-    FilterAttributeMap included;
-    for (const auto &key : model->included->string_array)
-    {
-      if (excluded.find(key) == excluded.end())
-      {
-        included.emplace(key, true);
-      }
-    }
-
-    return std::make_unique<FilteringAttributesProcessor>(std::move(included));
+    included_patterns = model->included->string_array;
   }
 
+  std::vector<std::string> excluded_patterns;
   if (model->excluded != nullptr)
   {
-    return std::make_unique<FilteringExcludeAttributesProcessor>(std::move(excluded));
+    excluded_patterns = model->excluded->string_array;
   }
 
-  return std::make_unique<DefaultAttributesProcessor>();
+  return std::make_unique<IncludeExcludeAttributesProcessor>(
+      model->included == nullptr, std::move(included_patterns), std::move(excluded_patterns));
 }
 
 void SdkBuilder::AddView(

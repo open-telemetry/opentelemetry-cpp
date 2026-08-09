@@ -748,6 +748,28 @@ TEST(SdkBuilder, CreateAttributesProcessor)
     EXPECT_NE(filtered.find("included"), filtered.end());
   }
 
+  // Wildcard patterns are evaluated per key, with exclusion taking precedence.
+  {
+    std::map<std::string, int> wildcard_attributes = {
+        {"foo.bar", 1}, {"foo.baz", 2}, {"question.x", 3}, {"question.xy", 4}, {"other", 5}};
+    opentelemetry::common::KeyValueIterableView<std::map<std::string, int>> wildcard_iterable(
+        wildcard_attributes);
+
+    auto model                    = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+    model->included               = std::make_unique<config_sdk::StringArrayConfiguration>();
+    model->included->string_array = {"foo.*", "question.?"};
+    model->excluded               = std::make_unique<config_sdk::StringArrayConfiguration>();
+    model->excluded->string_array = {"foo.bar"};
+
+    auto processor = builder.CreateAttributesProcessor(model);
+    ASSERT_NE(processor, nullptr);
+    auto filtered = processor->process(wildcard_iterable);
+
+    EXPECT_EQ(filtered.size(), 2u);
+    EXPECT_NE(filtered.find("foo.baz"), filtered.end());
+    EXPECT_NE(filtered.find("question.x"), filtered.end());
+  }
+
   // An exclude-only configuration retains every key that is not excluded.
   {
     auto model                    = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
