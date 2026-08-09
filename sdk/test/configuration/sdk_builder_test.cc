@@ -51,7 +51,6 @@
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
-#include "opentelemetry/sdk/configuration/unsupported_exception.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
@@ -79,6 +78,10 @@
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
+
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+#  include "opentelemetry/sdk/configuration/unsupported_exception.h"
+#endif
 
 using opentelemetry::sdk::configuration::Registry;
 using opentelemetry::sdk::configuration::SdkBuilder;
