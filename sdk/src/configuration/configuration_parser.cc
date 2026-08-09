@@ -898,22 +898,22 @@ TranslationStrategy ConfigurationParser::ParseTranslationStrategy(
     const std::unique_ptr<DocumentNode> &node,
     const std::string &name) const
 {
-  if (name == "UnderscoreEscapingWithSuffixes")
+  if (name == "underscore_escaping_with_suffixes")
   {
     return TranslationStrategy::UnderscoreEscapingWithSuffixes;
   }
 
-  if (name == "UnderscoreEscapingWithoutSuffixes")
+  if (name == "underscore_escaping_without_suffixes/development")
   {
     return TranslationStrategy::UnderscoreEscapingWithoutSuffixes;
   }
 
-  if (name == "NoUTF8EscapingWithSuffixes")
+  if (name == "no_utf8_escaping_with_suffixes/development")
   {
     return TranslationStrategy::NoUTF8EscapingWithSuffixes;
   }
 
-  if (name == "NoTranslation")
+  if (name == "no_translation/development")
   {
     return TranslationStrategy::NoTranslation;
   }
@@ -965,7 +965,7 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
   }
 
   std::string translation_strategy =
-      node->GetString("translation_strategy", "UnderscoreEscapingWithSuffixes");
+      node->GetString("translation_strategy", "underscore_escaping_with_suffixes");
   model->translation_strategy = ParseTranslationStrategy(node, translation_strategy);
 
   return model;
@@ -1843,6 +1843,13 @@ ConfigurationParser::ParseComposableProbabilitySamplerConfiguration(
   using Config = ComposableProbabilitySamplerConfiguration;
   auto model   = std::make_unique<ComposableProbabilitySamplerConfiguration>();
   model->ratio = node->GetDouble("ratio", Config::kDefaultRatio);
+  if (!(model->ratio >= Config::kMinRatio && model->ratio <= Config::kMaxRatio))
+  {
+    std::string message("Illegal ratio: ");
+    message.append(std::to_string(model->ratio));
+    throw InvalidSchemaException(node->Location(), message);
+  }
+
   return model;
 }
 
