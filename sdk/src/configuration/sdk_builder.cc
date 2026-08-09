@@ -9,6 +9,7 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -131,6 +132,7 @@
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/sdk/configuration/string_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"

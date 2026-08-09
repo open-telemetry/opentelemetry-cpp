@@ -65,6 +65,7 @@
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
