@@ -19,12 +19,12 @@ enum class InstrumentType : std::uint8_t
 {
   none, /* Represents a null entry */
   counter,
+  gauge,
   histogram,
   observable_counter,
   observable_gauge,
   observable_up_down_counter,
-  up_down_counter,
-  gauge
+  up_down_counter
 };
 
 }  // namespace configuration
