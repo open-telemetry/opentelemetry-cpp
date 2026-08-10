@@ -542,15 +542,13 @@ void HttpOperation::Cleanup()
   // Only cleanup async once even in recursive calls
   if (async_data_)
   {
-    // Just reset and move easy_handle to owner if in async mode
+    // Move the easy handle to the owner untouched. It may still be attached to the multi handle
+    // and running, and the thread inside curl_multi_perform owns it until the IO thread takes it
+    // out, so writing to it here would be a write to a live transfer. It is pointless as well:
+    // the next thing that happens to the handle is curl_easy_cleanup.
     Session *session = async_data_->session.exchange(nullptr, std::memory_order_acq_rel);
     if (session != nullptr)
     {
-      if (curl_resource_.easy_handle != nullptr)
-      {
-        curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_PRIVATE, NULL);
-        curl_easy_reset(curl_resource_.easy_handle);
-      }
       session->GetHttpClient().ScheduleRemoveSession(session->GetSessionId(),
                                                      std::move(curl_resource_));
     }
@@ -1525,6 +1523,14 @@ void HttpOperation::Abort()
 
 void HttpOperation::PerformCurlMessage(CURLcode code)
 {
+  if (is_cleaned_.load(std::memory_order_acquire))
+  {
+    // Already torn down, and the handle is queued for removal. The multi handle can still hold a
+    // message buffered from before that, and acting on it would dispatch a second round of
+    // terminal events and can put a handle that is waiting to be freed back on the retry queue.
+    return;
+  }
+
   ++retry_attempts_;
   last_attempt_time_      = std::chrono::system_clock::now();
   last_curl_result_       = code;

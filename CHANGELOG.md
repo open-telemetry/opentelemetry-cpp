@@ -71,6 +71,9 @@ Increment the:
   deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
   `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
   ([#4349](https://github.com/open-telemetry/opentelemetry-cpp/pull/4349))
+* [BUG] Remove a curl easy handle from the multi handle before freeing that
+  handle and the header list it points at
+  [#4391](https://github.com/open-telemetry/opentelemetry-cpp/issues/4391)
 
 * [CONFIGURATION] Add SDK component builder interfaces to the registry
   [#4358](https://github.com/open-telemetry/opentelemetry-cpp/issues/4358)

@@ -11,6 +11,7 @@
 #include <functional>
 #include <list>
 #include <mutex>
+#include <ostream>
 #include <string>
 #include <thread>
 #include <unordered_map>
@@ -23,6 +24,7 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
@@ -33,8 +35,6 @@
 #  include <array>
 
 #  include "opentelemetry/nostd/type_traits.h"
-#else
-#  include "opentelemetry/sdk/common/global_log_handler.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -811,13 +811,36 @@ bool HttpClient::doRemoveSessions()
 
     for (auto &removing_handle : pending_to_remove_session_handles)
     {
-      if (nullptr != removing_handle.second.headers_chunk)
+      auto &resource = removing_handle.second;
+      if (nullptr == resource.easy_handle)
       {
-        curl_slist_free_all(removing_handle.second.headers_chunk);
+        continue;
       }
 
-      curl_multi_remove_handle(multi_handle_, removing_handle.second.easy_handle);
-      curl_easy_cleanup(removing_handle.second.easy_handle);
+      // Take it out of the multi handle first. libcurl does not allow an easy handle to be
+      // cleaned up while a multi handle still owns it, and the header list has to stay alive
+      // until the handle is no longer used for a transfer. A handle that was never added
+      // reports CURLM_OK here, so this does not need to know which is which.
+      const CURLMcode rc = curl_multi_remove_handle(multi_handle_, resource.easy_handle);
+      if (CURLM_OK != rc)
+      {
+        // The multi handle may still own it. Leaking one easy handle is the better half of
+        // this trade: freeing it here would corrupt whatever still holds it.
+        OTEL_INTERNAL_LOG_ERROR(
+            "[HTTP Client Curl] curl_multi_remove_handle failed, leaving "
+            "the handle alone: "
+            << curl_multi_strerror(rc));
+        continue;
+      }
+
+      if (nullptr != resource.headers_chunk)
+      {
+        curl_slist_free_all(resource.headers_chunk);
+        resource.headers_chunk = nullptr;
+      }
+
+      curl_easy_cleanup(resource.easy_handle);
+      resource.easy_handle = nullptr;
     }
 
     for (auto &removing_session : pending_to_remove_sessions)
