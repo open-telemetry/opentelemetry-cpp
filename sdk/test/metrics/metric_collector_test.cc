@@ -594,6 +594,92 @@ TEST_F(MetricCollectorTest, ViewCardinalityLimitEnforcedOnCollection)
   EXPECT_TRUE(overflow_present);
 }
 
+namespace
+{
+size_t CountRealPoints(const MetricProducer::Result &result, bool *overflow_present)
+{
+  size_t total_points = 0;
+  for (const ScopeMetrics &sm : result.points_.scope_metric_data_)
+  {
+    for (const MetricData &md : sm.metric_data_)
+    {
+      for (const PointDataAttributes &pda : md.point_data_attr_)
+      {
+        if (!pda.attributes.GetAttributes().empty() &&
+            pda.attributes.GetAttributes().begin()->first == kAttributesLimitOverflowKey)
+        {
+          if (overflow_present)
+          {
+            *overflow_present = true;
+          }
+          continue;
+        }
+        ++total_points;
+      }
+    }
+  }
+  return total_points;
+}
+}  // namespace
+
+// Regression test for the bug found during review of #4188: resolving a reader-level
+// cardinality limit fallback into shared storage broke per-reader semantics, since a
+// stricter reader would force every other reader sharing the same storage down to its limit.
+//
+// With no view-level limit configured, a stricter reader must only ever report up to its own
+// limit (extra series collapse into its own overflow point), while a laxer reader sharing the
+// same underlying storage must still see every recorded series with no data loss and no
+// spurious overflow.
+TEST_F(MetricCollectorTest, ReaderCardinalityLimitFallbackWithMultipleReaders)
+{
+  constexpr size_t kLowLimit            = 3;
+  constexpr size_t kHighLimit           = 50;
+  constexpr size_t kUniqueAttributeSets = 10;
+
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+  auto scope   = InstrumentationScope::Create("ReaderCardinalityLimitFallbackWithMultipleReaders");
+  auto meter   = std::shared_ptr<Meter>(new Meter(context, std::move(scope)));
+  context->AddMeter(meter);
+
+  auto low_reader = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits low_limits;
+  low_limits.counter = kLowLimit;
+  low_reader->SetCardinalityLimits(low_limits);
+  auto low_collector = AddMetricReaderToMeterContext(context, low_reader).lock();
+
+  auto high_reader = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits high_limits;
+  high_limits.counter = kHighLimit;
+  high_reader->SetCardinalityLimits(high_limits);
+  auto high_collector = AddMetricReaderToMeterContext(context, high_reader).lock();
+
+  // Both readers must already be attached before the instrument is first used: recording
+  // storage capacity is resolved (as the max limit across attached readers) at that point.
+  auto counter = meter->CreateUInt64Counter("shared_counter");
+
+  for (size_t i = 0; i < kUniqueAttributeSets; ++i)
+  {
+    std::map<std::string, std::string> attrs = {{"key", std::to_string(i)}};
+    counter->Add(
+        1, opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        opentelemetry::context::Context{});
+  }
+
+  bool low_overflow  = false;
+  bool high_overflow = false;
+  size_t low_points  = CountRealPoints(low_collector->Produce(), &low_overflow);
+  size_t high_points = CountRealPoints(high_collector->Produce(), &high_overflow);
+
+  // The stricter reader must be capped at its own limit, with overflow absorbing the rest.
+  EXPECT_LE(low_points, kLowLimit);
+  EXPECT_TRUE(low_overflow);
+
+  // The laxer reader, sharing the same underlying storage, must see every recorded series:
+  // it must not be capped down to the stricter reader's limit, and must not report overflow.
+  EXPECT_EQ(high_points, kUniqueAttributeSets);
+  EXPECT_FALSE(high_overflow);
+}
+
 #if defined(__GNUC__) || defined(__clang__) || defined(__apple_build_version__)
 #  pragma GCC diagnostic pop
 #endif

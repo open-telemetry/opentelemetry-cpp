@@ -34,6 +34,8 @@ namespace metrics
 class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStorage
 {
 public:
+  // Back-compat overload preserving the original constructor signature for any external caller.
+  // See SyncMetricStorage's constructor comment for what `recording_cardinality_limit` is for.
   AsyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
                      const AggregationType aggregation_type,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -41,13 +43,30 @@ public:
                      nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
                      const AggregationConfig *aggregation_config)
+      : AsyncMetricStorage(instrument_descriptor,
+                           aggregation_type,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+                           exempler_filter_type,
+                           std::move(exemplar_reservoir),
+#endif
+                           aggregation_config,
+                           AggregationConfig::GetOrDefault(aggregation_config)->cardinality_limit_)
+  {}
+
+  AsyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
+                     const AggregationType aggregation_type,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+                     ExemplarFilterType exempler_filter_type,
+                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
+#endif
+                     const AggregationConfig *aggregation_config,
+                     std::size_t recording_cardinality_limit)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         aggregation_config_{AggregationConfig::GetOrDefault(aggregation_config)},
-        cumulative_hash_map_(
-            std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
-        delta_hash_map_(
-            std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
+        recording_cardinality_limit_(recording_cardinality_limit),
+        cumulative_hash_map_(std::make_unique<AttributesHashMap>(recording_cardinality_limit_)),
+        delta_hash_map_(std::make_unique<AttributesHashMap>(recording_cardinality_limit_)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_filter_type_(exempler_filter_type),
         exemplar_reservoir_(std::move(exemplar_reservoir)),
@@ -127,9 +146,8 @@ public:
     std::shared_ptr<AttributesHashMap> delta_metrics = nullptr;
     {
       std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
-      delta_metrics = std::move(delta_hash_map_);
-      delta_hash_map_ =
-          std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_);
+      delta_metrics   = std::move(delta_hash_map_);
+      delta_hash_map_ = std::make_unique<AttributesHashMap>(recording_cardinality_limit_);
     }
 
     auto status =
@@ -142,6 +160,8 @@ private:
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
   const AggregationConfig *aggregation_config_;
+  // Capacity used to (re)size cumulative_hash_map_/delta_hash_map_. See the constructor comment.
+  const std::size_t recording_cardinality_limit_;
   std::unique_ptr<AttributesHashMap> cumulative_hash_map_;
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
   opentelemetry::common::SpinLockMutex hashmap_lock_;

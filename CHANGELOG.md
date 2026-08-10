@@ -15,6 +15,15 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Enforce `MetricReader`-level cardinality limits as a fallback
+  during collection, when the matching view has no explicit
+  `aggregation_cardinality_limit` of its own (View > Reader > SDK default).
+  Shared recording storage for a view with no explicit limit is now sized at
+  the max limit across all attached readers, so a reader with a higher limit
+  does not lose data; each reader's own (possibly stricter) limit is then
+  re-applied to just its own collected output.
+  [#4387](https://github.com/open-telemetry/opentelemetry-cpp/issues/4387)
+
 * [CONFIGURATION] Add support for the composite sampler configuration
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))

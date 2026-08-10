@@ -114,9 +114,17 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   }
   auto unreported_list = std::move(present->second);
   // Iterate over the unreporter metrics for `collector` and store result in `merged_metrics`
-  std::unique_ptr<AttributesHashMap> merged_metrics(
-      new AttributesHashMap(aggregation_config_ ? aggregation_config_->cardinality_limit_
-                                                : kAggregationCardinalityLimit));
+  //
+  // When no view-level limit is configured (aggregation_config_ == nullptr), fall back to this
+  // specific collector's own MetricReader-level limit rather than a flat SDK default. The
+  // underlying recording storage may be sized larger (to avoid losing data for readers with a
+  // higher limit, see SyncMetricStorage/AsyncMetricStorage), so capping merged_metrics here to
+  // this collector's own limit re-applies the View > Reader > SDK default precedence per reader:
+  // AttributesHashMap::Set() below routes anything beyond this capacity into the overflow point,
+  // without affecting what other collectors of the same storage see.
+  std::unique_ptr<AttributesHashMap> merged_metrics(new AttributesHashMap(
+      aggregation_config_ ? aggregation_config_->cardinality_limit_
+                          : collector->GetCardinalityLimit(instrument_descriptor_.type_)));
   for (auto &agg_hashmap : unreported_list)
   {
     agg_hashmap->GetAllEntries(
