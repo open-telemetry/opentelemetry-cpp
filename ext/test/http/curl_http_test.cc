@@ -33,6 +33,7 @@
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 constexpr int HTTP_PORT{19000};
 
