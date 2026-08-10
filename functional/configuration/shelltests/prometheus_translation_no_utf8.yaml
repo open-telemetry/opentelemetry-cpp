@@ -1,8 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
-# SKIP_SCHEMA_VALIDATION: translation_strategy 'NoUTF8EscapingWithSuffixes' renamed to 'no_utf8_escaping_with_suffixes/development' in schema v1.0; C++ parser not yet updated
 
-file_format: "1.0"
+file_format: "1.1"
 
 meter_provider:
   readers:
@@ -11,5 +10,5 @@ meter_provider:
           prometheus/development:
             host: localhost
             port: 9464
-            without_scope_info: false
-            translation_strategy: NoUTF8EscapingWithSuffixes
+            scope_info_enabled: true
+            translation_strategy: no_utf8_escaping_with_suffixes/development
