@@ -217,59 +217,6 @@ using common::WildcardMatch;
 namespace
 {
 
-class IncludeExcludeAttributesProcessor final
-    : public opentelemetry::sdk::metrics::AttributesProcessor
-{
-public:
-  IncludeExcludeAttributesProcessor(bool include_all,
-                                    std::vector<std::string> included_patterns,
-                                    std::vector<std::string> excluded_patterns)
-      : include_all_(include_all),
-        included_patterns_(std::move(included_patterns)),
-        excluded_patterns_(std::move(excluded_patterns))
-  {}
-
-  opentelemetry::sdk::metrics::MetricAttributes process(
-      const opentelemetry::common::KeyValueIterable &attributes) const noexcept override
-  {
-    opentelemetry::sdk::metrics::MetricAttributes result;
-    attributes.ForEachKeyValue(
-        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
-          if (isPresent(key))
-          {
-            result.SetAttribute(key, value);
-          }
-          return true;
-        });
-
-    result.UpdateHash();
-    return result;
-  }
-
-  bool isPresent(nostd::string_view key) const noexcept override
-  {
-    return (include_all_ || MatchesAny(included_patterns_, key)) &&
-           !MatchesAny(excluded_patterns_, key);
-  }
-
-private:
-  static bool MatchesAny(const std::vector<std::string> &patterns, nostd::string_view key) noexcept
-  {
-    for (const auto &pattern : patterns)
-    {
-      if (WildcardMatch(pattern, key))
-      {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  bool include_all_;
-  std::vector<std::string> included_patterns_;
-  std::vector<std::string> excluded_patterns_;
-};
-
 static opentelemetry::logs::Severity ToLogSeverity(
     opentelemetry::sdk::configuration::SeverityNumber severity_number)
 {
@@ -1949,6 +1896,7 @@ SdkBuilder::CreateAttributesProcessor(
     const
 {
   using opentelemetry::sdk::metrics::DefaultAttributesProcessor;
+  using opentelemetry::sdk::metrics::IncludeExcludeAttributesProcessor;
 
   if (model->included == nullptr && model->excluded == nullptr)
   {
