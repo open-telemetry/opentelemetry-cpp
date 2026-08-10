@@ -618,9 +618,10 @@ std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
     return retry_after_time_point_;
   }
 
-  static std::random_device rd;
-  static std::mt19937 gen(rd());
-  static std::uniform_real_distribution<float> dis(0.8f, 1.2f);
+  // One engine per thread. Every HttpClient drives its own background thread, and drawing from
+  // the engine advances its state, so a shared one is written by all of them at once.
+  static thread_local std::mt19937 gen{std::random_device{}()};
+  std::uniform_real_distribution<float> dis(0.8f, 1.2f);
 
   // The initial retry attempt will occur after initialBackoff * random(0.8, 1.2)
   auto backoff = retry_policy_.initial_backoff;
