@@ -19,6 +19,9 @@ Increment the:
   declarative configuration
   [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
 
+* [CONFIGURATION] Add support for the composite sampler configuration
+  (programmatic and from yaml)
+  ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
 * [SDK] `OTELResourceDetector` now percent-decodes values parsed from the
   `OTEL_RESOURCE_ATTRIBUTES` environment variable, per the W3C Baggage value
   grammar the resource spec defers to. A malformed escape sequence is left
@@ -58,6 +61,9 @@ Increment the:
 
 * [BUG] Stop reading past a `nostd::string_view` that is not NUL terminated
   [#4346](https://github.com/open-telemetry/opentelemetry-cpp/pull/4346)
+* [BUG] Stop OTLP `ForceFlush` returning on the first notification and
+  overrunning the caller's deadline
+  [#4357](https://github.com/open-telemetry/opentelemetry-cpp/pull/4357)
 
 * [OTLP EXPORTERS] add otlp_common target for shared otlp utils
   [#4333](https://github.com/open-telemetry/opentelemetry-cpp/pull/4333)
@@ -193,6 +199,13 @@ Breaking changes:
   * `LogRecordProcessorConfigurationVisitor::VisitEventToSpanEventBridge()` was
     added with a default no-op implementation, so existing visitor
     implementations remain source compatible.
+* [CONFIGURATION] Update prometheus config to schema v1.1.0
+  [#4383](https://github.com/open-telemetry/opentelemetry-cpp/pull/4383)
+  * The following YAML values for `translation_strategy` have been replaced
+    * `UnderscoreEscapingWithSuffixes` is replaced by `underscore_escaping_with_suffixes`
+    * `UnderscoreEscapingWithoutSuffixes` is replaced by `underscore_escaping_without_suffixes/development`
+    * `NoUTF8EscapingWithSuffixes` is replaced by `no_utf8_escaping_with_suffixes/development`
+    * `NoTranslation` is replaced by `no_translation/development`
 
 ## [1.28.0] 2026-07-16
 
