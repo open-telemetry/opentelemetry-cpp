@@ -40,6 +40,28 @@ namespace curl        = opentelemetry::ext::http::client::curl;
 namespace http_client = opentelemetry::ext::http::client;
 namespace nostd       = opentelemetry::nostd;
 
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace ext
+{
+namespace http
+{
+namespace client
+{
+namespace curl
+{
+// resetMultiHandle only runs when curl_multi_perform fails, which a test cannot provoke, so
+// the case below reaches it directly. See #4389.
+class HttpClientTestPeer
+{
+public:
+  static void ResetMultiHandle(HttpClient &client) { client.resetMultiHandle(); }
+};
+}  // namespace curl
+}  // namespace client
+}  // namespace http
+}  // namespace ext
+OPENTELEMETRY_END_NAMESPACE
+
 namespace
 {
 
@@ -591,6 +613,20 @@ TEST_F(BasicCurlHttpTests, RetryJitterIsNotSharedAcrossThreads)
 
   drawing_first.join();
   drawing_second.join();
+}
+
+// resetMultiHandle used to hold sessions_m_ across CancelSession and doRemoveSessions, which
+// take it again on the same thread. One registered session is enough to reach both.
+TEST_F(BasicCurlHttpTests, ResetMultiHandleWithASessionDoesNotDeadlock)
+{
+  auto client = std::make_shared<http_client::curl::HttpClient>();
+
+  auto session = client->CreateSession("http://127.0.0.1:19000");
+  ASSERT_TRUE(session != nullptr);
+
+  http_client::curl::HttpClientTestPeer::ResetMultiHandle(*client);
+
+  client->FinishAllSessions();
 }
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
