@@ -1916,7 +1916,7 @@ SdkBuilder::CreateAttributesProcessor(
   }
 
   return std::make_unique<IncludeExcludeAttributesProcessor>(
-      model->included == nullptr, std::move(included_patterns), std::move(excluded_patterns));
+      included_patterns.empty(), std::move(included_patterns), std::move(excluded_patterns));
 }
 
 void SdkBuilder::AddView(

@@ -182,7 +182,7 @@ public:
 private:
   static bool MatchesAny(const std::vector<std::string> &patterns, nostd::string_view key) noexcept;
 
-  bool include_all_;
+  bool include_all_{true};
   std::vector<std::string> included_patterns_;
   std::vector<std::string> excluded_patterns_;
 };
