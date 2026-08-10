@@ -626,9 +626,10 @@ elif [[ "$1" == "bazel.ubsan" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test --config=ubsan $BAZEL_TEST_OPTIONS_ASYNC //...
   exit 0
 elif [[ "$1" == "bazel.tsan" ]]; then
-# TODO - potential race condition in Civetweb server used by prometheus-cpp during shutdown
-# https://github.com/civetweb/civetweb/issues/861, so removing prometheus from the test
-  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC  -- //... -//exporters/prometheus/...
+# Known intentional race in civetweb (used by prometheus-cpp) during shutdown
+# https://github.com/civetweb/civetweb/issues/1184, so excluding targets that
+# start the civetweb server from the test
+  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/configuration:example_yaml_kitchen_sink
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
@@ -656,6 +657,19 @@ elif [[ "$1" == "format" ]]; then
     git diff
     exit 1
   fi
+  exit 0
+elif [[ "$1" == "validate.otel.config" ]]; then
+  OTELCFG_VERSION=$(grep "^opentelemetry-configuration=" "${SRC_DIR}/third_party_release" | cut -d= -f2)
+  if [[ -n "${OTEL_CONFIG_SCHEMA:-}" ]]; then
+    SCHEMA_FILE="${OTEL_CONFIG_SCHEMA}"
+    SCHEMA_TMPFILE=""
+  else
+    SCHEMA_TMPFILE=$(mktemp --suffix=.json)
+    SCHEMA_FILE="${SCHEMA_TMPFILE}"
+    curl -fsSL "https://raw.githubusercontent.com/open-telemetry/opentelemetry-configuration/${OTELCFG_VERSION}/opentelemetry_configuration.json" -o "${SCHEMA_FILE}"
+  fi
+  python3 "${SRC_DIR}/tools/validate_otel_config_yaml.py" --schema "${SCHEMA_FILE}" --schema-version "${OTELCFG_VERSION}"
+  [[ -n "${SCHEMA_TMPFILE}" ]] && rm -f "${SCHEMA_TMPFILE}"
   exit 0
 elif [[ "$1" == "code.coverage" ]]; then
   cd "${BUILD_DIR}"

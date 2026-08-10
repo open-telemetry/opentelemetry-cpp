@@ -8,6 +8,7 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -59,11 +60,11 @@
 // Log to console if there's no standard log facility defined
 #  include <cstdio>
 #  ifndef LOG_DEBUG
-#    define LOG_DEBUG(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_TRACE(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_INFO(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_WARN(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_ERROR(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_DEBUG(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_TRACE(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_INFO(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_WARN(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_ERROR(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
 #  endif
 #endif
 
@@ -202,8 +203,8 @@ struct SocketAddr
     sockaddr_in parsed{};
     parsed.sin_family = AF_INET;
 
-    char const *colon          = strchr(addr, ':');
-    char const *hostEnd        = colon ? colon : addr + strlen(addr);
+    char const *colon          = std::strchr(addr, ':');
+    char const *hostEnd        = colon ? colon : addr + std::strlen(addr);
     ptrdiff_t const hostLength = hostEnd - addr;
 
     // Reject a host that would not fit rather than truncating it into a different valid address
@@ -213,7 +214,7 @@ struct SocketAddr
     if (ok)
     {
       char host[16];
-      memcpy(host, addr, static_cast<size_t>(hostLength));
+      std::memcpy(host, addr, static_cast<size_t>(hostLength));
       host[hostLength] = '\0';
       ok               = (::inet_pton(AF_INET, host, &parsed.sin_addr) == 1);
     }
@@ -252,7 +253,7 @@ struct SocketAddr
 
     if (ok)
     {
-      memcpy(&m_data, &parsed, sizeof(parsed));
+      std::memcpy(&m_data, &parsed, sizeof(parsed));
     }
     else
     {
@@ -275,7 +276,7 @@ struct SocketAddr
         // Copy out rather than binding a sockaddr_in glvalue to sockaddr storage, which is an
         // alignment/type-access issue (see the constructor and #4307).
         sockaddr_in inet4{};
-        memcpy(&inet4, &m_data, sizeof(inet4));
+        std::memcpy(&inet4, &m_data, sizeof(inet4));
         return ntohs(inet4.sin_port);
       }
 
@@ -292,7 +293,7 @@ struct SocketAddr
     {
       case AF_INET: {
         sockaddr_in inet4{};
-        memcpy(&inet4, &m_data, sizeof(inet4));
+        std::memcpy(&inet4, &m_data, sizeof(inet4));
         u_long addr = ntohl(inet4.sin_addr.s_addr);
         os << (addr >> 24) << '.' << ((addr >> 16) & 255) << '.' << ((addr >> 8) & 255) << '.'
            << (addr & 255);
