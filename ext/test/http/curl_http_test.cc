@@ -562,6 +562,37 @@ TEST_F(BasicCurlHttpTests, ACancelBeforeTheResponseReportsCancelled)
   session_manager->FinishAllSessions();
 }
 
+// NextRetryTime draws the backoff jitter from an engine that used to be a shared static, so
+// two clients retrying at the same time wrote the same std::mt19937. The case passes either
+// way, since a data race is not a functional failure. It is here for the sanitizer builds.
+TEST_F(BasicCurlHttpTests, RetryJitterIsNotSharedAcrossThreads)
+{
+  opentelemetry::ext::http::client::HttpSslOptions ssl_options;
+  opentelemetry::ext::http::client::Headers request_headers;
+  opentelemetry::ext::http::client::Body request_body;
+
+  http_client::curl::HttpOperation first(http_client::Method::Get, "http://127.0.0.1:19000/",
+                                         ssl_options, nullptr, request_headers, request_body);
+  http_client::curl::HttpOperation second(http_client::Method::Get, "http://127.0.0.1:19000/",
+                                          ssl_options, nullptr, request_headers, request_body);
+
+  std::thread drawing_first([&first] {
+    for (int i = 0; i < 200; ++i)
+    {
+      (void)first.NextRetryTime();
+    }
+  });
+  std::thread drawing_second([&second] {
+    for (int i = 0; i < 200; ++i)
+    {
+      (void)second.NextRetryTime();
+    }
+  });
+
+  drawing_first.join();
+  drawing_second.join();
+}
+
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 {
   received_requests_.clear();
