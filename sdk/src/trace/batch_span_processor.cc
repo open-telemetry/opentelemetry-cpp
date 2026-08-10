@@ -190,8 +190,11 @@ void BatchSpanProcessor::DoBackgroundWork()
     }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
-    // Wait for `timeout` milliseconds.
+    // This scope is important! `cv_m` must be released before acquiring `force_flush_cv_m`.
+    // Since `Export()` calls `NotifyCompletion()` which takes `force_flush_cv_m`,
+    // holding `cv_m` while calling `Export()` can lead to a ABBA deadlock.
     {
+      // Wait for `timeout` milliseconds.
       std::unique_lock<std::mutex> lk(synchronization_data_->cv_m);
       synchronization_data_->cv.wait_for(lk, timeout, [this] {
         if (synchronization_data_->is_force_wakeup_background_worker.load(
