@@ -250,6 +250,10 @@ meter_provider:
               # If omitted, .included resource attributes are included.
               excluded:
                 - "service.attr1"
+            # Configure how metric names are translated to Prometheus metric names.
+            # If omitted or null, underscore_escaping_with_suffixes is used.
+            # Values include: underscore_escaping_with_suffixes, underscore_escaping_without_suffixes/development, no_utf8_escaping_with_suffixes/development, no_translation/development
+            translation_strategy: underscore_escaping_with_suffixes
         # Configure metric producers.
         producers:
           - # Configure metric producer to be opencensus.
@@ -344,10 +348,6 @@ meter_provider:
             # Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
             # If omitted or null, explicit_bucket_histogram is used.
             default_histogram_aggregation: base2_exponential_bucket_histogram
-        # Configure metric producers.
-        producers:
-          - # Configure metric producer to be prometheus.
-            prometheus:
         # Configure cardinality limits.
         cardinality_limits:
           # Configure default cardinality limit for all instrument types.

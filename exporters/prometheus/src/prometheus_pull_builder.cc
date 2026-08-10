@@ -53,13 +53,14 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> PrometheusPullBuilder
       break;
     case sdk::configuration::TranslationStrategy::NoUTF8EscapingWithSuffixes:
       // FIXME: no flag to disable UnderscoreEscaping
-      OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] NoUTF8EscapingWithSuffixes not supported");
+      OTEL_INTERNAL_LOG_WARN(
+          "[Prometheus Exporter] no_utf8_escaping_with_suffixes/development not supported");
       options.without_units       = false;
       options.without_type_suffix = false;
       break;
     case sdk::configuration::TranslationStrategy::NoTranslation:
       // FIXME: no flag to disable UnderscoreEscaping
-      OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] NoTranslation not supported");
+      OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] no_translation/development not supported");
       options.without_units       = true;
       options.without_type_suffix = true;
       break;
