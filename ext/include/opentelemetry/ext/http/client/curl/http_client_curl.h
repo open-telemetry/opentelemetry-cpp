@@ -348,7 +348,7 @@ public:
   // return true if create background thread, false is already exist background thread
   bool MaybeSpawnBackgroundThread();
 
-  void ScheduleAddSession(uint64_t session_id);
+  bool ScheduleAddSession(uint64_t session_id);
   void ScheduleAbortSession(uint64_t session_id);
   void ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource);
 

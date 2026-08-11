@@ -11,6 +11,7 @@
 #include <functional>
 #include <list>
 #include <mutex>
+#include <ostream>
 #include <string>
 #include <thread>
 #include <unordered_map>
@@ -23,6 +24,7 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
@@ -33,8 +35,6 @@
 #  include <array>
 
 #  include "opentelemetry/nostd/type_traits.h"
-#else
-#  include "opentelemetry/sdk/common/global_log_handler.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -638,9 +638,19 @@ bool HttpClient::MaybeSpawnBackgroundThread()
   return true;
 }
 
-void HttpClient::ScheduleAddSession(uint64_t session_id)
+bool HttpClient::ScheduleAddSession(uint64_t session_id)
 {
   {
+    std::lock_guard<std::mutex> sessions_lock{sessions_m_};
+    if (sessions_.end() == sessions_.find(session_id))
+    {
+      // Either the URL never parsed, so CreateSession handed the caller a session it did not
+      // register, or a handler took this one out while the first events were dispatched.
+      // Whatever removed it owns the teardown; adding it back would run an operation nobody
+      // is waiting on and leave the caller waiting on one nobody runs.
+      return false;
+    }
+
     std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
     pending_to_add_session_ids_.insert(session_id);
     pending_to_remove_session_handles_.erase(session_id);
@@ -648,6 +658,7 @@ void HttpClient::ScheduleAddSession(uint64_t session_id)
   }
 
   wakeupBackgroundThread();
+  return true;
 }
 
 void HttpClient::ScheduleAbortSession(uint64_t session_id)
@@ -728,29 +739,49 @@ bool HttpClient::doAddSessions()
   }
 
   bool has_data = false;
+  std::list<std::shared_ptr<Session>> rejected_by_multi;
 
-  std::lock_guard<std::mutex> lock_guard{sessions_m_};
-  for (auto &session_id : pending_to_add_session_ids)
   {
-    auto session = sessions_.find(session_id);
-    if (session == sessions_.end())
+    std::lock_guard<std::mutex> lock_guard{sessions_m_};
+    for (auto &session_id : pending_to_add_session_ids)
     {
-      continue;
-    }
+      auto session = sessions_.find(session_id);
+      if (session == sessions_.end())
+      {
+        continue;
+      }
 
-    if (!session->second->GetOperation())
-    {
-      continue;
-    }
+      if (!session->second->GetOperation())
+      {
+        continue;
+      }
 
-    CURL *easy_handle = session->second->GetOperation()->GetCurlEasyHandle();
-    if (nullptr == easy_handle)
-    {
-      continue;
-    }
+      CURL *easy_handle = session->second->GetOperation()->GetCurlEasyHandle();
+      if (nullptr == easy_handle)
+      {
+        continue;
+      }
 
-    curl_multi_add_handle(multi_handle_, easy_handle);
-    has_data = true;
+      const CURLMcode rc = curl_multi_add_handle(multi_handle_, easy_handle);
+      if (CURLM_OK != rc)
+      {
+        // Nothing will drive this transfer. Leaving it here is what makes a caller wait on a
+        // future nobody can complete, so hand it to the loop below to be finished.
+        OTEL_INTERNAL_LOG_ERROR(
+            "[HTTP Client Curl] curl_multi_add_handle failed: " << curl_multi_strerror(rc));
+        rejected_by_multi.push_back(session->second);
+        continue;
+      }
+
+      has_data = true;
+    }
+  }
+
+  // Outside sessions_m_ on purpose. FinishOperation runs the caller's handler, and a handler
+  // that cancels from it takes that lock again. See #4389.
+  for (auto &session : rejected_by_multi)
+  {
+    session->FinishOperation();
   }
 
   return has_data;
