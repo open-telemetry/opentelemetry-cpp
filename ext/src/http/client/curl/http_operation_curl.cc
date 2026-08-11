@@ -404,12 +404,15 @@ int HttpOperation::OnProgressCallback(void *clientp,
 void HttpOperation::DispatchEvent(opentelemetry::ext::http::client::SessionState type,
                                   const std::string &reason)
 {
+  // Published before the handler runs. A handler can cancel from here, which lets the background
+  // thread finish the operation and publish a state of its own, and a store left until after the
+  // handler returned would overwrite that one.
+  session_state_.store(type, std::memory_order_release);
+
   if (event_handle_ != nullptr)
   {
     event_handle_->OnEvent(type, reason);
   }
-
-  session_state_ = type;
 }
 
 HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
