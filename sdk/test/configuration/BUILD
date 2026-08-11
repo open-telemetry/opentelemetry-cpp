@@ -35,7 +35,7 @@ cc_test(
     ],
     deps = [
         "//sdk:headers",
-        "//sdk/src/configuration:configuration_core",
+        "//sdk/src/configuration:configuration_registry_factory",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/resource",
@@ -57,7 +57,7 @@ cc_test(
     ],
     deps = [
         "//sdk:headers",
-        "//sdk/src/configuration:configuration_core",
+        "//sdk/src/configuration:configuration_registry_factory",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/resource",
@@ -78,11 +78,62 @@ cc_test(
     ],
     deps = [
         "//sdk:headers",
-        "//sdk/src/configuration:configuration_core",
+        "//sdk/src/configuration:configuration_registry_factory",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/resource",
         "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "trace_builders_test",
+    srcs = [
+        "trace_builders_test.cc",
+    ],
+    tags = [
+        "config",
+        "test",
+    ],
+    deps = [
+        "//sdk:headers",
+        "//sdk/src/configuration:configuration_trace_builders",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "logs_builders_test",
+    srcs = [
+        "logs_builders_test.cc",
+    ],
+    tags = [
+        "config",
+        "test",
+    ],
+    deps = [
+        "//sdk:headers",
+        "//sdk/src/configuration:configuration_logs_builders",
+        "//sdk/src/logs",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "metrics_builders_test",
+    srcs = [
+        "metrics_builders_test.cc",
+    ],
+    tags = [
+        "config",
+        "test",
+    ],
+    deps = [
+        "//sdk:headers",
+        "//sdk/src/configuration:configuration_metrics_builders",
+        "//sdk/src/metrics",
         "@com_google_googletest//:gtest_main",
     ],
 )

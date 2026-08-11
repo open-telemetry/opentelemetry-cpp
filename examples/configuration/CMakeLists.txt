@@ -22,6 +22,8 @@ add_executable(
 target_link_libraries(
   example_yaml
   PRIVATE ${CMAKE_THREAD_LIBS_INIT}
+          opentelemetry-cpp::configuration_registry_factory
+          opentelemetry-cpp::configuration
           common_metrics_foo_library
           common_logs_foo_library
           opentelemetry-cpp::ostream_span_exporter_builder
@@ -61,18 +63,6 @@ if(WITH_PROMETHEUS)
                         PRIVATE opentelemetry-cpp::prometheus_exporter_builder)
 endif()
 
-if(DEFINED OPENTELEMETRY_BUILD_DLL)
-  target_compile_definitions(example_yaml
-                             PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
-  target_link_libraries(example_yaml
-                        PRIVATE opentelemetry-cpp::opentelemetry_cpp)
-else()
-  target_link_libraries(
-    example_yaml
-    PRIVATE opentelemetry-cpp::configuration opentelemetry-cpp::common
-            opentelemetry-cpp::trace opentelemetry-cpp::logs)
-endif()
-
 if(BUILD_TESTING)
   if(WITH_OTLP_HTTP
      AND WITH_OTLP_GRPC
@@ -86,4 +76,8 @@ if(BUILD_TESTING)
   add_test(NAME examples.example_yaml_extensions
            COMMAND $<TARGET_FILE:example_yaml> --test --yaml
                    ${CMAKE_CURRENT_SOURCE_DIR}/extensions.yaml)
+
+  add_test(NAME examples.example_yaml_sdk_default
+           COMMAND $<TARGET_FILE:example_yaml> --test --yaml
+                   ${CMAKE_CURRENT_SOURCE_DIR}/sdk-default.yaml)
 endif()

@@ -24,8 +24,10 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/utility.h"
 
+#include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_configuration.h"
@@ -35,8 +37,11 @@
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
 #include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
@@ -47,12 +52,15 @@
 #include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/registry_factory.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/unsupported_exception.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
@@ -68,6 +76,7 @@
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -96,6 +105,7 @@ using opentelemetry::sdk::common::unsetenv;
 #endif
 
 using opentelemetry::sdk::configuration::Registry;
+using opentelemetry::sdk::configuration::RegistryFactory;
 using opentelemetry::sdk::configuration::SdkBuilder;
 using opentelemetry::sdk::configuration::SpanLimitsConfiguration;
 using opentelemetry::sdk::configuration::TracerProviderConfiguration;
@@ -140,8 +150,10 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> BuildRuleSampler(
   rule->sampler          = std::make_unique<config_sdk::ComposableAlwaysOnSamplerConfiguration>();
   auto rule_based_config = std::make_unique<config_sdk::ComposableRuleBasedSamplerConfiguration>();
   rule_based_config->rules.push_back(std::move(rule));
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(rule_based_config);
-  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(rule_based_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   return builder.CreateSampler(sampler_config);
 }
 
@@ -175,7 +187,7 @@ TEST(SdkBuilder, SpanLimitsDefaults)
   auto model    = std::make_unique<TracerProviderConfiguration>();
   model->limits = nullptr;
 
-  SdkBuilder builder(std::make_shared<Registry>());
+  SdkBuilder builder(RegistryFactory::Create());
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
   auto provider = builder.CreateTracerProvider(model, resource);
   ASSERT_NE(provider, nullptr);
@@ -202,7 +214,7 @@ TEST(SdkBuilder, SpanLimitsConfiguration)
   model->limits->event_attribute_count_limit  = 5555;
   model->limits->link_attribute_count_limit   = 6666;
 
-  SdkBuilder builder(std::make_shared<Registry>());
+  SdkBuilder builder(RegistryFactory::Create());
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
   auto provider = builder.CreateTracerProvider(model, resource);
   ASSERT_NE(provider, nullptr);
@@ -226,7 +238,7 @@ TEST_F(SdkBuilderExemplarFilterEnvironmentTest, DeclarativeExemplarFilterDoesNot
   auto model             = std::make_unique<config_sdk::MeterProviderConfiguration>();
   model->exemplar_filter = config_sdk::ExemplarFilter::always_on;
 
-  SdkBuilder builder(std::make_shared<Registry>());
+  SdkBuilder builder(RegistryFactory::Create());
   auto resource = opentelemetry::sdk::resource::Resource::Create({});
   auto provider = builder.CreateMeterProvider(model, resource);
   ASSERT_NE(provider, nullptr);
@@ -259,7 +271,7 @@ TEST(SdkBuilder, CreateLoggerConfigurator)
   model->loggers.push_back(matcher1);
   model->loggers.push_back(matcher2);
 
-  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
 
   auto logger_configurator = builder.CreateLoggerConfigurator(model);
   ASSERT_NE(logger_configurator, nullptr);
@@ -293,7 +305,7 @@ TEST(SdkBuilder, CreateParentBasedSampler)
   {
     config_sdk::ParentBasedSamplerConfiguration parent_based_sampler_config;
     parent_based_sampler_config.root = nullptr;
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ParentBased{AlwaysOnSampler})");
@@ -303,7 +315,7 @@ TEST(SdkBuilder, CreateParentBasedSampler)
   {
     config_sdk::ParentBasedSamplerConfiguration parent_based_sampler_config;
     parent_based_sampler_config.root = std::make_unique<config_sdk::AlwaysOnSamplerConfiguration>();
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ParentBased{AlwaysOnSampler})");
@@ -314,7 +326,7 @@ TEST(SdkBuilder, CreateParentBasedSampler)
     config_sdk::ParentBasedSamplerConfiguration parent_based_sampler_config;
     parent_based_sampler_config.root =
         std::make_unique<config_sdk::AlwaysOffSamplerConfiguration>();
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ParentBased{AlwaysOffSampler})");
@@ -327,7 +339,7 @@ TEST(SdkBuilder, CreateParentBasedSampler)
         std::make_unique<config_sdk::TraceIdRatioBasedSamplerConfiguration>();
     trace_id_ratio_based_sampler_config->ratio = 0.5;
     parent_based_sampler_config.root           = std::move(trace_id_ratio_based_sampler_config);
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()},
@@ -358,7 +370,7 @@ TEST(SdkBuilder, CreateParentBasedSampler)
         std::make_unique<config_sdk::AlwaysOffSamplerConfiguration>();
     parent_based_sampler_config.local_parent_not_sampled = std::move(always_off_sampler_config_2);
 
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateParentBasedSampler(&parent_based_sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()},
@@ -371,7 +383,7 @@ TEST(SdkBuilder, CreateProbabilitySampler)
   // default ratio is 1.0
   {
     config_sdk::ProbabilitySamplerConfiguration probability_sampler_config;
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateProbabilitySampler(&probability_sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ProbabilitySampler{1.000000})");
@@ -384,7 +396,7 @@ TEST(SdkBuilder, CreateProbabilitySampler)
     probability_sampler_config->ratio = 0.5;
     std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config =
         std::move(probability_sampler_config);
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateSampler(sampler_config);
     ASSERT_NE(sampler, nullptr);
     EXPECT_EQ(std::string{sampler->GetDescription()}, R"(ProbabilitySampler{0.500000})");
@@ -394,8 +406,10 @@ TEST(SdkBuilder, CreateProbabilitySampler)
 TEST(SdkBuilder, CreateComposableAlwaysOnSampler)
 {
   auto composable_config = std::make_unique<config_sdk::ComposableAlwaysOnSamplerConfiguration>();
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composable_config);
-  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+  auto composite         = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler                                    = std::move(composable_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
   EXPECT_EQ(std::string{sampler->GetDescription()},
@@ -405,8 +419,10 @@ TEST(SdkBuilder, CreateComposableAlwaysOnSampler)
 TEST(SdkBuilder, CreateComposableAlwaysOffSampler)
 {
   auto composable_config = std::make_unique<config_sdk::ComposableAlwaysOffSamplerConfiguration>();
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composable_config);
-  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+  auto composite         = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler                                    = std::move(composable_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
   EXPECT_EQ(std::string{sampler->GetDescription()},
@@ -418,9 +434,10 @@ TEST(SdkBuilder, CreateComposableProbabilitySampler)
   auto composable_probability_sampler_config =
       std::make_unique<config_sdk::ComposableProbabilitySamplerConfiguration>();
   composable_probability_sampler_config->ratio = 0.25;
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config =
-      std::move(composable_probability_sampler_config);
-  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(composable_probability_sampler_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
   EXPECT_EQ(std::string{sampler->GetDescription()},
@@ -433,9 +450,11 @@ TEST(SdkBuilder, CreateComposableParentThresholdSampler)
   root_config->ratio = 0.25;
   auto parent_config =
       std::make_unique<config_sdk::ComposableParentThresholdSamplerConfiguration>();
-  parent_config->root                                              = std::move(root_config);
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(parent_config);
-  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+  parent_config->root           = std::move(root_config);
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(parent_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
   EXPECT_EQ(
@@ -447,9 +466,11 @@ TEST(SdkBuilder, CreateComposableParentThresholdSamplerNullRoot)
 {
   auto parent_config =
       std::make_unique<config_sdk::ComposableParentThresholdSamplerConfiguration>();
-  parent_config->root                                              = nullptr;
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(parent_config);
-  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+  parent_config->root           = nullptr;
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(parent_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
   EXPECT_EQ(std::string{sampler->GetDescription()},
@@ -466,15 +487,56 @@ TEST(SdkBuilder, CreateComposableParentThresholdSamplerNestedDepth3)
   middle_config->root = std::move(innermost_config);
 
   auto outer_config = std::make_unique<config_sdk::ComposableParentThresholdSamplerConfiguration>();
-  outer_config->root = std::move(middle_config);
-
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(outer_config);
-  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+  outer_config->root            = std::move(middle_config);
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(outer_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
   EXPECT_EQ(std::string{sampler->GetDescription()},
             R"(CompositeSampler{ComposableParentThresholdSampler{ComposableParentThresholdSampler{)"
             R"(ComposableProbabilitySampler{0.250000}}}})");
+}
+
+namespace
+{
+
+// Builds a chain of parent_threshold nodes ending in an always_on leaf.
+// Total nesting depth, root included, is num_parent_nodes + 1.
+std::unique_ptr<config_sdk::SamplerConfiguration> MakeNestedComposableConfig(
+    std::size_t num_parent_nodes)
+{
+  std::unique_ptr<config_sdk::ComposableSamplerConfiguration> node =
+      std::make_unique<config_sdk::ComposableAlwaysOnSamplerConfiguration>();
+  for (std::size_t i = 0; i < num_parent_nodes; ++i)
+  {
+    auto parent  = std::make_unique<config_sdk::ComposableParentThresholdSamplerConfiguration>();
+    parent->root = std::move(node);
+    node         = std::move(parent);
+  }
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(node);
+  return composite;
+}
+
+}  // namespace
+
+TEST(SdkBuilder, CreateComposableSamplerAtMaxDepth)
+{
+  // 9 parent nodes + leaf = depth 10, the default maximum.
+  auto sampler_config = MakeNestedComposableConfig(9);
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
+  auto sampler = builder.CreateSampler(sampler_config);
+  ASSERT_NE(sampler, nullptr);
+}
+
+TEST(SdkBuilder, CreateComposableSamplerBeyondMaxDepth)
+{
+  // 10 parent nodes + leaf = depth 11, exceeding the default maximum.
+  auto sampler_config = MakeNestedComposableConfig(10);
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
+  EXPECT_THROW(builder.CreateSampler(sampler_config), config_sdk::UnsupportedException);
 }
 
 TEST(SdkBuilder, CreateComposableRuleBasedSampler)
@@ -493,9 +555,10 @@ TEST(SdkBuilder, CreateComposableRuleBasedSampler)
   auto fallback     = std::make_unique<config_sdk::ComposableRuleBasedSamplerRuleConfiguration>();
   fallback->sampler = std::make_unique<config_sdk::ComposableAlwaysOnSamplerConfiguration>();
   rule_based_config->rules.push_back(std::move(fallback));
-
-  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(rule_based_config);
-  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+  auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler = std::move(rule_based_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
   auto sampler = builder.CreateSampler(sampler_config);
   ASSERT_NE(sampler, nullptr);
   EXPECT_EQ(
@@ -729,8 +792,10 @@ TEST(SdkBuilder, RuleBasedFirstMatchAndDefaults)
     auto second     = std::make_unique<ComposableRuleBasedSamplerRuleConfiguration>();
     second->sampler = std::make_unique<config_sdk::ComposableAlwaysOnSamplerConfiguration>();
     rule_based_config->rules.push_back(std::move(second));
-    std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(rule_based_config);
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+    composite->composable_sampler = std::move(rule_based_config);
+    std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateSampler(sampler_config);
     ASSERT_NE(sampler, nullptr);
 
@@ -741,8 +806,10 @@ TEST(SdkBuilder, RuleBasedFirstMatchAndDefaults)
   {
     auto rule_based_config =
         std::make_unique<config_sdk::ComposableRuleBasedSamplerConfiguration>();
-    std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(rule_based_config);
-    config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+    auto composite                = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+    composite->composable_sampler = std::move(rule_based_config);
+    std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+    config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
     auto sampler = builder.CreateSampler(sampler_config);
     ASSERT_NE(sampler, nullptr);
 
@@ -756,9 +823,18 @@ TEST(SdkBuilder, CreatePeriodicMetricReader)
   exporter->name = "noop";
 
   config_sdk::PeriodicMetricReaderConfiguration model;
-  model.exporter = std::move(exporter);
-  model.interval = 12345;
-  model.timeout  = 678;
+  model.exporter           = std::move(exporter);
+  model.interval           = 12345;
+  model.timeout            = 678;
+  model.cardinality_limits = std::make_unique<config_sdk::CardinalityLimitsConfiguration>();
+  model.cardinality_limits->default_limit              = 100;
+  model.cardinality_limits->counter                    = 200;
+  model.cardinality_limits->gauge                      = 300;
+  model.cardinality_limits->histogram                  = 400;
+  model.cardinality_limits->observable_counter         = 500;
+  model.cardinality_limits->observable_gauge           = 600;
+  model.cardinality_limits->observable_up_down_counter = 700;
+  model.cardinality_limits->up_down_counter            = 800;
 
   auto captured = std::make_shared<config_test::CapturedPeriodicReaderArgs>();
 
@@ -776,6 +852,92 @@ TEST(SdkBuilder, CreatePeriodicMetricReader)
   EXPECT_EQ(captured->interval, model.interval);
   EXPECT_EQ(captured->timeout, model.timeout);
   EXPECT_TRUE(captured->exporter != nullptr);
+  EXPECT_EQ(reader->GetCardinalityLimit(opentelemetry::sdk::metrics::InstrumentType::kCounter),
+            200u);
+  EXPECT_EQ(reader->GetCardinalityLimit(opentelemetry::sdk::metrics::InstrumentType::kGauge), 300u);
+  EXPECT_EQ(reader->GetCardinalityLimit(opentelemetry::sdk::metrics::InstrumentType::kHistogram),
+            400u);
+  EXPECT_EQ(
+      reader->GetCardinalityLimit(opentelemetry::sdk::metrics::InstrumentType::kObservableCounter),
+      500u);
+  EXPECT_EQ(
+      reader->GetCardinalityLimit(opentelemetry::sdk::metrics::InstrumentType::kObservableGauge),
+      600u);
+  EXPECT_EQ(reader->GetCardinalityLimit(
+                opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter),
+            700u);
+  EXPECT_EQ(
+      reader->GetCardinalityLimit(opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter),
+      800u);
+}
+
+TEST(SdkBuilder, CreateAttributesProcessor)
+{
+  std::map<std::string, int> attributes = {{"included", 1}, {"excluded", 2}, {"unlisted", 3}};
+  opentelemetry::common::KeyValueIterableView<std::map<std::string, int>> iterable(attributes);
+  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
+
+  // When both lists are configured, exclusion takes precedence over inclusion.
+  {
+    auto model                    = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+    model->included               = std::make_unique<config_sdk::StringArrayConfiguration>();
+    model->included->string_array = {"included", "excluded"};
+    model->excluded               = std::make_unique<config_sdk::StringArrayConfiguration>();
+    model->excluded->string_array = {"excluded"};
+
+    auto processor = builder.CreateAttributesProcessor(model);
+    ASSERT_NE(processor, nullptr);
+    auto filtered = processor->process(iterable);
+
+    EXPECT_EQ(filtered.size(), 1u);
+    EXPECT_NE(filtered.find("included"), filtered.end());
+  }
+
+  // Wildcard patterns are evaluated per key, with exclusion taking precedence.
+  {
+    std::map<std::string, int> wildcard_attributes = {
+        {"foo.bar", 1}, {"foo.baz", 2}, {"question.x", 3}, {"question.xy", 4}, {"other", 5}};
+    opentelemetry::common::KeyValueIterableView<std::map<std::string, int>> wildcard_iterable(
+        wildcard_attributes);
+
+    auto model                    = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+    model->included               = std::make_unique<config_sdk::StringArrayConfiguration>();
+    model->included->string_array = {"foo.*", "question.?"};
+    model->excluded               = std::make_unique<config_sdk::StringArrayConfiguration>();
+    model->excluded->string_array = {"foo.bar"};
+
+    auto processor = builder.CreateAttributesProcessor(model);
+    ASSERT_NE(processor, nullptr);
+    auto filtered = processor->process(wildcard_iterable);
+
+    EXPECT_EQ(filtered.size(), 2u);
+    EXPECT_NE(filtered.find("foo.baz"), filtered.end());
+    EXPECT_NE(filtered.find("question.x"), filtered.end());
+  }
+
+  // An exclude-only configuration retains every key that is not excluded.
+  {
+    auto model                    = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+    model->excluded               = std::make_unique<config_sdk::StringArrayConfiguration>();
+    model->excluded->string_array = {"excluded"};
+
+    auto processor = builder.CreateAttributesProcessor(model);
+    ASSERT_NE(processor, nullptr);
+    auto filtered = processor->process(iterable);
+
+    EXPECT_EQ(filtered.size(), 2u);
+    EXPECT_EQ(filtered.find("excluded"), filtered.end());
+  }
+
+  // An empty include/exclude block leaves attributes unchanged.
+  {
+    auto model     = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+    auto processor = builder.CreateAttributesProcessor(model);
+    ASSERT_NE(processor, nullptr);
+    auto filtered = processor->process(iterable);
+
+    EXPECT_EQ(filtered.size(), attributes.size());
+  }
 }
 
 namespace
@@ -799,6 +961,63 @@ std::unique_ptr<config_sdk::ViewConfiguration> MakeCardinalityOnlyViewConfig(
 
 }  // namespace
 
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
+TEST(SdkBuilder, AddViewGaugeUnsupportedWithABIv1)
+{
+  auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::gauge, 42);
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  config_sdk::SdkBuilder builder(registry);
+  opentelemetry::sdk::metrics::ViewRegistry view_registry;
+
+  EXPECT_THROW(builder.AddView(&view_registry, model), config_sdk::UnsupportedException);
+}
+#endif
+
+TEST(SdkBuilder, AddViewEmptySelectorMatchesAllSupportedInstrumentTypes)
+{
+  namespace metrics_sdk = opentelemetry::sdk::metrics;
+
+  auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::none, 42);
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  config_sdk::SdkBuilder builder(registry);
+  metrics_sdk::ViewRegistry view_registry;
+  builder.AddView(&view_registry, model);
+
+  auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
+  std::vector<metrics_sdk::InstrumentType> supported_instrument_types{
+      metrics_sdk::InstrumentType::kCounter,
+      metrics_sdk::InstrumentType::kHistogram,
+      metrics_sdk::InstrumentType::kUpDownCounter,
+      metrics_sdk::InstrumentType::kObservableCounter,
+      metrics_sdk::InstrumentType::kObservableGauge,
+      metrics_sdk::InstrumentType::kObservableUpDownCounter};
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  supported_instrument_types.push_back(metrics_sdk::InstrumentType::kGauge);
+#endif
+
+  for (auto instrument_type : supported_instrument_types)
+  {
+    metrics_sdk::InstrumentDescriptor instrument_descriptor{
+        "test.instrument", "test description", "units", instrument_type,
+        metrics_sdk::InstrumentValueType::kLong};
+    int matched = 0;
+    view_registry.FindViews(instrument_descriptor, *instrumentation_scope,
+                            [&](const metrics_sdk::View &view) {
+                              auto *config = view.GetAggregationConfig();
+                              EXPECT_NE(config, nullptr);
+                              if (config != nullptr)
+                              {
+                                EXPECT_EQ(config->cardinality_limit_, 42u);
+                                matched++;
+                              }
+                              return true;
+                            });
+    EXPECT_EQ(matched, 1);
+  }
+}
+
 TEST(SdkBuilder, AddViewHistogramCardinalityLimitOnly)
 {
   namespace metrics_sdk = opentelemetry::sdk::metrics;
@@ -812,7 +1031,8 @@ TEST(SdkBuilder, AddViewHistogramCardinalityLimitOnly)
   builder.AddView(&view_registry, model);
 
   metrics_sdk::InstrumentDescriptor instrument_descriptor{
-      "", "", "", metrics_sdk::InstrumentType::kHistogram, metrics_sdk::InstrumentValueType::kLong};
+      "test.instrument", "test description", "units", metrics_sdk::InstrumentType::kHistogram,
+      metrics_sdk::InstrumentValueType::kLong};
   auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
 
   int matched = 0;
@@ -865,7 +1085,8 @@ TEST(SdkBuilder, AddViewCounterCardinalityLimitOnly)
   builder.AddView(&view_registry, model);
 
   metrics_sdk::InstrumentDescriptor instrument_descriptor{
-      "", "", "", metrics_sdk::InstrumentType::kCounter, metrics_sdk::InstrumentValueType::kLong};
+      "test.instrument", "test description", "units", metrics_sdk::InstrumentType::kCounter,
+      metrics_sdk::InstrumentValueType::kLong};
   auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
 
   int matched = 0;
@@ -878,6 +1099,47 @@ TEST(SdkBuilder, AddViewCounterCardinalityLimitOnly)
         {
           EXPECT_EQ(aggregation_config->GetType(), metrics_sdk::AggregationType::kDefault);
           EXPECT_EQ(aggregation_config->cardinality_limit_, 7u);
+        }
+        return true;
+      });
+
+  EXPECT_EQ(matched, 1);
+}
+
+TEST(SdkBuilder, AddViewWithCardinalityLimitPreservesExplicitAggregation)
+{
+  namespace metrics_sdk = opentelemetry::sdk::metrics;
+
+  auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::histogram, 42);
+  auto aggregation =
+      std::make_unique<config_sdk::ExplicitBucketHistogramAggregationConfiguration>();
+  aggregation->boundaries    = {1.0, 2.0};
+  model->stream->aggregation = std::move(aggregation);
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  config_sdk::SdkBuilder builder(registry);
+
+  metrics_sdk::ViewRegistry view_registry;
+  builder.AddView(&view_registry, model);
+
+  metrics_sdk::InstrumentDescriptor instrument_descriptor{
+      "test.instrument", "test description", "units", metrics_sdk::InstrumentType::kHistogram,
+      metrics_sdk::InstrumentValueType::kLong};
+  auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
+
+  int matched = 0;
+  view_registry.FindViews(
+      instrument_descriptor, *instrumentation_scope, [&](const metrics_sdk::View &view) {
+        ++matched;
+        auto *aggregation_config = view.GetAggregationConfig();
+        EXPECT_NE(aggregation_config, nullptr);
+        if (aggregation_config)
+        {
+          EXPECT_EQ(aggregation_config->GetType(), metrics_sdk::AggregationType::kHistogram);
+          EXPECT_EQ(aggregation_config->cardinality_limit_, 42u);
+          auto *histogram_config =
+              static_cast<const metrics_sdk::HistogramAggregationConfig *>(aggregation_config);
+          EXPECT_EQ(histogram_config->boundaries_, (std::vector<double>{1.0, 2.0}));
         }
         return true;
       });
