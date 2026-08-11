@@ -28,6 +28,10 @@
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
+#include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
+#include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
@@ -36,14 +40,18 @@
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/read_write_log_record.h"
+#include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/trace/exporter.h"
+#include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 
 namespace config_test
@@ -419,6 +427,35 @@ public:
 
 private:
   std::shared_ptr<CapturedPeriodicReaderArgs> captured_;
+};
+
+// ---------------------------------------------------------------------------
+// Mock batch processor builders: satisfy the batch builder interface but
+// create simple (synchronous) processors to avoid background-thread races in tests.
+
+class MockBatchSpanProcessorBuilder
+    : public opentelemetry::sdk::configuration::BatchSpanProcessorBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> Build(
+      const opentelemetry::sdk::configuration::BatchSpanProcessorConfiguration *,
+      std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> &&exporter) const override
+  {
+    return std::make_unique<opentelemetry::sdk::trace::SimpleSpanProcessor>(std::move(exporter));
+  }
+};
+
+class MockBatchLogRecordProcessorBuilder
+    : public opentelemetry::sdk::configuration::BatchLogRecordProcessorBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> Build(
+      const opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration *,
+      std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> &&exporter) const override
+  {
+    return std::make_unique<opentelemetry::sdk::logs::SimpleLogRecordProcessor>(
+        std::move(exporter));
+  }
 };
 
 // ---------------------------------------------------------------------------
