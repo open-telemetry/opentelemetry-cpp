@@ -16,9 +16,9 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdlib>
 #include <cstring>
 #include <map>
-#include <memory>
 #include <mutex>
 #include <sstream>
 #include <string>
@@ -32,7 +32,9 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 
 constexpr int HTTP_PORT{19000};
@@ -198,6 +200,162 @@ public:
   }
 };
 
+// libcurl routes every internal allocation through the callbacks given to
+// curl_global_init_mem, which is the only way to reach the failure returns of
+// curl_slist_append and curl_multi_init. They have to be installed before libcurl is
+// initialised: called afterwards the function returns CURLE_OK and quietly changes nothing.
+//
+// The failure switches are thread local, so arming one cannot disturb a client's background
+// thread. These callbacks serve the whole binary once installed.
+extern "C" {
+static std::atomic<bool> g_curl_hooks_ran{false};
+static thread_local bool g_fail_curl_malloc = false;
+static thread_local bool g_fail_curl_calloc = false;
+
+// NOLINTBEGIN(cppcoreguidelines-no-malloc,hicpp-no-malloc): these are the allocator libcurl
+// is given, so reaching for the C allocation functions is the point of them.
+static void *CurlTestMalloc(size_t size)
+{
+  g_curl_hooks_ran.store(true, std::memory_order_relaxed);
+  return g_fail_curl_malloc ? nullptr : std::malloc(size);
+}
+
+static void CurlTestFree(void *ptr)
+{
+  std::free(ptr);
+}
+
+static void *CurlTestRealloc(void *ptr, size_t size)
+{
+  return std::realloc(ptr, size);
+}
+
+// Not routed through CurlTestMalloc on purpose. curl_easy_init allocates with strdup and calloc
+// and never with malloc, while curl_slist_append uses one malloc and one strdup, so failing
+// malloc alone selects the list append and leaves the easy handle alone.
+static char *CurlTestStrdup(const char *str)
+{
+  const size_t length = std::strlen(str) + 1;
+  char *copy          = static_cast<char *>(std::malloc(length));
+  if (copy != nullptr)
+  {
+    std::memcpy(copy, str, length);
+  }
+  return copy;
+}
+
+// curl_multi_init allocates with calloc and never with malloc, so this one selects it.
+static void *CurlTestCalloc(size_t count, size_t size)
+{
+  g_curl_hooks_ran.store(true, std::memory_order_relaxed);
+  return g_fail_curl_calloc ? nullptr : std::calloc(count, size);
+}
+// NOLINTEND(cppcoreguidelines-no-malloc,hicpp-no-malloc)
+}  // extern "C"
+
+namespace
+{
+bool g_curl_hooks_installed = false;
+
+struct FailCurlMalloc
+{
+  FailCurlMalloc() { g_fail_curl_malloc = true; }
+  ~FailCurlMalloc() { g_fail_curl_malloc = false; }
+  FailCurlMalloc(const FailCurlMalloc &)            = delete;
+  FailCurlMalloc(FailCurlMalloc &&)                 = delete;
+  FailCurlMalloc &operator=(const FailCurlMalloc &) = delete;
+  FailCurlMalloc &operator=(FailCurlMalloc &&)      = delete;
+};
+
+struct FailCurlCalloc
+{
+  FailCurlCalloc() { g_fail_curl_calloc = true; }
+  ~FailCurlCalloc() { g_fail_curl_calloc = false; }
+  FailCurlCalloc(const FailCurlCalloc &)            = delete;
+  FailCurlCalloc(FailCurlCalloc &&)                 = delete;
+  FailCurlCalloc &operator=(const FailCurlCalloc &) = delete;
+  FailCurlCalloc &operator=(FailCurlCalloc &&)      = delete;
+};
+
+class CapturingLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
+{
+public:
+  void Handle(opentelemetry::sdk::common::internal_log::LogLevel,
+              const char *,
+              int,
+              const char *msg,
+              const opentelemetry::sdk::common::AttributeMap &) noexcept override
+  {
+    if (msg == nullptr)
+    {
+      return;
+    }
+    std::lock_guard<std::mutex> lock(messages_m_);
+    messages_.append(msg).append("\n");
+  }
+
+  std::string Text()
+  {
+    std::lock_guard<std::mutex> lock(messages_m_);
+    return messages_;
+  }
+
+private:
+  std::mutex messages_m_;
+  std::string messages_;
+};
+
+class ReportedStateHandler : public CustomEventHandler
+{
+public:
+  std::atomic<bool> create_failed_{false};
+  std::atomic<int> terminal_count_{0};
+
+  void OnResponse(http_client::Response &) noexcept override
+  {
+    terminal_count_.fetch_add(1, std::memory_order_acq_rel);
+  }
+
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    switch (state)
+    {
+      case http_client::SessionState::CreateFailed:
+      case http_client::SessionState::ConnectFailed:
+      case http_client::SessionState::SendFailed:
+      case http_client::SessionState::SSLHandshakeFailed:
+      case http_client::SessionState::TimedOut:
+      case http_client::SessionState::NetworkError:
+      case http_client::SessionState::Cancelled:
+        terminal_count_.fetch_add(1, std::memory_order_acq_rel);
+        break;
+      default:
+        break;
+    }
+
+    if (state != http_client::SessionState::CreateFailed)
+    {
+      return;
+    }
+    {
+      std::lock_guard<std::mutex> lock(reason_m_);
+      reason_.assign(reason.data(), reason.size());
+    }
+    create_failed_.store(true, std::memory_order_release);
+  }
+
+  std::string Reason()
+  {
+    std::lock_guard<std::mutex> lock(reason_m_);
+    return reason_;
+  }
+
+private:
+  std::mutex reason_m_;
+  std::string reason_;
+};
+}  // namespace
+
 class BasicCurlHttpTests : public ::testing::Test, public HTTP_SERVER_NS::HttpRequestCallback
 {
 protected:
@@ -214,6 +372,15 @@ protected:
 
 public:
   BasicCurlHttpTests() : is_setup_(false), is_running_(false) {}
+
+  // Runs once before the first case, which is the only point still ahead of the first
+  // HttpClient and therefore ahead of curl_global_init.
+  static void SetUpTestSuite()
+  {
+    g_curl_hooks_installed =
+        (CURLE_OK == curl_global_init_mem(CURL_GLOBAL_ALL, CurlTestMalloc, CurlTestFree,
+                                          CurlTestRealloc, CurlTestStrdup, CurlTestCalloc));
+  }
 
 protected:
   void SetUp() override
@@ -687,6 +854,100 @@ TEST_F(BasicCurlHttpTests, RepeatedCallerThreadCancelsAreClean)
   // A lower bound, not a count: #4360 tracks the same cancel arriving twice, and how many
   // arrive is not what this case decides.
   EXPECT_GE(terminal_total, 20);
+}
+
+// Without this the two cases below would fail for the wrong reason if the hooks ever stopped
+// being installed early enough, and the message would not say so.
+TEST_F(BasicCurlHttpTests, CurlAllocationHooksAreInstalled)
+{
+  EXPECT_TRUE(g_curl_hooks_installed) << "curl_global_init_mem did not return CURLE_OK";
+
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+  session_manager->FinishAllSessions();
+
+  EXPECT_TRUE(g_curl_hooks_ran.load(std::memory_order_relaxed))
+      << "libcurl allocated without calling the hooks, so they were installed too late";
+}
+
+// A header list that cannot be built has to end the operation. Reporting it is what stops the
+// request going out with none of the caller's headers, which for an OTLP export means no
+// Content-Type and a receiver that rejects it.
+TEST_F(BasicCurlHttpTests, AFailedHeaderAllocationIsReported)
+{
+  ASSERT_TRUE(g_curl_hooks_installed);
+
+  received_requests_.clear();
+
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  auto session         = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request         = session->CreateRequest();
+  request->SetUri("get/");
+  request->AddHeader("X-Test", "1");
+
+  auto handler = std::make_shared<ReportedStateHandler>();
+  {
+    // The operation is constructed on this thread inside SendRequest, so the switch reaches
+    // only its allocations.
+    FailCurlMalloc fail;
+    session->SendRequest(handler);
+  }
+
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  size_t requests_seen = 0;
+  {
+    std::unique_lock<std::mutex> lock_requests(mtx_requests);
+    requests_seen = received_requests_.size();
+  }
+
+  EXPECT_TRUE(handler->create_failed_.load(std::memory_order_acquire))
+      << "a header list that could not be built was not reported";
+  // Reporting it is only half. The easy handle is still valid here and Setup() skips
+  // CURLOPT_HTTPHEADER when the list is null, so without a construction result the request goes
+  // out anyway, carrying none of the caller's headers.
+  EXPECT_EQ(static_cast<size_t>(0), requests_seen)
+      << "the request reached the server after the failure was reported";
+  EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire))
+      << "expected exactly one terminal outcome";
+  // A failed curl_easy_init would report "Failed initialization" instead, so this holds the
+  // case to the header list rather than to whichever allocation happened to fail.
+  const std::string reason = handler->Reason();
+  EXPECT_NE(std::string::npos, reason.find("Out of memory")) << "reported as: " << reason;
+}
+
+// A client whose multi handle is null accepts sessions, adds none of them, and completes none
+// of them, so the failure has to be visible somewhere.
+TEST_F(BasicCurlHttpTests, AFailedMultiHandleAllocationIsReported)
+{
+  ASSERT_TRUE(g_curl_hooks_installed);
+
+  // One ordinary client first, so the global curl initializer already exists and the switch
+  // below can only reach curl_multi_init.
+  {
+    auto warmup = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+    ASSERT_TRUE(warmup != nullptr);
+    warmup->FinishAllSessions();
+  }
+
+  auto *capture = new CapturingLogHandler();
+  auto previous = opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogHandler();
+  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(
+      nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(capture));
+
+  {
+    FailCurlCalloc fail;
+    auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+    ASSERT_TRUE(client != nullptr);
+    client->FinishAllSessions();
+  }
+
+  const std::string text = capture->Text();
+  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous);
+
+  EXPECT_NE(std::string::npos, text.find("curl_multi_init failed"))
+      << "a multi handle that could not be created was not reported, captured: " << text;
 }
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
