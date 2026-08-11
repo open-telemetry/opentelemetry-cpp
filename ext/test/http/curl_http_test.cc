@@ -16,9 +16,11 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <sstream>
 #include <string>
@@ -35,6 +37,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
 constexpr int HTTP_PORT{19000};
@@ -992,6 +995,80 @@ TEST_F(BasicCurlHttpTests, AFailedMultiHandleAllocationIsReported)
 
   EXPECT_NE(std::string::npos, text.find("curl_multi_init failed"))
       << "a multi handle that could not be created was not reported, captured: " << text;
+}
+
+// SendAsync refuses a request whose header list could not be built, and Send has to refuse it
+// the same way, or a synchronous caller puts one on the wire carrying none of its headers.
+TEST_F(BasicCurlHttpTests, ASynchronousSendRefusesAFailedHeaderAllocation)
+{
+  ASSERT_TRUE(g_curl_hooks_installed);
+  received_requests_.clear();
+
+  // The operation keeps references to these, so they outlive it.
+  const http_client::HttpSslOptions no_ssl;
+  const http_client::Body body;
+  const http_client::Headers headers         = {{"X-Test", "1"}};
+  const http_client::Compression compression = http_client::Compression::kNone;
+
+  std::unique_ptr<curl::HttpOperation> operation;
+  {
+    // Only the constructor allocates under the switch. Send needs its own allocations to work.
+    FailCurlMalloc fail;
+    operation.reset(new curl::HttpOperation(http_client::Method::Get, "http://127.0.0.1:19000/get/",
+                                            no_ssl, nullptr, headers, body, compression));
+  }
+
+  const CURLcode result = operation->Send();
+
+  size_t requests_seen = 0;
+  {
+    std::unique_lock<std::mutex> lock_requests(mtx_requests);
+    requests_seen = received_requests_.size();
+  }
+
+  EXPECT_EQ(static_cast<size_t>(0), requests_seen)
+      << "a synchronous request went out after its setup had failed";
+
+  if (CURLE_OUT_OF_MEMORY != result)
+  {
+    GTEST_SKIP() << "this libcurl consumed the failing allocation before the header list, "
+                 << "reported as: " << curl_easy_strerror(result);
+  }
+  EXPECT_EQ(CURLE_OUT_OF_MEMORY, operation->GetLastResultCode())
+      << "the refusal was not recorded as the last result";
+}
+
+// Both constructors reach the multi handle through the same helper, so the overload that takes
+// thread instrumentation reports a failed one too. A null instrumentation is enough to pick it.
+TEST_F(BasicCurlHttpTests, AFailedMultiHandleIsReportedForAnInstrumentedClient)
+{
+  ASSERT_TRUE(g_curl_hooks_installed);
+
+  {
+    auto warmup = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+    ASSERT_TRUE(warmup != nullptr);
+    warmup->FinishAllSessions();
+  }
+
+  auto *capture = new CapturingLogHandler();
+  auto previous = opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogHandler();
+  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(
+      nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(capture));
+
+  {
+    FailCurlCalloc fail;
+    auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create(
+        std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation>{});
+    ASSERT_TRUE(client != nullptr);
+    client->FinishAllSessions();
+  }
+
+  const std::string text = capture->Text();
+  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous);
+
+  EXPECT_NE(std::string::npos, text.find("curl_multi_init failed"))
+      << "the instrumented constructor did not report a multi handle it could not create, "
+      << "captured: " << text;
 }
 
 // Reporting the failure does not by itself stop the client taking requests, so this holds what
