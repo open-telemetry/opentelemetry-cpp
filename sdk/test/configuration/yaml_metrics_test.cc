@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
@@ -39,6 +40,7 @@
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
+#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
     const std::string &yaml)
