@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -18,6 +19,7 @@
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/composite_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
+#include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
