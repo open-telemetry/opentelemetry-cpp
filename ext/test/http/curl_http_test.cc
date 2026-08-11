@@ -33,12 +33,35 @@
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/version.h"
 
 constexpr int HTTP_PORT{19000};
 
 namespace curl        = opentelemetry::ext::http::client::curl;
 namespace http_client = opentelemetry::ext::http::client;
 namespace nostd       = opentelemetry::nostd;
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace ext
+{
+namespace http
+{
+namespace client
+{
+namespace curl
+{
+// resetMultiHandle only runs when curl_multi_perform fails, which a test cannot provoke, so
+// the case below reaches it directly. See #4389.
+class HttpClientTestPeer
+{
+public:
+  static void ResetMultiHandle(HttpClient &client) { client.resetMultiHandle(); }
+};
+}  // namespace curl
+}  // namespace client
+}  // namespace http
+}  // namespace ext
+OPENTELEMETRY_END_NAMESPACE
 
 namespace
 {
@@ -560,6 +583,51 @@ TEST_F(BasicCurlHttpTests, ACancelBeforeTheResponseReportsCancelled)
       << "the cancel has to run on the IO thread, see #4369";
 
   session_manager->FinishAllSessions();
+}
+
+// NextRetryTime draws the backoff jitter from an engine that used to be a shared static, so
+// two clients retrying at the same time wrote the same std::mt19937. The case passes either
+// way, since a data race is not a functional failure. It is here for the sanitizer builds.
+TEST_F(BasicCurlHttpTests, RetryJitterIsNotSharedAcrossThreads)
+{
+  opentelemetry::ext::http::client::HttpSslOptions ssl_options;
+  opentelemetry::ext::http::client::Headers request_headers;
+  opentelemetry::ext::http::client::Body request_body;
+
+  http_client::curl::HttpOperation first(http_client::Method::Get, "http://127.0.0.1:19000/",
+                                         ssl_options, nullptr, request_headers, request_body);
+  http_client::curl::HttpOperation second(http_client::Method::Get, "http://127.0.0.1:19000/",
+                                          ssl_options, nullptr, request_headers, request_body);
+
+  std::thread drawing_first([&first] {
+    for (int i = 0; i < 200; ++i)
+    {
+      (void)first.NextRetryTime();
+    }
+  });
+  std::thread drawing_second([&second] {
+    for (int i = 0; i < 200; ++i)
+    {
+      (void)second.NextRetryTime();
+    }
+  });
+
+  drawing_first.join();
+  drawing_second.join();
+}
+
+// resetMultiHandle used to hold sessions_m_ across CancelSession and doRemoveSessions, which
+// take it again on the same thread. One registered session is enough to reach both.
+TEST_F(BasicCurlHttpTests, ResetMultiHandleWithASessionDoesNotDeadlock)
+{
+  auto client = std::make_shared<http_client::curl::HttpClient>();
+
+  auto session = client->CreateSession("http://127.0.0.1:19000");
+  ASSERT_TRUE(session != nullptr);
+
+  http_client::curl::HttpClientTestPeer::ResetMultiHandle(*client);
+
+  client->FinishAllSessions();
 }
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)

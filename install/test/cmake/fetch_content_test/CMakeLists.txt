@@ -79,6 +79,10 @@ target_link_libraries(
           opentelemetry-cpp::trace
           opentelemetry-cpp::logs
           opentelemetry-cpp::configuration_core
+          opentelemetry-cpp::configuration_trace_builders
+          opentelemetry-cpp::configuration_metrics_builders
+          opentelemetry-cpp::configuration_logs_builders
+          opentelemetry-cpp::configuration_registry_factory
           opentelemetry-cpp::configuration
           opentelemetry-cpp::resource_detectors
           opentelemetry-cpp::http_client

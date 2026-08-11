@@ -467,9 +467,25 @@ meter_provider:
         exporter:
           # Configure exporter to be console.
           console:
+            # Configure temporality preference.
+            # Values include: cumulative, delta, low_memory.
+            # If omitted or null, cumulative is used.
+            temporality_preference: delta
+            # Configure default histogram aggregation.
+            # Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram.
+            # If omitted or null, explicit_bucket_histogram is used.
+            default_histogram_aggregation: base2_exponential_bucket_histogram
   # Configure views.
   # Each view has a selector which determines the instrument(s) it applies to, and a configuration for the resulting stream(s).
   views:
+    - # Configure a catch-all view. An empty selector matches all instruments from all meters.
+      selector: {}
+      # Configure the resulting stream for every matched instrument.
+      stream:
+        # Retain all attributes except the explicitly excluded sensitive or high-cardinality keys.
+        attribute_keys:
+          excluded:
+            - request.id
     - # Configure view selector.
       # Selection criteria is additive as described in https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#instrument-selection-criteria.
       selector:
@@ -543,6 +559,104 @@ meter_provider:
           # If omitted, .attribute_keys.included are included.
           excluded:
             - key3
+    - selector:
+        instrument_name: exponential-histogram-instrument
+        instrument_type: histogram
+      stream:
+        # Configure aggregation to be base2 exponential bucket histogram.
+        aggregation:
+          base2_exponential_bucket_histogram:
+            # Configure the max scale factor. Value must be in range [-10, 20].
+            # If omitted or null, 20 is used.
+            max_scale: 20
+            # Configure the maximum number of positive and negative buckets.
+            # If omitted or null, 160 is used.
+            max_size: 160
+            # Configure whether or not to record min and max.
+            # If omitted or null, true is used.
+            record_min_max: true
+    - selector:
+        instrument_name: default-aggregation-instrument
+      stream:
+        # Configure aggregation based on the selected instrument kind.
+        aggregation:
+          default:
+    - selector:
+        instrument_name: dropped-instrument
+      stream:
+        # Configure aggregation to drop all measurements.
+        aggregation:
+          drop:
+    # Gauge instruments are only supported in opentelemetry-cpp ABIv2
+    # - selector:
+    #     instrument_name: last-value-instrument
+    #     instrument_type: gauge
+    #   stream:
+    #     # Configure aggregation to retain the last measurement.
+    #     aggregation:
+    #       last_value:
+    - selector:
+        instrument_name: summed-instrument
+        instrument_type: counter
+      stream:
+        # Configure aggregation to sum measurements.
+        aggregation:
+          sum:
+    - # Configure a view selecting observable counter instruments.
+      selector:
+        # Configure instrument name selection criteria.
+        instrument_name: observable-counter-instrument
+        # Configure instrument type selection criteria.
+        instrument_type: observable_counter
+      # Configure the resulting view stream.
+      stream:
+        # Configure aggregation based on the selected instrument kind.
+        aggregation:
+          default:
+    - # Configure a view selecting observable gauge instruments.
+      selector:
+        # Configure instrument name selection criteria.
+        instrument_name: observable-gauge-instrument
+        # Configure instrument type selection criteria.
+        instrument_type: observable_gauge
+      # Configure the resulting view stream.
+      stream:
+        # Configure aggregation based on the selected instrument kind.
+        aggregation:
+          default:
+    - # Configure a view selecting observable up down counter instruments.
+      selector:
+        # Configure instrument name selection criteria.
+        instrument_name: observable-up-down-counter-instrument
+        # Configure instrument type selection criteria.
+        instrument_type: observable_up_down_counter
+      # Configure the resulting view stream.
+      stream:
+        # Configure aggregation based on the selected instrument kind.
+        aggregation:
+          default:
+    - # Configure a view selecting up down counter instruments.
+      selector:
+        # Configure instrument name selection criteria.
+        instrument_name: up-down-counter-instrument
+        # Configure instrument type selection criteria.
+        instrument_type: up_down_counter
+      # Configure the resulting view stream.
+      stream:
+        # Configure aggregation based on the selected instrument kind.
+        aggregation:
+          default:
+    - # Configure a view selecting a histogram instrument.
+      selector:
+        # Configure instrument name selection criteria.
+        instrument_name: cardinality-limited-instrument
+        # Configure instrument type selection criteria.
+        instrument_type: histogram
+      # Configure the resulting view stream.
+      stream:
+        # Configure the aggregation cardinality limit while retaining the instrument's default aggregation.
+        # If omitted or null, the metric reader's default cardinality limit is used.
+        aggregation_cardinality_limit: 1000
   # Configure the exemplar filter.
   # Values include: trace_based, always_on, always_off. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#metrics-sdk-configuration.
   # If omitted or null, trace_based is used.
