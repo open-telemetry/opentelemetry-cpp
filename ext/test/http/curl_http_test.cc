@@ -285,6 +285,35 @@ struct FailCurlCalloc
   FailCurlCalloc &operator=(FailCurlCalloc &&)      = delete;
 };
 
+// Counts terminal outcomes without caring which one, since a client whose multi handle could
+// not be created may still recover and answer, and the case below is about the caller being
+// told either way rather than about which answer it gets.
+class MultiHandleOutcomeHandler : public http_client::EventHandler
+{
+public:
+  void OnResponse(http_client::Response & /* response */) noexcept override
+  {
+    terminal_.fetch_add(1, std::memory_order_release);
+  }
+
+  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
+  {
+    switch (state)
+    {
+      case http_client::SessionState::CreateFailed:
+      case http_client::SessionState::ConnectFailed:
+      case http_client::SessionState::SendFailed:
+      case http_client::SessionState::Cancelled:
+        terminal_.fetch_add(1, std::memory_order_release);
+        break;
+      default:
+        break;
+    }
+  }
+
+  std::atomic<int> terminal_{0};
+};
+
 class CapturingLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
 {
 public:
@@ -963,6 +992,48 @@ TEST_F(BasicCurlHttpTests, AFailedMultiHandleAllocationIsReported)
 
   EXPECT_NE(std::string::npos, text.find("curl_multi_init failed"))
       << "a multi handle that could not be created was not reported, captured: " << text;
+}
+
+// Reporting the failure does not by itself stop the client taking requests, so this holds what
+// taking one leads to. The IO loop resets the multi handle whenever curl_multi_perform rejects
+// it, so a client built on a null handle repairs itself and answers; if the allocation is still
+// failing by then it reports a failure instead. What must not happen is neither.
+TEST_F(BasicCurlHttpTests, AClientWithoutAMultiHandleStillAnswers)
+{
+  ASSERT_TRUE(g_curl_hooks_installed);
+  received_requests_.clear();
+
+  {
+    auto warmup = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+    ASSERT_TRUE(warmup != nullptr);
+    warmup->FinishAllSessions();
+  }
+
+  std::shared_ptr<http_client::HttpClient> client;
+  {
+    FailCurlCalloc fail;
+    client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  }
+  ASSERT_TRUE(client != nullptr);
+
+  auto session = client->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler = std::make_shared<MultiHandleOutcomeHandler>();
+  session->SendRequest(handler);
+
+  for (int i = 0; i < 300 && 0 == handler->terminal_.load(std::memory_order_acquire); ++i)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+
+  EXPECT_GE(handler->terminal_.load(std::memory_order_acquire), 1)
+      << "the request was accepted and never reached an outcome";
+  EXPECT_FALSE(session->IsSessionActive()) << "the session stayed active with nothing running it";
+
+  session->FinishSession();
+  client->FinishAllSessions();
 }
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
