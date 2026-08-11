@@ -59,6 +59,8 @@
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/exemplar_filter.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
@@ -498,6 +500,24 @@ public:
       return;
     }
     static const std::string die("No builder for ComposableRuleBasedSampler");
+    throw UnsupportedException(die);
+  }
+
+  void VisitComposableExtension(
+      const opentelemetry::sdk::configuration::ExtensionComposableSamplerConfiguration *model)
+      override
+  {
+    const ExtensionComposableSamplerBuilder *builder =
+        registry_->GetExtensionComposableSamplerBuilder(model->name);
+    if (builder != nullptr)
+    {
+      OTEL_INTERNAL_LOG_DEBUG("VisitComposableExtension() using registered builder "
+                              << model->name);
+      sampler = builder->Build(model);
+      return;
+    }
+    std::string die("No builder for extension composable sampler ");
+    die.append(model->name);
     throw UnsupportedException(die);
   }
   // NOLINTEND(misc-no-recursion)

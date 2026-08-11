@@ -22,6 +22,7 @@
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/container_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/extension_metric_producer_builder.h"
@@ -387,6 +388,26 @@ void Registry::SetExtensionSamplerBuilder(const std::string &name,
 {
   sampler_builders_.erase(name);
   sampler_builders_.insert({name, std::move(builder)});
+}
+
+const ExtensionComposableSamplerBuilder *Registry::GetExtensionComposableSamplerBuilder(
+    const std::string &name) const
+{
+  ExtensionComposableSamplerBuilder *builder = nullptr;
+  auto search                                = composable_sampler_builders_.find(name);
+  if (search != composable_sampler_builders_.end())
+  {
+    builder = search->second.get();
+  }
+  return builder;
+}
+
+void Registry::SetExtensionComposableSamplerBuilder(
+    const std::string &name,
+    std::unique_ptr<ExtensionComposableSamplerBuilder> &&builder)
+{
+  composable_sampler_builders_.erase(name);
+  composable_sampler_builders_.insert({name, std::move(builder)});
 }
 
 const ExtensionSpanExporterBuilder *Registry::GetExtensionSpanExporterBuilder(

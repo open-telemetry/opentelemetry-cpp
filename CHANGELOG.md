@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Add support for composable sampler extensions.
+  [#4409](https://github.com/open-telemetry/opentelemetry-cpp/issues/4409)
+
 * [CONFIGURATION] Apply metric view `attribute_keys` include and exclude patterns
   when building the SDK, with exclude patterns taking precedence.
   [#3546](https://github.com/open-telemetry/opentelemetry-cpp/issues/3546)
