@@ -1109,6 +1109,10 @@ TEST_F(BasicCurlHttpTests, AClientWithoutAMultiHandleStillAnswers)
       << "the request was accepted and never reached an outcome";
   EXPECT_FALSE(session->IsSessionActive()) << "the session stayed active with nothing running it";
 
+  // Cancel before finishing. If either assertion above failed then nothing is going to complete
+  // this operation, and FinishSession would wait for it for good, so the case would hang rather
+  // than fail. Cancelling a session that already answered does nothing.
+  session->CancelSession();
   session->FinishSession();
   client->FinishAllSessions();
 }

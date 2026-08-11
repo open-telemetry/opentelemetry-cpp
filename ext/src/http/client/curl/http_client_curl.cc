@@ -482,6 +482,10 @@ bool HttpClient::MaybeSpawnBackgroundThread()
           // can not curl_multi_perform it again
           if (mc != CURLM_OK)
           {
+            // curl_multi_perform leaves still_running alone when it rejects the handle, and it
+            // starts at one, so without this the loop keeps reporting work it does not have,
+            // never reaches the shutdown check below, and the thread cannot be joined.
+            still_running = 0;
             self->resetMultiHandle();
           }
           else if (still_running || need_wait_more)
