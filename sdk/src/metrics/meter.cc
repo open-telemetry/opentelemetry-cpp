@@ -87,13 +87,19 @@ std::ostream &operator<<(std::ostream &os,
   return os;
 }
 
-// When a view sets an explicit cardinality limit, it wins outright (View > Reader > SDK
-// default), so the raw recording storage is simply sized to that limit, unchanged.
+// When a view sets an explicit cardinality limit (cardinality_limit_explicit_), it wins outright
+// (View > Reader > SDK default), so the raw recording storage is simply sized to that limit,
+// unchanged. A non-null AggregationConfig does not by itself mean the view set an explicit
+// cardinality limit: e.g. SdkBuilder::AddView() may build one purely to carry histogram
+// boundaries, leaving cardinality_limit_ at its compiled-in default and
+// cardinality_limit_explicit_ false.
 //
 // When a view has no explicit limit, the shared recording storage must be sized to the highest
 // limit configured across all MetricReaders currently attached, so no reader loses data purely
-// because the shared cap was sized for a stricter reader. Each reader's own (possibly lower)
-// limit is then re-applied to just its own output during collection; see
+// because the shared cap was sized for a stricter reader. Do not floor this at the SDK default:
+// a reader may configure a limit lower than the default, and that stricter limit must still
+// apply when it is the only (or the strictest) reader attached. Each reader's own (possibly
+// lower) limit is then re-applied to just its own output during collection; see
 // TemporalMetricStorage::buildMetrics().
 std::size_t ResolveRecordingCardinalityLimit(
     const opentelemetry::sdk::metrics::AggregationConfig *aggregation_config,
@@ -101,11 +107,15 @@ std::size_t ResolveRecordingCardinalityLimit(
         collectors,
     opentelemetry::sdk::metrics::InstrumentType instrument_type)
 {
-  if (aggregation_config)
+  if (aggregation_config && aggregation_config->cardinality_limit_explicit_)
   {
     return aggregation_config->cardinality_limit_;
   }
-  std::size_t max_limit = opentelemetry::sdk::metrics::kAggregationCardinalityLimit;
+  if (collectors.empty())
+  {
+    return opentelemetry::sdk::metrics::kAggregationCardinalityLimit;
+  }
+  std::size_t max_limit = 0;
   for (auto &collector : collectors)
   {
     max_limit = (std::max)(max_limit, collector->GetCardinalityLimit(instrument_type));

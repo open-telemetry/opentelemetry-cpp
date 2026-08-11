@@ -620,6 +620,25 @@ size_t CountRealPoints(const MetricProducer::Result &result, bool *overflow_pres
   }
   return total_points;
 }
+
+// Sums the counter value across every point, including the overflow point. Used to prove no
+// data is silently dropped when several distinct attribute sets are funneled into overflow.
+int64_t SumCounterValue(const MetricProducer::Result &result)
+{
+  int64_t total = 0;
+  for (const ScopeMetrics &sm : result.points_.scope_metric_data_)
+  {
+    for (const MetricData &md : sm.metric_data_)
+    {
+      for (const PointDataAttributes &pda : md.point_data_attr_)
+      {
+        auto sum_point_data = nostd::get<SumPointData>(pda.point_data);
+        total += nostd::get<int64_t>(sum_point_data.value_);
+      }
+    }
+  }
+  return total;
+}
 }  // namespace
 
 // Regression test for the bug found during review of #4188: resolving a reader-level
@@ -665,19 +684,70 @@ TEST_F(MetricCollectorTest, ReaderCardinalityLimitFallbackWithMultipleReaders)
         opentelemetry::context::Context{});
   }
 
+  auto low_produced  = low_collector->Produce();
+  auto high_produced = high_collector->Produce();
+
   bool low_overflow  = false;
   bool high_overflow = false;
-  size_t low_points  = CountRealPoints(low_collector->Produce(), &low_overflow);
-  size_t high_points = CountRealPoints(high_collector->Produce(), &high_overflow);
+  size_t low_points  = CountRealPoints(low_produced, &low_overflow);
+  size_t high_points = CountRealPoints(high_produced, &high_overflow);
 
   // The stricter reader must be capped at its own limit, with overflow absorbing the rest.
   EXPECT_LE(low_points, kLowLimit);
   EXPECT_TRUE(low_overflow);
+  // No data may be silently dropped: every one of the kUniqueAttributeSets Add(1, ...) calls
+  // must still be reflected somewhere, whether as its own point or merged into overflow.
+  EXPECT_EQ(SumCounterValue(low_produced), static_cast<int64_t>(kUniqueAttributeSets));
 
   // The laxer reader, sharing the same underlying storage, must see every recorded series:
   // it must not be capped down to the stricter reader's limit, and must not report overflow.
   EXPECT_EQ(high_points, kUniqueAttributeSets);
   EXPECT_FALSE(high_overflow);
+}
+
+// Regression test for a second bug found during review: the single-collector delta fast path
+// in TemporalMetricStorage::buildMetrics() reads straight from the raw recording storage,
+// bypassing the per-collector re-cap. With a single delta reader this is only safe if the
+// *recording* storage itself was already sized to that reader's own limit (rather than floored
+// at the SDK default), which is what ResolveRecordingCardinalityLimit() in meter.cc must do.
+TEST_F(MetricCollectorTest, ReaderCardinalityLimitFallbackSingleDeltaReader)
+{
+  constexpr size_t kLimit               = 3;
+  constexpr size_t kUniqueAttributeSets = 10;
+
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+  auto scope   = InstrumentationScope::Create("ReaderCardinalityLimitFallbackSingleDeltaReader");
+  auto meter   = std::shared_ptr<Meter>(new Meter(context, std::move(scope)));
+  context->AddMeter(meter);
+
+  // MockMetricReader reports kDelta aggregation temporality, and with exactly one reader
+  // attached this exercises TemporalMetricStorage::buildMetrics()'s single-collector-delta
+  // fast path.
+  auto reader = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits limits;
+  limits.counter = kLimit;
+  reader->SetCardinalityLimits(limits);
+  auto collector = AddMetricReaderToMeterContext(context, reader).lock();
+
+  auto counter = meter->CreateUInt64Counter("delta_counter");
+
+  for (size_t i = 0; i < kUniqueAttributeSets; ++i)
+  {
+    std::map<std::string, std::string> attrs = {{"key", std::to_string(i)}};
+    counter->Add(
+        1, opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        opentelemetry::context::Context{});
+  }
+
+  auto produced         = collector->Produce();
+  bool overflow_present = false;
+  size_t real_points    = CountRealPoints(produced, &overflow_present);
+
+  // The reader's own limit must be honored even via the single-collector delta fast path,
+  // not silently widened to the SDK default (2000).
+  EXPECT_LE(real_points, kLimit);
+  EXPECT_TRUE(overflow_present);
+  EXPECT_EQ(SumCounterValue(produced), static_cast<int64_t>(kUniqueAttributeSets));
 }
 
 #if defined(__GNUC__) || defined(__clang__) || defined(__apple_build_version__)

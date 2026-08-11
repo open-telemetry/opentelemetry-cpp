@@ -40,7 +40,15 @@ public:
   }
 
   size_t cardinality_limit_;
-  virtual ~AggregationConfig() = default;
+  // Whether cardinality_limit_ reflects an intentionally-configured value, as opposed to
+  // just the compiled-in default left untouched because this config was built for some other
+  // reason (e.g. histogram boundaries). Defaults to true so any caller that constructs an
+  // AggregationConfig directly (tests, programmatic API) keeps prior behavior: the config's
+  // cardinality_limit_ is always honored as-is. SdkBuilder::AddView() is the one place that
+  // knows when a config was synthesized without an explicit `aggregation_cardinality_limit`,
+  // and sets this to false there so a MetricReader-level fallback can apply instead.
+  bool cardinality_limit_explicit_ = true;
+  virtual ~AggregationConfig()     = default;
 };
 
 class HistogramAggregationConfig : public AggregationConfig

@@ -30,6 +30,7 @@
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/instrument_type.h"
@@ -826,6 +827,97 @@ TEST(SdkBuilder, AddViewCounterCardinalityLimitOnly)
         }
         return true;
       });
+
+  EXPECT_EQ(matched, 1);
+}
+
+// Regression test for a bug found during review of #4388: a view that configures an
+// `aggregation` block for reasons unrelated to cardinality (here, explicit histogram
+// boundaries) without also setting `aggregation_cardinality_limit` must not be treated as
+// having an explicit view-level cardinality limit, since the resulting AggregationConfig's
+// cardinality_limit_ is just the compiled-in default (kAggregationCardinalityLimit), not a
+// user choice. Otherwise a MetricReader-level fallback would be silently skipped.
+TEST(SdkBuilder, AddViewHistogramBoundariesWithoutCardinalityLimitIsNotExplicit)
+{
+  namespace metrics_sdk = opentelemetry::sdk::metrics;
+
+  auto model                       = std::make_unique<config_sdk::ViewConfiguration>();
+  model->selector                  = std::make_unique<config_sdk::ViewSelectorConfiguration>();
+  model->selector->instrument_type = config_sdk::InstrumentType::histogram;
+
+  model->stream = std::make_unique<config_sdk::ViewStreamConfiguration>();
+  auto histogram_aggr =
+      std::make_unique<config_sdk::ExplicitBucketHistogramAggregationConfiguration>();
+  histogram_aggr->boundaries = {1.0, 2.0, 3.0};
+  model->stream->aggregation = std::move(histogram_aggr);
+  // aggregation_cardinality_limit intentionally left at its default (0 = kInheritFromReader).
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  config_sdk::SdkBuilder builder(registry);
+
+  metrics_sdk::ViewRegistry view_registry;
+  builder.AddView(&view_registry, model);
+
+  metrics_sdk::InstrumentDescriptor instrument_descriptor{
+      "", "", "", metrics_sdk::InstrumentType::kHistogram, metrics_sdk::InstrumentValueType::kLong};
+  auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
+
+  int matched = 0;
+  view_registry.FindViews(instrument_descriptor, *instrumentation_scope,
+                          [&](const metrics_sdk::View &view) {
+                            matched++;
+                            auto *aggregation_config = view.GetAggregationConfig();
+                            EXPECT_NE(aggregation_config, nullptr);
+                            if (aggregation_config)
+                            {
+                              EXPECT_FALSE(aggregation_config->cardinality_limit_explicit_);
+                            }
+                            return true;
+                          });
+
+  EXPECT_EQ(matched, 1);
+}
+
+// Companion to the test above: when the same stream also sets aggregation_cardinality_limit,
+// the resulting config must be marked explicit and carry that value.
+TEST(SdkBuilder, AddViewHistogramBoundariesWithCardinalityLimitIsExplicit)
+{
+  namespace metrics_sdk = opentelemetry::sdk::metrics;
+
+  auto model                       = std::make_unique<config_sdk::ViewConfiguration>();
+  model->selector                  = std::make_unique<config_sdk::ViewSelectorConfiguration>();
+  model->selector->instrument_type = config_sdk::InstrumentType::histogram;
+
+  model->stream = std::make_unique<config_sdk::ViewStreamConfiguration>();
+  auto histogram_aggr =
+      std::make_unique<config_sdk::ExplicitBucketHistogramAggregationConfiguration>();
+  histogram_aggr->boundaries                   = {1.0, 2.0, 3.0};
+  model->stream->aggregation                   = std::move(histogram_aggr);
+  model->stream->aggregation_cardinality_limit = 99;
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  config_sdk::SdkBuilder builder(registry);
+
+  metrics_sdk::ViewRegistry view_registry;
+  builder.AddView(&view_registry, model);
+
+  metrics_sdk::InstrumentDescriptor instrument_descriptor{
+      "", "", "", metrics_sdk::InstrumentType::kHistogram, metrics_sdk::InstrumentValueType::kLong};
+  auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
+
+  int matched = 0;
+  view_registry.FindViews(instrument_descriptor, *instrumentation_scope,
+                          [&](const metrics_sdk::View &view) {
+                            matched++;
+                            auto *aggregation_config = view.GetAggregationConfig();
+                            EXPECT_NE(aggregation_config, nullptr);
+                            if (aggregation_config)
+                            {
+                              EXPECT_TRUE(aggregation_config->cardinality_limit_explicit_);
+                              EXPECT_EQ(aggregation_config->cardinality_limit_, 99u);
+                            }
+                            return true;
+                          });
 
   EXPECT_EQ(matched, 1);
 }
