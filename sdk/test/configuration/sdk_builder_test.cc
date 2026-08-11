@@ -82,10 +82,6 @@
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 
-#if OPENTELEMETRY_ABI_VERSION_NO < 2
-#  include "opentelemetry/sdk/configuration/unsupported_exception.h"
-#endif
-
 using opentelemetry::sdk::configuration::Registry;
 using opentelemetry::sdk::configuration::RegistryFactory;
 using opentelemetry::sdk::configuration::SdkBuilder;
