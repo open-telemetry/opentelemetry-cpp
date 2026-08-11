@@ -15,6 +15,7 @@ foreach(
   trace_id_ratio_sampler_test
   composable_sampler_test
   batch_span_processor_test
+  batch_span_processor_test_stress
   tracer_config_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(

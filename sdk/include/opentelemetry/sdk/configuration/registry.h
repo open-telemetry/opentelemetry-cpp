@@ -25,6 +25,7 @@ class ComposableAlwaysOnSamplerBuilder;
 class ComposableParentThresholdSamplerBuilder;
 class ComposableProbabilitySamplerBuilder;
 class ComposableRuleBasedSamplerBuilder;
+class CompositeSamplerBuilder;
 class ConsoleLogRecordExporterBuilder;
 class ConsolePushMetricExporterBuilder;
 class ConsoleSpanExporterBuilder;
@@ -283,6 +284,13 @@ public:
   void SetComposableRuleBasedSamplerBuilder(
       std::unique_ptr<ComposableRuleBasedSamplerBuilder> &&builder);
 
+  const CompositeSamplerBuilder *GetCompositeSamplerBuilder() const
+  {
+    return composite_sampler_builder_.get();
+  }
+
+  void SetCompositeSamplerBuilder(std::unique_ptr<CompositeSamplerBuilder> &&builder);
+
   /* Processors. */
 
   const BatchSpanProcessorBuilder *GetBatchSpanProcessorBuilder() const
@@ -465,6 +473,7 @@ private:
   std::unique_ptr<ComposableParentThresholdSamplerBuilder>
       composable_parent_threshold_sampler_builder_;
   std::unique_ptr<ComposableRuleBasedSamplerBuilder> composable_rule_based_sampler_builder_;
+  std::unique_ptr<CompositeSamplerBuilder> composite_sampler_builder_;
 
   std::unique_ptr<BatchSpanProcessorBuilder> batch_span_processor_builder_;
   std::unique_ptr<SimpleSpanProcessorBuilder> simple_span_processor_builder_;
