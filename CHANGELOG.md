@@ -19,10 +19,31 @@ Increment the:
   `Base2ExponentialHistogramAggregation`.
   [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
 
+* [CONFIGURATION] Apply metric view `attribute_keys` include and exclude patterns
+  when building the SDK, with exclude patterns taking precedence.
+  [#3546](https://github.com/open-telemetry/opentelemetry-cpp/issues/3546)
+
+* [CONFIGURATION] Add support for the composite sampler configuration
+  (programmatic and from yaml)
+  ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
+* [SDK] `OTELResourceDetector` now percent-decodes values parsed from the
+  `OTEL_RESOURCE_ATTRIBUTES` environment variable, per the W3C Baggage value
+  grammar the resource spec defers to. A malformed escape sequence is left
+  in the value as-is rather than dropping the attribute.
+  [#1536](https://github.com/open-telemetry/opentelemetry-cpp/issues/1536)
+
 * [BUG] Report one outcome per request when a curl session is cancelled after
   the response arrives
   ([#4363](https://github.com/open-telemetry/opentelemetry-cpp/pull/4363))
-
+* [BUG] Draw the curl retry jitter from a per thread generator instead of one
+  shared across HTTP client threads
+  ([#4399](https://github.com/open-telemetry/opentelemetry-cpp/pull/4399))
+* [BUG] Stop the curl IO thread deadlocking on itself while recovering from a
+  multi handle error
+  ([#4394](https://github.com/open-telemetry/opentelemetry-cpp/pull/4394))
+* [BUG] Cancel a curl session without writing to the easy handle from the
+  cancelling thread
+  ([#4392](https://github.com/open-telemetry/opentelemetry-cpp/pull/4392))
 * [CODE HEALTH] Enable clang-tidy `modernize-deprecated-headers` and replace
   deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
   `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
@@ -45,10 +66,21 @@ Increment the:
   `std::mutex` blocks the waiter instead. Only this one contended lock changes;
   the API `SpinLockMutex` and all other SDK locks are unchanged.
   [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
+
+* [CONFIGURATION] Update ViewSelector to comply with schema v1.1.0
+  [#4384](https://github.com/open-telemetry/opentelemetry-cpp/pull/4384)
+
 * [CONFIGURATION] Add the probability sampler to file configuration
   [#4334](https://github.com/open-telemetry/opentelemetry-cpp/pull/4334)
+
+* [SDK] Make the global internal logger log level atomic
+  [#4368](https://github.com/open-telemetry/opentelemetry-cpp/pull/4368)
+
 * [BUG] Stop reading past a `nostd::string_view` that is not NUL terminated
   [#4346](https://github.com/open-telemetry/opentelemetry-cpp/pull/4346)
+* [BUG] Stop OTLP `ForceFlush` returning on the first notification and
+  overrunning the caller's deadline
+  [#4357](https://github.com/open-telemetry/opentelemetry-cpp/pull/4357)
 
 * [OTLP EXPORTERS] add otlp_common target for shared otlp utils
   [#4333](https://github.com/open-telemetry/opentelemetry-cpp/pull/4333)
@@ -59,6 +91,9 @@ Increment the:
 
 * [BUILD] Run the ext_http component install test on Windows
   [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
+
+* [CONFIGURATION] validate and update config files to yaml schema 1.1.0
+  [#4374](https://github.com/open-telemetry/opentelemetry-cpp/pull/4374)
 
 * [SDK] Convert SpinLockMutex to std::mutex part 1
   Replace SpinLockMutex with std::mutex in SimpleProcessor,
@@ -145,7 +180,18 @@ Increment the:
 * [CONFIGURATION] file configuration - yaml schema 1.1.0
   [#4340](https://github.com/open-telemetry/opentelemetry-cpp/pull/4340)
 
+* [SDK] Fix lost-wakeups in BatchSpanProcessor to prevent stalls during
+  shutdown and force flush.
+  [#4382](https://github.com/open-telemetry/opentelemetry-cpp/pull/4382)
+
 Breaking changes:
+
+* [CONFIGURATION] SDK default component builder libraries and example
+  [#4367](https://github.com/open-telemetry/opentelemetry-cpp/pull/4367)
+  * The declaritive configuration registry is now empty on construction and
+    the default SDK component builders are provided optionally through
+    the `opentelemetry-cpp::configuration_registry_factory` library and
+    the `opentelemetry::sdk::configuration::RegistryFactory::Create()` method.
 
 * [BUILD] Install an explicit list of ext headers instead of the whole
   directory
@@ -168,6 +214,14 @@ Breaking changes:
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
   * The public configuration member `max_buckets_` was renamed to `max_size_` to
     match the configuration schema. Please adjust SDK configuration accordingly.
+
+* [CONFIGURATION] Update prometheus config to schema v1.1.0
+  [#4383](https://github.com/open-telemetry/opentelemetry-cpp/pull/4383)
+  * The following YAML values for `translation_strategy` have been replaced
+    * `UnderscoreEscapingWithSuffixes` is replaced by `underscore_escaping_with_suffixes`
+    * `UnderscoreEscapingWithoutSuffixes` is replaced by `underscore_escaping_without_suffixes/development`
+    * `NoUTF8EscapingWithSuffixes` is replaced by `no_utf8_escaping_with_suffixes/development`
+    * `NoTranslation` is replaced by `no_translation/development`
 
 ## [1.28.0] 2026-07-16
 

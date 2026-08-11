@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <memory>
 
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
@@ -67,8 +68,15 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace trace
+{
+class ComposableSampler;
+}  // namespace trace
+
 namespace configuration
 {
+
+class ComposableSamplerConfiguration;
 
 class SdkBuilder
 {
@@ -103,6 +111,9 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateSampler(
       const std::unique_ptr<opentelemetry::sdk::configuration::SamplerConfiguration> &model) const;
+
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateCompositeSampler(
+      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model) const;
 
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpHttpSpanExporter(
       const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) const;

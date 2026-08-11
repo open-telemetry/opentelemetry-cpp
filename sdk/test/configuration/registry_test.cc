@@ -16,6 +16,7 @@
 #include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
@@ -208,6 +209,17 @@ public:
       const override
   {
     auto unused = std::move(rule_samplers);
+    return nullptr;
+  }
+};
+
+class TestCompositeSamplerBuilder : public configuration::CompositeSamplerBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> Build(
+      std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> &&sampler) const override
+  {
+    auto unused = std::move(sampler);
     return nullptr;
   }
 };
@@ -727,6 +739,12 @@ TEST(Registry, ComposableRuleBasedSamplerBuilder)
       &configuration::Registry::SetComposableRuleBasedSamplerBuilder);
 }
 
+TEST(Registry, CompositeSamplerBuilder)
+{
+  TestTypedSlot<TestCompositeSamplerBuilder>(&configuration::Registry::GetCompositeSamplerBuilder,
+                                             &configuration::Registry::SetCompositeSamplerBuilder);
+}
+
 TEST(Registry, BatchSpanProcessorBuilder)
 {
   TestTypedSlot<TestBatchSpanProcessorBuilder>(
@@ -913,19 +931,9 @@ TEST(Registry, OtlpFileLogRecordBuilder)
 
 TEST(Registry, PeriodicMetricReaderBuilder)
 {
-  // Registry pre-populates this slot; test replace lifecycle only.
-  configuration::Registry registry;
-  ASSERT_NE(registry.GetPeriodicMetricReaderBuilder(), nullptr);
-
-  auto first            = std::make_unique<TestPeriodicMetricReaderBuilder>();
-  const auto *first_ptr = first.get();
-  registry.SetPeriodicMetricReaderBuilder(std::move(first));
-  ASSERT_EQ(registry.GetPeriodicMetricReaderBuilder(), first_ptr);
-
-  auto second            = std::make_unique<TestPeriodicMetricReaderBuilder>();
-  const auto *second_ptr = second.get();
-  registry.SetPeriodicMetricReaderBuilder(std::move(second));
-  ASSERT_EQ(registry.GetPeriodicMetricReaderBuilder(), second_ptr);
+  TestTypedSlot<TestPeriodicMetricReaderBuilder>(
+      &configuration::Registry::GetPeriodicMetricReaderBuilder,
+      &configuration::Registry::SetPeriodicMetricReaderBuilder);
 }
 
 TEST(Registry, PrometheusPullMetricExporterBuilder)

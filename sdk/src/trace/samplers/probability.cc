@@ -4,7 +4,6 @@
 #include <atomic>
 #include <cstdint>
 #include <map>
-#include <ostream>
 #include <string>
 
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -22,31 +21,6 @@
 
 namespace trace_api = opentelemetry::trace;
 
-namespace
-{
-// Valid ratios are 0 (never sample) and [2^-56, 1.0]; 2^-56 is the smallest
-// probability expressible with a 56-bit threshold.
-bool IsValidRatio(double ratio) noexcept
-{
-  // 2^-56; hex float literals would need C++17.
-  constexpr double kMinRatio = 1.0 / static_cast<double>(opentelemetry::sdk::trace::kMaxThreshold);
-  return ratio == 0.0 || (ratio >= kMinRatio && ratio <= 1.0);
-}
-
-// Anything invalid (including NaN) logs a warning and returns 1.0, the
-// default of the configuration specification.
-double ValidateRatio(double ratio) noexcept
-{
-  if (IsValidRatio(ratio))
-  {
-    return ratio;
-  }
-  OTEL_INTERNAL_LOG_WARN("[ProbabilitySampler] ratio "
-                         << ratio << " is not 0 or within [2^-56, 1.0], using the default 1.0");
-  return 1.0;
-}
-}  // namespace
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -54,9 +28,11 @@ namespace trace
 {
 
 ProbabilitySampler::ProbabilitySampler(double ratio)
-    : description_("ProbabilitySampler{" + std::to_string(IsValidRatio(ratio) ? ratio : 1.0) + "}"),
-      threshold_(CalculateThreshold(ValidateRatio(ratio)))
-{}
+{
+  const double valid_ratio = ValidateRatio(ratio, "ProbabilitySampler");
+  description_             = "ProbabilitySampler{" + std::to_string(valid_ratio) + "}";
+  threshold_               = CalculateThreshold(valid_ratio);
+}
 
 SamplingResult ProbabilitySampler::ShouldSample(
     const trace_api::SpanContext &parent_context,
