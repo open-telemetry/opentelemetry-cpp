@@ -195,16 +195,56 @@ void Logger::EmitLogRecord(
   recordable->SetResource(context_->GetResource());
   recordable->SetInstrumentationScope(GetInstrumentationScope());
 
+  // No resolved context was ever produced for this record (it did not go through
+  // EmitLogRecord(args...)/EmitLogRecordWithContext()), so the ambient context -- resolved
+  // below only if a processor actually needs it -- is the best available approximation.
+  EmitToProcessor(std::move(recordable), nullptr);
+}
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+void Logger::EmitLogRecordWithContext(
+    opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record,
+    const nostd::variant<trace_api::SpanContext, context::Context> &resolved_context) noexcept
+{
+  if (!logger_enabled_.load(std::memory_order_relaxed))
+  {
+    return kNoopLogger.EmitLogRecordWithContext(std::move(log_record), resolved_context);
+  }
+
+  if (!log_record)
+  {
+    return;
+  }
+
+  std::unique_ptr<Recordable> recordable =
+      std::unique_ptr<Recordable>(static_cast<Recordable *>(log_record.release()));
+  recordable->SetResource(context_->GetResource());
+  recordable->SetInstrumentationScope(GetInstrumentationScope());
+
+  EmitToProcessor(std::move(recordable), &resolved_context);
+}
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+void Logger::EmitToProcessor(
+    std::unique_ptr<Recordable> &&recordable,
+    const nostd::variant<trace_api::SpanContext, context::Context> *resolved_context) noexcept
+{
   auto &processor = context_->GetProcessor();
 
-  // Only resolve the context when a processor will actually read it: resolving means a
-  // RuntimeContext::GetCurrent() call, which would otherwise be pure overhead on every log for
-  // the common pipelines (simple/batch) that ignore the context entirely.
+  // Only resolve/forward a context when a processor will actually read it: resolving the
+  // ambient context means a RuntimeContext::GetCurrent() call, which would otherwise be pure
+  // overhead on every log for the common pipelines (simple/batch) that ignore it entirely.
   if (context_->ConsumesResolvedContext())
   {
-    const nostd::variant<trace_api::SpanContext, context::Context> resolved_context{
+    if (resolved_context != nullptr)
+    {
+      processor.OnEmitWithContext(std::move(recordable), *resolved_context);
+      return;
+    }
+
+    const nostd::variant<trace_api::SpanContext, context::Context> ambient_context{
         context::RuntimeContext::GetCurrent()};
-    processor.OnEmitWithContext(std::move(recordable), resolved_context);
+    processor.OnEmitWithContext(std::move(recordable), ambient_context);
     return;
   }
 

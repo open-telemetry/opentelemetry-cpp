@@ -675,6 +675,52 @@ TEST(LoggerSDK, LoggerTraceBasedConfigAllowsSampledExplicitContextWithNamedEvent
   EXPECT_EQ(call_state->call_count, 1U);
 }
 
+// Captures the resolved context a context-aware processor was actually handed, so a test can
+// assert it is the explicitly supplied one rather than whatever happens to be ambient.
+class ContextCapturingProcessor final : public LogRecordProcessor
+{
+public:
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
+  {
+    return std::unique_ptr<Recordable>(new MockLogRecordable());
+  }
+
+  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override
+  {
+    static_cast<void>(std::move(record));
+    ++on_emit_calls;
+  }
+
+  void OnEmitWithContext(
+      std::unique_ptr<Recordable> &&record,
+      const nostd::variant<opentelemetry::trace::SpanContext, opentelemetry::context::Context>
+          &context) noexcept override
+  {
+    static_cast<void>(std::move(record));
+    ++on_emit_with_context_calls;
+
+    if (const auto *sc = nostd::get_if<opentelemetry::trace::SpanContext>(&context))
+    {
+      received_span_context = *sc;
+      return;
+    }
+    if (const auto *ctx = nostd::get_if<opentelemetry::context::Context>(&context))
+    {
+      received_span_context = opentelemetry::trace::GetSpanContext(*ctx);
+    }
+  }
+
+  bool ConsumesResolvedContext() const noexcept override { return true; }
+
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+
+  size_t on_emit_calls              = 0;
+  size_t on_emit_with_context_calls = 0;
+  opentelemetry::trace::SpanContext received_span_context =
+      opentelemetry::trace::SpanContext::GetInvalid();
+};
+
 class LoggerEmitWithExplicitTraceTest : public ::testing::Test
 {
 protected:
@@ -689,6 +735,10 @@ protected:
     sdk_lp->AddProcessor(
         std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable_)));
 
+    auto *context_processor = new ContextCapturingProcessor();
+    context_processor_      = context_processor;
+    sdk_lp->AddProcessor(std::unique_ptr<LogRecordProcessor>(context_processor));
+
     {
       std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> sp;
       auto tp       = opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sp));
@@ -700,6 +750,7 @@ protected:
   std::shared_ptr<logs_api::LoggerProvider> api_lp_;
   nostd::shared_ptr<logs_api::Logger> logger_;
   std::shared_ptr<MockLogRecordable> shared_recordable_;
+  ContextCapturingProcessor *context_processor_ = nullptr;
   nostd::shared_ptr<opentelemetry::trace::Span> runtime_span_;
   std::unique_ptr<opentelemetry::trace::Scope> runtime_scope_;
 };
@@ -743,6 +794,30 @@ TEST_F(LoggerEmitWithExplicitTraceTest, ExplicitTracePartsStampsTraceFields)
   EXPECT_EQ(shared_recordable_->GetSpanId(), explicit_span_ctx.span_id());
   EXPECT_EQ(shared_recordable_->GetTraceFlags(), explicit_span_ctx.trace_flags());
   EXPECT_NE(shared_recordable_->GetTraceId(), runtime_span_->GetContext().trace_id());
+}
+
+// The end-to-end case lalitb flagged on review: a log is emitted with an explicit context for
+// span_a while span_b (runtime_span_, from the fixture's Scope) is ambient. A processor that
+// declares ConsumesResolvedContext() must receive span_a's context, not span_b's -- if the
+// resolved context were re-derived from RuntimeContext::GetCurrent() instead of carried through
+// from EmitLogRecord(args...), it would receive span_b here and silently misattribute the log.
+TEST_F(LoggerEmitWithExplicitTraceTest, ContextAwareProcessorReceivesExplicitContextNotAmbientSpan)
+{
+  auto explicit_span = MakeTestSpan(/*sampled=*/true);
+  context::Context explicit_context;
+  explicit_context             = opentelemetry::trace::SetSpan(explicit_context, explicit_span);
+  const auto explicit_span_ctx = explicit_span->GetContext();
+
+  ASSERT_NE(explicit_span_ctx.trace_id(), runtime_span_->GetContext().trace_id());
+
+  logger_->EmitLogRecord(logs_api::Severity::kInfo, nostd::string_view{"msg"}, explicit_context);
+
+  ASSERT_EQ(context_processor_->on_emit_with_context_calls, 1u);
+  EXPECT_EQ(context_processor_->on_emit_calls, 0u);
+  EXPECT_EQ(context_processor_->received_span_context.trace_id(), explicit_span_ctx.trace_id());
+  EXPECT_EQ(context_processor_->received_span_context.span_id(), explicit_span_ctx.span_id());
+  EXPECT_NE(context_processor_->received_span_context.trace_id(),
+            runtime_span_->GetContext().trace_id());
 }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 

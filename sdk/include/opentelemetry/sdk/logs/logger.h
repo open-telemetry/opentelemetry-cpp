@@ -14,20 +14,18 @@
 #include "opentelemetry/logs/noop.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/logger_context.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/version.h"
-
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include "opentelemetry/nostd/variant.h"
-#  include "opentelemetry/trace/span_context.h"
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
 namespace logs
 {
+class Recordable;
 
 class Logger final : public opentelemetry::logs::Logger
 {
@@ -61,6 +59,13 @@ public:
 
   void EmitLogRecord(
       nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record) noexcept override;
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  void EmitLogRecordWithContext(
+      nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record,
+      const nostd::variant<opentelemetry::trace::SpanContext, opentelemetry::context::Context>
+          &resolved_context) noexcept override;
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
   /** Returns the associated instrumentation scope */
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope &GetInstrumentationScope()
@@ -102,6 +107,16 @@ private:
    * LoggerConfigurator is replaced at runtime.
    */
   void UpdateLoggerConfig(LoggerConfig config) noexcept;
+
+  /**
+   * Shared tail of EmitLogRecord()/EmitLogRecordWithContext(): dispatches recordable to the
+   * configured processor, resolving the ambient context only if resolved_context is nullptr
+   * and some processor actually needs it (per LoggerContext::ConsumesResolvedContext()).
+   */
+  void EmitToProcessor(
+      std::unique_ptr<Recordable> &&recordable,
+      const nostd::variant<opentelemetry::trace::SpanContext, opentelemetry::context::Context>
+          *resolved_context) noexcept;
 
   // The name of this logger
   std::string logger_name_;
