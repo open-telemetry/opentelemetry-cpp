@@ -140,6 +140,7 @@
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/string_array_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_builder.h"
@@ -1799,16 +1800,31 @@ std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> SdkBuilder::Crea
 
 std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>
 SdkBuilder::CreateAttributesProcessor(
-    const std::unique_ptr<opentelemetry::sdk::configuration::IncludeExcludeConfiguration>
-        & /* model */) const
+    const std::unique_ptr<opentelemetry::sdk::configuration::IncludeExcludeConfiguration> &model)
+    const
 {
-  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk;
+  using opentelemetry::sdk::metrics::DefaultAttributesProcessor;
+  using opentelemetry::sdk::metrics::IncludeExcludeAttributesProcessor;
 
-  // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3546
-  // FIXME-SDK: Need a subclass of AttributesProcessor for IncludeExclude
-  OTEL_INTERNAL_LOG_WARN("IncludeExclude attribute processor not supported, ignoring");
+  if (model->included == nullptr && model->excluded == nullptr)
+  {
+    return std::make_unique<DefaultAttributesProcessor>();
+  }
 
-  return sdk;
+  std::vector<std::string> included_patterns;
+  if (model->included != nullptr)
+  {
+    included_patterns = model->included->string_array;
+  }
+
+  std::vector<std::string> excluded_patterns;
+  if (model->excluded != nullptr)
+  {
+    excluded_patterns = model->excluded->string_array;
+  }
+
+  return std::make_unique<IncludeExcludeAttributesProcessor>(
+      included_patterns.empty(), std::move(included_patterns), std::move(excluded_patterns));
 }
 
 void SdkBuilder::AddView(
