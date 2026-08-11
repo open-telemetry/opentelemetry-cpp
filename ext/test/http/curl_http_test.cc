@@ -16,11 +16,9 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <map>
-#include <memory>
 #include <mutex>
 #include <sstream>
 #include <string>
