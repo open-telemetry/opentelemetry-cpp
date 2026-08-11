@@ -1452,20 +1452,45 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   // Abort() with nothing to do but raise the flag.
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_NOPROGRESS, 0L);
 
-  DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
+  // A handler can cancel from this event, so everything Cleanup() needs has to be published
+  // before it runs. The callback most of all: Cleanup() takes is_cleaned_ at its start and
+  // swaps the callback much later, so a cleanup racing an assignment placed after the event
+  // would swap an empty one, never run the completion, and leave the session marked active
+  // for good.
   is_finished_.store(false, std::memory_order_release);
   is_aborted_.store(false, std::memory_order_release);
   is_cleaned_.store(false, std::memory_order_release);
-
   async_data_->session.store(session, std::memory_order_release);
-  if (false == async_data_->is_promise_running.exchange(true, std::memory_order_acq_rel))
-  {
-    async_data_->result_promise = std::promise<CURLcode>();
-    async_data_->result_future  = async_data_->result_promise.get_future();
-  }
   async_data_->callback = std::move(callback);
 
-  session->GetHttpClient().ScheduleAddSession(session->GetSessionId());
+  DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
+
+  // The future is the one thing that stays unpublished until after the event, so a handler that
+  // calls FinishSession() from it returns instead of waiting on a transfer that has not been
+  // scheduled yet.
+  async_data_->result_promise = std::promise<CURLcode>();
+  async_data_->result_future  = async_data_->result_promise.get_future();
+  async_data_->is_promise_running.store(true, std::memory_order_release);
+
+  // Cancelling from the event hands the session to the IO thread, which may already have torn
+  // the operation down and found no future to complete. Settle it here if so.
+  if (is_cleaned_.load(std::memory_order_acquire))
+  {
+    if (async_data_->is_promise_running.exchange(false, std::memory_order_acq_rel))
+    {
+      async_data_->result_promise.set_value(last_curl_result_);
+    }
+    return CURLE_OK;
+  }
+
+  if (WasAborted() || !session->GetHttpClient().ScheduleAddSession(session->GetSessionId()))
+  {
+    // Nothing is going to run this operation. It was cancelled while the event was dispatched,
+    // or its session was never registered because the URL did not parse. Finish it here rather
+    // than leave a future nobody can complete.
+    Cleanup();
+  }
+
   return CURLE_OK;
 }
 

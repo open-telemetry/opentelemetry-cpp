@@ -689,6 +689,74 @@ TEST_F(BasicCurlHttpTests, RepeatedCallerThreadCancelsAreClean)
   EXPECT_GE(terminal_total, 20);
 }
 
+// A handler is allowed to cancel from the events SendRequest dispatches, so the flags and the
+// cancel route have to be published before the dispatch. Publish them after it and the cancel
+// is thrown away, the request is neither sent nor completed, and FinishSession() waits on a
+// promise nobody can fulfil. See #4390.
+TEST_F(BasicCurlHttpTests, CancelFromCreatedCompletes)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<TerminalCountingHandler>();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::Created;
+
+  session->SendRequest(handler);
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_GE(handler->terminal_count_.load(std::memory_order_acquire), 1);
+}
+
+TEST_F(BasicCurlHttpTests, CancelFromConnectingCompletes)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<TerminalCountingHandler>();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::Connecting;
+
+  session->SendRequest(handler);
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_GE(handler->terminal_count_.load(std::memory_order_acquire), 1);
+}
+
+// CreateSession hands back an unregistered session when the URL does not parse, and
+// CURLOPT_URL is not checked when it is set, so nothing on this path stops the operation
+// reaching the same dead end with no handler involved at all. See #4393.
+TEST_F(BasicCurlHttpTests, InvalidUrlCompletes)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:not-a-port");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler = std::make_shared<TerminalCountingHandler>();
+
+  session->SendRequest(handler);
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_GE(handler->terminal_count_.load(std::memory_order_acquire), 1);
+}
+
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 {
   received_requests_.clear();

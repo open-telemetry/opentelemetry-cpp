@@ -110,6 +110,9 @@ Increment the:
 * [BUG] Cancel a curl session without writing to the easy handle from the
   cancelling thread
   ([#4392](https://github.com/open-telemetry/opentelemetry-cpp/pull/4392))
+* [BUG] Finish a curl operation that never gets scheduled, instead of leaving
+  FinishSession blocked forever
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
 * [CODE HEALTH] Enable clang-tidy `modernize-deprecated-headers` and replace
   deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
   `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
