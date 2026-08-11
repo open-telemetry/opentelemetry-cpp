@@ -23,6 +23,7 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
@@ -33,8 +34,6 @@
 #  include <array>
 
 #  include "opentelemetry/nostd/type_traits.h"
-#else
-#  include "opentelemetry/sdk/common/global_log_handler.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -236,7 +235,8 @@ void Session::SendRequest(
   {
     if (callback)
     {
-      callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed, "");
+      callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
+                        curl_easy_strerror(curl_operation_->GetLastResultCode()));
     }
     is_session_active_.store(false, std::memory_order_release);
   }
@@ -270,8 +270,20 @@ void Session::FinishOperation()
   }
 }
 
+// A null multi handle makes every curl_multi_add_handle report CURLM_BAD_HANDLE, so a client
+// built on one accepts sessions and never sends any of them. Say so rather than fail quietly.
+static CURLM *initMultiHandle()
+{
+  CURLM *handle = curl_multi_init();
+  if (nullptr == handle)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_multi_init failed, this client cannot send");
+  }
+  return handle;
+}
+
 HttpClient::HttpClient()
-    : multi_handle_(curl_multi_init()),
+    : multi_handle_(initMultiHandle()),
       next_session_id_{0},
       max_sessions_per_connection_{8},
       background_thread_instrumentation_(nullptr),
@@ -282,7 +294,7 @@ HttpClient::HttpClient()
 
 HttpClient::HttpClient(
     const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation)
-    : multi_handle_(curl_multi_init()),
+    : multi_handle_(initMultiHandle()),
       next_session_id_{0},
       max_sessions_per_connection_{8},
       background_thread_instrumentation_(thread_instrumentation),
@@ -913,7 +925,7 @@ void HttpClient::resetMultiHandle()
   curl_multi_cleanup(multi_handle_);
 
   // Create a another multi handle to continue pending sessions
-  multi_handle_ = curl_multi_init();
+  multi_handle_ = initMultiHandle();
 }
 
 }  // namespace curl
