@@ -757,6 +757,85 @@ TEST_F(BasicCurlHttpTests, InvalidUrlCompletes)
   EXPECT_GE(handler->terminal_count_.load(std::memory_order_acquire), 1);
 }
 
+// The counters say whether the IO thread reached this handler while the caller was still
+// inside an event of its own. They are relaxed on purpose. An acquire or a release on them
+// would give the two threads an ordering the code under test does not have, and a state store
+// racing another would stop being reported.
+class OverlappingCancelHandler : public TerminalCountingHandler
+{
+public:
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    const int depth = inside_events_.fetch_add(1, std::memory_order_relaxed) + 1;
+    int highest     = max_concurrent_events_.load(std::memory_order_relaxed);
+    while (depth > highest &&
+           !max_concurrent_events_.compare_exchange_weak(highest, depth, std::memory_order_relaxed,
+                                                         std::memory_order_relaxed))
+    {
+    }
+
+    TerminalCountingHandler::OnEvent(state, reason);
+
+    if (state == cancel_at_)
+    {
+      // Cancelling wakes the IO thread, which finishes the operation and dispatches a Cancelled
+      // of its own. Stay in this event until that one arrives so the two really do overlap, and
+      // give up rather than hang if it never does.
+      const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(30);
+      while (inside_events_.load(std::memory_order_relaxed) < 2 &&
+             std::chrono::steady_clock::now() < deadline)
+      {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
+    }
+
+    inside_events_.fetch_sub(1, std::memory_order_relaxed);
+  }
+
+  std::atomic<int> inside_events_{0};
+  std::atomic<int> max_concurrent_events_{0};
+};
+
+// A client spawns its IO thread only after a request has been scheduled, so cancelling from
+// the first event of the first request has nothing to overlap. On a client that is already
+// polling, the IO thread finishes the operation while the handler is still inside that event,
+// and the caller reaches the end of SendAsync with the operation already cleaned up.
+TEST_F(BasicCurlHttpTests, CancelFromConnectingWhilePollingCompletes)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  {
+    auto warm         = session_manager->CreateSession("http://127.0.0.1:19000");
+    auto warm_request = warm->CreateRequest();
+    warm_request->SetUri("get/");
+    auto warm_handler = std::make_shared<TerminalCountingHandler>();
+    warm->SendRequest(warm_handler);
+    ASSERT_TRUE(waitForRequests(30, 1));
+    warm->FinishSession();
+    ASSERT_TRUE(warm_handler->got_response_.load(std::memory_order_acquire));
+  }
+
+  // Nothing listens on 19937, so this operation cannot answer on its own.
+  auto session = session_manager->CreateSession("http://127.0.0.1:19937");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<OverlappingCancelHandler>();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::Connecting;
+
+  session->SendRequest(handler);
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  EXPECT_EQ(2, handler->max_concurrent_events_.load(std::memory_order_acquire));
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, handler->cancelled_from_callback_.load(std::memory_order_acquire));
+  EXPECT_FALSE(session->IsSessionActive());
+}
+
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 {
   received_requests_.clear();

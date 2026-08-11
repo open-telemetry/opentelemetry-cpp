@@ -13,6 +13,7 @@
 #  include <future>
 #endif
 
+#include <atomic>
 #include <cstdint>
 #include <functional>
 #include <map>
@@ -246,7 +247,7 @@ public:
    */
   opentelemetry::ext::http::client::SessionState GetSessionState() const noexcept
   {
-    return session_state_;
+    return session_state_.load(std::memory_order_acquire);
   }
 
   /**
@@ -338,7 +339,9 @@ private:
   const Headers &request_headers_;
   const opentelemetry::ext::http::client::Body &request_body_;
   size_t request_nwrite_{0};
-  opentelemetry::ext::http::client::SessionState session_state_{
+  // Written by whichever thread dispatches an event. A handler that cancels from one event
+  // lets the background thread dispatch another, so the two dispatches can overlap.
+  std::atomic<opentelemetry::ext::http::client::SessionState> session_state_{
       opentelemetry::ext::http::client::SessionState::Created};
 
   const opentelemetry::ext::http::client::Compression &compression_;
