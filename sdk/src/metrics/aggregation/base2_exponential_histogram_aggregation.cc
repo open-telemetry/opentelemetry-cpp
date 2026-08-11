@@ -11,7 +11,6 @@
 #include <ostream>
 #include <utility>
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
@@ -184,7 +183,7 @@ void Base2ExponentialHistogramAggregation::Aggregate(
     double value,
     const PointAttributes & /* attributes */) noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<std::mutex> locked(lock_);
   point_data_.sum_ += value;
   point_data_.count_++;
 
@@ -456,7 +455,7 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
 
 PointType Base2ExponentialHistogramAggregation::ToPoint() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<std::mutex> locked(lock_);
 
   Base2ExponentialHistogramPointData copy;
   copy.sum_            = point_data_.sum_;

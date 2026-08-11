@@ -5,8 +5,8 @@
 
 #include <cstdint>
 #include <memory>
+#include <mutex>
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h"
@@ -49,7 +49,7 @@ private:
                             double value) noexcept;
   void Downscale(uint32_t by) noexcept;
 
-  mutable opentelemetry::common::SpinLockMutex lock_;
+  mutable std::mutex lock_;
   Base2ExponentialHistogramPointData point_data_;
   Base2ExponentialHistogramIndexer indexer_;
   bool record_min_max_ = true;

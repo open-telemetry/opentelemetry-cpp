@@ -6,7 +6,6 @@
 #include <mutex>
 #include <ostream>
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
@@ -39,7 +38,7 @@ void LongSumAggregation::Aggregate(int64_t value, const PointAttributes & /* att
         << value);
     return;
   }
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<std::mutex> locked(lock_);
   point_data_.value_ = nostd::get<int64_t>(point_data_.value_) + value;
 }
 
@@ -97,7 +96,7 @@ std::unique_ptr<Aggregation> LongSumAggregation::Diff(const Aggregation &next) c
 
 PointType LongSumAggregation::ToPoint() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<std::mutex> locked(lock_);
   return point_data_;
 }
 
@@ -120,7 +119,7 @@ void DoubleSumAggregation::Aggregate(double value,
         << value);
     return;
   }
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<std::mutex> locked(lock_);
   point_data_.value_ = nostd::get<double>(point_data_.value_) + value;
 }
 
@@ -178,7 +177,7 @@ std::unique_ptr<Aggregation> DoubleSumAggregation::Diff(const Aggregation &next)
 
 PointType DoubleSumAggregation::ToPoint() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<std::mutex> locked(lock_);
   return point_data_;
 }
 
