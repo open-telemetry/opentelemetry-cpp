@@ -34,6 +34,7 @@
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_parser.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
@@ -898,22 +899,22 @@ TranslationStrategy ConfigurationParser::ParseTranslationStrategy(
     const std::unique_ptr<DocumentNode> &node,
     const std::string &name) const
 {
-  if (name == "UnderscoreEscapingWithSuffixes")
+  if (name == "underscore_escaping_with_suffixes")
   {
     return TranslationStrategy::UnderscoreEscapingWithSuffixes;
   }
 
-  if (name == "UnderscoreEscapingWithoutSuffixes")
+  if (name == "underscore_escaping_without_suffixes/development")
   {
     return TranslationStrategy::UnderscoreEscapingWithoutSuffixes;
   }
 
-  if (name == "NoUTF8EscapingWithSuffixes")
+  if (name == "no_utf8_escaping_with_suffixes/development")
   {
     return TranslationStrategy::NoUTF8EscapingWithSuffixes;
   }
 
-  if (name == "NoTranslation")
+  if (name == "no_translation/development")
   {
     return TranslationStrategy::NoTranslation;
   }
@@ -965,7 +966,7 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
   }
 
   std::string translation_strategy =
-      node->GetString("translation_strategy", "UnderscoreEscapingWithSuffixes");
+      node->GetString("translation_strategy", "underscore_escaping_with_suffixes");
   model->translation_strategy = ParseTranslationStrategy(node, translation_strategy);
 
   return model;
@@ -1272,6 +1273,11 @@ InstrumentType ConfigurationParser::ParseInstrumentType(const std::unique_ptr<Do
   if (name == "counter")
   {
     return InstrumentType::counter;
+  }
+
+  if (name == "gauge")
+  {
+    return InstrumentType::gauge;
   }
 
   if (name == "histogram")
@@ -2114,7 +2120,9 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
   }
   else if (name == "composite/development")
   {
-    model = ParseComposableSamplerConfiguration(child, depth);
+    auto composite                = std::make_unique<CompositeSamplerConfiguration>();
+    composite->composable_sampler = ParseComposableSamplerConfiguration(child, depth);
+    model                         = std::move(composite);
   }
   else
   {
