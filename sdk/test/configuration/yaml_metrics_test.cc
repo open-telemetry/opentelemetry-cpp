@@ -816,7 +816,7 @@ meter_provider:
   ASSERT_EQ(view->stream->attribute_keys, nullptr);
 }
 
-TEST(YamlMetrics, selector)
+TEST(YamlMetrics, selector_counter)
 {
   std::string yaml = R"(
 file_format: "1.0-metrics"
@@ -856,6 +856,181 @@ meter_provider:
   ASSERT_EQ(view->stream->aggregation_cardinality_limit, 0);
   ASSERT_EQ(view->stream->aggregation, nullptr);
   ASSERT_EQ(view->stream->attribute_keys, nullptr);
+}
+
+TEST(YamlMetrics, selector_gauge)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: gauge
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->selector, nullptr);
+  ASSERT_EQ(view->selector->instrument_type,
+            opentelemetry::sdk::configuration::InstrumentType::gauge);
+}
+
+TEST(YamlMetrics, selector_histogram)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: histogram
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->selector, nullptr);
+  ASSERT_EQ(view->selector->instrument_type,
+            opentelemetry::sdk::configuration::InstrumentType::histogram);
+}
+
+TEST(YamlMetrics, selector_observable_counter)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: observable_counter
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->selector, nullptr);
+  ASSERT_EQ(view->selector->instrument_type,
+            opentelemetry::sdk::configuration::InstrumentType::observable_counter);
+}
+
+TEST(YamlMetrics, selector_observable_gauge)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: observable_gauge
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->selector, nullptr);
+  ASSERT_EQ(view->selector->instrument_type,
+            opentelemetry::sdk::configuration::InstrumentType::observable_gauge);
+}
+
+TEST(YamlMetrics, selector_observable_up_down_counter)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: observable_up_down_counter
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->selector, nullptr);
+  ASSERT_EQ(view->selector->instrument_type,
+            opentelemetry::sdk::configuration::InstrumentType::observable_up_down_counter);
+}
+
+TEST(YamlMetrics, selector_up_down_counter)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: up_down_counter
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->selector, nullptr);
+  ASSERT_EQ(view->selector->instrument_type,
+            opentelemetry::sdk::configuration::InstrumentType::up_down_counter);
+}
+
+TEST(YamlMetrics, selector_invalid_instrument_type)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: invalid
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
 }
 
 TEST(YamlMetrics, stream)

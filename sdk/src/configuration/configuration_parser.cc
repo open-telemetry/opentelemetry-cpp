@@ -1274,6 +1274,11 @@ InstrumentType ConfigurationParser::ParseInstrumentType(const std::unique_ptr<Do
     return InstrumentType::counter;
   }
 
+  if (name == "gauge")
+  {
+    return InstrumentType::gauge;
+  }
+
   if (name == "histogram")
   {
     return InstrumentType::histogram;
