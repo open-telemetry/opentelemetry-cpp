@@ -25,6 +25,10 @@ target_link_libraries(
           opentelemetry-cpp::metrics
           opentelemetry-cpp::logs
           opentelemetry-cpp::configuration_core
+          opentelemetry-cpp::configuration_trace_builders
+          opentelemetry-cpp::configuration_metrics_builders
+          opentelemetry-cpp::configuration_logs_builders
+          opentelemetry-cpp::configuration_registry_factory
           GTest::gtest
           GTest::gtest_main)
 

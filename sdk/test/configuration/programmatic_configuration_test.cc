@@ -43,7 +43,9 @@
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
@@ -73,6 +75,7 @@
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/registry_factory.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
@@ -152,7 +155,7 @@ protected:
 
   void MakeRegistry()
   {
-    registry_ = std::make_shared<config_sdk::Registry>();
+    registry_ = config_sdk::RegistryFactory::Create();
     registry_->SetExtensionSpanExporterBuilder(
         "recording", std::make_unique<config_test::RecordingSpanExporterBuilder>(span_buffer_));
     registry_->SetExtensionLogRecordExporterBuilder(
@@ -162,6 +165,10 @@ protected:
         std::make_unique<config_test::RecordingPushMetricExporterBuilder>(metric_buffer_));
     registry_->SetPeriodicMetricReaderBuilder(
         std::make_unique<config_test::SyncPeriodicMetricReaderBuilder>());
+    registry_->SetBatchSpanProcessorBuilder(
+        std::make_unique<config_test::MockBatchSpanProcessorBuilder>());
+    registry_->SetBatchLogRecordProcessorBuilder(
+        std::make_unique<config_test::MockBatchLogRecordProcessorBuilder>());
   }
 
   static std::unique_ptr<config_sdk::TracerProviderConfiguration> MakeTracerProviderConfig()
@@ -367,10 +374,7 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLoggerConfigurator)
   EXPECT_EQ(log_buffer_->size(), 2);
 }
 
-// TODO: Re-enable this test once a mock BatchSpanProcessor can be configured.
-// All tests that use a BatchProcessor may timeout due to the a race between the background thread
-// and the ForceFlush call.
-TEST_F(ProgrammaticConfigTest, DISABLED_LoggerProviderWithBatchProcessorDefaults)
+TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorDefaults)
 {
   auto exporter       = std::make_unique<config_sdk::ExtensionLogRecordExporterConfiguration>();
   exporter->name      = "recording";
@@ -392,8 +396,7 @@ TEST_F(ProgrammaticConfigTest, DISABLED_LoggerProviderWithBatchProcessorDefaults
   EXPECT_GE(log_buffer_->size(), 1);
 }
 
-// TODO: Re-enable this test once a mock BatchProcessor can be configured.
-TEST_F(ProgrammaticConfigTest, DISABLED_LoggerProviderWithBatchProcessorConfigured)
+TEST_F(ProgrammaticConfigTest, LoggerProviderWithBatchProcessorConfigured)
 {
   auto exporter       = std::make_unique<config_sdk::ExtensionLogRecordExporterConfiguration>();
   exporter->name      = "recording";
@@ -474,7 +477,195 @@ TEST_F(ProgrammaticConfigTest, MeterProviderWithMeterConfigurator)
   }
 }
 
-TEST_F(ProgrammaticConfigTest, MeterProviderWithViews)
+TEST_F(ProgrammaticConfigTest, MeterProviderWithDefaultViewSelector)
+{
+  // Create a view with a default selector (no instrument name or type, no meter name).
+  // This view must match all instruments from all meters.
+
+  auto view                 = std::make_unique<config_sdk::ViewConfiguration>();
+  view->selector            = std::make_unique<config_sdk::ViewSelectorConfiguration>();
+  view->stream              = std::make_unique<config_sdk::ViewStreamConfiguration>();
+  view->stream->description = "selected-by-default-view";
+
+  auto meter_provider_config = MakeMeterProviderConfig();
+  meter_provider_config->views.emplace_back(std::move(view));
+
+  auto model            = std::make_unique<config_sdk::Configuration>();
+  model->meter_provider = std::move(meter_provider_config);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->meter_provider, nullptr);
+
+  auto first_meter = metrics::Provider::GetMeterProvider()->GetMeter(
+      "first-meter", "1.0", "https://opentelemetry.io/schemas/1.0.0");
+  first_meter->CreateUInt64Counter("first-counter", "original", "requests")->Add(1);
+
+  auto second_meter = metrics::Provider::GetMeterProvider()->GetMeter(
+      "second-meter", "2.0", "https://opentelemetry.io/schemas/1.1.0");
+  second_meter->CreateInt64UpDownCounter("second-up-down-counter", "original", "connections")
+      ->Add(1);
+  auto active_context = context::Context{};
+  second_meter->CreateDoubleHistogram("third-histogram", "original", "milliseconds")
+      ->Record(1.0, active_context);
+
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
+
+  ASSERT_EQ(metric_buffer_->size(), 3);
+  for (const auto &metric : *metric_buffer_)
+  {
+    EXPECT_EQ(metric.instrument_descriptor.description_, "selected-by-default-view");
+  }
+}
+
+TEST_F(ProgrammaticConfigTest, MeterProviderWithDefaultInstrumentNameViewSelector)
+{
+  // Create a selector with a specific instrument type, but default (empty) instrument name.
+  // This must match all instruments of the specified type.
+  auto selector             = std::make_unique<config_sdk::ViewSelectorConfiguration>();
+  selector->instrument_type = config_sdk::InstrumentType::histogram;
+
+  auto stream         = std::make_unique<config_sdk::ViewStreamConfiguration>();
+  stream->description = "selected-histogram";
+
+  auto view      = std::make_unique<config_sdk::ViewConfiguration>();
+  view->selector = std::move(selector);
+  view->stream   = std::move(stream);
+
+  auto meter_provider_config = MakeMeterProviderConfig();
+  meter_provider_config->views.emplace_back(std::move(view));
+
+  auto model            = std::make_unique<config_sdk::Configuration>();
+  model->meter_provider = std::move(meter_provider_config);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->meter_provider, nullptr);
+
+  auto active_context = context::Context{};
+  auto meter          = metrics::Provider::GetMeterProvider()->GetMeter("test");
+  meter->CreateDoubleHistogram("first-histogram", "original")->Record(1.0, active_context);
+  meter->CreateDoubleHistogram("second-histogram", "original")->Record(1.0, active_context);
+  meter->CreateUInt64Counter("counter", "original")->Add(1);
+
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
+
+  ASSERT_EQ(metric_buffer_->size(), 3);
+  std::size_t matched = 0;
+  for (const auto &metric : *metric_buffer_)
+  {
+    if (metric.instrument_descriptor.description_ == "selected-histogram")
+    {
+      EXPECT_EQ(metric.instrument_descriptor.type_, metrics_sdk::InstrumentType::kHistogram);
+      ++matched;
+    }
+  }
+  EXPECT_EQ(matched, 2);
+}
+
+TEST_F(ProgrammaticConfigTest, MeterProviderWithDefaultInstrumentTypeViewSelector)
+{
+  // Create a selector with a specific instrument name, but default (none) instrument type.
+  // This must match all instruments of the specified name, regardless of type.
+  // Different meters may each have an instrument of the same name and type.
+  auto selector             = std::make_unique<config_sdk::ViewSelectorConfiguration>();
+  selector->instrument_name = "selected-instrument";
+
+  auto stream         = std::make_unique<config_sdk::ViewStreamConfiguration>();
+  stream->description = "selected-instrument";
+
+  auto view      = std::make_unique<config_sdk::ViewConfiguration>();
+  view->selector = std::move(selector);
+  view->stream   = std::move(stream);
+
+  auto meter_provider_config = MakeMeterProviderConfig();
+  meter_provider_config->views.emplace_back(std::move(view));
+
+  auto model            = std::make_unique<config_sdk::Configuration>();
+  model->meter_provider = std::move(meter_provider_config);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->meter_provider, nullptr);
+
+  auto active_context  = context::Context{};
+  auto histogram_meter = metrics::Provider::GetMeterProvider()->GetMeter("histogram-meter");
+  histogram_meter->CreateDoubleHistogram("selected-instrument", "original")
+      ->Record(1.0, active_context);
+
+  auto counter_meter = metrics::Provider::GetMeterProvider()->GetMeter("counter-meter");
+  counter_meter->CreateUInt64Counter("selected-instrument", "original")->Add(1);
+  counter_meter->CreateUInt64Counter("unmatched-counter", "original")->Add(1);
+
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
+
+  ASSERT_EQ(metric_buffer_->size(), 3);
+  std::size_t matched = 0;
+  for (const auto &metric : *metric_buffer_)
+  {
+    if (metric.instrument_descriptor.description_ == "selected-instrument")
+    {
+      ++matched;
+    }
+  }
+  EXPECT_EQ(matched, 2);
+}
+
+TEST_F(ProgrammaticConfigTest, MeterProviderWithMeterScopeViewSelector)
+{
+  auto selector              = std::make_unique<config_sdk::ViewSelectorConfiguration>();
+  selector->instrument_name  = "test-counter";
+  selector->instrument_type  = config_sdk::InstrumentType::counter;
+  selector->meter_name       = "selected-meter";
+  selector->meter_version    = "1.0";
+  selector->meter_schema_url = "https://opentelemetry.io/schemas/1.0.0";
+
+  auto stream         = std::make_unique<config_sdk::ViewStreamConfiguration>();
+  stream->description = "selected-by-meter";
+
+  auto view      = std::make_unique<config_sdk::ViewConfiguration>();
+  view->selector = std::move(selector);
+  view->stream   = std::move(stream);
+
+  auto meter_provider_config = MakeMeterProviderConfig();
+  meter_provider_config->views.emplace_back(std::move(view));
+
+  auto model            = std::make_unique<config_sdk::Configuration>();
+  model->meter_provider = std::move(meter_provider_config);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->meter_provider, nullptr);
+
+  auto meter_provider = metrics::Provider::GetMeterProvider();
+  meter_provider->GetMeter("selected-meter", "1.0", "https://opentelemetry.io/schemas/1.0.0")
+      ->CreateUInt64Counter("test-counter", "original")
+      ->Add(1);
+  meter_provider->GetMeter("other-meter", "1.0", "https://opentelemetry.io/schemas/1.0.0")
+      ->CreateUInt64Counter("test-counter", "original")
+      ->Add(1);
+  meter_provider->GetMeter("selected-meter", "2.0", "https://opentelemetry.io/schemas/1.0.0")
+      ->CreateUInt64Counter("test-counter", "original")
+      ->Add(1);
+  meter_provider->GetMeter("selected-meter", "1.0", "https://opentelemetry.io/schemas/1.1.0")
+      ->CreateUInt64Counter("test-counter", "original")
+      ->Add(1);
+
+  ASSERT_TRUE(sdk_->meter_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->meter_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
+
+  ASSERT_EQ(metric_buffer_->size(), 4);
+  std::size_t matched = 0;
+  for (const auto &metric : *metric_buffer_)
+  {
+    if (metric.instrument_descriptor.description_ == "selected-by-meter")
+    {
+      ++matched;
+    }
+  }
+  EXPECT_EQ(matched, 1);
+}
+
+TEST_F(ProgrammaticConfigTest, MeterProviderWithHistogramAggregationViews)
 {
   // View 1: Base2 exponential aggregation
   const std::size_t max_scale   = 10;
@@ -659,8 +850,7 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithParentBasedSamplerNullRoot)
   EXPECT_EQ(span_buffer_->size(), 1);
 }
 
-// TODO: Re-enable this test once a mock BatchSpanProcessor can be configured.
-TEST_F(ProgrammaticConfigTest, DISABLED_TracerProviderWithBatchProcessor)
+TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessor)
 {
   auto exporter               = std::make_unique<config_sdk::ExtensionSpanExporterConfiguration>();
   exporter->name              = "recording";
@@ -681,8 +871,7 @@ TEST_F(ProgrammaticConfigTest, DISABLED_TracerProviderWithBatchProcessor)
   EXPECT_GE(span_buffer_->size(), 1);
 }
 
-// TODO: Re-enable this test once a mock BatchSpanProcessor can be configured.
-TEST_F(ProgrammaticConfigTest, DISABLED_TracerProviderWithBatchProcessorConfigured)
+TEST_F(ProgrammaticConfigTest, TracerProviderWithBatchProcessorConfigured)
 {
   auto exporter             = std::make_unique<config_sdk::ExtensionSpanExporterConfiguration>();
   exporter->name            = "recording";

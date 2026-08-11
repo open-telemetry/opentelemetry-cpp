@@ -56,6 +56,10 @@ Increment the:
   `std::mutex` blocks the waiter instead. Only this one contended lock changes;
   the API `SpinLockMutex` and all other SDK locks are unchanged.
   [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
+
+* [CONFIGURATION] Update ViewSelector to comply with schema v1.1.0
+  [#4384](https://github.com/open-telemetry/opentelemetry-cpp/pull/4384)
+
 * [CONFIGURATION] Add the probability sampler to file configuration
   [#4334](https://github.com/open-telemetry/opentelemetry-cpp/pull/4334)
 
@@ -167,6 +171,13 @@ Increment the:
   [#4340](https://github.com/open-telemetry/opentelemetry-cpp/pull/4340)
 
 Breaking changes:
+
+* [CONFIGURATION] SDK default component builder libraries and example
+  [#4367](https://github.com/open-telemetry/opentelemetry-cpp/pull/4367)
+  * The declaritive configuration registry is now empty on construction and
+    the default SDK component builders are provided optionally through
+    the `opentelemetry-cpp::configuration_registry_factory` library and
+    the `opentelemetry::sdk::configuration::RegistryFactory::Create()` method.
 
 * [BUILD] Install an explicit list of ext headers instead of the whole
   directory
