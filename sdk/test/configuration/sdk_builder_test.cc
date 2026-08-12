@@ -39,6 +39,8 @@
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composite_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
@@ -81,6 +83,7 @@
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/samplers/composable_always_on.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/span_context.h"
@@ -142,6 +145,23 @@ trace_api::SpanContext MakeRuleParent(bool sampled, bool is_remote)
   return trace_api::SpanContext(trace_api::TraceId(trace_buf), trace_api::SpanId(span_buf),
                                 trace_api::TraceFlags(sampled ? 1 : 0), is_remote);
 }
+
+class TestExtensionComposableSamplerBuilder : public config_sdk::ExtensionComposableSamplerBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> Build(
+      const config_sdk::ExtensionComposableSamplerConfiguration *model) const override
+  {
+    called = true;
+    name   = model->name;
+    depth  = model->depth;
+    return std::make_unique<opentelemetry::sdk::trace::ComposableAlwaysOnSampler>();
+  }
+
+  mutable bool called{false};
+  mutable std::string name;
+  mutable std::size_t depth{0};
+};
 
 // Builds composite(rule_based{[rule]}) where the rule maps to always_on.
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> BuildRuleSampler(
@@ -427,6 +447,43 @@ TEST(SdkBuilder, CreateComposableAlwaysOffSampler)
   ASSERT_NE(sampler, nullptr);
   EXPECT_EQ(std::string{sampler->GetDescription()},
             R"(CompositeSampler{ComposableAlwaysOffSampler})");
+}
+
+TEST(SdkBuilder, CreateExtensionComposableSampler)
+{
+  auto registry               = config_sdk::RegistryFactory::Create();
+  auto extension_builder      = std::make_unique<TestExtensionComposableSamplerBuilder>();
+  auto *extension_builder_ptr = extension_builder.get();
+  registry->SetExtensionComposableSamplerBuilder("custom_composable", std::move(extension_builder));
+
+  auto extension_config   = std::make_unique<config_sdk::ExtensionComposableSamplerConfiguration>();
+  extension_config->name  = "custom_composable";
+  extension_config->depth = 2;
+  auto composite          = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler                                    = std::move(extension_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+
+  config_sdk::SdkBuilder builder(std::move(registry));
+  auto sampler = builder.CreateSampler(sampler_config);
+
+  ASSERT_NE(sampler, nullptr);
+  EXPECT_TRUE(extension_builder_ptr->called);
+  EXPECT_EQ(extension_builder_ptr->name, "custom_composable");
+  EXPECT_EQ(extension_builder_ptr->depth, 2);
+  EXPECT_EQ(std::string{sampler->GetDescription()},
+            R"(CompositeSampler{ComposableAlwaysOnSampler})");
+}
+
+TEST(SdkBuilder, CreateUnregisteredExtensionComposableSampler)
+{
+  auto extension_config  = std::make_unique<config_sdk::ExtensionComposableSamplerConfiguration>();
+  extension_config->name = "missing_composable";
+  auto composite         = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler                                    = std::move(extension_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
+  EXPECT_THROW(builder.CreateSampler(sampler_config), config_sdk::UnsupportedException);
 }
 
 TEST(SdkBuilder, CreateComposableProbabilitySampler)

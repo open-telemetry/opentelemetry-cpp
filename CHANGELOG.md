@@ -19,6 +19,9 @@ Increment the:
   `Base2ExponentialHistogramAggregation`.
   [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
 
+* [CONFIGURATION] Add support for composable sampler extensions.
+  [#4409](https://github.com/open-telemetry/opentelemetry-cpp/issues/4409)
+
 * [CONFIGURATION] Apply metric view `attribute_keys` include and exclude patterns
   when building the SDK, with exclude patterns taking precedence.
   [#3546](https://github.com/open-telemetry/opentelemetry-cpp/issues/3546)
@@ -189,6 +192,10 @@ Increment the:
   `trace_based` to match the specification.
   [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328)
 
+* [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
+  `AlwaysOff`/`TraceBased`)
+  [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+
 Breaking changes:
 
 * [CONFIGURATION] SDK default component builder libraries and example
@@ -234,6 +241,18 @@ Breaking changes:
   and SDK ABI change. Applications using the preview exemplar feature must be
   rebuilt.
   [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328)
+
+* [METRICS SDK] Remove the `SystemTimestamp` parameter from the preview
+  `ExemplarReservoir::OfferMeasurement()` overloads
+  [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+  * This is an incompatible API and ABI change for custom exemplar reservoirs.
+    Implementations and callers must remove the timestamp parameter.
+
+* [METRICS SDK] Breaking change to the preview metrics exemplar surface: the
+  `SyncMetricStorage`/`AsyncMetricStorage` constructors now take an
+  `ExemplarFilterType`, and `ExemplarData::Create` takes the `SpanContext`
+  by value.
+  [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
 
 ## [1.28.0] 2026-07-16
 

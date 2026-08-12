@@ -52,6 +52,7 @@
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/exemplar_filter.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_metric_producer_configuration.h"
@@ -2038,9 +2039,22 @@ ConfigurationParser::ParseComposableSamplerConfiguration(const std::unique_ptr<D
   if (name == "rule_based")
     return ParseComposableRuleBasedSamplerConfiguration(child, depth);
 
-  std::string message("Illegal composable sampler type: ");
-  message.append(name);
-  throw InvalidSchemaException(node->Location(), message);
+  return ParseComposableSamplerExtensionConfiguration(name, std::move(child), depth);
+}
+
+std::unique_ptr<ExtensionComposableSamplerConfiguration>
+ConfigurationParser::ParseComposableSamplerExtensionConfiguration(
+    const std::string &name,
+    std::unique_ptr<DocumentNode> node,
+    size_t depth) const
+{
+  auto model = std::make_unique<ExtensionComposableSamplerConfiguration>();
+
+  model->name  = name;
+  model->node  = std::move(node);
+  model->depth = depth;
+
+  return model;
 }
 // NOLINTEND(misc-no-recursion)
 
