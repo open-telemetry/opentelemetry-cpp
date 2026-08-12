@@ -12,7 +12,9 @@ include(GoogleTest)
 add_executable(resource_detectors_test
                ${INSTALL_TEST_SRC_DIR}/test_resource_detectors.cc)
 target_link_libraries(
-  resource_detectors_test PRIVATE opentelemetry-cpp::resource_detectors
-                                  GTest::gtest GTest::gtest_main)
+  resource_detectors_test
+  PRIVATE opentelemetry-cpp::resource_detectors
+          opentelemetry-cpp::resource_detectors_builders GTest::gtest
+          GTest::gtest_main)
 
 gtest_discover_tests(resource_detectors_test)
