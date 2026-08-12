@@ -65,7 +65,7 @@ public:
                           aggregation_type,
                           std::move(attributes_processor),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                          exempler_filter_type,
+                          exemplar_filter_type,
                           std::move(exemplar_reservoir),
 #endif
                           aggregation_config,
@@ -83,7 +83,7 @@ public:
                     const AggregationType aggregation_type,
                     std::shared_ptr<const AttributesProcessor> attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                    ExemplarFilterType exempler_filter_type,
+                    ExemplarFilterType exemplar_filter_type,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
                     const AggregationConfig *aggregation_config,

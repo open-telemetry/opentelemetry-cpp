@@ -47,7 +47,7 @@ public:
       : AsyncMetricStorage(instrument_descriptor,
                            aggregation_type,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                           exempler_filter_type,
+                           exemplar_filter_type,
                            std::move(exemplar_reservoir),
 #endif
                            aggregation_config,
@@ -57,7 +57,7 @@ public:
   AsyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
                      const AggregationType aggregation_type,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                     ExemplarFilterType exempler_filter_type,
+                     ExemplarFilterType exemplar_filter_type,
                      nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
                      const AggregationConfig *aggregation_config,
