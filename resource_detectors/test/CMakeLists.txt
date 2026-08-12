@@ -2,14 +2,20 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_executable(
-  resource_detector_test container_detector_test.cc process_detector_test.cc
-                         env_entity_detector_test.cc)
+  resource_detector_test
+  container_detector_test.cc container_detector_builder_test.cc
+  process_detector_test.cc process_detector_builder_test.cc
+  env_entity_detector_test.cc)
 
 # Link the required dependencies
 target_link_libraries(
   resource_detector_test
-  PRIVATE opentelemetry_resource_detectors opentelemetry_api
-          opentelemetry_resources GTest::gtest_main)
+  PRIVATE opentelemetry_resource_detectors
+          opentelemetry_resource_detectors_builder
+          opentelemetry_api
+          opentelemetry_resources
+          opentelemetry_configuration_core
+          GTest::gtest_main)
 
 gtest_add_tests(
   TARGET resource_detector_test

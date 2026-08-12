@@ -6,14 +6,18 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_test(
     name = "resource_detector_test",
     srcs = [
+        "container_detector_builder_test.cc",
         "container_detector_test.cc",
         "env_entity_detector_test.cc",
+        "process_detector_builder_test.cc",
         "process_detector_test.cc",
     ],
     tags = ["test"],
     deps = [
         "//api",
         "//resource_detectors",
+        "//resource_detectors:resource_detectors_builder",
+        "//sdk/src/configuration:configuration_core",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",
     ],

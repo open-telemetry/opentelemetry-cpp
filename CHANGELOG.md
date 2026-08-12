@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Add configuration builders for the container and process
+  resource detectors
+  [#4412](https://github.com/open-telemetry/opentelemetry-cpp/issues/4412)
+
 * [CONFIGURATION] Apply metric view `attribute_keys` include and exclude patterns
   when building the SDK, with exclude patterns taking precedence.
   [#3546](https://github.com/open-telemetry/opentelemetry-cpp/issues/3546)
