@@ -152,6 +152,7 @@
 #include <opentelemetry/sdk/configuration/double_attribute_value_configuration.h>
 #include <opentelemetry/sdk/configuration/drop_aggregation_configuration.h>
 #include <opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h>
+#include <opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h>
 #include <opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h>
 #include <opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h>
 #include <opentelemetry/sdk/configuration/extension_metric_producer_configuration.h>
@@ -250,6 +251,7 @@
 #include <opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h>
 #include <opentelemetry/sdk/configuration/console_span_exporter_builder.h>
 #include <opentelemetry/sdk/configuration/container_resource_detector_builder.h>
+#include <opentelemetry/sdk/configuration/extension_composable_sampler_builder.h>
 #include <opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h>
 #include <opentelemetry/sdk/configuration/extension_log_record_processor_builder.h>
 #include <opentelemetry/sdk/configuration/extension_metric_producer_builder.h>
