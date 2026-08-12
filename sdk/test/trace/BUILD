@@ -84,6 +84,19 @@ cc_test(
 )
 
 cc_test(
+    name = "batch_span_processor_test_stress",
+    srcs = glob(["*_test_stress.cc"]),
+    tags = [
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "tracer_test",
     srcs = [
         "tracer_test.cc",
