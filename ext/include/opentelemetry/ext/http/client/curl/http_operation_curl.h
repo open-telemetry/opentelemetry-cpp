@@ -362,7 +362,8 @@ private:
 
   struct AsyncData
   {
-    Session *session{nullptr};  // Owner Session
+    // Read by Abort() on whichever thread cancels, cleared by Cleanup() on the IO thread.
+    std::atomic<Session *> session{nullptr};  // Owner Session
 
     std::thread::id callback_thread;
     std::function<void(HttpOperation &)> callback;
