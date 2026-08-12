@@ -8,6 +8,7 @@ cc_test(
     srcs = [
         "container_detector_test.cc",
         "env_entity_detector_test.cc",
+        "host_detector_test.cc",
         "process_detector_test.cc",
     ],
     tags = ["test"],

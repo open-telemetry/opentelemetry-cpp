@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_executable(
-  resource_detector_test container_detector_test.cc process_detector_test.cc
-                         env_entity_detector_test.cc)
+  resource_detector_test container_detector_test.cc host_detector_test.cc
+                         process_detector_test.cc env_entity_detector_test.cc)
 
 # Link the required dependencies
 target_link_libraries(
