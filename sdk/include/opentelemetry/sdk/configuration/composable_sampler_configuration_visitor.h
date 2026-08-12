@@ -16,6 +16,7 @@ class ComposableAlwaysOnSamplerConfiguration;
 class ComposableProbabilitySamplerConfiguration;
 class ComposableParentThresholdSamplerConfiguration;
 class ComposableRuleBasedSamplerConfiguration;
+class ExtensionComposableSamplerConfiguration;
 
 class ComposableSamplerConfigurationVisitor
 {
@@ -36,6 +37,7 @@ public:
   virtual void VisitComposableParentThreshold(
       const ComposableParentThresholdSamplerConfiguration *model)                             = 0;
   virtual void VisitComposableRuleBased(const ComposableRuleBasedSamplerConfiguration *model) = 0;
+  virtual void VisitComposableExtension(const ExtensionComposableSamplerConfiguration *model) = 0;
 };
 
 }  // namespace configuration
