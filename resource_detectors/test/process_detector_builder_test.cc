@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <memory>
+#include <string>
 
 #include "opentelemetry/resource_detectors/process_detector_builder.h"
 #include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
