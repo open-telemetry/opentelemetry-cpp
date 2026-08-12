@@ -30,6 +30,7 @@ class ConsoleLogRecordExporterBuilder;
 class ConsolePushMetricExporterBuilder;
 class ConsoleSpanExporterBuilder;
 class ContainerResourceDetectorBuilder;
+class ExtensionComposableSamplerBuilder;
 class ExtensionLogRecordExporterBuilder;
 class ExtensionLogRecordProcessorBuilder;
 class ExtensionMetricProducerBuilder;
@@ -388,6 +389,13 @@ public:
   void SetExtensionSamplerBuilder(const std::string &name,
                                   std::unique_ptr<ExtensionSamplerBuilder> &&builder);
 
+  const ExtensionComposableSamplerBuilder *GetExtensionComposableSamplerBuilder(
+      const std::string &name) const;
+
+  void SetExtensionComposableSamplerBuilder(
+      const std::string &name,
+      std::unique_ptr<ExtensionComposableSamplerBuilder> &&builder);
+
   const ExtensionSpanExporterBuilder *GetExtensionSpanExporterBuilder(
       const std::string &name) const;
 
@@ -493,6 +501,8 @@ private:
 
   std::map<std::string, std::unique_ptr<TextMapPropagatorBuilder>> propagator_builders_;
   std::map<std::string, std::unique_ptr<ExtensionSamplerBuilder>> sampler_builders_;
+  std::map<std::string, std::unique_ptr<ExtensionComposableSamplerBuilder>>
+      composable_sampler_builders_;
   std::map<std::string, std::unique_ptr<ExtensionSpanExporterBuilder>> span_exporter_builders_;
   std::map<std::string, std::unique_ptr<ExtensionSpanProcessorBuilder>> span_processor_builders_;
   std::map<std::string, std::unique_ptr<ExtensionPushMetricExporterBuilder>>
