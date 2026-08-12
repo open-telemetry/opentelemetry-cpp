@@ -12,6 +12,7 @@
 #include "opentelemetry/resource_detectors/host_detector.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/semconv/incubating/host_attributes.h"
+#include "opentelemetry/semconv/schema_url.h"
 
 namespace semconv = opentelemetry::semconv;
 
@@ -96,4 +97,6 @@ TEST(HostDetectorTest, DetectSetsHostName)
   auto it = attrs.find(semconv::host::kHostName);
   ASSERT_NE(it, attrs.end());
   EXPECT_FALSE(opentelemetry::nostd::get<std::string>(it->second).empty());
+
+  EXPECT_EQ(resource.GetSchemaURL(), std::string{semconv::kSchemaUrl});
 }

@@ -8,6 +8,7 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/semconv/incubating/host_attributes.h"
+#include "opentelemetry/semconv/schema_url.h"
 #include "opentelemetry/version.h"
 
 #include <exception>
@@ -57,7 +58,7 @@ opentelemetry::sdk::resource::Resource HostResourceDetector::Detect() noexcept
                                                         << ex.what());
   }
 
-  return ResourceDetector::Create(attributes);
+  return ResourceDetector::Create(attributes, semconv::kSchemaUrl);
 }
 
 }  // namespace resource_detector
