@@ -3,7 +3,12 @@
 
 #include <gtest/gtest.h>
 
-#include <cstddef>
+#if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
+#  include <cstdlib>
+#else
+#  include <cstddef>
+#endif
+
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -85,6 +90,20 @@
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 
+#if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+#  include "opentelemetry/sdk/configuration/exemplar_filter.h"
+#  include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
+#  include "opentelemetry/sdk/metrics/meter_provider.h"
+#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
+
+#  if defined(_MSC_VER)
+#    include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
+#  endif
+#endif
+
 using opentelemetry::sdk::configuration::Registry;
 using opentelemetry::sdk::configuration::RegistryFactory;
 using opentelemetry::sdk::configuration::SdkBuilder;
@@ -140,6 +159,23 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> BuildRuleSampler(
 
 }  // namespace
 
+#if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
+namespace
+{
+
+constexpr char kMetricsExemplarFilterEnv[] = "OTEL_METRICS_EXEMPLAR_FILTER";
+
+class SdkBuilderExemplarFilterEnvironmentTest : public ::testing::Test
+{
+protected:
+  void SetUp() override { unsetenv(kMetricsExemplarFilterEnv); }
+
+  void TearDown() override { unsetenv(kMetricsExemplarFilterEnv); }
+};
+
+}  // namespace
+#endif
+
 //------------------------------------------------------------------------------
 // Tests for the SdkBuilder class methods that create SDK components from configuration models
 // These tests focus on the API of the SdkBuilder for creating SDK components that can be
@@ -191,6 +227,25 @@ TEST(SdkBuilder, SpanLimitsConfiguration)
   EXPECT_EQ(limits.event_attribute_count_limit, model->limits->event_attribute_count_limit);
   EXPECT_EQ(limits.link_attribute_count_limit, model->limits->link_attribute_count_limit);
 }
+
+#if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
+TEST_F(SdkBuilderExemplarFilterEnvironmentTest, DeclarativeExemplarFilterDoesNotReadEnvironment)
+{
+  opentelemetry::test_common::ScopedTestLogHandler log_handler{
+      opentelemetry::sdk::common::internal_log::LogLevel::Warning};
+  setenv(kMetricsExemplarFilterEnv, "invalid", 1);
+
+  auto model             = std::make_unique<config_sdk::MeterProviderConfiguration>();
+  model->exemplar_filter = config_sdk::ExemplarFilter::always_on;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateMeterProvider(model, resource);
+  ASSERT_NE(provider, nullptr);
+
+  EXPECT_TRUE(log_handler.Drain().empty());
+}
+#endif
 
 TEST(SdkBuilder, CreateLoggerConfigurator)
 {

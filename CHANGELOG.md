@@ -37,6 +37,9 @@ Increment the:
 * [BUG] Stop the curl IO thread deadlocking on itself while recovering from a
   multi handle error
   ([#4394](https://github.com/open-telemetry/opentelemetry-cpp/pull/4394))
+* [BUG] Cancel a curl session without writing to the easy handle from the
+  cancelling thread
+  ([#4392](https://github.com/open-telemetry/opentelemetry-cpp/pull/4392))
 * [CODE HEALTH] Enable clang-tidy `modernize-deprecated-headers` and replace
   deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
   `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
@@ -173,6 +176,19 @@ Increment the:
 * [CONFIGURATION] file configuration - yaml schema 1.1.0
   [#4340](https://github.com/open-telemetry/opentelemetry-cpp/pull/4340)
 
+* [SDK] Fix lost-wakeups in BatchSpanProcessor to prevent stalls during
+  shutdown and force flush.
+  [#4382](https://github.com/open-telemetry/opentelemetry-cpp/pull/4382)
+
+* [METRICS SDK] Support `OTEL_METRICS_EXEMPLAR_FILTER` when metrics exemplars
+  are enabled. The default exemplar filter changes from `always_off` to
+  `trace_based` to match the specification.
+  [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328)
+
+* [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
+  `AlwaysOff`/`TraceBased`)
+  [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+
 Breaking changes:
 
 * [CONFIGURATION] SDK default component builder libraries and example
@@ -211,6 +227,25 @@ Breaking changes:
     * `UnderscoreEscapingWithoutSuffixes` is replaced by `underscore_escaping_without_suffixes/development`
     * `NoUTF8EscapingWithSuffixes` is replaced by `no_utf8_escaping_with_suffixes/development`
     * `NoTranslation` is replaced by `no_translation/development`
+
+* [METRICS SDK] Add an `ExemplarFilterType` parameter to the `MeterContext`
+  constructor when metrics exemplars are enabled. The parameter has a default
+  value, so existing source calls remain valid, but the constructor signature
+  and SDK ABI change. Applications using the preview exemplar feature must be
+  rebuilt.
+  [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328)
+
+* [METRICS SDK] Remove the `SystemTimestamp` parameter from the preview
+  `ExemplarReservoir::OfferMeasurement()` overloads
+  [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+  * This is an incompatible API and ABI change for custom exemplar reservoirs.
+    Implementations and callers must remove the timestamp parameter.
+
+* [METRICS SDK] Breaking change to the preview metrics exemplar surface: the
+  `SyncMetricStorage`/`AsyncMetricStorage` constructors now take an
+  `ExemplarFilterType`, and `ExemplarData::Create` takes the `SpanContext`
+  by value.
+  [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
 
 ## [1.28.0] 2026-07-16
 
