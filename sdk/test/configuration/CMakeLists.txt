@@ -55,6 +55,8 @@ foreach(testname sdk_builder_test configured_sdk_test
     TEST_LIST ${testname})
 endforeach()
 
+target_link_libraries(sdk_builder_test PRIVATE opentelemetry_test_common)
+
 if(WITH_CONFIGURATION)
   foreach(
     testname
