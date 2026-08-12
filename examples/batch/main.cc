@@ -102,7 +102,7 @@ int main(int /* argc */, char ** /* argv */)
 
   // Shutdown and drain queue
   StartAndEndSpans();
-  printf("Shutting down and draining queue.... \n");
+  std::printf("Shutting down and draining queue.... \n");
   std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
   // We invoke the processor destructor
