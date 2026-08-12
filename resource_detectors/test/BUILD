@@ -32,7 +32,7 @@ cc_test(
     deps = [
         "//api",
         "//resource_detectors",
-        "//resource_detectors:resource_detectors_builder",
+        "//resource_detectors:resource_detectors_builders",
         "//sdk/src/configuration:configuration_core",
         "//sdk/src/resource",
         "@com_google_googletest//:gtest_main",

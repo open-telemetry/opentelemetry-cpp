@@ -30,7 +30,7 @@ cc_library(
 )
 
 cc_library(
-    name = "resource_detectors_builder",
+    name = "resource_detectors_builders",
     srcs = [
         "src/container_detector_builder.cc",
         "src/process_detector_builder.cc",

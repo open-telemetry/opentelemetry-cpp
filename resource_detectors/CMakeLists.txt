@@ -19,23 +19,23 @@ target_include_directories(
          "$<INSTALL_INTERFACE:include>")
 
 #
-# opentelemetry_resource_detectors_builder
+# opentelemetry_resource_detectors_builders
 #
 
-add_library(opentelemetry_resource_detectors_builder
+add_library(opentelemetry_resource_detectors_builders
             src/container_detector_builder.cc src/process_detector_builder.cc)
 
-set_target_properties(opentelemetry_resource_detectors_builder
-                      PROPERTIES EXPORT_NAME resource_detectors_builder)
-set_target_version(opentelemetry_resource_detectors_builder)
+set_target_properties(opentelemetry_resource_detectors_builders
+                      PROPERTIES EXPORT_NAME resource_detectors_builders)
+set_target_version(opentelemetry_resource_detectors_builders)
 
 target_include_directories(
-  opentelemetry_resource_detectors_builder
+  opentelemetry_resource_detectors_builders
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
 target_link_libraries(
-  opentelemetry_resource_detectors_builder
+  opentelemetry_resource_detectors_builders
   PUBLIC opentelemetry_resource_detectors
   PRIVATE opentelemetry_configuration_core)
 
@@ -44,6 +44,7 @@ otel_add_component(
   resource_detectors
   TARGETS
   opentelemetry_resource_detectors
+  opentelemetry_resource_detectors_builders
   FILES_DIRECTORY
   "include/opentelemetry/"
   FILES_DESTINATION
@@ -53,28 +54,7 @@ otel_add_component(
   "*.h"
   PATTERN
   "resource_detectors/detail/*"
-  EXCLUDE
-  PATTERN
-  "container_detector_builder.h"
-  EXCLUDE
-  PATTERN
-  "process_detector_builder.h"
   EXCLUDE)
-
-otel_add_component(
-  COMPONENT
-  resource_detectors_builder
-  TARGETS
-  opentelemetry_resource_detectors_builder
-  FILES_DIRECTORY
-  "include/opentelemetry/"
-  FILES_DESTINATION
-  "include/opentelemetry"
-  FILES_MATCHING
-  PATTERN
-  "container_detector_builder.h"
-  PATTERN
-  "process_detector_builder.h")
 
 if(BUILD_TESTING)
   add_subdirectory(test)

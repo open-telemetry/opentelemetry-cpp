@@ -22,7 +22,7 @@ add_executable(resource_detector_builder_test container_detector_builder_test.cc
 target_link_libraries(
   resource_detector_builder_test
   PRIVATE opentelemetry_resource_detectors
-          opentelemetry_resource_detectors_builder
+          opentelemetry_resource_detectors_builders
           opentelemetry_api
           opentelemetry_resources
           opentelemetry_configuration_core

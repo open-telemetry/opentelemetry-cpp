@@ -66,7 +66,7 @@ endif()
 if(WITH_RESOURCE_DETECTORS_PREVIEW)
   target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_RESOURCE_DETECTORS)
   target_link_libraries(example_yaml
-                        PRIVATE opentelemetry-cpp::resource_detectors_builder)
+                        PRIVATE opentelemetry-cpp::resource_detectors_builders)
 endif()
 
 if(BUILD_TESTING)

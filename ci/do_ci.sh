@@ -506,7 +506,6 @@ elif [[ "$1" == "cmake.install.test" ]]; then
     "exporters_elasticsearch"
     "exporters_zipkin"
     "resource_detectors"
-    "resource_detectors_builder"
   )
   EXPECTED_COMPONENTS_STRING=$(IFS=\;; echo "${EXPECTED_COMPONENTS[*]}")
   mkdir -p "${BUILD_DIR}/install_test"
