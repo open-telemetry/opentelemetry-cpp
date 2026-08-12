@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <fstream>
 #include <string>
+#include <utility>
 
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/resource_detectors/detail/host_detector_utils.h"
