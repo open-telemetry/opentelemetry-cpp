@@ -85,6 +85,7 @@ target_link_libraries(
           opentelemetry-cpp::configuration_registry_factory
           opentelemetry-cpp::configuration
           opentelemetry-cpp::resource_detectors
+          opentelemetry-cpp::resource_detectors_builders
           opentelemetry-cpp::http_client
           opentelemetry-cpp::http_client_curl
           opentelemetry-cpp::in_memory_span_exporter

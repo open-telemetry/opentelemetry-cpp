@@ -19,6 +19,10 @@ Increment the:
   `Base2ExponentialHistogramAggregation`.
   [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
 
+* [CONFIGURATION] Add configuration builders for the container and process
+  resource detectors
+  [#4412](https://github.com/open-telemetry/opentelemetry-cpp/issues/4412)
+
 * [CONFIGURATION] Add support for composable sampler extensions.
   [#4409](https://github.com/open-telemetry/opentelemetry-cpp/issues/4409)
 
