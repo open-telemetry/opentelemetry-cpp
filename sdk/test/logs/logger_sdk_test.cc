@@ -48,6 +48,7 @@
 #  include <cstddef>
 
 #  include "opentelemetry/context/context.h"
+#  include "opentelemetry/context/runtime_context.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/trace/context.h"
 #  include "opentelemetry/trace/default_span.h"
@@ -671,6 +672,51 @@ TEST(LoggerSDK, LoggerTraceBasedConfigAllowsSampledExplicitContextWithNamedEvent
   EXPECT_EQ(call_state->call_count, 1U);
 }
 
+// Captures the resolved context a context-aware processor was actually handed, so a test can
+// assert it is the explicitly supplied one (or ambient, when documenting the create-then-emit
+// limitation) rather than assuming.
+class ContextCapturingProcessor final : public LogRecordProcessor
+{
+public:
+  std::unique_ptr<Recordable> MakeRecordable() noexcept override
+  {
+    return std::unique_ptr<Recordable>(new MockLogRecordable());
+  }
+
+  void OnEmit(std::unique_ptr<Recordable> &&record) noexcept override
+  {
+    static_cast<void>(std::move(record));
+    ++on_emit_calls;
+  }
+
+  void OnEmitWithContext(
+      std::unique_ptr<Recordable> &&record,
+      const nostd::variant<opentelemetry::trace::SpanContext, opentelemetry::context::Context>
+          &context) noexcept override
+  {
+    static_cast<void>(std::move(record));
+    ++on_emit_with_context_calls;
+
+    if (const auto *sc = nostd::get_if<opentelemetry::trace::SpanContext>(&context))
+    {
+      received_span_context = *sc;
+      return;
+    }
+    if (const auto *ctx = nostd::get_if<opentelemetry::context::Context>(&context))
+    {
+      received_span_context = opentelemetry::trace::GetSpanContext(*ctx);
+    }
+  }
+
+  bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
+
+  size_t on_emit_calls              = 0;
+  size_t on_emit_with_context_calls = 0;
+  opentelemetry::trace::SpanContext received_span_context =
+      opentelemetry::trace::SpanContext::GetInvalid();
+};
+
 class LoggerEmitWithExplicitTraceTest : public ::testing::Test
 {
 protected:
@@ -685,6 +731,10 @@ protected:
     sdk_lp->AddProcessor(
         std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable_)));
 
+    auto *context_processor = new ContextCapturingProcessor();
+    context_processor_      = context_processor;
+    sdk_lp->AddProcessor(std::unique_ptr<LogRecordProcessor>(context_processor));
+
     {
       std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> sp;
       auto tp       = opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(sp));
@@ -696,6 +746,7 @@ protected:
   std::shared_ptr<logs_api::LoggerProvider> api_lp_;
   nostd::shared_ptr<logs_api::Logger> logger_;
   std::shared_ptr<MockLogRecordable> shared_recordable_;
+  ContextCapturingProcessor *context_processor_ = nullptr;
   nostd::shared_ptr<opentelemetry::trace::Span> runtime_span_;
   std::unique_ptr<opentelemetry::trace::Scope> runtime_scope_;
 };
@@ -713,6 +764,11 @@ TEST_F(LoggerEmitWithExplicitTraceTest, ExplicitContextStampsTraceFieldsFromCont
   EXPECT_EQ(shared_recordable_->GetSpanId(), explicit_span_ctx.span_id());
   EXPECT_EQ(shared_recordable_->GetTraceFlags(), explicit_span_ctx.trace_flags());
   EXPECT_NE(shared_recordable_->GetTraceId(), runtime_span_->GetContext().trace_id());
+
+  // Case 1: the processor must also observe the explicit context, not whatever is ambient.
+  ASSERT_EQ(context_processor_->on_emit_with_context_calls, 1u);
+  EXPECT_EQ(context_processor_->received_span_context.trace_id(), explicit_span_ctx.trace_id());
+  EXPECT_EQ(context_processor_->received_span_context.span_id(), explicit_span_ctx.span_id());
 }
 
 TEST_F(LoggerEmitWithExplicitTraceTest, ExplicitSpanContextStampsTraceFields)
@@ -725,6 +781,11 @@ TEST_F(LoggerEmitWithExplicitTraceTest, ExplicitSpanContextStampsTraceFields)
   EXPECT_EQ(shared_recordable_->GetSpanId(), explicit_span_ctx.span_id());
   EXPECT_EQ(shared_recordable_->GetTraceFlags(), explicit_span_ctx.trace_flags());
   EXPECT_NE(shared_recordable_->GetTraceId(), runtime_span_->GetContext().trace_id());
+
+  // Case 5: a bare SpanContext has no live Span, but its ids must still reach the processor.
+  ASSERT_EQ(context_processor_->on_emit_with_context_calls, 1u);
+  EXPECT_EQ(context_processor_->received_span_context.trace_id(), explicit_span_ctx.trace_id());
+  EXPECT_EQ(context_processor_->received_span_context.span_id(), explicit_span_ctx.span_id());
 }
 
 TEST_F(LoggerEmitWithExplicitTraceTest, ExplicitTracePartsStampsTraceFields)
@@ -739,6 +800,203 @@ TEST_F(LoggerEmitWithExplicitTraceTest, ExplicitTracePartsStampsTraceFields)
   EXPECT_EQ(shared_recordable_->GetSpanId(), explicit_span_ctx.span_id());
   EXPECT_EQ(shared_recordable_->GetTraceFlags(), explicit_span_ctx.trace_flags());
   EXPECT_NE(shared_recordable_->GetTraceId(), runtime_span_->GetContext().trace_id());
+
+  // Case 6: same as case 5, ids assembled from parts instead of a SpanContext.
+  ASSERT_EQ(context_processor_->on_emit_with_context_calls, 1u);
+  EXPECT_EQ(context_processor_->received_span_context.trace_id(), explicit_span_ctx.trace_id());
+  EXPECT_EQ(context_processor_->received_span_context.span_id(), explicit_span_ctx.span_id());
+}
+
+// Case 2: no context anywhere in EmitLogRecord(args...) -- the processor must still receive
+// something, and it must be the ambient span (runtime_span_), resolved without an extra
+// RuntimeContext::GetCurrent() beyond the one EmitLogRecord(args...) already does for filtering.
+TEST_F(LoggerEmitWithExplicitTraceTest, ImplicitAmbientContextReachesProcessor)
+{
+  logger_->EmitLogRecord(logs_api::Severity::kInfo, nostd::string_view{"msg"});
+
+  ASSERT_EQ(context_processor_->on_emit_with_context_calls, 1u);
+  EXPECT_EQ(context_processor_->received_span_context.trace_id(),
+            runtime_span_->GetContext().trace_id());
+  EXPECT_EQ(context_processor_->received_span_context.span_id(),
+            runtime_span_->GetContext().span_id());
+}
+
+// Case 3: CreateLogRecord() then a separate EmitLogRecord(record) call, no context ever
+// supplied. The processor's best-effort resolution is the ambient context at emit time -- the
+// spec-correct answer, since nothing explicit was ever given.
+TEST_F(LoggerEmitWithExplicitTraceTest, CreateThenEmitWithNoContextResolvesAmbient)
+{
+  auto record = logger_->CreateLogRecord();
+  logger_->EmitLogRecord(std::move(record));
+
+  ASSERT_EQ(context_processor_->on_emit_with_context_calls, 1u);
+  EXPECT_EQ(context_processor_->received_span_context.trace_id(),
+            runtime_span_->GetContext().trace_id());
+  EXPECT_EQ(context_processor_->received_span_context.span_id(),
+            runtime_span_->GetContext().span_id());
+}
+
+// Case 4, documented limitation: CreateLogRecord(context) stamps the record from an explicit
+// context, but that context is not retained for a later, separate EmitLogRecord(record) call.
+// The plain record-only overload can only fall back to whatever is ambient *at emit time*,
+// which is a different span here -- this pins the documented gap so a future change either
+// keeps it documented or is a deliberate, visible improvement.
+TEST_F(LoggerEmitWithExplicitTraceTest, CreateThenPlainEmitWithExplicitContextLosesIt)
+{
+  auto explicit_span = MakeTestSpan(/*sampled=*/true);
+  context::Context explicit_context;
+  explicit_context             = opentelemetry::trace::SetSpan(explicit_context, explicit_span);
+  const auto explicit_span_ctx = explicit_span->GetContext();
+  ASSERT_NE(explicit_span_ctx.trace_id(), runtime_span_->GetContext().trace_id());
+
+  auto record = logger_->CreateLogRecord(explicit_context);
+  logger_->EmitLogRecord(std::move(record));
+
+  ASSERT_EQ(context_processor_->on_emit_with_context_calls, 1u);
+  // Documents the gap: the processor sees the ambient span, not explicit_span.
+  EXPECT_EQ(context_processor_->received_span_context.trace_id(),
+            runtime_span_->GetContext().trace_id());
+  EXPECT_NE(context_processor_->received_span_context.trace_id(), explicit_span_ctx.trace_id());
+}
+
+// Case 4, the fix: re-passing the same explicit context to EmitLogRecordWithContext() delivers
+// it to the processor correctly, unlike the plain EmitLogRecord(record) call above.
+TEST_F(LoggerEmitWithExplicitTraceTest, CreateThenEmitWithContextPreservesExplicitContext)
+{
+  auto explicit_span = MakeTestSpan(/*sampled=*/true);
+  context::Context explicit_context;
+  explicit_context             = opentelemetry::trace::SetSpan(explicit_context, explicit_span);
+  const auto explicit_span_ctx = explicit_span->GetContext();
+  ASSERT_NE(explicit_span_ctx.trace_id(), runtime_span_->GetContext().trace_id());
+
+  const nostd::variant<opentelemetry::trace::SpanContext, context::Context> resolved_context{
+      explicit_context};
+  auto record = logger_->CreateLogRecord(explicit_context);
+  logger_->EmitLogRecordWithContext(std::move(record), resolved_context);
+
+  ASSERT_EQ(context_processor_->on_emit_with_context_calls, 1u);
+  EXPECT_EQ(context_processor_->received_span_context.trace_id(), explicit_span_ctx.trace_id());
+  EXPECT_EQ(context_processor_->received_span_context.span_id(), explicit_span_ctx.span_id());
+}
+
+// Case 7, documented limitation: same shape as case 4, but with a bare SpanContext (which never
+// had a live Span to begin with). The plain create-then-emit call still only sees ambient.
+TEST_F(LoggerEmitWithExplicitTraceTest, CreateThenPlainEmitWithBareSpanContextLosesIt)
+{
+  const auto explicit_span_ctx = MakeTestSpan(true)->GetContext();
+  ASSERT_NE(explicit_span_ctx.trace_id(), runtime_span_->GetContext().trace_id());
+
+  auto record = logger_->CreateLogRecord(explicit_span_ctx);
+  logger_->EmitLogRecord(std::move(record));
+
+  ASSERT_EQ(context_processor_->on_emit_with_context_calls, 1u);
+  EXPECT_EQ(context_processor_->received_span_context.trace_id(),
+            runtime_span_->GetContext().trace_id());
+  EXPECT_NE(context_processor_->received_span_context.trace_id(), explicit_span_ctx.trace_id());
+}
+
+// Case 7, the fix: re-passing the same bare SpanContext to EmitLogRecordWithContext() delivers
+// its ids to the processor correctly. This is full compliance for this case, since a bare
+// SpanContext never had a live Span to lose in the first place -- only ids matter here.
+TEST_F(LoggerEmitWithExplicitTraceTest, CreateThenEmitWithContextPreservesBareSpanContext)
+{
+  const auto explicit_span_ctx = MakeTestSpan(true)->GetContext();
+  ASSERT_NE(explicit_span_ctx.trace_id(), runtime_span_->GetContext().trace_id());
+
+  const nostd::variant<opentelemetry::trace::SpanContext, context::Context> resolved_context{
+      explicit_span_ctx};
+  auto record = logger_->CreateLogRecord(explicit_span_ctx);
+  logger_->EmitLogRecordWithContext(std::move(record), resolved_context);
+
+  ASSERT_EQ(context_processor_->on_emit_with_context_calls, 1u);
+  EXPECT_EQ(context_processor_->received_span_context.trace_id(), explicit_span_ctx.trace_id());
+  EXPECT_EQ(context_processor_->received_span_context.span_id(), explicit_span_ctx.span_id());
+}
+
+// A RuntimeContextStorage that counts GetCurrent() calls, to pin the actual cost of resolving
+// context unconditionally (see the plan's justification: ThreadLocalContextStorage::GetCurrent()
+// is a plain thread-local read, and cases 1/5/6 add no new call since EmitLogRecord(args...)
+// already resolves context_or_span for the Enabled() filter chain regardless of processors).
+class CountingRuntimeContextStorage final : public opentelemetry::context::RuntimeContextStorage
+{
+public:
+  opentelemetry::context::Context GetCurrent() noexcept override
+  {
+    ++get_current_calls;
+    return context_;
+  }
+
+  bool Detach(opentelemetry::context::Token & /* token */) noexcept override { return true; }
+
+  nostd::unique_ptr<opentelemetry::context::Token> Attach(
+      const opentelemetry::context::Context &context) noexcept override
+  {
+    context_ = context;
+    return CreateToken(context);
+  }
+
+  size_t get_current_calls = 0;
+
+private:
+  opentelemetry::context::Context context_;
+};
+
+TEST_F(LoggerEmitWithExplicitTraceTest, EmitWithExplicitContextCallsGetCurrentZeroTimes)
+{
+  auto *counting_storage = new CountingRuntimeContextStorage();
+  opentelemetry::context::RuntimeContext::SetRuntimeContextStorage(
+      nostd::shared_ptr<opentelemetry::context::RuntimeContextStorage>(counting_storage));
+
+  const auto explicit_span_ctx = MakeTestSpan(true)->GetContext();
+  logger_->EmitLogRecord(logs_api::Severity::kInfo, nostd::string_view{"msg"}, explicit_span_ctx);
+
+  // Case 5 (and by the same code path, cases 1/6): the caller supplied the trace context
+  // directly in args, so nothing here needs to consult the ambient context at all.
+  EXPECT_EQ(counting_storage->get_current_calls, 0u);
+
+  opentelemetry::context::RuntimeContext::SetRuntimeContextStorage(
+      nostd::shared_ptr<opentelemetry::context::RuntimeContextStorage>(
+          new CountingRuntimeContextStorage()));
+}
+
+TEST_F(LoggerEmitWithExplicitTraceTest, EmitWithImplicitContextCallsGetCurrentOnce)
+{
+  auto *counting_storage = new CountingRuntimeContextStorage();
+  opentelemetry::context::RuntimeContext::SetRuntimeContextStorage(
+      nostd::shared_ptr<opentelemetry::context::RuntimeContextStorage>(counting_storage));
+
+  logger_->EmitLogRecord(logs_api::Severity::kInfo, nostd::string_view{"msg"});
+
+  // Case 2: EmitLogRecord(args...) resolves the ambient context once for the Enabled() filter
+  // chain and CreateLogRecord(context_or_span); that same resolution is reused for
+  // EmitLogRecordWithContext(), so this is not a new cost introduced by passing context through.
+  EXPECT_EQ(counting_storage->get_current_calls, 1u);
+
+  opentelemetry::context::RuntimeContext::SetRuntimeContextStorage(
+      nostd::shared_ptr<opentelemetry::context::RuntimeContextStorage>(
+          new CountingRuntimeContextStorage()));
+}
+
+TEST_F(LoggerEmitWithExplicitTraceTest, CreateThenEmitWithNoContextCallsGetCurrentTwice)
+{
+  auto *counting_storage = new CountingRuntimeContextStorage();
+  opentelemetry::context::RuntimeContext::SetRuntimeContextStorage(
+      nostd::shared_ptr<opentelemetry::context::RuntimeContextStorage>(counting_storage));
+
+  auto record = logger_->CreateLogRecord();
+  logger_->EmitLogRecord(std::move(record));
+
+  // Case 3: CreateLogRecord() resolves ambient once to stamp the record's own fields; the
+  // plain EmitLogRecord(record) overload resolves it again for the processor, since nothing
+  // carries the first resolution forward (see CreateThenPlainEmitWithExplicitContextLosesIt
+  // above for why storing it on the Recordable was rejected). This second call is the one real,
+  // documented added cost of always passing context to OnEmitWithContext -- limited to this
+  // specific create-then-emit-with-no-explicit-context shape.
+  EXPECT_EQ(counting_storage->get_current_calls, 2u);
+
+  opentelemetry::context::RuntimeContext::SetRuntimeContextStorage(
+      nostd::shared_ptr<opentelemetry::context::RuntimeContextStorage>(
+          new CountingRuntimeContextStorage()));
 }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
