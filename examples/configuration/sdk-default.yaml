@@ -112,9 +112,12 @@ resource:
   attributes:
     - name: service.name
       value: sdk-builtin-test
-  detection/development:
-    detectors:
-      - container:  # Registry::SetContainerResourceDetectorBuilder
-      - host:  # Registry::SetHostResourceDetectorBuilder
-      - process:  # Registry::SetProcessResourceDetectorBuilder
-      - service:  # Registry::SetServiceResourceDetectorBuilder
+  # A configured detector must have a builder registered in the Registry,
+  # or building the SDK fails. This example does not register the built-in
+  # detector builders, so the detectors below are commented out.
+  # detection/development:
+  #   detectors:
+  #     - container:  # Registry::SetContainerResourceDetectorBuilder
+  #     - host:  # Registry::SetHostResourceDetectorBuilder
+  #     - process:  # Registry::SetProcessResourceDetectorBuilder
+  #     - service:  # Registry::SetServiceResourceDetectorBuilder
