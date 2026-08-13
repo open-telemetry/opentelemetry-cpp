@@ -644,10 +644,8 @@ bool HttpClient::ScheduleAddSession(uint64_t session_id)
     std::lock_guard<std::mutex> sessions_lock{sessions_m_};
     if (sessions_.end() == sessions_.find(session_id))
     {
-      // Either the URL never parsed, so CreateSession handed the caller a session it did not
-      // register, or a handler took this one out while the first events were dispatched.
-      // Whatever removed it owns the teardown; adding it back would run an operation nobody
-      // is waiting on and leave the caller waiting on one nobody runs.
+      // Whatever removed the session owns its teardown. Adding it back would run an operation
+      // nobody waits on, and leave the caller waiting on one nobody runs.
       return false;
     }
 
