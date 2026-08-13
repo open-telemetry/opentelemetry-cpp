@@ -137,9 +137,8 @@ public:
   {
     // If any failure event occurs, release the condition variable to unblock main thread.
     //
-    // A failure is reported only by the event that decided the outcome. Recording is first writer
-    // wins, so any of these can arrive after a response has already succeeded, and an error line
-    // there would describe a failure the caller was never told about.
+    // Recording is first writer wins, and only the event that decided the outcome reports it: a
+    // line from a later event would describe a failure the caller was never told about.
     switch (state)
     {
       case http_client::SessionState::CreateFailed:
