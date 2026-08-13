@@ -24,6 +24,12 @@ Increment the:
   re-applied to just its own collected output.
   [#4387](https://github.com/open-telemetry/opentelemetry-cpp/issues/4387)
 
+* [RESOURCE DETECTOR] Add the host resource detector
+  [#4413](https://github.com/open-telemetry/opentelemetry-cpp/issues/4413)
+* [CONFIGURATION] Add configuration builders for the container and process
+  resource detectors
+  [#4412](https://github.com/open-telemetry/opentelemetry-cpp/issues/4412)
+
 * [CONFIGURATION] Add support for composable sampler extensions.
   [#4409](https://github.com/open-telemetry/opentelemetry-cpp/issues/4409)
 
@@ -107,6 +113,9 @@ Increment the:
   Replace SpinLockMutex with std::mutex in SimpleProcessor,
   SimpleLogRecordProcessor, MeterContext and Meter.
   [#4323](https://github.com/open-telemetry/opentelemetry-cpp/pull/4323)
+
+* [SDK] Add Tracer::StartSpan benchmark and optimizations
+  [#4248](https://github.com/open-telemetry/opentelemetry-cpp/pull/4248)
 
 * [CONFIGURATION] Decouple config registry and builder headers
   [#4335](https://github.com/open-telemetry/opentelemetry-cpp/pull/4335)
