@@ -10,5 +10,5 @@
 opentelemetry::sdk::resource::Resource CustomResourceDetector::Detect() noexcept
 {
   OTEL_INTERNAL_LOG_ERROR("CustomResourceDetector::Detect(): YOUR CODE HERE");
-  return ResourceDetector::Create({});
+  return ResourceDetector::Create({{"custom.comment", comment_}});
 }
