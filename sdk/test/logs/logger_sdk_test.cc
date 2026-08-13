@@ -22,7 +22,7 @@
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/unique_ptr.h"  // IWYU pragma: keep
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
@@ -527,6 +527,31 @@ TEST(LoggerSDK, LoggerWithMinimumSeverityConfig)
   logger->EmitLogRecord(logs_api::Severity::kWarn, "allowed");
   ASSERT_EQ(shared_recordable->GetBody(), "allowed");
   ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kWarn);
+}
+
+TEST(LoggerSDK, DisabledLoggerEmitLogRecordWithContextIsNoop)
+{
+  ScopeConfigurator<LoggerConfig> disabled_all_scopes =
+      ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Disabled()).Build();
+  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+  auto log_processor = std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable));
+
+  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  const std::string schema_url{"https://opentelemetry.io/schemas/1.11.0"};
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(
+      new LoggerProvider(std::move(log_processor), resource,
+                         std::make_unique<ScopeConfigurator<LoggerConfig>>(disabled_all_scopes)));
+  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library", "", schema_url);
+
+  auto record = logger->CreateLogRecord();
+  const nostd::variant<opentelemetry::trace::SpanContext, context::Context> resolved_context{
+      opentelemetry::trace::SpanContext::GetInvalid()};
+  // A disabled logger's EmitLogRecordWithContext() should behave like the noop logger and never
+  // reach the configured processor.
+  logger->EmitLogRecordWithContext(std::move(record), resolved_context);
+
+  ASSERT_EQ(shared_recordable->GetBody(), "");
+  ASSERT_EQ(shared_recordable->GetSeverity(), opentelemetry::logs::Severity::kInvalid);
 }
 
 TEST(LoggerSDK, LoggerEnabledWithNamedEventIdUsesProcessorEnablement)
