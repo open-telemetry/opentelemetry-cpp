@@ -319,6 +319,133 @@ private:
 // Only the event that decided the outcome reports it. A terminal failure arriving after a response
 // has already succeeded would otherwise leave an export failure in the log that the caller was
 // never given, and the result alone cannot tell the two apart.
+// The states that end the wait in failure and say so. Destroyed is terminal too, but it reports
+// the end of the session rather than an error, so it is not in this table.
+struct ErrorTerminalState
+{
+  http_client::SessionState state;
+  const char *message;
+};
+
+const ErrorTerminalState kErrorTerminalStates[] = {
+    {http_client::SessionState::CreateFailed, "Failed to create session"},
+    {http_client::SessionState::ConnectFailed, "Failed to connect to peer"},
+    {http_client::SessionState::SendFailed, "Failed to send request"},
+    {http_client::SessionState::SSLHandshakeFailed, "Failed SSL Handshake"},
+    {http_client::SessionState::TimedOut, "Request timed out"},
+    {http_client::SessionState::NetworkError, "Network error"},
+    {http_client::SessionState::ReadError, "Read error"},
+    {http_client::SessionState::WriteError, "Write error"},
+    {http_client::SessionState::Cancelled, "(manually) cancelled"},
+};
+
+// Counts the exporter's own error lines, and returns the ones that carry a given message.
+std::size_t CountExporterErrors(const std::vector<std::string> &lines)
+{
+  std::size_t count = 0;
+  for (const auto &line : lines)
+  {
+    if (line.find("[ES Log Exporter]") != std::string::npos)
+    {
+      ++count;
+    }
+  }
+  return count;
+}
+
+// The winning side of the same rule. Without this, a recordCompletion that still records the
+// outcome but always answers "you did not decide it" passes every other case here while the
+// exporter goes silent about every failure it reports to its caller.
+TEST_F(ElasticsearchLogsExporterSyncTests, AWinningTerminalErrorIsReportedExactlyOnce)
+{
+  for (const auto &terminal : kErrorTerminalStates)
+  {
+    auto capturing = nostd::shared_ptr<internal_log::LogHandler>(new ErrorCapturingLogHandler());
+    const auto previous = internal_log::GlobalLogHandler::GetLogHandler();
+    internal_log::GlobalLogHandler::SetLogHandler(capturing);
+
+    const auto state = terminal.state;
+    const auto result =
+        ExportWith([state](http_client::EventHandler &handler) { handler.OnEvent(state, ""); });
+
+    const auto errors = static_cast<ErrorCapturingLogHandler *>(capturing.get())->errors();
+    internal_log::GlobalLogHandler::SetLogHandler(previous);
+
+    EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure)
+        << "state " << static_cast<int>(state) << " did not fail the export";
+    EXPECT_EQ(CountExporterErrors(errors), static_cast<std::size_t>(1))
+        << "state " << static_cast<int>(state) << " reported " << CountExporterErrors(errors)
+        << " times rather than once";
+    bool found = false;
+    for (const auto &line : errors)
+    {
+      if (line.find(terminal.message) != std::string::npos)
+      {
+        found = true;
+      }
+    }
+    EXPECT_TRUE(found) << "no line carried " << terminal.message;
+  }
+}
+
+// The shared curl client has reported more than one terminal event for one request, see #4360,
+// so which of two failures is described matters rather than only how many arrive.
+TEST_F(ElasticsearchLogsExporterSyncTests, OnlyTheFirstTerminalFailureIsReported)
+{
+  auto capturing      = nostd::shared_ptr<internal_log::LogHandler>(new ErrorCapturingLogHandler());
+  const auto previous = internal_log::GlobalLogHandler::GetLogHandler();
+  internal_log::GlobalLogHandler::SetLogHandler(capturing);
+
+  const auto result = ExportWith([](http_client::EventHandler &handler) {
+    handler.OnEvent(http_client::SessionState::ConnectFailed, "");
+    handler.OnEvent(http_client::SessionState::CreateFailed, "");
+    handler.OnEvent(http_client::SessionState::TimedOut, "");
+  });
+
+  const auto errors = static_cast<ErrorCapturingLogHandler *>(capturing.get())->errors();
+  internal_log::GlobalLogHandler::SetLogHandler(previous);
+
+  EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
+  EXPECT_EQ(CountExporterErrors(errors), static_cast<std::size_t>(1));
+  bool found_first = false;
+  for (const auto &line : errors)
+  {
+    if (line.find("Failed to connect to peer") != std::string::npos)
+    {
+      found_first = true;
+    }
+    EXPECT_EQ(line.find("Failed to create session"), std::string::npos)
+        << "a later failure described the outcome: " << line;
+  }
+  EXPECT_TRUE(found_first) << "the failure that decided the outcome was not the one reported";
+}
+
+// The losing side, over the same table rather than three of the nine.
+TEST_F(ElasticsearchLogsExporterSyncTests, NoTerminalErrorAfterAResponseIsReported)
+{
+  for (const auto &terminal : kErrorTerminalStates)
+  {
+    auto capturing = nostd::shared_ptr<internal_log::LogHandler>(new ErrorCapturingLogHandler());
+    const auto previous = internal_log::GlobalLogHandler::GetLogHandler();
+    internal_log::GlobalLogHandler::SetLogHandler(capturing);
+
+    const auto state  = terminal.state;
+    const auto result = ExportWith([state](http_client::EventHandler &handler) {
+      FakeResponse response(200, kAcceptedBody);
+      handler.OnResponse(response);
+      handler.OnEvent(state, "");
+    });
+
+    const auto errors = static_cast<ErrorCapturingLogHandler *>(capturing.get())->errors();
+    internal_log::GlobalLogHandler::SetLogHandler(previous);
+
+    EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess)
+        << "state " << static_cast<int>(state) << " took the outcome from the response";
+    EXPECT_EQ(CountExporterErrors(errors), static_cast<std::size_t>(0))
+        << "state " << static_cast<int>(state) << " reported a failure the caller never saw";
+  }
+}
+
 TEST_F(ElasticsearchLogsExporterSyncTests, ALateTerminalFailureDoesNotClaimTheExportFailed)
 {
   auto capturing      = nostd::shared_ptr<internal_log::LogHandler>(new ErrorCapturingLogHandler());
