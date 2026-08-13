@@ -598,26 +598,33 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             }
           } while (true);
 
-          // Abort all pending easy handles
+          // Abort all pending easy handles. This one calls nothing from the multi interface, so
+          // it runs whether or not there is a handle and teardown keeps working without one.
           if (self->doAbortSessions())
           {
             still_running = 1;
           }
 
+          // The three below every call curl_multi_add_handle or curl_multi_remove_handle. Running
+          // them without a handle would take the pending sessions out of the queue that keeps
+          // them safe from the next reset, hand them to a multi function that cannot accept
+          // them, and report the transfer as running.
+          const bool multi_available = (nullptr != self->multi_handle_);
+
           // Remove all pending easy handles
-          if (self->doRemoveSessions())
+          if (multi_available && self->doRemoveSessions())
           {
             still_running = 1;
           }
 
           // Add all pending easy handles
-          if (self->doAddSessions())
+          if (multi_available && self->doAddSessions())
           {
             still_running = 1;
           }
 
           // Check if pending easy handles can be retried
-          if (self->doRetrySessions(false))
+          if (multi_available && self->doRetrySessions(false))
           {
             still_running = 1;
           }
@@ -660,20 +667,22 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               still_running = 1;
             }
 
+            const bool multi_available_now = (nullptr != self->multi_handle_);
+
             // Remove all pending easy handles
-            if (self->doRemoveSessions())
+            if (multi_available_now && self->doRemoveSessions())
             {
               still_running = 1;
             }
 
             // Add all pending easy handles
-            if (self->doAddSessions())
+            if (multi_available_now && self->doAddSessions())
             {
               still_running = 1;
             }
 
             // Check if pending easy handles can be retried
-            if (self->doRetrySessions(true))
+            if (multi_available_now && self->doRetrySessions(true))
             {
               still_running = 1;
             }
