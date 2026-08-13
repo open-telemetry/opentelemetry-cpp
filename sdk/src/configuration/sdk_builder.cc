@@ -16,6 +16,7 @@
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"

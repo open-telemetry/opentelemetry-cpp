@@ -13,6 +13,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -24,10 +25,10 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/utility.h"
 
-#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
@@ -64,6 +65,7 @@
 #include "opentelemetry/sdk/configuration/registry_factory.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
