@@ -6,6 +6,7 @@
 #include <opentelemetry/resource_detectors/container_detector.h>
 #include <opentelemetry/resource_detectors/container_detector_builder.h>
 #include <opentelemetry/resource_detectors/env_entity_detector.h>
+#include <opentelemetry/resource_detectors/host_detector.h>
 #include <opentelemetry/resource_detectors/process_detector.h>
 #include <opentelemetry/resource_detectors/process_detector_builder.h>
 #include <memory>
@@ -22,6 +23,14 @@ TEST(ResourceDetectorsInstall, EnvEntityDetector)
 {
   std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> detector =
       std::make_unique<opentelemetry::resource_detector::EnvEntityDetector>();
+  ASSERT_TRUE(detector != nullptr);
+  ASSERT_NO_THROW(auto resource = detector->Detect());
+}
+
+TEST(ResourceDetectorsInstall, HostResourceDetector)
+{
+  std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> detector =
+      std::make_unique<opentelemetry::resource_detector::HostResourceDetector>();
   ASSERT_TRUE(detector != nullptr);
   ASSERT_NO_THROW(auto resource = detector->Detect());
 }
