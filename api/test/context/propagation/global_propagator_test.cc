@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <utility>
 
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/global_propagator.h"
