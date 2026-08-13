@@ -153,14 +153,9 @@ TEST(ElasticsearchLogRecordableTests, BasicTests)
   EXPECT_EQ(actual, expected);
 }
 
-// ---------------------------------------------------------------------------
-// Synchronous completion path.
-//
-// A fake HTTP client drives a scripted sequence of callbacks from inside
-// SendRequest(), which runs before the exporter reaches waitForResponse(). Every
-// case here therefore also covers a completion recorded before the wait starts,
-// the notification a bare cv_.wait() would have missed.
-// ---------------------------------------------------------------------------
+// Synchronous completion path. The fake client scripts its callbacks from inside SendRequest(),
+// which runs before the exporter reaches waitForResponse(), so every case here also covers a
+// completion recorded before the wait starts.
 namespace
 {
 namespace http_client = opentelemetry::ext::http::client;
@@ -318,9 +313,8 @@ private:
 };
 }  // namespace
 
-// Only the event that decided the outcome reports it. A terminal failure arriving after a response
-// has already succeeded would otherwise leave an export failure in the log that the caller was
-// never given, and the result alone cannot tell the two apart.
+// Only the event that decided the outcome reports it: a failure logged after a response succeeded
+// would describe an outcome the caller was never given.
 namespace
 {
 // The states that end the wait in failure and say so. Destroyed is terminal too, but it reports
