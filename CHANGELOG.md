@@ -71,8 +71,8 @@ Increment the:
   deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
   `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
   ([#4349](https://github.com/open-telemetry/opentelemetry-cpp/pull/4349))
-* [BUG] Check what curl_slist_append and curl_multi_init return instead of
-  treating a failed allocation as success
+* [BUG] Check what curl_easy_init, curl_slist_append and curl_multi_init return
+  instead of treating a failed allocation as success
   [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
 * [BUG] Stop the curl IO thread spinning, flooding the log, and refusing to be
   destroyed, when the multi handle cannot be created

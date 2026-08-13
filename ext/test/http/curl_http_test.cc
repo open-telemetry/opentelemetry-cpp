@@ -342,7 +342,13 @@ public:
         terminal_.fetch_add(1, std::memory_order_release);
         break;
       case http_client::SessionState::CreateFailed:
+        create_failed_.fetch_add(1, std::memory_order_release);
+        terminal_.fetch_add(1, std::memory_order_release);
+        break;
       case http_client::SessionState::ConnectFailed:
+        connect_failed_.fetch_add(1, std::memory_order_release);
+        terminal_.fetch_add(1, std::memory_order_release);
+        break;
       case http_client::SessionState::SendFailed:
         terminal_.fetch_add(1, std::memory_order_release);
         break;
@@ -354,6 +360,8 @@ public:
   std::atomic<int> terminal_{0};
   std::atomic<int> responses_{0};
   std::atomic<int> cancels_{0};
+  std::atomic<int> create_failed_{0};
+  std::atomic<int> connect_failed_{0};
 };
 
 class CapturingLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
@@ -1624,6 +1632,39 @@ TEST_F(BasicCurlHttpTests, AQueuedRequestSurvivesAMissingMultiHandle)
       << "the request queued while the handle was missing never reached the wire";
 
   session->CancelSession();
+  session->FinishSession();
+  client->FinishAllSessions();
+}
+
+// curl_easy_init can fail as well, and the operation then holds no handle. It has to be refused
+// like a failed header list, so one request produces one kind of failure rather than a create
+// failure from the constructor followed by a connect failure from the null handle.
+TEST_F(BasicCurlHttpTests, AFailedEasyHandleIsReportedOnce)
+{
+  ASSERT_TRUE(g_curl_hooks_installed);
+  received_requests_.clear();
+
+  auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(client != nullptr);
+
+  auto session = client->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  auto handler = std::make_shared<MultiHandleOutcomeHandler>();
+
+  // Armed here so it reaches the curl_easy_init inside SendRequest and nothing before it.
+  g_fail_curl_calloc_everywhere.store(true, std::memory_order_relaxed);
+  session->SendRequest(handler);
+  g_fail_curl_calloc_everywhere.store(false, std::memory_order_relaxed);
+
+  EXPECT_GE(handler->create_failed_.load(std::memory_order_acquire), 1)
+      << "the caller was never told the handle could not be created";
+  EXPECT_EQ(0, handler->connect_failed_.load(std::memory_order_acquire))
+      << "a request with no easy handle still reported a connect failure";
+  EXPECT_EQ(0, handler->responses_.load(std::memory_order_acquire));
+  EXPECT_FALSE(session->IsSessionActive()) << "the session stayed active with nothing running it";
+  EXPECT_EQ(0U, received_requests_.size()) << "a request with no easy handle reached the server";
+
   session->FinishSession();
   client->FinishAllSessions();
 }
