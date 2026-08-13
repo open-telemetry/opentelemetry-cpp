@@ -19,6 +19,7 @@
 
 #include <gtest/gtest.h>
 #include <array>
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -26,6 +27,7 @@
 #include <initializer_list>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 #include "nlohmann/json.hpp"
@@ -319,6 +321,8 @@ private:
 // Only the event that decided the outcome reports it. A terminal failure arriving after a response
 // has already succeeded would otherwise leave an export failure in the log that the caller was
 // never given, and the result alone cannot tell the two apart.
+namespace
+{
 // The states that end the wait in failure and say so. Destroyed is terminal too, but it reports
 // the end of the session rather than an error, so it is not in this table.
 struct ErrorTerminalState
@@ -352,6 +356,7 @@ std::size_t CountExporterErrors(const std::vector<std::string> &lines)
   }
   return count;
 }
+}  // namespace
 
 // The winning side of the same rule. Without this, a recordCompletion that still records the
 // outcome but always answers "you did not decide it" passes every other case here while the
@@ -418,6 +423,71 @@ TEST_F(ElasticsearchLogsExporterSyncTests, OnlyTheFirstTerminalFailureIsReported
         << "a later failure described the outcome: " << line;
   }
   EXPECT_TRUE(found_first) << "the failure that decided the outcome was not the one reported";
+}
+
+// Everything else here delivers its callbacks one after another from inside SendRequest(), which
+// covers a completion recorded before the waiter arrives but never two callbacks at once. This
+// releases a response and a read error together. Either may win, and the point is that the result
+// and the diagnostic never disagree about which one did.
+TEST_F(ElasticsearchLogsExporterSyncTests, AResponseRacingAReadErrorAgree)
+{
+  for (int attempt = 0; attempt < 50; ++attempt)
+  {
+    auto capturing = nostd::shared_ptr<internal_log::LogHandler>(new ErrorCapturingLogHandler());
+    const auto previous = internal_log::GlobalLogHandler::GetLogHandler();
+    internal_log::GlobalLogHandler::SetLogHandler(capturing);
+
+    const auto result = ExportWith([](http_client::EventHandler &handler) {
+      std::atomic<int> at_the_line{0};
+      // This orders where the two threads start, not the two calls that follow it, so those stay
+      // unordered with respect to each other and the exporter's own mutex is what has to hold.
+      auto wait_for_the_other = [&at_the_line] {
+        at_the_line.fetch_add(1, std::memory_order_acq_rel);
+        while (at_the_line.load(std::memory_order_acquire) < 2)
+        {
+          std::this_thread::yield();
+        }
+      };
+
+      std::thread responder([&handler, &wait_for_the_other] {
+        wait_for_the_other();
+        FakeResponse response(200, kAcceptedBody);
+        handler.OnResponse(response);
+      });
+      std::thread failer([&handler, &wait_for_the_other] {
+        wait_for_the_other();
+        handler.OnEvent(http_client::SessionState::ReadError, "");
+      });
+      responder.join();
+      failer.join();
+    });
+
+    const auto errors = static_cast<ErrorCapturingLogHandler *>(capturing.get())->errors();
+    internal_log::GlobalLogHandler::SetLogHandler(previous);
+
+    const auto reported = CountExporterErrors(errors);
+    if (result == opentelemetry::sdk::common::ExportResult::kSuccess)
+    {
+      EXPECT_EQ(reported, static_cast<std::size_t>(0))
+          << "the response won and a failure was reported anyway, attempt " << attempt;
+    }
+    else
+    {
+      EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure)
+          << "attempt " << attempt;
+      EXPECT_EQ(reported, static_cast<std::size_t>(1))
+          << "the read error won and was reported " << reported << " times, attempt " << attempt;
+      bool carried_the_reason = false;
+      for (const auto &line : errors)
+      {
+        if (line.find("Read error") != std::string::npos)
+        {
+          carried_the_reason = true;
+        }
+      }
+      EXPECT_TRUE(carried_the_reason) << "the failure was not described, attempt " << attempt;
+    }
+  }
 }
 
 // The losing side, over the same table rather than three of the nine.
