@@ -542,10 +542,8 @@ void HttpOperation::Cleanup()
   // Only cleanup async once even in recursive calls
   if (async_data_)
   {
-    // Move the easy handle to the owner untouched. It may still be attached to the multi handle
-    // and running, and the thread inside curl_multi_perform owns it until the IO thread takes it
-    // out, so writing to it here would be a write to a live transfer. It is pointless as well:
-    // the next thing that happens to the handle is curl_easy_cleanup.
+    // Hand the easy handle over untouched. It may still be attached to the multi handle, and the
+    // thread inside curl_multi_perform owns it until the IO thread removes it.
     Session *session = async_data_->session.exchange(nullptr, std::memory_order_acq_rel);
     if (session != nullptr)
     {
@@ -1525,9 +1523,8 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
 {
   if (is_cleaned_.load(std::memory_order_acquire))
   {
-    // Already torn down, and the handle is queued for removal. The multi handle can still hold a
-    // message buffered from before that, and acting on it would dispatch a second round of
-    // terminal events and can put a handle that is waiting to be freed back on the retry queue.
+    // Already torn down and queued for removal. A message buffered before that would dispatch a
+    // second round of terminal events and requeue a handle waiting to be freed.
     return;
   }
 
