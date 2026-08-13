@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [RESOURCE DETECTOR] Add the host resource detector
+  [#4413](https://github.com/open-telemetry/opentelemetry-cpp/issues/4413)
 * [CONFIGURATION] Add configuration builders for the container and process
   resource detectors
   [#4412](https://github.com/open-telemetry/opentelemetry-cpp/issues/4412)
