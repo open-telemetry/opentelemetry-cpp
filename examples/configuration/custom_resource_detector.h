@@ -5,7 +5,6 @@
 
 #include <string>
 
-#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 
 class CustomResourceDetector : public opentelemetry::sdk::resource::ResourceDetector
