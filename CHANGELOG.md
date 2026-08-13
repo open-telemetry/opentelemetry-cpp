@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Add a resource detector extension example
+  [#4419](https://github.com/open-telemetry/opentelemetry-cpp/issues/4419)
+
 * [RESOURCE DETECTOR] Add the host resource detector
   [#4413](https://github.com/open-telemetry/opentelemetry-cpp/issues/4413)
 * [CONFIGURATION] Add configuration builders for the container and process
@@ -204,6 +207,24 @@ Increment the:
 * [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
   `AlwaysOff`/`TraceBased`)
   [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+
+Important changes:
+
+* [API] Never set a null global provider or propagator
+  [#4420](https://github.com/open-telemetry/opentelemetry-cpp/pull/4420)
+
+  * `trace::Provider::SetTracerProvider()`,
+    `metrics::Provider::SetMeterProvider()`,
+    `logs::Provider::SetLoggerProvider()`,
+    `logs::Provider::SetEventLoggerProvider()` and
+    `context::propagation::GlobalTextMapPropagator::SetGlobalPropagator()`
+    now install the corresponding no-op implementation when passed a null
+    pointer, instead of storing the null. The matching getters therefore never
+    return `nullptr`, as already documented, and code that resets a global
+    during cleanup no longer risks a nullptr de-ref on a later use.
+    **Note**: this is a correctness fix to an inline API header; the observable
+    behavior of these methods changes towards the already documented contract
+    (see `docs/abi-policy.md`).
 
 Breaking changes:
 
