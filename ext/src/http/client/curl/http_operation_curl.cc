@@ -453,6 +453,9 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
   if (!curl_resource_.easy_handle)
   {
     last_curl_result_ = CURLE_FAILED_INIT;
+    // Refuses Send() and SendAsync(), which would otherwise drive a null handle into libcurl and
+    // add a connect failure to the create failure this already reports.
+    construction_result_ = CURLE_FAILED_INIT;
     DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
                   curl_easy_strerror(last_curl_result_));
     return;
