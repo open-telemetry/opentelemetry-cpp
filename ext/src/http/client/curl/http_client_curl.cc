@@ -817,10 +817,8 @@ bool HttpClient::doRemoveSessions()
         continue;
       }
 
-      // Take it out of the multi handle first. libcurl does not allow an easy handle to be
-      // cleaned up while a multi handle still owns it, and the header list has to stay alive
-      // until the handle is no longer used for a transfer. A handle that was never added
-      // reports CURLM_OK here, so this does not need to know which is which.
+      // Remove before cleanup: libcurl forbids freeing an easy handle, or the header list it
+      // points at, while the multi handle still owns it. A handle never added reports CURLM_OK.
       const CURLMcode rc = curl_multi_remove_handle(multi_handle_, resource.easy_handle);
       if (CURLM_OK != rc)
       {
