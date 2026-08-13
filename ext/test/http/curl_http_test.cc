@@ -1545,10 +1545,9 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
 }
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
-// A client whose multi handle can never be created has nothing to run, and used to say so as
-// fast as the CPU allowed: measured at a full core and 1,168,126 error lines over three seconds
-// with the client alive. The IO loop reports a run of failures once and waits between attempts
-// now, and this holds both.
+// A client whose multi handle can never be created has nothing to run. The IO loop reports a run
+// of failures once and waits between attempts, so a client left alive in that state costs neither
+// a core nor a log line per pass, and this holds both.
 TEST_F(BasicCurlHttpTests, APersistentMultiHandleFailureDoesNotSpin)
 {
   ASSERT_TRUE(g_curl_hooks_installed);
