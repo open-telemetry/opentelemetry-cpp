@@ -285,25 +285,35 @@ static CURLM *initMultiHandle()
 }
 
 HttpClient::HttpClient()
-    : multi_handle_(initMultiHandle()),
+    : multi_handle_(nullptr),
       next_session_id_{0},
       max_sessions_per_connection_{8},
       background_thread_instrumentation_(nullptr),
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
       background_thread_wait_for_{std::chrono::minutes{1}},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
-{}
+{
+  // Members are initialised in declaration order, and multi_handle_ is declared first, so this
+  // cannot go in the list: curl_global_init has to have run before any other libcurl call, and
+  // it runs from curl_global_initializer_ above.
+  multi_handle_ = initMultiHandle();
+}
 
 HttpClient::HttpClient(
     const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation)
-    : multi_handle_(initMultiHandle()),
+    : multi_handle_(nullptr),
       next_session_id_{0},
       max_sessions_per_connection_{8},
       background_thread_instrumentation_(thread_instrumentation),
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
       background_thread_wait_for_{std::chrono::minutes{1}},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
-{}
+{
+  // Members are initialised in declaration order, and multi_handle_ is declared first, so this
+  // cannot go in the list: curl_global_init has to have run before any other libcurl call, and
+  // it runs from curl_global_initializer_ above.
+  multi_handle_ = initMultiHandle();
+}
 
 HttpClient::~HttpClient()
 {
