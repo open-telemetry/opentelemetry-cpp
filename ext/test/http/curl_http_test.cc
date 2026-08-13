@@ -127,9 +127,8 @@ public:
     }
   }
 
-  // Cancelling reaches curl_easy_setopt through Abort(), so it has to run on the thread that
-  // owns the handle. Both cases below cancel from an event the IO thread dispatches, and assert
-  // on cancelled_from_ so that a later edit cannot quietly move it back to the caller.
+  // cancel_at_ picks the event to cancel from and cancelled_from_ records the thread it ran
+  // on, so a case can pin which side of the client it covers.
   http_client::Session *cancel_target_ = nullptr;
   http_client::SessionState cancel_at_ = http_client::SessionState::Response;
   std::thread::id cancelled_from_{};
@@ -580,7 +579,7 @@ TEST_F(BasicCurlHttpTests, ACancelBeforeTheResponseReportsCancelled)
   // else reports a cancel.
   EXPECT_EQ(1, handler->cancelled_from_callback_.load(std::memory_order_acquire));
   EXPECT_NE(handler->cancelled_from_, std::this_thread::get_id())
-      << "the cancel has to run on the IO thread, see #4369";
+      << "this case cancels from an event the IO thread dispatches";
 
   session_manager->FinishAllSessions();
 }
@@ -628,6 +627,66 @@ TEST_F(BasicCurlHttpTests, ResetMultiHandleWithASessionDoesNotDeadlock)
   http_client::curl::HttpClientTestPeer::ResetMultiHandle(*client);
 
   client->FinishAllSessions();
+}
+
+// The caller-thread side of the same cancel. The server handler takes mtx_requests before it
+// answers, so holding it keeps a response from racing the cancel and the abort lands while the
+// IO thread is still driving the easy handle. That pairing is what #4369 caught.
+TEST_F(BasicCurlHttpTests, ACancelFromTheCallerThreadReportsCancelled)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler = std::make_shared<TerminalCountingHandler>();
+
+  {
+    std::unique_lock<std::mutex> lock_requests(mtx_requests);
+    session->SendRequest(handler);
+    session->CancelSession();
+    session->FinishSession();
+  }
+
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, handler->cancelled_from_callback_.load(std::memory_order_acquire));
+
+  session_manager->FinishAllSessions();
+}
+
+// The same cancel again, repeated, because #4369 is a race and one attempt proves little.
+// Nothing listens on 19937, so every attempt fails to connect and the IO thread reaches Cleanup
+// while the caller is still inside CancelSession, which is the overlap the race needs. Under a
+// thread sanitizer this reports against the unfixed client on every run.
+TEST_F(BasicCurlHttpTests, RepeatedCallerThreadCancelsAreClean)
+{
+  int terminal_total = 0;
+
+  for (int i = 0; i < 20; ++i)
+  {
+    auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+    ASSERT_TRUE(session_manager != nullptr);
+
+    auto session = session_manager->CreateSession("http://127.0.0.1:19937");
+    auto request = session->CreateRequest();
+    request->SetUri("get/");
+
+    auto handler = std::make_shared<TerminalCountingHandler>();
+    session->SendRequest(handler);
+    session->CancelSession();
+    session->FinishSession();
+    session_manager->FinishAllSessions();
+
+    EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+    terminal_total += handler->terminal_count_.load(std::memory_order_acquire);
+  }
+
+  // A lower bound, not a count: #4360 tracks the same cancel arriving twice, and how many
+  // arrive is not what this case decides.
+  EXPECT_GE(terminal_total, 20);
 }
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)

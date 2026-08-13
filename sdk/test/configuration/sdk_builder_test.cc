@@ -3,7 +3,12 @@
 
 #include <gtest/gtest.h>
 
-#include <cstddef>
+#if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
+#  include <cstdlib>
+#else
+#  include <cstddef>
+#endif
+
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -34,6 +39,8 @@
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composite_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
@@ -76,6 +83,7 @@
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/samplers/composable_always_on.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/span_context.h"
@@ -84,6 +92,20 @@
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
+
+#if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+#  include "opentelemetry/sdk/configuration/exemplar_filter.h"
+#  include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
+#  include "opentelemetry/sdk/metrics/meter_provider.h"
+#  include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
+
+#  if defined(_MSC_VER)
+#    include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
+#  endif
+#endif
 
 using opentelemetry::sdk::configuration::Registry;
 using opentelemetry::sdk::configuration::RegistryFactory;
@@ -124,6 +146,23 @@ trace_api::SpanContext MakeRuleParent(bool sampled, bool is_remote)
                                 trace_api::TraceFlags(sampled ? 1 : 0), is_remote);
 }
 
+class TestExtensionComposableSamplerBuilder : public config_sdk::ExtensionComposableSamplerBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> Build(
+      const config_sdk::ExtensionComposableSamplerConfiguration *model) const override
+  {
+    called = true;
+    name   = model->name;
+    depth  = model->depth;
+    return std::make_unique<opentelemetry::sdk::trace::ComposableAlwaysOnSampler>();
+  }
+
+  mutable bool called{false};
+  mutable std::string name;
+  mutable std::size_t depth{0};
+};
+
 // Builds composite(rule_based{[rule]}) where the rule maps to always_on.
 std::unique_ptr<opentelemetry::sdk::trace::Sampler> BuildRuleSampler(
     std::unique_ptr<config_sdk::ComposableRuleBasedSamplerRuleConfiguration> rule)
@@ -139,6 +178,23 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> BuildRuleSampler(
 }
 
 }  // namespace
+
+#if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
+namespace
+{
+
+constexpr char kMetricsExemplarFilterEnv[] = "OTEL_METRICS_EXEMPLAR_FILTER";
+
+class SdkBuilderExemplarFilterEnvironmentTest : public ::testing::Test
+{
+protected:
+  void SetUp() override { unsetenv(kMetricsExemplarFilterEnv); }
+
+  void TearDown() override { unsetenv(kMetricsExemplarFilterEnv); }
+};
+
+}  // namespace
+#endif
 
 //------------------------------------------------------------------------------
 // Tests for the SdkBuilder class methods that create SDK components from configuration models
@@ -191,6 +247,25 @@ TEST(SdkBuilder, SpanLimitsConfiguration)
   EXPECT_EQ(limits.event_attribute_count_limit, model->limits->event_attribute_count_limit);
   EXPECT_EQ(limits.link_attribute_count_limit, model->limits->link_attribute_count_limit);
 }
+
+#if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
+TEST_F(SdkBuilderExemplarFilterEnvironmentTest, DeclarativeExemplarFilterDoesNotReadEnvironment)
+{
+  opentelemetry::test_common::ScopedTestLogHandler log_handler{
+      opentelemetry::sdk::common::internal_log::LogLevel::Warning};
+  setenv(kMetricsExemplarFilterEnv, "invalid", 1);
+
+  auto model             = std::make_unique<config_sdk::MeterProviderConfiguration>();
+  model->exemplar_filter = config_sdk::ExemplarFilter::always_on;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateMeterProvider(model, resource);
+  ASSERT_NE(provider, nullptr);
+
+  EXPECT_TRUE(log_handler.Drain().empty());
+}
+#endif
 
 TEST(SdkBuilder, CreateLoggerConfigurator)
 {
@@ -372,6 +447,43 @@ TEST(SdkBuilder, CreateComposableAlwaysOffSampler)
   ASSERT_NE(sampler, nullptr);
   EXPECT_EQ(std::string{sampler->GetDescription()},
             R"(CompositeSampler{ComposableAlwaysOffSampler})");
+}
+
+TEST(SdkBuilder, CreateExtensionComposableSampler)
+{
+  auto registry               = config_sdk::RegistryFactory::Create();
+  auto extension_builder      = std::make_unique<TestExtensionComposableSamplerBuilder>();
+  auto *extension_builder_ptr = extension_builder.get();
+  registry->SetExtensionComposableSamplerBuilder("custom_composable", std::move(extension_builder));
+
+  auto extension_config   = std::make_unique<config_sdk::ExtensionComposableSamplerConfiguration>();
+  extension_config->name  = "custom_composable";
+  extension_config->depth = 2;
+  auto composite          = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler                                    = std::move(extension_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+
+  config_sdk::SdkBuilder builder(std::move(registry));
+  auto sampler = builder.CreateSampler(sampler_config);
+
+  ASSERT_NE(sampler, nullptr);
+  EXPECT_TRUE(extension_builder_ptr->called);
+  EXPECT_EQ(extension_builder_ptr->name, "custom_composable");
+  EXPECT_EQ(extension_builder_ptr->depth, 2);
+  EXPECT_EQ(std::string{sampler->GetDescription()},
+            R"(CompositeSampler{ComposableAlwaysOnSampler})");
+}
+
+TEST(SdkBuilder, CreateUnregisteredExtensionComposableSampler)
+{
+  auto extension_config  = std::make_unique<config_sdk::ExtensionComposableSamplerConfiguration>();
+  extension_config->name = "missing_composable";
+  auto composite         = std::make_unique<config_sdk::CompositeSamplerConfiguration>();
+  composite->composable_sampler                                    = std::move(extension_config);
+  std::unique_ptr<config_sdk::SamplerConfiguration> sampler_config = std::move(composite);
+
+  config_sdk::SdkBuilder builder(config_sdk::RegistryFactory::Create());
+  EXPECT_THROW(builder.CreateSampler(sampler_config), config_sdk::UnsupportedException);
 }
 
 TEST(SdkBuilder, CreateComposableProbabilitySampler)

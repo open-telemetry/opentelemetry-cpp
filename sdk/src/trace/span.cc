@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <chrono>
+#include <map>
 #include <utility>
 
 #include "opentelemetry/nostd/function_ref.h"
@@ -55,8 +56,9 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            const common::KeyValueIterable &attributes,
            const opentelemetry::trace::SpanContextKeyValueIterable &links,
            const opentelemetry::trace::StartSpanOptions &options,
+           const opentelemetry::sdk::trace::SamplingResult &sampling_result,
            const opentelemetry::trace::SpanContext &parent_span_context,
-           std::unique_ptr<opentelemetry::trace::SpanContext> span_context) noexcept
+           opentelemetry::trace::SpanContext span_context) noexcept
     : tracer_{std::move(tracer)},
       recordable_{tracer_->GetProcessor().MakeRecordable()},
       start_steady_time{options.start_steady_time},
@@ -69,11 +71,11 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
   recordable_->SetSpanLimits(tracer_->GetSpanLimits());
   recordable_->SetName(name);
   recordable_->SetInstrumentationScope(tracer_->GetInstrumentationScope());
-  recordable_->SetIdentity(*span_context_, parent_span_context.IsValid()
-                                               ? parent_span_context.span_id()
-                                               : opentelemetry::trace::SpanId());
+  recordable_->SetIdentity(span_context_, parent_span_context.IsValid()
+                                              ? parent_span_context.span_id()
+                                              : opentelemetry::trace::SpanId());
 
-  recordable_->SetTraceFlags(span_context_->trace_flags());
+  recordable_->SetTraceFlags(span_context_.trace_flags());
 
   attributes.ForEachKeyValue([&](nostd::string_view key, common::AttributeValue value) noexcept {
     recordable_->SetAttribute(key, value);
@@ -85,6 +87,14 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
     recordable_->AddLink(span_context, attributes);
     return true;
   });
+
+  if (sampling_result.attributes != nullptr)
+  {
+    for (const auto &kv : *sampling_result.attributes)
+    {
+      recordable_->SetAttribute(kv.first, kv.second);
+    }
+  }
 
   recordable_->SetSpanKind(options.kind);
   recordable_->SetStartTime(NowOr(options.start_system_time));
