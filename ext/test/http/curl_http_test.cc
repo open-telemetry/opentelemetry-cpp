@@ -108,7 +108,13 @@ public:
 
   void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
   {
-    if (state == http_client::SessionState::Cancelled)
+    if (state == http_client::SessionState::CreateFailed)
+    {
+      terminal_count_.fetch_add(1, std::memory_order_release);
+      create_failed_.fetch_add(1, std::memory_order_release);
+      last_reason_empty_.store(reason.empty(), std::memory_order_release);
+    }
+    else if (state == http_client::SessionState::Cancelled)
     {
       terminal_count_.fetch_add(1, std::memory_order_release);
       // Cleanup dispatches its own Cancelled carrying a curl message, and GetCurlErrorMessage
@@ -134,6 +140,8 @@ public:
   std::thread::id cancelled_from_{};
   std::atomic<int> terminal_count_{0};
   std::atomic<int> cancelled_from_callback_{0};
+  std::atomic<int> create_failed_{0};
+  std::atomic<bool> last_reason_empty_{true};
 };
 
 class GetEventHandler : public CustomEventHandler
@@ -711,7 +719,7 @@ TEST_F(BasicCurlHttpTests, CancelFromCreatedCompletes)
   session_manager->FinishAllSessions();
 
   EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
-  EXPECT_GE(handler->terminal_count_.load(std::memory_order_acquire), 1);
+  EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire));
 }
 
 TEST_F(BasicCurlHttpTests, CancelFromConnectingCompletes)
@@ -732,12 +740,49 @@ TEST_F(BasicCurlHttpTests, CancelFromConnectingCompletes)
   session_manager->FinishAllSessions();
 
   EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
-  EXPECT_GE(handler->terminal_count_.load(std::memory_order_acquire), 1);
+  // Two, and one is the goal rather than the behaviour: cancelling once the transfer has been
+  // handed to the IO thread produces a terminal event from Cleanup and another from the
+  // completion callback. That is #4360, and pinning the number here makes any change to it
+  // visible instead of letting an at-least-one assertion absorb it.
+  EXPECT_EQ(2, handler->terminal_count_.load(std::memory_order_acquire));
 }
 
 // CreateSession hands back an unregistered session when the URL does not parse, and
 // CURLOPT_URL is not checked when it is set, so nothing on this path stops the operation
 // reaching the same dead end with no handler involved at all. See #4393.
+// Pending removals are keyed by session id. Two sessions whose URL never parsed must not share
+// one: the map's move assignment swaps the displaced easy handle and header list into a
+// temporary whose destructor frees neither.
+TEST_F(BasicCurlHttpTests, UnparsableUrlsReleaseTheirOwnResources)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto first  = session_manager->CreateSession("http://127.0.0.1:not-a-port");
+  auto second = session_manager->CreateSession("http://127.0.0.1:also-not-a-port");
+
+  const auto first_id  = static_cast<http_client::curl::Session *>(first.get())->GetSessionId();
+  const auto second_id = static_cast<http_client::curl::Session *>(second.get())->GetSessionId();
+  EXPECT_NE(0U, first_id) << "an unregistered session kept the default id";
+  EXPECT_NE(first_id, second_id) << "two unregistered sessions share a pending removal key";
+
+  auto first_request = first->CreateRequest();
+  first_request->SetUri("get/");
+  auto second_request = second->CreateRequest();
+  second_request->SetUri("get/");
+
+  auto first_handler  = std::make_shared<TerminalCountingHandler>();
+  auto second_handler = std::make_shared<TerminalCountingHandler>();
+  first->SendRequest(first_handler);
+  second->SendRequest(second_handler);
+  first->FinishSession();
+  second->FinishSession();
+  session_manager->FinishAllSessions();
+
+  EXPECT_EQ(1, first_handler->terminal_count_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, second_handler->terminal_count_.load(std::memory_order_acquire));
+}
+
 TEST_F(BasicCurlHttpTests, InvalidUrlCompletes)
 {
   auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
@@ -754,7 +799,13 @@ TEST_F(BasicCurlHttpTests, InvalidUrlCompletes)
   session_manager->FinishAllSessions();
 
   EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
-  EXPECT_GE(handler->terminal_count_.load(std::memory_order_acquire), 1);
+  // Exact, so a duplicate notification or a failure dressed as a manual cancel fails here
+  // rather than passing as at least one of something.
+  EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, handler->create_failed_.load(std::memory_order_acquire))
+      << "an unregistered session was not reported as a failed create";
+  EXPECT_FALSE(handler->last_reason_empty_.load(std::memory_order_acquire))
+      << "the failure was reported without saying what failed";
 }
 
 // The counters say whether the IO thread reached this handler while the caller was still

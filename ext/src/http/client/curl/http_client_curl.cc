@@ -327,7 +327,12 @@ std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSes
   const auto parsedUrl = common::UrlParser(std::string(url));
   if (!parsedUrl.success_)
   {
-    return std::make_shared<Session>(*this);
+    // Unregistered, but given an id all the same. Pending removals are keyed by session id, so
+    // two sessions sharing one displace each other's easy handle and header list, which nothing
+    // then frees.
+    auto unregistered = std::make_shared<Session>(*this);
+    unregistered->SetId(++next_session_id_);
+    return unregistered;
   }
   auto session =
       std::make_shared<Session>(*this, parsedUrl.scheme_, parsedUrl.host_, parsedUrl.port_);
@@ -737,7 +742,7 @@ bool HttpClient::doAddSessions()
   }
 
   bool has_data = false;
-  std::list<std::shared_ptr<Session>> rejected_by_multi;
+  std::list<std::pair<std::shared_ptr<Session>, CURLMcode>> rejected_by_multi;
 
   {
     std::lock_guard<std::mutex> lock_guard{sessions_m_};
@@ -764,10 +769,9 @@ bool HttpClient::doAddSessions()
       if (CURLM_OK != rc)
       {
         // Nothing will drive this transfer. Leaving it here is what makes a caller wait on a
-        // future nobody can complete, so hand it to the loop below to be finished.
-        OTEL_INTERNAL_LOG_ERROR(
-            "[HTTP Client Curl] curl_multi_add_handle failed: " << curl_multi_strerror(rc));
-        rejected_by_multi.push_back(session->second);
+        // future nobody can complete, so hand it to the loop below to be finished. Reported
+        // there too: the log handler is application code that can re-enter this client.
+        rejected_by_multi.emplace_back(session->second, rc);
         continue;
       }
 
@@ -777,12 +781,17 @@ bool HttpClient::doAddSessions()
 
   // Outside sessions_m_ on purpose. FinishOperation runs the caller's handler, and a handler
   // that cancels from it takes that lock again. See #4389.
-  for (auto &session : rejected_by_multi)
+  for (auto &rejected : rejected_by_multi)
   {
-    session->FinishOperation();
+    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_multi_add_handle failed: "
+                            << curl_multi_strerror(rejected.second));
+    rejected.first->FinishOperation();
   }
 
-  return has_data;
+  // Finishing a rejected session queues its removal, and the loop's idle check has already run
+  // doRemoveSessions by the time it calls this. Answering false here lets the worker exit with
+  // that removal still queued.
+  return has_data || !rejected_by_multi.empty();
 }
 
 bool HttpClient::doAbortSessions()
