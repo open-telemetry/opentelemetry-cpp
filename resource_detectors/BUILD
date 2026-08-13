@@ -17,6 +17,8 @@ cc_library(
         "src/container_detector.cc",
         "src/container_detector_utils.cc",
         "src/env_entity_detector.cc",
+        "src/host_detector.cc",
+        "src/host_detector_utils.cc",
         "src/process_detector.cc",
         "src/process_detector_utils.cc",
     ],
