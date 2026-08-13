@@ -1421,3 +1421,38 @@ TEST(SdkBuilder, SetResourceMergePriority)
   EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.name"), "opentelemetry");
   EXPECT_EQ(resource.GetSchemaURL(), "https://opentelemetry.io/schemas/1.2.0");
 }
+
+TEST(SdkBuilder, SetResourceFilterAppliesToDetectedAttributesOnly)
+{
+  auto registry = RegistryFactory::Create();
+  registry->SetProcessResourceDetectorBuilder(
+      std::make_unique<TestProcessResourceDetectorBuilder>());
+  SdkBuilder builder(std::move(registry));
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(
+      std::make_unique<config_sdk::ProcessResourceDetectorConfiguration>());
+
+  // Exclude everything the detector produced.
+  auto filter                    = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+  filter->excluded               = std::make_unique<config_sdk::StringArrayConfiguration>();
+  filter->excluded->string_array = {"process.*"};
+  model->detection->attributes   = std::move(filter);
+
+  // Attributes matching the excluded pattern, from attributes_list and attributes.
+  model->attributes_list = "process.pid=from-list";
+
+  auto typed_value   = std::make_unique<config_sdk::StringAttributeValueConfiguration>();
+  typed_value->value = "from-attributes";
+  model->attributes  = std::make_unique<config_sdk::AttributesConfiguration>();
+  model->attributes->kv_map.emplace("process.command_args", std::move(typed_value));
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  // The filter removed every detected attribute, but does not apply to the
+  // attributes and attributes_list fields, even when their keys match.
+  EXPECT_EQ(GetStringAttribute(resource, "process.pid"), "from-list");
+  EXPECT_EQ(GetStringAttribute(resource, "process.command_args"), "from-attributes");
+}
