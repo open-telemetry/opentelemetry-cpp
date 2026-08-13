@@ -765,7 +765,7 @@ bool HttpClient::doAbortSessions()
   }
 
   bool has_data = false;
-  for (const auto &session : pending_to_abort_sessions)
+  for (auto &session : pending_to_abort_sessions)
   {
     if (!session.second)
     {
@@ -776,6 +776,15 @@ bool HttpClient::doAbortSessions()
     {
       session.second->FinishOperation();
       has_data = true;
+    }
+
+    // FinishOperation queued the easy handle for removal, and that handle still holds
+    // CURLOPT_PRIVATE and the callback data pointing into this session and its operation.
+    // doRemoveSessions cannot find the session to hold, because aborting took it out of
+    // sessions_, so hand it the owner directly: it keeps one until the handle is freed.
+    {
+      std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
+      pending_to_remove_sessions_.emplace_back(std::move(session.second));
     }
   }
   return has_data;
