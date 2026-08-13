@@ -18,6 +18,7 @@
 #include <condition_variable>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <map>
 #include <mutex>
 #include <sstream>
@@ -253,11 +254,21 @@ static char *CurlTestStrdup(const char *str)
   return copy;
 }
 
-// curl_multi_init allocates with calloc and never with malloc, so this one selects it.
+// Aimed at curl_multi_init, which allocates with calloc on the libcurl this was measured
+// against. Which internal allocation a given libcurl uses is not part of its contract, so
+// the cases that rely on this check what actually failed rather than assume.
+// Not thread_local, unlike the switches above. The case that keeps a client alive while the
+// multi handle cannot be created needs the failure to reach the IO thread as well.
+static std::atomic<bool> g_fail_curl_calloc_everywhere{false};
+
 static void *CurlTestCalloc(size_t count, size_t size)
 {
   g_curl_hooks_ran.store(true, std::memory_order_relaxed);
-  return g_fail_curl_calloc ? nullptr : std::calloc(count, size);
+  if (g_fail_curl_calloc || g_fail_curl_calloc_everywhere.load(std::memory_order_relaxed))
+  {
+    return nullptr;
+  }
+  return std::calloc(count, size);
 }
 // NOLINTEND(cppcoreguidelines-no-malloc,hicpp-no-malloc)
 }  // extern "C"
@@ -289,6 +300,23 @@ struct FailCurlCalloc
 // Counts terminal outcomes without caring which one, since a client whose multi handle could
 // not be created may still recover and answer, and the case below is about the caller being
 // told either way rather than about which answer it gets.
+// Counts internal log lines, so a case can hold that a run of failures is reported a bounded
+// number of times rather than once per pass of the IO loop.
+class CountingLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
+{
+public:
+  void Handle(opentelemetry::sdk::common::internal_log::LogLevel /* level */,
+              const char * /* file */,
+              int /* line */,
+              const char * /* msg */,
+              const opentelemetry::sdk::common::AttributeMap & /* attributes */) noexcept override
+  {
+    count_.fetch_add(1, std::memory_order_relaxed);
+  }
+
+  std::atomic<int> count_{0};
+};
+
 class MultiHandleOutcomeHandler : public http_client::EventHandler
 {
 public:
@@ -1070,10 +1098,11 @@ TEST_F(BasicCurlHttpTests, AFailedMultiHandleIsReportedForAnInstrumentedClient)
 }
 
 // Reporting the failure does not by itself stop the client taking requests, so this holds what
-// taking one leads to. The IO loop resets the multi handle whenever curl_multi_perform rejects
-// it, so a client built on a null handle repairs itself and answers; if the allocation is still
-// failing by then it reports a failure instead. What must not happen is neither.
-TEST_F(BasicCurlHttpTests, AClientWithoutAMultiHandleStillAnswers)
+// taking one leads to. The IO loop creates a new multi handle when curl_multi_perform rejects
+// the one it has, so a client built on a null handle usually recovers and answers, and reports a
+// failure instead when the allocation is still failing by then. Either is fine. Neither is not,
+// and that is what this checks, so it does not assert which one arrives.
+TEST_F(BasicCurlHttpTests, AClientWithoutAMultiHandleReachesATerminalOutcome)
 {
   ASSERT_TRUE(g_curl_hooks_installed);
   received_requests_.clear();
@@ -1515,5 +1544,72 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
   session_manager->FinishAllSessions();
 }
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
+
+// A client whose multi handle can never be created has nothing to run, and used to say so as
+// fast as the CPU allowed: measured at a full core and 1,168,126 error lines over three seconds
+// with the client alive. The IO loop reports a run of failures once and waits between attempts
+// now, and this holds both.
+TEST_F(BasicCurlHttpTests, APersistentMultiHandleFailureDoesNotSpin)
+{
+  ASSERT_TRUE(g_curl_hooks_installed);
+  received_requests_.clear();
+
+  auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(client != nullptr);
+
+  // One completed request, so the IO thread exists and the loop below is the one under test.
+  {
+    auto warm         = client->CreateSession("http://127.0.0.1:19000");
+    auto warm_request = warm->CreateRequest();
+    warm_request->SetUri("get/");
+    auto warm_handler = std::make_shared<MultiHandleOutcomeHandler>();
+    warm->SendRequest(warm_handler);
+    ASSERT_TRUE(waitForRequests(30, 1));
+    warm->FinishSession();
+    ASSERT_GE(warm_handler->terminal_.load(std::memory_order_acquire), 1);
+  }
+
+  auto *capture = new CountingLogHandler();
+  auto previous = opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogHandler();
+  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(
+      nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(capture));
+
+  const std::clock_t cpu_before = std::clock();
+  {
+    // The hooks serve libcurl only, so this fails curl_multi_init on the IO thread without
+    // touching the allocations the rest of the binary makes.
+    g_fail_curl_calloc_everywhere.store(true, std::memory_order_relaxed);
+    auto *concrete = static_cast<http_client::curl::HttpClient *>(client.get());
+    http_client::curl::HttpClientTestPeer::ResetMultiHandle(*concrete);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    g_fail_curl_calloc_everywhere.store(false, std::memory_order_relaxed);
+  }
+  const double cpu_seconds = static_cast<double>(std::clock() - cpu_before) / CLOCKS_PER_SEC;
+  const int log_lines      = capture->count_.load(std::memory_order_relaxed);
+
+  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous);
+
+  EXPECT_LT(cpu_seconds, 0.5) << "the IO thread spun while it had no multi handle, " << cpu_seconds
+                              << " seconds of CPU over a one second window";
+  EXPECT_LE(log_lines, 8) << "the same failure was reported " << log_lines << " times";
+
+  // And it recovers once allocation works again, so the wait is a wait rather than a stop.
+  received_requests_.clear();
+  auto session = client->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  auto handler = std::make_shared<MultiHandleOutcomeHandler>();
+  session->SendRequest(handler);
+  for (int i = 0; i < 300 && 0 == handler->terminal_.load(std::memory_order_acquire); ++i)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+  EXPECT_GE(handler->terminal_.load(std::memory_order_acquire), 1)
+      << "the client did not come back once curl_multi_init could succeed again";
+
+  session->CancelSession();
+  session->FinishSession();
+  client->FinishAllSessions();
+}
 
 }  // namespace

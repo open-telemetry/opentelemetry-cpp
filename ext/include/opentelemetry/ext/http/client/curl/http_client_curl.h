@@ -364,7 +364,9 @@ private:
   bool doAbortSessions();
   bool doRemoveSessions();
   bool doRetrySessions(bool report_all);
-  void resetMultiHandle();
+  // Returns whether the client has a multi handle afterwards. The IO loop has nothing to
+  // run while it does not, and needs to know rather than call into libcurl regardless.
+  bool resetMultiHandle();
 
   std::mutex multi_handle_m_;
   CURLM *multi_handle_;
