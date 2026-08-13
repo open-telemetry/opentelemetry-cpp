@@ -201,13 +201,10 @@ public:
   }
 };
 
-// libcurl routes every internal allocation through the callbacks given to
-// curl_global_init_mem, which is the only way to reach the failure returns of
-// curl_slist_append and curl_multi_init. They have to be installed before libcurl is
-// initialised: called afterwards the function returns CURLE_OK and quietly changes nothing.
-//
-// The failure switches are thread local, so arming one cannot disturb a client's background
-// thread. These callbacks serve the whole binary once installed.
+// curl_global_init_mem is the only way to reach the failure returns of curl_slist_append and
+// curl_multi_init. It must be called before libcurl is initialised: afterwards it returns
+// CURLE_OK and changes nothing. The switches are thread local, so arming one from a test cannot
+// disturb a client's background thread.
 extern "C" {
 static std::atomic<bool> g_curl_hooks_ran{false};
 static thread_local bool g_fail_curl_malloc = false;
@@ -254,10 +251,8 @@ static char *CurlTestStrdup(const char *str)
 }
 
 // Aimed at curl_multi_init, which allocates with calloc on the libcurl this was measured
-// against. Which internal allocation a given libcurl uses is not part of its contract, so
-// the cases that rely on this check what actually failed rather than assume.
-// Not thread_local, unlike the switches above. The case that keeps a client alive while the
-// multi handle cannot be created needs the failure to reach the IO thread.
+// against. That is not part of libcurl's contract, so the cases assert on what actually failed.
+// Not thread local, unlike the switches above: the failure has to reach the IO thread.
 static std::atomic<bool> g_fail_curl_calloc_everywhere{false};
 
 // Counts what the process wide switch refused, which is one per curl_multi_init the IO thread

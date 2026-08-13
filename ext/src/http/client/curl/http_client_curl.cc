@@ -293,9 +293,7 @@ HttpClient::HttpClient()
       background_thread_wait_for_{std::chrono::minutes{1}},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
 {
-  // Members are initialised in declaration order, and multi_handle_ is declared first, so this
-  // cannot go in the list: curl_global_init has to have run before any other libcurl call, and
-  // it runs from curl_global_initializer_ above.
+  // Not in the initialiser list: curl_global_initializer_ is declared later and has to run first.
   multi_handle_ = initMultiHandle();
 }
 
@@ -309,9 +307,7 @@ HttpClient::HttpClient(
       background_thread_wait_for_{std::chrono::minutes{1}},
       curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
 {
-  // Members are initialised in declaration order, and multi_handle_ is declared first, so this
-  // cannot go in the list: curl_global_init has to have run before any other libcurl call, and
-  // it runs from curl_global_initializer_ above.
+  // Not in the initialiser list: curl_global_initializer_ is declared later and has to run first.
   multi_handle_ = initMultiHandle();
 }
 
@@ -612,17 +608,14 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             }
           } while (true);
 
-          // Abort all pending easy handles. This one calls nothing from the multi interface, so
-          // it runs whether or not there is a handle and teardown keeps working without one.
+          // Abort all pending easy handles. Calls no multi function, so it runs without a handle.
           if (self->doAbortSessions())
           {
             still_running = 1;
           }
 
-          // The three below every call curl_multi_add_handle or curl_multi_remove_handle. Running
-          // them without a handle would take the pending sessions out of the queue that keeps
-          // them safe from the next reset, hand them to a multi function that cannot accept
-          // them, and report the transfer as running.
+          // The three below each call curl_multi_add_handle or curl_multi_remove_handle. Without
+          // a handle they would drain the pending queue into a function that cannot accept it.
           const bool multi_available = (nullptr != self->multi_handle_);
 
           // Remove all pending easy handles

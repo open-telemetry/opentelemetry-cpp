@@ -325,10 +325,8 @@ private:
 
   char curl_error_message_[CURL_ERROR_SIZE]{};
   HttpCurlEasyResource curl_resource_;
-  CURLcode last_curl_result_{CURLE_OK};  // Curl result OR HTTP status code if successful
-  // Set when the constructor could not finish. Send() and SendAsync() refuse on it, so a
-  // request whose setup never completed is not put on the wire.
-  CURLcode construction_result_{CURLE_OK};
+  CURLcode last_curl_result_{CURLE_OK};     // Curl result OR HTTP status code if successful
+  CURLcode construction_result_{CURLE_OK};  // Non-OK if setup failed; Send() refuses on it
 
   opentelemetry::ext::http::client::EventHandler *event_handle_{nullptr};
 
