@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <future>
 #include <initializer_list>
 #include <mutex>
 #include <string>
@@ -228,6 +229,53 @@ private:
   EventScript script_;
 };
 
+// Keeps the handler and returns, so the export reaches its wait with nothing recorded and only a
+// notification can end it.
+class DeferredSession : public http_client::Session
+{
+public:
+  DeferredSession(std::shared_ptr<http_client::EventHandler> *slot, std::promise<void> *arrived)
+      : slot_(slot), arrived_(arrived)
+  {}
+
+  std::shared_ptr<http_client::Request> CreateRequest() noexcept override
+  {
+    return std::make_shared<FakeRequest>();
+  }
+  void SendRequest(std::shared_ptr<http_client::EventHandler> handler) noexcept override
+  {
+    *slot_ = std::move(handler);
+    arrived_->set_value();
+  }
+  bool IsSessionActive() noexcept override { return true; }
+  bool CancelSession() noexcept override { return true; }
+  bool FinishSession() noexcept override { return true; }
+
+private:
+  std::shared_ptr<http_client::EventHandler> *slot_;
+  std::promise<void> *arrived_;
+};
+
+class DeferredHttpClient : public http_client::HttpClient
+{
+public:
+  DeferredHttpClient(std::shared_ptr<http_client::EventHandler> *slot, std::promise<void> *arrived)
+      : slot_(slot), arrived_(arrived)
+  {}
+
+  std::shared_ptr<http_client::Session> CreateSession(nostd::string_view) noexcept override
+  {
+    return std::make_shared<DeferredSession>(slot_, arrived_);
+  }
+  bool CancelAllSessions() noexcept override { return true; }
+  bool FinishAllSessions() noexcept override { return true; }
+  void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
+
+private:
+  std::shared_ptr<http_client::EventHandler> *slot_;
+  std::promise<void> *arrived_;
+};
+
 class FakeHttpClient : public http_client::HttpClient
 {
 public:
@@ -272,6 +320,80 @@ protected:
   }
 };
 }  // namespace
+
+namespace
+{
+// Runs one export on another thread against a session that keeps its handler, and hands back the
+// handler once the exporter has reached it. Everything is held by shared_ptr and the thread is
+// detached, because waitForResponse has no deadline: if a wake-up stops working the export never
+// returns, and joining it would hang the binary rather than fail the case.
+struct ParkedExport
+{
+  std::shared_ptr<DeferredHttpClient> client;
+  std::shared_ptr<logs_exporter::ElasticsearchLogRecordExporter> exporter;
+  std::shared_ptr<http_client::EventHandler> handler;
+  std::promise<void> arrived;
+  std::promise<opentelemetry::sdk::common::ExportResult> done;
+  std::future<opentelemetry::sdk::common::ExportResult> finished;
+};
+
+std::shared_ptr<ParkedExport> StartParkedExport()
+{
+  auto parked    = std::make_shared<ParkedExport>();
+  parked->client = std::make_shared<DeferredHttpClient>(&parked->handler, &parked->arrived);
+
+  logs_exporter::ElasticsearchExporterOptions options;
+  parked->exporter =
+      std::make_shared<logs_exporter::ElasticsearchLogRecordExporter>(options, parked->client);
+
+  auto reached  = parked->arrived.get_future();
+  auto finished = parked->done.get_future();
+
+  std::thread([parked] {
+    auto record = parked->exporter->MakeRecordable();
+    parked->done.set_value(
+        parked->exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1)));
+  }).detach();
+
+  EXPECT_EQ(std::future_status::ready, reached.wait_for(std::chrono::seconds{5}))
+      << "the exporter never sent the request";
+  EXPECT_TRUE(parked->handler) << "the session was not given a handler";
+  EXPECT_EQ(std::future_status::timeout, finished.wait_for(std::chrono::milliseconds{100}))
+      << "the export returned without waiting for anything";
+
+  parked->finished = std::move(finished);
+  return parked;
+}
+}  // namespace
+
+// A terminal error delivered once the waiter is parked has to end the wait, which is the half the
+// notification is responsible for. Without these, removing cv_.notify_all() keeps this file green.
+TEST_F(ElasticsearchLogsExporterSyncTests, AReadErrorAfterTheWaiterParksWakesTheExport)
+{
+  auto parked = StartParkedExport();
+  ASSERT_TRUE(parked->handler);
+
+  parked->handler->OnEvent(http_client::SessionState::ReadError, "");
+
+  ASSERT_EQ(std::future_status::ready, parked->finished.wait_for(std::chrono::seconds{10}))
+      << "the read error never woke the export";
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kFailure, parked->finished.get());
+}
+
+// The same for the success half, which also holds that the wait is a wait: a waitForResponse that
+// only read the current state would answer before this response arrives.
+TEST_F(ElasticsearchLogsExporterSyncTests, AResponseAfterTheWaiterParksWakesTheExport)
+{
+  auto parked = StartParkedExport();
+  ASSERT_TRUE(parked->handler);
+
+  FakeResponse response(200, kAcceptedBody);
+  parked->handler->OnResponse(response);
+
+  ASSERT_EQ(std::future_status::ready, parked->finished.wait_for(std::chrono::seconds{10}))
+      << "the response never woke the export";
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, parked->finished.get());
+}
 
 TEST_F(ElasticsearchLogsExporterSyncTests, ResponseRecordedBeforeTheWaitIsStillSeen)
 {
@@ -337,7 +459,7 @@ const ErrorTerminalState kErrorTerminalStates[] = {
     {http_client::SessionState::Cancelled, "(manually) cancelled"},
 };
 
-// Counts the exporter's own error lines, and returns the ones that carry a given message.
+// Counts the exporter's own error lines.
 std::size_t CountExporterErrors(const std::vector<std::string> &lines)
 {
   std::size_t count = 0;
