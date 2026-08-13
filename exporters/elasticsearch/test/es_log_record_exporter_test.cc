@@ -626,6 +626,7 @@ protected:
 #else
     // One skip point, because GTEST_SKIP returns and a second one after it would leave the rest of
     // this body unreachable, which MSVC reports as C4702 under maintainer mode.
+    previous_handler_ = internal_log::GlobalLogHandler::GetLogHandler();
     handler_ = nostd::shared_ptr<internal_log::LogHandler>(new CompletionCountingLogHandler());
     internal_log::GlobalLogHandler::SetLogHandler(handler_);
     previous_level_ = internal_log::GlobalLogHandler::GetLogLevel();
@@ -638,8 +639,7 @@ protected:
     if (handler_)
     {
       internal_log::GlobalLogHandler::SetLogLevel(previous_level_);
-      internal_log::GlobalLogHandler::SetLogHandler(
-          nostd::shared_ptr<internal_log::LogHandler>(new internal_log::DefaultLogHandler()));
+      internal_log::GlobalLogHandler::SetLogHandler(previous_handler_);
     }
   }
 
@@ -651,6 +651,7 @@ protected:
   int Completions() const { return Counter().completions(); }
 
   nostd::shared_ptr<internal_log::LogHandler> handler_;
+  nostd::shared_ptr<internal_log::LogHandler> previous_handler_;
   internal_log::LogLevel previous_level_ = internal_log::LogLevel::Warning;
 };
 }  // namespace
@@ -664,8 +665,9 @@ TEST_F(ElasticsearchAsyncCompletionTests, EverySessionStateIsClassifiedAndReport
     bool terminal;
   };
 
-  // Every member of the enum, so a state added upstream shows up here as a missing row rather than
-  // as a session that quietly never finishes. The switch has no default label for the same reason.
+  // Every member of the enum as it stands. An array cannot notice that the enum grew, so what
+  // catches a new state is the switch in the exporter having no default, under the -Wswitch that
+  // maintainer mode turns into an error. This table is the second half of that.
   const Case cases[] = {
       {http_client::SessionState::CreateFailed, true},
       {http_client::SessionState::Created, false},
@@ -846,9 +848,13 @@ namespace
 class FlushingLogHandler : public internal_log::LogHandler
 {
 public:
-  void Watch(logs_exporter::ElasticsearchLogRecordExporter *exporter) noexcept
+  // The needle picks which diagnostic re-enters the exporter, because the two paths that log
+  // one describe it differently.
+  void Watch(logs_exporter::ElasticsearchLogRecordExporter *exporter,
+             const char *needle = "Logs were not written") noexcept
   {
     exporter_ = exporter;
+    needle_   = needle;
   }
 
   void Handle(internal_log::LogLevel /* level */,
@@ -861,10 +867,11 @@ public:
     {
       return;
     }
-    if (std::string(msg).find("Logs were not written") == std::string::npos)
+    if (std::string(msg).find(needle_) == std::string::npos)
     {
       return;
     }
+    lines_.fetch_add(1, std::memory_order_relaxed);
     if (reentered_.exchange(true, std::memory_order_relaxed))
     {
       return;
@@ -874,11 +881,14 @@ public:
 
   bool reentered() const noexcept { return reentered_.load(std::memory_order_relaxed); }
   bool flushed() const noexcept { return flushed_.load(std::memory_order_relaxed); }
+  int lines() const noexcept { return lines_.load(std::memory_order_relaxed); }
 
 private:
   logs_exporter::ElasticsearchLogRecordExporter *exporter_{nullptr};
+  const char *needle_{"Logs were not written"};
   std::atomic<bool> reentered_{false};
   std::atomic<bool> flushed_{false};
+  std::atomic<int> lines_{0};
 };
 }  // namespace
 
@@ -900,6 +910,27 @@ TEST_F(ElasticsearchAsyncCompletionTests, AFlushFromInsideTheLogHandlerDoesNotWa
 
   ASSERT_TRUE(raw->reentered()) << "the failure never reached the log handler";
   EXPECT_TRUE(raw->flushed()) << "the flush waited for the session that was reporting itself";
+  raw->Watch(nullptr);
+}
+
+// The same rule on the path that refuses the batch. The export is registered before the shutdown
+// check, so reporting the refusal before retiring it makes a flushing handler wait for the
+// Export() that is calling it, and the refusal is described twice.
+TEST_F(ElasticsearchAsyncCompletionTests, AFlushFromTheShutdownErrorDoesNotWaitForItsOwnExport)
+{
+  auto fixture = MakeExporter([](const std::shared_ptr<http_client::EventHandler> &) {});
+  ASSERT_TRUE(fixture.exporter->Shutdown());
+
+  auto watcher = nostd::shared_ptr<internal_log::LogHandler>(new FlushingLogHandler());
+  auto *raw    = static_cast<FlushingLogHandler *>(watcher.get());
+  raw->Watch(fixture.exporter.get(), "exporter is shutdown");
+  internal_log::GlobalLogHandler::SetLogHandler(watcher);
+
+  ExportOnce(*fixture.exporter);
+
+  ASSERT_TRUE(raw->reentered()) << "the shutdown refusal never reached the log handler";
+  EXPECT_TRUE(raw->flushed()) << "the flush waited for the export that was refusing itself";
+  EXPECT_EQ(1, raw->lines()) << "one refusal was described " << raw->lines() << " times";
   raw->Watch(nullptr);
 }
 
@@ -958,8 +989,9 @@ TEST_F(ElasticsearchAsyncCompletionTests, TwoTerminalEventsCountAsOneSession)
       << "the second session is still in flight";
 }
 
-// The other in-tree double fire: the completion lambda uses two independent ifs, so an aborted
-// operation that also has a response reports Cancelled and then delivers the response.
+// The curl client's completion lambda tests the response first and the abort in an else, so this
+// ordering no longer comes from it. It still comes from anywhere: EventHandler promises callers
+// nothing about how many terminal events arrive, and #4360 is open on exactly that.
 TEST_F(ElasticsearchAsyncCompletionTests, CancelledThenAResponseCountsOnce)
 {
   std::vector<std::shared_ptr<http_client::EventHandler>> kept;

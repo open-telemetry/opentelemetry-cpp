@@ -458,16 +458,24 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
     synchronization_data_->running_sessions.insert(session_id);
   }
 
-  using Completion    = std::function<bool(opentelemetry::sdk::common::ExportResult)>;
-  Completion complete = [span_count, session_id,
-                         synchronization_data](opentelemetry::sdk::common::ExportResult result) {
+  // Retiring the export is separate from describing what happened to it, because the refusal
+  // below has to retire without having an outcome to report through the completion.
+  auto retire = [session_id, synchronization_data]() noexcept {
+    bool retired = false;
     {
       // Published under the mutex ForceFlush() waits on. A waiter that has evaluated its
       // predicate but not yet parked would otherwise not see this until the next wakeup.
       std::lock_guard<std::mutex> lock(synchronization_data->force_flush_cv_m);
-      synchronization_data->running_sessions.erase(session_id);
+      retired = synchronization_data->running_sessions.erase(session_id) == 1;
     }
     synchronization_data->force_flush_cv.notify_all();
+    return retired;
+  };
+
+  using Completion    = std::function<bool(opentelemetry::sdk::common::ExportResult)>;
+  Completion complete = [span_count,
+                         retire](opentelemetry::sdk::common::ExportResult result) noexcept {
+    retire();
 
     // Logged after the session is retired. The log handler is replaceable, and one that calls
     // ForceFlush() would otherwise wait for the very session this call has not let go of yet.
@@ -512,6 +520,12 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   // Return failure if this exporter has been shutdown
   if (isShutdown())
   {
+#ifdef ENABLE_ASYNC_EXPORT
+    // Retired before anything replaceable runs, and reported here rather than through the guard,
+    // so a log handler that flushes does not wait for this Export() and one refusal reads as one.
+    guard.report = nullptr;
+    retire();
+#endif
     OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Exporting "
                             << records.size() << " log(s) failed, exporter is shutdown");
     return sdk::common::ExportResult::kFailure;
