@@ -270,14 +270,16 @@ void Session::FinishOperation()
   }
 }
 
-// A null multi handle makes every curl_multi_add_handle report CURLM_BAD_HANDLE, so a client
-// built on one accepts sessions and never sends any of them. Say so rather than fail quietly.
+// Reported once, where it happens. The IO loop does its own reporting, because sharing this one
+// would repeat the same line on every pass for as long as the handle stays missing.
 static CURLM *initMultiHandle()
 {
   CURLM *handle = curl_multi_init();
   if (nullptr == handle)
   {
-    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_multi_init failed, this client cannot send");
+    OTEL_INTERNAL_LOG_ERROR(
+        "[HTTP Client Curl] curl_multi_init failed, requests cannot be processed until it "
+        "succeeds");
   }
   return handle;
 }
@@ -470,14 +472,21 @@ bool HttpClient::MaybeSpawnBackgroundThread()
         }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
-        auto still_running           = 1;
-        auto last_free_job_timepoint = std::chrono::system_clock::now();
-        auto need_wait_more          = false;
+        auto still_running                 = 1;
+        auto last_free_job_timepoint       = std::chrono::system_clock::now();
+        auto need_wait_more                = false;
+        bool missing_multi_handle_reported = false;
         while (true)
         {
           CURLMsg *msg = nullptr;
           int queued   = 0;
-          CURLMcode mc = curl_multi_perform(self->multi_handle_, &still_running);
+          // curl_multi_init says the other multi functions cannot be used once it has returned
+          // null, so a missing handle is answered here rather than passed to libcurl.
+          CURLMcode mc = CURLM_BAD_HANDLE;
+          if (nullptr != self->multi_handle_)
+          {
+            mc = curl_multi_perform(self->multi_handle_, &still_running);
+          }
           // According to https://curl.se/libcurl/c/curl_multi_perform.html, when mc is not OK, we
           // can not curl_multi_perform it again
           if (mc != CURLM_OK)
@@ -486,7 +495,24 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             // starts at one, so without this the loop keeps reporting work it does not have,
             // never reaches the shutdown check below, and the thread cannot be joined.
             still_running = 0;
-            self->resetMultiHandle();
+            if (self->resetMultiHandle())
+            {
+              missing_multi_handle_reported = false;
+            }
+            else if (!self->is_shutdown_.load(std::memory_order_acquire))
+            {
+              // Nothing can run without a handle. Retrying at once pegs a core and repeats one
+              // error for the whole idle window, so report the run of failures once and wait as
+              // long as a poll would have. Shutdown skips the wait so teardown stays prompt.
+              if (!missing_multi_handle_reported)
+              {
+                OTEL_INTERNAL_LOG_ERROR(
+                    "[HTTP Client Curl] no multi handle, requests cannot be processed until "
+                    "curl_multi_init succeeds");
+                missing_multi_handle_reported = true;
+              }
+              std::this_thread::sleep_for(self->scheduled_delay_milliseconds_);
+            }
           }
           else if (still_running || need_wait_more)
           {
@@ -897,7 +923,7 @@ bool HttpClient::doRetrySessions(bool /* report_all */)
 }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
-void HttpClient::resetMultiHandle()
+bool HttpClient::resetMultiHandle()
 {
   std::list<std::shared_ptr<Session>> sessions;
   {
@@ -928,8 +954,10 @@ void HttpClient::resetMultiHandle()
   std::lock_guard<std::mutex> lock_guard{multi_handle_m_};
   curl_multi_cleanup(multi_handle_);
 
-  // Create a another multi handle to continue pending sessions
-  multi_handle_ = initMultiHandle();
+  // Create a another multi handle to continue pending sessions. Silent on failure: the caller
+  // decides how often a run of failures is worth reporting.
+  multi_handle_ = curl_multi_init();
+  return nullptr != multi_handle_;
 }
 
 }  // namespace curl
