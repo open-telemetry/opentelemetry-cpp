@@ -1481,10 +1481,18 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
     return CURLE_OK;
   }
 
-  if (WasAborted() || !session->GetHttpClient().ScheduleAddSession(session->GetSessionId()))
+  if (WasAborted())
   {
     // Nothing will run this operation, so finish it here rather than leave an unfulfillable
-    // future.
+    // future. Cleanup() reports the cancel, which is what happened.
+    Cleanup();
+  }
+  else if (!session->GetHttpClient().ScheduleAddSession(session->GetSessionId()))
+  {
+    // The same, except nobody cancelled anything. Name the failure first: Cleanup() would report
+    // a manual cancel, with a reason read from a curl result that is still CURLE_OK.
+    DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
+                  "the session is not registered with this client");
     Cleanup();
   }
 
