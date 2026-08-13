@@ -259,10 +259,14 @@ static std::atomic<bool> g_fail_curl_calloc_everywhere{false};
 // tried while it had no handle. That is the retry rate, measured the same way everywhere.
 static std::atomic<int> g_curl_calloc_failures{0};
 
+// Exempts one thread from the process wide switch. A test that has to build a request while the
+// IO thread cannot create a handle needs its own allocations to keep working.
+static thread_local bool g_curl_calloc_exempt = false;
+
 static void *CurlTestCalloc(size_t count, size_t size)
 {
   g_curl_hooks_ran.store(true, std::memory_order_relaxed);
-  if (g_fail_curl_calloc_everywhere.load(std::memory_order_relaxed))
+  if (g_fail_curl_calloc_everywhere.load(std::memory_order_relaxed) && !g_curl_calloc_exempt)
   {
     g_curl_calloc_failures.fetch_add(1, std::memory_order_relaxed);
     return nullptr;
@@ -325,6 +329,7 @@ class MultiHandleOutcomeHandler : public http_client::EventHandler
 public:
   void OnResponse(http_client::Response & /* response */) noexcept override
   {
+    responses_.fetch_add(1, std::memory_order_release);
     terminal_.fetch_add(1, std::memory_order_release);
   }
 
@@ -332,10 +337,13 @@ public:
   {
     switch (state)
     {
+      case http_client::SessionState::Cancelled:
+        cancels_.fetch_add(1, std::memory_order_release);
+        terminal_.fetch_add(1, std::memory_order_release);
+        break;
       case http_client::SessionState::CreateFailed:
       case http_client::SessionState::ConnectFailed:
       case http_client::SessionState::SendFailed:
-      case http_client::SessionState::Cancelled:
         terminal_.fetch_add(1, std::memory_order_release);
         break;
       default:
@@ -344,6 +352,8 @@ public:
   }
 
   std::atomic<int> terminal_{0};
+  std::atomic<int> responses_{0};
+  std::atomic<int> cancels_{0};
 };
 
 class CapturingLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
@@ -1551,6 +1561,73 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
 // A client whose multi handle can never be created has nothing to run. The IO loop reports a run
 // of failures once and waits between attempts, so a client left alive in that state costs neither
 // a core nor a log line per pass, and this holds both.
+// The phases the loop gates on a multi handle move sessions between queues. Ungated, a session
+// queued while the handle is missing leaves the pending queue for a multi function that cannot
+// take it, and the next reset cancels it, so the caller is told a request was cancelled that
+// nothing cancelled.
+TEST_F(BasicCurlHttpTests, AQueuedRequestSurvivesAMissingMultiHandle)
+{
+  ASSERT_TRUE(g_curl_hooks_installed);
+  received_requests_.clear();
+
+  auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(client != nullptr);
+
+  // One completed request, so the IO thread exists and is running the loop under test.
+  {
+    auto warm         = client->CreateSession("http://127.0.0.1:19000");
+    auto warm_request = warm->CreateRequest();
+    warm_request->SetUri("get/");
+    auto warm_handler = std::make_shared<MultiHandleOutcomeHandler>();
+    warm->SendRequest(warm_handler);
+    ASSERT_TRUE(waitForRequests(30, 1));
+    warm->FinishSession();
+    ASSERT_GE(warm_handler->responses_.load(std::memory_order_acquire), 1);
+  }
+  received_requests_.clear();
+
+  g_curl_calloc_failures.store(0, std::memory_order_relaxed);
+  g_fail_curl_calloc_everywhere.store(true, std::memory_order_relaxed);
+  auto *concrete = static_cast<http_client::curl::HttpClient *>(client.get());
+  http_client::curl::HttpClientTestPeer::ResetMultiHandle(*concrete);
+
+  // curl_easy_init allocates with calloc too, so without this the request below could not be
+  // built and the case would test the refusal rather than the queue.
+  g_curl_calloc_exempt = true;
+
+  auto session = client->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  auto handler = std::make_shared<MultiHandleOutcomeHandler>();
+  session->SendRequest(handler);
+
+  // Wait for the IO thread to go round several times with no handle, so the gated phases have
+  // had every chance to consume the queued session.
+  for (int i = 0; i < 200 && g_curl_calloc_failures.load(std::memory_order_relaxed) < 5; ++i)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
+  ASSERT_GE(g_curl_calloc_failures.load(std::memory_order_relaxed), 1)
+      << "the IO thread never ran without a handle, so nothing was tested";
+
+  g_fail_curl_calloc_everywhere.store(false, std::memory_order_relaxed);
+  g_curl_calloc_exempt = false;
+
+  for (int i = 0; i < 300 && 0 == handler->terminal_.load(std::memory_order_acquire); ++i)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+
+  EXPECT_EQ(0, handler->cancels_.load(std::memory_order_acquire))
+      << "the queued request was cancelled although nothing cancelled it";
+  EXPECT_GE(handler->responses_.load(std::memory_order_acquire), 1)
+      << "the request queued while the handle was missing never reached the wire";
+
+  session->CancelSession();
+  session->FinishSession();
+  client->FinishAllSessions();
+}
+
 TEST_F(BasicCurlHttpTests, APersistentMultiHandleFailureDoesNotSpin)
 {
   ASSERT_TRUE(g_curl_hooks_installed);
