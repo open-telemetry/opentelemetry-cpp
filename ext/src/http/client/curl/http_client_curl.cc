@@ -521,7 +521,17 @@ bool HttpClient::MaybeSpawnBackgroundThread()
                     "curl_multi_init succeeds");
                 missing_multi_handle_reported = true;
               }
-              std::this_thread::sleep_for(self->scheduled_delay_milliseconds_);
+              // In slices, because this thread cannot be woken: wakeupBackgroundThread reaches it
+              // through the multi handle, and there is not one. A whole delay here would be a
+              // whole delay added to destroying the client.
+              constexpr std::chrono::milliseconds kMissingHandleWaitSlice{16};
+              for (std::chrono::milliseconds waited = std::chrono::milliseconds::zero();
+                   waited < self->scheduled_delay_milliseconds_ &&
+                   !self->is_shutdown_.load(std::memory_order_acquire);
+                   waited += kMissingHandleWaitSlice)
+              {
+                std::this_thread::sleep_for(kMissingHandleWaitSlice);
+              }
             }
           }
           else if (still_running || need_wait_more)
@@ -556,7 +566,9 @@ bool HttpClient::MaybeSpawnBackgroundThread()
 
           do
           {
-            msg = curl_multi_info_read(self->multi_handle_, &queued);
+            msg = (nullptr == self->multi_handle_)
+                      ? nullptr
+                      : curl_multi_info_read(self->multi_handle_, &queued);
             if (msg == nullptr)
             {
               break;
