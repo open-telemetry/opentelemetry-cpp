@@ -105,6 +105,9 @@ Increment the:
   SimpleLogRecordProcessor, MeterContext and Meter.
   [#4323](https://github.com/open-telemetry/opentelemetry-cpp/pull/4323)
 
+* [SDK] Add Tracer::StartSpan benchmark and optimizations
+  [#4248](https://github.com/open-telemetry/opentelemetry-cpp/pull/4248)
+
 * [CONFIGURATION] Decouple config registry and builder headers
   [#4335](https://github.com/open-telemetry/opentelemetry-cpp/pull/4335)
 
