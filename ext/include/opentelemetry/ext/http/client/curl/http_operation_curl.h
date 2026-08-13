@@ -339,8 +339,7 @@ private:
   const Headers &request_headers_;
   const opentelemetry::ext::http::client::Body &request_body_;
   size_t request_nwrite_{0};
-  // Written by whichever thread dispatches an event. A handler that cancels from one event
-  // lets the background thread dispatch another, so the two dispatches can overlap.
+  // Atomic because a handler that cancels from one event can overlap the next dispatch.
   std::atomic<opentelemetry::ext::http::client::SessionState> session_state_{
       opentelemetry::ext::http::client::SessionState::Created};
 
