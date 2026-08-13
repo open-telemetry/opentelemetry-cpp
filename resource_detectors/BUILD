@@ -17,6 +17,8 @@ cc_library(
         "src/container_detector.cc",
         "src/container_detector_utils.cc",
         "src/env_entity_detector.cc",
+        "src/host_detector.cc",
+        "src/host_detector_utils.cc",
         "src/process_detector.cc",
         "src/process_detector_utils.cc",
     ],
@@ -26,5 +28,16 @@ cc_library(
         "//resource_detectors:headers",
         "//sdk:headers",
         "//sdk/src/resource",
+    ],
+)
+
+cc_library(
+    name = "resource_detectors_builders",
+    srcs = [
+        "src/container_detector_builder.cc",
+        "src/process_detector_builder.cc",
+    ],
+    deps = [
+        ":resource_detectors",
     ],
 )

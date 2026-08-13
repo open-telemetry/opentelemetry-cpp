@@ -63,6 +63,12 @@ if(WITH_PROMETHEUS)
                         PRIVATE opentelemetry-cpp::prometheus_exporter_builder)
 endif()
 
+if(WITH_RESOURCE_DETECTORS_PREVIEW)
+  target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_RESOURCE_DETECTORS)
+  target_link_libraries(example_yaml
+                        PRIVATE opentelemetry-cpp::resource_detectors_builders)
+endif()
+
 if(BUILD_TESTING)
   if(WITH_OTLP_HTTP
      AND WITH_OTLP_GRPC

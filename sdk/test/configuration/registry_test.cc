@@ -21,6 +21,7 @@
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/container_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/extension_metric_producer_builder.h"
@@ -552,6 +553,17 @@ public:
   }
 };
 
+class TestExtensionComposableSamplerBuilder
+    : public configuration::ExtensionComposableSamplerBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> Build(
+      const configuration::ExtensionComposableSamplerConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
 class TestExtensionSpanExporterBuilder : public configuration::ExtensionSpanExporterBuilder
 {
 public:
@@ -966,6 +978,13 @@ TEST(Registry, ExtensionSamplerBuilder)
   TestNamedSlot<TestExtensionSamplerBuilder>(&configuration::Registry::GetExtensionSamplerBuilder,
                                              &configuration::Registry::SetExtensionSamplerBuilder,
                                              "my_sampler");
+}
+
+TEST(Registry, ExtensionComposableSamplerBuilder)
+{
+  TestNamedSlot<TestExtensionComposableSamplerBuilder>(
+      &configuration::Registry::GetExtensionComposableSamplerBuilder,
+      &configuration::Registry::SetExtensionComposableSamplerBuilder, "my_composable_sampler");
 }
 
 TEST(Registry, ExtensionSpanExporterBuilder)

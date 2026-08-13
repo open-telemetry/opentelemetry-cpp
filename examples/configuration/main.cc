@@ -55,6 +55,11 @@
 #  include "opentelemetry/exporters/prometheus/prometheus_pull_builder.h"
 #endif
 
+#ifdef OTEL_HAVE_RESOURCE_DETECTORS
+#  include "opentelemetry/resource_detectors/container_detector_builder.h"
+#  include "opentelemetry/resource_detectors/process_detector_builder.h"
+#endif
+
 static bool opt_help        = false;
 static bool opt_debug       = false;
 static bool opt_test        = false;
@@ -213,6 +218,11 @@ void InitOtel(const std::string &config_file)
 
 #ifdef OTEL_HAVE_PROMETHEUS
     opentelemetry::exporter::metrics::PrometheusPullBuilder::Register(registry.get());
+#endif
+
+#ifdef OTEL_HAVE_RESOURCE_DETECTORS
+    opentelemetry::resource_detector::ContainerDetectorBuilder::Register(registry.get());
+    opentelemetry::resource_detector::ProcessDetectorBuilder::Register(registry.get());
 #endif
   }
 
