@@ -413,6 +413,39 @@ static_assert(
         alignof(opentelemetry::ext::http::client::SessionState),
     "std::atomic<SessionState> is more aligned, which changes the layout of HttpOperation");
 
+namespace
+{
+// Which operations the calling thread is currently inside a callback for. A handler is allowed to
+// call FinishSession() on the request it is being told about, and that call must not wait for a
+// completion only the thread it is running on can publish.
+thread_local std::vector<const HttpOperation *> callbacks_in_progress;
+
+class CallbackScope
+{
+public:
+  explicit CallbackScope(const HttpOperation *operation) noexcept
+  {
+    callbacks_in_progress.push_back(operation);
+  }
+  ~CallbackScope() { callbacks_in_progress.pop_back(); }
+
+  CallbackScope(const CallbackScope &)            = delete;
+  CallbackScope &operator=(const CallbackScope &) = delete;
+
+  static bool InsideCallbackFor(const HttpOperation *operation) noexcept
+  {
+    for (const auto *entry : callbacks_in_progress)
+    {
+      if (entry == operation)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+};
+}  // namespace
+
 void HttpOperation::DispatchEvent(opentelemetry::ext::http::client::SessionState type,
                                   const std::string &reason)
 {
@@ -422,6 +455,7 @@ void HttpOperation::DispatchEvent(opentelemetry::ext::http::client::SessionState
 
   if (event_handle_ != nullptr)
   {
+    const CallbackScope scope{this};
     event_handle_->OnEvent(type, reason);
   }
 }
@@ -514,6 +548,14 @@ HttpOperation::~HttpOperation()
 
 void HttpOperation::Finish()
 {
+  // Called from inside a callback this operation dispatched, so the completion being waited for is
+  // the one this thread has not published yet. Returning before the flag below leaves the wait
+  // available to a caller that is not inside a callback.
+  if (CallbackScope::InsideCallbackFor(this))
+  {
+    return;
+  }
+
   if (is_finished_.exchange(true, std::memory_order_acq_rel))
   {
     return;
@@ -572,6 +614,7 @@ void HttpOperation::Cleanup()
     callback.swap(async_data_->callback);
     if (callback)
     {
+      const CallbackScope scope{this};
       HttpOperationAccessor::SetThreadId(*async_data_, std::this_thread::get_id());
       callback(*this);
       HttpOperationAccessor::SetThreadId(*async_data_, std::thread::id());
@@ -1472,26 +1515,18 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   is_finished_.store(false, std::memory_order_release);
   is_aborted_.store(false, std::memory_order_release);
   is_cleaned_.store(false, std::memory_order_release);
-  async_data_->session.store(session, std::memory_order_release);
-  async_data_->callback = std::move(callback);
-
-  DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
-
-  // The future alone stays unpublished until after the event, so a handler calling
-  // FinishSession() from it returns instead of waiting on an unscheduled transfer.
+  async_data_->callback       = std::move(callback);
   async_data_->result_promise = std::promise<CURLcode>();
   async_data_->result_future  = async_data_->result_promise.get_future();
   async_data_->is_promise_running.store(true, std::memory_order_release);
 
-  // A cancel from the event may have torn the operation down before the future existed.
-  if (is_cleaned_.load(std::memory_order_acquire))
-  {
-    if (async_data_->is_promise_running.exchange(false, std::memory_order_acq_rel))
-    {
-      async_data_->result_promise.set_value(last_curl_result_);
-    }
-    return CURLE_OK;
-  }
+  // Last, and the only thing that makes this operation reachable from the IO thread: an abort is
+  // queued through this route, so nothing can bring the operation there before the callback and
+  // the completion above exist. Cleanup is therefore the only thing that ever fulfils the promise,
+  // at its tail, once the terminal event and the completion callback have run.
+  async_data_->session.store(session, std::memory_order_release);
+
+  DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
 
   if (WasAborted())
   {
