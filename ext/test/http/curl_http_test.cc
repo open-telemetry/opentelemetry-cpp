@@ -320,24 +320,96 @@ struct FailCurlCalloc
   FailCurlCalloc &operator=(FailCurlCalloc &&)      = delete;
 };
 
+// The failure that reaches every thread, and the exemption for the one that armed it, since
+// they are armed together and have to be put away together. A guard because these two are
+// process wide and there are fatal assertions between arming and disarming: one of those
+// returning early would otherwise leave every later case in the binary allocating through a
+// calloc that refuses, on every thread, which turns one mismatched injection into a matrix of
+// timeouts rather than one red case. The cases below disarm on their way through, and this is
+// what happens when they do not get that far.
+struct FailCurlCallocEverywhere
+{
+  FailCurlCallocEverywhere()
+  {
+    g_curl_calloc_failures.store(0, std::memory_order_relaxed);
+    g_fail_curl_calloc_everywhere.store(true, std::memory_order_relaxed);
+  }
+
+  ~FailCurlCallocEverywhere() { Disarm(); }
+
+  // curl_easy_init allocates the same way, so a case that has to build a request exempts the
+  // thread it builds it on. The IO thread is not exempt, which is the point.
+  void ExemptThisThread() { g_curl_calloc_exempt = true; }
+
+  void Disarm()
+  {
+    g_fail_curl_calloc_everywhere.store(false, std::memory_order_relaxed);
+    g_curl_calloc_exempt = false;
+  }
+
+  FailCurlCallocEverywhere(const FailCurlCallocEverywhere &)            = delete;
+  FailCurlCallocEverywhere(FailCurlCallocEverywhere &&)                 = delete;
+  FailCurlCallocEverywhere &operator=(const FailCurlCallocEverywhere &) = delete;
+  FailCurlCallocEverywhere &operator=(FailCurlCallocEverywhere &&)      = delete;
+};
+
 // Counts terminal outcomes without caring which one, since a client whose multi handle could
 // not be created may still recover and answer, and the case below is about the caller being
 // told either way rather than about which answer it gets.
-// Counts internal log lines, so a case can hold that a run of failures is reported a bounded
-// number of times rather than once per pass of the IO loop.
+// Counts the internal log lines that say a particular thing, so a case can hold that a run of
+// failures is reported a bounded number of times rather than once per pass of the IO loop. Only
+// the ones it asked for: anything else the binary writes while this is installed would move the
+// bound without meaning anything.
 class CountingLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
 {
 public:
+  explicit CountingLogHandler(std::string wanted) : wanted_{std::move(wanted)} {}
+
   void Handle(opentelemetry::sdk::common::internal_log::LogLevel /* level */,
               const char * /* file */,
               int /* line */,
-              const char * /* msg */,
+              const char *msg,
               const opentelemetry::sdk::common::AttributeMap & /* attributes */) noexcept override
   {
-    count_.fetch_add(1, std::memory_order_relaxed);
+    if (nullptr != msg && std::string::npos != std::string{msg}.find(wanted_))
+    {
+      count_.fetch_add(1, std::memory_order_relaxed);
+    }
   }
 
   std::atomic<int> count_{0};
+
+private:
+  const std::string wanted_;
+};
+
+// GlobalLogHandler reads and writes the handler through a plain shared pointer with nothing
+// synchronizing it, and the documentation asks for it to be set once at startup for that
+// reason. So a case that captures installs it before anything that logs exists and puts it back
+// after all of it has gone. A guard rather than two calls: declared before the client, it is
+// destroyed after it, and an assertion that returns early still puts it back.
+class ScopedLogHandler
+{
+public:
+  explicit ScopedLogHandler(
+      const nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler> &handler)
+      : previous_{opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogHandler()}
+  {
+    opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(handler);
+  }
+
+  ~ScopedLogHandler()
+  {
+    opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous_);
+  }
+
+  ScopedLogHandler(const ScopedLogHandler &)            = delete;
+  ScopedLogHandler(ScopedLogHandler &&)                 = delete;
+  ScopedLogHandler &operator=(const ScopedLogHandler &) = delete;
+  ScopedLogHandler &operator=(ScopedLogHandler &&)      = delete;
+
+private:
+  const nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler> previous_;
 };
 
 class MultiHandleOutcomeHandler : public http_client::EventHandler
@@ -483,6 +555,18 @@ public:
     g_curl_hooks_installed =
         (CURLE_OK == curl_global_init_mem(CURL_GLOBAL_ALL, CurlTestMalloc, CurlTestFree,
                                           CurlTestRealloc, CurlTestStrdup, CurlTestCalloc));
+  }
+
+  // libcurl counts initializations and asks for a cleanup for each one. The line above is this
+  // suite's, and every client takes one of its own through HttpCurlGlobalInitializer, so
+  // without this the count never reaches zero: the allocator callbacks stay installed into
+  // static teardown, and what libcurl still holds is reported as leaked.
+  static void TearDownTestSuite()
+  {
+    if (g_curl_hooks_installed)
+    {
+      curl_global_cleanup();
+    }
   }
 
 protected:
@@ -1042,9 +1126,8 @@ TEST_F(BasicCurlHttpTests, AFailedMultiHandleAllocationIsReported)
   }
 
   auto *capture = new CapturingLogHandler();
-  auto previous = opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogHandler();
-  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(
-      nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(capture));
+  ScopedLogHandler installed{
+      nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(capture)};
 
   {
     FailCurlCalloc fail;
@@ -1054,7 +1137,6 @@ TEST_F(BasicCurlHttpTests, AFailedMultiHandleAllocationIsReported)
   }
 
   const std::string text = capture->Text();
-  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous);
 
   EXPECT_NE(std::string::npos, text.find("curl_multi_init failed"))
       << "a multi handle that could not be created was not reported, captured: " << text;
@@ -1114,9 +1196,8 @@ TEST_F(BasicCurlHttpTests, AFailedMultiHandleIsReportedForAnInstrumentedClient)
   }
 
   auto *capture = new CapturingLogHandler();
-  auto previous = opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogHandler();
-  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(
-      nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(capture));
+  ScopedLogHandler installed{
+      nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(capture)};
 
   {
     FailCurlCalloc fail;
@@ -1127,7 +1208,6 @@ TEST_F(BasicCurlHttpTests, AFailedMultiHandleIsReportedForAnInstrumentedClient)
   }
 
   const std::string text = capture->Text();
-  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous);
 
   EXPECT_NE(std::string::npos, text.find("curl_multi_init failed"))
       << "the instrumented constructor did not report a multi handle it could not create, "
@@ -1687,15 +1767,14 @@ TEST_F(BasicCurlHttpTests, AQueuedRequestSurvivesAMissingMultiHandle)
   // Built without a handle, for the reason given above: a case that took one away would be
   // using it from two threads at once, and could not then say whether what it saw was the
   // client's behaviour or its own.
-  g_curl_calloc_failures.store(0, std::memory_order_relaxed);
-  g_fail_curl_calloc_everywhere.store(true, std::memory_order_relaxed);
+  FailCurlCallocEverywhere failing;
   auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
   ASSERT_TRUE(client != nullptr);
   auto *concrete = static_cast<http_client::curl::HttpClient *>(client.get());
   ASSERT_GE(g_curl_calloc_failures.load(std::memory_order_relaxed), 1)
       << "the client was built with a multi handle, so nothing was tested";
 
-  g_curl_calloc_exempt = true;
+  failing.ExemptThisThread();
 
   // The idle grace is a minute by default, but only from libcurl 7.68: the line that gives it
   // that value is behind a version check, and older libcurl leaves it at zero, where the IO
@@ -1708,6 +1787,10 @@ TEST_F(BasicCurlHttpTests, AQueuedRequestSurvivesAMissingMultiHandle)
   auto request = session->CreateRequest();
   request->SetUri("get/");
   auto handler = std::make_shared<MultiHandleOutcomeHandler>();
+
+  // Back to zero after the constructor's own attempt and before there is an IO thread to make
+  // one, and this thread is exempt from here on, so what is counted below was refused to that
+  // thread and to nothing else. Without this the wait would be satisfied by the constructor.
   g_curl_calloc_failures.store(0, std::memory_order_relaxed);
   session->SendRequest(handler);
 
@@ -1721,8 +1804,7 @@ TEST_F(BasicCurlHttpTests, AQueuedRequestSurvivesAMissingMultiHandle)
   ASSERT_GE(g_curl_calloc_failures.load(std::memory_order_relaxed), 1)
       << "the IO thread never ran without a handle, so nothing was tested";
 
-  g_fail_curl_calloc_everywhere.store(false, std::memory_order_relaxed);
-  g_curl_calloc_exempt = false;
+  failing.Disarm();
 
   for (int i = 0; i < 300 && 0 == handler->terminal_.load(std::memory_order_acquire); ++i)
   {
@@ -1755,10 +1837,11 @@ TEST_F(BasicCurlHttpTests, AFailedEasyHandleIsReportedOnce)
   request->SetUri("get/");
   auto handler = std::make_shared<MultiHandleOutcomeHandler>();
 
-  // Armed here so it reaches the curl_easy_init inside SendRequest and nothing before it.
-  g_fail_curl_calloc_everywhere.store(true, std::memory_order_relaxed);
-  session->SendRequest(handler);
-  g_fail_curl_calloc_everywhere.store(false, std::memory_order_relaxed);
+  {
+    // Armed here so it reaches the curl_easy_init inside SendRequest and nothing before it.
+    FailCurlCallocEverywhere failing;
+    session->SendRequest(handler);
+  }
 
   EXPECT_EQ(1, handler->create_failed_.load(std::memory_order_acquire))
       << "one failed handle was not described exactly once";
@@ -1779,49 +1862,54 @@ TEST_F(BasicCurlHttpTests, APersistentMultiHandleFailureDoesNotSpin)
   ASSERT_TRUE(g_curl_hooks_installed);
   received_requests_.clear();
 
-  // The client is built without a multi handle rather than having one taken away. Nothing here
-  // touches a handle another thread is using, which libcurl does not allow and which would
-  // leave any result this case reported open to being an artefact of the injection. What fails
-  // is curl_multi_init, on whichever thread calls it, and after the constructor that is the IO
-  // thread every time.
-  g_curl_calloc_failures.store(0, std::memory_order_relaxed);
-  g_fail_curl_calloc_everywhere.store(true, std::memory_order_relaxed);
-  auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
-  ASSERT_TRUE(client != nullptr);
-  ASSERT_GE(g_curl_calloc_failures.load(std::memory_order_relaxed), 1)
-      << "the client was built with a multi handle, so nothing was tested";
-
-  // curl_easy_init allocates with calloc too, and the request below needs one. The IO thread is
-  // not exempt, so its curl_multi_init goes on failing.
-  g_curl_calloc_exempt = true;
-
-  // After the constructor, so the report it makes is not counted as one of the loop's.
-  auto *capture = new CountingLogHandler();
-  auto previous = opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogHandler();
-  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(
-      nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(capture));
+  // First, and outside everything below, so that it is in place before anything that logs
+  // exists and goes back only once all of it has been destroyed. Counting the line the loop
+  // writes rather than every line, which also leaves out the one the constructor writes about
+  // the same failure.
+  auto *capture = new CountingLogHandler("no multi handle");
+  ScopedLogHandler installed{
+      nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(capture)};
 
   int attempts = 0;
   {
+    // The client is built without a multi handle rather than having one taken away. Nothing
+    // here touches a handle another thread is using, which libcurl does not allow and which
+    // would leave any result this case reported open to being an artefact of the injection.
+    // What fails is curl_multi_init, on whichever thread calls it, and after the constructor
+    // that is the IO thread every time.
+    FailCurlCallocEverywhere failing;
+    auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+    ASSERT_TRUE(client != nullptr);
+    ASSERT_GE(g_curl_calloc_failures.load(std::memory_order_relaxed), 1)
+        << "the client was built with a multi handle, so nothing was tested";
+
+    failing.ExemptThisThread();
+
     // A request is what keeps the IO thread there. With nothing owed to anybody it retires,
     // which is the other half of this and is held by the case below.
     auto session = client->CreateSession("http://127.0.0.1:19000");
     auto request = session->CreateRequest();
     request->SetUri("get/");
     auto handler = std::make_shared<MultiHandleOutcomeHandler>();
+
+    // Back to zero after the constructor's own attempt and before there is an IO thread to
+    // make one, and this thread is exempt from here on, so what is counted below was refused
+    // to that thread and to nothing else. Without this the count would be the constructor's
+    // and would say nothing about whether the loop ever tried.
     g_curl_calloc_failures.store(0, std::memory_order_relaxed);
     session->SendRequest(handler);
 
     std::this_thread::sleep_for(std::chrono::seconds(1));
     attempts = g_curl_calloc_failures.load(std::memory_order_relaxed);
 
-    g_fail_curl_calloc_everywhere.store(false, std::memory_order_relaxed);
-    g_curl_calloc_exempt = false;
+    failing.Disarm();
     session->CancelSession();
     session->FinishSession();
+    client->FinishAllSessions();
   }
+
+  // Read once the client, and the thread that was writing those lines, have gone.
   const int log_lines = capture->count_.load(std::memory_order_relaxed);
-  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous);
 
   // Counting what the allocator refused says how often the IO thread tried, which is what a spin
   // is, and says it the same way on every platform. The lower bounds matter as much as the upper
@@ -1831,8 +1919,6 @@ TEST_F(BasicCurlHttpTests, APersistentMultiHandleFailureDoesNotSpin)
                           << " times in a second, which is a spin rather than a wait";
   EXPECT_GE(log_lines, 1) << "the failure was never reported";
   EXPECT_LE(log_lines, 8) << "the same failure was reported " << log_lines << " times";
-
-  client->FinishAllSessions();
 }
 
 }  // namespace
