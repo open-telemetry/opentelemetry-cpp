@@ -457,6 +457,19 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
   exit 0
+elif [[ "$1" == "cmake.install_functions.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  rm -rf ${INSTALL_TEST_DIR}/*
+  export LD_LIBRARY_PATH="${INSTALL_TEST_DIR}/lib:$LD_LIBRARY_PATH"
+  mkdir -p "${BUILD_DIR}/install_functions_test"
+  cd "${BUILD_DIR}/install_functions_test"
+  cmake "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
+        "-DINSTALL_TEST_DIR=${INSTALL_TEST_DIR}" \
+        "-DOPENTELEMETRY_SOURCE_DIR=${SRC_DIR}" \
+        -S "${SRC_DIR}/install/test/cmake/install_functions_test"
+  ctest --output-on-failure
+  exit 0
 elif [[ "$1" == "cmake.install.test" ]]; then
   if [[ -n "${BUILD_SHARED_LIBS}" && "${BUILD_SHARED_LIBS}" == "ON" ]]; then
     CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=ON")
@@ -610,8 +623,8 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
   # that make this test always fail. Ignore these packages in the noexcept test here.
   # Set the api:with_cxx_stdlib=none because C++17 std::variant::get<> throws
 
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/... -//resource_detectors/test:resource_detector_builder_test
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/... -//resource_detectors/test:resource_detector_builder_test
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client

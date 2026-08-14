@@ -17,7 +17,9 @@ add_executable(
   custom_log_record_exporter.cc
   custom_log_record_exporter_builder.cc
   custom_log_record_processor.cc
-  custom_log_record_processor_builder.cc)
+  custom_log_record_processor_builder.cc
+  custom_resource_detector.cc
+  custom_resource_detector_builder.cc)
 
 target_link_libraries(
   example_yaml
@@ -61,6 +63,12 @@ if(WITH_PROMETHEUS)
   target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_PROMETHEUS)
   target_link_libraries(example_yaml
                         PRIVATE opentelemetry-cpp::prometheus_exporter_builder)
+endif()
+
+if(WITH_RESOURCE_DETECTORS_PREVIEW)
+  target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_RESOURCE_DETECTORS)
+  target_link_libraries(example_yaml
+                        PRIVATE opentelemetry-cpp::resource_detectors_builders)
 endif()
 
 if(BUILD_TESTING)
