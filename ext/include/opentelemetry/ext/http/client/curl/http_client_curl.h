@@ -367,10 +367,6 @@ private:
   // Returns true if the client has a multi handle afterwards.
   bool resetMultiHandle();
 
-  // Returns true if any queue still holds work. The IO loop cannot read that from
-  // still_running, which only the phases that need a multi handle ever set.
-  bool hasPendingWork();
-
   std::mutex multi_handle_m_;
   CURLM *multi_handle_;
   std::atomic<uint64_t> next_session_id_{0};
