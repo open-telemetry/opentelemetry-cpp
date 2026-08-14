@@ -95,7 +95,7 @@ public:
 
 // Counts the terminal notifications one request produces. Set cancel_at_response_ to cancel from
 // inside the Response event, which is the one moment both arms of the completion callback are
-// eligible: DispatchEvent notifies the handler before it stores the new state, and the callback
+// eligible: DispatchEvent stores the new state before it notifies the handler, and the callback
 // runs after both, so it sees an aborted operation that also has a response.
 class TerminalCountingHandler : public CustomEventHandler
 {
@@ -117,6 +117,7 @@ public:
     else if (state == http_client::SessionState::Cancelled)
     {
       terminal_count_.fetch_add(1, std::memory_order_release);
+      cancelled_.fetch_add(1, std::memory_order_release);
       // Cleanup dispatches its own Cancelled carrying a curl message, and GetCurlErrorMessage
       // never yields an empty one, so an empty reason is the completion callback and only it.
       if (reason.empty())
@@ -141,6 +142,7 @@ public:
   std::atomic<int> terminal_count_{0};
   std::atomic<int> cancelled_from_callback_{0};
   std::atomic<int> create_failed_{0};
+  std::atomic<int> cancelled_{0};
   std::atomic<bool> last_reason_empty_{true};
 };
 
@@ -719,7 +721,16 @@ TEST_F(BasicCurlHttpTests, CancelFromCreatedCompletes)
   session_manager->FinishAllSessions();
 
   EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  // Exact, and the classification with it, because a count alone cannot tell an honoured cancel
+  // from a request that was never registered. What it reports today is the second one: Created is
+  // dispatched from the constructor, before curl_operation_ holds this operation, so the cancel
+  // reaches the Session but not the operation, and scheduling then finds no registration. The
+  // caller asked to cancel and is told the create failed. Moving the first events out of the
+  // constructor is what would make this a cancel, and that is the startup ordering #4390 is
+  // about rather than something to bolt on here. Pinned so the day it changes is visible.
   EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire));
+  EXPECT_EQ(0, handler->cancelled_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, handler->create_failed_.load(std::memory_order_acquire));
 }
 
 TEST_F(BasicCurlHttpTests, CancelFromConnectingCompletes)
