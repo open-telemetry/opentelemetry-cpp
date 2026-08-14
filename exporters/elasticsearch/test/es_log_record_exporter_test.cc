@@ -255,6 +255,52 @@ private:
 }  // namespace
 
 // ---------------------------------------------------------------------------
+// Snapshot ordering, for the cases that need an export to start after a flush has taken its
+// watermark. That order decides what the flush is waiting on, so it has to be a fact rather
+// than a sleep: on a loaded runner the other order runs instead, and in that order even the
+// counting model these cases exist to rule out would report a pass.
+// ---------------------------------------------------------------------------
+#ifdef ENABLE_ASYNC_EXPORT
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace exporter
+{
+namespace logs
+{
+class ElasticsearchExporterTestPeer
+{
+public:
+  static std::uint64_t WatermarksTaken(ElasticsearchLogRecordExporter &exporter)
+  {
+    std::lock_guard<std::mutex> lock_guard{exporter.synchronization_data_->force_flush_cv_m};
+    return exporter.synchronization_data_->watermarks_taken;
+  }
+};
+}  // namespace logs
+}  // namespace exporter
+OPENTELEMETRY_END_NAMESPACE
+
+namespace
+{
+// Bounded, and the count only goes up, so a wait that expires means the flush never got there
+// rather than that the case missed it.
+bool WaitForWatermarks(logs_exporter::ElasticsearchLogRecordExporter &exporter,
+                       std::uint64_t wanted)
+{
+  const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{30};
+  while (std::chrono::steady_clock::now() < deadline)
+  {
+    if (logs_exporter::ElasticsearchExporterTestPeer::WatermarksTaken(exporter) >= wanted)
+    {
+      return true;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds{1});
+  }
+  return false;
+}
+}  // namespace
+#endif  // ENABLE_ASYNC_EXPORT
+
+// ---------------------------------------------------------------------------
 // ForceFlush deadline. Only built with async export, which is the only
 // configuration where the wait exists.
 // ---------------------------------------------------------------------------
@@ -542,6 +588,84 @@ TEST_F(ElasticsearchForceFlushTests, AConcurrentFlushKeepsItsOwnDeadline)
 // The default argument is microseconds::max(), which AdjustWaitForTimeout maps to the sentinel for
 // no deadline. That branch takes the lock outright and waits on the predicate, so it needs a case
 // where the predicate already holds or the test would never return.
+// The indefinite wait, actually waited on. The case above it reaches the same branch but the
+// fake answers from inside SendRequest(), so the session is already gone and the predicate holds
+// before ForceFlush() is called. Nothing there would notice the wait being replaced by one
+// evaluation of the predicate.
+TEST_F(ElasticsearchForceFlushTests, AnIndefiniteFlushParksUntilTheOutcomeArrives)
+{
+  std::shared_ptr<http_client::EventHandler> captured;
+  auto fixture =
+      MakeExporter([&captured](const std::shared_ptr<http_client::EventHandler> &handler) {
+        captured = handler;
+      });
+  ExportOnce(*fixture.exporter);
+  ASSERT_NE(captured, nullptr);
+
+  std::atomic<bool> returned{false};
+  bool flushed = false;
+  std::thread waiter([&fixture, &returned, &flushed] {
+    flushed = fixture.exporter->ForceFlush();
+    returned.store(true, std::memory_order_release);
+  });
+
+  // Recorded rather than asserted here. A fatal assertion between starting that thread and
+  // joining it leaves it joinable, and a joinable thread being destroyed ends the process, which
+  // takes the rest of the binary with it instead of reporting one case.
+  const bool snapshotted    = WaitForWatermarks(*fixture.exporter, 1);
+  const bool returned_early = returned.load(std::memory_order_acquire);
+
+  FakeResponse response(200, kAcceptedBody);
+  captured->OnResponse(response);
+  waiter.join();
+
+  EXPECT_TRUE(snapshotted) << "the flush never took a watermark, so it never reached the wait";
+  EXPECT_FALSE(returned_early) << "the flush returned with its session still outstanding";
+  EXPECT_TRUE(flushed) << "the flush did not report the completion it was waiting for";
+}
+
+// The other boundary from the substitution cases. Those hold that a newer completion cannot
+// finish an older flush; this holds that a newer export still running cannot keep that flush
+// open. Without it the predicate could become running.empty(), or compare with > instead of >=,
+// and nothing would report it.
+TEST_F(ElasticsearchForceFlushTests, ANewerSessionDoesNotHoldAnOlderFlushOpen)
+{
+  std::vector<std::shared_ptr<http_client::EventHandler>> kept;
+  auto fixture = MakeExporter([&kept](const std::shared_ptr<http_client::EventHandler> &handler) {
+    kept.push_back(handler);
+  });
+
+  ExportOnce(*fixture.exporter);
+  ASSERT_EQ(kept.size(), static_cast<std::size_t>(1));
+
+  std::atomic<bool> returned{false};
+  bool flushed = false;
+  std::thread waiter([&fixture, &returned, &flushed] {
+    flushed = fixture.exporter->ForceFlush(std::chrono::seconds{5});
+    returned.store(true, std::memory_order_release);
+  });
+
+  // Recorded rather than asserted, for the same reason as the case above: nothing fatal may
+  // happen while that thread is still running.
+  const bool snapshotted = WaitForWatermarks(*fixture.exporter, 1);
+
+  // Started after the snapshot and never answered, so it is outside what this flush waits on.
+  ExportOnce(*fixture.exporter);
+  const std::size_t exports_started = kept.size();
+  const bool returned_early         = returned.load(std::memory_order_acquire);
+
+  FakeResponse response(200, kAcceptedBody);
+  kept.front()->OnResponse(response);
+  waiter.join();
+
+  EXPECT_TRUE(snapshotted)
+      << "the flush never took a watermark, so the second export is not newer than one";
+  EXPECT_EQ(exports_started, static_cast<std::size_t>(2));
+  EXPECT_FALSE(returned_early)
+      << "the flush returned before the export it snapshotted had answered";
+  EXPECT_TRUE(flushed) << "the flush waited out its deadline on an export that started after it";
+}
+
 TEST_F(ElasticsearchForceFlushTests, AnIndefiniteFlushReturnsOnceEverythingIsFinished)
 {
   auto fixture = MakeExporter([](const std::shared_ptr<http_client::EventHandler> &handler) {

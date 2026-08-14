@@ -626,7 +626,8 @@ bool ElasticsearchLogRecordExporter::ForceFlush(std::chrono::microseconds timeou
   // cannot stand in for one of these. Ids are issued in order, so the smallest one still running
   // decides. Callers are not serialised, so two deadlines never queue behind one another.
   const std::uint64_t watermark = synchronization_data_->next_session_id;
-  const auto flushed            = [this, watermark]() {
+  ++synchronization_data_->watermarks_taken;
+  const auto flushed = [this, watermark]() {
     const auto &running = synchronization_data_->running_sessions;
     return running.empty() || *running.begin() >= watermark;
   };

@@ -169,8 +169,17 @@ private:
     std::set<std::uint64_t> running_sessions;
     std::condition_variable force_flush_cv;
     std::mutex force_flush_cv_m;
+
+    // Raised once per ForceFlush(), under that mutex and immediately after the call has taken
+    // its watermark. Nothing in the exporter reads it. A case that has to start an export after
+    // a flush has snapshotted, and before it gives up, waits on this: the alternative is a sleep,
+    // which leaves the order to the scheduler, and the order that does not reproduce the defect
+    // is the one that would report a pass.
+    std::uint64_t watermarks_taken{0};
   };
   nostd::shared_ptr<SynchronizationData> synchronization_data_;
+
+  friend class ElasticsearchExporterTestPeer;
 #endif
 };
 }  // namespace logs
