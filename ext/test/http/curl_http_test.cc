@@ -783,6 +783,56 @@ TEST_F(BasicCurlHttpTests, UnparsableUrlsReleaseTheirOwnResources)
   EXPECT_EQ(1, second_handler->terminal_count_.load(std::memory_order_acquire));
 }
 
+namespace
+{
+// The event is dispatched after the operation is finished, so a handler is free to call
+// FinishSession() from it. Reporting first instead leaves this waiting on a promise that only the
+// Cleanup() below the dispatch can fulfil, which hangs rather than fails, so this case has to run.
+class FinishFromEventHandler : public TerminalCountingHandler
+{
+public:
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    TerminalCountingHandler::OnEvent(state, reason);
+    if (state == http_client::SessionState::CreateFailed && finish_target_ != nullptr)
+    {
+      auto *target   = finish_target_;
+      finish_target_ = nullptr;
+      entered_.store(true, std::memory_order_release);
+      target->FinishSession();
+      returned_.store(true, std::memory_order_release);
+    }
+  }
+
+  http_client::Session *finish_target_ = nullptr;
+  std::atomic<bool> entered_{false};
+  std::atomic<bool> returned_{false};
+};
+}  // namespace
+
+TEST_F(BasicCurlHttpTests, FinishFromTheCreateFailedEventReturns)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:not-a-port");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<FinishFromEventHandler>();
+  handler->finish_target_ = session.get();
+
+  session->SendRequest(handler);
+
+  ASSERT_TRUE(handler->entered_.load(std::memory_order_acquire))
+      << "the failure never reached the handler, so nothing was tested";
+  EXPECT_TRUE(handler->returned_.load(std::memory_order_acquire))
+      << "FinishSession from this event waited on a promise only its own caller can set";
+
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+}
+
 TEST_F(BasicCurlHttpTests, InvalidUrlCompletes)
 {
   auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
