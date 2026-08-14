@@ -1612,50 +1612,36 @@ TEST_F(BasicCurlHttpTests, AQueuedRequestSurvivesAMissingMultiHandle)
   ASSERT_TRUE(g_curl_hooks_installed);
   received_requests_.clear();
 
+  // Built without a handle, for the reason given above: a case that took one away would be
+  // using it from two threads at once, and could not then say whether what it saw was the
+  // client's behaviour or its own.
+  g_curl_calloc_failures.store(0, std::memory_order_relaxed);
+  g_fail_curl_calloc_everywhere.store(true, std::memory_order_relaxed);
   auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
   ASSERT_TRUE(client != nullptr);
   auto *concrete = static_cast<http_client::curl::HttpClient *>(client.get());
+  ASSERT_GE(g_curl_calloc_failures.load(std::memory_order_relaxed), 1)
+      << "the client was built with a multi handle, so nothing was tested";
 
-  // The idle grace is a minute by default, but only from libcurl 7.68: the assignment that
-  // gives it that value is behind a version check, and older libcurl leaves it at zero, where
-  // the IO thread reaches the retirement check on its first idle pass. CMake asks for no
-  // minimum libcurl, so both are supported and this asks for the shorter one, to run the same
+  g_curl_calloc_exempt = true;
+
+  // The idle grace is a minute by default, but only from libcurl 7.68: the line that gives it
+  // that value is behind a version check, and older libcurl leaves it at zero, where the IO
+  // thread reaches the retirement check on its first idle pass. CMake asks for no minimum
+  // libcurl, so both are supported, and this asks for the shorter one so the case runs the same
   // way everywhere rather than the way whichever libcurl the job has happens to allow.
   concrete->SetBackgroundWaitFor(std::chrono::milliseconds::zero());
-
-  // One completed request, so the IO thread exists and is running the loop under test.
-  {
-    auto warm         = client->CreateSession("http://127.0.0.1:19000");
-    auto warm_request = warm->CreateRequest();
-    warm_request->SetUri("get/");
-    auto warm_handler = std::make_shared<MultiHandleOutcomeHandler>();
-    warm->SendRequest(warm_handler);
-    ASSERT_TRUE(waitForRequests(30, 1));
-    warm->FinishSession();
-    ASSERT_GE(warm_handler->responses_.load(std::memory_order_acquire), 1);
-  }
-  received_requests_.clear();
-
-  // Join the IO thread before taking its multi handle away. resetMultiHandle destroys the one
-  // it finds, and a handle another thread is inside is not one to destroy.
-  concrete->WaitBackgroundThreadExit();
-
-  g_curl_calloc_failures.store(0, std::memory_order_relaxed);
-  g_fail_curl_calloc_everywhere.store(true, std::memory_order_relaxed);
-  http_client::curl::HttpClientTestPeer::ResetMultiHandle(*concrete);
-
-  // curl_easy_init allocates with calloc too, so without this the request below could not be
-  // built and the case would test the refusal rather than the queue.
-  g_curl_calloc_exempt = true;
 
   auto session = client->CreateSession("http://127.0.0.1:19000");
   auto request = session->CreateRequest();
   request->SetUri("get/");
   auto handler = std::make_shared<MultiHandleOutcomeHandler>();
+  g_curl_calloc_failures.store(0, std::memory_order_relaxed);
   session->SendRequest(handler);
 
-  // Wait for the IO thread to go round several times with no handle, so the gated phases have
-  // had every chance to consume the queued session.
+  // Wait for the IO thread to go round several times with no handle, so the phases that need
+  // one have had every chance to consume the queued session and the retirement check has been
+  // reached more than once.
   for (int i = 0; i < 200 && g_curl_calloc_failures.load(std::memory_order_relaxed) < 5; ++i)
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -1721,21 +1707,23 @@ TEST_F(BasicCurlHttpTests, APersistentMultiHandleFailureDoesNotSpin)
   ASSERT_TRUE(g_curl_hooks_installed);
   received_requests_.clear();
 
+  // The client is built without a multi handle rather than having one taken away. Nothing here
+  // touches a handle another thread is using, which libcurl does not allow and which would
+  // leave any result this case reported open to being an artefact of the injection. What fails
+  // is curl_multi_init, on whichever thread calls it, and after the constructor that is the IO
+  // thread every time.
+  g_curl_calloc_failures.store(0, std::memory_order_relaxed);
+  g_fail_curl_calloc_everywhere.store(true, std::memory_order_relaxed);
   auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
   ASSERT_TRUE(client != nullptr);
+  ASSERT_GE(g_curl_calloc_failures.load(std::memory_order_relaxed), 1)
+      << "the client was built with a multi handle, so nothing was tested";
 
-  // One completed request, so the IO thread exists and the loop below is the one under test.
-  {
-    auto warm         = client->CreateSession("http://127.0.0.1:19000");
-    auto warm_request = warm->CreateRequest();
-    warm_request->SetUri("get/");
-    auto warm_handler = std::make_shared<MultiHandleOutcomeHandler>();
-    warm->SendRequest(warm_handler);
-    ASSERT_TRUE(waitForRequests(30, 1));
-    warm->FinishSession();
-    ASSERT_GE(warm_handler->terminal_.load(std::memory_order_acquire), 1);
-  }
+  // curl_easy_init allocates with calloc too, and the request below needs one. The IO thread is
+  // not exempt, so its curl_multi_init goes on failing.
+  g_curl_calloc_exempt = true;
 
+  // After the constructor, so the report it makes is not counted as one of the loop's.
   auto *capture = new CountingLogHandler();
   auto previous = opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogHandler();
   opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(
@@ -1743,15 +1731,22 @@ TEST_F(BasicCurlHttpTests, APersistentMultiHandleFailureDoesNotSpin)
 
   int attempts = 0;
   {
-    // The hooks serve libcurl only, so this fails curl_multi_init on the IO thread without
-    // touching the allocations the rest of the binary makes.
+    // A request is what keeps the IO thread there. With nothing owed to anybody it retires,
+    // which is the other half of this and is held by the case below.
+    auto session = client->CreateSession("http://127.0.0.1:19000");
+    auto request = session->CreateRequest();
+    request->SetUri("get/");
+    auto handler = std::make_shared<MultiHandleOutcomeHandler>();
     g_curl_calloc_failures.store(0, std::memory_order_relaxed);
-    g_fail_curl_calloc_everywhere.store(true, std::memory_order_relaxed);
-    auto *concrete = static_cast<http_client::curl::HttpClient *>(client.get());
-    http_client::curl::HttpClientTestPeer::ResetMultiHandle(*concrete);
+    session->SendRequest(handler);
+
     std::this_thread::sleep_for(std::chrono::seconds(1));
     attempts = g_curl_calloc_failures.load(std::memory_order_relaxed);
+
     g_fail_curl_calloc_everywhere.store(false, std::memory_order_relaxed);
+    g_curl_calloc_exempt = false;
+    session->CancelSession();
+    session->FinishSession();
   }
   const int log_lines = capture->count_.load(std::memory_order_relaxed);
   opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous);
@@ -1765,9 +1760,6 @@ TEST_F(BasicCurlHttpTests, APersistentMultiHandleFailureDoesNotSpin)
   EXPECT_GE(log_lines, 1) << "the failure was never reported";
   EXPECT_LE(log_lines, 8) << "the same failure was reported " << log_lines << " times";
 
-  // Recovery from a handle that could not be created is held by
-  // AClientWithoutAMultiHandleReachesATerminalOutcome. What this case is for is the state in
-  // between, which nothing else reaches.
   client->FinishAllSessions();
 }
 
