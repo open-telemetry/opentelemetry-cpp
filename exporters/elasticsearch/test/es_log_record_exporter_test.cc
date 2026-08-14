@@ -157,6 +157,12 @@ namespace
 constexpr const char *kPrettySuccess =
     R"({"took":30,"errors":false,"items":[{"index":{"_index":"logs","_id":"1",)"
     R"("_shards":{"total":2,"successful":1,"failed" : 0},"status":201}}]})";
+// Two operations acknowledged, so a batch of two has something to match. 201 for a new document
+// and 200 for an overwrite are both what Elasticsearch answers for an index operation.
+constexpr const char *kTwoItemCompactSuccess = R"({"took":30,"errors":false,"items":[)"
+                                               R"({"index":{"_index":"logs","status":201}},)"
+                                               R"({"index":{"_index":"logs","status":200}}]})";
+
 constexpr const char *kCompactSuccess =
     R"({"took":30,"errors":false,"items":[{"index":{"_index":"logs","_id":"1",)"
     R"("_shards":{"total":2,"successful":1,"failed":0},"status":201}}]})";
@@ -570,6 +576,21 @@ TEST_F(ElasticsearchLogsExporterWiringTests, RejectedItemIsAFailedExport)
 
 // The status has to reach the parser, not just the body. A handler that stored a fixed status,
 // or an Export() that never asked for it, would still pass every case above.
+// The count has to travel. Every other successful case here sends one record, so an expected
+// count fixed at one would satisfy them all, and the only two item case is a rejection that fails
+// whatever the count is.
+TEST_F(ElasticsearchLogsExporterWiringTests, TwoAcceptedRecordsUseTheActualBatchSize)
+{
+  const auto result = ExportWith(
+      [](http_client::EventHandler &handler) {
+        FakeResponse response(200, kTwoItemCompactSuccess);
+        handler.OnResponse(response);
+      },
+      2);
+
+  EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
+}
+
 TEST_F(ElasticsearchLogsExporterWiringTests, ServerErrorIsAFailedExportEvenWithAnAcceptedBody)
 {
   const auto result = ExportWith([](http_client::EventHandler &handler) {
@@ -657,6 +678,33 @@ TEST_F(ElasticsearchLogsExporterAsyncTests, AnAcceptedResponseIsNotReportedAsAFa
 
 // The count reaches the parser on this path through the handler rather than through Export(), so
 // a handler that dropped it would still satisfy every synchronous case.
+// The status has to travel on this path too. Every other case here answers 200, so a status fixed
+// at 200 would satisfy them all, and the original defect was this path ignoring the status.
+TEST_F(ElasticsearchLogsExporterAsyncTests, AServerErrorIsReportedEvenWithAnAcceptedBody)
+{
+  EXPECT_EQ(ExportWith([](http_client::EventHandler &handler) {
+              FakeResponse response(500, kCompactSuccess);
+              handler.OnResponse(response);
+            }),
+            opentelemetry::sdk::common::ExportResult::kSuccess);
+
+  EXPECT_TRUE(LoggedAnExportFailure()) << "a server error was not reported on the async path";
+}
+
+// And the count, for the same reason it is held on the synchronous path.
+TEST_F(ElasticsearchLogsExporterAsyncTests, TwoAcceptedRecordsAreNotReportedAsAFailure)
+{
+  EXPECT_EQ(ExportWith(
+                [](http_client::EventHandler &handler) {
+                  FakeResponse response(200, kTwoItemCompactSuccess);
+                  handler.OnResponse(response);
+                },
+                2),
+            opentelemetry::sdk::common::ExportResult::kSuccess);
+
+  EXPECT_FALSE(LoggedAnExportFailure()) << "two acknowledged records were reported as a failure";
+}
+
 TEST_F(ElasticsearchLogsExporterAsyncTests, ARejectedResponseIsReportedAsAFailure)
 {
   // Export() reports success on this path whatever the response says, which is why the outcome has
