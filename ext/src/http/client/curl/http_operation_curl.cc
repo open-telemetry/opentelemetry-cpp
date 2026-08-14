@@ -401,6 +401,18 @@ int HttpOperation::OnProgressCallback(void *clientp,
 }
 #endif
 
+// The atomic member is only free of layout cost while it stays the size and alignment of the
+// enum it replaced. The standard does not promise that, so it is checked here rather than
+// asserted in prose: a toolchain where it does not hold changes an installed type and should say
+// so at build time.
+static_assert(sizeof(std::atomic<opentelemetry::ext::http::client::SessionState>) ==
+                  sizeof(opentelemetry::ext::http::client::SessionState),
+              "std::atomic<SessionState> grew, which changes the layout of HttpOperation");
+static_assert(
+    alignof(std::atomic<opentelemetry::ext::http::client::SessionState>) ==
+        alignof(opentelemetry::ext::http::client::SessionState),
+    "std::atomic<SessionState> is more aligned, which changes the layout of HttpOperation");
+
 void HttpOperation::DispatchEvent(opentelemetry::ext::http::client::SessionState type,
                                   const std::string &reason)
 {
