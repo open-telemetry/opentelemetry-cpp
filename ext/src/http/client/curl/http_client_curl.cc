@@ -676,14 +676,6 @@ bool HttpClient::MaybeSpawnBackgroundThread()
 
             const bool multi_available_now = (nullptr != self->multi_handle_);
 
-            // Without a handle the three phases below are skipped, and they are the only thing
-            // that sets still_running, so retiring here would strand whatever they did not get
-            // to. Nothing starts this thread again until another request arrives.
-            if (!multi_available_now && self->hasPendingWork())
-            {
-              still_running = 1;
-            }
-
             // Remove all pending easy handles
             if (multi_available_now && self->doRemoveSessions())
             {
@@ -805,14 +797,6 @@ void HttpClient::wakeupBackgroundThread()
     curl_multi_wakeup(multi_handle_);
   }
 #endif
-}
-
-bool HttpClient::hasPendingWork()
-{
-  std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
-  return !pending_to_add_session_ids_.empty() || !pending_to_abort_sessions_.empty() ||
-         !pending_to_remove_session_handles_.empty() || !pending_to_remove_sessions_.empty() ||
-         !pending_to_retry_sessions_.empty();
 }
 
 bool HttpClient::doAddSessions()
