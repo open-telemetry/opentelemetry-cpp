@@ -47,9 +47,6 @@ cc_test(
     ],
 )
 
-# Kept separate from detector tests: linking configuration_core pulls in
-# sdk_builder.cc, which requires exception support, so these targets are excluded
-# from the bazel.noexcept build in ci/do_ci.sh.
 cc_test(
     name = "container_resource_detector_builder_test",
     srcs = ["container_detector_builder_test.cc"],
