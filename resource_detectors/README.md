@@ -5,14 +5,16 @@ describing the environment where the application is running.
 
 Detectors in this project will be limited to those defined as `built-in` by the
 OTel [Resource SDK Spec](https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-detector-name)
-and [declaritive configuration resource schema](https://github.com/open-telemetry/opentelemetry-configuration/blob/main/schema/resource.yaml).
-Currently this set includes:
+and [configuration schema](https://github.com/open-telemetry/opentelemetry-configuration/blob/main/schema/resource.yaml)
+along with the experimental
+[EnvEntity Detector](https://opentelemetry.io/docs/specs/otel/entities/entity-propagation/#enventitydetector).
+
+Currently the `built-in` detectors include:
 
 - `service`
 - `container`
 - `host`
 - `process`
-- `env entities (experimental and not defined in the yaml configuration schema)`
 
 The detectors should support all tested platforms (Linux, macOS, and Windows)
 and must follow the semantic conventions for
@@ -85,9 +87,8 @@ OTEL_ENTITIES=service{service.name=my-app,service.instance.id=i-1}[service.versi
 
 Each builder registers its detector with the SDK
 [declarative configuration](https://opentelemetry.io/docs/specs/otel/configuration/)
-`Registry`, making it available when the SDK is initialised from a config file.
-The detector is a private dependency of the builder and is not exposed
-transitively — link only the builder targets you need.
+`Registry`, making it available when the SDK is initialized using programmatic
+configuration or from a yaml file.
 
 Detectors can be declared under the `resource.detection/development` entry in
 the configuration YAML file.
@@ -117,7 +118,7 @@ opentelemetry::resource_detector::ProcessDetectorBuilder::Register(registry.get(
 
 ## Linking with CMake
 
-### Detector targets: Link to the detector for direct use in an application
+### Linking to detectors directly (not required for declaritive config)
 
 Link to all available detectors:
 
@@ -133,7 +134,7 @@ find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS resource_detectors)
 target_link_libraries(my_target PRIVATE opentelemetry-cpp::host_resource_detector)
 ```
 
-### Builder targets: Link to builders for declaritive configuration
+### Linking to builders for declaritive configuration
 
 Builder targets make detectors available for declaritive configuration and hide
 the concrete detector implementations.
@@ -171,7 +172,7 @@ All targets are part of the `resource_detectors` component.
 
 ## Linking with Bazel
 
-### Detector targets: Link detector for direct use in an application
+### Linking to detectors directly
 
 Link to all available detectors:
 
@@ -185,7 +186,7 @@ Link to only the detectors you use:
 deps = ["//resource_detectors:host_resource_detector"]
 ```
 
-### Builder targets: Link builders for declaritive configuration
+### Linking to builders only
 
 Builder targets make detectors available for declarative configuration and hide
 the concrete detector implementations.
