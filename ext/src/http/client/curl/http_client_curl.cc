@@ -49,20 +49,29 @@ namespace curl
 
 namespace
 {
-// The easy handle goes first. libcurl does not copy the header list, so it is in use for as long
-// as anything is still transferring on the handle that points at it.
+// Only ever called with the handle detached, either because it has been given back or because
+// the multi handle that held it has been cleaned up.
+//
+// The reset clears the callbacks and the pointers they are given, so that freeing the handle
+// cannot reach the operation or the event handler the caller has let go of by then. The header
+// list goes next, because libcurl does not copy it and the reset is what stops it being read.
 void ReleaseCurlResource(HttpCurlEasyResource &resource) noexcept
 {
   if (nullptr != resource.easy_handle)
   {
-    curl_easy_cleanup(resource.easy_handle);
-    resource.easy_handle = nullptr;
+    curl_easy_reset(resource.easy_handle);
   }
 
   if (nullptr != resource.headers_chunk)
   {
     curl_slist_free_all(resource.headers_chunk);
     resource.headers_chunk = nullptr;
+  }
+
+  if (nullptr != resource.easy_handle)
+  {
+    curl_easy_cleanup(resource.easy_handle);
+    resource.easy_handle = nullptr;
   }
 }
 }  // namespace
