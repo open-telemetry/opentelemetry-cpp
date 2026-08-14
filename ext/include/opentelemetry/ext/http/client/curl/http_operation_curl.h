@@ -230,6 +230,15 @@ public:
    */
   CURLcode SendAsync(Session *session, std::function<void(HttpOperation &)> callback = nullptr);
 
+  /**
+   * Finish an operation that nothing is going to run, and say why.
+   *
+   * The state goes in ahead of the cleanup, which would otherwise report a cancel nobody asked
+   * for, and the cleanup goes in ahead of the event, so a handler that calls FinishSession()
+   * from it is not waiting on the promise that this cleanup is the only thing able to fulfil.
+   */
+  void FinishUnscheduled(const char *reason);
+
   inline void SendSync() { Send(); }
 
   /**

@@ -16,6 +16,7 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdio>
 #include <cstring>
 #include <map>
 #include <memory>
@@ -56,6 +57,19 @@ class HttpClientTestPeer
 {
 public:
   static void ResetMultiHandle(HttpClient &client) { client.resetMultiHandle(); }
+
+  static bool AddSessions(HttpClient &client) { return client.doAddSessions(); }
+
+  static bool RemoveSessions(HttpClient &client) { return client.doRemoveSessions(); }
+
+  // A multi handle that failed to initialize refuses every add, which is the state the case
+  // below needs and the one thing no transfer can be arranged into.
+  static CURLM *ExchangeMultiHandle(HttpClient &client, CURLM *replacement)
+  {
+    CURLM *previous      = client.multi_handle_;
+    client.multi_handle_ = replacement;
+    return previous;
+  }
 };
 }  // namespace curl
 }  // namespace client
@@ -637,6 +651,85 @@ TEST_F(BasicCurlHttpTests, ResetMultiHandleWithASessionDoesNotDeadlock)
   http_client::curl::HttpClientTestPeer::ResetMultiHandle(*client);
 
   client->FinishAllSessions();
+}
+
+class RecordingHandler : public CustomEventHandler
+{
+public:
+  void OnResponse(http_client::Response & /* response */) noexcept override
+  {
+    got_response_.store(true, std::memory_order_release);
+  }
+
+  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
+  {
+    std::lock_guard<std::mutex> lock_guard{states_m_};
+    states_.push_back(state);
+  }
+
+  std::vector<http_client::SessionState> States()
+  {
+    std::lock_guard<std::mutex> lock_guard{states_m_};
+    return states_;
+  }
+
+private:
+  std::mutex states_m_;
+  std::vector<http_client::SessionState> states_;
+};
+
+// The third way an operation ends up with nothing to run it. SendAsync does the whole async
+// setup and Session::SendRequest is what spawns the worker, so the add runs here on one thread
+// against a multi handle that refuses it, which is what a multi handle that failed to initialize
+// does to every add.
+TEST_F(BasicCurlHttpTests, ASessionTheMultiHandleRefusesIsFinished)
+{
+  curl::HttpClient client;
+
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  ASSERT_TRUE(session != nullptr);
+  auto curl_session = std::static_pointer_cast<curl::Session>(session);
+
+  auto handler = std::make_shared<RecordingHandler>();
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::RetryPolicy no_retry{};
+
+  // Named, and outliving the operation: it keeps a reference to the ssl options, the headers,
+  // the body and this rather than a copy of any of them.
+  http_client::Compression compression = http_client::Compression::kNone;
+
+  curl_session->GetOperation().reset(new curl::HttpOperation(
+      http_client::Method::Get, "http://127.0.0.1:19000/get/", no_ssl, handler.get(), headers, body,
+      compression, false, curl::kDefaultHttpConnTimeout, false, false, no_retry));
+
+  std::atomic<int> completed{0};
+  ASSERT_EQ(CURLE_OK, curl_session->GetOperation()->SendAsync(
+                          curl_session.get(), [&completed](curl::HttpOperation & /* operation */) {
+                            completed.fetch_add(1, std::memory_order_release);
+                          }));
+
+  CURLM *multi_handle = http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, nullptr);
+  const bool has_data = http_client::curl::HttpClientTestPeer::AddSessions(client);
+  http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, multi_handle);
+
+  // The removal the finish queues is the reason this has to answer true: the worker checks it
+  // after it has already run doRemoveSessions for this round, and nothing else would drain it.
+  EXPECT_TRUE(has_data);
+  EXPECT_EQ(1, completed.load(std::memory_order_acquire));
+
+  // Told the same way as a session this client never registered. Not Cancelled: the enum calls
+  // that one manually cancelled and both exporters print that word, and nobody cancelled this.
+  const auto states = handler->States();
+  ASSERT_FALSE(states.empty());
+  EXPECT_EQ(http_client::SessionState::CreateFailed, states.back());
+  for (const auto state : states)
+  {
+    EXPECT_NE(http_client::SessionState::Cancelled, state);
+  }
+
+  http_client::curl::HttpClientTestPeer::RemoveSessions(client);
 }
 
 // The caller-thread side of the same cancel. The server handler takes mtx_requests before it

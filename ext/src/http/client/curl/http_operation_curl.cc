@@ -1536,16 +1536,8 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   }
   else if (!session->GetHttpClient().ScheduleAddSession(session->GetSessionId()))
   {
-    // The same, except nobody cancelled anything. The terminal state goes in first so Cleanup()
-    // does not report a manual cancel, with a reason read from a curl result that is still
-    // CURLE_OK, and the operation is finished before the handler hears about it: a handler that
-    // calls FinishSession() from this event would otherwise wait on the promise that the
-    // Cleanup() below it is the only thing able to fulfil.
-    session_state_.store(opentelemetry::ext::http::client::SessionState::CreateFailed,
-                         std::memory_order_release);
-    Cleanup();
-    DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
-                  "the session is not registered with this client");
+    // The same, except nobody cancelled anything.
+    FinishUnscheduled("the session is not registered with this client");
   }
 
   return CURLE_OK;
@@ -1603,6 +1595,22 @@ void HttpOperation::Abort()
       session->GetHttpClient().ScheduleAbortSession(session->GetSessionId());
     }
   }
+}
+
+void HttpOperation::FinishUnscheduled(const char *reason)
+{
+  // Ahead of the cleanup: Cleanup() reports a manual cancel for any state short of a terminal
+  // one, with a reason read from a curl result that is still CURLE_OK, and nobody cancelled
+  // this. The enum documents Cancelled as manually cancelled and both exporters print that word.
+  session_state_.store(opentelemetry::ext::http::client::SessionState::CreateFailed,
+                       std::memory_order_release);
+
+  // Ahead of the event, so a handler calling FinishSession() from it is not waiting on the
+  // promise that this cleanup is the only thing able to fulfil.
+  Cleanup();
+
+  DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
+                nullptr != reason ? reason : "");
 }
 
 void HttpOperation::PerformCurlMessage(CURLcode code)

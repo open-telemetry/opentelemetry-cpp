@@ -783,9 +783,16 @@ bool HttpClient::doAddSessions()
   // that cancels from it takes that lock again. See #4389.
   for (auto &rejected : rejected_by_multi)
   {
-    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_multi_add_handle failed: "
-                            << curl_multi_strerror(rejected.second));
-    rejected.first->FinishOperation();
+    const char *reason = curl_multi_strerror(rejected.second);
+    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_multi_add_handle failed: " << reason);
+
+    // Told the same way as a session this client never registered, because it is the same thing
+    // from the handler's side: nothing is going to run this request.
+    auto &operation = rejected.first->GetOperation();
+    if (operation)
+    {
+      operation->FinishUnscheduled(reason);
+    }
   }
 
   // Finishing a rejected session queues its removal, and the loop's idle check has already run
