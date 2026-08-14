@@ -863,11 +863,18 @@ TEST_F(ElasticsearchAsyncCompletionTests, TerminalOrderingsReportExactlyOnce)
     const int before = Completions();
     ExportOnce(*fixture.exporter);
     EXPECT_EQ(Completions() - before, 1);
+
+    // The handler is still alive at the check above, and its destructor reports when nothing
+    // else has. Letting it go here is what makes the two together exactly one rather than the
+    // callback alone.
+    kept.clear();
+    EXPECT_EQ(Completions() - before, 1) << "destroying the handler reported a second time";
   }
 }
 
 // A response decides the outcome, and a teardown event arriving after it must not report again.
-// Both orderings, because the first verdict is the one that has to survive either way.
+// The other order is the case below, because the first verdict is the one that has to survive
+// either way round.
 TEST_F(ElasticsearchAsyncCompletionTests, AResponseAndATeardownEventReportOnce)
 {
   for (const auto state :
@@ -891,6 +898,43 @@ TEST_F(ElasticsearchAsyncCompletionTests, AResponseAndATeardownEventReportOnce)
     EXPECT_EQ(Completions() - before, 1);
     EXPECT_EQ(Counter().failures() - failures_before, 0)
         << "the teardown verdict replaced the response's";
+
+    kept.clear();
+    EXPECT_EQ(Completions() - before, 1) << "destroying the handler reported a second time";
+  }
+}
+
+// The other order, and the contract it settles. A read or write error ends the export here: the
+// exporter treats it as the outcome, and a response arriving afterwards is ignored rather than
+// replacing it. EventHandler does not say whether either state can be followed by a response, so
+// this is the choice this exporter makes, written down where a change to it would be visible.
+TEST_F(ElasticsearchAsyncCompletionTests, ATeardownEventAndALaterResponseReportOnce)
+{
+  for (const auto state :
+       {http_client::SessionState::ReadError, http_client::SessionState::WriteError,
+        http_client::SessionState::Destroyed, http_client::SessionState::TimedOut,
+        http_client::SessionState::NetworkError, http_client::SessionState::Cancelled})
+  {
+    SCOPED_TRACE(static_cast<int>(state));
+    std::vector<std::shared_ptr<http_client::EventHandler>> kept;
+    auto fixture =
+        MakeExporter([&kept, state](const std::shared_ptr<http_client::EventHandler> &handler) {
+          kept.push_back(handler);
+          handler->OnEvent(state, "");
+          FakeResponse response(200, kAcceptedBody);
+          handler->OnResponse(response);
+        });
+
+    const int before          = Completions();
+    const int failures_before = Counter().failures();
+    ExportOnce(*fixture.exporter);
+
+    EXPECT_EQ(Completions() - before, 1);
+    EXPECT_EQ(Counter().failures() - failures_before, 1)
+        << "a response after the failure replaced the verdict that had already been reported";
+
+    kept.clear();
+    EXPECT_EQ(Completions() - before, 1) << "destroying the handler reported a second time";
   }
 }
 
