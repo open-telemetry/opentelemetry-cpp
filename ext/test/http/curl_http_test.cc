@@ -143,6 +143,14 @@ public:
 
   void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
   {
+    // Counted on its own, and before the chain below rather than inside it: a case can cancel
+    // from one of these, and two others pin terminal_count_ to an exact value.
+    if (state == http_client::SessionState::ConnectFailed ||
+        state == http_client::SessionState::SendFailed)
+    {
+      failed_count_.fetch_add(1, std::memory_order_release);
+    }
+
     if (state == http_client::SessionState::Cancelled)
     {
       terminal_count_.fetch_add(1, std::memory_order_release);
@@ -168,6 +176,7 @@ public:
   http_client::SessionState cancel_at_ = http_client::SessionState::Response;
   std::thread::id cancelled_from_{};
   std::atomic<int> terminal_count_{0};
+  std::atomic<int> failed_count_{0};
   std::atomic<int> cancelled_from_callback_{0};
 };
 
@@ -822,8 +831,6 @@ TEST_F(BasicCurlHttpTests, ACancelFromTheCallerThreadReportsCancelled)
 // thread sanitizer this reports against the unfixed client on every run.
 TEST_F(BasicCurlHttpTests, RepeatedCallerThreadCancelsAreClean)
 {
-  int terminal_total = 0;
-
   for (int i = 0; i < 20; ++i)
   {
     auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
@@ -840,12 +847,15 @@ TEST_F(BasicCurlHttpTests, RepeatedCallerThreadCancelsAreClean)
     session_manager->FinishAllSessions();
 
     EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
-    terminal_total += handler->terminal_count_.load(std::memory_order_acquire);
-  }
 
-  // A lower bound, not a count: #4360 tracks the same cancel arriving twice, and how many
-  // arrive is not what this case decides.
-  EXPECT_GE(terminal_total, 20);
+    // Whichever side wins, the attempt ends somewhere the handler is told about: the cancel
+    // lands first, or the connection to a closed port fails first and the cancel is then
+    // correctly a no-op. How many cancels arrive is not what this case decides, #4360 tracks
+    // that, and neither is which of the two wins.
+    EXPECT_GT(handler->terminal_count_.load(std::memory_order_acquire) +
+                  handler->failed_count_.load(std::memory_order_acquire),
+              0);
+  }
 }
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
