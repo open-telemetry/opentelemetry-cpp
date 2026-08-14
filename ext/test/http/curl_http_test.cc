@@ -16,8 +16,8 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
-#include <cstdio>
 #include <cstring>
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
