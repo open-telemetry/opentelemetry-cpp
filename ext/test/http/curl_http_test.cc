@@ -942,6 +942,12 @@ TEST_F(BasicCurlHttpTests, CancelFromConnectingWhilePollingCompletes)
   session->FinishSession();
   session_manager->FinishAllSessions();
 
+  // Two callbacks are in the handler at once here. That is what this client does today, not
+  // something EventHandler promises: the interface says nothing about whether one request's
+  // callbacks can overlap, so a handler written against it is not obliged to be re-entrant. The
+  // number is pinned because this case exists to reach that overlap, and a client that started
+  // serialising callbacks per operation would be an improvement worth noticing rather than a
+  // silent change. Read it as a record of the shape, not as a contract to preserve.
   EXPECT_EQ(2, handler->max_concurrent_events_.load(std::memory_order_acquire));
   EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
   EXPECT_EQ(1, handler->cancelled_from_callback_.load(std::memory_order_acquire));
