@@ -70,3 +70,20 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "fixed_size_exemplar_reservoir_test",
+    srcs = [
+        "fixed_size_exemplar_reservoir_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

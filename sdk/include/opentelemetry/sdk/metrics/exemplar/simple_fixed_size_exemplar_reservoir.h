@@ -88,11 +88,12 @@ public:
       return static_cast<int>(index);
     }
 
-    void reset() override {}
+    void reset() override { measurements_seen_ = 0; }
 
   private:
     size_t measurements_seen_ = 0;
     size_t size_;
+    friend class SimpleFixedSizeCellSelectorTestPeer;
   };  // class SimpleFixedSizeCellSelector
 
 };  // class SimpleFixedSizeExemplarReservoir
