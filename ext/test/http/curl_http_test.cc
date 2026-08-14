@@ -986,11 +986,23 @@ public:
       // Cancelling wakes the IO thread, which finishes the operation and dispatches a Cancelled
       // of its own. Stay in this event until that one arrives so the two really do overlap, and
       // give up rather than hang if it never does.
+      //
+      // On the count that only goes up. inside_events_ is lowered again on the way out of that
+      // event, which is a few atomics long, so sampling it every millisecond almost never catches
+      // it and the bound below is spent in full even though the overlap did happen.
       const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(30);
-      while (inside_events_.load(std::memory_order_relaxed) < 2 &&
+      while (max_concurrent_events_.load(std::memory_order_relaxed) < 2 &&
              std::chrono::steady_clock::now() < deadline)
       {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
+
+      if (max_concurrent_events_.load(std::memory_order_relaxed) < 2)
+      {
+        // Only a run where the overlap never happened reaches this, and it is worth saying so:
+        // the count checked at the end would otherwise read as the client dispatching one event
+        // rather than as the other thread never turning up.
+        overlap_timed_out_.store(true, std::memory_order_release);
       }
     }
 
@@ -999,6 +1011,7 @@ public:
 
   std::atomic<int> inside_events_{0};
   std::atomic<int> max_concurrent_events_{0};
+  std::atomic<bool> overlap_timed_out_{false};
 };
 
 // A client spawns its IO thread only after a request has been scheduled, so cancelling from
@@ -1118,6 +1131,7 @@ TEST_F(BasicCurlHttpTests, CancelFromConnectingWhilePollingCompletes)
   // number is pinned because this case exists to reach that overlap, and a client that started
   // serialising callbacks per operation would be an improvement worth noticing rather than a
   // silent change. Read it as a record of the shape, not as a contract to preserve.
+  EXPECT_FALSE(handler->overlap_timed_out_.load(std::memory_order_acquire));
   EXPECT_EQ(2, handler->max_concurrent_events_.load(std::memory_order_acquire));
   EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
   EXPECT_EQ(1, handler->cancelled_from_callback_.load(std::memory_order_acquire));
