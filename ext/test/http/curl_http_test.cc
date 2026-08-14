@@ -233,9 +233,37 @@ static thread_local bool g_fail_curl_calloc = false;
 // failing allocation is otherwise a property of the libcurl in use rather than of this test.
 static const size_t kCurlSmallAllocation = 64;
 
+// Measured rather than assumed. libcurl does not say which allocator a list append uses, how
+// large a node is, or how many allocations anything else makes first, so a case that wants the
+// failure to land on a particular append asks this file to watch one happen and then aims at
+// blocks of exactly that size. Which append is the one that fails is a count, so a case can
+// have the first go through and the second not.
+static thread_local size_t g_watch_malloc_size    = 0;
+static thread_local size_t g_watched_malloc_size  = 0;
+static thread_local size_t g_fail_malloc_of_size  = 0;
+static thread_local int g_let_through_before_fail = 0;
+
 static void *CurlTestMalloc(size_t size)
 {
   g_curl_hooks_ran.store(true, std::memory_order_relaxed);
+
+  if (0 != g_watch_malloc_size && 0 == g_watched_malloc_size)
+  {
+    g_watched_malloc_size = size;
+  }
+
+  if (0 != g_fail_malloc_of_size && size == g_fail_malloc_of_size)
+  {
+    if (g_let_through_before_fail > 0)
+    {
+      --g_let_through_before_fail;
+    }
+    else
+    {
+      return nullptr;
+    }
+  }
+
   if (g_fail_curl_malloc && size <= kCurlSmallAllocation)
   {
     return nullptr;
@@ -318,6 +346,44 @@ struct FailCurlCalloc
   FailCurlCalloc(FailCurlCalloc &&)                 = delete;
   FailCurlCalloc &operator=(const FailCurlCalloc &) = delete;
   FailCurlCalloc &operator=(FailCurlCalloc &&)      = delete;
+};
+
+// How big a list node is on the libcurl this binary is linked against, or zero if an append
+// does not reach the malloc callback at all. Taken by watching one, since libcurl promises
+// none of it. The string is copied through the strdup callback, which is deliberately not the
+// one being watched, so the only block this sees is the node.
+inline size_t MeasureSlistNode()
+{
+  g_watched_malloc_size = 0;
+  g_watch_malloc_size   = 1;
+  curl_slist *measured  = curl_slist_append(nullptr, "X-Measure: 1");
+  g_watch_malloc_size   = 0;
+
+  const size_t size = (nullptr != measured) ? g_watched_malloc_size : 0;
+  curl_slist_free_all(measured);
+  return size;
+}
+
+// Lets a number of nodes through and refuses the next one, so a case can say which append
+// fails rather than hoping it is the first thing libcurl asks for.
+struct FailSlistNodeAfter
+{
+  FailSlistNodeAfter(int let_through, size_t node_size)
+  {
+    g_let_through_before_fail = let_through;
+    g_fail_malloc_of_size     = node_size;
+  }
+
+  ~FailSlistNodeAfter()
+  {
+    g_fail_malloc_of_size     = 0;
+    g_let_through_before_fail = 0;
+  }
+
+  FailSlistNodeAfter(const FailSlistNodeAfter &)            = delete;
+  FailSlistNodeAfter(FailSlistNodeAfter &&)                 = delete;
+  FailSlistNodeAfter &operator=(const FailSlistNodeAfter &) = delete;
+  FailSlistNodeAfter &operator=(FailSlistNodeAfter &&)      = delete;
 };
 
 // The failure that reaches every thread, and the exemption for the one that armed it, since
@@ -1109,6 +1175,56 @@ TEST_F(BasicCurlHttpTests, AFailedHeaderAllocationIsReported)
 
   EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire))
       << "expected exactly one terminal outcome";
+}
+
+// The first header goes on and the second does not. That is the case the temporary pointer is
+// there for: curl_slist_append returns null on failure and leaves the list it was given, so
+// assigning its result straight back over the member loses everything appended so far. With one
+// header there is nothing to lose, which is why the case above cannot tell the difference.
+TEST_F(BasicCurlHttpTests, AHeaderListThatFailsPartWayThroughIsNotLost)
+{
+  ASSERT_TRUE(g_curl_hooks_installed);
+  received_requests_.clear();
+
+  const size_t node = MeasureSlistNode();
+  if (0 == node)
+  {
+    GTEST_SKIP() << "list appends on this libcurl do not reach the malloc callback, so the "
+                 << "failure cannot be aimed at one";
+  }
+
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  auto session         = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request         = session->CreateRequest();
+  request->SetUri("get/");
+  request->AddHeader("X-First", "1");
+  request->AddHeader("X-Second", "2");
+
+  auto handler = std::make_shared<ReportedStateHandler>();
+  {
+    // One node through, the next refused. Whichever append that turns out to be, the list is
+    // not empty when it happens, which is the whole point.
+    FailSlistNodeAfter failing{1, node};
+    session->SendRequest(handler);
+  }
+
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  size_t requests_seen = 0;
+  {
+    std::unique_lock<std::mutex> lock_requests(mtx_requests);
+    requests_seen = received_requests_.size();
+  }
+
+  EXPECT_TRUE(handler->create_failed_.load(std::memory_order_acquire))
+      << "a header list that could not be finished was not reported";
+  EXPECT_EQ(static_cast<size_t>(0), requests_seen)
+      << "the request reached the server carrying a header list that was never finished";
+  EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire))
+      << "expected exactly one terminal outcome";
+  // LeakSanitizer is what says the nodes that were appended before the failure were freed
+  // rather than dropped.
 }
 
 // A client whose multi handle is null accepts sessions, adds none of them, and completes none
