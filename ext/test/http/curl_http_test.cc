@@ -912,6 +912,83 @@ public:
 // the first event of the first request has nothing to overlap. On a client that is already
 // polling, the IO thread finishes the operation while the handler is still inside that event,
 // and the caller reaches the end of SendAsync with the operation already cleaned up.
+namespace
+{
+// Cancels from Connecting, then holds inside the terminal event for a bounded 200 ms. The bound is
+// its own, so this can never block for good and a case built on it can only fail, not hang.
+class LatchedCancelHandler : public TerminalCountingHandler
+{
+public:
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    TerminalCountingHandler::OnEvent(state, reason);
+    if (state == http_client::SessionState::Cancelled)
+    {
+      entries_.fetch_add(1, std::memory_order_relaxed);
+      if (std::this_thread::get_id() == owner_)
+      {
+        on_owner_thread_.fetch_add(1, std::memory_order_relaxed);
+      }
+      inside_.fetch_add(1, std::memory_order_release);
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+      inside_.fetch_sub(1, std::memory_order_release);
+    }
+  }
+
+  std::thread::id owner_{};
+  std::atomic<int> entries_{0};
+  std::atomic<int> on_owner_thread_{0};
+  std::atomic<int> inside_{0};
+};
+}  // namespace
+
+// Holds that Finish does not return while a handler is still running. Which thread delivers the
+// terminal event is not something this case can choose: when the caller thread delivers it there
+// is nothing for Finish to wait for and the case only confirms that. Measured across separate
+// runs, the IO thread takes it roughly one time in three, and that is the run that matters. So
+// this asserts a true invariant on either schedule but does not on its own discriminate the
+// ordering change it came from; the evidence for that is in the commit that made it.
+TEST_F(BasicCurlHttpTests, FinishDoesNotReturnWhileAHandlerIsRunning)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  {
+    auto warm         = session_manager->CreateSession("http://127.0.0.1:19000");
+    auto warm_request = warm->CreateRequest();
+    warm_request->SetUri("get/");
+    auto warm_handler = std::make_shared<TerminalCountingHandler>();
+    warm->SendRequest(warm_handler);
+    ASSERT_TRUE(waitForRequests(30, 1));
+    warm->FinishSession();
+  }
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19937");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<LatchedCancelHandler>();
+  handler->owner_         = std::this_thread::get_id();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::Connecting;
+
+  session->SendRequest(handler);
+
+  const auto start = std::chrono::steady_clock::now();
+  session->FinishSession();
+  const auto finished = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::steady_clock::now() - start)
+                            .count();
+  const int still_inside = handler->inside_.load(std::memory_order_acquire);
+  session_manager->FinishAllSessions();
+
+  EXPECT_EQ(0, still_inside) << "Finish returned after " << finished
+                             << " ms with a handler still running";
+  EXPECT_GE(handler->entries_.load(std::memory_order_relaxed), 1)
+      << "the terminal event never arrived, so nothing was tested";
+}
+
 TEST_F(BasicCurlHttpTests, CancelFromConnectingWhilePollingCompletes)
 {
   received_requests_.clear();
