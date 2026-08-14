@@ -437,14 +437,17 @@ TEST_F(ElasticsearchForceFlushTests, ACompletionAfterTheWaiterParksWakesIt)
   ExportOnce(*fixture.exporter);
   ASSERT_NE(captured, nullptr);
 
-  std::thread responder([&captured] {
-    std::this_thread::sleep_for(std::chrono::milliseconds{50});
+  bool parked = false;
+  std::thread responder([&fixture, &captured, &parked] {
+    parked = WaitForWatermarks(*fixture.exporter, 1);
     FakeResponse response(200, kAcceptedBody);
     captured->OnResponse(response);
   });
 
   const bool flushed = fixture.exporter->ForceFlush(std::chrono::seconds{5});
   responder.join();
+
+  EXPECT_TRUE(parked) << "the flush never took a watermark, so it was not waiting for this";
   EXPECT_TRUE(flushed);
 }
 
@@ -470,8 +473,9 @@ TEST_F(ElasticsearchForceFlushTests, ANewerSessionDoesNotStandInForAnOlderOne)
   // The batch the caller waits for. It never finishes.
   ExportOnce(*fixture.exporter);
 
-  std::thread newer([&fixture, &latest] {
-    std::this_thread::sleep_for(std::chrono::milliseconds{100});
+  bool snapshotted = false;
+  std::thread newer([&fixture, &latest, &snapshotted] {
+    snapshotted = WaitForWatermarks(*fixture.exporter, 1);
     ExportOnce(*fixture.exporter);
     FakeResponse response(200, kAcceptedBody);
     latest->OnResponse(response);
@@ -480,6 +484,8 @@ TEST_F(ElasticsearchForceFlushTests, ANewerSessionDoesNotStandInForAnOlderOne)
   const bool flushed = fixture.exporter->ForceFlush(std::chrono::milliseconds{500});
   newer.join();
 
+  EXPECT_TRUE(snapshotted)
+      << "the second export did not start after the snapshot, so it is not a later batch";
   EXPECT_FALSE(flushed) << "a later batch's completion flushed an export that is still in flight";
 }
 
@@ -545,8 +551,9 @@ TEST_F(ElasticsearchForceFlushTests, LaterCompletionsCannotCoverAnOlderOutstandi
   ExportOnce(*fixture.exporter);
   auto second = latest;
 
-  std::thread worker([&fixture, &second, &latest] {
-    std::this_thread::sleep_for(std::chrono::milliseconds{100});
+  bool snapshotted = false;
+  std::thread worker([&fixture, &second, &latest, &snapshotted] {
+    snapshotted = WaitForWatermarks(*fixture.exporter, 1);
     ExportOnce(*fixture.exporter);  // starts after the flush took its snapshot
     const auto &third = latest;
     FakeResponse response(200, kAcceptedBody);
@@ -557,6 +564,8 @@ TEST_F(ElasticsearchForceFlushTests, LaterCompletionsCannotCoverAnOlderOutstandi
   const bool flushed = fixture.exporter->ForceFlush(std::chrono::milliseconds{500});
   worker.join();
 
+  EXPECT_TRUE(snapshotted)
+      << "the third export did not start after the snapshot, so it is not a later batch";
   EXPECT_FALSE(flushed) << "two completions arrived, but not the one the caller was waiting for";
 }
 
@@ -573,15 +582,20 @@ TEST_F(ElasticsearchForceFlushTests, AConcurrentFlushKeepsItsOwnDeadline)
   // The first caller waits well past the bound asserted below, so a second caller that queued
   // behind it could not come in under that bound by accident.
   std::thread slow([&fixture] { fixture.exporter->ForceFlush(std::chrono::milliseconds{1500}); });
-  std::this_thread::sleep_for(std::chrono::milliseconds{100});
 
-  const auto start = std::chrono::steady_clock::now();
-  EXPECT_FALSE(fixture.exporter->ForceFlush(std::chrono::milliseconds{20}));
-  const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+  // Recorded rather than asserted: that thread is still running, and a fatal assertion here
+  // would destroy it while it is joinable, which ends the process.
+  const bool first_waiting = WaitForWatermarks(*fixture.exporter, 1);
+
+  const auto start          = std::chrono::steady_clock::now();
+  const bool second_flushed = fixture.exporter->ForceFlush(std::chrono::milliseconds{20});
+  const auto ms             = std::chrono::duration_cast<std::chrono::milliseconds>(
                       std::chrono::steady_clock::now() - start)
                       .count();
   slow.join();
 
+  EXPECT_TRUE(first_waiting) << "the first caller never reached its wait, so nothing was queued";
+  EXPECT_FALSE(second_flushed);
   EXPECT_LT(ms, 700) << "waited behind the first caller instead of its own deadline";
 }
 
