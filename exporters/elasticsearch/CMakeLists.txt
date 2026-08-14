@@ -61,4 +61,8 @@ if(BUILD_TESTING)
     TARGET es_log_record_exporter_test
     TEST_PREFIX exporter.
     TEST_LIST es_log_record_exporter_test)
+
+  # The asynchronous cases wait on a response that a regression can stop delivering, and a case
+  # that hangs stops the job rather than reporting. A bound turns that back into a red test.
+  set_tests_properties(${es_log_record_exporter_test} PROPERTIES TIMEOUT 120)
 endif() # BUILD_TESTING

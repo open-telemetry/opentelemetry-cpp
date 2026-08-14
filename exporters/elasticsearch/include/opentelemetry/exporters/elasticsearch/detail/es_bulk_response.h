@@ -18,23 +18,33 @@ namespace detail
 {
 
 /**
- * Whether an acknowledged operation status is one that applied the operation. Elasticsearch
- * answers an index operation with 200 or 201, so 2xx is the whole band.
+ * The band a status has to fall in to say the thing it answers was applied. Elasticsearch
+ * answers the bulk request with 200 and an index operation with 200 or 201, so 2xx is the whole
+ * of it on both, and this says so once for both rather than twice with two spellings.
  *
- * Compared in the type the number was parsed as. Narrowing to int first is not safe here: the
- * value comes from the server, is_number_integer() is true for unsigned as well, and 2^32 + 200
- * narrows back into the band on a 32 bit int.
+ * Two overloads rather than one signed parameter, because an operation status arrives through
+ * nlohmann::json and is compared in the type it was parsed as: is_number_integer() is true for
+ * unsigned as well, and 2^32 + 200 narrows back into the band on a 32 bit int.
  */
+inline bool IsSuccessStatus(nlohmann::json::number_unsigned_t value) noexcept
+{
+  return value >= 200U && value <= 299U;
+}
+
+inline bool IsSuccessStatus(nlohmann::json::number_integer_t value) noexcept
+{
+  return value >= 200 && value <= 299;
+}
+
+/** Whether an acknowledged operation status is one that applied the operation. */
 inline bool IsAcknowledgedStatus(const nlohmann::json &status) noexcept
 {
   if (status.is_number_unsigned())
   {
-    const auto value = status.get<nlohmann::json::number_unsigned_t>();
-    return value >= 200U && value <= 299U;
+    return IsSuccessStatus(status.get<nlohmann::json::number_unsigned_t>());
   }
 
-  const auto value = status.get<nlohmann::json::number_integer_t>();
-  return value >= 200 && value <= 299;
+  return IsSuccessStatus(status.get<nlohmann::json::number_integer_t>());
 }
 
 /**
@@ -49,7 +59,8 @@ inline bool IsAcknowledgedStatus(const nlohmann::json &status) noexcept
  * @param expected_items the number of index operations the request submitted
  * @param failure_reason a best-effort explanation when this returns false
  * @return true only when the status is 2xx, "errors" is false, and "items" holds exactly
- *         expected_items index results that each acknowledge a 2xx status and carry no error
+ *         expected_items index results that each name a target index, acknowledge a 2xx status
+ *         and carry no error
  */
 inline bool IsBulkResponseSuccessful(int status_code,
                                      const std::string &body,
@@ -62,7 +73,9 @@ inline bool IsBulkResponseSuccessful(int status_code,
   {
 #endif
     // Inside the try: building a reason allocates.
-    if (status_code < 200 || status_code > 299)
+    // The same band as an operation status, through the same predicate. The cast picks the
+    // signed overload, which an int reaches without losing anything.
+    if (!IsSuccessStatus(static_cast<nlohmann::json::number_integer_t>(status_code)))
     {
       failure_reason = "unexpected HTTP status " + std::to_string(status_code);
       return false;
@@ -117,6 +130,17 @@ inline bool IsBulkResponseSuccessful(int status_code,
       if (operation == item.end() || !operation->is_object())
       {
         failure_reason = "the response does not acknowledge the submitted index operation";
+        return false;
+      }
+
+      // Elasticsearch names the index it wrote to in every index result, whether the operation
+      // applied or not. Presence and type only: the name it reports is the index the write
+      // resolved to, which an alias or a date math index makes different from the one that was
+      // submitted, so it is not something to compare against.
+      const auto target = operation->find("_index");
+      if (target == operation->end() || !target->is_string())
+      {
+        failure_reason = "the response acknowledges an index operation with no target index";
         return false;
       }
 
