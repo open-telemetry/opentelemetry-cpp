@@ -262,9 +262,9 @@ TEST(ElasticsearchBulkResponseTests, RequiresAnAcknowledgementForEverySubmittedO
   constexpr const char *kNoItems   = R"({"errors":false})";
   constexpr const char *kNullItems = R"({"errors":false,"items":null})";
   constexpr const char *kOneItemBody =
-      R"({"errors":false,"items":[{"index":{"_shards":{"failed":0},"status":201}}]})";
+      R"({"errors":false,"items":[{"index":{"_index":"logs","_shards":{"failed":0},"status":201}}]})";
   constexpr const char *kTwoItemBody =
-      R"({"errors":false,"items":[{"index":{"status":201}},{"index":{"status":201}}]})";
+      R"({"errors":false,"items":[{"index":{"_index":"logs","status":201}},{"index":{"_index":"logs","status":201}}]})";
 
   EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(200, kNoItems, 1, reason));
   EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(200, kNullItems, 1, reason));
@@ -296,15 +296,24 @@ TEST(ElasticsearchBulkResponseTests, RejectsItemsEntriesThatDoNotAcknowledgeAnIn
       << "the index key holds no result object";
   EXPECT_TRUE(rejected(R"({"errors":false,"items":[{"index":{},"delete":{}}]})", 1))
       << "one entry cannot answer two operations";
-  EXPECT_TRUE(rejected(R"({"errors":false,"items":[{"index":{"status":201},"delete":{}}]})", 1))
+  EXPECT_TRUE(rejected(
+      R"({"errors":false,"items":[{"index":{"_index":"logs","status":201},"delete":{}}]})", 1))
       << "a valid acknowledgement does not license a second member";
   EXPECT_TRUE(rejected(R"({"errors":false,"items":[{"index":{"_index":"logs"}}]})", 1))
       << "an index result carrying no status";
+  EXPECT_TRUE(rejected(R"({"errors":false,"items":[{"index":{"status":201}}]})", 1))
+      << "an index result naming no target index";
+  EXPECT_TRUE(rejected(R"({"errors":false,"items":[{"index":{"_index":7,"status":201}}]})", 1))
+      << "a target index that is not a name";
+  EXPECT_TRUE(rejected(R"({"errors":false,"items":[{"index":{"_index":null,"status":201}}]})", 1))
+      << "a target index that is not there under another spelling";
   EXPECT_TRUE(rejected(R"({"errors":true,"items":[null,null]})", 2))
       << "the same shape has to fail whichever way errors reads";
 
-  // The shape a real acknowledgement has.
-  EXPECT_FALSE(rejected(R"({"errors":false,"items":[{"index":{"status":201}}]})", 1));
+  // The shape a real acknowledgement has: one index result, naming the index it wrote to and
+  // carrying the status it wrote with.
+  EXPECT_FALSE(
+      rejected(R"({"errors":false,"items":[{"index":{"_index":"logs","status":201}}]})", 1));
 
   // Three shapes, three reasons: they are different things to go and look at.
   const auto reason_for = [&reason](const char *body) {
@@ -314,9 +323,11 @@ TEST(ElasticsearchBulkResponseTests, RejectsItemsEntriesThatDoNotAcknowledgeAnIn
   const std::string padded  = reason_for(R"({"errors":false,"items":[{"index":{},"delete":{}}]})");
   const std::string other   = reason_for(R"({"errors":false,"items":[{"unknown":{"status":1}}]})");
   const std::string no_stat = reason_for(R"({"errors":false,"items":[{"index":{"_index":"l"}}]})");
+  const std::string no_idx  = reason_for(R"({"errors":false,"items":[{"index":{"status":201}}]})");
   EXPECT_NE(padded, other) << padded;
   EXPECT_NE(other, no_stat) << other;
   EXPECT_NE(padded, no_stat) << no_stat;
+  EXPECT_NE(no_stat, no_idx) << no_idx;
 }
 
 // The status says whether the operation applied, so the band has to hold for the number the server
@@ -326,7 +337,8 @@ TEST(ElasticsearchBulkResponseTests, RejectsAcknowledgementsOutsideTheSuccessBan
   std::string reason;
   const auto applied = [&reason](const char *status) {
     const std::string body =
-        std::string(R"({"errors":false,"items":[{"index":{"status":)") + status + R"(}}]})";
+        std::string(R"({"errors":false,"items":[{"index":{"_index":"logs","status":)") + status +
+        R"(}}]})";
     return logs_exporter::detail::IsBulkResponseSuccessful(200, body, 1, reason);
   };
 
@@ -357,20 +369,22 @@ TEST(ElasticsearchBulkResponseTests, RejectsAnAcknowledgedFailureUnderErrorsFals
 {
   std::string reason;
   EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(
-      200, R"({"errors":false,"items":[{"index":{"status":400}}]})", 1, reason));
+      200, R"({"errors":false,"items":[{"index":{"_index":"logs","status":400}}]})", 1, reason));
   EXPECT_NE(reason.find("400"), std::string::npos) << "the reason names the status: " << reason;
 
   EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(
-      200, R"({"errors":false,"items":[{"index":{"status":201}},{"index":{"status":429}}]})", 2,
-      reason))
+      200,
+      R"({"errors":false,"items":[{"index":{"_index":"logs","status":201}},{"index":{"_index":"logs","status":429}}]})",
+      2, reason))
       << "one rejected operation among several is still a rejection";
 
   // The whole 2xx band is a success, the same band the response's own HTTP status uses.
   EXPECT_TRUE(logs_exporter::detail::IsBulkResponseSuccessful(
-      200, R"({"errors":false,"items":[{"index":{"status":200}},{"index":{"status":299}}]})", 2,
-      reason));
+      200,
+      R"({"errors":false,"items":[{"index":{"_index":"logs","status":200}},{"index":{"_index":"logs","status":299}}]})",
+      2, reason));
   EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(
-      200, R"({"errors":false,"items":[{"index":{"status":300}}]})", 1, reason));
+      200, R"({"errors":false,"items":[{"index":{"_index":"logs","status":300}}]})", 1, reason));
 }
 
 // An operation that did not apply says so through its status and through an "error" member. The
