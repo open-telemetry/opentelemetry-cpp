@@ -1786,6 +1786,56 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
 // take it, and the next reset cancels it, so the caller is told a request was cancelled that
 // nothing cancelled.
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
+// The other half of the case above, and the one an exporter actually does: nothing cancels the
+// request, the client is simply destroyed. The entry left in the retry queue names an operation
+// that still holds a promise and an easy handle, so somebody has to be the one to finish it and
+// release them, and after the client has gone there is nobody.
+TEST_F(BasicCurlHttpTests, AClientDestroyedWithAPendingRetryDoesNotWaitForIt)
+{
+  received_requests_.clear();
+
+  // Outside the block on purpose. The terminal event for this one is dispatched from the
+  // client's destructor, so the handler has to outlive the client rather than the other way
+  // round.
+  auto handler = std::make_shared<MultiHandleOutcomeHandler>();
+
+  const auto started = std::chrono::steady_clock::now();
+  {
+    auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+    ASSERT_TRUE(client != nullptr);
+    auto *concrete = static_cast<http_client::curl::HttpClient *>(client.get());
+
+    auto session = client->CreateSession("http://127.0.0.1:19000");
+    auto request = session->CreateRequest();
+    request->SetUri("retry/");
+    request->SetMethod(http_client::Method::Post);
+
+    // Long enough that waiting for it would be unmistakable inside the bound below.
+    request->SetRetryPolicy(
+        {4, std::chrono::duration<float>{8.0f}, std::chrono::duration<float>{16.0f}, 2.0f});
+
+    session->SendRequest(handler);
+
+    for (int i = 0;
+         i < 300 && 0 == http_client::curl::HttpClientTestPeer::RetryQueueSize(*concrete); ++i)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    ASSERT_GE(http_client::curl::HttpClientTestPeer::RetryQueueSize(*concrete), 1u)
+        << "the request was never queued for retry, so nothing was tested";
+  }
+  const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - started);
+
+  EXPECT_LT(elapsed.count(), 4000) << "destroying the client took " << elapsed.count()
+                                   << " ms, which is it waiting out a retry nobody is going to run";
+  EXPECT_GE(handler->terminal_.load(std::memory_order_acquire), 1)
+      << "the request was neither retried nor finished";
+  // LeakSanitizer is what says the easy handle and the header list went with it.
+}
+#endif  // ENABLE_OTLP_RETRY_PREVIEW
+
+#ifdef ENABLE_OTLP_RETRY_PREVIEW
 TEST_F(BasicCurlHttpTests, ACancelledRetryDoesNotHoldTheClientOpen)
 {
   received_requests_.clear();
