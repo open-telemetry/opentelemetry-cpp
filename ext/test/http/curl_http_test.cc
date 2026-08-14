@@ -1582,6 +1582,23 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
 // queued while the handle is missing leaves the pending queue for a multi function that cannot
 // take it, and the next reset cancels it, so the caller is told a request was cancelled that
 // nothing cancelled.
+TEST_F(BasicCurlHttpTests, AQueuedHandleIsReleasedWithTheClientThatQueuedIt)
+{
+  auto client = std::make_shared<http_client::curl::HttpClient>();
+
+  http_client::curl::HttpCurlEasyResource resource;
+  resource.easy_handle = curl_easy_init();
+  ASSERT_TRUE(resource.easy_handle != nullptr);
+  resource.headers_chunk = curl_slist_append(nullptr, "X-Test: 1");
+  ASSERT_TRUE(resource.headers_chunk != nullptr);
+  client->ScheduleRemoveSession(4404, std::move(resource));
+
+  // Nothing was sent, so there is no IO thread and nobody else is coming for that queue. The
+  // record is two raw pointers and the container that holds it frees neither, so what is still
+  // queued when the client goes is the client's to release. LeakSanitizer is the assertion.
+  client.reset();
+}
+
 TEST_F(BasicCurlHttpTests, AHandleQueuedWithoutAMultiHandleIsReleased)
 {
   auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();

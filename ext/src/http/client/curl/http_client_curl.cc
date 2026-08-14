@@ -335,6 +335,16 @@ HttpClient::~HttpClient()
       background_thread->join();
     }
   }
+
+  // The background thread has gone and no more sessions are made here, so nothing else is
+  // coming back for what it left behind. Aborting first, because finishing an operation hands
+  // its easy handle and header list to the removal queue, and that queue holds two raw
+  // pointers whose container frees neither. Ordinarily both are already empty: this is for the
+  // case where the thread had retired before the sessions were cancelled, and it runs before
+  // the multi handle goes so a handle that is still attached can be given back.
+  doAbortSessions();
+  doRemoveSessions();
+
   {
     std::lock_guard<std::mutex> lock_guard{multi_handle_m_};
     ReleaseMultiHandle();
