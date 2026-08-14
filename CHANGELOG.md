@@ -196,6 +196,12 @@ Increment the:
   `AlwaysOff`/`TraceBased`)
   [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
 
+* [METRICS SDK] Fix preview exemplar reservoirs to serialize concurrent
+  measurement offers and collection, reset stored cells and sampling state
+  between collection intervals, remain usable after collection, and omit empty
+  cells from collected results.
+  [#4429](https://github.com/open-telemetry/opentelemetry-cpp/pull/4429)
+
 Breaking changes:
 
 * [CONFIGURATION] SDK default component builder libraries and example
