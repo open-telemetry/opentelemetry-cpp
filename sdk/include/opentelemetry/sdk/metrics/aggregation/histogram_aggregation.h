@@ -7,9 +7,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <vector>
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
@@ -49,7 +49,7 @@ public:
   PointType ToPoint() const noexcept override;
 
 private:
-  mutable opentelemetry::common::SpinLockMutex lock_;
+  mutable std::mutex lock_;
   HistogramPointData point_data_;
   bool record_min_max_ = true;
 };
@@ -79,7 +79,7 @@ public:
   PointType ToPoint() const noexcept override;
 
 private:
-  mutable opentelemetry::common::SpinLockMutex lock_;
+  mutable std::mutex lock_;
   mutable HistogramPointData point_data_;
   bool record_min_max_ = true;
 };

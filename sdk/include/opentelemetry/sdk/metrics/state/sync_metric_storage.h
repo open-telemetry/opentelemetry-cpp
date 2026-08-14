@@ -11,7 +11,6 @@
 #include <unordered_map>
 
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/function_ref.h"
@@ -226,7 +225,7 @@ public:
     InstrumentValueType value_type_;
     MetricAttributes attributes_;
     // Protected by lock_.
-    opentelemetry::common::SpinLockMutex lock_;
+    std::mutex lock_;
     std::unique_ptr<Aggregation> current_;
     bool dirty_ = false;
   };

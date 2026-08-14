@@ -6,7 +6,6 @@
 #include <memory>
 #include <mutex>
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
@@ -34,7 +33,7 @@ LongLastValueAggregation::LongLastValueAggregation(const LastValuePointData &dat
 void LongLastValueAggregation::Aggregate(int64_t value,
                                          const PointAttributes & /* attributes */) noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<std::mutex> locked(lock_);
   point_data_.is_lastvalue_valid_ = true;
   point_data_.value_              = value;
   point_data_.sample_ts_          = std::chrono::system_clock::now();
@@ -73,7 +72,7 @@ std::unique_ptr<Aggregation> LongLastValueAggregation::Diff(const Aggregation &n
 
 PointType LongLastValueAggregation::ToPoint() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<std::mutex> locked(lock_);
   return point_data_;
 }
 
@@ -90,7 +89,7 @@ DoubleLastValueAggregation::DoubleLastValueAggregation(const LastValuePointData 
 void DoubleLastValueAggregation::Aggregate(double value,
                                            const PointAttributes & /* attributes */) noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<std::mutex> locked(lock_);
   point_data_.is_lastvalue_valid_ = true;
   point_data_.value_              = value;
   point_data_.sample_ts_          = std::chrono::system_clock::now();
@@ -130,7 +129,7 @@ std::unique_ptr<Aggregation> DoubleLastValueAggregation::Diff(
 
 PointType DoubleLastValueAggregation::ToPoint() const noexcept
 {
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  const std::lock_guard<std::mutex> locked(lock_);
   return point_data_;
 }
 }  // namespace metrics

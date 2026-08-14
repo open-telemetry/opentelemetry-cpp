@@ -5,8 +5,8 @@
 
 #include <cstdint>
 #include <memory>
+#include <mutex>
 
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
@@ -35,7 +35,7 @@ public:
   PointType ToPoint() const noexcept override;
 
 private:
-  mutable opentelemetry::common::SpinLockMutex lock_;
+  mutable std::mutex lock_;
   SumPointData point_data_;
 };
 
@@ -56,7 +56,7 @@ public:
   PointType ToPoint() const noexcept override;
 
 private:
-  mutable opentelemetry::common::SpinLockMutex lock_;
+  mutable std::mutex lock_;
   SumPointData point_data_;
 };
 

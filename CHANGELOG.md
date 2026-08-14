@@ -34,6 +34,10 @@ Increment the:
 * [CONFIGURATION] Add support for the composite sampler configuration
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
+
+* [SDK] Replace SpinLockMutex with std::mutex in the metrics library
+  [#4416](https://github.com/open-telemetry/opentelemetry-cpp/pull/4416)
+
 * [SDK] `OTELResourceDetector` now percent-decodes values parsed from the
   `OTEL_RESOURCE_ATTRIBUTES` environment variable, per the W3C Baggage value
   grammar the resource spec defers to. A malformed escape sequence is left
