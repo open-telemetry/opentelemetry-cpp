@@ -630,19 +630,30 @@ class ElasticsearchLogsExporterAsyncTests : public ::testing::Test
 protected:
   void SetUp() override
   {
-#ifndef ENABLE_ASYNC_EXPORT
+    // One skip point: GTEST_SKIP returns, and a second below it would leave the rest of this body
+    // unreachable, which MSVC reports as C4702 under maintainer mode.
+#if !defined(ENABLE_ASYNC_EXPORT)
     GTEST_SKIP() << "Export() takes the synchronous path when async export is disabled";
-#endif
-    handler_ = nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(
+#elif OTEL_INTERNAL_LOG_LEVEL < OTEL_INTERNAL_LOG_LEVEL_ERROR
+    // These cases read the failure out of the log. Below error level it is not written at all, so
+    // a wrong result and a right one look the same and the cases would stop discriminating.
+    GTEST_SKIP() << "the failure these observe is compiled out below error level";
+#else
+    previous_handler_ = opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogHandler();
+    handler_          = nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(
         new CapturingLogHandler());
     opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(handler_);
+#endif
   }
 
   void TearDown() override
   {
-    opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(
-        nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(
-            new opentelemetry::sdk::common::internal_log::DefaultLogHandler()));
+    // Put back what was found, rather than a fresh default that would displace a handler another
+    // case in this binary had installed.
+    if (handler_)
+    {
+      opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous_handler_);
+    }
   }
 
   bool LoggedAnExportFailure() const
@@ -660,6 +671,7 @@ protected:
   }
 
   nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler> handler_;
+  nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler> previous_handler_;
 };
 }  // namespace
 
@@ -671,9 +683,7 @@ TEST_F(ElasticsearchLogsExporterAsyncTests, AnAcceptedResponseIsNotReportedAsAFa
             }),
             opentelemetry::sdk::common::ExportResult::kSuccess);
 
-#if OTEL_INTERNAL_LOG_LEVEL >= OTEL_INTERNAL_LOG_LEVEL_ERROR
   EXPECT_FALSE(LoggedAnExportFailure());
-#endif
 }
 
 // The count reaches the parser on this path through the handler rather than through Export(), so
@@ -718,7 +728,5 @@ TEST_F(ElasticsearchLogsExporterAsyncTests, ARejectedResponseIsReportedAsAFailur
                 2),
             opentelemetry::sdk::common::ExportResult::kSuccess);
 
-#if OTEL_INTERNAL_LOG_LEVEL >= OTEL_INTERNAL_LOG_LEVEL_ERROR
   EXPECT_TRUE(LoggedAnExportFailure());
-#endif
 }
