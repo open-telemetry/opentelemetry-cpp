@@ -379,11 +379,13 @@ private:
   std::unordered_map<uint64_t, std::shared_ptr<Session>> sessions_;
   std::unordered_set<uint64_t> pending_to_add_session_ids_;
   std::unordered_map<uint64_t, std::shared_ptr<Session>> pending_to_abort_sessions_;
-  // One easy handle on its way back to libcurl. There is one of these per handle rather than
-  // per session, because a session that starts another request hands over a second handle while
-  // the first is still queued, and one entry per session would drop the first one, leaving its
-  // easy handle and header list with no owner. The session is only filled in when the handle
-  // has to be kept, and names what the handle still points at.
+  // One easy handle on its way back to libcurl, with the session it still names through
+  // CURLOPT_PRIVATE. The session is taken when the record is made, so that nothing has to find
+  // it again later against a sessions_ the calling thread is free to change in between.
+  //
+  // There is one of these per handle rather than per session, because a session that starts
+  // another request hands over a second handle while the first is still queued, and one entry
+  // per session would drop the first one, leaving its easy handle and header list with no owner.
   struct PendingCurlRemoval
   {
     uint64_t session_id;
@@ -392,7 +394,6 @@ private:
   };
 
   std::list<PendingCurlRemoval> pending_to_remove_session_handles_;
-  std::unordered_map<uint64_t, std::shared_ptr<Session>> pending_to_remove_sessions_;
 
   // Which easy handles the multi handle holds, recorded when curl_multi_add_handle accepts one.
   // What curl_multi_remove_handle returns cannot answer that question afterwards: it reports
