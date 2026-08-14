@@ -1368,6 +1368,40 @@ TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
   }
 }
 
+TEST_F(BasicCurlHttpTests, ASessionResetTookBeforeItWasQueuedIsFinished)
+{
+  auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(client != nullptr);
+  auto *concrete = static_cast<http_client::curl::HttpClient *>(client.get());
+
+  auto session = client->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  // The interleaving, in program order, which is what makes it a case rather than a window.
+  // A reset keeps the sessions whose ids are already in pending_to_add_session_ids_ and takes
+  // the rest, and a request that has not reached ScheduleAddSession yet is one of the rest:
+  // the caller is between CreateSession, which registered it, and SendAsync, which is what
+  // queues the id. Nothing here is sent, so the IO thread does not exist and this thread is
+  // standing exactly where it would be standing.
+  http_client::curl::HttpClientTestPeer::ResetMultiHandle(*concrete);
+
+  auto handler = std::make_shared<RecordingHandler>();
+  session->SendRequest(handler);
+
+  // Nothing is going to run this operation: the session it names is not registered any more,
+  // and adding the id back would leave the caller waiting on a transfer nobody arranged. So
+  // what has to happen is that it is finished. Returning from here is the assertion, and
+  // without it this hangs rather than fails.
+  session->FinishSession();
+
+  const auto states = handler->States();
+  ASSERT_FALSE(states.empty());
+  EXPECT_EQ(http_client::SessionState::CreateFailed, states.back());
+
+  client->FinishAllSessions();
+}
+
 TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
 {
   auto http_client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
