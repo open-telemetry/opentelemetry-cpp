@@ -520,6 +520,32 @@ TEST_F(BasicCurlHttpTests, RetryPolicyEnabled)
   ASSERT_TRUE(operation.IsRetryable());
 }
 
+// Reading a message and taking the operation on for another attempt are one decision. The status
+// an operation reports does not change when it is cleaned up, so a caller that asks about it
+// separately would put a session whose easy handle is on its way out back in the retry queue.
+TEST_F(BasicCurlHttpTests, ACleanedOperationDoesNotAskToBeRetried)
+{
+  RetryEventHandler handler;
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::Compression compression  = http_client::Compression::kNone;
+  http_client::RetryPolicy retry_policy = {5, std::chrono::duration<float>{1.0f},
+                                           std::chrono::duration<float>{5.0f}, 1.5f};
+
+  curl::HttpOperation operation(http_client::Method::Post, "http://127.0.0.1:19000/retry/", no_ssl,
+                                &handler, headers, body, compression, false,
+                                curl::kDefaultHttpConnTimeout, false, false, retry_policy);
+
+  ASSERT_EQ(CURLE_OK, operation.Send());
+  ASSERT_TRUE(operation.IsRetryable());
+
+  operation.Cleanup();
+
+  EXPECT_TRUE(operation.IsRetryable());
+  EXPECT_FALSE(operation.PerformCurlMessage(CURLE_OK));
+}
+
 TEST_F(BasicCurlHttpTests, RetryPolicyDisabled)
 {
   RetryEventHandler handler;

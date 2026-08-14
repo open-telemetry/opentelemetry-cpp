@@ -568,9 +568,11 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               {
                 // Session can not be destroyed when calling PerformCurlMessage
                 auto hold_session = session->shared_from_this();
-                operation->PerformCurlMessage(result);
 
-                if (operation->IsRetryable())
+                // Reading the message and taking it on for another attempt are one decision.
+                // Asking again afterwards reads whatever the last message left behind, which for
+                // an operation that has since been cleaned up is a status from before that.
+                if (operation->PerformCurlMessage(result))
                 {
                   self->pending_to_retry_sessions_.push_back(hold_session);
                 }

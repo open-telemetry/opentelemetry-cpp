@@ -1519,13 +1519,15 @@ void HttpOperation::Abort()
   }
 }
 
-void HttpOperation::PerformCurlMessage(CURLcode code)
+bool HttpOperation::PerformCurlMessage(CURLcode code)
 {
   if (is_cleaned_.load(std::memory_order_acquire))
   {
-    // Already torn down and queued for removal. A message buffered before that would dispatch a
-    // second round of terminal events and requeue a handle waiting to be freed.
-    return;
+    // Some thread has entered Cleanup for this operation, which is as much as the flag says: it
+    // is taken before the terminal event, the hand over of the easy handle and the completion
+    // callback. Either way this message is not this operation's to read, and it is not to be
+    // taken on for another attempt on the strength of what an earlier message left behind.
+    return false;
   }
 
   ++retry_attempts_;
@@ -1632,7 +1634,10 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
   {
     // Cleanup and unbind easy handle from multi handle, and finish callback
     Cleanup();
+    return false;
   }
+
+  return true;
 }
 
 }  // namespace curl
