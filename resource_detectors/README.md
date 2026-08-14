@@ -1,45 +1,69 @@
 # Resource Detectors
 
-Resource detectors populate the OpenTelemetry `Resource` with attributes
+Resource detectors populate `Resource Entity` attributes
 describing the environment where the application is running.
 
-Refer to the linked semconv pages for the stability status of each detector
-and its attributes.
+Detectors in this project will be limited to those defined as `built-in` by the
+OTel [Resource SDK Spec](https://opentelemetry.io/docs/specs/otel/resource/sdk/#resource-detector-name)
+and [declaritive configuration resource schema](https://github.com/open-telemetry/opentelemetry-configuration/blob/main/schema/resource.yaml).
+Currently this set includes:
 
-## Available detectors
+- `service`
+- `container`
+- `host`
+- `process`
+- `env entities (experimental and not defined in the yaml configuration schema)`
+
+The detectors should support all tested platforms (Linux, macOS, and Windows)
+and must follow the semantic conventions for
+[Entities](https://opentelemetry.io/docs/specs/semconv/registry/entities/).
+
+## Built-in detectors
+
+Each detector section lists currently supported Entity attributes by platform.
+Contributions to detect more attributes for each Entity are welcome.
+
+### Service Resource Detector
+
+[Entity: Service](https://opentelemetry.io/docs/specs/semconv/registry/entities/service/)
+
+Not implemented.
 
 ### Container Resource Detector
 
-[Semconv: Container](https://opentelemetry.io/docs/specs/semconv/resource/container/)
+[Entity: Container](https://opentelemetry.io/docs/specs/semconv/registry/entities/container/)
 
-Reads the container ID from the cgroup file (e.g. Docker, Kubernetes).
+| Attribute | Description | Linux | macOS | Windows |
+| --- | --- | --- | --- | --- |
+| `container.id` | Container ID from `/proc/self/cgroup` | Yes | No | No |
 
-| Attribute | Description |
-| --- | --- |
-| `container.id` | Container ID (e.g. `a3bf90e006b2`) |
+Limitation: this detector depends on Linux cgroup data and may return no value
+outside containers or when cgroup data is unavailable.
 
 ### Host Resource Detector
 
-[Semconv: Host](https://opentelemetry.io/docs/specs/semconv/resource/host/)
+[Entity: Host](https://opentelemetry.io/docs/specs/semconv/registry/entities/host/)
 
-Reads host information from the operating system.
+| Attribute | Description | Linux | macOS | Windows |
+| --- | --- | --- | --- | --- |
+| `host.name` | Hostname from OS APIs | Yes | Yes | Yes |
+| `host.arch` | Architecture mapped at build time | Yes | Yes | Yes |
+| `host.id` | Host ID from OS-specific sources | Yes | Yes | Yes |
 
-| Attribute | Description |
-| --- | --- |
-| `host.name` | Hostname (from `gethostname` / `uname`) |
-| `host.arch` | CPU architecture (e.g. `amd64`, `arm64`) |
-| `host.id` | Machine ID (from `/etc/machine-id` on Linux, registry on Windows) |
+Limitation: `host.id` is omitted when the platform-specific source is missing
+or inaccessible.
 
 ### Process Resource Detector
 
-[Semconv: Process](https://opentelemetry.io/docs/specs/semconv/resource/process/)
+[Entity: Process](https://opentelemetry.io/docs/specs/semconv/registry/entities/process/)
 
-Reads process information from the operating system.
+| Attribute | Description | Linux | macOS | Windows |
+| --- | --- | --- | --- | --- |
+| `process.pid` | Process ID | Yes | Yes | Yes |
+| `process.executable.path` | Path via `/proc` (Linux) or Win32 APIs | Yes | No | Yes |
 
-| Attribute | Description |
-| --- | --- |
-| `process.pid` | Process ID |
-| `process.executable.path` | Full path to the process executable |
+Limitation: current macOS implementation does not populate
+`process.executable.path`.
 
 ### Env Entity Resource Detector (Experimental)
 
