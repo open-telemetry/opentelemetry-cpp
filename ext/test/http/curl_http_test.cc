@@ -6,7 +6,6 @@
 #include "gtest/gtest.h"
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <curl/curl.h>
 #  include "gmock/gmock.h"
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
