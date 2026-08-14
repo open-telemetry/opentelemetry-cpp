@@ -979,22 +979,44 @@ bool HttpClient::doRetrySessions(bool report_all)
     const auto session   = *retry_it;
     const auto operation = session ? session->GetOperation().get() : nullptr;
 
-    if (!operation)
+    // An operation that was cancelled, or torn down, is not going to be retried. Its easy
+    // handle has gone back to the client already, so what waiting for its turn would buy is a
+    // null handle offered to libcurl and an entry that keeps the background thread alive until
+    // a time that means nothing. At shutdown that time is time the join spends waiting.
+    if (nullptr == operation || operation->WasAborted() ||
+        nullptr == operation->GetCurlEasyHandle())
     {
       retry_it = pending_to_retry_sessions_.erase(retry_it);
+      continue;
     }
-    else if (operation->NextRetryTime() < now)
+
+    if (operation->NextRetryTime() >= now)
     {
-      auto easy_handle = operation->GetCurlEasyHandle();
-      curl_multi_remove_handle(multi_handle_, easy_handle);
-      curl_multi_add_handle(multi_handle_, easy_handle);
-      retry_it = pending_to_retry_sessions_.erase(retry_it);
-      has_data = true;
-    }
-    else
-    {
+      // Pushed at the back, so nothing behind this one is due either.
       break;
     }
+
+    CURL *const easy_handle = operation->GetCurlEasyHandle();
+
+    // The handle is still with the multi handle from the attempt that just failed, so it has
+    // to come back before it can go again, and it only goes again if it came back.
+    const CURLMcode detached = curl_multi_remove_handle(multi_handle_, easy_handle);
+    const CURLMcode attached =
+        (CURLM_OK == detached) ? curl_multi_add_handle(multi_handle_, easy_handle) : detached;
+
+    retry_it = pending_to_retry_sessions_.erase(retry_it);
+
+    if (CURLM_OK != attached)
+    {
+      // Nobody is going to run this transfer, so it is finished here rather than left with a
+      // promise nothing will fulfil, and it is not reported as work that was arranged.
+      OTEL_INTERNAL_LOG_ERROR(
+          "[HTTP Client Curl] a retry could not be scheduled: " << curl_multi_strerror(attached));
+      session->FinishOperation();
+      continue;
+    }
+
+    has_data = true;
   }
 
   report_all = report_all && !pending_to_retry_sessions_.empty();

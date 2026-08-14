@@ -62,6 +62,13 @@ public:
 
   static bool RemoveSessions(HttpClient &client) { return client.doRemoveSessions(); }
 
+#ifdef ENABLE_OTLP_RETRY_PREVIEW
+  static std::size_t RetryQueueSize(const HttpClient &client)
+  {
+    return client.pending_to_retry_sessions_.size();
+  }
+#endif  // ENABLE_OTLP_RETRY_PREVIEW
+
   static CURLM *ExchangeMultiHandle(HttpClient &client, CURLM *replacement)
   {
     CURLM *previous      = client.multi_handle_;
@@ -1582,6 +1589,54 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
 // queued while the handle is missing leaves the pending queue for a multi function that cannot
 // take it, and the next reset cancels it, so the caller is told a request was cancelled that
 // nothing cancelled.
+#ifdef ENABLE_OTLP_RETRY_PREVIEW
+TEST_F(BasicCurlHttpTests, ACancelledRetryDoesNotHoldTheClientOpen)
+{
+  received_requests_.clear();
+
+  const auto started = std::chrono::steady_clock::now();
+  {
+    auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+    ASSERT_TRUE(client != nullptr);
+    auto *concrete = static_cast<http_client::curl::HttpClient *>(client.get());
+
+    auto session = client->CreateSession("http://127.0.0.1:19000");
+    auto request = session->CreateRequest();
+    request->SetUri("retry/");
+    request->SetMethod(http_client::Method::Post);
+
+    // Long enough that waiting for it would be unmistakable, and long enough that it cannot
+    // come round on its own inside the bound below.
+    request->SetRetryPolicy(
+        {4, std::chrono::duration<float>{8.0f}, std::chrono::duration<float>{16.0f}, 2.0f});
+
+    auto handler = std::make_shared<MultiHandleOutcomeHandler>();
+    session->SendRequest(handler);
+
+    // The server answers this route with something retryable, so the session goes into the
+    // retry queue with a time on it that has not come.
+    for (int i = 0;
+         i < 300 && 0 == http_client::curl::HttpClientTestPeer::RetryQueueSize(*concrete); ++i)
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    ASSERT_GE(http_client::curl::HttpClientTestPeer::RetryQueueSize(*concrete), 1u)
+        << "the request was never queued for retry, so nothing was tested";
+
+    // Cancelling takes the operation apart and hands its easy handle back, and the entry left
+    // behind names an operation that is not going to be retried by anybody.
+    session->CancelSession();
+    session->FinishSession();
+  }
+  const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - started);
+
+  EXPECT_LT(elapsed.count(), 4000)
+      << "destroying the client took " << elapsed.count()
+      << " ms, which is it waiting out a retry for an operation that had already finished";
+}
+#endif  // ENABLE_OTLP_RETRY_PREVIEW
+
 TEST_F(BasicCurlHttpTests, AQueuedHandleIsReleasedWithTheClientThatQueuedIt)
 {
   auto client = std::make_shared<http_client::curl::HttpClient>();
