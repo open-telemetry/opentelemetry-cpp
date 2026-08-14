@@ -54,13 +54,21 @@ namespace client
 namespace curl
 {
 // resetMultiHandle only runs when curl_multi_perform fails, which a test cannot provoke, so
-// the case below reaches it directly. See #4389.
+// ResetMultiHandleWithASessionDoesNotDeadlock reaches it directly. See #4389.
 class HttpClientTestPeer
 {
 public:
   static void ResetMultiHandle(HttpClient &client) { client.resetMultiHandle(); }
 
   static bool RemoveSessions(HttpClient &client) { return client.doRemoveSessions(); }
+
+  // Guarded by session_ids_m_, which is what every producer of this queue takes, so a case may
+  // read it whatever else is running.
+  static std::size_t PendingRemovalCount(HttpClient &client)
+  {
+    std::lock_guard<std::recursive_mutex> lock_guard{client.session_ids_m_};
+    return client.pending_to_remove_session_handles_.size();
+  }
 
   static CURLM *ExchangeMultiHandle(HttpClient &client, CURLM *replacement)
   {
@@ -412,9 +420,6 @@ struct FailCurlCallocEverywhere
   FailCurlCallocEverywhere &operator=(FailCurlCallocEverywhere &&)      = delete;
 };
 
-// Counts terminal outcomes without caring which one, since a client whose multi handle could
-// not be created may still recover and answer, and the case below is about the caller being
-// told either way rather than about which answer it gets.
 // Counts the internal log lines that say a particular thing, so a case can hold that a run of
 // failures is reported a bounded number of times rather than once per pass of the IO loop. Only
 // the ones it asked for: anything else the binary writes while this is installed would move the
@@ -471,6 +476,9 @@ private:
   const nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler> previous_;
 };
 
+// Counts terminal outcomes without caring which one, since a client whose multi handle could
+// not be created may still recover and answer, and what the cases using this ask is whether the
+// caller was told either way rather than which answer it got.
 class MultiHandleOutcomeHandler : public http_client::EventHandler
 {
 public:
@@ -1851,13 +1859,12 @@ TEST_F(BasicCurlHttpTests, ACancelledRetryDoesNotHoldTheClientOpen)
 
     session->SendRequest(handler);
 
-    // Watched from outside the client. The retry queue has no lock, because only the
-    // background thread is supposed to touch it, and a peer that read it from here would make
-    // that untrue: ThreadSanitizer reports exactly that, twice, against a version of this case
-    // that did. So it waits on what the server saw, which is behind a mutex, and then for long
-    // enough that the answer has been read and the session put back with its wait on it. A
-    // second in, that wait still has seven to run, so anything outstanding here is outstanding
-    // because it is queued.
+    // Watched from outside the client, because the retry queue has no lock: only the
+    // background thread is meant to touch it, and reading it from here would make that untrue.
+    // So this waits on what the server saw, which is behind a mutex, and then long enough for
+    // the answer to have been read and the session put back with its wait on it. A second in,
+    // that wait still has seven to run, so anything outstanding here is outstanding because it
+    // is queued.
     ASSERT_TRUE(waitForRequests(30, 1)) << "the request never reached the server";
     std::this_thread::sleep_for(std::chrono::seconds(1));
     ASSERT_EQ(0, handler->terminal_.load(std::memory_order_acquire))
@@ -1889,6 +1896,9 @@ TEST_F(BasicCurlHttpTests, AQueuedHandleIsReleasedWithTheClientThatQueuedIt)
   resource.headers_chunk = curl_slist_append(nullptr, "X-Test: 1");
   ASSERT_TRUE(resource.headers_chunk != nullptr);
   client->ScheduleRemoveSession(4404, std::move(resource));
+  ASSERT_EQ(static_cast<std::size_t>(1),
+            http_client::curl::HttpClientTestPeer::PendingRemovalCount(*client))
+      << "the handle was never queued, so nothing was tested";
 
   // Nothing was sent, so there is no IO thread and nobody else is coming for that queue. The
   // record is two raw pointers and the container that holds it frees neither, so what is still
@@ -1911,6 +1921,9 @@ TEST_F(BasicCurlHttpTests, AHandleQueuedWithoutAMultiHandleIsReleased)
 
   CURLM *previous = http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(*concrete, nullptr);
   concrete->ScheduleRemoveSession(4404, std::move(resource));
+  ASSERT_EQ(static_cast<std::size_t>(1),
+            http_client::curl::HttpClientTestPeer::PendingRemovalCount(*concrete))
+      << "the handle was never queued, so nothing was tested";
 
   // What resetMultiHandle does when curl_multi_init has just failed on it. The easy handle and
   // its header list are released rather than held until a multi handle comes back, and neither
@@ -1929,6 +1942,9 @@ TEST_F(BasicCurlHttpTests, AQueuedRequestSurvivesAMissingMultiHandle)
   // Built without a handle, for the reason given above: a case that took one away would be
   // using it from two threads at once, and could not then say whether what it saw was the
   // client's behaviour or its own.
+  // Before the client, so that it outlives it. The client dispatches terminal events from its
+  // destructor, and a handler declared after it would be gone by then.
+  auto handler = std::make_shared<MultiHandleOutcomeHandler>();
   FailCurlCallocEverywhere failing;
   auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
   ASSERT_TRUE(client != nullptr);
@@ -1948,7 +1964,6 @@ TEST_F(BasicCurlHttpTests, AQueuedRequestSurvivesAMissingMultiHandle)
   auto session = client->CreateSession("http://127.0.0.1:19000");
   auto request = session->CreateRequest();
   request->SetUri("get/");
-  auto handler = std::make_shared<MultiHandleOutcomeHandler>();
 
   // Back to zero after the constructor's own attempt and before there is an IO thread to make
   // one, and this thread is exempt from here on, so what is counted below was refused to that
@@ -1991,13 +2006,15 @@ TEST_F(BasicCurlHttpTests, AFailedEasyHandleIsReportedOnce)
   ASSERT_TRUE(g_curl_hooks_installed);
   received_requests_.clear();
 
-  auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  // Before the client, so that it outlives it. The client dispatches terminal events from its
+  // destructor, and a handler declared after it would be gone by then.
+  auto handler = std::make_shared<MultiHandleOutcomeHandler>();
+  auto client  = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
   ASSERT_TRUE(client != nullptr);
 
   auto session = client->CreateSession("http://127.0.0.1:19000");
   auto request = session->CreateRequest();
   request->SetUri("get/");
-  auto handler = std::make_shared<MultiHandleOutcomeHandler>();
 
   {
     // Armed here so it reaches the curl_easy_init inside SendRequest and nothing before it.
@@ -2039,6 +2056,9 @@ TEST_F(BasicCurlHttpTests, APersistentMultiHandleFailureDoesNotSpin)
     // would leave any result this case reported open to being an artefact of the injection.
     // What fails is curl_multi_init, on whichever thread calls it, and after the constructor
     // that is the IO thread every time.
+    // Before the client, so that it outlives it. The client dispatches terminal events from its
+    // destructor, and a handler declared after it would be gone by then.
+    auto handler = std::make_shared<MultiHandleOutcomeHandler>();
     FailCurlCallocEverywhere failing;
     auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
     ASSERT_TRUE(client != nullptr);
@@ -2052,7 +2072,6 @@ TEST_F(BasicCurlHttpTests, APersistentMultiHandleFailureDoesNotSpin)
     auto session = client->CreateSession("http://127.0.0.1:19000");
     auto request = session->CreateRequest();
     request->SetUri("get/");
-    auto handler = std::make_shared<MultiHandleOutcomeHandler>();
 
     // Back to zero after the constructor's own attempt and before there is an IO thread to
     // make one, and this thread is exempt from here on, so what is counted below was refused

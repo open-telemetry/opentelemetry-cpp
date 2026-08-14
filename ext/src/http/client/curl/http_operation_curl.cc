@@ -455,8 +455,8 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
     last_curl_result_ = CURLE_FAILED_INIT;
     // Refuses Send() and SendAsync(), which would otherwise drive a null handle into libcurl.
     construction_result_ = CURLE_FAILED_INIT;
-    // Terminal already, and reported by the caller that sees SendAsync refuse, the same way the
-    // header list failure below is. Dispatching here as well told the handler twice.
+    // Terminal already, and reported once by the caller that sees SendAsync refuse, the same
+    // way the header list failure below is. Nothing is dispatched from here.
     session_state_ = opentelemetry::ext::http::client::SessionState::CreateFailed;
     return;
   }

@@ -1054,10 +1054,9 @@ bool HttpClient::hasActionableWork()
   std::lock_guard<std::mutex> session_lock_guard{sessions_m_};
   std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
 
-  // An id whose session has gone is what doAddSessions would drop on its next pass, so it is
-  // dropped here too rather than counted. The difference matters: the first version of this
-  // check took every queue at its size, and an entry nothing could be done about held the
-  // thread open against the join in the destructor.
+  // An id whose session has gone is what doAddSessions drops on its next pass, so it is
+  // dropped here too rather than counted. Counting an entry that can never drain would keep
+  // this thread alive against the join in the destructor.
   for (auto id = pending_to_add_session_ids_.begin(); id != pending_to_add_session_ids_.end();)
   {
     const auto session = sessions_.find(*id);
