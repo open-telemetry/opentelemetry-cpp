@@ -1489,11 +1489,16 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   }
   else if (!session->GetHttpClient().ScheduleAddSession(session->GetSessionId()))
   {
-    // The same, except nobody cancelled anything. Name the failure first: Cleanup() would report
-    // a manual cancel, with a reason read from a curl result that is still CURLE_OK.
+    // The same, except nobody cancelled anything. The terminal state goes in first so Cleanup()
+    // does not report a manual cancel, with a reason read from a curl result that is still
+    // CURLE_OK, and the operation is finished before the handler hears about it: a handler that
+    // calls FinishSession() from this event would otherwise wait on the promise that the
+    // Cleanup() below it is the only thing able to fulfil.
+    session_state_.store(opentelemetry::ext::http::client::SessionState::CreateFailed,
+                         std::memory_order_release);
+    Cleanup();
     DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
                   "the session is not registered with this client");
-    Cleanup();
   }
 
   return CURLE_OK;
