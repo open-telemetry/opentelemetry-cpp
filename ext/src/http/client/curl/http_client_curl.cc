@@ -346,23 +346,29 @@ HttpClient::~HttpClient()
   }
 
   // The background thread has stopped, so nothing else is coming back for what it left behind.
-  // Sessions go first, because releasing one can hand over one last easy handle, and they are
-  // released outside the lock because that hand over takes it.
+  // A batch at a time and with no lock held: a record owns the session it names, and letting one
+  // go runs a destructor that comes back through ScheduleRemoveSession. That can only queue what
+  // a session still held, and no more sessions are made here, so this ends.
   releaseQuarantinedHandles();
+
+  while (true)
   {
-    std::unordered_map<uint64_t, std::shared_ptr<Session>> pending_to_remove_sessions;
+    std::list<PendingCurlRemoval> pending_to_remove_session_handles;
     {
       std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
-      pending_to_remove_sessions_.swap(pending_to_remove_sessions);
+      pending_to_remove_session_handles_.swap(pending_to_remove_session_handles);
+    }
+
+    if (pending_to_remove_session_handles.empty())
+    {
+      break;
+    }
+
+    for (auto &pending : pending_to_remove_session_handles)
+    {
+      ReleaseCurlResource(pending.resource);
     }
   }
-
-  std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
-  for (auto &pending : pending_to_remove_session_handles_)
-  {
-    ReleaseCurlResource(pending.resource);
-  }
-  pending_to_remove_session_handles_.clear();
 }
 
 std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSession(
@@ -438,28 +444,13 @@ void HttpClient::CleanupSession(uint64_t session_id)
     std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
     pending_to_add_session_ids_.erase(session_id);
 
-    if (session)
+    // A handle of this session that is queued for removal already holds the session, so there
+    // is nothing to decide about one here.
+    if (session && session->IsSessionActive() && session->GetOperation())
     {
-      bool has_pending_handle = false;
-      for (const auto &pending : pending_to_remove_session_handles_)
-      {
-        if (pending.session_id == session_id)
-        {
-          has_pending_handle = true;
-          break;
-        }
-      }
-
-      if (has_pending_handle)
-      {
-        pending_to_remove_sessions_.emplace(session_id, std::move(session));
-      }
-      else if (session->IsSessionActive() && session->GetOperation())
-      {
-        // If this session is already running, give it to the background thread for cleanup.
-        pending_to_abort_sessions_[session_id] = std::move(session);
-        need_wakeup_background_thread          = true;
-      }
+      // If this session is already running, give it to the background thread for cleanup.
+      pending_to_abort_sessions_[session_id] = std::move(session);
+      need_wakeup_background_thread          = true;
     }
   }
 
@@ -728,10 +719,23 @@ void HttpClient::ScheduleAbortSession(uint64_t session_id)
 void HttpClient::ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource)
 {
   {
-    std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
+    // The session is taken here, in the same breath as the record. Looking it up when the record
+    // is drained instead leaves a gap the calling thread runs through: it returns from
+    // FinishSession, CleanupSession takes the session out of sessions_, and by then this queue
+    // has been swapped away, so neither side would be holding a session the handle still names.
+    std::lock_guard<std::mutex> session_lock_guard{sessions_m_};
+    std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
+
+    std::shared_ptr<Session> owner;
+    auto session = sessions_.find(session_id);
+    if (session != sessions_.end())
+    {
+      owner = session->second;
+    }
+
     pending_to_add_session_ids_.erase(session_id);
     pending_to_remove_session_handles_.push_back(
-        PendingCurlRemoval{session_id, std::move(resource), nullptr});
+        PendingCurlRemoval{session_id, std::move(resource), std::move(owner)});
   }
 
   wakeupBackgroundThread();
@@ -842,13 +846,18 @@ bool HttpClient::doAbortSessions()
       has_data = true;
     }
 
-    // FinishOperation queued the easy handle for removal, and that handle still holds
-    // CURLOPT_PRIVATE and the callback data pointing into this session and its operation.
-    // doRemoveSessions cannot find the session to hold, because aborting took it out of
-    // sessions_, so hand it over under the id it will look the handle up by.
+    // Aborting took this session out of sessions_ before FinishOperation queued its easy
+    // handle, so the record could not take the session for itself and is given it here. Nothing
+    // drains the queue in between: both run on this thread, one after the other.
     {
       std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
-      pending_to_remove_sessions_.emplace(session.first, std::move(session.second));
+      for (auto &pending : pending_to_remove_session_handles_)
+      {
+        if (pending.session_id == session.first && !pending.owner)
+        {
+          pending.owner = session.second;
+        }
+      }
     }
   }
   return has_data;
@@ -865,7 +874,6 @@ bool HttpClient::doRemoveSessions()
     {
       std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
       pending_to_remove_session_handles_.swap(pending_to_remove_session_handles);
-      pending_to_remove_sessions_.swap(pending_to_remove_sessions);
     }
     {
       // If user callback do not call CancelSession or FinishSession, We still need to remove it
@@ -895,13 +903,8 @@ bool HttpClient::doRemoveSessions()
       if (!detachHandle(resource.easy_handle))
       {
         // Still held, so a transfer may still be running on it and its CURLOPT_PRIVATE still
-        // names this session. Keep the whole record instead of losing track of the handle.
-        auto owner = pending_to_remove_sessions.find(removing_handle.session_id);
-        if (owner != pending_to_remove_sessions.end())
-        {
-          removing_handle.owner = owner->second;
-        }
-
+        // names this session. The record carries that session already, so keeping the record
+        // keeps both.
         quarantined_handles_.push_back(std::move(removing_handle));
         continue;
       }
