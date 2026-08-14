@@ -479,6 +479,13 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
 
     // Logged after the session is retired. The log handler is replaceable, and one that calls
     // ForceFlush() would otherwise wait for the very session this call has not let go of yet.
+    //
+    // That is the whole of what the ordering buys, and it is worth being exact about the rest.
+    // It does not make a log handler safe to re-enter the exporter from in general: one that
+    // calls ForceFlush() without a deadline from a progress event blocks the Export() that has
+    // not handed its request to the client yet, and one that flushes from any callback the HTTP
+    // client dispatches can wait on work only that client thread can advance. Neither is new
+    // here and neither is fixed here.
     if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
     {
       OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] ERROR: Export "
