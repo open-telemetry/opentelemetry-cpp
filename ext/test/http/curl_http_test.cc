@@ -97,6 +97,37 @@ public:
 // inside the Response event, which is the one moment both arms of the completion callback are
 // eligible: DispatchEvent notifies the handler before it stores the new state, and the callback
 // runs after both, so it sees an aborted operation that also has a response.
+class ReentrantSendHandler : public CustomEventHandler
+{
+public:
+  void OnResponse(http_client::Response & /* response */) noexcept override
+  {
+    got_response_.store(true, std::memory_order_release);
+
+    if (session_ != nullptr && !resent_.exchange(true, std::memory_order_acq_rel))
+    {
+      auto again = session_->CreateRequest();
+      again->SetUri("get/");
+      session_->SendRequest(self_.lock());
+    }
+  }
+
+  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
+  {
+    if (state == http_client::SessionState::CreateFailed)
+    {
+      create_failed_.fetch_add(1, std::memory_order_release);
+    }
+  }
+
+  http_client::Session *session_ = nullptr;
+  std::weak_ptr<ReentrantSendHandler> self_;
+  std::atomic<int> create_failed_{0};
+
+private:
+  std::atomic<bool> resent_{false};
+};
+
 class TerminalCountingHandler : public CustomEventHandler
 {
 public:
@@ -627,6 +658,63 @@ TEST_F(BasicCurlHttpTests, ResetMultiHandleWithASessionDoesNotDeadlock)
   http_client::curl::HttpClientTestPeer::ResetMultiHandle(*client);
 
   client->FinishAllSessions();
+}
+
+// The reproduction from #4396. A handler that sends again from OnResponse replaces the operation
+// whose Cleanup is running that handler, and Cleanup reads that operation again on the way out.
+TEST_F(BasicCurlHttpTests, ASecondRequestFromInsideTheResponseIsRefused)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler      = std::make_shared<ReentrantSendHandler>();
+  handler->session_ = session.get();
+  handler->self_    = handler;
+
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+
+  EXPECT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, handler->create_failed_.load(std::memory_order_acquire));
+
+  session_manager->FinishAllSessions();
+}
+
+// The same thing without the re-entrancy, and the request the first send is reading from is not
+// replaced under it either.
+TEST_F(BasicCurlHttpTests, ASessionSendsOneRequest)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto first = std::make_shared<ReentrantSendHandler>();
+  session->SendRequest(first);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+
+  EXPECT_TRUE(first->got_response_.load(std::memory_order_acquire));
+  EXPECT_EQ(0, first->create_failed_.load(std::memory_order_acquire));
+
+  auto again = session->CreateRequest();
+  EXPECT_EQ(request.get(), again.get());
+
+  auto second = std::make_shared<ReentrantSendHandler>();
+  session->SendRequest(second);
+  EXPECT_EQ(1, second->create_failed_.load(std::memory_order_acquire));
+  EXPECT_FALSE(second->got_response_.load(std::memory_order_acquire));
+
+  session_manager->FinishAllSessions();
 }
 
 // The caller-thread side of the same cancel. The server handler takes mtx_requests before it
