@@ -1657,8 +1657,10 @@ TEST_F(BasicCurlHttpTests, AFailedEasyHandleIsReportedOnce)
   session->SendRequest(handler);
   g_fail_curl_calloc_everywhere.store(false, std::memory_order_relaxed);
 
-  EXPECT_GE(handler->create_failed_.load(std::memory_order_acquire), 1)
-      << "the caller was never told the handle could not be created";
+  EXPECT_EQ(1, handler->create_failed_.load(std::memory_order_acquire))
+      << "one failed handle was not described exactly once";
+  EXPECT_EQ(1, handler->terminal_.load(std::memory_order_acquire))
+      << "one request produced more than one terminal outcome";
   EXPECT_EQ(0, handler->connect_failed_.load(std::memory_order_acquire))
       << "a request with no easy handle still reported a connect failure";
   EXPECT_EQ(0, handler->responses_.load(std::memory_order_acquire));
