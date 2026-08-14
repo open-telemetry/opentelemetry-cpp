@@ -117,8 +117,7 @@ target_link_libraries(
           opentelemetry_configuration_core)
 
 #
-# opentelemetry_resource_detectors (interface - links all individual detectors
-# and builders)
+# opentelemetry_resource_detectors (interface to all detectors)
 #
 
 add_library(opentelemetry_resource_detectors INTERFACE)
@@ -134,8 +133,7 @@ target_link_libraries(
             opentelemetry_process_resource_detector)
 
 #
-# opentelemetry_resource_detectors_builders (interface - links all individual
-# builders)
+# opentelemetry_resource_detectors_builders (interface to all builders)
 #
 
 add_library(opentelemetry_resource_detectors_builders INTERFACE)

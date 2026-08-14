@@ -86,7 +86,7 @@ cc_library(
     ],
 )
 
-# Convenience target linking all individual detectors.
+# Convenience target linking all resource detectors.
 cc_library(
     name = "resource_detectors",
     deps = [
@@ -97,7 +97,7 @@ cc_library(
     ],
 )
 
-# Convenience target linking all individual builders.
+# Convenience target linking all resource detector builders.
 cc_library(
     name = "resource_detectors_builders",
     deps = [
