@@ -500,7 +500,8 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             // curl_multi_perform leaves still_running alone when it rejects the handle, and it
             // starts at one, so without this the loop keeps reporting work it does not have,
             // never reaches the shutdown check below, and the thread cannot be joined.
-            still_running = 0;
+            still_running           = 0;
+            const uint64_t woken_at = self->wakeup_generation_.load(std::memory_order_acquire);
             if (self->resetMultiHandle())
             {
               missing_multi_handle_reported = false;
@@ -524,13 +525,16 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
-              // In slices, because this thread cannot be woken: wakeupBackgroundThread reaches it
-              // through the multi handle, and there is not one. A whole delay here would be a
-              // whole delay added to destroying the client.
+              // In slices, because curl_multi_wakeup cannot reach this thread: it goes through
+              // the multi handle, and there is not one. What ends the wait early instead is the
+              // counter every producer raises, or shutdown. A whole delay spent either way would
+              // be a whole delay added to answering the next request, and to destroying the
+              // client.
               constexpr std::chrono::milliseconds kMissingHandleWaitSlice{16};
               for (std::chrono::milliseconds waited = std::chrono::milliseconds::zero();
                    waited < self->scheduled_delay_milliseconds_ &&
-                   !self->is_shutdown_.load(std::memory_order_acquire);
+                   !self->is_shutdown_.load(std::memory_order_acquire) &&
+                   woken_at == self->wakeup_generation_.load(std::memory_order_acquire);
                    waited += kMissingHandleWaitSlice)
               {
                 std::this_thread::sleep_for(kMissingHandleWaitSlice);
@@ -694,6 +698,17 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               still_running = 1;
             }
 
+            // Skipping those three reports nothing, which is not the same as having nothing to
+            // do. A request the client has accepted has to be either handed to libcurl or
+            // finished, and this thread is the only one that does either, so it stays while it
+            // owes one. Shutdown is exempt: there the queues that need a handle cannot drain
+            // without one, and staying for them is staying under the join that is waiting here.
+            if (!multi_available_now && !self->is_shutdown_.load(std::memory_order_acquire) &&
+                self->hasActionableWork())
+            {
+              still_running = 1;
+            }
+
             // If there is no pending jobs, we can stop the background thread.
             if (still_running == 0)
             {
@@ -788,6 +803,10 @@ void HttpClient::WaitBackgroundThreadExit()
 
 void HttpClient::wakeupBackgroundThread()
 {
+  // First, and whatever libcurl is: the call below needs a multi handle and there is not always
+  // one, so this is what the background thread watches when it is waiting without a handle.
+  wakeup_generation_.fetch_add(1, std::memory_order_release);
+
 // Before libcurl 7.68.0, we can only wait for timeout and do the rest jobs
 // See https://curl.se/libcurl/c/curl_multi_wakeup.html
 #if LIBCURL_VERSION_NUM >= 0x074400
@@ -960,6 +979,46 @@ bool HttpClient::doRetrySessions(bool /* report_all */)
   return false;
 }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
+
+bool HttpClient::hasActionableWork()
+{
+  std::lock_guard<std::mutex> session_lock_guard{sessions_m_};
+  std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
+
+  // An id whose session has gone is what doAddSessions would drop on its next pass, so it is
+  // dropped here too rather than counted. The difference matters: the first version of this
+  // check took every queue at its size, and an entry nothing could be done about held the
+  // thread open against the join in the destructor.
+  for (auto id = pending_to_add_session_ids_.begin(); id != pending_to_add_session_ids_.end();)
+  {
+    const auto session = sessions_.find(*id);
+    if (session == sessions_.end() || !session->second || !session->second->GetOperation())
+    {
+      id = pending_to_add_session_ids_.erase(id);
+    }
+    else
+    {
+      ++id;
+    }
+  }
+
+  // Same rule doRetrySessions applies to the same container.
+  for (auto retry = pending_to_retry_sessions_.begin(); retry != pending_to_retry_sessions_.end();)
+  {
+    if (!*retry || !(*retry)->GetOperation())
+    {
+      retry = pending_to_retry_sessions_.erase(retry);
+    }
+    else
+    {
+      ++retry;
+    }
+  }
+
+  return !pending_to_add_session_ids_.empty() || !pending_to_abort_sessions_.empty() ||
+         !pending_to_remove_session_handles_.empty() || !pending_to_remove_sessions_.empty() ||
+         !pending_to_retry_sessions_.empty();
+}
 
 bool HttpClient::resetMultiHandle()
 {

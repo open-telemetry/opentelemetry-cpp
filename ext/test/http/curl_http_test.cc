@@ -1580,6 +1580,14 @@ TEST_F(BasicCurlHttpTests, AQueuedRequestSurvivesAMissingMultiHandle)
 
   auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
   ASSERT_TRUE(client != nullptr);
+  auto *concrete = static_cast<http_client::curl::HttpClient *>(client.get());
+
+  // The idle grace is a minute by default, but only from libcurl 7.68: the assignment that
+  // gives it that value is behind a version check, and older libcurl leaves it at zero, where
+  // the IO thread reaches the retirement check on its first idle pass. CMake asks for no
+  // minimum libcurl, so both are supported and this asks for the shorter one, to run the same
+  // way everywhere rather than the way whichever libcurl the job has happens to allow.
+  concrete->SetBackgroundWaitFor(std::chrono::milliseconds::zero());
 
   // One completed request, so the IO thread exists and is running the loop under test.
   {
@@ -1594,9 +1602,12 @@ TEST_F(BasicCurlHttpTests, AQueuedRequestSurvivesAMissingMultiHandle)
   }
   received_requests_.clear();
 
+  // Join the IO thread before taking its multi handle away. resetMultiHandle destroys the one
+  // it finds, and a handle another thread is inside is not one to destroy.
+  concrete->WaitBackgroundThreadExit();
+
   g_curl_calloc_failures.store(0, std::memory_order_relaxed);
   g_fail_curl_calloc_everywhere.store(true, std::memory_order_relaxed);
-  auto *concrete = static_cast<http_client::curl::HttpClient *>(client.get());
   http_client::curl::HttpClientTestPeer::ResetMultiHandle(*concrete);
 
   // curl_easy_init allocates with calloc too, so without this the request below could not be
