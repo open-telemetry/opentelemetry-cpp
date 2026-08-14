@@ -1,11 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curl.h>
 #include <curl/curlver.h>
 #include "gtest/gtest.h"
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <curl/curl.h>
 #  include "gmock/gmock.h"
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
@@ -17,12 +17,14 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstring>
+#include <list>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <sstream>
 #include <string>
 #include <thread>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -56,6 +58,39 @@ class HttpClientTestPeer
 {
 public:
   static void ResetMultiHandle(HttpClient &client) { client.resetMultiHandle(); }
+
+  static bool RemoveSessions(HttpClient &client) { return client.doRemoveSessions(); }
+
+  // What the multi handle holds is recorded when curl_multi_add_handle accepts a handle. The
+  // cases below have no transfer to accept, so they say what it holds directly.
+  static void NoteAttached(HttpClient &client, CURL *easy_handle)
+  {
+    client.attached_handles_.insert(easy_handle);
+  }
+
+  static std::size_t AttachedCount(const HttpClient &client)
+  {
+    return client.attached_handles_.size();
+  }
+
+  static std::size_t PendingRemovalCount(const HttpClient &client)
+  {
+    return client.pending_to_remove_session_handles_.size();
+  }
+
+  static std::size_t QuarantinedCount(const HttpClient &client)
+  {
+    return client.quarantined_handles_.size();
+  }
+
+  // A multi handle that failed to initialize refuses every removal, which is how the cases below
+  // reach the path where libcurl will not take a handle back.
+  static CURLM *ExchangeMultiHandle(HttpClient &client, CURLM *replacement)
+  {
+    CURLM *previous      = client.multi_handle_;
+    client.multi_handle_ = replacement;
+    return previous;
+  }
 };
 }  // namespace curl
 }  // namespace client
@@ -627,6 +662,130 @@ TEST_F(BasicCurlHttpTests, ResetMultiHandleWithASessionDoesNotDeadlock)
   http_client::curl::HttpClientTestPeer::ResetMultiHandle(*client);
 
   client->FinishAllSessions();
+}
+
+// The record queued for removal is the only thing naming the easy handle, the header list it
+// points at and the session, so a removal libcurl refuses has to keep all three. The message
+// loop reads that session back out of CURLOPT_PRIVATE, which makes letting go of it as much a
+// live pointer left behind as a handle.
+TEST_F(BasicCurlHttpTests, ARefusedRemovalKeepsTheHandleAndTheSessionItNames)
+{
+  curl::HttpClient client;
+
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  ASSERT_TRUE(session != nullptr);
+  const auto session_id = std::static_pointer_cast<curl::Session>(session)->GetSessionId();
+
+  CURL *easy_handle = curl_easy_init();
+  ASSERT_TRUE(easy_handle != nullptr);
+  curl_slist *headers_chunk = curl_slist_append(nullptr, "X-Test: keep");
+  ASSERT_TRUE(headers_chunk != nullptr);
+
+  http_client::curl::HttpClientTestPeer::NoteAttached(client, easy_handle);
+  client.ScheduleRemoveSession(session_id, {easy_handle, headers_chunk});
+
+  // From here the client holds the only reference, so what survives the removal is what the
+  // removal chose to keep.
+  std::weak_ptr<http_client::Session> watch = session;
+  session.reset();
+
+  CURLM *multi_handle = http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, nullptr);
+  http_client::curl::HttpClientTestPeer::RemoveSessions(client);
+  http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, multi_handle);
+
+  EXPECT_EQ(1U, http_client::curl::HttpClientTestPeer::QuarantinedCount(client));
+  EXPECT_FALSE(watch.expired());
+}
+
+// A multi handle that was never given a handle has nothing to give back, and asking it is not a
+// way to find that out: libcurl 8.10 and 8.11 refuse, and a multi handle that failed to
+// initialize refuses on every version. Reading either refusal as ownership strands the handle.
+TEST_F(BasicCurlHttpTests, AHandleTheMultiHandleNeverTookIsFreedNotStranded)
+{
+  curl::HttpClient client;
+
+  CURL *easy_handle = curl_easy_init();
+  ASSERT_TRUE(easy_handle != nullptr);
+  curl_slist *headers_chunk = curl_slist_append(nullptr, "X-Test: free");
+  ASSERT_TRUE(headers_chunk != nullptr);
+
+  client.ScheduleRemoveSession(4405U, {easy_handle, headers_chunk});
+
+  CURLM *multi_handle = http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, nullptr);
+  http_client::curl::HttpClientTestPeer::RemoveSessions(client);
+  http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, multi_handle);
+
+  EXPECT_EQ(0U, http_client::curl::HttpClientTestPeer::QuarantinedCount(client));
+  EXPECT_EQ(0U, http_client::curl::HttpClientTestPeer::PendingRemovalCount(client));
+}
+
+// A handle handed over after the background thread has stopped, or before it ever started, has
+// nobody left to drain it, so the client frees it on the way out. Nothing here can watch that
+// happen, which leaves this case checking that the record reaches the queue and the sanitizer
+// builds checking what becomes of it.
+TEST_F(BasicCurlHttpTests, AHandleQueuedWithNoOneLeftToDrainItIsFreedWithTheClient)
+{
+  curl::HttpClient client;
+
+  CURL *easy_handle = curl_easy_init();
+  ASSERT_TRUE(easy_handle != nullptr);
+  curl_slist *headers_chunk = curl_slist_append(nullptr, "X-Test: undrained");
+  ASSERT_TRUE(headers_chunk != nullptr);
+
+  client.ScheduleRemoveSession(4405U, {easy_handle, headers_chunk});
+
+  EXPECT_EQ(1U, http_client::curl::HttpClientTestPeer::PendingRemovalCount(client));
+}
+
+// One record per easy handle. A session that starts another request hands over a second handle
+// while the first is still queued, and keying the queue by session would lose the first one.
+TEST_F(BasicCurlHttpTests, ASecondHandleFromTheSameSessionDoesNotDisplaceTheFirst)
+{
+  curl::HttpClient client;
+
+  CURL *first = curl_easy_init();
+  ASSERT_TRUE(first != nullptr);
+  CURL *second = curl_easy_init();
+  ASSERT_TRUE(second != nullptr);
+  curl_slist *first_headers = curl_slist_append(nullptr, "X-Test: first");
+  ASSERT_TRUE(first_headers != nullptr);
+  curl_slist *second_headers = curl_slist_append(nullptr, "X-Test: second");
+  ASSERT_TRUE(second_headers != nullptr);
+
+  client.ScheduleRemoveSession(4405U, {first, first_headers});
+  client.ScheduleAddSession(4405U);
+  client.ScheduleRemoveSession(4405U, {second, second_headers});
+
+  EXPECT_EQ(2U, http_client::curl::HttpClientTestPeer::PendingRemovalCount(client));
+
+  http_client::curl::HttpClientTestPeer::RemoveSessions(client);
+
+  EXPECT_EQ(0U, http_client::curl::HttpClientTestPeer::PendingRemovalCount(client));
+  EXPECT_EQ(0U, http_client::curl::HttpClientTestPeer::QuarantinedCount(client));
+}
+
+// The same ledger after a real request. The background thread is the only one that writes it and
+// it only stops once nothing is running, so what a case can look at is the state it leaves
+// behind: an entry left there would send a later handle allocated at the same address through a
+// removal it never needed, and nothing should still be waiting to be given back.
+TEST_F(BasicCurlHttpTests, TheAttachmentLedgerIsEmptyOnceARequestFinishes)
+{
+  received_requests_.clear();
+  curl::HttpClient client;
+
+  auto session = client.CreateSession("http://127.0.0.1:19000/get/");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  auto handler = std::make_shared<CustomEventHandler>();
+
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+  client.WaitBackgroundThreadExit();
+
+  EXPECT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_EQ(0U, http_client::curl::HttpClientTestPeer::AttachedCount(client));
+  EXPECT_EQ(0U, http_client::curl::HttpClientTestPeer::QuarantinedCount(client));
 }
 
 // The caller-thread side of the same cancel. The server handler takes mtx_requests before it
