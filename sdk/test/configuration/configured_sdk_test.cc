@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <chrono>
 #include <string>
 #include <utility>
 #include <vector>
@@ -18,8 +17,9 @@
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/provider.h"
 
-#include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
+#include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
@@ -33,10 +33,12 @@
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/registry_factory.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
@@ -44,114 +46,18 @@
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
-#include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/read_write_log_record.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/span_data.h"
 
-namespace nostd       = opentelemetry::nostd;
-namespace trace       = opentelemetry::trace;
-namespace logs        = opentelemetry::logs;
-namespace metrics     = opentelemetry::metrics;
-namespace propagation = opentelemetry::context::propagation;
+#include "config_test_common.h"
 
-namespace common_sdk   = opentelemetry::sdk::common;
-namespace logs_sdk     = opentelemetry::sdk::logs;
-namespace metrics_sdk  = opentelemetry::sdk::metrics;
-namespace trace_sdk    = opentelemetry::sdk::trace;
+namespace trace        = opentelemetry::trace;
+namespace logs         = opentelemetry::logs;
+namespace metrics      = opentelemetry::metrics;
+namespace propagation  = opentelemetry::context::propagation;
 namespace config_sdk   = opentelemetry::sdk::configuration;
 namespace internal_log = opentelemetry::sdk::common::internal_log;
 
 namespace
 {
-//------------------------------------------------------------------------------
-// Noop Exporters
-
-class NoopSpanExporter : public trace_sdk::SpanExporter
-{
-public:
-  NoopSpanExporter() = default;
-  std::unique_ptr<trace_sdk::Recordable> MakeRecordable() noexcept override
-  {
-    return std::make_unique<trace_sdk::SpanData>();
-  }
-  common_sdk::ExportResult Export(
-      const nostd::span<std::unique_ptr<trace_sdk::Recordable>> &) noexcept override
-  {
-    return common_sdk::ExportResult::kSuccess;
-  }
-  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
-  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
-};
-
-class NoopLogRecordExporter : public logs_sdk::LogRecordExporter
-{
-public:
-  NoopLogRecordExporter() = default;
-  std::unique_ptr<logs_sdk::Recordable> MakeRecordable() noexcept override
-  {
-    return std::make_unique<logs_sdk::ReadWriteLogRecord>();
-  }
-  common_sdk::ExportResult Export(
-      const nostd::span<std::unique_ptr<logs_sdk::Recordable>> &) noexcept override
-  {
-    return common_sdk::ExportResult::kSuccess;
-  }
-  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
-  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
-};
-
-class NoopPushMetricExporter : public metrics_sdk::PushMetricExporter
-{
-public:
-  NoopPushMetricExporter() = default;
-  common_sdk::ExportResult Export(const metrics_sdk::ResourceMetrics &) noexcept override
-  {
-    return common_sdk::ExportResult::kSuccess;
-  }
-  metrics_sdk::AggregationTemporality GetAggregationTemporality(
-      metrics_sdk::InstrumentType) const noexcept override
-  {
-    return metrics_sdk::AggregationTemporality::kCumulative;
-  }
-  bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
-  bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
-};
-
-//------------------------------------------------------------------------------
-// Configuration Builders
-
-class NoopSpanExporterBuilder : public config_sdk::ExtensionSpanExporterBuilder
-{
-public:
-  std::unique_ptr<trace_sdk::SpanExporter> Build(
-      const config_sdk::ExtensionSpanExporterConfiguration *) const override
-  {
-    return std::make_unique<NoopSpanExporter>();
-  }
-};
-
-class NoopLogRecordExporterBuilder : public config_sdk::ExtensionLogRecordExporterBuilder
-{
-public:
-  std::unique_ptr<logs_sdk::LogRecordExporter> Build(
-      const config_sdk::ExtensionLogRecordExporterConfiguration *) const override
-  {
-    return std::make_unique<NoopLogRecordExporter>();
-  }
-};
-
-class NoopPushMetricExporterBuilder : public config_sdk::ExtensionPushMetricExporterBuilder
-{
-public:
-  std::unique_ptr<metrics_sdk::PushMetricExporter> Build(
-      const config_sdk::ExtensionPushMetricExporterConfiguration *) const override
-  {
-    return std::make_unique<NoopPushMetricExporter>();
-  }
-};
 
 //------------------------------------------------------------------------------
 // ConfiguredSdkTest fixture
@@ -162,7 +68,7 @@ protected:
   void SetUp() override
   {
     MakeRegistry();
-    SetNullProviders();
+    SetNoopProviders();
   }
 
   void TearDown() override
@@ -181,10 +87,11 @@ protected:
     logs::Provider::SetLoggerProvider({});
     metrics::Provider::SetMeterProvider({});
 
-    ASSERT_EQ(propagation::GlobalTextMapPropagator::GetGlobalPropagator(), nullptr);
-    ASSERT_EQ(trace::Provider::GetTracerProvider(), nullptr);
-    ASSERT_EQ(logs::Provider::GetLoggerProvider(), nullptr);
-    ASSERT_EQ(metrics::Provider::GetMeterProvider(), nullptr);
+    // Installing null providers falls back to the no-op providers.
+    ASSERT_NE(propagation::GlobalTextMapPropagator::GetGlobalPropagator(), nullptr);
+    ASSERT_NE(trace::Provider::GetTracerProvider(), nullptr);
+    ASSERT_NE(logs::Provider::GetLoggerProvider(), nullptr);
+    ASSERT_NE(metrics::Provider::GetMeterProvider(), nullptr);
   }
 
   void SetNoopProviders()
@@ -210,12 +117,19 @@ protected:
 
   void MakeRegistry()
   {
-    registry_ = std::make_shared<config_sdk::Registry>();
-    registry_->SetExtensionSpanExporterBuilder("noop", std::make_unique<NoopSpanExporterBuilder>());
+    registry_ = config_sdk::RegistryFactory::Create();
+    registry_->SetExtensionSpanExporterBuilder(
+        "noop", std::make_unique<config_test::NoopSpanExporterBuilder>());
     registry_->SetExtensionLogRecordExporterBuilder(
-        "noop", std::make_unique<NoopLogRecordExporterBuilder>());
+        "noop", std::make_unique<config_test::NoopLogRecordExporterBuilder>());
     registry_->SetExtensionPushMetricExporterBuilder(
-        "noop", std::make_unique<NoopPushMetricExporterBuilder>());
+        "noop", std::make_unique<config_test::NoopPushMetricExporterBuilder>());
+    registry_->SetPeriodicMetricReaderBuilder(
+        std::make_unique<config_test::NoopPeriodicMetricReaderBuilder>());
+    registry_->SetBatchSpanProcessorBuilder(
+        std::make_unique<config_test::MockBatchSpanProcessorBuilder>());
+    registry_->SetBatchLogRecordProcessorBuilder(
+        std::make_unique<config_test::MockBatchLogRecordProcessorBuilder>());
   }
 
   static std::unique_ptr<config_sdk::TracerProviderConfiguration> MakeTracerProviderConfig()
@@ -300,14 +214,26 @@ TEST_F(ConfiguredSdkTest, ConfiguredSdkInstallUninstall)
 
   CreateSdk(model);
   sdk_->Install();
+  auto sdk_tracer_provider = trace::Provider::GetTracerProvider();
+  auto sdk_logger_provider = logs::Provider::GetLoggerProvider();
+  auto sdk_meter_provider  = metrics::Provider::GetMeterProvider();
+  auto sdk_propagator      = propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+
+  EXPECT_NE(sdk_tracer_provider, nullptr);
+  EXPECT_NE(sdk_logger_provider, nullptr);
+  EXPECT_NE(sdk_meter_provider, nullptr);
+  EXPECT_NE(sdk_propagator, nullptr);
+
+  sdk_->UnInstall();
+  // UnInstall() releases the SDK providers, and the globals fall back to no-op
+  // providers instead of becoming null.
   EXPECT_NE(trace::Provider::GetTracerProvider(), nullptr);
   EXPECT_NE(logs::Provider::GetLoggerProvider(), nullptr);
   EXPECT_NE(metrics::Provider::GetMeterProvider(), nullptr);
   EXPECT_NE(propagation::GlobalTextMapPropagator::GetGlobalPropagator(), nullptr);
 
-  sdk_->UnInstall();
-  EXPECT_EQ(trace::Provider::GetTracerProvider(), nullptr);
-  EXPECT_EQ(logs::Provider::GetLoggerProvider(), nullptr);
-  EXPECT_EQ(metrics::Provider::GetMeterProvider(), nullptr);
-  EXPECT_EQ(propagation::GlobalTextMapPropagator::GetGlobalPropagator(), nullptr);
+  EXPECT_NE(trace::Provider::GetTracerProvider(), sdk_tracer_provider);
+  EXPECT_NE(logs::Provider::GetLoggerProvider(), sdk_logger_provider);
+  EXPECT_NE(metrics::Provider::GetMeterProvider(), sdk_meter_provider);
+  EXPECT_NE(propagation::GlobalTextMapPropagator::GetGlobalPropagator(), sdk_propagator);
 }

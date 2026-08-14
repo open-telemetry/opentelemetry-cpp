@@ -50,7 +50,7 @@ public:
 
 private:
   explicit MeterConfig(const bool enabled = true) : enabled_(enabled) {}
-  bool enabled_{true};
+  bool enabled_;
 };
 }  // namespace metrics
 }  // namespace sdk

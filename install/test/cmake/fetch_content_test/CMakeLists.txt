@@ -79,8 +79,13 @@ target_link_libraries(
           opentelemetry-cpp::trace
           opentelemetry-cpp::logs
           opentelemetry-cpp::configuration_core
+          opentelemetry-cpp::configuration_trace_builders
+          opentelemetry-cpp::configuration_metrics_builders
+          opentelemetry-cpp::configuration_logs_builders
+          opentelemetry-cpp::configuration_registry_factory
           opentelemetry-cpp::configuration
           opentelemetry-cpp::resource_detectors
+          opentelemetry-cpp::resource_detectors_builders
           opentelemetry-cpp::http_client
           opentelemetry-cpp::http_client_curl
           opentelemetry-cpp::in_memory_span_exporter
@@ -91,6 +96,8 @@ target_link_libraries(
           opentelemetry-cpp::ostream_metrics_exporter_builder
           opentelemetry-cpp::ostream_span_exporter
           opentelemetry-cpp::ostream_span_exporter_builder
+          opentelemetry-cpp::otlp_common
+          opentelemetry-cpp::otlp_recordable
           opentelemetry-cpp::otlp_file_exporter
           opentelemetry-cpp::otlp_file_exporter_builder
           opentelemetry-cpp::otlp_file_log_record_exporter

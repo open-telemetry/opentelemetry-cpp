@@ -15,6 +15,9 @@ using opentelemetry::trace::TracerProvider;
 
 namespace nostd = opentelemetry::nostd;
 
+namespace
+{
+
 class TestProvider : public TracerProvider
 {
 public:
@@ -49,3 +52,22 @@ TEST(Provider, SetTracerProvider)
   Provider::SetTracerProvider(tf);
   ASSERT_EQ(tf, Provider::GetTracerProvider());
 }
+
+TEST(Provider, SetNullTracerProvider)
+{
+  auto tf = nostd::shared_ptr<TracerProvider>(new TestProvider());
+  Provider::SetTracerProvider(tf);
+  ASSERT_EQ(tf, Provider::GetTracerProvider());
+
+  // Setting a null TracerProvider installs a no-op TracerProvider.
+  Provider::SetTracerProvider(nostd::shared_ptr<TracerProvider>());
+
+  auto noop = Provider::GetTracerProvider();
+  ASSERT_NE(nullptr, noop);
+  ASSERT_NE(tf, noop);
+
+  // The no-op TracerProvider is usable, it does not crash on use.
+  EXPECT_NE(nullptr, noop->GetTracer("test"));
+}
+
+}  // namespace

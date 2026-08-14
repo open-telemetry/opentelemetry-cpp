@@ -1,0 +1,120 @@
+# Copyright The OpenTelemetry Authors
+# SPDX-License-Identifier: Apache-2.0
+
+# Exercises the built-in SDK component builders.
+#
+# The Registry provides one builder per SDK component type. Each builder constructs its component from the parsed configuration model.
+# RegistryFactory::Create() pre-loads all the SDK default builders shown in this file.
+# Call Set*Builder() on the Registry to swap in your own implementation before calling ConfiguredSdk::Create:
+#
+#   auto registry = RegistryFactory::Create();
+#   registry->SetBatchSpanProcessorBuilder(std::make_unique<MyBatchSpanProcessorBuilder>());
+#   auto sdk = ConfiguredSdk::Create(registry, model);
+
+file_format: "1.1"
+disabled: false
+
+# --- Logs ---
+logger_provider:
+  processors:
+    - batch:  # Registry::SetBatchLogRecordProcessorBuilder
+        exporter:
+          console:  # Registry::SetConsoleLogRecordBuilder
+    - simple:  # Registry::SetSimpleLogRecordProcessorBuilder
+        exporter:
+          console:  # Registry::SetConsoleLogRecordBuilder
+  logger_configurator/development:  # Registry::SetLoggerConfiguratorBuilder
+    default_config:
+      enabled: true
+
+# --- Metrics ---
+meter_provider:
+  readers:
+    - periodic:  # Registry::SetPeriodicMetricReaderBuilder
+        exporter:
+          console:  # Registry::SetConsolePushMetricExporterBuilder
+  meter_configurator/development:  # Registry::SetMeterConfiguratorBuilder
+    default_config:
+      enabled: true
+
+# --- Propagators ---
+propagator:
+  composite:
+    - tracecontext:  # Registry::SetTextMapPropagatorBuilder("tracecontext")
+    - baggage:  # Registry::SetTextMapPropagatorBuilder("baggage")
+    - b3:  # Registry::SetTextMapPropagatorBuilder("b3")
+    - b3multi:  # Registry::SetTextMapPropagatorBuilder("b3multi")
+    - jaeger:  # Registry::SetTextMapPropagatorBuilder("jaeger")
+
+# --- Traces ---
+tracer_provider:
+  processors:
+    - batch:  # Registry::SetBatchSpanProcessorBuilder
+        exporter:
+          console:  # Registry::SetConsoleSpanBuilder
+    - simple:  # Registry::SetSimpleSpanProcessorBuilder
+        exporter:
+          console:  # Registry::SetConsoleSpanBuilder
+  sampler:  # See kitchen-sink.yaml for sampler field semantics.
+    parent_based:  # Registry::SetParentBasedSamplerBuilder
+      root:
+        composite/development:
+          rule_based:  # Registry::SetComposableRuleBasedSamplerBuilder
+            rules:
+              - span_kinds:
+                  - internal
+                sampler:
+                  always_on:  # Registry::SetComposableAlwaysOnSamplerBuilder
+              - attribute_patterns:
+                  key: http.url
+                  included:
+                    - .*/health*
+                  excluded:
+                    - .*/healthz/live
+                sampler:
+                  always_off:  # Registry::SetComposableAlwaysOffSamplerBuilder
+              - attribute_values:
+                  key: http.response.status_code
+                  values:
+                    - "500"
+                    - "503"
+                sampler:
+                  always_on:  # Registry::SetComposableAlwaysOnSamplerBuilder
+              - span_kinds:
+                  - server
+                  - consumer
+                parent:
+                  - none
+                sampler:
+                  parent_threshold:  # Registry::SetComposableParentThresholdSamplerBuilder
+                    root:
+                      probability:  # Registry::SetComposableProbabilitySamplerBuilder
+                        ratio: 0.25
+              - sampler:
+                  probability:  # Registry::SetComposableProbabilitySamplerBuilder
+                    ratio: 0.01
+      remote_parent_sampled:
+        always_on:  # Registry::SetAlwaysOnSamplerBuilder
+      remote_parent_not_sampled:
+        trace_id_ratio_based:  # Registry::SetTraceIdRatioBasedSamplerBuilder
+          ratio: 0.001
+      local_parent_sampled:
+        always_off:  # Registry::SetAlwaysOffSamplerBuilder
+      local_parent_not_sampled:
+        probability/development:  # Registry::SetProbabilitySamplerBuilder
+          ratio: 0.001
+
+  tracer_configurator/development:  # Registry::SetTracerConfiguratorBuilder
+    default_config:
+      enabled: false
+
+resource:
+  attributes:
+    - name: service.name
+      value: sdk-builtin-test
+  detection/development:
+    detectors:
+      - container:  # Registry::SetContainerResourceDetectorBuilder
+      - host:  # Registry::SetHostResourceDetectorBuilder
+      - process:  # Registry::SetProcessResourceDetectorBuilder
+      - service:  # Registry::SetServiceResourceDetectorBuilder

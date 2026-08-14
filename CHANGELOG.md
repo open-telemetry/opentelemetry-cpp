@@ -15,6 +15,135 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Add a resource detector extension example
+  [#4419](https://github.com/open-telemetry/opentelemetry-cpp/issues/4419)
+
+* [RESOURCE DETECTOR] Add the host resource detector
+  [#4413](https://github.com/open-telemetry/opentelemetry-cpp/issues/4413)
+* [CONFIGURATION] Add configuration builders for the container and process
+  resource detectors
+  [#4412](https://github.com/open-telemetry/opentelemetry-cpp/issues/4412)
+
+* [CONFIGURATION] Add support for composable sampler extensions.
+  [#4409](https://github.com/open-telemetry/opentelemetry-cpp/issues/4409)
+
+* [CONFIGURATION] Apply metric view `attribute_keys` include and exclude patterns
+  when building the SDK, with exclude patterns taking precedence.
+  [#3546](https://github.com/open-telemetry/opentelemetry-cpp/issues/3546)
+
+* [CONFIGURATION] Add support for the composite sampler configuration
+  (programmatic and from yaml)
+  ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
+* [SDK] `OTELResourceDetector` now percent-decodes values parsed from the
+  `OTEL_RESOURCE_ATTRIBUTES` environment variable, per the W3C Baggage value
+  grammar the resource spec defers to. A malformed escape sequence is left
+  in the value as-is rather than dropping the attribute.
+  [#1536](https://github.com/open-telemetry/opentelemetry-cpp/issues/1536)
+
+* [BUG] Report one outcome per request when a curl session is cancelled after
+  the response arrives
+  ([#4363](https://github.com/open-telemetry/opentelemetry-cpp/pull/4363))
+* [BUG] Draw the curl retry jitter from a per thread generator instead of one
+  shared across HTTP client threads
+  ([#4399](https://github.com/open-telemetry/opentelemetry-cpp/pull/4399))
+* [BUG] Stop the curl IO thread deadlocking on itself while recovering from a
+  multi handle error
+  ([#4394](https://github.com/open-telemetry/opentelemetry-cpp/pull/4394))
+* [BUG] Cancel a curl session without writing to the easy handle from the
+  cancelling thread
+  ([#4392](https://github.com/open-telemetry/opentelemetry-cpp/pull/4392))
+* [CODE HEALTH] Enable clang-tidy `modernize-deprecated-headers` and replace
+  deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
+  `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
+  ([#4349](https://github.com/open-telemetry/opentelemetry-cpp/pull/4349))
+
+* [CONFIGURATION] Add SDK component builder interfaces to the registry
+  [#4358](https://github.com/open-telemetry/opentelemetry-cpp/issues/4358)
+
+* [CODE HEALTH] Move remaining `misc-use-internal-linkage` classes/enums into
+  anonymous namespaces: `OtlpFileSystemBackend`/`OtlpFileOstreamBackend` in
+  the OTLP file exporter, `ResponseHandler`/`AsyncResponseHandler`/
+  `json_assign_visitor` in the Elasticsearch log exporter, and the
+  `TestMode`/`test_mode` enums in the OTLP functional test binaries.
+  [#4196](https://github.com/open-telemetry/opentelemetry-cpp/issues/4196)
+
+* [CMAKE] Add support for CMake component deprecation and update the policy
+  [#4272](https://github.com/open-telemetry/opentelemetry-cpp/pull/4272)
+
+* [METRICS SDK] Fix Windows metrics tail latency on the synchronous record path:
+  `SyncMetricStorage::attribute_hashmap_lock_` now uses `std::mutex` instead of
+  `common::SpinLockMutex`. The spin lock's final `sleep_for(1ms)` back-off is
+  rounded up to the Windows timer quantum (~15.6 ms), so a waiter contending
+  on a hot instrument could stall for a full quantum, inflating tail latency.
+  `std::mutex` blocks the waiter instead. Only this one contended lock changes;
+  the API `SpinLockMutex` and all other SDK locks are unchanged.
+  [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
+
+* [CONFIGURATION] Update ViewSelector to comply with schema v1.1.0
+  [#4384](https://github.com/open-telemetry/opentelemetry-cpp/pull/4384)
+
+* [CONFIGURATION] Add the probability sampler to file configuration
+  [#4334](https://github.com/open-telemetry/opentelemetry-cpp/pull/4334)
+
+* [SDK] Make the global internal logger log level atomic
+  [#4368](https://github.com/open-telemetry/opentelemetry-cpp/pull/4368)
+
+* [BUG] Stop reading past a `nostd::string_view` that is not NUL terminated
+  [#4346](https://github.com/open-telemetry/opentelemetry-cpp/pull/4346)
+* [BUG] Stop OTLP `ForceFlush` returning on the first notification and
+  overrunning the caller's deadline
+  [#4357](https://github.com/open-telemetry/opentelemetry-cpp/pull/4357)
+
+* [OTLP EXPORTERS] add otlp_common target for shared otlp utils
+  [#4333](https://github.com/open-telemetry/opentelemetry-cpp/pull/4333)
+
+* [OTLP/HTTP] Honor `Retry-After` response header when retrying exports,
+  supporting both delay-seconds and HTTP-date formats per RFC 7231 §7.1.3.
+  [#4172](https://github.com/open-telemetry/opentelemetry-cpp/issues/4172)
+
+* [BUILD] Run the ext_http component install test on Windows
+  [#4326](https://github.com/open-telemetry/opentelemetry-cpp/pull/4326)
+
+* [CONFIGURATION] validate and update config files to yaml schema 1.1.0
+  [#4374](https://github.com/open-telemetry/opentelemetry-cpp/pull/4374)
+
+* [SDK] Convert SpinLockMutex to std::mutex part 1
+  Replace SpinLockMutex with std::mutex in SimpleProcessor,
+  SimpleLogRecordProcessor, MeterContext and Meter.
+  [#4323](https://github.com/open-telemetry/opentelemetry-cpp/pull/4323)
+
+* [SDK] Add Tracer::StartSpan benchmark and optimizations
+  [#4248](https://github.com/open-telemetry/opentelemetry-cpp/pull/4248)
+
+* [CONFIGURATION] Decouple config registry and builder headers
+  [#4335](https://github.com/open-telemetry/opentelemetry-cpp/pull/4335)
+
+* [BENCHMARK] Add multi-threaded base2 exponential histogram benchmarks
+  [#4319](https://github.com/open-telemetry/opentelemetry-cpp/pull/4319)
+
+* [BUILD] Add missing opentelemetry_proto dependency to otlp_recordable
+  pkg-config
+  [#4316](https://github.com/open-telemetry/opentelemetry-cpp/pull/4316)
+
+* [CODE HEALTH] Move SDK trace and metrics test helpers into anonymous
+  namespaces
+  [#4303](https://github.com/open-telemetry/opentelemetry-cpp/pull/4303)
+
+* [CODE HEALTH] Move remaining API test helpers into anonymous namespaces
+  [#4301](https://github.com/open-telemetry/opentelemetry-cpp/pull/4301)
+
+* [BUG] Wait on a completion state in the Elasticsearch exporter
+  [#4298](https://github.com/open-telemetry/opentelemetry-cpp/pull/4298)
+
+* [BUG] Make SocketAddr string parsing safe and reject malformed addresses
+  [#4292](https://github.com/open-telemetry/opentelemetry-cpp/pull/4292)
+
+* [BUG] Fix use-after-free when an HTTP handler closes the connection
+  [#4289](https://github.com/open-telemetry/opentelemetry-cpp/pull/4289)
+
+* [CODE HEALTH] Move metrics storage test fixtures into anonymous namespace
+  [#4286](https://github.com/open-telemetry/opentelemetry-cpp/pull/4286)
+
 * [CODE HEALTH] Fix more clang tidy warnings (member initialization)
   [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
 
@@ -24,6 +153,11 @@ Increment the:
 * [RELEASE] Bump main branch to 1.29.0-dev
   [#4259](https://github.com/open-telemetry/opentelemetry-cpp/pull/4259)
 
+* [ETW] Ensure spans own their names until they are ended
+  [#4247](https://github.com/open-telemetry/opentelemetry-cpp/pull/4247)
+
+* [Metrics SDK] Implement configurable cardinality limit
+  [#4188](https://github.com/open-telemetry/opentelemetry-cpp/pull/4188)
 * [CONFIGURATION] Programmatic configuration use case tests and fixes
   [#4243](https://github.com/open-telemetry/opentelemetry-cpp/pull/4243)
 
@@ -41,12 +175,114 @@ Increment the:
         that do not receive explicit SpanLimits
   [#4258](https://github.com/open-telemetry/opentelemetry-cpp/pull/4258)
 
+* [CODE HEALTH] Fix remaining misc-override-with-different-visibility warnings
+  [#4280](https://github.com/open-telemetry/opentelemetry-cpp/pull/4280)
+
+* [CODE HEALTH] Move SDK common and logs test helpers into anonymous
+  namespaces
+  [#4302](https://github.com/open-telemetry/opentelemetry-cpp/pull/4302)
+
+* [METRICS SDK] Fix histogram views being rejected when only
+  `aggregation_cardinality_limit` is set
+  [#4314](https://github.com/open-telemetry/opentelemetry-cpp/pull/4314)
+
+* [SDK] Implement the ProbabilitySampler
+  [#4135](https://github.com/open-telemetry/opentelemetry-cpp/pull/4135)
+
+* [SDK] Downscale base2 exponential histogram buckets in place
+  [#4324](https://github.com/open-telemetry/opentelemetry-cpp/pull/4324)
+
+* [CONFIGURATION] file configuration - yaml schema 1.1.0
+  [#4340](https://github.com/open-telemetry/opentelemetry-cpp/pull/4340)
+
+* [SDK] Fix lost-wakeups in BatchSpanProcessor to prevent stalls during
+  shutdown and force flush.
+  [#4382](https://github.com/open-telemetry/opentelemetry-cpp/pull/4382)
+
+* [METRICS SDK] Support `OTEL_METRICS_EXEMPLAR_FILTER` when metrics exemplars
+  are enabled. The default exemplar filter changes from `always_off` to
+  `trace_based` to match the specification.
+  [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328)
+
+* [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
+  `AlwaysOff`/`TraceBased`)
+  [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+
+Important changes:
+
+* [API] Never set a null global provider or propagator
+  [#4420](https://github.com/open-telemetry/opentelemetry-cpp/pull/4420)
+
+  * `trace::Provider::SetTracerProvider()`,
+    `metrics::Provider::SetMeterProvider()`,
+    `logs::Provider::SetLoggerProvider()`,
+    `logs::Provider::SetEventLoggerProvider()` and
+    `context::propagation::GlobalTextMapPropagator::SetGlobalPropagator()`
+    now install the corresponding no-op implementation when passed a null
+    pointer, instead of storing the null. The matching getters therefore never
+    return `nullptr`, as already documented, and code that resets a global
+    during cleanup no longer risks a nullptr de-ref on a later use.
+    **Note**: this is a correctness fix to an inline API header; the observable
+    behavior of these methods changes towards the already documented contract
+    (see `docs/abi-policy.md`).
+
 Breaking changes:
+
+* [CONFIGURATION] SDK default component builder libraries and example
+  [#4367](https://github.com/open-telemetry/opentelemetry-cpp/pull/4367)
+  * The declaritive configuration registry is now empty on construction and
+    the default SDK component builders are provided optionally through
+    the `opentelemetry-cpp::configuration_registry_factory` library and
+    the `opentelemetry::sdk::configuration::RegistryFactory::Create()` method.
+
+* [BUILD] Install an explicit list of ext headers instead of the whole
+  directory
+  [#4327](https://github.com/open-telemetry/opentelemetry-cpp/pull/4327)
+  * The `ext_common` component installed `include/opentelemetry/ext` with a
+    `*.h` glob. It now installs a named list, and these five headers are no
+    longer part of the package:
+    * `opentelemetry/ext/http/client/curl/http_client_curl.h`
+    * `opentelemetry/ext/http/client/curl/http_operation_curl.h`
+    * `opentelemetry/ext/http/client/detail/default_factory.h`
+    * `opentelemetry/ext/http/server/http_server.h`
+    * `opentelemetry/ext/http/server/socket_tools.h`
+  * Code that included any of them from an installed package will no longer
+    compile. A curl client is created through `http_client_factory_curl.h`,
+    which needs only the abstract `http_client_factory.h`. The two server
+    headers are an embedded test server; moving them out of `ext` is tracked
+    in #4332.
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
   * The public configuration member `max_buckets_` was renamed to `max_size_` to
     match the configuration schema. Please adjust SDK configuration accordingly.
+
+* [CONFIGURATION] Update prometheus config to schema v1.1.0
+  [#4383](https://github.com/open-telemetry/opentelemetry-cpp/pull/4383)
+  * The following YAML values for `translation_strategy` have been replaced
+    * `UnderscoreEscapingWithSuffixes` is replaced by `underscore_escaping_with_suffixes`
+    * `UnderscoreEscapingWithoutSuffixes` is replaced by `underscore_escaping_without_suffixes/development`
+    * `NoUTF8EscapingWithSuffixes` is replaced by `no_utf8_escaping_with_suffixes/development`
+    * `NoTranslation` is replaced by `no_translation/development`
+
+* [METRICS SDK] Add an `ExemplarFilterType` parameter to the `MeterContext`
+  constructor when metrics exemplars are enabled. The parameter has a default
+  value, so existing source calls remain valid, but the constructor signature
+  and SDK ABI change. Applications using the preview exemplar feature must be
+  rebuilt.
+  [#4328](https://github.com/open-telemetry/opentelemetry-cpp/pull/4328)
+
+* [METRICS SDK] Remove the `SystemTimestamp` parameter from the preview
+  `ExemplarReservoir::OfferMeasurement()` overloads
+  [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+  * This is an incompatible API and ABI change for custom exemplar reservoirs.
+    Implementations and callers must remove the timestamp parameter.
+
+* [METRICS SDK] Breaking change to the preview metrics exemplar surface: the
+  `SyncMetricStorage`/`AsyncMetricStorage` constructors now take an
+  `ExemplarFilterType`, and `ExemplarData::Create` takes the `SpanContext`
+  by value.
+  [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
 
 ## [1.28.0] 2026-07-16
 

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <memory>
 
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
@@ -37,6 +38,7 @@
 #include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
@@ -66,8 +68,15 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace trace
+{
+class ComposableSampler;
+}  // namespace trace
+
 namespace configuration
 {
+
+class ComposableSamplerConfiguration;
 
 class SdkBuilder
 {
@@ -91,6 +100,9 @@ public:
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateParentBasedSampler(
       const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *model) const;
 
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateProbabilitySampler(
+      const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model) const;
+
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateTraceIdRatioBasedSampler(
       const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model) const;
 
@@ -99,6 +111,9 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateSampler(
       const std::unique_ptr<opentelemetry::sdk::configuration::SamplerConfiguration> &model) const;
+
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateCompositeSampler(
+      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model) const;
 
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpHttpSpanExporter(
       const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) const;

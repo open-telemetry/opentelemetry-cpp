@@ -42,8 +42,10 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
          "$<INSTALL_INTERFACE:include>")
 
-target_link_libraries(opentelemetry_exporter_prometheus_builder
-                      PUBLIC opentelemetry_exporter_prometheus)
+target_link_libraries(
+  opentelemetry_exporter_prometheus_builder
+  PUBLIC opentelemetry_exporter_prometheus
+  PRIVATE opentelemetry_configuration_core)
 
 otel_add_component(
   COMPONENT

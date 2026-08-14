@@ -432,6 +432,7 @@ switch ($action) {
       "api",
       "sdk",
       "ext_common",
+      "ext_http",
       "ext_http_curl",
       "exporters_in_memory",
       "exporters_ostream",
@@ -470,6 +471,33 @@ switch ($action) {
       exit $exit
     }
 
+    exit 0
+  }
+  "cmake.install_functions.test" {
+    Remove-Item -Recurse -Force "$BUILD_DIR\*"
+    Remove-Item -Recurse -Force "$INSTALL_TEST_DIR\*"
+    cd "$BUILD_DIR"
+    mkdir "$BUILD_DIR\install_functions_test"
+    cd "$BUILD_DIR\install_functions_test"
+    $INSTALL_FUNCTIONS_CMAKE_OPTIONS = @(
+      "-DVCPKG_TARGET_TRIPLET=x64-windows",
+      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
+    )
+    $CMAKE_OPTIONS_STRING = $INSTALL_FUNCTIONS_CMAKE_OPTIONS -join " "
+    cmake "-DCMAKE_PREFIX_PATH=$INSTALL_TEST_DIR" `
+      "-DINSTALL_TEST_CMAKE_OPTIONS=$CMAKE_OPTIONS_STRING" `
+      "-DINSTALL_TEST_DIR=$INSTALL_TEST_DIR" `
+      "-DOPENTELEMETRY_SOURCE_DIR=$SRC_DIR" `
+      -S "$SRC_DIR\install\test\cmake\install_functions_test"
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
+    ctest -C Debug --output-on-failure
+    $exit = $LASTEXITCODE
+    if ($exit -ne 0) {
+      exit $exit
+    }
     exit 0
   }
   "cmake.dll.install.test" {

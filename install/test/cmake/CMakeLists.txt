@@ -51,62 +51,21 @@ set(INSTALL_TEST_SRC_DIR "${CMAKE_SOURCE_DIR}/../src")
 enable_testing()
 
 # -----------------------------------------------------------
-# CMake Usage tests for find_package(opentelemetry-cpp ...)
-#
-# 1. Test find_package with no components specified
-# 2. Test find_package with components specified but not sorted in dependency
-#    order
-# 3. Test find_package with components specified but missing dependent components
-# 4. Test find_package with components specified but including
-#    unsupported/unknown components
-# 5. Test find_package with components specified but including deprecated
-#    components
-# -----------------------------------------------------------
-
-add_test(
-  NAME cmake-usage-no-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/no_components -B
-    build-cmake-usage-no-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
-
-add_test(
-  NAME cmake-usage-unsorted-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/unsorted_components -B
-    build-cmake-usage-unsorted-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
-
-add_test(
-  NAME cmake-usage-missing-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/missing_components -B
-    build-cmake-usage-missing-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
-
-add_test(
-  NAME cmake-usage-unsupported-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/unsupported_components -B
-    build-cmake-usage-unsupported-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
+# Test find_package with components specified but including deprecated
+# components
 
 if(INSTALL_TEST_DEPRECATED_COMPONENTS)
   add_test(
-    NAME cmake-usage-deprecated-components-test
+    NAME cmake-deprecated-components-test
     COMMAND
       ${CMAKE_COMMAND} -Wdeprecated --log-level=DEBUG -S
-      ${CMAKE_SOURCE_DIR}/usage_tests/deprecated_components -B
+      ${CMAKE_SOURCE_DIR}/deprecated_components -B
       build-cmake-usage-deprecated-components-test
       "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS}
       "-DINSTALL_TEST_DEPRECATED_COMPONENTS=${INSTALL_TEST_DEPRECATED_COMPONENTS}"
   )
   set_tests_properties(
-    cmake-usage-deprecated-components-test
+    cmake-deprecated-components-test
     PROPERTIES PASS_REGULAR_EXPRESSION "CMake Deprecation Warning")
 endif()
 
