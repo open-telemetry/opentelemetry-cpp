@@ -71,12 +71,9 @@ logger_provider:
           # Registry::SetExtensionLogRecordExporterBuilder, see custom_log_record_exporter.cc.
           my_custom_log_record_exporter:
             comment: "This is a log record exporter extension point, with properties."
-# A configured detector must have a builder registered in the Registry,
-# or building the SDK fails. Enable this once an extension resource
-# detector builder is registered, see #4419.
-# resource:
-#   detection/development:
-#     detectors:
-#       # Registry::SetExtensionResourceDetectorBuilder. No example implementation in this directory.
-#       - my_custom_detector:
-#           comment: "This is a resource detector extension point, with properties."
+resource:
+  detection/development:
+    detectors:
+      # Registry::SetExtensionResourceDetectorBuilder, see custom_resource_detector.cc.
+      - my_custom_detector:
+          comment: "This is a resource detector extension point, with properties."
