@@ -15,7 +15,7 @@ and its attributes.
 Reads the container ID from the cgroup file (e.g. Docker, Kubernetes).
 
 | Attribute | Description |
-|---|---|
+| --- | --- |
 | `container.id` | Container ID (e.g. `a3bf90e006b2`) |
 
 ### Host Resource Detector
@@ -25,7 +25,7 @@ Reads the container ID from the cgroup file (e.g. Docker, Kubernetes).
 Reads host information from the operating system.
 
 | Attribute | Description |
-|---|---|
+| --- | --- |
 | `host.name` | Hostname (from `gethostname` / `uname`) |
 | `host.arch` | CPU architecture (e.g. `amd64`, `arm64`) |
 | `host.id` | Machine ID (from `/etc/machine-id` on Linux, registry on Windows) |
@@ -37,7 +37,7 @@ Reads host information from the operating system.
 Reads process information from the operating system.
 
 | Attribute | Description |
-|---|---|
+| --- | --- |
 | `process.pid` | Process ID |
 | `process.executable.path` | Full path to the process executable |
 
@@ -111,7 +111,7 @@ target_link_libraries(my_target PRIVATE opentelemetry-cpp::host_resource_detecto
 
 ### Builder targets: Link to builders for declaritive configuration
 
-Builder targets make detectors availble for declaritive configuration and hide
+Builder targets make detectors available for declaritive configuration and hide
 the concrete detector implementations.
 
 Link all builders:
@@ -135,7 +135,7 @@ target_link_libraries(my_target PRIVATE
 All targets are part of the `resource_detectors` component.
 
 | Target | Description |
-|---|---|
+| --- | --- |
 | `opentelemetry-cpp::resource_detectors` | Interface: links all detectors |
 | `opentelemetry-cpp::resource_detectors_builders` | Interface: links all builders |
 | `opentelemetry-cpp::container_resource_detector` | Container detector |
@@ -181,7 +181,7 @@ deps = ["//resource_detectors:process_resource_detector_builder"]
 ### Available targets (Bazel)
 
 | Target | Description |
-|---|---|
+| --- | --- |
 | `//resource_detectors` | Interface: links all detectors |
 | `//resource_detectors:resource_detectors_builders` | Interface: links all builders |
 | `//resource_detectors:container_resource_detector` | Container detector |
