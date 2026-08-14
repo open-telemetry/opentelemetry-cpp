@@ -369,6 +369,9 @@ private:
   // work. Call it on the background thread only: it prunes pending_to_retry_sessions_, which
   // has no lock because that thread is the only one that touches it.
   bool hasActionableWork();
+  // Cleans up the multi handle if there is one, and leaves none behind either way. Call it
+  // holding multi_handle_m_.
+  void ReleaseMultiHandle();
   // Returns true if the client has a multi handle afterwards.
   bool resetMultiHandle();
 

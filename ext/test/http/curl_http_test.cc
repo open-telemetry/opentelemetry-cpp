@@ -59,6 +59,15 @@ class HttpClientTestPeer
 {
 public:
   static void ResetMultiHandle(HttpClient &client) { client.resetMultiHandle(); }
+
+  static bool RemoveSessions(HttpClient &client) { return client.doRemoveSessions(); }
+
+  static CURLM *ExchangeMultiHandle(HttpClient &client, CURLM *replacement)
+  {
+    CURLM *previous      = client.multi_handle_;
+    client.multi_handle_ = replacement;
+    return previous;
+  }
 };
 }  // namespace curl
 }  // namespace client
@@ -1573,6 +1582,31 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
 // queued while the handle is missing leaves the pending queue for a multi function that cannot
 // take it, and the next reset cancels it, so the caller is told a request was cancelled that
 // nothing cancelled.
+TEST_F(BasicCurlHttpTests, AHandleQueuedWithoutAMultiHandleIsReleased)
+{
+  auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(client != nullptr);
+  auto *concrete = static_cast<http_client::curl::HttpClient *>(client.get());
+
+  // Nothing has been sent, so this is the only thread here and the queue is the client's own.
+  http_client::curl::HttpCurlEasyResource resource;
+  resource.easy_handle = curl_easy_init();
+  ASSERT_TRUE(resource.easy_handle != nullptr);
+  resource.headers_chunk = curl_slist_append(nullptr, "X-Test: 1");
+  ASSERT_TRUE(resource.headers_chunk != nullptr);
+
+  CURLM *previous = http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(*concrete, nullptr);
+  concrete->ScheduleRemoveSession(4404, std::move(resource));
+
+  // What resetMultiHandle does when curl_multi_init has just failed on it. The easy handle and
+  // its header list are released rather than held until a multi handle comes back, and neither
+  // is handed to a multi function that has none to work with. LeakSanitizer is what says the
+  // release happened.
+  EXPECT_TRUE(http_client::curl::HttpClientTestPeer::RemoveSessions(*concrete));
+
+  http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(*concrete, previous);
+}
+
 TEST_F(BasicCurlHttpTests, AQueuedRequestSurvivesAMissingMultiHandle)
 {
   ASSERT_TRUE(g_curl_hooks_installed);

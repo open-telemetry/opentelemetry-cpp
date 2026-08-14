@@ -337,7 +337,7 @@ HttpClient::~HttpClient()
   }
   {
     std::lock_guard<std::mutex> lock_guard{multi_handle_m_};
-    curl_multi_cleanup(multi_handle_);
+    ReleaseMultiHandle();
   }
 }
 
@@ -618,24 +618,24 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             still_running = 1;
           }
 
-          // The three below each call curl_multi_add_handle or curl_multi_remove_handle. Without
-          // a handle they would drain the pending queue into a function that cannot accept it.
-          const bool multi_available = (nullptr != self->multi_handle_);
-
-          // Remove all pending easy handles
-          if (multi_available && self->doRemoveSessions())
+          // Remove all pending easy handles. Detaching is the only thing here that wants a
+          // multi handle, and without one there is nothing to detach from, so this releases
+          // rather than waits: holding the resources back would hold them for the whole
+          // outage.
+          if (self->doRemoveSessions())
           {
             still_running = 1;
           }
 
-          // Add all pending easy handles
-          if (multi_available && self->doAddSessions())
+          // Add all pending easy handles. Answers for itself when there is no handle, as does
+          // the retry below: neither can hand libcurl a transfer without one.
+          if (self->doAddSessions())
           {
             still_running = 1;
           }
 
           // Check if pending easy handles can be retried
-          if (multi_available && self->doRetrySessions(false))
+          if (self->doRetrySessions(false))
           {
             still_running = 1;
           }
@@ -678,22 +678,20 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               still_running = 1;
             }
 
-            const bool multi_available_now = (nullptr != self->multi_handle_);
-
             // Remove all pending easy handles
-            if (multi_available_now && self->doRemoveSessions())
+            if (self->doRemoveSessions())
             {
               still_running = 1;
             }
 
             // Add all pending easy handles
-            if (multi_available_now && self->doAddSessions())
+            if (self->doAddSessions())
             {
               still_running = 1;
             }
 
             // Check if pending easy handles can be retried
-            if (multi_available_now && self->doRetrySessions(true))
+            if (self->doRetrySessions(true))
             {
               still_running = 1;
             }
@@ -703,8 +701,8 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             // finished, and this thread is the only one that does either, so it stays while it
             // owes one. Shutdown is exempt: there the queues that need a handle cannot drain
             // without one, and staying for them is staying under the join that is waiting here.
-            if (!multi_available_now && !self->is_shutdown_.load(std::memory_order_acquire) &&
-                self->hasActionableWork())
+            if (nullptr == self->multi_handle_ &&
+                !self->is_shutdown_.load(std::memory_order_acquire) && self->hasActionableWork())
             {
               still_running = 1;
             }
@@ -820,6 +818,12 @@ void HttpClient::wakeupBackgroundThread()
 
 bool HttpClient::doAddSessions()
 {
+  if (nullptr == multi_handle_)
+  {
+    // Before the swap below, which would drop the ids it took.
+    return false;
+  }
+
   std::unordered_set<uint64_t> pending_to_add_session_ids;
   {
     std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
@@ -915,7 +919,15 @@ bool HttpClient::doRemoveSessions()
         curl_slist_free_all(removing_handle.second.headers_chunk);
       }
 
-      curl_multi_remove_handle(multi_handle_, removing_handle.second.easy_handle);
+      // Detaching needs something to detach from. Without a multi handle there is nothing
+      // this could name: the one it would have named was destroyed by curl_multi_cleanup,
+      // which detaches what it still holds, and nothing has been attached since. So the
+      // resource is released rather than kept, which is what resetMultiHandle asks for when
+      // curl_multi_init has just failed on it.
+      if (nullptr != multi_handle_)
+      {
+        curl_multi_remove_handle(multi_handle_, removing_handle.second.easy_handle);
+      }
       curl_easy_cleanup(removing_handle.second.easy_handle);
     }
 
@@ -939,6 +951,11 @@ bool HttpClient::doRemoveSessions()
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
 bool HttpClient::doRetrySessions(bool report_all)
 {
+  if (nullptr == multi_handle_)
+  {
+    return false;
+  }
+
   const auto now = std::chrono::system_clock::now();
   auto has_data  = false;
 
@@ -979,6 +996,26 @@ bool HttpClient::doRetrySessions(bool /* report_all */)
   return false;
 }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
+
+void HttpClient::ReleaseMultiHandle()
+{
+  if (nullptr == multi_handle_)
+  {
+    // curl_multi_init says the other multi functions cannot be used once it has returned null,
+    // and curl_multi_cleanup is one of them. Reaching here with none is ordinary: the
+    // constructor may have started without one, and a reset that could not build a replacement
+    // leaves none behind.
+    return;
+  }
+
+  const CURLMcode cleanup_result = curl_multi_cleanup(multi_handle_);
+  multi_handle_                  = nullptr;
+  if (CURLM_OK != cleanup_result)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_multi_cleanup failed with message: "
+                            << curl_multi_strerror(cleanup_result));
+  }
+}
 
 bool HttpClient::hasActionableWork()
 {
@@ -1049,7 +1086,7 @@ bool HttpClient::resetMultiHandle()
 
   // We will modify the multi_handle_, so we need to lock it
   std::lock_guard<std::mutex> lock_guard{multi_handle_m_};
-  curl_multi_cleanup(multi_handle_);
+  ReleaseMultiHandle();
 
   // Create a another multi handle to continue pending sessions. Silent on failure: the caller
   // decides how often a run of failures is worth reporting.
