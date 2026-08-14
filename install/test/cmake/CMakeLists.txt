@@ -51,48 +51,6 @@ set(INSTALL_TEST_SRC_DIR "${CMAKE_SOURCE_DIR}/../src")
 enable_testing()
 
 # -----------------------------------------------------------
-# CMake Usage tests for find_package(opentelemetry-cpp ...)
-#
-# 1. Test find_package with no components specified
-# 2. Test find_package with components specified but not sorted in dependency
-#    order
-# 3. Test find_package with components specified but missing dependent components
-# 4. Test find_package with components specified but including
-#    unsupported/unknown components
-
-add_test(
-  NAME cmake-usage-no-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/no_components -B
-    build-cmake-usage-no-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
-
-add_test(
-  NAME cmake-usage-unsorted-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/unsorted_components -B
-    build-cmake-usage-unsorted-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
-
-add_test(
-  NAME cmake-usage-missing-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/missing_components -B
-    build-cmake-usage-missing-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
-
-add_test(
-  NAME cmake-usage-unsupported-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/unsupported_components -B
-    build-cmake-usage-unsupported-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
-
-# -----------------------------------------------------------
 # Test the full package install using legacy cmake build instructions
 # find_package(opentelemetry-cpp CONFIG REQUIRED)
 

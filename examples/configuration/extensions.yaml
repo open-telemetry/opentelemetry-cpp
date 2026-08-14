@@ -74,6 +74,6 @@ logger_provider:
 resource:
   detection/development:
     detectors:
-      # Registry::SetExtensionResourceDetectorBuilder. No example implementation in this directory.
+      # Registry::SetExtensionResourceDetectorBuilder, see custom_resource_detector.cc.
       - my_custom_detector:
           comment: "This is a resource detector extension point, with properties."

@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Add a resource detector extension example
+  [#4419](https://github.com/open-telemetry/opentelemetry-cpp/issues/4419)
+
+* [RESOURCE DETECTOR] Add the host resource detector
+  [#4413](https://github.com/open-telemetry/opentelemetry-cpp/issues/4413)
 * [CONFIGURATION] Add configuration builders for the container and process
   resource detectors
   [#4412](https://github.com/open-telemetry/opentelemetry-cpp/issues/4412)
@@ -61,6 +66,10 @@ Increment the:
   `json_assign_visitor` in the Elasticsearch log exporter, and the
   `TestMode`/`test_mode` enums in the OTLP functional test binaries.
   [#4196](https://github.com/open-telemetry/opentelemetry-cpp/issues/4196)
+
+* [CMAKE] Add support for CMake component deprecation and update the policy
+  [#4272](https://github.com/open-telemetry/opentelemetry-cpp/pull/4272)
+
 * [METRICS SDK] Fix Windows metrics tail latency on the synchronous record path:
   `SyncMetricStorage::attribute_hashmap_lock_` now uses `std::mutex` instead of
   `common::SpinLockMutex`. The spin lock's final `sleep_for(1ms)` back-off is
@@ -102,6 +111,9 @@ Increment the:
   Replace SpinLockMutex with std::mutex in SimpleProcessor,
   SimpleLogRecordProcessor, MeterContext and Meter.
   [#4323](https://github.com/open-telemetry/opentelemetry-cpp/pull/4323)
+
+* [SDK] Add Tracer::StartSpan benchmark and optimizations
+  [#4248](https://github.com/open-telemetry/opentelemetry-cpp/pull/4248)
 
 * [CONFIGURATION] Decouple config registry and builder headers
   [#4335](https://github.com/open-telemetry/opentelemetry-cpp/pull/4335)
@@ -201,6 +213,24 @@ Increment the:
   between collection intervals, remain usable after collection, and omit empty
   cells from collected results.
   [#4429](https://github.com/open-telemetry/opentelemetry-cpp/pull/4429)
+
+Important changes:
+
+* [API] Never set a null global provider or propagator
+  [#4420](https://github.com/open-telemetry/opentelemetry-cpp/pull/4420)
+
+  * `trace::Provider::SetTracerProvider()`,
+    `metrics::Provider::SetMeterProvider()`,
+    `logs::Provider::SetLoggerProvider()`,
+    `logs::Provider::SetEventLoggerProvider()` and
+    `context::propagation::GlobalTextMapPropagator::SetGlobalPropagator()`
+    now install the corresponding no-op implementation when passed a null
+    pointer, instead of storing the null. The matching getters therefore never
+    return `nullptr`, as already documented, and code that resets a global
+    during cleanup no longer risks a nullptr de-ref on a later use.
+    **Note**: this is a correctness fix to an inline API header; the observable
+    behavior of these methods changes towards the already documented contract
+    (see `docs/abi-policy.md`).
 
 Breaking changes:
 

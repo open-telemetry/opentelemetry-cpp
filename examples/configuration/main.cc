@@ -21,6 +21,7 @@
 #include "custom_log_record_processor_builder.h"
 #include "custom_pull_metric_exporter_builder.h"
 #include "custom_push_metric_exporter_builder.h"
+#include "custom_resource_detector_builder.h"
 #include "custom_sampler_builder.h"
 #include "custom_span_exporter_builder.h"
 #include "custom_span_processor_builder.h"
@@ -235,6 +236,7 @@ void InitOtel(const std::string &config_file)
   CustomPullMetricExporterBuilder::Register(registry.get());
   CustomLogRecordExporterBuilder::Register(registry.get());
   CustomLogRecordProcessorBuilder::Register(registry.get());
+  CustomResourceDetectorBuilder::Register(registry.get());
 
   /* 4 - Parse a config.yaml */
 

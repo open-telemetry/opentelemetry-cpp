@@ -457,6 +457,19 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
   exit 0
+elif [[ "$1" == "cmake.install_functions.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  rm -rf ${INSTALL_TEST_DIR}/*
+  export LD_LIBRARY_PATH="${INSTALL_TEST_DIR}/lib:$LD_LIBRARY_PATH"
+  mkdir -p "${BUILD_DIR}/install_functions_test"
+  cd "${BUILD_DIR}/install_functions_test"
+  cmake "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
+        "-DINSTALL_TEST_DIR=${INSTALL_TEST_DIR}" \
+        "-DOPENTELEMETRY_SOURCE_DIR=${SRC_DIR}" \
+        -S "${SRC_DIR}/install/test/cmake/install_functions_test"
+  ctest --output-on-failure
+  exit 0
 elif [[ "$1" == "cmake.install.test" ]]; then
   if [[ -n "${BUILD_SHARED_LIBS}" && "${BUILD_SHARED_LIBS}" == "ON" ]]; then
     CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=ON")
