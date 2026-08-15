@@ -47,9 +47,21 @@ inline bool IsAppliedStatus(nlohmann::json::number_integer_t value) noexcept
   return 200 == value || 201 == value;
 }
 
-/** Whether an acknowledged operation status is one that applied the operation. */
+/**
+ * Whether an acknowledged operation status is one that applied the operation.
+ *
+ * The type check is here rather than left to the caller, although the one caller does it too.
+ * This is noexcept, and get() on a value that is not a number throws, so a caller that forgot
+ * would not get a wrong answer, it would get std::terminate. A float does not throw: it
+ * truncates, so 200.5 would answer for 200.
+ */
 inline bool IsAcknowledgedStatus(const nlohmann::json &status) noexcept
 {
+  if (!status.is_number_integer())
+  {
+    return false;
+  }
+
   if (status.is_number_unsigned())
   {
     return IsAppliedStatus(status.get<nlohmann::json::number_unsigned_t>());
@@ -63,6 +75,11 @@ inline bool IsAcknowledgedStatus(const nlohmann::json &status) noexcept
  *
  * Callers include noexcept response handlers, so nothing may escape. Anything that stops the body
  * being inspected counts as a failed export.
+ *
+ * This reads the fields the bulk response documents to decide an outcome. It is not a check
+ * against a responder that is trying to be believed: a repeated key, for one, is folded before
+ * this sees the document, so a body carrying both "errors": true and "errors": false arrives as
+ * whichever one the parser kept, and nothing here can tell that the other was ever sent.
  *
  * @param status_code the response status, which the caller passes rather than this reading the
  *        body alone: "errors" describes item outcomes and cannot override a transport error
