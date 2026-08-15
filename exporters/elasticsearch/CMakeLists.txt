@@ -62,8 +62,9 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.
     TEST_LIST es_log_record_exporter_test)
 
-  # The asynchronous cases wait on a response that a regression can stop
-  # delivering, and a case that hangs stops the job rather than reporting. A
-  # bound turns that back into a red test.
+  # The synchronous wiring cases wait on a completion, and a regression that
+  # stops delivering one hangs the job rather than reporting. A bound turns that
+  # back into a red test. Not the asynchronous ones: their fake calls back from
+  # inside SendRequest() and Export() returns without waiting.
   set_tests_properties(${es_log_record_exporter_test} PROPERTIES TIMEOUT 120)
 endif() # BUILD_TESTING
