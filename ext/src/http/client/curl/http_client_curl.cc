@@ -765,7 +765,7 @@ bool HttpClient::doAddSessions()
         continue;
       }
 
-      const CURLMcode rc = curl_multi_add_handle(multi_handle_, easy_handle);
+      const CURLMcode rc = add_handle_(multi_handle_, easy_handle);
       if (CURLM_OK != rc)
       {
         // Nothing will drive this transfer. Leaving it here is what makes a caller wait on a
