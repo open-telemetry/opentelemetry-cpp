@@ -166,7 +166,10 @@ Increment the:
 
 * [BUG] Decide Elasticsearch bulk export success from the HTTP status, the
   errors flag, and one acknowledgement per record that names its target index
-  and carries a 2xx status
+  and says the operation applied
+  [#4297](https://github.com/open-telemetry/opentelemetry-cpp/pull/4297)
+* [BUG] Stop reading an Elasticsearch bulk response that only says the request
+  was accepted as a batch that was written
   [#4297](https://github.com/open-telemetry/opentelemetry-cpp/pull/4297)
 
 * [BUG] Make SocketAddr string parsing safe and reject malformed addresses
