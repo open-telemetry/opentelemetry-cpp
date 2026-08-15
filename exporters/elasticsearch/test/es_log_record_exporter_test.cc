@@ -668,6 +668,14 @@ protected:
     handler_          = nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(
         new CapturingLogHandler());
     opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(handler_);
+
+    // The level as well as the handler. It is process wide and another case in this binary can
+    // lower it, and a failure filtered out at runtime looks exactly like one the parser never
+    // reported, so these cases would stop discriminating without saying so.
+    previous_level_ = opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogLevel();
+    opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(
+        opentelemetry::sdk::common::internal_log::LogLevel::Error);
+    restore_level_ = true;
 #endif
   }
 
@@ -675,6 +683,10 @@ protected:
   {
     // Put back what was found, rather than a fresh default that would displace a handler another
     // case in this binary had installed.
+    if (restore_level_)
+    {
+      opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(previous_level_);
+    }
     if (handler_)
     {
       opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous_handler_);
@@ -697,6 +709,9 @@ protected:
 
   nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler> handler_;
   nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler> previous_handler_;
+  opentelemetry::sdk::common::internal_log::LogLevel previous_level_ =
+      opentelemetry::sdk::common::internal_log::LogLevel::Warning;
+  bool restore_level_ = false;
 };
 
 class ElasticsearchLogsExporterDebugLoggingTests : public ::testing::Test
