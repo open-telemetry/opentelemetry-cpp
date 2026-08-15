@@ -69,9 +69,9 @@ inline bool IsAcknowledgedStatus(const nlohmann::json &status) noexcept
  * @param body the raw response body
  * @param expected_items the number of index operations the request submitted
  * @param failure_reason a best-effort explanation when this returns false
- * @return true only when the status is 2xx, "errors" is false, and "items" holds exactly
- *         expected_items index results that each name a target index, acknowledge a 2xx status
- *         and carry no error
+ * @return true only when the status is 200, "errors" is false, and "items" holds exactly
+ *         expected_items index results that each name a target index, acknowledge a status the
+ *         operation applied under, and carry no error
  */
 inline bool IsBulkResponseSuccessful(int status_code,
                                      const std::string &body,
