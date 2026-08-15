@@ -418,32 +418,45 @@ namespace
 // Which operations the calling thread is currently inside a callback for. A handler is allowed to
 // call FinishSession() on the request it is being told about, and that call must not wait for a
 // completion only the thread it is running on can publish.
-thread_local std::vector<const HttpOperation *> callbacks_in_progress;
-
+// A stack of scopes linked through the scopes themselves, so entering one allocates nothing. Each
+// lives on the stack frame that dispatches the callback, which is exactly as long as the entry
+// needs to be there. A container here would put a heap allocation on every event, and would put
+// it inside a noexcept constructor, where running out of memory calls std::terminate rather than
+// reaching whoever asked for the request.
 class CallbackScope
 {
 public:
   explicit CallbackScope(const HttpOperation *operation) noexcept
+      : operation_{operation}, previous_{current_}
   {
-    callbacks_in_progress.push_back(operation);
+    current_ = this;
   }
-  ~CallbackScope() { callbacks_in_progress.pop_back(); }
+
+  ~CallbackScope() { current_ = previous_; }
 
   CallbackScope(const CallbackScope &)            = delete;
   CallbackScope &operator=(const CallbackScope &) = delete;
 
   static bool InsideCallbackFor(const HttpOperation *operation) noexcept
   {
-    for (const auto *entry : callbacks_in_progress)
+    for (const CallbackScope *scope = current_; nullptr != scope; scope = scope->previous_)
     {
-      if (entry == operation)
+      if (scope->operation_ == operation)
       {
         return true;
       }
     }
     return false;
   }
+
+private:
+  const HttpOperation *operation_;
+  const CallbackScope *previous_;
+
+  static thread_local const CallbackScope *current_;
 };
+
+thread_local const CallbackScope *CallbackScope::current_ = nullptr;
 }  // namespace
 
 void HttpOperation::DispatchEvent(opentelemetry::ext::http::client::SessionState type,
