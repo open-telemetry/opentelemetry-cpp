@@ -1599,18 +1599,21 @@ void HttpOperation::Abort()
 
 void HttpOperation::FinishUnscheduled(const char *reason)
 {
-  // Ahead of the cleanup: Cleanup() reports a manual cancel for any state short of a terminal
-  // one, with a reason read from a curl result that is still CURLE_OK, and nobody cancelled
-  // this. The enum documents Cancelled as manually cancelled and both exporters print that word.
-  session_state_.store(opentelemetry::ext::http::client::SessionState::CreateFailed,
-                       std::memory_order_release);
-
-  // Ahead of the event, so a handler calling FinishSession() from it is not waiting on the
-  // promise that this cleanup is the only thing able to fulfil.
-  Cleanup();
-
+  // The event first, because the operation holds the handler as a bare pointer and the only
+  // strong reference to it is the one the completion callback captured. Cleanup() takes that
+  // callback and lets it go, so an event dispatched afterwards can be talking to a handler
+  // nothing owns any more. A handler calling FinishSession() from here is inside a callback for
+  // this operation, so Finish() returns rather than waiting on a promise this thread has not
+  // published yet, which is what used to make the other order necessary.
+  //
+  // DispatchEvent stores the state before it calls the handler, so the cleanup below sees a
+  // terminal state and does not report a manual cancel for something nobody cancelled.
   DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
                 nullptr != reason ? reason : "");
+
+  // Last, so that a Finish() on another thread waits for the terminal event and the completion
+  // callback rather than for the promise alone.
+  Cleanup();
 }
 
 void HttpOperation::PerformCurlMessage(CURLcode code)

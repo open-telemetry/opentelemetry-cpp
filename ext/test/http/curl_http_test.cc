@@ -678,6 +678,101 @@ private:
   std::vector<http_client::SessionState> states_;
 };
 
+// Owned by the case rather than by the handler, so the order survives the handler being
+// destroyed. That is what lets the case below tell "the event ran while the handler was alive"
+// from "the event ran on memory nothing owned any more" without depending on a sanitizer,
+// though AddressSanitizer reports the second one outright.
+struct LifetimeProbe
+{
+  std::atomic<int> next{0};
+  std::atomic<int> event_at{-1};
+  std::atomic<int> destroyed_at{-1};
+};
+
+class ProbedHandler : public CustomEventHandler
+{
+public:
+  explicit ProbedHandler(std::shared_ptr<LifetimeProbe> probe) : probe_{std::move(probe)} {}
+
+  ~ProbedHandler() override
+  {
+    probe_->destroyed_at.store(probe_->next.fetch_add(1, std::memory_order_acq_rel),
+                               std::memory_order_release);
+  }
+
+  ProbedHandler(const ProbedHandler &)            = delete;
+  ProbedHandler(ProbedHandler &&)                 = delete;
+  ProbedHandler &operator=(const ProbedHandler &) = delete;
+  ProbedHandler &operator=(ProbedHandler &&)      = delete;
+
+  void OnResponse(http_client::Response & /* response */) noexcept override {}
+
+  void OnEvent(http_client::SessionState /* state */,
+               nostd::string_view /* reason */) noexcept override
+  {
+    probe_->event_at.store(probe_->next.fetch_add(1, std::memory_order_acq_rel),
+                           std::memory_order_release);
+  }
+
+private:
+  std::shared_ptr<LifetimeProbe> probe_;
+};
+
+// The operation holds the handler as a bare pointer, and what keeps the caller's handler alive
+// past SendRequest is the shared_ptr the completion callback captured. Cleanup() takes that
+// callback and lets it go, so anything dispatched after Cleanup() is talking to whatever is left
+// of the handler. This case is the only one in the file that leaves the completion callback as
+// the sole owner, which is exactly what Session::SendRequest arranges for every real caller.
+TEST_F(BasicCurlHttpTests, AnUnscheduledSessionTellsAHandlerNothingElseHolds)
+{
+  curl::HttpClient client;
+
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  ASSERT_TRUE(session != nullptr);
+  auto curl_session = std::static_pointer_cast<curl::Session>(session);
+
+  auto probe   = std::make_shared<LifetimeProbe>();
+  auto handler = std::make_shared<ProbedHandler>(probe);
+
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::RetryPolicy no_retry{};
+  http_client::Compression compression = http_client::Compression::kNone;
+
+  curl_session->GetOperation().reset(new curl::HttpOperation(
+      http_client::Method::Get, "http://127.0.0.1:19000/get/", no_ssl, handler.get(), headers, body,
+      compression, false, curl::kDefaultHttpConnTimeout, false, false, no_retry));
+
+  std::atomic<int> completed{0};
+  ASSERT_EQ(CURLE_OK,
+            curl_session->GetOperation()->SendAsync(
+                curl_session.get(), [handler, &completed](curl::HttpOperation & /* operation */) {
+                  completed.fetch_add(1, std::memory_order_release);
+                }));
+
+  // Deliberately the last reference the case holds, the same as a caller that hands its handler
+  // to SendRequest and keeps nothing of its own.
+  handler.reset();
+
+  CURLM *multi_handle = http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, nullptr);
+  const bool has_data = http_client::curl::HttpClientTestPeer::AddSessions(client);
+  http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, multi_handle);
+
+  EXPECT_TRUE(has_data);
+  EXPECT_EQ(1, completed.load(std::memory_order_acquire));
+
+  const int event_at     = probe->event_at.load(std::memory_order_acquire);
+  const int destroyed_at = probe->destroyed_at.load(std::memory_order_acquire);
+  ASSERT_GE(event_at, 0) << "the handler was never told that nothing would run its request";
+  ASSERT_GE(destroyed_at, 0) << "the handler outlived the operation, so this case is not holding "
+                             << "the ownership it says it is";
+  EXPECT_LT(event_at, destroyed_at)
+      << "the terminal event reached the handler after the last reference to it had gone";
+
+  http_client::curl::HttpClientTestPeer::RemoveSessions(client);
+}
+
 // The third way an operation ends up with nothing to run it. SendAsync does the whole async
 // setup and Session::SendRequest is what spawns the worker, so the add runs here on one thread
 // against a multi handle that refuses it, which is what a multi handle that failed to initialize
