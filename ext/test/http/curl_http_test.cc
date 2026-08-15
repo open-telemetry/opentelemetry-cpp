@@ -235,36 +235,21 @@ static thread_local bool g_fail_curl_calloc = false;
 // failing allocation is otherwise a property of the libcurl in use rather than of this test.
 static const size_t kCurlSmallAllocation = 64;
 
-// Measured rather than assumed. libcurl does not say which allocator a list append uses, how
-// large a node is, or how many allocations anything else makes first, so a case that wants the
-// failure to land on a particular append asks this file to watch one happen and then aims at
-// blocks of exactly that size. Which append is the one that fails is a count, so a case can
-// have the first go through and the second not.
-static thread_local size_t g_watch_malloc_size    = 0;
-static thread_local size_t g_watched_malloc_size  = 0;
-static thread_local size_t g_fail_malloc_of_size  = 0;
-static thread_local int g_let_through_before_fail = 0;
+// Named rather than measured. A case that wants one particular append to fail says which header
+// it is, and the refusal happens when libcurl copies that exact string. Sizes and counts cannot
+// do this: a node's size is not part of libcurl's contract, and anything allocated before the
+// append can match the same size and consume the refusal, which leaves the list built and the
+// case asserting against a path it never took.
+static thread_local const char *g_refuse_strdup_of = nullptr;
+static thread_local const char *g_watch_strdup_of  = nullptr;
+static thread_local int g_strdup_calls             = 0;
+static thread_local int g_strdup_refusals          = 0;
+static thread_local int g_watched_at               = 0;
+static thread_local int g_refused_at               = 0;
 
 static void *CurlTestMalloc(size_t size)
 {
   g_curl_hooks_ran.store(true, std::memory_order_relaxed);
-
-  if (0 != g_watch_malloc_size && 0 == g_watched_malloc_size)
-  {
-    g_watched_malloc_size = size;
-  }
-
-  if (0 != g_fail_malloc_of_size && size == g_fail_malloc_of_size)
-  {
-    if (g_let_through_before_fail > 0)
-    {
-      --g_let_through_before_fail;
-    }
-    else
-    {
-      return nullptr;
-    }
-  }
 
   if (g_fail_curl_malloc && size <= kCurlSmallAllocation)
   {
@@ -285,8 +270,29 @@ static void *CurlTestRealloc(void *ptr, size_t size)
 
 // Not routed through CurlTestMalloc on purpose, so that a failing malloc cannot reach the
 // copies libcurl makes of the caller's strings and land somewhere other than the list node.
+// The one refusal it does make is aimed by content: curl_slist_append copies the string it is
+// given before it has a list to return, so refusing that copy is what makes that append, and no
+// other, return null.
 static char *CurlTestStrdup(const char *str)
 {
+  if (nullptr != str && (nullptr != g_watch_strdup_of || nullptr != g_refuse_strdup_of))
+  {
+    ++g_strdup_calls;
+
+    if (nullptr != g_watch_strdup_of && 0 == g_watched_at &&
+        0 == std::strcmp(str, g_watch_strdup_of))
+    {
+      g_watched_at = g_strdup_calls;
+    }
+
+    if (nullptr != g_refuse_strdup_of && 0 == std::strcmp(str, g_refuse_strdup_of))
+    {
+      ++g_strdup_refusals;
+      g_refused_at = g_strdup_calls;
+      return nullptr;
+    }
+  }
+
   const size_t length = std::strlen(str) + 1;
   char *copy          = static_cast<char *>(std::malloc(length));
   if (copy != nullptr)
@@ -350,42 +356,32 @@ struct FailCurlCalloc
   FailCurlCalloc &operator=(FailCurlCalloc &&)      = delete;
 };
 
-// How big a list node is on the libcurl this binary is linked against, or zero if an append
-// does not reach the malloc callback at all. Taken by watching one, since libcurl promises
-// none of it. The string is copied through the strdup callback, which is deliberately not the
-// one being watched, so the only block this sees is the node.
-inline size_t MeasureSlistNode()
+// Watches one header go on and refuses the next, both by name, and records the order the two
+// were copied in. A case reads those back to say three different things apart: a libcurl that
+// never routed an appended string here at all, an append that was refused as asked, and a
+// refusal that landed on the first header rather than part way through a list.
+struct RefuseSlistAppendOf
 {
-  g_watched_malloc_size = 0;
-  g_watch_malloc_size   = 1;
-  curl_slist *measured  = curl_slist_append(nullptr, "X-Measure: 1");
-  g_watch_malloc_size   = 0;
-
-  const size_t size = (nullptr != measured) ? g_watched_malloc_size : 0;
-  curl_slist_free_all(measured);
-  return size;
-}
-
-// Lets a number of nodes through and refuses the next one, so a case can say which append
-// fails rather than hoping it is the first thing libcurl asks for.
-struct FailSlistNodeAfter
-{
-  FailSlistNodeAfter(int let_through, size_t node_size)
+  RefuseSlistAppendOf(const char *let_through, const char *refuse)
   {
-    g_let_through_before_fail = let_through;
-    g_fail_malloc_of_size     = node_size;
+    g_strdup_calls     = 0;
+    g_strdup_refusals  = 0;
+    g_watched_at       = 0;
+    g_refused_at       = 0;
+    g_watch_strdup_of  = let_through;
+    g_refuse_strdup_of = refuse;
   }
 
-  ~FailSlistNodeAfter()
+  ~RefuseSlistAppendOf()
   {
-    g_fail_malloc_of_size     = 0;
-    g_let_through_before_fail = 0;
+    g_watch_strdup_of  = nullptr;
+    g_refuse_strdup_of = nullptr;
   }
 
-  FailSlistNodeAfter(const FailSlistNodeAfter &)            = delete;
-  FailSlistNodeAfter(FailSlistNodeAfter &&)                 = delete;
-  FailSlistNodeAfter &operator=(const FailSlistNodeAfter &) = delete;
-  FailSlistNodeAfter &operator=(FailSlistNodeAfter &&)      = delete;
+  RefuseSlistAppendOf(const RefuseSlistAppendOf &)            = delete;
+  RefuseSlistAppendOf(RefuseSlistAppendOf &&)                 = delete;
+  RefuseSlistAppendOf &operator=(const RefuseSlistAppendOf &) = delete;
+  RefuseSlistAppendOf &operator=(RefuseSlistAppendOf &&)      = delete;
 };
 
 // The failure that reaches every thread, and the exemption for the one that armed it, since
@@ -1188,13 +1184,6 @@ TEST_F(BasicCurlHttpTests, AHeaderListThatFailsPartWayThroughIsNotLost)
   ASSERT_TRUE(g_curl_hooks_installed);
   received_requests_.clear();
 
-  const size_t node = MeasureSlistNode();
-  if (0 == node)
-  {
-    GTEST_SKIP() << "list appends on this libcurl do not reach the malloc callback, so the "
-                 << "failure cannot be aimed at one";
-  }
-
   auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
   auto session         = session_manager->CreateSession("http://127.0.0.1:19000");
   auto request         = session->CreateRequest();
@@ -1202,12 +1191,19 @@ TEST_F(BasicCurlHttpTests, AHeaderListThatFailsPartWayThroughIsNotLost)
   request->AddHeader("X-First", "1");
   request->AddHeader("X-Second", "2");
 
-  auto handler = std::make_shared<ReportedStateHandler>();
+  auto handler       = std::make_shared<ReportedStateHandler>();
+  int refusals       = 0;
+  int let_through_at = 0;
+  int refused_at     = 0;
   {
-    // One node through, the next refused. Whichever append that turns out to be, the list is
-    // not empty when it happens, which is the whole point.
-    FailSlistNodeAfter failing{1, node};
+    // Named, not counted. Which append fails is then a property of this case rather than of how
+    // the libcurl in use sizes a node, or of what it happened to allocate before reaching the
+    // header list.
+    RefuseSlistAppendOf failing{"X-First: 1", "X-Second: 2"};
     session->SendRequest(handler);
+    refusals       = g_strdup_refusals;
+    let_through_at = g_watched_at;
+    refused_at     = g_refused_at;
   }
 
   session->FinishSession();
@@ -1218,6 +1214,19 @@ TEST_F(BasicCurlHttpTests, AHeaderListThatFailsPartWayThroughIsNotLost)
     std::unique_lock<std::mutex> lock_requests(mtx_requests);
     requests_seen = received_requests_.size();
   }
+
+  if (0 == refusals && 0 == let_through_at)
+  {
+    GTEST_SKIP() << "this libcurl does not copy appended header strings through the allocator "
+                 << "callbacks, so an append cannot be refused by name";
+  }
+  ASSERT_EQ(1, refusals) << "this libcurl reached the allocator callbacks with the first header "
+                         << "but never with the second, so nothing below is a statement about "
+                         << "what happens when an append fails";
+  ASSERT_GT(let_through_at, 0) << "the first header was never copied, so the refusal landed on "
+                               << "an empty list and this case is not the one it says it is";
+  ASSERT_LT(let_through_at, refused_at) << "the refusal came before the first header went on, so "
+                                        << "the list it landed on was still empty";
 
   EXPECT_TRUE(handler->create_failed_.load(std::memory_order_acquire))
       << "a header list that could not be finished was not reported";
