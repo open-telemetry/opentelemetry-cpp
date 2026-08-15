@@ -230,8 +230,9 @@ private:
   /**
    * Record the outcome of the request, first writer wins, then release any waiter. Keeping the
    * first outcome means a session destroyed after a successful response does not overwrite it.
+   *
+   * @return whether this call is the one that decided the outcome
    */
-  /// Returns whether this call is the one that decided the outcome.
   bool recordCompletion(CompletionState state)
   {
     bool recorded = false;
