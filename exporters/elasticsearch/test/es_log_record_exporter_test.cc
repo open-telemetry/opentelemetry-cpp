@@ -165,7 +165,7 @@ namespace http_client = opentelemetry::ext::http::client;
 // acknowledged operation result carrying a 2xx status, so these cases keep meaning the
 // same thing whichever success check is in place.
 constexpr const char *kAcceptedBody =
-    R"({"took":30,"errors":false,"items":[{"index":{"status":201,"_shards":{"failed" : 0}}}]})";
+    R"({"took":30,"errors":false,"items":[{"index":{"_index":"logs","status":201,"_shards":{"failed" : 0}}}]})";
 
 class FakeResponse : public http_client::Response
 {
@@ -234,46 +234,46 @@ private:
 class DeferredSession : public http_client::Session
 {
 public:
-  DeferredSession(std::shared_ptr<http_client::EventHandler> *slot, std::promise<void> *arrived)
-      : slot_(slot), arrived_(arrived)
+  explicit DeferredSession(std::promise<std::shared_ptr<http_client::EventHandler>> *arrived)
+      : arrived_(arrived)
   {}
 
   std::shared_ptr<http_client::Request> CreateRequest() noexcept override
   {
     return std::make_shared<FakeRequest>();
   }
+  // The handler travels in the promise rather than beside it. A waiter that times out has not
+  // observed the promise becoming ready and so is not synchronized with this thread, which would
+  // make a handler read on that path a race with this write.
   void SendRequest(std::shared_ptr<http_client::EventHandler> handler) noexcept override
   {
-    *slot_ = std::move(handler);
-    arrived_->set_value();
+    arrived_->set_value(std::move(handler));
   }
   bool IsSessionActive() noexcept override { return true; }
   bool CancelSession() noexcept override { return true; }
   bool FinishSession() noexcept override { return true; }
 
 private:
-  std::shared_ptr<http_client::EventHandler> *slot_;
-  std::promise<void> *arrived_;
+  std::promise<std::shared_ptr<http_client::EventHandler>> *arrived_;
 };
 
 class DeferredHttpClient : public http_client::HttpClient
 {
 public:
-  DeferredHttpClient(std::shared_ptr<http_client::EventHandler> *slot, std::promise<void> *arrived)
-      : slot_(slot), arrived_(arrived)
+  explicit DeferredHttpClient(std::promise<std::shared_ptr<http_client::EventHandler>> *arrived)
+      : arrived_(arrived)
   {}
 
   std::shared_ptr<http_client::Session> CreateSession(nostd::string_view) noexcept override
   {
-    return std::make_shared<DeferredSession>(slot_, arrived_);
+    return std::make_shared<DeferredSession>(arrived_);
   }
   bool CancelAllSessions() noexcept override { return true; }
   bool FinishAllSessions() noexcept override { return true; }
   void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
 
 private:
-  std::shared_ptr<http_client::EventHandler> *slot_;
-  std::promise<void> *arrived_;
+  std::promise<std::shared_ptr<http_client::EventHandler>> *arrived_;
 };
 
 class FakeHttpClient : public http_client::HttpClient
@@ -319,6 +319,25 @@ protected:
 #endif
   }
 };
+
+// For the cases that read the lines the exporter writes rather than only the result it returns.
+// Below error level OTEL_INTERNAL_LOG_ERROR expands to nothing, so the line is not filtered at
+// runtime, it does not exist: a case expecting the winner to report one would fail on correct
+// code, and one expecting silence from the loser would pass without testing anything.
+class ElasticsearchLogsExporterSyncLoggingTests : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
+#ifdef ENABLE_ASYNC_EXPORT
+    GTEST_SKIP() << "Export() returns without waiting when async export is enabled";
+#elif OTEL_INTERNAL_LOG_LEVEL < OTEL_INTERNAL_LOG_LEVEL_ERROR
+    // One skip point, because GTEST_SKIP returns and a second one after it would leave the rest of
+    // this body unreachable, which MSVC reports as C4702 under maintainer mode.
+    GTEST_SKIP() << "the exporter's error lines are compiled out below error level";
+#endif
+  }
+};
 }  // namespace
 
 namespace
@@ -332,15 +351,18 @@ struct ParkedExport
   std::shared_ptr<DeferredHttpClient> client;
   std::shared_ptr<logs_exporter::ElasticsearchLogRecordExporter> exporter;
   std::shared_ptr<http_client::EventHandler> handler;
-  std::promise<void> arrived;
+  std::promise<std::shared_ptr<http_client::EventHandler>> arrived;
   std::promise<opentelemetry::sdk::common::ExportResult> done;
   std::future<opentelemetry::sdk::common::ExportResult> finished;
 };
 
+// Answers with nullptr rather than a half prepared handle when a precondition does not hold. Each
+// step below is something a case needs before it can mean anything, and carrying on past one of
+// them reads state the other thread is still writing.
 std::shared_ptr<ParkedExport> StartParkedExport()
 {
   auto parked    = std::make_shared<ParkedExport>();
-  parked->client = std::make_shared<DeferredHttpClient>(&parked->handler, &parked->arrived);
+  parked->client = std::make_shared<DeferredHttpClient>(&parked->arrived);
 
   logs_exporter::ElasticsearchExporterOptions options;
   parked->exporter =
@@ -355,23 +377,42 @@ std::shared_ptr<ParkedExport> StartParkedExport()
         parked->exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1)));
   }).detach();
 
-  EXPECT_EQ(std::future_status::ready, reached.wait_for(std::chrono::seconds{5}))
-      << "the exporter never sent the request";
-  EXPECT_TRUE(parked->handler) << "the session was not given a handler";
-  EXPECT_EQ(std::future_status::timeout, finished.wait_for(std::chrono::milliseconds{100}))
-      << "the export returned without waiting for anything";
+  if (std::future_status::ready != reached.wait_for(std::chrono::seconds{5}))
+  {
+    ADD_FAILURE() << "the exporter never handed off the request handler";
+    return nullptr;
+  }
+
+  parked->handler = reached.get();
+  if (!parked->handler)
+  {
+    ADD_FAILURE() << "the session was handed a null handler";
+    return nullptr;
+  }
+
+  if (std::future_status::timeout != finished.wait_for(std::chrono::milliseconds{100}))
+  {
+    ADD_FAILURE() << "the export returned before any callback was delivered";
+    return nullptr;
+  }
 
   parked->finished = std::move(finished);
   return parked;
 }
 }  // namespace
 
-// A terminal error delivered once the waiter is parked has to end the wait, which is the half the
-// notification is responsible for. Without these, removing cv_.notify_all() keeps this file green.
-TEST_F(ElasticsearchLogsExporterSyncTests, AReadErrorAfterTheWaiterParksWakesTheExport)
+// A terminal error that arrives after the handler has been handed off, while the export is still
+// running, has to end the wait, which is the half the notification is responsible for. Without
+// these two, removing cv_.notify_all() keeps this file green.
+//
+// The handoff is what they hold, not the parking: the session publishes the handler before
+// SendRequest() returns, so the export need not have reached cv_.wait() when the callback is
+// delivered. Holding that would want a wait entry seam in production code, which is not worth the
+// API it would add.
+TEST_F(ElasticsearchLogsExporterSyncTests, AReadErrorAfterTheHandoffEndsTheExport)
 {
   auto parked = StartParkedExport();
-  ASSERT_TRUE(parked->handler);
+  ASSERT_NE(nullptr, parked);
 
   parked->handler->OnEvent(http_client::SessionState::ReadError, "");
 
@@ -382,10 +423,10 @@ TEST_F(ElasticsearchLogsExporterSyncTests, AReadErrorAfterTheWaiterParksWakesThe
 
 // The same for the success half, which also holds that the wait is a wait: a waitForResponse that
 // only read the current state would answer before this response arrives.
-TEST_F(ElasticsearchLogsExporterSyncTests, AResponseAfterTheWaiterParksWakesTheExport)
+TEST_F(ElasticsearchLogsExporterSyncTests, AResponseAfterTheHandoffEndsTheExport)
 {
   auto parked = StartParkedExport();
-  ASSERT_TRUE(parked->handler);
+  ASSERT_NE(nullptr, parked);
 
   FakeResponse response(200, kAcceptedBody);
   parked->handler->OnResponse(response);
@@ -395,7 +436,7 @@ TEST_F(ElasticsearchLogsExporterSyncTests, AResponseAfterTheWaiterParksWakesTheE
   EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, parked->finished.get());
 }
 
-TEST_F(ElasticsearchLogsExporterSyncTests, ResponseRecordedBeforeTheWaitIsStillSeen)
+TEST_F(ElasticsearchLogsExporterSyncLoggingTests, ResponseRecordedBeforeTheWaitIsStillSeen)
 {
   const auto result = ExportWith([](http_client::EventHandler &handler) {
     FakeResponse response(200, kAcceptedBody);
@@ -477,7 +518,7 @@ std::size_t CountExporterErrors(const std::vector<std::string> &lines)
 // The winning side of the same rule. Without this, a recordCompletion that still records the
 // outcome but always answers "you did not decide it" passes every other case here while the
 // exporter goes silent about every failure it reports to its caller.
-TEST_F(ElasticsearchLogsExporterSyncTests, AWinningTerminalErrorIsReportedExactlyOnce)
+TEST_F(ElasticsearchLogsExporterSyncLoggingTests, AWinningTerminalErrorIsReportedExactlyOnce)
 {
   for (const auto &terminal : kErrorTerminalStates)
   {
@@ -511,7 +552,7 @@ TEST_F(ElasticsearchLogsExporterSyncTests, AWinningTerminalErrorIsReportedExactl
 
 // The shared curl client has reported more than one terminal event for one request, see #4360,
 // so which of two failures is described matters rather than only how many arrive.
-TEST_F(ElasticsearchLogsExporterSyncTests, OnlyTheFirstTerminalFailureIsReported)
+TEST_F(ElasticsearchLogsExporterSyncLoggingTests, OnlyTheFirstTerminalFailureIsReported)
 {
   auto capturing      = nostd::shared_ptr<internal_log::LogHandler>(new ErrorCapturingLogHandler());
   const auto previous = internal_log::GlobalLogHandler::GetLogHandler();
@@ -545,7 +586,7 @@ TEST_F(ElasticsearchLogsExporterSyncTests, OnlyTheFirstTerminalFailureIsReported
 // covers a completion recorded before the waiter arrives but never two callbacks at once. This
 // releases a response and a read error together. Either may win, and the point is that the result
 // and the diagnostic never disagree about which one did.
-TEST_F(ElasticsearchLogsExporterSyncTests, AResponseRacingAReadErrorAgree)
+TEST_F(ElasticsearchLogsExporterSyncLoggingTests, AResponseRacingAReadErrorAgree)
 {
   for (int attempt = 0; attempt < 50; ++attempt)
   {
@@ -607,7 +648,7 @@ TEST_F(ElasticsearchLogsExporterSyncTests, AResponseRacingAReadErrorAgree)
 }
 
 // The losing side, over the same table rather than three of the nine.
-TEST_F(ElasticsearchLogsExporterSyncTests, NoTerminalErrorAfterAResponseIsReported)
+TEST_F(ElasticsearchLogsExporterSyncLoggingTests, NoTerminalErrorAfterAResponseIsReported)
 {
   for (const auto &terminal : kErrorTerminalStates)
   {
@@ -632,7 +673,7 @@ TEST_F(ElasticsearchLogsExporterSyncTests, NoTerminalErrorAfterAResponseIsReport
   }
 }
 
-TEST_F(ElasticsearchLogsExporterSyncTests, ALateTerminalFailureDoesNotClaimTheExportFailed)
+TEST_F(ElasticsearchLogsExporterSyncLoggingTests, ALateTerminalFailureDoesNotClaimTheExportFailed)
 {
   auto capturing      = nostd::shared_ptr<internal_log::LogHandler>(new ErrorCapturingLogHandler());
   const auto previous = internal_log::GlobalLogHandler::GetLogHandler();
