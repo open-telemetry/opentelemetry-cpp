@@ -123,6 +123,10 @@ Increment the:
   including the ones the IO thread delivers, instead of waiting on a completion
   only that thread goes on to publish
   ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
+* [BUG] Decide whether a curl thread is inside a callback without an
+  unsynchronized member, which was read and written from two threads behind a
+  sanitizer suppression
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
 * [CODE HEALTH] Enable clang-tidy `modernize-deprecated-headers` and replace
   deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
   `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
