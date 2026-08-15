@@ -298,6 +298,17 @@ bool WaitForWatermarks(logs_exporter::ElasticsearchLogRecordExporter &exporter,
   return false;
 }
 }  // namespace
+#else
+namespace
+{
+// The cases that call this skip in SetUp when there is no wait to observe, but they are compiled
+// in both configurations on purpose: a case removed from the binary stays registered with CTest
+// and reports a pass without running. So the helper has to exist in both too.
+inline bool WaitForWatermarks(logs_exporter::ElasticsearchLogRecordExporter &, std::uint64_t)
+{
+  return false;
+}
+}  // namespace
 #endif  // ENABLE_ASYNC_EXPORT
 
 // ---------------------------------------------------------------------------
