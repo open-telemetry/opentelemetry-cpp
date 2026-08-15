@@ -63,9 +63,16 @@ or inaccessible.
 | --- | --- | --- | --- | --- |
 | `process.pid` | Process ID | Yes | Yes | Yes |
 | `process.executable.path` | Path via `/proc` (Linux) or Win32 APIs | Yes | No | Yes |
+| `process.executable.name` | Basename of the executable path | Yes | No | Yes |
+| `process.creation.time` | Process start time in ISO 8601 UTC | Yes | Yes | Yes |
+| `process.owner` | Username of the process owner | Yes | Yes | Yes |
+| `process.executable.build_id.htlhash` | Deterministic SHA256-based build ID | Yes | No | Yes |
 
-Limitation: current macOS implementation does not populate
-`process.executable.path`.
+Limitations:
+- `process.executable.path`, `process.executable.name`, and
+  `process.executable.build_id.htlhash` are not populated on macOS because
+  reading `/proc/<pid>/exe` is not available. A macOS implementation via
+  `proc_pidinfo()` would be a welcome contribution.
 
 ### Env Entity Resource Detector (Experimental)
 
