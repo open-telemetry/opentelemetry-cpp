@@ -993,7 +993,7 @@ public:
   void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
   {
     TerminalCountingHandler::OnEvent(state, reason);
-    if (state == http_client::SessionState::CreateFailed && finish_target_ != nullptr)
+    if (state == finish_at_ && finish_target_ != nullptr)
     {
       auto *target   = finish_target_;
       finish_target_ = nullptr;
@@ -1004,6 +1004,7 @@ public:
   }
 
   http_client::Session *finish_target_ = nullptr;
+  http_client::SessionState finish_at_ = http_client::SessionState::CreateFailed;
   std::atomic<bool> entered_{false};
   std::atomic<bool> returned_{false};
 };
@@ -1188,6 +1189,151 @@ TEST_F(BasicCurlHttpTests, FinishDoesNotReturnWhileAHandlerIsRunning)
                              << " ms with a handler still running";
   EXPECT_GE(handler->entries_.load(std::memory_order_relaxed), 1)
       << "the terminal event never arrived, so nothing was tested";
+}
+
+namespace
+{
+// Stays inside the terminal event until the case lets it out, so another thread's FinishSession()
+// has something to be held up by.
+class HeldTerminalHandler : public CustomEventHandler
+{
+public:
+  std::atomic<bool> inside_{false};
+  std::atomic<bool> release_{false};
+
+  void OnResponse(http_client::Response & /* response */) noexcept override {}
+
+  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
+  {
+    if (http_client::SessionState::CreateFailed != state)
+    {
+      return;
+    }
+    inside_.store(true, std::memory_order_release);
+    while (!release_.load(std::memory_order_acquire))
+    {
+      std::this_thread::yield();
+    }
+    inside_.store(false, std::memory_order_release);
+  }
+};
+
+// Polls a condition to a deadline rather than sleeping for a fixed time, so a pass costs only as
+// long as the thing being waited for takes and a failure is a bounded wait rather than a hang.
+template <typename Predicate>
+bool WaitFor(Predicate ready, std::chrono::milliseconds budget)
+{
+  const auto deadline = std::chrono::steady_clock::now() + budget;
+  while (std::chrono::steady_clock::now() < deadline)
+  {
+    if (ready())
+    {
+      return true;
+    }
+    std::this_thread::yield();
+  }
+  return ready();
+}
+}  // namespace
+
+// A handler is allowed to finish the request it is being told about. On the IO thread's events
+// that used to be a deadlock, because Finish() waited on a promise only the thread running the
+// handler goes on to fulfil. Fixes #4402.
+TEST_F(BasicCurlHttpTests, FinishSessionFromAnEventTheIoThreadDelivers)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19937");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<FinishFromEventHandler>();
+  handler->finish_target_ = session.get();
+  handler->finish_at_     = http_client::SessionState::ConnectFailed;
+
+  // The handler has to be the first caller: a FinishSession() from here would take is_finished_
+  // and every later one would return without ever reaching the wait.
+  session->SendRequest(handler);
+
+  const bool entered =
+      WaitFor([&handler]() { return handler->entered_.load(std::memory_order_acquire); },
+              std::chrono::seconds(30));
+  ASSERT_TRUE(entered) << "the connect never failed, so no handler ran and nothing was tested";
+
+  const bool returned =
+      WaitFor([&handler]() { return handler->returned_.load(std::memory_order_acquire); },
+              std::chrono::seconds(30));
+  EXPECT_TRUE(returned) << "FinishSession() called from the event did not return";
+
+  session_manager->FinishAllSessions();
+}
+
+// The other half of the same ordering: an outside Finish() has to wait for the terminal event and
+// the completion callback, not just for the promise. The handler holds the event open and the
+// case watches the other thread stay inside FinishSession() until it lets go.
+TEST_F(BasicCurlHttpTests, FinishFromAnotherThreadWaitsForTheTerminalEvent)
+{
+  curl::HttpClient client;
+
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  ASSERT_TRUE(session != nullptr);
+  auto curl_session = std::static_pointer_cast<curl::Session>(session);
+
+  auto handler = std::make_shared<HeldTerminalHandler>();
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::RetryPolicy no_retry{};
+  http_client::Compression compression = http_client::Compression::kNone;
+
+  curl_session->GetOperation().reset(new curl::HttpOperation(
+      http_client::Method::Get, "http://127.0.0.1:19000/get/", no_ssl, handler.get(), headers, body,
+      compression, false, curl::kDefaultHttpConnTimeout, false, false, no_retry));
+
+  ASSERT_EQ(CURLE_OK, curl_session->GetOperation()->SendAsync(
+                          curl_session.get(), [](curl::HttpOperation & /* operation */) {}));
+
+  CURLM *multi_handle = http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, nullptr);
+
+  std::atomic<bool> finish_returned{false};
+  std::thread finisher([&curl_session, &finish_returned]() {
+    curl_session->FinishSession();
+    finish_returned.store(true, std::memory_order_release);
+  });
+
+  // This thread is the one that dispatches the terminal event, so it is the one that parks inside
+  // the handler. Whoever lets it out has to be somebody else, and that somebody is also the only
+  // one placed to watch the finisher while the event is still running.
+  std::atomic<bool> observed_held{false};
+  std::atomic<bool> returned_early{false};
+  std::thread watcher([&handler, &finish_returned, &observed_held, &returned_early]() {
+    if (WaitFor([&handler]() { return handler->inside_.load(std::memory_order_acquire); },
+                std::chrono::seconds(30)))
+    {
+      observed_held.store(true, std::memory_order_release);
+      returned_early.store(
+          WaitFor([&finish_returned]() { return finish_returned.load(std::memory_order_acquire); },
+                  std::chrono::milliseconds(200)),
+          std::memory_order_release);
+    }
+    handler->release_.store(true, std::memory_order_release);
+  });
+
+  http_client::curl::HttpClientTestPeer::AddSessions(client);
+  http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, multi_handle);
+
+  watcher.join();
+  finisher.join();
+
+  ASSERT_TRUE(observed_held.load(std::memory_order_acquire))
+      << "the terminal event never reached the handler, so nothing was tested";
+  EXPECT_FALSE(returned_early.load(std::memory_order_acquire))
+      << "FinishSession() on another thread returned while the handler was still inside the "
+      << "terminal event";
+  EXPECT_TRUE(finish_returned.load(std::memory_order_acquire));
+
+  http_client::curl::HttpClientTestPeer::RemoveSessions(client);
 }
 
 TEST_F(BasicCurlHttpTests, CancelFromConnectingWhilePollingCompletes)

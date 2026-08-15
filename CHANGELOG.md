@@ -119,6 +119,10 @@ Increment the:
 * [BUG] Store the curl session state before the event that reports it, so a
   cancel dispatched by the IO thread is not overwritten or raced
   ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
+* [BUG] Let a handler finish the request it is being told about from any event,
+  including the ones the IO thread delivers, instead of waiting on a completion
+  only that thread goes on to publish
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
 * [CODE HEALTH] Enable clang-tidy `modernize-deprecated-headers` and replace
   deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
   `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
