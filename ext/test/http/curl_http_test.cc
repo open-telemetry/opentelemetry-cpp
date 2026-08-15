@@ -62,6 +62,16 @@ public:
 
   static bool RemoveSessions(HttpClient &client) { return client.doRemoveSessions(); }
 
+  // Refuses every add with a code the case chooses. A case about what happens to a refused
+  // session then says which refusal it means, instead of arranging a multi handle libcurl
+  // documents as unusable and depending on what libcurl does with one.
+  static void RefuseAdds(HttpClient &client)
+  {
+    client.add_handle_ = [](CURLM *, CURL *) { return CURLM_BAD_EASY_HANDLE; };
+  }
+
+  static void AllowAdds(HttpClient &client) { client.add_handle_ = &curl_multi_add_handle; }
+
   // A multi handle that failed to initialize refuses every add, which is the state the case
   // below needs and the one thing no transfer can be arranged into.
   static CURLM *ExchangeMultiHandle(HttpClient &client, CURLM *replacement)
@@ -755,9 +765,9 @@ TEST_F(BasicCurlHttpTests, AnUnscheduledSessionTellsAHandlerNothingElseHolds)
   // to SendRequest and keeps nothing of its own.
   handler.reset();
 
-  CURLM *multi_handle = http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, nullptr);
+  http_client::curl::HttpClientTestPeer::RefuseAdds(client);
   const bool has_data = http_client::curl::HttpClientTestPeer::AddSessions(client);
-  http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, multi_handle);
+  http_client::curl::HttpClientTestPeer::AllowAdds(client);
 
   EXPECT_TRUE(has_data);
   EXPECT_EQ(1, completed.load(std::memory_order_acquire));
@@ -805,9 +815,9 @@ TEST_F(BasicCurlHttpTests, ASessionTheMultiHandleRefusesIsFinished)
                             completed.fetch_add(1, std::memory_order_release);
                           }));
 
-  CURLM *multi_handle = http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, nullptr);
+  http_client::curl::HttpClientTestPeer::RefuseAdds(client);
   const bool has_data = http_client::curl::HttpClientTestPeer::AddSessions(client);
-  http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, multi_handle);
+  http_client::curl::HttpClientTestPeer::AllowAdds(client);
 
   // The removal the finish queues is the reason this has to answer true: the worker checks it
   // after it has already run doRemoveSessions for this round, and nothing else would drain it.
@@ -1294,7 +1304,7 @@ TEST_F(BasicCurlHttpTests, FinishFromAnotherThreadWaitsForTheTerminalEvent)
   ASSERT_EQ(CURLE_OK, curl_session->GetOperation()->SendAsync(
                           curl_session.get(), [](curl::HttpOperation & /* operation */) {}));
 
-  CURLM *multi_handle = http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, nullptr);
+  http_client::curl::HttpClientTestPeer::RefuseAdds(client);
 
   std::atomic<bool> finish_returned{false};
   std::thread finisher([&curl_session, &finish_returned]() {
@@ -1321,7 +1331,7 @@ TEST_F(BasicCurlHttpTests, FinishFromAnotherThreadWaitsForTheTerminalEvent)
   });
 
   http_client::curl::HttpClientTestPeer::AddSessions(client);
-  http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(client, multi_handle);
+  http_client::curl::HttpClientTestPeer::AllowAdds(client);
 
   watcher.join();
   finisher.join();
