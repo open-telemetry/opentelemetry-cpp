@@ -683,6 +683,13 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             // Double check, make sure no more pending sessions after locking background thread
             // management
 
+            // Read before the drains below, compared after them. Everything that queues work for
+            // this thread bumps it, and the producers of the abort and removal queues only wake
+            // this thread rather than starting one, so anything queued after a drain has already
+            // reported empty would sit there until the next request or the destructor.
+            const uint64_t generation_before =
+                self->wakeup_generation_.load(std::memory_order_acquire);
+
             // Abort all pending easy handles
             if (self->doAbortSessions())
             {
@@ -714,6 +721,14 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             // without one, and staying for them is staying under the join that is waiting here.
             if (nullptr == self->multi_handle_ &&
                 !self->is_shutdown_.load(std::memory_order_acquire) && self->hasActionableWork())
+            {
+              still_running = 1;
+            }
+
+            // Queued while the drains above were running, so this thread still owes somebody
+            // the work rather than being finished with it.
+            if (still_running == 0 &&
+                generation_before != self->wakeup_generation_.load(std::memory_order_acquire))
             {
               still_running = 1;
             }
