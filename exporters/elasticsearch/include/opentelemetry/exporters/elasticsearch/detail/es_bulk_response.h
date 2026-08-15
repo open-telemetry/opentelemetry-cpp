@@ -18,22 +18,33 @@ namespace detail
 {
 
 /**
- * The band a status has to fall in to say the thing it answers was applied. Elasticsearch
- * answers the bulk request with 200 and an index operation with 200 or 201, so 2xx is the whole
- * of it on both, and this says so once for both rather than twice with two spellings.
+ * What the bulk request itself has to answer with. Elasticsearch answers a bulk request with 200,
+ * and the rest of the 2xx band does not say the batch was written. 202 is the one that matters:
+ * it says the request was accepted and the processing is not finished, and may never be. Reading
+ * that as success is not a conservative reading of a vague answer, it is the opposite of what the
+ * answer says, and a success here lets the caller drop the records it just handed over.
+ */
+inline bool IsSuccessfulBulkStatus(int status_code) noexcept
+{
+  return 200 == status_code;
+}
+
+/**
+ * What an acknowledged index operation has to carry. Elasticsearch answers one with 201 when it
+ * created the document and 200 when it replaced an existing one.
  *
  * Two overloads rather than one signed parameter, because an operation status arrives through
  * nlohmann::json and is compared in the type it was parsed as: is_number_integer() is true for
- * unsigned as well, and 2^32 + 200 narrows back into the band on a 32 bit int.
+ * unsigned as well, and 2^32 + 200 narrows back to 200 on a 32 bit int.
  */
-inline bool IsSuccessStatus(nlohmann::json::number_unsigned_t value) noexcept
+inline bool IsAppliedStatus(nlohmann::json::number_unsigned_t value) noexcept
 {
-  return value >= 200U && value <= 299U;
+  return 200U == value || 201U == value;
 }
 
-inline bool IsSuccessStatus(nlohmann::json::number_integer_t value) noexcept
+inline bool IsAppliedStatus(nlohmann::json::number_integer_t value) noexcept
 {
-  return value >= 200 && value <= 299;
+  return 200 == value || 201 == value;
 }
 
 /** Whether an acknowledged operation status is one that applied the operation. */
@@ -41,10 +52,10 @@ inline bool IsAcknowledgedStatus(const nlohmann::json &status) noexcept
 {
   if (status.is_number_unsigned())
   {
-    return IsSuccessStatus(status.get<nlohmann::json::number_unsigned_t>());
+    return IsAppliedStatus(status.get<nlohmann::json::number_unsigned_t>());
   }
 
-  return IsSuccessStatus(status.get<nlohmann::json::number_integer_t>());
+  return IsAppliedStatus(status.get<nlohmann::json::number_integer_t>());
 }
 
 /**
@@ -73,9 +84,10 @@ inline bool IsBulkResponseSuccessful(int status_code,
   {
 #endif
     // Inside the try: building a reason allocates.
-    // The same band as an operation status, through the same predicate. The cast picks the
-    // signed overload, which an int reaches without losing anything.
-    if (!IsSuccessStatus(static_cast<nlohmann::json::number_integer_t>(status_code)))
+    // Not the band an operation status is held to. This one answers for the request, and an
+    // operation that applied answers 201 for a document it created, which the request itself
+    // never says.
+    if (!IsSuccessfulBulkStatus(status_code))
     {
       failure_reason = "unexpected HTTP status " + std::to_string(status_code);
       return false;
