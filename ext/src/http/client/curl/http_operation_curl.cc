@@ -403,8 +403,7 @@ namespace
 class CallbackScope
 {
 public:
-  explicit CallbackScope(const HttpOperation *operation) noexcept
-      : operation_{operation}, previous_{current_}
+  explicit CallbackScope(const HttpOperation *operation) noexcept : operation_{operation}
   {
     current_ = this;
   }
@@ -412,7 +411,9 @@ public:
   ~CallbackScope() { current_ = previous_; }
 
   CallbackScope(const CallbackScope &)            = delete;
+  CallbackScope(CallbackScope &&)                 = delete;
   CallbackScope &operator=(const CallbackScope &) = delete;
+  CallbackScope &operator=(CallbackScope &&)      = delete;
 
   static bool InsideCallbackFor(const HttpOperation *operation) noexcept
   {
@@ -427,10 +428,11 @@ public:
   }
 
 private:
-  const HttpOperation *operation_;
-  const CallbackScope *previous_;
-
   static thread_local const CallbackScope *current_;
+
+  const HttpOperation *operation_;
+  // Read before the constructor body replaces it, which is what makes the stack a stack.
+  const CallbackScope *previous_ = current_;
 };
 
 thread_local const CallbackScope *CallbackScope::current_ = nullptr;
