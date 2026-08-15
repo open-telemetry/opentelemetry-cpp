@@ -241,15 +241,20 @@ TEST(ElasticsearchBulkResponseTests, ReportsFailureWhenErrorsTrueWithoutItemErro
       200, R"({"errors":true,"items":[{"index":42}]})", 1, reason));
 }
 
-// The 2xx range is the success band; the codes just outside it are failures. This pins the boundary
-// so a later change to the status check cannot silently widen or narrow it.
-TEST(ElasticsearchBulkResponseTests, TreatsThe2xxRangeAsTheSuccessBand)
+// 200 is what Elasticsearch answers a bulk request with, and it is the only status that says the
+// batch was written. 202 is the one worth naming: it says the request was accepted and the
+// processing is not finished, so reading it as success would let the caller drop records the
+// server has not promised to keep. This pins the boundary on both sides.
+TEST(ElasticsearchBulkResponseTests, AcceptsOnlyTheStatusThatSaysTheBatchWasWritten)
 {
   std::string reason;
   const char *ok_body = R"({"errors":false,"items":[]})";
   EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(199, ok_body, 0, reason));
   EXPECT_TRUE(logs_exporter::detail::IsBulkResponseSuccessful(200, ok_body, 0, reason));
-  EXPECT_TRUE(logs_exporter::detail::IsBulkResponseSuccessful(299, ok_body, 0, reason));
+  EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(201, ok_body, 0, reason));
+  EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(202, ok_body, 0, reason))
+      << "202 says the processing is not finished, which is not a write acknowledgement";
+  EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(299, ok_body, 0, reason));
   EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(300, ok_body, 0, reason));
 }
 
@@ -342,9 +347,12 @@ TEST(ElasticsearchBulkResponseTests, RejectsAcknowledgementsOutsideTheSuccessBan
     return logs_exporter::detail::IsBulkResponseSuccessful(200, body, 1, reason);
   };
 
-  EXPECT_TRUE(applied("200"));
-  EXPECT_TRUE(applied("201"));
-  EXPECT_TRUE(applied("299"));
+  EXPECT_FALSE(applied("199"));
+  EXPECT_TRUE(applied("200")) << "an index operation that replaced a document";
+  EXPECT_TRUE(applied("201")) << "an index operation that created one";
+  EXPECT_FALSE(applied("202")) << "accepted is not applied";
+  EXPECT_FALSE(applied("299"));
+  EXPECT_FALSE(applied("300"));
 
   EXPECT_FALSE(applied("0")) << "zero is a status, not the absence of one";
   EXPECT_FALSE(reason.empty());
@@ -378,10 +386,10 @@ TEST(ElasticsearchBulkResponseTests, RejectsAnAcknowledgedFailureUnderErrorsFals
       2, reason))
       << "one rejected operation among several is still a rejection";
 
-  // The whole 2xx band is a success, the same band the response's own HTTP status uses.
+  // Both of the statuses an index operation answers with when it applied, in one response.
   EXPECT_TRUE(logs_exporter::detail::IsBulkResponseSuccessful(
       200,
-      R"({"errors":false,"items":[{"index":{"_index":"logs","status":200}},{"index":{"_index":"logs","status":299}}]})",
+      R"({"errors":false,"items":[{"index":{"_index":"logs","status":200}},{"index":{"_index":"logs","status":201}}]})",
       2, reason));
   EXPECT_FALSE(logs_exporter::detail::IsBulkResponseSuccessful(
       200, R"({"errors":false,"items":[{"index":{"_index":"logs","status":300}}]})", 1, reason));
