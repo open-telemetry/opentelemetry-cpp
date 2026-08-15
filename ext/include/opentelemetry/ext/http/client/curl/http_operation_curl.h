@@ -233,9 +233,11 @@ public:
   /**
    * Finish an operation that nothing is going to run, and say why.
    *
-   * The state goes in ahead of the cleanup, which would otherwise report a cancel nobody asked
-   * for, and the cleanup goes in ahead of the event, so a handler that calls FinishSession()
-   * from it is not waiting on the promise that this cleanup is the only thing able to fulfil.
+   * The event goes in ahead of the cleanup, because the only strong reference to the caller's
+   * handler is the one the completion callback holds and the cleanup is what lets that go. The
+   * event carries the terminal state with it, so the cleanup still does not report a cancel
+   * nobody asked for, and cleaning up last is what makes a Finish() on another thread wait for
+   * the event rather than for the promise alone.
    */
   void FinishUnscheduled(const char *reason);
 
