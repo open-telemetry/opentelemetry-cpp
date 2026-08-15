@@ -498,6 +498,7 @@ const ErrorTerminalState kErrorTerminalStates[] = {
     {http_client::SessionState::ReadError, "Read error"},
     {http_client::SessionState::WriteError, "Write error"},
     {http_client::SessionState::Cancelled, "(manually) cancelled"},
+    {http_client::SessionState::Destroyed, "Session destroyed before a response"},
 };
 
 // Counts the exporter's own error lines.

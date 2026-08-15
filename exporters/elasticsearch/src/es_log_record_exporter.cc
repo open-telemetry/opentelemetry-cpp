@@ -151,10 +151,18 @@ public:
         OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Session created");
         break;
       case http_client::SessionState::Destroyed:
-        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Session destroyed");
         // Nothing else will arrive after this. If no outcome was recorded, the session ended
-        // without a response, so release the waiter rather than leaving it blocked forever.
-        recordCompletion(CompletionState::Failure);
+        // without a response, so release the waiter rather than leaving it blocked forever, and
+        // say why: this is the event that decided the export failed, and the default level does
+        // not show debug.
+        if (recordCompletion(CompletionState::Failure))
+        {
+          OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Session destroyed before a response");
+        }
+        else
+        {
+          OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Session destroyed");
+        }
         break;
       case http_client::SessionState::Connecting:
         OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Connecting to peer");
