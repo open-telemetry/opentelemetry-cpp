@@ -20,7 +20,6 @@
 #include <random>
 #include <sstream>
 #include <string>
-#include <thread>
 #include <utility>
 #include <vector>
 
@@ -97,28 +96,6 @@ namespace client
 {
 namespace curl
 {
-
-class HttpOperationAccessor
-{
-public:
-  OPENTELEMETRY_SANITIZER_NO_THREAD static std::thread::id GetThreadId(
-      const HttpOperation::AsyncData &async_data)
-  {
-#if !(defined(OPENTELEMETRY_HAVE_THREAD_SANITIZER) && OPENTELEMETRY_HAVE_THREAD_SANITIZER)
-    std::atomic_thread_fence(std::memory_order_acquire);
-#endif
-    return async_data.callback_thread;
-  }
-
-  OPENTELEMETRY_SANITIZER_NO_THREAD static void SetThreadId(HttpOperation::AsyncData &async_data,
-                                                            std::thread::id thread_id)
-  {
-    async_data.callback_thread = thread_id;
-#if !(defined(OPENTELEMETRY_HAVE_THREAD_SANITIZER) && OPENTELEMETRY_HAVE_THREAD_SANITIZER)
-    std::atomic_thread_fence(std::memory_order_release);
-#endif
-  }
-};
 
 size_t HttpOperation::WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
@@ -542,13 +519,14 @@ HttpOperation::~HttpOperation()
     case opentelemetry::ext::http::client::SessionState::Connecting:
     case opentelemetry::ext::http::client::SessionState::Connected:
     case opentelemetry::ext::http::client::SessionState::Sending: {
-      if (async_data_ && async_data_->result_future.valid())
+      // Not while inside a callback this operation dispatched: a handler that destroys the
+      // operation it is being told about would be waiting for a completion that only the thread
+      // running the handler can publish.
+      if (async_data_ && async_data_->result_future.valid() &&
+          !CallbackScope::InsideCallbackFor(this))
       {
-        if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
-        {
-          async_data_->result_future.wait();
-          last_curl_result_ = async_data_->result_future.get();
-        }
+        async_data_->result_future.wait();
+        last_curl_result_ = async_data_->result_future.get();
       }
       break;
     }
@@ -576,12 +554,8 @@ void HttpOperation::Finish()
 
   if (async_data_ && async_data_->result_future.valid())
   {
-    // We should not wait in callback from Cleanup()
-    if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
-    {
-      async_data_->result_future.wait();
-      last_curl_result_ = async_data_->result_future.get();
-    }
+    async_data_->result_future.wait();
+    last_curl_result_ = async_data_->result_future.get();
   }
 }
 
@@ -628,9 +602,7 @@ void HttpOperation::Cleanup()
     if (callback)
     {
       const CallbackScope scope{this};
-      HttpOperationAccessor::SetThreadId(*async_data_, std::this_thread::get_id());
       callback(*this);
-      HttpOperationAccessor::SetThreadId(*async_data_, std::thread::id());
     }
 
     // Set value to promise to continue Finish()

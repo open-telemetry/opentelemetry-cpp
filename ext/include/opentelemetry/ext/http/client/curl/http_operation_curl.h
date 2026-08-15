@@ -20,7 +20,6 @@
 #include <regex>
 #include <sstream>
 #include <string>
-#include <thread>
 #include <vector>
 #ifdef _WIN32
 #  include <io.h>
@@ -230,17 +229,6 @@ public:
    */
   CURLcode SendAsync(Session *session, std::function<void(HttpOperation &)> callback = nullptr);
 
-  /**
-   * Finish an operation that nothing is going to run, and say why.
-   *
-   * The event goes in ahead of the cleanup, because the only strong reference to the caller's
-   * handler is the one the completion callback holds and the cleanup is what lets that go. The
-   * event carries the terminal state with it, so the cleanup still does not report a cancel
-   * nobody asked for, and cleaning up last is what makes a Finish() on another thread wait for
-   * the event rather than for the promise alone.
-   */
-  void FinishUnscheduled(const char *reason);
-
   inline void SendSync() { Send(); }
 
   /**
@@ -302,6 +290,22 @@ public:
   inline CURL *GetCurlEasyHandle() noexcept { return curl_resource_.easy_handle; }
 
 private:
+  // The client is what discovers that nothing will run a request, so it is what gets to say so.
+  friend class HttpClient;
+
+  /**
+   * Finish an operation that nothing is going to run, and say why. Not for callers: it forces a
+   * terminal state, cleans up, dispatches the terminal event, fulfils the promise and hands the
+   * easy resource back, none of which is safe to ask for from outside the client.
+   *
+   * The event goes in ahead of the cleanup, because the only strong reference to the caller's
+   * handler is the one the completion callback holds and the cleanup is what lets that go. The
+   * event carries the terminal state with it, so the cleanup still does not report a cancel
+   * nobody asked for, and cleaning up last is what makes a Finish() on another thread wait for
+   * the event rather than for the promise alone.
+   */
+  void FinishUnscheduled(const char *reason);
+
   CURLcode SetCurlPtrOption(CURLoption option, void *value);
 
   CURLcode SetCurlStrOption(CURLoption option, const char *str)
@@ -378,13 +382,11 @@ private:
     // Read by Abort() on whichever thread cancels, cleared by Cleanup() on the IO thread.
     std::atomic<Session *> session{nullptr};  // Owner Session
 
-    std::thread::id callback_thread;
     std::function<void(HttpOperation &)> callback;
     std::atomic<bool> is_promise_running{false};
     std::promise<CURLcode> result_promise;
     std::future<CURLcode> result_future;
   };
-  friend class HttpOperationAccessor;
   std::unique_ptr<AsyncData> async_data_;
 };
 }  // namespace curl
