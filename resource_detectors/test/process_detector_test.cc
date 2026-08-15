@@ -255,8 +255,15 @@ TEST(ProcessDetectorUtilsTest, GetProcessOwnerTest)
 TEST(ProcessDetectorUtilsTest, GetExecutableBuildIdHtlhashTest)
 {
   int32_t pid      = getpid();
+  std::string exe_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
   std::string hash1 = opentelemetry::resource_detector::detail::GetExecutableBuildIdHtlhash(pid);
   std::string hash2 = opentelemetry::resource_detector::detail::GetExecutableBuildIdHtlhash(pid);
+
+  if (exe_path.empty())
+  {
+    EXPECT_TRUE(hash1.empty()) << "htlhash should be empty when executable path is empty";
+    return;
+  }
 
   EXPECT_FALSE(hash1.empty()) << "Build ID htlhash must not be empty";
 
