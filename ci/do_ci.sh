@@ -182,6 +182,7 @@ elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
         -DWITH_OTLP_RETRY_PREVIEW=ON \
         -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         -DWITH_CONFIGURATION=ON \
+        -DWITH_RESOURCE_DETECTORS_PREVIEW=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure

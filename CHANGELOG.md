@@ -15,6 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
+  the `detection.attributes` include/exclude filter to the detected attributes,
+  and merge the resource per the resource SDK specification.
+  [#4411](https://github.com/open-telemetry/opentelemetry-cpp/issues/4411)
+  * Behavior change: `SetResource` no longer runs `OTELResourceDetector` and no
+    longer injects a default `service.name`, since neither is part of the
+    configuration model. Use the `service` detector or set the attributes in
+    the configuration file instead.
 * [CONFIGURATION] Add a resource detector extension example
   [#4419](https://github.com/open-telemetry/opentelemetry-cpp/issues/4419)
 

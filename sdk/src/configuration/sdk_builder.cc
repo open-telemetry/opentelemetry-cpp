@@ -16,6 +16,7 @@
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"
@@ -55,6 +56,8 @@
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/container_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/container_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/exemplar_filter.h"
@@ -69,12 +72,16 @@
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/host_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/host_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
 #include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
@@ -118,6 +125,8 @@
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/probability_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/process_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
@@ -128,9 +137,14 @@
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detector_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detector_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
+#include "opentelemetry/sdk/configuration/service_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/service_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
@@ -179,6 +193,7 @@
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/metrics/view/view_registry_factory.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -190,6 +205,7 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/version.h"
+#include "src/common/wildcard_match.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
@@ -691,6 +707,96 @@ public:
 private:
   const SdkBuilder *sdk_builder_;
 };
+
+class ResourceDetectorBuilder
+    : public opentelemetry::sdk::configuration::ResourceDetectorConfigurationVisitor
+{
+public:
+  ResourceDetectorBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
+  ResourceDetectorBuilder(ResourceDetectorBuilder &&)                      = delete;
+  ResourceDetectorBuilder(const ResourceDetectorBuilder &)                 = delete;
+  ResourceDetectorBuilder &operator=(ResourceDetectorBuilder &&)           = delete;
+  ResourceDetectorBuilder &operator=(const ResourceDetectorBuilder &other) = delete;
+  ~ResourceDetectorBuilder() override                                      = default;
+
+  void VisitContainer(
+      const opentelemetry::sdk::configuration::ContainerResourceDetectorConfiguration *model)
+      override
+  {
+    detector = sdk_builder_->CreateContainerResourceDetector(model);
+  }
+
+  void VisitHost(
+      const opentelemetry::sdk::configuration::HostResourceDetectorConfiguration *model) override
+  {
+    detector = sdk_builder_->CreateHostResourceDetector(model);
+  }
+
+  void VisitProcess(
+      const opentelemetry::sdk::configuration::ProcessResourceDetectorConfiguration *model) override
+  {
+    detector = sdk_builder_->CreateProcessResourceDetector(model);
+  }
+
+  void VisitService(
+      const opentelemetry::sdk::configuration::ServiceResourceDetectorConfiguration *model) override
+  {
+    detector = sdk_builder_->CreateServiceResourceDetector(model);
+  }
+
+  void VisitExtension(
+      const opentelemetry::sdk::configuration::ExtensionResourceDetectorConfiguration *model)
+      override
+  {
+    detector = sdk_builder_->CreateExtensionResourceDetector(model);
+  }
+
+  std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> detector;
+
+private:
+  const SdkBuilder *sdk_builder_;
+};
+
+bool ResourceAttributeKeyMatches(
+    const opentelemetry::sdk::configuration::IncludeExcludeConfiguration *attributes,
+    const std::string &key)
+{
+  using opentelemetry::sdk::common::WildcardMatch;
+
+  bool included = true;
+
+  if (attributes->included != nullptr && !attributes->included->string_array.empty())
+  {
+    included = false;
+    for (const auto &pattern : attributes->included->string_array)
+    {
+      if (WildcardMatch(pattern, key))
+      {
+        included = true;
+        break;
+      }
+    }
+  }
+
+  if (!included)
+  {
+    return false;
+  }
+
+  // excluded is applied after included, and wins.
+  if (attributes->excluded != nullptr)
+  {
+    for (const auto &pattern : attributes->excluded->string_array)
+    {
+      if (WildcardMatch(pattern, key))
+      {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
 
 class MetricReaderBuilder
     : public opentelemetry::sdk::configuration::MetricReaderConfigurationVisitor
@@ -2278,6 +2384,131 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
   return sdk;
 }
 
+std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector>
+SdkBuilder::CreateContainerResourceDetector(
+    const opentelemetry::sdk::configuration::ContainerResourceDetectorConfiguration *model) const
+{
+  const ContainerResourceDetectorBuilder *builder =
+      registry_->GetContainerResourceDetectorBuilder();
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateContainerResourceDetector() using registered builder");
+    return builder->Build(model);
+  }
+
+  static const std::string die("No builder for ContainerResourceDetector");
+  throw UnsupportedException(die);
+}
+
+std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector>
+SdkBuilder::CreateHostResourceDetector(
+    const opentelemetry::sdk::configuration::HostResourceDetectorConfiguration *model) const
+{
+  const HostResourceDetectorBuilder *builder = registry_->GetHostResourceDetectorBuilder();
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateHostResourceDetector() using registered builder");
+    return builder->Build(model);
+  }
+
+  static const std::string die("No builder for HostResourceDetector");
+  throw UnsupportedException(die);
+}
+
+std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector>
+SdkBuilder::CreateProcessResourceDetector(
+    const opentelemetry::sdk::configuration::ProcessResourceDetectorConfiguration *model) const
+{
+  const ProcessResourceDetectorBuilder *builder = registry_->GetProcessResourceDetectorBuilder();
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateProcessResourceDetector() using registered builder");
+    return builder->Build(model);
+  }
+
+  static const std::string die("No builder for ProcessResourceDetector");
+  throw UnsupportedException(die);
+}
+
+std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector>
+SdkBuilder::CreateServiceResourceDetector(
+    const opentelemetry::sdk::configuration::ServiceResourceDetectorConfiguration *model) const
+{
+  const ServiceResourceDetectorBuilder *builder = registry_->GetServiceResourceDetectorBuilder();
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateServiceResourceDetector() using registered builder");
+    return builder->Build(model);
+  }
+
+  static const std::string die("No builder for ServiceResourceDetector");
+  throw UnsupportedException(die);
+}
+
+std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector>
+SdkBuilder::CreateExtensionResourceDetector(
+    const opentelemetry::sdk::configuration::ExtensionResourceDetectorConfiguration *model) const
+{
+  std::string name = model->name;
+
+  const ExtensionResourceDetectorBuilder *builder =
+      registry_->GetExtensionResourceDetectorBuilder(name);
+
+  if (builder != nullptr)
+  {
+    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionResourceDetector() using registered builder " << name);
+    return builder->Build(model);
+  }
+
+  std::string die("CreateExtensionResourceDetector() no builder for ");
+  die.append(name);
+  throw UnsupportedException(die);
+}
+
+std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> SdkBuilder::CreateResourceDetector(
+    const std::unique_ptr<opentelemetry::sdk::configuration::ResourceDetectorConfiguration> &model)
+    const
+{
+  ResourceDetectorBuilder builder(this);
+  model->Accept(&builder);
+  return std::move(builder.detector);
+}
+
+opentelemetry::sdk::resource::Resource SdkBuilder::CreateDetectedResource(
+    const std::unique_ptr<opentelemetry::sdk::configuration::ResourceDetectionConfiguration> &model)
+    const
+{
+  opentelemetry::sdk::resource::Resource detected;
+
+  for (const auto &detector_model : model->detectors)
+  {
+    auto detector = CreateResourceDetector(detector_model);
+    detected      = detected.Merge(detector->Detect());
+  }
+
+  // The filter applies to detected attributes only.
+  if (model->attributes != nullptr)
+  {
+    opentelemetry::sdk::resource::ResourceAttributes filtered_attributes;
+
+    for (const auto &kv : detected.GetAttributes())
+    {
+      if (ResourceAttributeKeyMatches(model->attributes.get(), kv.first))
+      {
+        filtered_attributes[kv.first] = kv.second;
+      }
+    }
+
+    detected = opentelemetry::sdk::resource::Resource(filtered_attributes, detected.GetSchemaURL());
+  }
+
+  return detected;
+}
+
 void SdkBuilder::SetResourceAttribute(
     opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,
     const std::string &name,
@@ -2293,13 +2524,24 @@ void SdkBuilder::SetResource(
     const std::unique_ptr<opentelemetry::sdk::configuration::ResourceConfiguration> &opt_model)
     const
 {
+  // Lowest priority: the default resource, with telemetry.sdk.* attributes only.
+  // Resource::Create() is not usable here: it also runs OTELResourceDetector,
+  // which is not part of the configuration model.
+  resource = opentelemetry::sdk::resource::Resource::GetDefault();
+
   if (opt_model)
   {
-    opentelemetry::sdk::resource::ResourceAttributes sdk_attributes;
+    // Detected attributes, filtered by detection.attributes, win over the default.
+    if (opt_model->detection != nullptr)
+    {
+      resource = resource.Merge(CreateDetectedResource(opt_model->detection));
+    }
 
-    // First, scan attributes_list, which has low priority.
+    // attributes_list wins over detected attributes.
     if (opt_model->attributes_list.size() != 0)
     {
+      opentelemetry::sdk::resource::ResourceAttributes list_attributes;
+
       opentelemetry::common::KeyValueStringTokenizer tokenizer{opt_model->attributes_list};
 
       opentelemetry::nostd::string_view attribute_key;
@@ -2311,16 +2553,20 @@ void SdkBuilder::SetResource(
         if (attribute_valid)
         {
           opentelemetry::common::AttributeValue wrapped_attribute_value(attribute_value);
-          sdk_attributes.SetAttribute(attribute_key, wrapped_attribute_value);
+          list_attributes.SetAttribute(attribute_key, wrapped_attribute_value);
         }
         else
         {
           OTEL_INTERNAL_LOG_WARN("Found invalid key/value pair in attributes_list");
         }
       }
+
+      resource = resource.Merge(opentelemetry::sdk::resource::Resource(list_attributes));
     }
 
-    // Second, scan attributes, which has high priority.
+    // Highest priority: attributes and schema_url from the model.
+    opentelemetry::sdk::resource::ResourceAttributes sdk_attributes;
+
     if (opt_model->attributes)
     {
       for (const auto &kv : opt_model->attributes->kv_map)
@@ -2329,20 +2575,8 @@ void SdkBuilder::SetResource(
       }
     }
 
-    if (opt_model->detection != nullptr)
-    {
-      // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3548
-      // FIXME-SDK: Implement resource detectors
-      OTEL_INTERNAL_LOG_WARN("resource detectors not supported, ignoring");
-    }
-
-    auto sdk_resource =
-        opentelemetry::sdk::resource::Resource::Create(sdk_attributes, opt_model->schema_url);
-    resource = resource.Merge(sdk_resource);
-  }
-  else
-  {
-    resource = opentelemetry::sdk::resource::Resource::GetDefault();
+    resource = resource.Merge(
+        opentelemetry::sdk::resource::Resource(sdk_attributes, opt_model->schema_url));
   }
 }
 
