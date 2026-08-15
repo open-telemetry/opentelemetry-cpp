@@ -520,10 +520,13 @@ private:
 
 // The response has to answer one operation per record, so a case using a body with N items has to
 // export N records or it would be rejected on the count before reaching what it means to test.
-opentelemetry::sdk::common::ExportResult ExportWith(EventScript script, std::size_t records = 1)
+opentelemetry::sdk::common::ExportResult ExportWith(EventScript script,
+                                                    std::size_t records = 1,
+                                                    bool console_debug  = false)
 {
   auto client = std::make_shared<FakeHttpClient>(std::move(script));
   logs_exporter::ElasticsearchExporterOptions options;
+  options.console_debug_ = console_debug;
   logs_exporter::ElasticsearchLogRecordExporter exporter(options, client);
 
   std::vector<std::unique_ptr<sdklogs::Recordable>> batch;
@@ -695,7 +698,87 @@ protected:
   nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler> handler_;
   nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler> previous_handler_;
 };
+
+class ElasticsearchLogsExporterDebugLoggingTests : public ::testing::Test
+{
+protected:
+  void SetUp() override
+  {
+    // One skip point: GTEST_SKIP returns, and a second below it would leave the rest of this body
+    // unreachable, which MSVC reports as C4702 under maintainer mode.
+#ifdef ENABLE_ASYNC_EXPORT
+    GTEST_SKIP() << "Export() returns without waiting when async export is enabled";
+#elif OTEL_INTERNAL_LOG_LEVEL < OTEL_INTERNAL_LOG_LEVEL_DEBUG
+    // The line these read is not filtered below debug level, it is not written, so a response
+    // that described itself and one that stayed quiet would look the same here.
+    GTEST_SKIP() << "the line these observe is compiled out below debug level";
+#else
+    previous_handler_ = opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogHandler();
+    handler_          = nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler>(
+        new CapturingLogHandler());
+    opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(handler_);
+
+    // The compiled in level only decides whether the call exists. What it dispatches is filtered
+    // again at runtime, and the default there is Warning, so without this the handler is installed
+    // and never told anything.
+    previous_level_ = opentelemetry::sdk::common::internal_log::GlobalLogHandler::GetLogLevel();
+    opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(
+        opentelemetry::sdk::common::internal_log::LogLevel::Debug);
+    restore_level_ = true;
+#endif
+  }
+
+  void TearDown() override
+  {
+    if (restore_level_)
+    {
+      opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(previous_level_);
+    }
+    if (handler_)
+    {
+      opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogHandler(previous_handler_);
+    }
+  }
+
+  std::size_t ResponsesDescribed() const
+  {
+    std::size_t described = 0;
+    for (const auto &message : static_cast<CapturingLogHandler *>(handler_.get())->messages)
+    {
+      if (message.second.find("Got response from Elasticsearch") != std::string::npos)
+      {
+        ++described;
+      }
+    }
+    return described;
+  }
+
+  nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler> handler_;
+  nostd::shared_ptr<opentelemetry::sdk::common::internal_log::LogHandler> previous_handler_;
+  opentelemetry::sdk::common::internal_log::LogLevel previous_level_ =
+      opentelemetry::sdk::common::internal_log::LogLevel::Warning;
+  bool restore_level_ = false;
+};
 }  // namespace
+
+// Only the response the caller was given describes itself. A second one arriving for the same
+// request has its status and body dropped, so a line for it would describe an answer nobody was
+// handed, and the two lines together would disagree about what the export returned.
+TEST_F(ElasticsearchLogsExporterDebugLoggingTests, OnlyTheResponseThatDecidedTheOutcomeIsDescribed)
+{
+  const auto result = ExportWith(
+      [](http_client::EventHandler &handler) {
+        FakeResponse first(200, kCompactSuccess);
+        handler.OnResponse(first);
+        FakeResponse second(500, kCompactSuccess);
+        handler.OnResponse(second);
+      },
+      1, true);
+
+  EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
+  EXPECT_EQ(ResponsesDescribed(), static_cast<std::size_t>(1))
+      << "the losing response described itself as well";
+}
 
 TEST_F(ElasticsearchLogsExporterAsyncTests, AnAcceptedResponseIsNotReportedAsAFailure)
 {
