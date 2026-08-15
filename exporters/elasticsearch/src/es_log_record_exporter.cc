@@ -76,17 +76,14 @@ public:
    */
   void OnResponse(http_client::Response &response) noexcept override
   {
+    std::string described;
+    bool decided = false;
+
     // Lock the private members so they can't be read while being modified
     {
       std::unique_lock<std::mutex> lk(mutex_);
 
       std::string body(response.GetBody().begin(), response.GetBody().end());
-
-      if (console_debug_)
-      {
-        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Got response from Elasticsearch, "
-                                << BuildResponseLogMessage(response, body));
-      }
 
       // Kept with the outcome it decides, and only by the call that decides it. Export() folds the
       // status into the ExportResult, since storing the body alone let a non-2xx response be
@@ -95,12 +92,26 @@ public:
       // non-2xx response is not logged a second time here with the full body.
       if (completion_ == CompletionState::Pending)
       {
+        if (console_debug_)
+        {
+          described = BuildResponseLogMessage(response, body);
+        }
         status_code_ = response.GetStatusCode();
         body_        = std::move(body);
         recordCompletionLocked(CompletionState::Success);
+        decided = true;
       }
     }
     cv_.notify_all();
+
+    // Outside the lock and only for the response that decided the outcome. The log handler is
+    // replaceable application code, so one that reaches back into this exporter would otherwise do
+    // it while this thread holds mutex_, and a line for a response whose status and body were
+    // discarded describes an answer the caller was never given.
+    if (decided && console_debug_)
+    {
+      OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Got response from Elasticsearch, " << described);
+    }
   }
 
   /**
