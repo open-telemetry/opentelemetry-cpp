@@ -959,6 +959,21 @@ bool HttpClient::doRemoveSessions()
   return has_data;
 }
 
+namespace
+{
+// One rule for the retry queue, shared by the pass that drains it and by the scan that decides
+// whether this thread still owes anybody an answer. They walk the same container, so a predicate
+// that disagreed would either keep the thread alive for an entry the retry pass is about to drop,
+// or drop one the retry pass still wants. Outside the retry guard because the scan runs in both
+// builds and the queue is empty rather than absent when the preview is off.
+bool RetryEntryIsLive(const std::shared_ptr<Session> &session)
+{
+  const auto operation = session ? session->GetOperation().get() : nullptr;
+  return nullptr != operation && !operation->WasAborted() &&
+         nullptr != operation->GetCurlEasyHandle();
+}
+}  // namespace
+
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
 bool HttpClient::doRetrySessions(bool report_all)
 {
@@ -977,19 +992,19 @@ bool HttpClient::doRetrySessions(bool report_all)
   for (auto retry_it = pending_to_retry_sessions_.cbegin();
        retry_it != pending_to_retry_sessions_.cend();)
   {
-    const auto session   = *retry_it;
-    const auto operation = session ? session->GetOperation().get() : nullptr;
+    const auto session = *retry_it;
 
     // An operation that was cancelled, or torn down, is not going to be retried. Its easy
     // handle has gone back to the client already, so what waiting for its turn would buy is a
     // null handle offered to libcurl and an entry that keeps the background thread alive until
     // a time that means nothing. At shutdown that time is time the join spends waiting.
-    if (nullptr == operation || operation->WasAborted() ||
-        nullptr == operation->GetCurlEasyHandle())
+    if (!RetryEntryIsLive(session))
     {
       retry_it = pending_to_retry_sessions_.erase(retry_it);
       continue;
     }
+
+    const auto operation = session->GetOperation().get();
 
     if (operation->NextRetryTime() >= now)
     {
@@ -1071,10 +1086,11 @@ bool HttpClient::hasActionableWork()
     }
   }
 
-  // Same rule doRetrySessions applies to the same container.
+  // The same rule doRetrySessions applies to the same container, from the same function, so the
+  // two cannot drift apart again.
   for (auto retry = pending_to_retry_sessions_.begin(); retry != pending_to_retry_sessions_.end();)
   {
-    if (!*retry || !(*retry)->GetOperation())
+    if (!RetryEntryIsLive(*retry))
     {
       retry = pending_to_retry_sessions_.erase(retry);
     }
