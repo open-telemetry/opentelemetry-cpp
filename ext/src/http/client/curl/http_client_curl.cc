@@ -346,9 +346,19 @@ HttpClient::~HttpClient()
   doAbortSessions();
   doRemoveSessions();
 
+  CURLMcode cleanup_result = CURLM_OK;
   {
     std::lock_guard<std::mutex> lock_guard{multi_handle_m_};
-    ReleaseMultiHandle();
+    cleanup_result = ReleaseMultiHandle();
+  }
+
+  // Outside the lock: the log handler is replaceable application code, and one that comes back
+  // into this client reaches wakeupBackgroundThread(), which takes the mutex this thread would
+  // still be holding.
+  if (CURLM_OK != cleanup_result)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_multi_cleanup failed with message: "
+                            << curl_multi_strerror(cleanup_result));
   }
 }
 
@@ -1060,7 +1070,7 @@ bool HttpClient::doRetrySessions(bool /* report_all */)
 }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
-void HttpClient::ReleaseMultiHandle()
+CURLMcode HttpClient::ReleaseMultiHandle()
 {
   if (nullptr == multi_handle_)
   {
@@ -1068,16 +1078,12 @@ void HttpClient::ReleaseMultiHandle()
     // and curl_multi_cleanup is one of them. Reaching here with none is ordinary: the
     // constructor may have started without one, and a reset that could not build a replacement
     // leaves none behind.
-    return;
+    return CURLM_OK;
   }
 
   const CURLMcode cleanup_result = curl_multi_cleanup(multi_handle_);
   multi_handle_                  = nullptr;
-  if (CURLM_OK != cleanup_result)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_multi_cleanup failed with message: "
-                            << curl_multi_strerror(cleanup_result));
-  }
+  return cleanup_result;
 }
 
 bool HttpClient::hasActionableWork()
@@ -1147,14 +1153,28 @@ bool HttpClient::resetMultiHandle()
 
   doRemoveSessions();
 
-  // We will modify the multi_handle_, so we need to lock it
-  std::lock_guard<std::mutex> lock_guard{multi_handle_m_};
-  ReleaseMultiHandle();
+  CURLMcode cleanup_result = CURLM_OK;
+  bool have_handle         = false;
+  {
+    // We will modify the multi_handle_, so we need to lock it
+    std::lock_guard<std::mutex> lock_guard{multi_handle_m_};
+    cleanup_result = ReleaseMultiHandle();
 
-  // Create a another multi handle to continue pending sessions. Silent on failure: the caller
-  // decides how often a run of failures is worth reporting.
-  multi_handle_ = curl_multi_init();
-  return nullptr != multi_handle_;
+    // Create a another multi handle to continue pending sessions. Silent on failure: the caller
+    // decides how often a run of failures is worth reporting.
+    multi_handle_ = curl_multi_init();
+    have_handle   = (nullptr != multi_handle_);
+  }
+
+  // Outside the lock, for the same reason as the other caller: a log handler that comes back into
+  // this client takes this mutex.
+  if (CURLM_OK != cleanup_result)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_multi_cleanup failed with message: "
+                            << curl_multi_strerror(cleanup_result));
+  }
+
+  return have_handle;
 }
 
 }  // namespace curl
