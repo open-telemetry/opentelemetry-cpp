@@ -243,6 +243,22 @@ Important changes:
 
 Breaking changes:
 
+* [CONFIGURATION] Align declarative configuration schema defaults with
+  OpenTelemetry Configuration Schema v1.1.0
+  [#4432](https://github.com/open-telemetry/opentelemetry-cpp/issues/4432)
+  * When a YAML field is omitted, the parsed configuration model now uses
+    these schema defaults instead of the previous legacy values:
+    * `attribute_limits.attribute_value_length_limit`,
+      `logger_provider.limits.attribute_value_length_limit`, and
+      `tracer_provider.limits.attribute_value_length_limit` default to no limit
+      (unlimited attribute value length) instead of 4096 bytes.
+    * `batch` log record processor `schedule_delay` defaults to 1000 ms instead
+      of 5000 ms (more frequent batch exports when the field is omitted).
+    * `periodic` metric reader `interval` defaults to 60000 ms instead of 5000 ms
+      (less frequent metric exports when the field is omitted).
+    * `trace_id_ratio_based` sampler `ratio` defaults to 1.0 instead of 0.0
+      (sample all traces instead of dropping all when the field is omitted).
+
 * [CONFIGURATION] SDK default component builder libraries and example
   [#4367](https://github.com/open-telemetry/opentelemetry-cpp/pull/4367)
   * The declaritive configuration registry is now empty on construction and

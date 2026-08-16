@@ -605,7 +605,9 @@ tracer_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
   ASSERT_NE(config->tracer_provider->limits, nullptr);
-  ASSERT_EQ(config->tracer_provider->limits->attribute_value_length_limit, 4096);
+  ASSERT_EQ(config->tracer_provider->limits->attribute_value_length_limit,
+            opentelemetry::sdk::configuration::SpanLimitsConfiguration::
+                kDefaultAttributeValueLengthLimit);
   ASSERT_EQ(config->tracer_provider->limits->attribute_count_limit, 128);
   ASSERT_EQ(config->tracer_provider->limits->event_count_limit, 128);
   ASSERT_EQ(config->tracer_provider->limits->link_count_limit, 128);
@@ -949,7 +951,9 @@ tracer_provider:
   auto *ratio =
       reinterpret_cast<opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *>(
           sampler);
-  ASSERT_EQ(ratio->ratio, 0.0);
+  ASSERT_EQ(
+      ratio->ratio,
+      opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration::kDefaultRatio);
 }
 
 TEST(YamlTrace, trace_id_ratio_based_sampler)

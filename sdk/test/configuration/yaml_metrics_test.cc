@@ -114,7 +114,9 @@ meter_provider:
   auto *periodic =
       reinterpret_cast<opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *>(
           reader);
-  ASSERT_EQ(periodic->interval, 5000);
+  ASSERT_EQ(
+      periodic->interval,
+      opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration::kDefaultIntervalMs);
   ASSERT_EQ(periodic->timeout, 30000);
   ASSERT_NE(periodic->exporter, nullptr);
   auto *exporter = periodic->exporter.get();
