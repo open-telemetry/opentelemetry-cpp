@@ -1,7 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <chrono>
 #include <map>
 #include <memory>
 #include <string>
@@ -18,10 +17,12 @@
 #include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/container_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/extension_metric_producer_builder.h"
@@ -47,7 +48,6 @@
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
-#include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/probability_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/process_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
@@ -59,10 +59,6 @@
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_builder.h"
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_factory.h"
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader_options.h"
-#include "opentelemetry/sdk/metrics/metric_reader.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/propagation/jaeger.h"
@@ -127,23 +123,6 @@ public:
   }
 };
 
-class DefaultPeriodicMetricReaderBuilder : public PeriodicMetricReaderBuilder
-{
-public:
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> Build(
-      const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model,
-      std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> &&exporter) const override
-  {
-    opentelemetry::sdk::metrics::PeriodicExportingMetricReaderOptions options;
-
-    options.export_interval_millis = std::chrono::milliseconds(model->interval);
-    options.export_timeout_millis  = std::chrono::milliseconds(model->timeout);
-
-    return opentelemetry::sdk::metrics::PeriodicExportingMetricReaderFactory::Create(
-        std::move(exporter), options);
-  }
-};
-
 }  // namespace
 
 Registry::Registry()
@@ -153,8 +132,6 @@ Registry::Registry()
   SetTextMapPropagatorBuilder("b3", std::make_unique<B3Builder>());
   SetTextMapPropagatorBuilder("b3multi", std::make_unique<B3MultiBuilder>());
   SetTextMapPropagatorBuilder("jaeger", std::make_unique<JaegerBuilder>());
-
-  SetPeriodicMetricReaderBuilder(std::make_unique<DefaultPeriodicMetricReaderBuilder>());
 }
 
 Registry::~Registry() = default;
@@ -311,6 +288,11 @@ void Registry::SetComposableRuleBasedSamplerBuilder(
   composable_rule_based_sampler_builder_ = std::move(builder);
 }
 
+void Registry::SetCompositeSamplerBuilder(std::unique_ptr<CompositeSamplerBuilder> &&builder)
+{
+  composite_sampler_builder_ = std::move(builder);
+}
+
 void Registry::SetBatchSpanProcessorBuilder(std::unique_ptr<BatchSpanProcessorBuilder> &&builder)
 {
   batch_span_processor_builder_ = std::move(builder);
@@ -406,6 +388,26 @@ void Registry::SetExtensionSamplerBuilder(const std::string &name,
 {
   sampler_builders_.erase(name);
   sampler_builders_.insert({name, std::move(builder)});
+}
+
+const ExtensionComposableSamplerBuilder *Registry::GetExtensionComposableSamplerBuilder(
+    const std::string &name) const
+{
+  ExtensionComposableSamplerBuilder *builder = nullptr;
+  auto search                                = composable_sampler_builders_.find(name);
+  if (search != composable_sampler_builders_.end())
+  {
+    builder = search->second.get();
+  }
+  return builder;
+}
+
+void Registry::SetExtensionComposableSamplerBuilder(
+    const std::string &name,
+    std::unique_ptr<ExtensionComposableSamplerBuilder> &&builder)
+{
+  composable_sampler_builders_.erase(name);
+  composable_sampler_builders_.insert({name, std::move(builder)});
 }
 
 const ExtensionSpanExporterBuilder *Registry::GetExtensionSpanExporterBuilder(

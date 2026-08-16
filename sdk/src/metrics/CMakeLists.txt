@@ -30,6 +30,7 @@ add_library(
   aggregation/sum_aggregation.cc
   data/circular_buffer.cc
   exemplar/reservoir.cc
+  view/attributes_processor.cc
   view/instrument_selector_factory.cc
   view/meter_selector_factory.cc
   view/view_factory.cc

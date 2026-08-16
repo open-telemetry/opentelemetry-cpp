@@ -17,11 +17,15 @@ add_executable(
   custom_log_record_exporter.cc
   custom_log_record_exporter_builder.cc
   custom_log_record_processor.cc
-  custom_log_record_processor_builder.cc)
+  custom_log_record_processor_builder.cc
+  custom_resource_detector.cc
+  custom_resource_detector_builder.cc)
 
 target_link_libraries(
   example_yaml
   PRIVATE ${CMAKE_THREAD_LIBS_INIT}
+          opentelemetry-cpp::configuration_registry_factory
+          opentelemetry-cpp::configuration
           common_metrics_foo_library
           common_logs_foo_library
           opentelemetry-cpp::ostream_span_exporter_builder
@@ -61,23 +65,18 @@ if(WITH_PROMETHEUS)
                         PRIVATE opentelemetry-cpp::prometheus_exporter_builder)
 endif()
 
-if(DEFINED OPENTELEMETRY_BUILD_DLL)
-  target_compile_definitions(example_yaml
-                             PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
+if(WITH_RESOURCE_DETECTORS_PREVIEW)
+  target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_RESOURCE_DETECTORS)
   target_link_libraries(example_yaml
-                        PRIVATE opentelemetry-cpp::opentelemetry_cpp)
-else()
-  target_link_libraries(
-    example_yaml
-    PRIVATE opentelemetry-cpp::configuration opentelemetry-cpp::common
-            opentelemetry-cpp::trace opentelemetry-cpp::logs)
+                        PRIVATE opentelemetry-cpp::resource_detectors_builders)
 endif()
 
 if(BUILD_TESTING)
   if(WITH_OTLP_HTTP
      AND WITH_OTLP_GRPC
      AND WITH_OTLP_FILE
-     AND WITH_PROMETHEUS)
+     AND WITH_PROMETHEUS
+     AND WITH_RESOURCE_DETECTORS_PREVIEW)
     add_test(NAME examples.example_yaml_kitchen_sink
              COMMAND $<TARGET_FILE:example_yaml> --test --yaml
                      ${CMAKE_CURRENT_SOURCE_DIR}/kitchen-sink.yaml)
@@ -86,4 +85,8 @@ if(BUILD_TESTING)
   add_test(NAME examples.example_yaml_extensions
            COMMAND $<TARGET_FILE:example_yaml> --test --yaml
                    ${CMAKE_CURRENT_SOURCE_DIR}/extensions.yaml)
+
+  add_test(NAME examples.example_yaml_sdk_default
+           COMMAND $<TARGET_FILE:example_yaml> --test --yaml
+                   ${CMAKE_CURRENT_SOURCE_DIR}/sdk-default.yaml)
 endif()
