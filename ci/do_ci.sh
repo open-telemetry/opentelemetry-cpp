@@ -182,6 +182,7 @@ elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
         -DWITH_OTLP_RETRY_PREVIEW=ON \
         -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         -DWITH_CONFIGURATION=ON \
+        -DWITH_RESOURCE_DETECTORS_PREVIEW=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -506,27 +507,34 @@ elif [[ "$1" == "cmake.install.test" ]]; then
     "ext_http_curl"
     "exporters_in_memory"
     "exporters_ostream"
-    "exporters_ostream_builder"
     "exporters_otlp_common"
     "exporters_otlp_file"
-    "exporters_otlp_file_builder"
     "exporters_otlp_grpc"
-    "exporters_otlp_grpc_builder"
     "exporters_otlp_http"
-    "exporters_otlp_http_builder"
     "exporters_prometheus"
-    "exporters_prometheus_builder"
     "exporters_elasticsearch"
     "exporters_zipkin"
     "resource_detectors"
   )
   EXPECTED_COMPONENTS_STRING=$(IFS=\;; echo "${EXPECTED_COMPONENTS[*]}")
+
+  DEPRECATED_COMPONENTS=(
+      "exporters_ostream_builder"
+      "exporters_otlp_builder_utils"
+      "exporters_otlp_file_builder"
+      "exporters_otlp_grpc_builder"
+      "exporters_otlp_http_builder"
+      "exporters_prometheus_builder"
+    )
+  DEPRECATED_COMPONENTS_STRING=$(IFS=\;; echo "${DEPRECATED_COMPONENTS[*]}")
+
   mkdir -p "${BUILD_DIR}/install_test"
   cd "${BUILD_DIR}/install_test"
   cmake  "${CMAKE_OPTIONS[@]}" \
          "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
          "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
          "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}" \
+         "-DINSTALL_TEST_DEPRECATED_COMPONENTS=${DEPRECATED_COMPONENTS_STRING}" \
          -S "${SRC_DIR}/install/test/cmake"
   ctest --output-on-failure
   exit 0
@@ -623,8 +631,8 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
   # that make this test always fail. Ignore these packages in the noexcept test here.
   # Set the api:with_cxx_stdlib=none because C++17 std::variant::get<> throws
 
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/... -//resource_detectors/test:resource_detector_builder_test
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/... -//resource_detectors/test:resource_detector_builder_test
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/... -//resource_detectors/...
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/... -//resource_detectors/...
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client
