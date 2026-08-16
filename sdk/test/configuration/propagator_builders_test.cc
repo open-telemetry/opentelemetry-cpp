@@ -24,7 +24,7 @@ namespace config_sdk = opentelemetry::sdk::configuration;
 namespace
 {
 // ---------------------------------------------------------------------------
-// PropagatorBuilderTest: Test that builders are registerd and match the expected propagator type
+// PropagatorBuilderTest: Test that builders are registered and match the expected propagator type
 
 class PropagatorBuilderTest : public ::testing::Test
 {
