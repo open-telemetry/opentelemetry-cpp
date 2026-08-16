@@ -5,6 +5,7 @@
 #include <chrono>
 #include <mutex>
 #include <utility>
+#include <vector>
 
 #include "opentelemetry/common/key_value_iterable.h"  // IWYU pragma: keep
 #include "opentelemetry/nostd/shared_ptr.h"
