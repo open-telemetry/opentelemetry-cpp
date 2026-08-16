@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-
 #include <chrono>
 #include <cstddef>
 #include <map>
@@ -33,12 +32,6 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/trace/context.h"
-#include "opentelemetry/trace/noop.h"
-#include "opentelemetry/trace/provider.h"
-#include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/tracer.h"
-#include "opentelemetry/trace/tracer_provider.h"
 
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
@@ -99,8 +92,17 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/trace/context.h"
+#include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/provider.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/trace/tracer_provider.h"
 
-#include "config_test_common.h"
+#include "config_test_logs.h"
+#include "config_test_metrics.h"
+#include "config_test_propagators.h"
+#include "config_test_trace.h"
 
 namespace common      = opentelemetry::common;
 namespace nostd       = opentelemetry::nostd;
@@ -961,3 +963,27 @@ TEST_F(ProgrammaticConfigTest, PropagatorsComposite)
 
   CheckPropagators();
 }
+
+TEST_F(ProgrammaticConfigTest, PropagatorsDuplicateNames)
+{
+  // Duplicate names in composite + composite_list must each be registered only once.
+  auto propagator_config = std::make_unique<config_sdk::PropagatorConfiguration>();
+  propagator_config->composite.emplace_back("tracecontext");
+  propagator_config->composite.emplace_back("baggage");
+  propagator_config->composite.emplace_back("b3");
+  propagator_config->composite.emplace_back("b3multi");
+  propagator_config->composite.emplace_back("jaeger");
+  // tracecontext and baggage duplicated via composite_list — must be skipped
+  propagator_config->composite_list = "tracecontext,baggage";
+
+  auto model             = std::make_unique<config_sdk::Configuration>();
+  model->tracer_provider = MakeTracerProviderConfig();
+  model->propagator      = std::move(propagator_config);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->propagator, nullptr);
+
+  CheckPropagators();
+}
+
+// ---------------------------------------------------------------------------
