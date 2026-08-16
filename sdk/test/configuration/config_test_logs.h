@@ -97,6 +97,10 @@ public:
       const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::logs::Recordable>>
           &records) noexcept override
   {
+    if (!buffer_)
+    {
+      return opentelemetry::sdk::common::ExportResult::kFailure;
+    }
     for (auto &rec : records)
     {
       buffer_->emplace_back(

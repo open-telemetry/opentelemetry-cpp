@@ -91,6 +91,10 @@ public:
       const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>
           &spans) noexcept override
   {
+    if (!buffer_)
+    {
+      return opentelemetry::sdk::common::ExportResult::kFailure;
+    }
     for (auto &span : spans)
     {
       buffer_->emplace_back(static_cast<opentelemetry::sdk::trace::SpanData *>(span.release()));

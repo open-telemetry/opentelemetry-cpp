@@ -134,6 +134,10 @@ public:
   opentelemetry::sdk::common::ExportResult Export(
       const opentelemetry::sdk::metrics::ResourceMetrics &resource_metrics) noexcept override
   {
+    if (!buffer_)
+    {
+      return opentelemetry::sdk::common::ExportResult::kFailure;
+    }
     for (const auto &scope : resource_metrics.scope_metric_data_)
     {
       for (const auto &metric : scope.metric_data_)
