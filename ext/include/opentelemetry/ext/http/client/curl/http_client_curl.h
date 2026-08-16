@@ -370,8 +370,10 @@ private:
   // has no lock because that thread is the only one that touches it.
   bool hasActionableWork();
   // Cleans up the multi handle if there is one, and leaves none behind either way. Call it
-  // holding multi_handle_m_.
-  void ReleaseMultiHandle();
+  // holding multi_handle_m_. It answers with what curl_multi_cleanup said rather than reporting
+  // it, because reporting reaches a log handler the application supplies, and one that comes back
+  // into this client would do it while the caller still holds that mutex.
+  CURLMcode ReleaseMultiHandle();
   // Returns true if the client has a multi handle afterwards.
   bool resetMultiHandle();
 
