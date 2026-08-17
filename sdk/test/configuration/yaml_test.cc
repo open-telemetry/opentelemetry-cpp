@@ -176,7 +176,9 @@ attribute_limits:
   ASSERT_NE(config, nullptr);
   ASSERT_EQ(config->file_format, "1.0");
   ASSERT_NE(config->attribute_limits, nullptr);
-  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit, 4096);
+  const auto defaults = opentelemetry::sdk::configuration::AttributeLimitsConfiguration{};
+  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit,
+            defaults.attribute_value_length_limit);
   ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
 }
 
@@ -608,7 +610,8 @@ tracer_provider:
   auto ratio_sampler =
       static_cast<opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *>(
           sampler);
-  ASSERT_EQ(ratio_sampler->ratio, 0.0);
+  const auto defaults = opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration{};
+  ASSERT_EQ(ratio_sampler->ratio, defaults.ratio);
 }
 
 TEST(Yaml, illegal_double)
@@ -653,7 +656,8 @@ tracer_provider:
   auto ratio_sampler =
       static_cast<opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *>(
           sampler);
-  ASSERT_EQ(ratio_sampler->ratio, 0.0);
+  const auto defaults = opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration{};
+  ASSERT_EQ(ratio_sampler->ratio, defaults.ratio);
 }
 
 TEST(Yaml, empty_double_substitution)
@@ -680,7 +684,8 @@ tracer_provider:
   auto ratio_sampler =
       static_cast<opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *>(
           sampler);
-  ASSERT_EQ(ratio_sampler->ratio, 0.0);
+  const auto defaults = opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration{};
+  ASSERT_EQ(ratio_sampler->ratio, defaults.ratio);
 }
 
 TEST(Yaml, with_double_substitution)

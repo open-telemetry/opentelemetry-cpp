@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cstddef>
+#include <limits>
 
 #include "opentelemetry/version.h"
 
@@ -18,8 +19,8 @@ namespace configuration
 class SpanLimitsConfiguration
 {
 public:
-  // TODO: spec default is no limit, using 4096 to preserve original behavior
-  static constexpr std::size_t kDefaultAttributeValueLengthLimit  = 4096;
+  static constexpr std::size_t kDefaultAttributeValueLengthLimit =
+      (std::numeric_limits<std::size_t>::max)();
   static constexpr std::uint32_t kDefaultAttributeCountLimit      = 128;
   static constexpr std::uint32_t kDefaultEventCountLimit          = 128;
   static constexpr std::uint32_t kDefaultLinkCountLimit           = 128;
