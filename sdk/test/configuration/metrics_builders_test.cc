@@ -32,6 +32,7 @@
 #include "opentelemetry/nostd/variant.h"
 
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
@@ -77,6 +78,7 @@
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
@@ -101,7 +103,7 @@ namespace config_sdk  = opentelemetry::sdk::configuration;
 namespace
 {
 
-class MetricsBuilderTest : public ::testing::Test
+class MetricsBuildersTest : public ::testing::Test
 {
 protected:
   void SetUp() override
@@ -195,7 +197,7 @@ protected:
                                                  sdk_type, metrics_sdk::InstrumentValueType::kLong};
     auto scope = scope_sdk::InstrumentationScope::Create("");
 
-    int matched = 0;
+    std::size_t matched = 0;
     view_registry.FindViews(descriptor, *scope, [&](const metrics_sdk::View &view) {
       matched++;
       auto *config = view.GetAggregationConfig();
@@ -218,9 +220,10 @@ protected:
     AddView(&view_registry, model);
 
     auto scope = scope_sdk::InstrumentationScope::Create("");
-    metrics_sdk::InstrumentDescriptor descriptor{"m", "", "", metrics_sdk::InstrumentType::kCounter,
+    metrics_sdk::InstrumentDescriptor descriptor{"test.instrument", "test description", "units",
+                                                 metrics_sdk::InstrumentType::kCounter,
                                                  metrics_sdk::InstrumentValueType::kLong};
-    int matched = 0;
+    std::size_t matched = 0;
     view_registry.FindViews(descriptor, *scope, [&](const metrics_sdk::View &view) {
       EXPECT_EQ(view.GetAggregationType(), expected_type);
       matched++;
@@ -233,14 +236,14 @@ protected:
 };
 }  // namespace
 
-TEST_F(MetricsBuilderTest, DefaultRegistry)
+TEST_F(MetricsBuildersTest, DefaultRegistry)
 {
   auto registry = std::make_shared<config_sdk::Registry>();
   EXPECT_EQ(registry->GetPeriodicMetricReaderBuilder(), nullptr);
   EXPECT_EQ(registry->GetMeterConfiguratorBuilder(), nullptr);
 }
 
-TEST_F(MetricsBuilderTest, RegisterDefaultMetricsBuilders)
+TEST_F(MetricsBuildersTest, RegisterDefaultMetricsBuilders)
 {
   auto registry = std::make_shared<config_sdk::Registry>();
   config_sdk::RegisterDefaultMetricsBuilders(registry.get());
@@ -261,7 +264,7 @@ using opentelemetry::sdk::common::unsetenv;
 #  endif
 }  // namespace
 
-TEST_F(MetricsBuilderTest, DeclarativeExemplarFilterDoesNotReadEnvironment)
+TEST_F(MetricsBuildersTest, DeclarativeExemplarFilterDoesNotReadEnvironment)
 {
   unsetenv(kMetricsExemplarFilterEnv);
   opentelemetry::test_common::ScopedTestLogHandler log_handler{
@@ -279,82 +282,93 @@ TEST_F(MetricsBuilderTest, DeclarativeExemplarFilterDoesNotReadEnvironment)
 }
 #endif
 
-TEST_F(MetricsBuilderTest, AggregationTypeDefault)
+TEST_F(MetricsBuildersTest, AggregationTypeDefault)
 {
   CheckAggregationType(std::make_unique<config_sdk::DefaultAggregationConfiguration>(),
                        metrics_sdk::AggregationType::kDefault);
 }
 
-TEST_F(MetricsBuilderTest, AggregationTypeSumAggregation)
+TEST_F(MetricsBuildersTest, AggregationTypeSumAggregation)
 {
   CheckAggregationType(std::make_unique<config_sdk::SumAggregationConfiguration>(),
                        metrics_sdk::AggregationType::kSum);
 }
 
-TEST_F(MetricsBuilderTest, AggregationTypeLastValueAggregation)
+TEST_F(MetricsBuildersTest, AggregationTypeLastValueAggregation)
 {
   CheckAggregationType(std::make_unique<config_sdk::LastValueAggregationConfiguration>(),
                        metrics_sdk::AggregationType::kLastValue);
 }
 
-TEST_F(MetricsBuilderTest, AggregationTypeDropAggregation)
+TEST_F(MetricsBuildersTest, AggregationTypeDropAggregation)
 {
   CheckAggregationType(std::make_unique<config_sdk::DropAggregationConfiguration>(),
                        metrics_sdk::AggregationType::kDrop);
 }
 
-TEST_F(MetricsBuilderTest, InstrumentTypeCounter)
+TEST_F(MetricsBuildersTest, AggregationTypeExplicitBucketHistogramAggregation)
+{
+  CheckAggregationType(
+      std::make_unique<config_sdk::ExplicitBucketHistogramAggregationConfiguration>(),
+      metrics_sdk::AggregationType::kHistogram);
+}
+
+TEST_F(MetricsBuildersTest, AggregationTypeBase2ExponentialHistogramAggregation)
+{
+  CheckAggregationType(
+      std::make_unique<config_sdk::Base2ExponentialBucketHistogramAggregationConfiguration>(),
+      metrics_sdk::AggregationType::kBase2ExponentialHistogram);
+}
+
+TEST_F(MetricsBuildersTest, InstrumentTypeCounter)
 {
   CheckInstrumentType(config_sdk::InstrumentType::counter, metrics_sdk::InstrumentType::kCounter);
 }
 
-TEST_F(MetricsBuilderTest, InstrumentTypeUpDownCounter)
+TEST_F(MetricsBuildersTest, InstrumentTypeUpDownCounter)
 {
   CheckInstrumentType(config_sdk::InstrumentType::up_down_counter,
                       metrics_sdk::InstrumentType::kUpDownCounter);
 }
 
-TEST_F(MetricsBuilderTest, InstrumentTypeObservableCounter)
+TEST_F(MetricsBuildersTest, InstrumentTypeObservableCounter)
 {
   CheckInstrumentType(config_sdk::InstrumentType::observable_counter,
                       metrics_sdk::InstrumentType::kObservableCounter);
 }
 
-TEST_F(MetricsBuilderTest, InstrumentTypeObservableGauge)
+TEST_F(MetricsBuildersTest, InstrumentTypeObservableGauge)
 {
   CheckInstrumentType(config_sdk::InstrumentType::observable_gauge,
                       metrics_sdk::InstrumentType::kObservableGauge);
 }
 
-TEST_F(MetricsBuilderTest, InstrumentTypeObservableUpDownCounter)
+TEST_F(MetricsBuildersTest, InstrumentTypeObservableUpDownCounter)
 {
   CheckInstrumentType(config_sdk::InstrumentType::observable_up_down_counter,
                       metrics_sdk::InstrumentType::kObservableUpDownCounter);
 }
 
-TEST_F(MetricsBuilderTest, InstrumentTypeHistogram)
+TEST_F(MetricsBuildersTest, InstrumentTypeHistogram)
 {
   CheckInstrumentType(config_sdk::InstrumentType::histogram,
                       metrics_sdk::InstrumentType::kHistogram,
                       metrics_sdk::AggregationType::kHistogram);
 }
 
-#if OPENTELEMETRY_ABI_VERSION_NO < 2
-// No CheckInstrumentType test for gauge: gauge is unsupported in ABI v1 and throws instead.
-TEST_F(MetricsBuilderTest, InstrumentTypeGaugeABIv1)
+// Gauge is only supported in ABI v2.
+TEST_F(MetricsBuildersTest, InstrumentTypeGauge)
 {
+#if OPENTELEMETRY_ABI_VERSION_NO < 2
   auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::gauge, 42);
   metrics_sdk::ViewRegistry view_registry;
   EXPECT_THROW(AddView(&view_registry, model), config_sdk::UnsupportedException);
-}
 #else
-TEST_F(MetricsBuilderTest, InstrumentTypeGaugeABIv2)
-{
   CheckInstrumentType(config_sdk::InstrumentType::gauge, metrics_sdk::InstrumentType::kGauge);
-}
 #endif
+}
 
-TEST_F(MetricsBuilderTest, ViewSelectorInstrumentTypeNone)
+TEST_F(MetricsBuildersTest, ViewSelectorInstrumentTypeNone)
 {
   namespace metrics_sdk = metrics_sdk;
 
@@ -380,7 +394,7 @@ TEST_F(MetricsBuilderTest, ViewSelectorInstrumentTypeNone)
     metrics_sdk::InstrumentDescriptor instrument_descriptor{
         "test.instrument", "test description", "units", instrument_type,
         metrics_sdk::InstrumentValueType::kLong};
-    int matched = 0;
+    std::size_t matched = 0;
     view_registry.FindViews(instrument_descriptor, *instrumentation_scope,
                             [&](const metrics_sdk::View &view) {
                               auto *config = view.GetAggregationConfig();
@@ -396,7 +410,7 @@ TEST_F(MetricsBuilderTest, ViewSelectorInstrumentTypeNone)
   }
 }
 
-TEST_F(MetricsBuilderTest, ViewSelectorWithHistogramCardinalityLimit)
+TEST_F(MetricsBuildersTest, ViewSelectorWithHistogramCardinalityLimit)
 {
   // Verify that AddView populates default bucket boundaries on a cardinality-only
   // histogram view, rather than leaving boundaries_ empty (which would produce a
@@ -430,7 +444,7 @@ TEST_F(MetricsBuilderTest, ViewSelectorWithHistogramCardinalityLimit)
       });
 }
 
-TEST_F(MetricsBuilderTest, ViewSelectorWithHistogramExplicitAggregation)
+TEST_F(MetricsBuildersTest, ViewSelectorWithHistogramExplicitAggregation)
 {
   auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::histogram, 42);
   auto aggregation =
@@ -446,7 +460,7 @@ TEST_F(MetricsBuilderTest, ViewSelectorWithHistogramExplicitAggregation)
       metrics_sdk::InstrumentValueType::kLong};
   auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
 
-  int matched = 0;
+  std::size_t matched = 0;
   view_registry.FindViews(
       instrument_descriptor, *instrumentation_scope, [&](const metrics_sdk::View &view) {
         ++matched;
@@ -466,7 +480,7 @@ TEST_F(MetricsBuilderTest, ViewSelectorWithHistogramExplicitAggregation)
   EXPECT_EQ(matched, 1);
 }
 
-TEST_F(MetricsBuilderTest, ViewSelectorWithAttributesProcessor)
+TEST_F(MetricsBuildersTest, ViewSelectorWithAttributesProcessor)
 {
 
   auto model                       = std::make_unique<config_sdk::ViewConfiguration>();
@@ -501,7 +515,7 @@ TEST_F(MetricsBuilderTest, ViewSelectorWithAttributesProcessor)
   });
 }
 
-TEST_F(MetricsBuilderTest, CreateBuiltInPeriodicMetricReader)
+TEST_F(MetricsBuildersTest, CreateBuiltInPeriodicMetricReader)
 {
   auto model      = std::make_unique<config_sdk::PeriodicMetricReaderConfiguration>();
   model->interval = 2000;
@@ -515,7 +529,7 @@ TEST_F(MetricsBuilderTest, CreateBuiltInPeriodicMetricReader)
   EXPECT_TRUE(reader->Shutdown(std::chrono::seconds(5)));
 }
 
-TEST_F(MetricsBuilderTest, CreatePullMetricReaderWithExtensionExporter)
+TEST_F(MetricsBuildersTest, CreatePullMetricReaderWithExtensionExporter)
 {
   registry_->SetExtensionPullMetricExporterBuilder(
       "test_pull", std::make_unique<config_test::NoopPullMetricExporterBuilder>());
@@ -531,7 +545,7 @@ TEST_F(MetricsBuilderTest, CreatePullMetricReaderWithExtensionExporter)
   EXPECT_TRUE(reader->Shutdown(std::chrono::seconds(5)));
 }
 
-TEST_F(MetricsBuilderTest, CreatePullMetricReaderWithProducer)
+TEST_F(MetricsBuildersTest, CreatePullMetricReaderWithProducer)
 {
   registry_->SetExtensionPullMetricExporterBuilder(
       "test_pull", std::make_unique<config_test::NoopPullMetricExporterBuilder>());
@@ -548,7 +562,7 @@ TEST_F(MetricsBuilderTest, CreatePullMetricReaderWithProducer)
   EXPECT_TRUE(reader->Shutdown(std::chrono::seconds(5)));
 }
 
-TEST_F(MetricsBuilderTest, CreatePullMetricReaderWithCardinalityLimits)
+TEST_F(MetricsBuildersTest, CreatePullMetricReaderWithCardinalityLimits)
 {
   registry_->SetExtensionPullMetricExporterBuilder(
       "test_pull", std::make_unique<config_test::NoopPullMetricExporterBuilder>());
@@ -567,7 +581,7 @@ TEST_F(MetricsBuilderTest, CreatePullMetricReaderWithCardinalityLimits)
   EXPECT_TRUE(reader->Shutdown(std::chrono::seconds(5)));
 }
 
-TEST_F(MetricsBuilderTest, CreatePeriodicMetricReader)
+TEST_F(MetricsBuildersTest, CreatePeriodicMetricReader)
 {
   auto exporter  = std::make_unique<config_sdk::ExtensionPushMetricExporterConfiguration>();
   exporter->name = "noop";
@@ -613,7 +627,7 @@ TEST_F(MetricsBuilderTest, CreatePeriodicMetricReader)
   EXPECT_EQ(reader->GetCardinalityLimit(metrics_sdk::InstrumentType::kUpDownCounter), 800u);
 }
 
-TEST_F(MetricsBuilderTest, CreateAttributesProcessor)
+TEST_F(MetricsBuildersTest, CreateAttributesProcessor)
 {
   std::map<std::string, int> attributes = {{"included", 1}, {"excluded", 2}, {"unlisted", 3}};
   opentelemetry::common::KeyValueIterableView<std::map<std::string, int>> iterable(attributes);
@@ -695,16 +709,16 @@ TEST_F(MetricsBuilderTest, CreateAttributesProcessor)
 }
 
 // ---------------------------------------------------------------------------
-// MetricsBuilderTest: Verify that unregistered builders throw UnsupportedException.
+// MetricsBuildersTest: Verify that unregistered builders throw UnsupportedException.
 
-TEST_F(MetricsBuilderTest, UnregisteredMeterConfiguratorBuilder)
+TEST_F(MetricsBuildersTest, UnregisteredMeterConfiguratorBuilder)
 {
   registry_->SetMeterConfiguratorBuilder(nullptr);
   auto model = std::make_unique<config_sdk::MeterConfiguratorConfiguration>();
   EXPECT_THROW(MakeMeterConfigurator(std::move(model)), config_sdk::UnsupportedException);
 }
 
-TEST_F(MetricsBuilderTest, UnregisteredExtensionPushMetricExporterBuilder)
+TEST_F(MetricsBuildersTest, UnregisteredExtensionPushMetricExporterBuilder)
 {
   auto ext         = std::make_unique<config_sdk::ExtensionPushMetricExporterConfiguration>();
   ext->name        = "unregistered";
@@ -714,7 +728,7 @@ TEST_F(MetricsBuilderTest, UnregisteredExtensionPushMetricExporterBuilder)
   EXPECT_THROW(MakeMetricReader(std::move(model)), config_sdk::UnsupportedException);
 }
 
-TEST_F(MetricsBuilderTest, UnregisteredExtensionPullMetricExporterBuilder)
+TEST_F(MetricsBuildersTest, UnregisteredExtensionPullMetricExporterBuilder)
 {
   auto ext         = std::make_unique<config_sdk::ExtensionPullMetricExporterConfiguration>();
   ext->name        = "unregistered";
@@ -724,7 +738,7 @@ TEST_F(MetricsBuilderTest, UnregisteredExtensionPullMetricExporterBuilder)
   EXPECT_THROW(MakeMetricReader(std::move(model)), config_sdk::UnsupportedException);
 }
 
-TEST_F(MetricsBuilderTest, UnregisteredPeriodicMetricReaderBuilder)
+TEST_F(MetricsBuildersTest, UnregisteredPeriodicMetricReaderBuilder)
 {
   registry_->SetPeriodicMetricReaderBuilder(nullptr);
 
@@ -736,7 +750,7 @@ TEST_F(MetricsBuilderTest, UnregisteredPeriodicMetricReaderBuilder)
   EXPECT_THROW(MakeMetricReader(std::move(model)), config_sdk::UnsupportedException);
 }
 
-TEST_F(MetricsBuilderTest, UnregisteredConsolePushMetricExporterBuilder)
+TEST_F(MetricsBuildersTest, UnregisteredConsolePushMetricExporterBuilder)
 {
   registry_->SetConsolePushMetricExporterBuilder(nullptr);
 
@@ -748,7 +762,7 @@ TEST_F(MetricsBuilderTest, UnregisteredConsolePushMetricExporterBuilder)
   EXPECT_THROW(MakeMetricReader(std::move(model)), config_sdk::UnsupportedException);
 }
 
-TEST_F(MetricsBuilderTest, UnregisteredOtlpHttpPushMetricExporterBuilder)
+TEST_F(MetricsBuildersTest, UnregisteredOtlpHttpPushMetricExporterBuilder)
 {
   registry_->SetOtlpHttpPushMetricExporterBuilder(nullptr);
 
@@ -760,7 +774,7 @@ TEST_F(MetricsBuilderTest, UnregisteredOtlpHttpPushMetricExporterBuilder)
   EXPECT_THROW(MakeMetricReader(std::move(model)), config_sdk::UnsupportedException);
 }
 
-TEST_F(MetricsBuilderTest, UnregisteredOtlpGrpcPushMetricExporterBuilder)
+TEST_F(MetricsBuildersTest, UnregisteredOtlpGrpcPushMetricExporterBuilder)
 {
   registry_->SetOtlpGrpcPushMetricExporterBuilder(nullptr);
 
@@ -772,7 +786,7 @@ TEST_F(MetricsBuilderTest, UnregisteredOtlpGrpcPushMetricExporterBuilder)
   EXPECT_THROW(MakeMetricReader(std::move(model)), config_sdk::UnsupportedException);
 }
 
-TEST_F(MetricsBuilderTest, UnregisteredOtlpFilePushMetricExporterBuilder)
+TEST_F(MetricsBuildersTest, UnregisteredOtlpFilePushMetricExporterBuilder)
 {
   registry_->SetOtlpFilePushMetricExporterBuilder(nullptr);
 
@@ -784,7 +798,7 @@ TEST_F(MetricsBuilderTest, UnregisteredOtlpFilePushMetricExporterBuilder)
   EXPECT_THROW(MakeMetricReader(std::move(model)), config_sdk::UnsupportedException);
 }
 
-TEST_F(MetricsBuilderTest, UnregisteredPrometheusPullMetricExporterBuilder)
+TEST_F(MetricsBuildersTest, UnregisteredPrometheusPullMetricExporterBuilder)
 {
   registry_->SetPrometheusPullMetricExporterBuilder(nullptr);
 
