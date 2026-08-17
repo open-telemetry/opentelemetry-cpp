@@ -56,9 +56,11 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.
     TEST_LIST es_log_record_exporter_test)
 
-  # AnIndefiniteFlushReturnsOnceEverythingIsFinished exercises the branch that
-  # waits without a deadline, so a regression there does not fail, it stops.
-  # CTest's default bound is 25 minutes, which is a long time to spend learning
-  # that.
-  set_tests_properties(${es_log_record_exporter_test} PROPERTIES TIMEOUT 30)
+  # AnIndefiniteFlushParksUntilTheOutcomeArrives really does park on the
+  # condition variable, so a regression there does not fail, it stalls until the
+  # exporter's own bound expires. CTest's default is 25 minutes, which is a long
+  # time to spend learning that. This is deliberately well above the bounds the
+  # cases use themselves, so that one of them expiring reports which case failed
+  # rather than being killed from the outside.
+  set_tests_properties(${es_log_record_exporter_test} PROPERTIES TIMEOUT 60)
 endif() # BUILD_TESTING

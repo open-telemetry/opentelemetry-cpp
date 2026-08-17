@@ -338,33 +338,30 @@ public:
     const char *failure = nullptr;
     switch (state)
     {
+      // The states a session passes through on its way to an outcome. Nothing is reported for
+      // them, and in particular nothing is logged: the log handler is replaceable, this session is
+      // registered before the request is handed to the client, and none of these events has
+      // retired it. A handler that flushed from here would wait for the session whose call stack
+      // it is standing in. Every other report in this file retires first for that reason, and
+      // there is nothing to retire on the way to an outcome.
+      case http_client::SessionState::Created:
+      case http_client::SessionState::Connecting:
+      case http_client::SessionState::Connected:
+      case http_client::SessionState::Sending:
+      // The body arrives through OnResponse(), which is what reports the outcome.
+      case http_client::SessionState::Response:
+        break;
       case http_client::SessionState::CreateFailed:
         failure = "[ES Log Exporter] Create request to elasticsearch failed";
-        break;
-      case http_client::SessionState::Created:
-        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Session created");
         break;
       case http_client::SessionState::Destroyed:
         failure = "[ES Log Exporter] Session to elasticsearch destroyed before a response";
         break;
-      case http_client::SessionState::Connecting:
-        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Connecting to elasticsearch");
-        break;
       case http_client::SessionState::ConnectFailed:
         failure = "[ES Log Exporter] Connection to elasticsearch failed";
         break;
-      case http_client::SessionState::Connected:
-        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Connected to elasticsearch");
-        break;
-      case http_client::SessionState::Sending:
-        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Sending request to elasticsearch");
-        break;
       case http_client::SessionState::SendFailed:
         failure = "[ES Log Exporter] Request failed to be sent to elasticsearch";
-        break;
-      case http_client::SessionState::Response:
-        // The body arrives through OnResponse(), which is what reports the outcome.
-        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Response received from elasticsearch");
         break;
       case http_client::SessionState::SSLHandshakeFailed:
         failure = "[ES Log Exporter] SSL handshake to elasticsearch failed";
@@ -482,10 +479,9 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
     //
     // That is the whole of what the ordering buys, and it is worth being exact about the rest.
     // It does not make a log handler safe to re-enter the exporter from in general: one that
-    // calls ForceFlush() without a deadline from a progress event blocks the Export() that has
-    // not handed its request to the client yet, and one that flushes from any callback the HTTP
-    // client dispatches can wait on work only that client thread can advance. Neither is new
-    // here and neither is fixed here.
+    // flushes from any callback the HTTP client dispatches can still wait on work that only the
+    // client thread it is standing on can advance. That is
+    // https://github.com/open-telemetry/opentelemetry-cpp/issues/4435, and it is not fixed here.
     if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
     {
       OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] ERROR: Export "
@@ -500,37 +496,19 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
     return true;
   };
 
-  // A return added between here and SendRequest() would otherwise strand a waiter on a session
-  // that can never finish. Reporting through the same completion leaves a session one way out,
-  // and says so in the log rather than dropping the batch silently.
-  struct GiveUpGuard
-  {
-    Completion *report = nullptr;
-
-    GiveUpGuard()                               = default;
-    GiveUpGuard(const GiveUpGuard &)            = delete;
-    GiveUpGuard &operator=(const GiveUpGuard &) = delete;
-    GiveUpGuard(GiveUpGuard &&)                 = delete;
-    GiveUpGuard &operator=(GiveUpGuard &&)      = delete;
-
-    ~GiveUpGuard()
-    {
-      if (report != nullptr)
-      {
-        (*report)(opentelemetry::sdk::common::ExportResult::kFailure);
-      }
-    }
-  } guard;
-  guard.report = &complete;
+  // Two ways out from here, and each one is spelled out below: the shutdown refusal retires by
+  // hand, and the handler takes the session over once SendRequest() has it. A return added
+  // between them has to do one or the other, or it strands a waiter on a session that can never
+  // finish.
 #endif
 
   // Return failure if this exporter has been shutdown
   if (isShutdown())
   {
 #ifdef ENABLE_ASYNC_EXPORT
-    // Retired before anything replaceable runs, and reported here rather than through the guard,
-    // so a log handler that flushes does not wait for this Export() and one refusal reads as one.
-    guard.report = nullptr;
+    // Retired before anything replaceable runs, and reported by the line below rather than
+    // through the completion, so a log handler that flushes does not wait for this Export() and
+    // one refusal reads as one.
     retire();
 #endif
     OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Exporting "
@@ -573,10 +551,11 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
 
 #ifdef ENABLE_ASYNC_EXPORT
   // Send the request
-  auto handler = std::make_shared<AsyncResponseHandler>(session, Completion(complete),
-                                                        options_.console_debug_);
+  // The handler reports this session from here on, so the completion goes to it rather than
+  // being copied to it.
+  auto handler =
+      std::make_shared<AsyncResponseHandler>(session, std::move(complete), options_.console_debug_);
   session->SendRequest(handler);
-  guard.report = nullptr;  // the handler reports this session from here on
   return sdk::common::ExportResult::kSuccess;
 #else
   // Send the request
@@ -627,6 +606,25 @@ bool ElasticsearchLogRecordExporter::ForceFlush(std::chrono::microseconds timeou
   timeout = opentelemetry::common::DurationUtil::AdjustWaitForTimeout(
       timeout, std::chrono::microseconds::zero());
 
+  // A caller that asks for no deadline still gets one, because a flush that cannot end is worse
+  // than one that reports it did not finish, and the client is not obliged to call back at all.
+  // response_timeout_ is the bound this wait already had before the accounting was fixed, and it
+  // is the same value the request itself is given, so a session outstanding when the watermark is
+  // taken has at most that long before the client owes it a terminal event. The bound is
+  // unchanged; what changes is that running out of it no longer reports success.
+  if (timeout <= std::chrono::microseconds::zero())
+  {
+    timeout = std::chrono::seconds{options_.response_timeout_};
+  }
+
+  // Taken before the lock rather than after it, so the time spent waiting for the mutex comes out
+  // of the caller's budget instead of being handed back as a fresh one. A plain mutex still
+  // cannot promise a bound, but acquiring it should not add a second full timeout to the one that
+  // was asked for.
+  const std::chrono::steady_clock::time_point deadline =
+      std::chrono::steady_clock::now() +
+      std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
+
   std::unique_lock<std::mutex> lock(synchronization_data_->force_flush_cv_m);
 
   // The snapshot is the next id, not a count: a session started after it takes a larger id and
@@ -639,20 +637,9 @@ bool ElasticsearchLogRecordExporter::ForceFlush(std::chrono::microseconds timeou
     return running.empty() || *running.begin() >= watermark;
   };
 
-  if (timeout <= std::chrono::microseconds::zero())
-  {
-    // wait() only returns once the predicate holds, so the flush has completed.
-    synchronization_data_->force_flush_cv.wait(lock, flushed);
-    return true;
-  }
-
   // One deadline for the call, so a wakeup that is not a completion resumes against what is left
   // rather than starting the wait again. wait_until() returns the predicate, so a flush that ran
   // out of time cannot report success.
-  const std::chrono::steady_clock::time_point deadline =
-      std::chrono::steady_clock::now() +
-      std::chrono::duration_cast<std::chrono::steady_clock::duration>(timeout);
-
   return synchronization_data_->force_flush_cv.wait_until(lock, deadline, flushed);
 #else
   return true;

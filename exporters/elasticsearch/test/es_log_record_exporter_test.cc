@@ -244,7 +244,20 @@ public:
 
   // Runs inside Export(), after the records have been handed over and before the request exists.
   std::function<void()> on_create_session;
-  bool CancelAllSessions() noexcept override { return true; }
+
+  // Runs inside Shutdown(). A real client answers its outstanding sessions here, so a case that
+  // needs a flush to be woken by the shutdown rather than by its own bound sets this; one that
+  // leaves it unset is a client that goes quiet instead, which is the case the bound exists for.
+  std::function<void()> on_cancel_all;
+
+  bool CancelAllSessions() noexcept override
+  {
+    if (on_cancel_all)
+    {
+      on_cancel_all();
+    }
+    return true;
+  }
   bool FinishAllSessions() noexcept override { return true; }
   void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
 
@@ -283,10 +296,15 @@ namespace
 {
 // Bounded, and the count only goes up, so a wait that expires means the flush never got there
 // rather than that the case missed it.
+//
+// Well inside the bound CTest puts on the whole binary. Matching the two would mean a case that
+// never takes its watermark is killed from the outside before this returns, so it would never
+// reach its own assertion, its join, or its cleanup, and the report would say the suite timed out
+// rather than which case failed and why.
 bool WaitForWatermarks(logs_exporter::ElasticsearchLogRecordExporter &exporter,
                        std::uint64_t wanted)
 {
-  const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{30};
+  const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds{5};
   while (std::chrono::steady_clock::now() < deadline)
   {
     if (logs_exporter::ElasticsearchExporterTestPeer::WatermarksTaken(exporter) >= wanted)
@@ -718,6 +736,98 @@ TEST_F(ElasticsearchForceFlushTests, AFailedExportSettlesItsSessionAndIsReported
 
   EXPECT_TRUE(fixture.exporter->ForceFlush(std::chrono::milliseconds{20}));
 }
+
+// A caller with no deadline of its own still gets one. Nothing obliges an HTTP client to call
+// back, and a flush that waits for a callback that never comes would take the caller down with
+// it, so the exporter bounds the wait by its own response timeout and reports that it did not
+// finish. The elapsed time is asserted from below as well: a bound of zero would also return
+// false here, and would return it immediately.
+TEST_F(ElasticsearchForceFlushTests, ANoDeadlineFlushGivesUpAtTheResponseTimeout)
+{
+  // Kept for the same reason as the case at the top of this file: a dropped handler reports a
+  // failure from its destructor, which would retire the session this case needs left outstanding.
+  std::vector<std::shared_ptr<http_client::EventHandler>> kept;
+  auto fixture = MakeExporter([&kept](const std::shared_ptr<http_client::EventHandler> &handler) {
+    kept.push_back(handler);
+  });
+  ExportOnce(*fixture.exporter);
+
+  const auto start   = std::chrono::steady_clock::now();
+  const bool flushed = fixture.exporter->ForceFlush();
+  const auto elapsed = std::chrono::steady_clock::now() - start;
+  const auto ms      = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+
+  EXPECT_FALSE(flushed) << "reported a completion for a session that never answered";
+  EXPECT_GE(ms, 1000) << "returned without waiting, so the bound is not the response timeout";
+}
+
+// ForceFlush() and Shutdown() are required to be safe to call concurrently, and this PR took out
+// the lock that used to serialise them, so the overlap is deterministic here rather than left to
+// chance: the flush is parked on its session before the shutdown starts. A real client answers
+// its outstanding sessions while shutting down, which is what has to wake the waiter.
+TEST_F(ElasticsearchForceFlushTests, AParkedFlushIsWokenByTheShutdownThatCompletesItsSession)
+{
+  std::shared_ptr<http_client::EventHandler> captured;
+  auto fixture =
+      MakeExporter([&captured](const std::shared_ptr<http_client::EventHandler> &handler) {
+        captured = handler;
+      });
+  ExportOnce(*fixture.exporter);
+  ASSERT_NE(captured, nullptr);
+
+  fixture.client->on_cancel_all = [&captured] {
+    captured->OnEvent(http_client::SessionState::Cancelled, "");
+  };
+
+  std::atomic<bool> returned{false};
+  bool flushed = false;
+  std::thread waiter([&fixture, &returned, &flushed] {
+    flushed = fixture.exporter->ForceFlush();
+    returned.store(true, std::memory_order_release);
+  });
+
+  // Recorded rather than asserted, for the reason the cases above give: nothing fatal may happen
+  // while that thread is still joinable.
+  const bool snapshotted    = WaitForWatermarks(*fixture.exporter, 1);
+  const bool returned_early = returned.load(std::memory_order_acquire);
+
+  const auto start = std::chrono::steady_clock::now();
+  const bool down  = fixture.exporter->Shutdown();
+  waiter.join();
+  const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                      std::chrono::steady_clock::now() - start)
+                      .count();
+
+  EXPECT_TRUE(snapshotted) << "the flush never took a watermark, so it never reached the wait";
+  EXPECT_FALSE(returned_early) << "the flush returned with its session still outstanding";
+  EXPECT_TRUE(down);
+  EXPECT_TRUE(flushed) << "the shutdown settled the session and the flush still reported failure";
+  EXPECT_LT(ms, kShortResponseTimeoutSeconds * 1000)
+      << "the flush waited out its own bound instead of being woken by the shutdown";
+}
+
+// The same overlap against a client that answers nothing on the way down. There is no event to
+// wake the waiter here, so what is being pinned is that the flush still ends: without a bound on
+// the no-deadline wait this case does not fail, it stops.
+TEST_F(ElasticsearchForceFlushTests, AParkedFlushEndsEvenIfTheShutdownSettlesNothing)
+{
+  std::vector<std::shared_ptr<http_client::EventHandler>> kept;
+  auto fixture = MakeExporter([&kept](const std::shared_ptr<http_client::EventHandler> &handler) {
+    kept.push_back(handler);
+  });
+  ExportOnce(*fixture.exporter);
+
+  bool flushed = false;
+  std::thread waiter([&fixture, &flushed] { flushed = fixture.exporter->ForceFlush(); });
+
+  const bool snapshotted = WaitForWatermarks(*fixture.exporter, 1);
+  const bool down        = fixture.exporter->Shutdown();
+  waiter.join();
+
+  EXPECT_TRUE(snapshotted) << "the flush never took a watermark, so it never reached the wait";
+  EXPECT_TRUE(down);
+  EXPECT_FALSE(flushed) << "reported a completion for a session nothing ever settled";
+}
 // ---------------------------------------------------------------------------
 // Exactly-once accounting for the async handler, which exists only in an async build, so
 // these cases skip there rather than compile out.
@@ -743,6 +853,8 @@ public:
     {
       return;
     }
+    lines_.fetch_add(1, std::memory_order_relaxed);
+
     const std::string text(msg);
     if (text.find("log record(s) success") != std::string::npos)
     {
@@ -758,9 +870,14 @@ public:
   int failures() const noexcept { return failures_.load(std::memory_order_relaxed); }
   int completions() const noexcept { return successes() + failures(); }
 
+  // Everything the handler was given, not only the completions. What a session says on its way to
+  // an outcome is as much a part of the contract as what it says at the end of one.
+  int lines() const noexcept { return lines_.load(std::memory_order_relaxed); }
+
 private:
   std::atomic<int> successes_{0};
   std::atomic<int> failures_{0};
+  std::atomic<int> lines_{0};
 };
 
 class ElasticsearchAsyncCompletionTests : public ::testing::Test
@@ -798,6 +915,7 @@ protected:
   }
 
   int Completions() const { return Counter().completions(); }
+  int Lines() const { return Counter().lines(); }
 
   nostd::shared_ptr<internal_log::LogHandler> handler_;
   nostd::shared_ptr<internal_log::LogHandler> previous_handler_;
@@ -848,11 +966,26 @@ TEST_F(ElasticsearchAsyncCompletionTests, EverySessionStateIsClassifiedAndReport
 
     // Counted per iteration: the previous fixture's handler reports from its destructor as it goes
     // out of scope, which lands in the same counter.
-    const int before = Completions();
+    const int before       = Completions();
+    const int lines_before = Lines();
     ExportOnce(*fixture.exporter);
 
     EXPECT_EQ(Completions() - before, test_case.terminal ? 1 : 0);
     EXPECT_EQ(fixture.exporter->ForceFlush(std::chrono::milliseconds{20}), test_case.terminal);
+
+    // Nothing on the way to an outcome may reach the log handler at all. The handler is
+    // replaceable, this session is registered before the request is handed to the client, and no
+    // progress event has retired it, so a handler that flushed from one would be waiting for the
+    // export whose call stack it is standing in. A terminal state is reported, and by then the
+    // session has already been let go.
+    if (test_case.terminal)
+    {
+      EXPECT_GT(Lines() - lines_before, 0) << "a terminal state said nothing";
+    }
+    else
+    {
+      EXPECT_EQ(Lines() - lines_before, 0) << "a progress event reached the log handler";
+    }
   }
 }
 

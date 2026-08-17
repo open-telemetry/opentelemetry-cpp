@@ -170,11 +170,12 @@ private:
     std::condition_variable force_flush_cv;
     std::mutex force_flush_cv_m;
 
-    // Raised once per ForceFlush(), under that mutex and immediately after the call has taken
-    // its watermark. Nothing in the exporter reads it. A case that has to start an export after
-    // a flush has snapshotted, and before it gives up, waits on this: the alternative is a sleep,
-    // which leaves the order to the scheduler, and the order that does not reproduce the defect
-    // is the one that would report a pass.
+    // Test synchronization only, and not exporter state: nothing here reads it and no behaviour
+    // depends on it. Raised once per ForceFlush(), under that mutex and immediately after the
+    // call has taken its watermark. A case that has to start an export after a flush has
+    // snapshotted, and before it gives up, waits on this. The alternative is a sleep, which
+    // leaves the order to the scheduler, and the order that does not reproduce the defect is the
+    // one that would report a pass.
     std::uint64_t watermarks_taken{0};
   };
   nostd::shared_ptr<SynchronizationData> synchronization_data_;
