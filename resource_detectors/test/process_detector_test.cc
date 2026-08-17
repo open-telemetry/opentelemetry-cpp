@@ -198,9 +198,9 @@ TEST(ProcessDetectorUtilsTest, GetCommandWithArgsTest)
 
 TEST(ProcessDetectorUtilsTest, GetExecutableNameTest)
 {
-  int32_t pid             = getpid();
-  std::string exe_path    = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
-  std::string exe_name    = opentelemetry::resource_detector::detail::GetExecutableName(pid);
+  int32_t pid          = getpid();
+  std::string exe_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
+  std::string exe_name = opentelemetry::resource_detector::detail::GetExecutableName(pid);
 
   if (exe_path.empty())
   {
@@ -243,7 +243,7 @@ TEST(ProcessDetectorUtilsTest, GetProcessCreationTimeTest)
 
 TEST(ProcessDetectorUtilsTest, GetProcessOwnerTest)
 {
-  int32_t pid      = getpid();
+  int32_t pid       = getpid();
   std::string owner = opentelemetry::resource_detector::detail::GetProcessOwner(pid);
 
   // On all supported platforms the effective user name must be non-empty.
@@ -254,10 +254,10 @@ TEST(ProcessDetectorUtilsTest, GetProcessOwnerTest)
 
 TEST(ProcessDetectorUtilsTest, GetExecutableBuildIdHtlhashTest)
 {
-  int32_t pid      = getpid();
+  int32_t pid          = getpid();
   std::string exe_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
-  std::string hash1 = opentelemetry::resource_detector::detail::GetExecutableBuildIdHtlhash(pid);
-  std::string hash2 = opentelemetry::resource_detector::detail::GetExecutableBuildIdHtlhash(pid);
+  std::string hash1    = opentelemetry::resource_detector::detail::GetExecutableBuildIdHtlhash(pid);
+  std::string hash2    = opentelemetry::resource_detector::detail::GetExecutableBuildIdHtlhash(pid);
 
   if (exe_path.empty())
   {
@@ -305,8 +305,8 @@ TEST(ProcessResourceDetectorTest, DetectPopulatesExpectedAttributes)
       << "process.executable.name must be present on this platform";
 
   // process.executable.build_id.htlhash — present on Linux and Windows.
-  EXPECT_NE(
-      attrs.find(opentelemetry::semconv::process::kProcessExecutableBuildIdHtlhash), attrs.end())
+  EXPECT_NE(attrs.find(opentelemetry::semconv::process::kProcessExecutableBuildIdHtlhash),
+            attrs.end())
       << "process.executable.build_id.htlhash must be present on this platform";
 #endif
 

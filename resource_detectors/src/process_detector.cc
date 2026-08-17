@@ -43,9 +43,8 @@ opentelemetry::sdk::resource::Resource ProcessResourceDetector::Detect() noexcep
 
       // process.executable.name is the basename of the executable path.
       std::size_t sep = executable_path.find_last_of("/\\");
-      std::string executable_name = (sep == std::string::npos)
-                                        ? executable_path
-                                        : executable_path.substr(sep + 1);
+      std::string executable_name =
+          (sep == std::string::npos) ? executable_path : executable_path.substr(sep + 1);
       if (!executable_name.empty())
       {
         attributes[semconv::process::kProcessExecutableName] = std::move(executable_name);
@@ -100,8 +99,8 @@ opentelemetry::sdk::resource::Resource ProcessResourceDetector::Detect() noexcep
   }
   catch (const std::exception &ex)
   {
-    OTEL_INTERNAL_LOG_ERROR("[Process Resource Detector] "
-                            << "Error extracting process owner: " << ex.what());
+    OTEL_INTERNAL_LOG_ERROR("[Process Resource Detector] " << "Error extracting process owner: "
+                                                           << ex.what());
   }
 
   try

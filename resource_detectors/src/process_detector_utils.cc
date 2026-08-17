@@ -165,9 +165,8 @@ std::string FileTimeToIso8601(const FILETIME &ft)
     return std::string();
   }
   char buf[32];
-  std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ",
-                static_cast<int>(st.wYear), static_cast<int>(st.wMonth),
-                static_cast<int>(st.wDay), static_cast<int>(st.wHour),
+  std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ", static_cast<int>(st.wYear),
+                static_cast<int>(st.wMonth), static_cast<int>(st.wDay), static_cast<int>(st.wHour),
                 static_cast<int>(st.wMinute), static_cast<int>(st.wSecond),
                 static_cast<int>(st.wMilliseconds));
   return std::string(buf);
@@ -270,9 +269,9 @@ std::string GetProcessCreationTime(const int32_t &pid)
   struct tm utc_time = {};
   gmtime_r(&secs, &utc_time);
   char buf[32];
-  std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03ldZ",
-                utc_time.tm_year + 1900, utc_time.tm_mon + 1, utc_time.tm_mday,
-                utc_time.tm_hour, utc_time.tm_min, utc_time.tm_sec, usecs / 1000);
+  std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03ldZ", utc_time.tm_year + 1900,
+                utc_time.tm_mon + 1, utc_time.tm_mday, utc_time.tm_hour, utc_time.tm_min,
+                utc_time.tm_sec, usecs / 1000);
   return std::string(buf);
 
 #else
@@ -296,7 +295,7 @@ std::string GetProcessCreationTime(const int32_t &pid)
     return std::string();
   }
 
-  const auto clk = static_cast<unsigned long long>(clk_tck);
+  const auto clk                 = static_cast<unsigned long long>(clk_tck);
   unsigned long long start_secs  = boot_time_secs + starttime_ticks / clk;
   unsigned long long start_msecs = (starttime_ticks % clk) * 1000 / clk;
 
@@ -305,9 +304,9 @@ std::string GetProcessCreationTime(const int32_t &pid)
   gmtime_r(&t, &utc_time);
 
   char buf[32];
-  std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03lluZ",
-                utc_time.tm_year + 1900, utc_time.tm_mon + 1, utc_time.tm_mday,
-                utc_time.tm_hour, utc_time.tm_min, utc_time.tm_sec, start_msecs);
+  std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03lluZ", utc_time.tm_year + 1900,
+                utc_time.tm_mon + 1, utc_time.tm_mday, utc_time.tm_hour, utc_time.tm_min,
+                utc_time.tm_sec, start_msecs);
   return std::string(buf);
 #endif
 }
@@ -401,16 +400,14 @@ struct Sha256Context
 };
 
 static const uint32_t kSha256K[64] = {
-    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4,
-    0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe,
-    0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f,
-    0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7,
-    0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc,
-    0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b,
-    0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116,
-    0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
-    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7,
-    0xc67178f2};
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2};
 
 inline uint32_t Rotr32(uint32_t x, int n)
 {
@@ -468,14 +465,14 @@ void Sha256ProcessBlock(Sha256Context &ctx, const uint8_t block[64])
 
 void Sha256Init(Sha256Context &ctx)
 {
-  ctx.state[0]  = 0x6a09e667;
-  ctx.state[1]  = 0xbb67ae85;
-  ctx.state[2]  = 0x3c6ef372;
-  ctx.state[3]  = 0xa54ff53a;
-  ctx.state[4]  = 0x510e527f;
-  ctx.state[5]  = 0x9b05688c;
-  ctx.state[6]  = 0x1f83d9ab;
-  ctx.state[7]  = 0x5be0cd19;
+  ctx.state[0]   = 0x6a09e667;
+  ctx.state[1]   = 0xbb67ae85;
+  ctx.state[2]   = 0x3c6ef372;
+  ctx.state[3]   = 0xa54ff53a;
+  ctx.state[4]   = 0x510e527f;
+  ctx.state[5]   = 0x9b05688c;
+  ctx.state[6]   = 0x1f83d9ab;
+  ctx.state[7]   = 0x5be0cd19;
   ctx.bit_count  = 0;
   ctx.buffer_len = 0;
 }
