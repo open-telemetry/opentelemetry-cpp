@@ -17,7 +17,9 @@ add_executable(
   custom_log_record_exporter.cc
   custom_log_record_exporter_builder.cc
   custom_log_record_processor.cc
-  custom_log_record_processor_builder.cc)
+  custom_log_record_processor_builder.cc
+  custom_resource_detector.cc
+  custom_resource_detector_builder.cc)
 
 target_link_libraries(
   example_yaml
@@ -73,7 +75,8 @@ if(BUILD_TESTING)
   if(WITH_OTLP_HTTP
      AND WITH_OTLP_GRPC
      AND WITH_OTLP_FILE
-     AND WITH_PROMETHEUS)
+     AND WITH_PROMETHEUS
+     AND WITH_RESOURCE_DETECTORS_PREVIEW)
     add_test(NAME examples.example_yaml_kitchen_sink
              COMMAND $<TARGET_FILE:example_yaml> --test --yaml
                      ${CMAKE_CURRENT_SOURCE_DIR}/kitchen-sink.yaml)
