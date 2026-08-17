@@ -138,6 +138,50 @@ to enable or disable the feature.
 
 This compilation flag will be removed after October 1st, 2026.
 
+### CMake exporter builder components merged into exporter components
+
+#### Announcement (exporter builder components)
+
+The following CMake install components are deprecated:
+
+* `exporters_ostream_builder` (merged into `exporters_ostream`)
+* `exporters_otlp_builder_utils` (merged into `exporters_otlp_common`)
+* `exporters_otlp_file_builder` (merged into `exporters_otlp_file`)
+* `exporters_otlp_grpc_builder` (merged into `exporters_otlp_grpc`)
+* `exporters_otlp_http_builder` (merged into `exporters_otlp_http`)
+* `exporters_prometheus_builder` (merged into `exporters_prometheus`)
+
+#### Motivation (exporter builder components)
+
+The core configuration libraries with the builder interfaces are now installed
+unconditionally with the SDK. The exporter builder targets have their own CMake
+component but do not bring in any external dependencies. Merging the builder
+component into its associated exporter component simplifies the experience for
+users: if CMake finds the exporter component it also imports the builder target.
+
+#### Scope (exporter builder components)
+
+The separate builder CMake install components listed above are deprecated and
+merged into their corresponding exporter components.
+
+#### Mitigation (exporter builder components)
+
+Remove the explicit builder component from `find_package` calls:
+
+```cmake
+# Before: explicitly importing the builder component
+find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS exporters_otlp_grpc exporters_otlp_grpc_builder)
+
+# After: the builder is included with the exporter component
+find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS exporters_otlp_grpc)
+```
+
+Apply the same change for each deprecated builder component listed above.
+
+#### Planned removal (exporter builder components)
+
+These CMake install components will be removed in a future release.
+
 ## [opentelemetry-cpp API]
 
 ### Deprecation of EventLogger

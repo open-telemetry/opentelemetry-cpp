@@ -29,6 +29,8 @@ jobs:
       - name: Build dependencies with vcpkg submodule
         run: |
           ./ci/setup_windows_ci_environment.ps1
+      - name: Run Install Functions Tests
+        run: ./ci/do_ci.ps1 cmake.install_functions.test
       - name: Run Tests
         run: ./ci/do_ci.ps1 cmake.install.test
       - name: Run DLL Tests
@@ -51,6 +53,8 @@ jobs:
       - name: Build dependencies with vcpkg submodule
         run: |
           ./ci/setup_windows_ci_environment.ps1
+      - name: Run Install Functions Tests
+        run: ./ci/do_ci.ps1 cmake.install_functions.test
       - name: Run Tests
         run: ./ci/do_ci.ps1 cmake.install.test
 
@@ -78,6 +82,8 @@ jobs:
         sudo -E apt-get update
         sudo -E apt-get install -y libabsl-dev libcurl4-openssl-dev zlib1g-dev nlohmann-json3-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "googletest;benchmark"
+    - name: Run Install Functions Tests
+      run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -108,6 +114,8 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_latest
+    - name: Run Install Functions Tests
+      run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -138,6 +146,8 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_stable
+    - name: Run Install Functions Tests
+      run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -172,6 +182,8 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_minimum
+    - name: Run Install Functions Tests
+      run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
       env:
           BUILD_SHARED_LIBS: 'OFF'
@@ -209,6 +221,8 @@ jobs:
         run: |
           conan install install/conan/conanfile_stable.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
           conan cache clean --source --build
+      - name: Run Install Functions Tests
+        run: ./ci/do_ci.sh cmake.install_functions.test
       - name: Run Tests (static libs)
         env:
           BUILD_SHARED_LIBS: 'OFF'
@@ -248,6 +262,8 @@ jobs:
         run: |
           conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
           conan cache clean --source --build
+      - name: Run Install Functions Tests
+        run: ./ci/do_ci.sh cmake.install_functions.test
       - name: Run Tests (static libs)
         env:
           BUILD_SHARED_LIBS: 'OFF'
@@ -288,6 +304,8 @@ jobs:
       run: |
         conan install install/conan/conanfile_stable.txt --build=missing -of /Users/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
         conan cache clean --source --build
+    - name: Run Install Functions Tests
+      run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -320,6 +338,8 @@ jobs:
         brew install grpc
         brew install nlohmann-json
         brew install prometheus-cpp
+    - name: Run Install Functions Tests
+      run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
