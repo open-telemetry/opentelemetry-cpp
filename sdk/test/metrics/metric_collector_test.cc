@@ -750,6 +750,60 @@ TEST_F(MetricCollectorTest, ReaderCardinalityLimitFallbackSingleDeltaReader)
   EXPECT_EQ(SumCounterValue(produced), static_cast<int64_t>(kUniqueAttributeSets));
 }
 
+// Documents and pins a known limitation raised during review of #4188: recording capacity is
+// resolved once, as the highest limit across readers attached at instrument-creation time (see
+// ResolveRecordingCardinalityLimit() in meter.cc), and is not grown retroactively. A reader
+// added later with a higher limit cannot recover attribute sets that had already collapsed into
+// the overflow point before it was attached; see the Note on MeterContext::AddMetricReader().
+TEST_F(MetricCollectorTest, ReaderAddedAfterInstrumentCreationDoesNotGrowRecordingCapacity)
+{
+  constexpr size_t kLowLimit            = 3;
+  constexpr size_t kHighLimit           = 50;
+  constexpr size_t kUniqueAttributeSets = 10;
+
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+  auto scope   = InstrumentationScope::Create(
+      "ReaderAddedAfterInstrumentCreationDoesNotGrowRecordingCapacity");
+  auto meter = std::shared_ptr<Meter>(new Meter(context, std::move(scope)));
+  context->AddMeter(meter);
+
+  auto low_reader = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits low_limits;
+  low_limits.counter = kLowLimit;
+  low_reader->SetCardinalityLimits(low_limits);
+  AddMetricReaderToMeterContext(context, low_reader);
+
+  // The instrument is created (and its recording capacity resolved) with only the low-limit
+  // reader attached.
+  auto counter = meter->CreateUInt64Counter("late_reader_counter");
+
+  for (size_t i = 0; i < kUniqueAttributeSets; ++i)
+  {
+    std::map<std::string, std::string> attrs = {{"key", std::to_string(i)}};
+    counter->Add(
+        1, opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        opentelemetry::context::Context{});
+  }
+
+  // A higher-limit reader is attached only after the instrument already exists and has recorded
+  // more unique attribute sets than the low limit.
+  auto high_reader = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits high_limits;
+  high_limits.counter = kHighLimit;
+  high_reader->SetCardinalityLimits(high_limits);
+  auto high_collector = AddMetricReaderToMeterContext(context, high_reader).lock();
+
+  auto high_produced = high_collector->Produce();
+  bool high_overflow = false;
+  size_t high_points = CountRealPoints(high_produced, &high_overflow);
+
+  // Despite its own limit of kHighLimit, the late-attached reader is still capped by the
+  // recording capacity resolved when the instrument was created: attribute sets already
+  // collapsed into overflow before this reader existed cannot be recovered.
+  EXPECT_LE(high_points, kLowLimit);
+  EXPECT_TRUE(high_overflow);
+}
+
 #if defined(__GNUC__) || defined(__clang__) || defined(__apple_build_version__)
 #  pragma GCC diagnostic pop
 #endif

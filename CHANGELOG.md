@@ -21,7 +21,11 @@ Increment the:
   Shared recording storage for a view with no explicit limit is now sized at
   the max limit across all attached readers, so a reader with a higher limit
   does not lose data; each reader's own (possibly stricter) limit is then
-  re-applied to just its own collected output.
+  re-applied to just its own collected output. A programmatically-constructed
+  `AggregationConfig`/`HistogramAggregationConfig`/
+  `Base2ExponentialHistogramAggregationConfig` (e.g. one built only to carry
+  histogram boundaries) is now also correctly treated as not having an
+  explicit cardinality limit, matching the declarative-configuration path.
   [#4387](https://github.com/open-telemetry/opentelemetry-cpp/issues/4387)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,

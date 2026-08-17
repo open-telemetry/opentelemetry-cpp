@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <cstddef>
+#include <limits>
 #include <vector>
 
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -15,11 +17,21 @@ namespace sdk
 namespace metrics
 {
 
+// Sentinel passed to AggregationConfig's cardinality_limit constructor argument to mean "the
+// caller did not specify a limit", distinct from any real limit value (which is always a small
+// positive count). Lets the constructor tell apart e.g. HistogramAggregationConfig() built only
+// to carry boundaries_ from HistogramAggregationConfig(500) built to set a real limit of 500,
+// without needing <optional> (avoided elsewhere in the SDK for ABI reasons).
+constexpr size_t kCardinalityLimitUnspecified = (std::numeric_limits<size_t>::max)();
+
 class AggregationConfig
 {
 public:
-  AggregationConfig(size_t cardinality_limit = kAggregationCardinalityLimit)
-      : cardinality_limit_(cardinality_limit)
+  AggregationConfig(size_t cardinality_limit = kCardinalityLimitUnspecified)
+      : cardinality_limit_(cardinality_limit == kCardinalityLimitUnspecified
+                               ? kAggregationCardinalityLimit
+                               : cardinality_limit),
+        cardinality_limit_explicit_(cardinality_limit != kCardinalityLimitUnspecified)
   {}
 
   AggregationConfig(const AggregationConfig &)            = default;
@@ -40,21 +52,21 @@ public:
   }
 
   size_t cardinality_limit_;
-  // Whether cardinality_limit_ reflects an intentionally-configured value, as opposed to
-  // just the compiled-in default left untouched because this config was built for some other
-  // reason (e.g. histogram boundaries). Defaults to true so any caller that constructs an
-  // AggregationConfig directly (tests, programmatic API) keeps prior behavior: the config's
-  // cardinality_limit_ is always honored as-is. SdkBuilder::AddView() is the one place that
-  // knows when a config was synthesized without an explicit `aggregation_cardinality_limit`,
-  // and sets this to false there so a MetricReader-level fallback can apply instead.
-  bool cardinality_limit_explicit_ = true;
-  virtual ~AggregationConfig()     = default;
+  // Whether cardinality_limit_ reflects an intentionally-configured value, as opposed to just
+  // the compiled-in default it was left at because this config was constructed for some other
+  // reason (e.g. histogram boundaries) without a cardinality_limit argument. Derived from
+  // whether the constructor's cardinality_limit argument was kCardinalityLimitUnspecified, so
+  // this is correct for every construction path (tests, programmatic API, SdkBuilder) without
+  // each caller having to set it manually. A MetricReader-level fallback applies whenever this
+  // is false.
+  bool cardinality_limit_explicit_;
+  virtual ~AggregationConfig() = default;
 };
 
 class HistogramAggregationConfig : public AggregationConfig
 {
 public:
-  HistogramAggregationConfig(size_t cardinality_limit = kAggregationCardinalityLimit)
+  HistogramAggregationConfig(size_t cardinality_limit = kCardinalityLimitUnspecified)
       : AggregationConfig(cardinality_limit)
   {}
 
@@ -84,7 +96,7 @@ class Base2ExponentialHistogramAggregationConfig : public AggregationConfig
 {
 public:
   Base2ExponentialHistogramAggregationConfig(
-      size_t cardinality_limit = kAggregationCardinalityLimit)
+      size_t cardinality_limit = kCardinalityLimitUnspecified)
       : AggregationConfig(cardinality_limit)
   {}
 
