@@ -112,9 +112,21 @@ resource:
   attributes:
     - name: service.name
       value: sdk-builtin-test
+  attributes_list: "service.namespace=sdk-builtin-namespace,service.version=1.0.0"
+  schema_url: https://opentelemetry.io/schemas/1.16.0
+  # Exercise the detection node with just the sdk: the attribute filter is
+  # configured, and no detectors are enabled. A configured detector must have
+  # a builder registered in the Registry, or building the SDK fails. This
+  # example does not register the built-in detector builders, so the
+  # detectors below are commented out.
   detection/development:
-    detectors:
-      - container:  # Registry::SetContainerResourceDetectorBuilder
-      - host:  # Registry::SetHostResourceDetectorBuilder
-      - process:  # Registry::SetProcessResourceDetectorBuilder
-      - service:  # Registry::SetServiceResourceDetectorBuilder
+    attributes:
+      included:
+        - "*"
+      excluded:
+        - process.command_args
+    # detectors:
+    #   - container:  # Registry::SetContainerResourceDetectorBuilder
+    #   - host:  # Registry::SetHostResourceDetectorBuilder
+    #   - process:  # Registry::SetProcessResourceDetectorBuilder
+    #   - service:  # Registry::SetServiceResourceDetectorBuilder
