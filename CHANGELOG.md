@@ -18,6 +18,21 @@ Increment the:
 * [METRICS SDK] Enforce a runtime minimum scale for
   `Base2ExponentialHistogramAggregation`.
   [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
+* [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
+  the `detection.attributes` include/exclude filter to the detected attributes,
+  and merge the resource per the resource SDK specification.
+  [#4411](https://github.com/open-telemetry/opentelemetry-cpp/issues/4411)
+  * Behavior change: `SetResource` no longer runs `OTELResourceDetector` and no
+    longer injects a default `service.name`, since neither is part of the
+    configuration model. Use the `service` detector or set the attributes in
+    the configuration file instead.
+* [CONFIGURATION] Add a resource detector extension example
+  [#4419](https://github.com/open-telemetry/opentelemetry-cpp/issues/4419)
+
+* [RESOURCE DETECTOR] Add the host resource detector
+  [#4413](https://github.com/open-telemetry/opentelemetry-cpp/issues/4413)
+* [CONFIGURATION] deprecate config builder cmake components
+  [#4428](https://github.com/open-telemetry/opentelemetry-cpp/pull/4428)
 
 * [CONFIGURATION] Add configuration builders for the container and process
   resource detectors
@@ -33,6 +48,10 @@ Increment the:
 * [CONFIGURATION] Add support for the composite sampler configuration
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
+
+* [CONFIGURATION/BUILD] Add resource detector targets and README
+  [#4430](https://github.com/open-telemetry/opentelemetry-cpp/pull/4430)
+
 * [SDK] `OTELResourceDetector` now percent-decodes values parsed from the
   `OTEL_RESOURCE_ATTRIBUTES` environment variable, per the W3C Baggage value
   grammar the resource spec defers to. A malformed escape sequence is left
@@ -65,6 +84,10 @@ Increment the:
   `json_assign_visitor` in the Elasticsearch log exporter, and the
   `TestMode`/`test_mode` enums in the OTLP functional test binaries.
   [#4196](https://github.com/open-telemetry/opentelemetry-cpp/issues/4196)
+
+* [CMAKE] Add support for CMake component deprecation and update the policy
+  [#4272](https://github.com/open-telemetry/opentelemetry-cpp/pull/4272)
+
 * [METRICS SDK] Fix Windows metrics tail latency on the synchronous record path:
   `SyncMetricStorage::attribute_hashmap_lock_` now uses `std::mutex` instead of
   `common::SpinLockMutex`. The spin lock's final `sleep_for(1ms)` back-off is
@@ -106,6 +129,9 @@ Increment the:
   Replace SpinLockMutex with std::mutex in SimpleProcessor,
   SimpleLogRecordProcessor, MeterContext and Meter.
   [#4323](https://github.com/open-telemetry/opentelemetry-cpp/pull/4323)
+
+* [SDK] Add Tracer::StartSpan benchmark and optimizations
+  [#4248](https://github.com/open-telemetry/opentelemetry-cpp/pull/4248)
 
 * [CONFIGURATION] Decouple config registry and builder headers
   [#4335](https://github.com/open-telemetry/opentelemetry-cpp/pull/4335)
@@ -200,7 +226,41 @@ Increment the:
   `AlwaysOff`/`TraceBased`)
   [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
 
+Important changes:
+
+* [API] Never set a null global provider or propagator
+  [#4420](https://github.com/open-telemetry/opentelemetry-cpp/pull/4420)
+
+  * `trace::Provider::SetTracerProvider()`,
+    `metrics::Provider::SetMeterProvider()`,
+    `logs::Provider::SetLoggerProvider()`,
+    `logs::Provider::SetEventLoggerProvider()` and
+    `context::propagation::GlobalTextMapPropagator::SetGlobalPropagator()`
+    now install the corresponding no-op implementation when passed a null
+    pointer, instead of storing the null. The matching getters therefore never
+    return `nullptr`, as already documented, and code that resets a global
+    during cleanup no longer risks a nullptr de-ref on a later use.
+    **Note**: this is a correctness fix to an inline API header; the observable
+    behavior of these methods changes towards the already documented contract
+    (see `docs/abi-policy.md`).
+
 Breaking changes:
+
+* [CONFIGURATION] Align declarative configuration schema defaults with
+  OpenTelemetry Configuration Schema v1.1.0
+  [#4432](https://github.com/open-telemetry/opentelemetry-cpp/issues/4432)
+  * When a YAML field is omitted, the parsed configuration model now uses
+    these schema defaults instead of the previous legacy values:
+    * `attribute_limits.attribute_value_length_limit`,
+      `logger_provider.limits.attribute_value_length_limit`, and
+      `tracer_provider.limits.attribute_value_length_limit` default to no limit
+      (unlimited attribute value length) instead of 4096 bytes.
+    * `batch` log record processor `schedule_delay` defaults to 1000 ms instead
+      of 5000 ms (more frequent batch exports when the field is omitted).
+    * `periodic` metric reader `interval` defaults to 60000 ms instead of 5000 ms
+      (less frequent metric exports when the field is omitted).
+    * `trace_id_ratio_based` sampler `ratio` defaults to 1.0 instead of 0.0
+      (sample all traces instead of dropping all when the field is omitted).
 
 * [CONFIGURATION] SDK default component builder libraries and example
   [#4367](https://github.com/open-telemetry/opentelemetry-cpp/pull/4367)

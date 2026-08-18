@@ -13,6 +13,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -27,6 +28,8 @@
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_on_sampler_configuration.h"
@@ -43,6 +46,9 @@
 #include "opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_configuration.h"
+#include "opentelemetry/sdk/configuration/host_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
 #include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
@@ -52,14 +58,20 @@
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/process_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/registry_factory.h"
+#include "opentelemetry/sdk/configuration/resource_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/string_array_configuration.h"
+#include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/unsupported_exception.h"
@@ -82,6 +94,7 @@
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/composable_always_on.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
@@ -1202,4 +1215,244 @@ TEST(SdkBuilder, AddViewWithCardinalityLimitPreservesExplicitAggregation)
       });
 
   EXPECT_EQ(matched, 1);
+}
+
+//------------------------------------------------------------------------------
+// Resource detection (SetResource)
+
+namespace
+{
+
+class TestResourceDetector : public opentelemetry::sdk::resource::ResourceDetector
+{
+public:
+  TestResourceDetector(opentelemetry::sdk::resource::ResourceAttributes attributes,
+                       std::string schema_url)
+      : attributes_(std::move(attributes)), schema_url_(std::move(schema_url))
+  {}
+
+  opentelemetry::sdk::resource::Resource Detect() override
+  {
+    return Create(attributes_, schema_url_);
+  }
+
+private:
+  opentelemetry::sdk::resource::ResourceAttributes attributes_;
+  std::string schema_url_;
+};
+
+class TestProcessResourceDetectorBuilder : public config_sdk::ProcessResourceDetectorBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> Build(
+      const config_sdk::ProcessResourceDetectorConfiguration * /* model */) const override
+  {
+    called = true;
+    return std::make_unique<TestResourceDetector>(
+        opentelemetry::sdk::resource::ResourceAttributes{{"process.pid", "12345"},
+                                                         {"process.command_args", "detected-args"}},
+        "https://opentelemetry.io/schemas/1.0.0");
+  }
+
+  mutable bool called{false};
+};
+
+class TestExtensionResourceDetectorBuilder : public config_sdk::ExtensionResourceDetectorBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> Build(
+      const config_sdk::ExtensionResourceDetectorConfiguration *model) const override
+  {
+    called = true;
+    name   = model->name;
+    return std::make_unique<TestResourceDetector>(
+        opentelemetry::sdk::resource::ResourceAttributes{{"custom.key", "custom-value"}},
+        std::string{});
+  }
+
+  mutable bool called{false};
+  mutable std::string name;
+};
+
+std::string GetStringAttribute(const opentelemetry::sdk::resource::Resource &resource,
+                               const std::string &key)
+{
+  const auto &attributes = resource.GetAttributes();
+  auto it                = attributes.find(key);
+  if (it == attributes.end())
+  {
+    return std::string{};
+  }
+  return opentelemetry::nostd::get<std::string>(it->second);
+}
+
+}  // namespace
+
+TEST(SdkBuilder, SetResourceWithoutModel)
+{
+  SdkBuilder builder(RegistryFactory::Create());
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  std::unique_ptr<config_sdk::ResourceConfiguration> model;
+  builder.SetResource(resource, model);
+
+  EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.name"), "opentelemetry");
+  EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.language"), "cpp");
+}
+
+TEST(SdkBuilder, SetResourceDetectorDispatch)
+{
+  auto registry           = RegistryFactory::Create();
+  auto process_builder    = std::make_unique<TestProcessResourceDetectorBuilder>();
+  auto *process_builder_p = process_builder.get();
+  registry->SetProcessResourceDetectorBuilder(std::move(process_builder));
+  SdkBuilder builder(std::move(registry));
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(
+      std::make_unique<config_sdk::ProcessResourceDetectorConfiguration>());
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  EXPECT_TRUE(process_builder_p->called);
+  EXPECT_EQ(GetStringAttribute(resource, "process.pid"), "12345");
+  // Detected attributes win over the default resource.
+  EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.name"), "opentelemetry");
+  // The detected schema url is preserved.
+  EXPECT_EQ(resource.GetSchemaURL(), "https://opentelemetry.io/schemas/1.0.0");
+}
+
+TEST(SdkBuilder, SetResourceExtensionDetector)
+{
+  auto registry             = RegistryFactory::Create();
+  auto extension_builder    = std::make_unique<TestExtensionResourceDetectorBuilder>();
+  auto *extension_builder_p = extension_builder.get();
+  registry->SetExtensionResourceDetectorBuilder("my_custom_detector", std::move(extension_builder));
+  SdkBuilder builder(std::move(registry));
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  auto extension   = std::make_unique<config_sdk::ExtensionResourceDetectorConfiguration>();
+  extension->name  = "my_custom_detector";
+  model->detection->detectors.push_back(std::move(extension));
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  EXPECT_TRUE(extension_builder_p->called);
+  EXPECT_EQ(extension_builder_p->name, "my_custom_detector");
+  EXPECT_EQ(GetStringAttribute(resource, "custom.key"), "custom-value");
+}
+
+TEST(SdkBuilder, SetResourceUnregisteredDetectorFails)
+{
+  SdkBuilder builder(RegistryFactory::Create());
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(
+      std::make_unique<config_sdk::HostResourceDetectorConfiguration>());
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  EXPECT_THROW(builder.SetResource(resource, model),
+               opentelemetry::sdk::configuration::UnsupportedException);
+}
+
+TEST(SdkBuilder, SetResourceDetectionAttributeFilter)
+{
+  auto registry = RegistryFactory::Create();
+  registry->SetProcessResourceDetectorBuilder(
+      std::make_unique<TestProcessResourceDetectorBuilder>());
+  SdkBuilder builder(std::move(registry));
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(
+      std::make_unique<config_sdk::ProcessResourceDetectorConfiguration>());
+
+  auto filter                    = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+  filter->included               = std::make_unique<config_sdk::StringArrayConfiguration>();
+  filter->included->string_array = {"process.*"};
+  filter->excluded               = std::make_unique<config_sdk::StringArrayConfiguration>();
+  filter->excluded->string_array = {"process.command_args"};
+  model->detection->attributes   = std::move(filter);
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  // Matched by included.
+  EXPECT_EQ(GetStringAttribute(resource, "process.pid"), "12345");
+  // Matched by included AND excluded: excluded wins.
+  EXPECT_EQ(GetStringAttribute(resource, "process.command_args"), "");
+  // The filter applies to detected attributes only, not to the default resource.
+  EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.name"), "opentelemetry");
+}
+
+TEST(SdkBuilder, SetResourceMergePriority)
+{
+  auto registry = RegistryFactory::Create();
+  registry->SetProcessResourceDetectorBuilder(
+      std::make_unique<TestProcessResourceDetectorBuilder>());
+  SdkBuilder builder(std::move(registry));
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(
+      std::make_unique<config_sdk::ProcessResourceDetectorConfiguration>());
+
+  // process.pid: detected, then overridden by attributes_list, then by attributes.
+  model->attributes_list = "process.pid=from-list,list.only=list-value";
+
+  auto typed_value   = std::make_unique<config_sdk::StringAttributeValueConfiguration>();
+  typed_value->value = "from-attributes";
+  model->attributes  = std::make_unique<config_sdk::AttributesConfiguration>();
+  model->attributes->kv_map.emplace("process.pid", std::move(typed_value));
+
+  model->schema_url = "https://opentelemetry.io/schemas/1.2.0";
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  EXPECT_EQ(GetStringAttribute(resource, "process.pid"), "from-attributes");
+  EXPECT_EQ(GetStringAttribute(resource, "list.only"), "list-value");
+  EXPECT_EQ(GetStringAttribute(resource, "process.command_args"), "detected-args");
+  EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.name"), "opentelemetry");
+  EXPECT_EQ(resource.GetSchemaURL(), "https://opentelemetry.io/schemas/1.2.0");
+}
+
+TEST(SdkBuilder, SetResourceFilterAppliesToDetectedAttributesOnly)
+{
+  auto registry = RegistryFactory::Create();
+  registry->SetProcessResourceDetectorBuilder(
+      std::make_unique<TestProcessResourceDetectorBuilder>());
+  SdkBuilder builder(std::move(registry));
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(
+      std::make_unique<config_sdk::ProcessResourceDetectorConfiguration>());
+
+  // Exclude everything the detector produced.
+  auto filter                    = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+  filter->excluded               = std::make_unique<config_sdk::StringArrayConfiguration>();
+  filter->excluded->string_array = {"process.*"};
+  model->detection->attributes   = std::move(filter);
+
+  // Attributes matching the excluded pattern, from attributes_list and attributes.
+  model->attributes_list = "process.pid=from-list";
+
+  auto typed_value   = std::make_unique<config_sdk::StringAttributeValueConfiguration>();
+  typed_value->value = "from-attributes";
+  model->attributes  = std::make_unique<config_sdk::AttributesConfiguration>();
+  model->attributes->kv_map.emplace("process.command_args", std::move(typed_value));
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  // The filter removed every detected attribute, but does not apply to the
+  // attributes and attributes_list fields, even when their keys match.
+  EXPECT_EQ(GetStringAttribute(resource, "process.pid"), "from-list");
+  EXPECT_EQ(GetStringAttribute(resource, "process.command_args"), "from-attributes");
 }
