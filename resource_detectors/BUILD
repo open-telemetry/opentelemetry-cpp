@@ -95,6 +95,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "service_resource_detector_utils",
+    srcs = ["src/service_detector_utils.cc"],
+    copts = ["-fexceptions"],
+    deps = [
+        ":process_resource_detector",
+        "//api",
+        "//resource_detectors:headers",
+        "//sdk:headers",
+        "//sdk/src/common:env_variables",
+        "//sdk/src/common:random",
+        "//sdk/src/resource",
+    ],
+)
+
 # Convenience target linking all resource detectors.
 cc_library(
     name = "resource_detectors",

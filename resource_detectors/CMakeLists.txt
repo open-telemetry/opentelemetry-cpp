@@ -137,6 +137,22 @@ target_link_libraries(
           opentelemetry_configuration_core)
 
 #
+# opentelemetry_service_resource_detector_utils
+#
+
+add_library(opentelemetry_service_resource_detector_utils
+            src/service_detector_utils.cc)
+
+target_link_libraries(
+  opentelemetry_service_resource_detector_utils
+  PUBLIC opentelemetry_resources
+  PRIVATE opentelemetry_process_resource_detector)
+target_include_directories(
+  opentelemetry_service_resource_detector_utils
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+
+#
 # opentelemetry_resource_detectors (interface to all detectors)
 #
 

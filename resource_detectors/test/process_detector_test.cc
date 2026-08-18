@@ -112,6 +112,15 @@ TEST(ProcessDetectorUtilsTest, GetExecutablePathTest)
   EXPECT_EQ(path, expected_path);
 }
 
+TEST(ProcessDetectorUtilsTest, GetExecutableNameTest)
+{
+  int32_t pid                 = getpid();
+  std::string executable_name = opentelemetry::resource_detector::detail::GetExecutableName(pid);
+  EXPECT_FALSE(executable_name.empty());
+  EXPECT_EQ(executable_name.find('/'), std::string::npos);
+  EXPECT_EQ(executable_name.find('\\'), std::string::npos);
+}
+
 TEST(ProcessDetectorUtilsTest, CommandTest)
 {
   int32_t pid = getpid();

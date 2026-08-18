@@ -7,6 +7,10 @@
 #include <string>
 #include <vector>
 
+#if defined(__APPLE__)
+#  include <mach-o/dyld.h>
+#endif
+
 #ifdef _MSC_VER
 // clang-format off
 #  include <windows.h>
@@ -30,6 +34,25 @@ namespace detail
 
 constexpr const char *kExecutableName = "exe";
 constexpr const char *kCmdlineName    = "cmdline";
+
+namespace
+{
+std::string Basename(const std::string &path)
+{
+  if (path.empty())
+  {
+    return std::string();
+  }
+
+  const size_t pos = path.find_last_of("/\\");
+  if (pos == std::string::npos)
+  {
+    return path;
+  }
+
+  return path.substr(pos + 1);
+}
+}  // namespace
 
 std::string GetExecutablePath(const int32_t &pid)
 {
@@ -68,6 +91,27 @@ std::string GetExecutablePath(const int32_t &pid)
   }
 
   return std::string();
+#endif
+}
+
+std::string GetExecutableName(const int32_t &pid)
+{
+#if defined(__APPLE__)
+  if (pid != static_cast<int32_t>(getpid()))
+  {
+    return std::string();
+  }
+
+  char path[4096];
+  uint32_t size = sizeof(path);
+  if (_NSGetExecutablePath(path, &size) != 0)
+  {
+    return std::string();
+  }
+
+  return Basename(path);
+#else
+  return Basename(GetExecutablePath(pid));
 #endif
 }
 

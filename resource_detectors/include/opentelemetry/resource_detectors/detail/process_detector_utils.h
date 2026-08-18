@@ -33,6 +33,18 @@ std::string FormFilePath(const int32_t &pid, const char *process_type);
 std::string GetExecutablePath(const int32_t &pid);
 
 /**
+ * Retrieves the executable file name for a given PID.
+ * Platform-specific behavior:
+ *   - Windows: Basename of the path from GetExecutablePath().
+ *   - Linux: Basename of the path from /proc/<pid>/exe.
+ *   - macOS: Uses _NSGetExecutablePath() for the current process only; returns
+ *     an empty string for other PIDs.
+ *
+ * @param pid Process ID.
+ */
+std::string GetExecutableName(const int32_t &pid);
+
+/**
  * Extracts the command-line arguments and the command.
  * Platform-specific behavior:
  *   - Windows: Uses CommandLineToArgvW() to parse the command line.
