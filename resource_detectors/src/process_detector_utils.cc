@@ -20,6 +20,14 @@
 #  include <cstdio>
 #endif
 
+#ifdef __APPLE__
+#  include <sys/sysctl.h>
+#endif
+
+#ifndef _MSC_VER
+#  include <pwd.h>
+#endif
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -31,14 +39,15 @@ namespace detail
 constexpr const char *kExecutableName = "exe";
 constexpr const char *kCmdlineName    = "cmdline";
 
-std::string GetExecutablePath(const int32_t &pid)
+ExecutableInfo GetExecutableInfo(const int32_t &pid)
 {
+  ExecutableInfo info;
 #ifdef _MSC_VER
   HANDLE hProcess =
       OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, static_cast<DWORD>(pid));
   if (!hProcess)
   {
-    return std::string();
+    return info;
   }
 
   WCHAR wbuffer[MAX_PATH];
@@ -47,7 +56,7 @@ std::string GetExecutablePath(const int32_t &pid)
 
   if (len == 0)
   {
-    return std::string();
+    return info;
   }
 
   // Convert UTF-16 to UTF-8
@@ -55,36 +64,32 @@ std::string GetExecutablePath(const int32_t &pid)
   std::string utf8_path(size_needed, 0);
   WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL);
 
-  return utf8_path;
+  info.path = utf8_path;
 #else
-  std::string path = FormFilePath(pid, kExecutableName);
+  std::string proc_path = FormFilePath(pid, kExecutableName);
   char buffer[4096];
 
-  ssize_t len = readlink(path.c_str(), buffer, sizeof(buffer) - 1);
+  ssize_t len = readlink(proc_path.c_str(), buffer, sizeof(buffer) - 1);
   if (len != -1)
   {
     buffer[len] = '\0';
-    return std::string(buffer);
+    info.path   = std::string(buffer);
   }
-
-  return std::string();
 #endif
-}
 
-std::string GetExecutableName(const int32_t &pid)
-{
-  std::string path = GetExecutablePath(pid);
-  if (path.empty())
+  if (!info.path.empty())
   {
-    return std::string();
+    std::size_t sep = info.path.find_last_of("/\\");
+    if (sep != std::string::npos)
+    {
+      info.name = info.path.substr(sep + 1);
+    }
+    else
+    {
+      info.name = info.path;
+    }
   }
-  // Find last path separator (works for both '/' and '\').
-  std::size_t sep = path.find_last_of("/\\");
-  if (sep == std::string::npos)
-  {
-    return path;
-  }
-  return path.substr(sep + 1);
+  return info;
 }
 
 std::vector<std::string> ExtractCommandWithArgs(const std::string &command_line_path)
@@ -234,10 +239,6 @@ bool ReadBootTimeSecs(unsigned long long &boot_time)
 }  // namespace
 #endif  // !_MSC_VER && !__APPLE__
 
-#ifdef __APPLE__
-#  include <sys/sysctl.h>
-#endif
-
 std::string GetProcessCreationTime(const int32_t &pid)
 {
 #ifdef _MSC_VER
@@ -315,11 +316,7 @@ std::string GetProcessCreationTime(const int32_t &pid)
 // GetProcessOwner
 // ---------------------------------------------------------------------------
 
-#ifndef _MSC_VER
-#  include <pwd.h>
-#endif
-
-std::string GetProcessOwner(const int32_t & /* pid */)
+std::string GetProcessOwner()
 {
 #ifdef _MSC_VER
   // On Windows, open the current process token and look up the account SID.
@@ -541,7 +538,7 @@ std::string DigestToHex(const uint8_t *digest, std::size_t byte_count)
 
 std::string GetExecutableBuildIdHtlhash(const int32_t &pid)
 {
-  std::string exe_path = GetExecutablePath(pid);
+  std::string exe_path = GetExecutableInfo(pid).path;
   if (exe_path.empty())
   {
     return std::string();
@@ -564,14 +561,17 @@ std::string GetExecutableBuildIdHtlhash(const int32_t &pid)
   std::size_t head_read = static_cast<std::size_t>(f.gcount());
   head.resize(head_read);
 
-  // Read tail (up to 4096 bytes from end).
-  std::string tail(kChunkSize, '\0');
-  std::size_t tail_offset =
-      (file_size > kChunkSize) ? static_cast<std::size_t>(file_size - kChunkSize) : 0;
-  f.seekg(static_cast<std::streamoff>(tail_offset), std::ios::beg);
-  f.read(&tail[0], static_cast<std::streamsize>(kChunkSize));
-  std::size_t tail_read = static_cast<std::size_t>(f.gcount());
-  tail.resize(tail_read);
+  // Read tail (up to 4096 bytes from end) only if file is larger than 4096 bytes.
+  std::string tail;
+  if (file_size > kChunkSize)
+  {
+    tail.resize(kChunkSize, '\0');
+    std::size_t tail_offset = static_cast<std::size_t>(file_size - kChunkSize);
+    f.seekg(static_cast<std::streamoff>(tail_offset), std::ios::beg);
+    f.read(&tail[0], static_cast<std::streamsize>(kChunkSize));
+    std::size_t tail_read = static_cast<std::size_t>(f.gcount());
+    tail.resize(tail_read);
+  }
 
   // Encode file length as big-endian uint64.
   std::uint64_t file_size_be = file_size;
@@ -594,6 +594,19 @@ std::string GetExecutableBuildIdHtlhash(const int32_t &pid)
 
   // Return first 16 bytes (128 bits) as hex (32 hex chars).
   return DigestToHex(digest, 16);
+}
+
+std::string ComputeSha256Hex(const std::string &data)
+{
+  Sha256Context ctx;
+  Sha256Init(ctx);
+  Sha256Update(ctx, reinterpret_cast<const uint8_t *>(data.data()), data.size());
+
+  uint8_t digest[32];
+  Sha256Final(ctx, digest);
+
+  // Return all 32 bytes (256 bits) as hex (64 hex chars).
+  return DigestToHex(digest, 32);
 }
 
 }  // namespace detail

@@ -111,7 +111,7 @@ TEST(ProcessDetectorUtilsTest, GetExecutablePathTest)
     path = std::string();
   }
 #endif
-  std::string expected_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
+  std::string expected_path = opentelemetry::resource_detector::detail::GetExecutableInfo(pid).path;
   EXPECT_EQ(path, expected_path);
 }
 
@@ -199,8 +199,9 @@ TEST(ProcessDetectorUtilsTest, GetCommandWithArgsTest)
 TEST(ProcessDetectorUtilsTest, GetExecutableNameTest)
 {
   int32_t pid          = getpid();
-  std::string exe_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
-  std::string exe_name = opentelemetry::resource_detector::detail::GetExecutableName(pid);
+  auto exe_info        = opentelemetry::resource_detector::detail::GetExecutableInfo(pid);
+  std::string exe_path = exe_info.path;
+  std::string exe_name = exe_info.name;
 
   if (exe_path.empty())
   {
@@ -244,7 +245,7 @@ TEST(ProcessDetectorUtilsTest, GetProcessCreationTimeTest)
 TEST(ProcessDetectorUtilsTest, GetProcessOwnerTest)
 {
   int32_t pid       = getpid();
-  std::string owner = opentelemetry::resource_detector::detail::GetProcessOwner(pid);
+  std::string owner = opentelemetry::resource_detector::detail::GetProcessOwner();
 
   // On all supported platforms the effective user name must be non-empty.
   EXPECT_FALSE(owner.empty()) << "Process owner should be non-empty";
@@ -255,7 +256,7 @@ TEST(ProcessDetectorUtilsTest, GetProcessOwnerTest)
 TEST(ProcessDetectorUtilsTest, GetExecutableBuildIdHtlhashTest)
 {
   int32_t pid          = getpid();
-  std::string exe_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
+  std::string exe_path = opentelemetry::resource_detector::detail::GetExecutableInfo(pid).path;
   std::string hash1    = opentelemetry::resource_detector::detail::GetExecutableBuildIdHtlhash(pid);
   std::string hash2    = opentelemetry::resource_detector::detail::GetExecutableBuildIdHtlhash(pid);
 
@@ -284,6 +285,23 @@ TEST(ProcessDetectorUtilsTest, GetExecutableBuildIdHtlhashTest)
 // ---------------------------------------------------------------------------
 // Integration test — Detect() attribute presence
 // ---------------------------------------------------------------------------
+
+TEST(ProcessDetectorUtilsTest, ComputeSha256HexTest)
+{
+  // Test vectors from NIST FIPS 180-4
+  // 1. Empty string
+  EXPECT_EQ(opentelemetry::resource_detector::detail::ComputeSha256Hex(""),
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+
+  // 2. "abc"
+  EXPECT_EQ(opentelemetry::resource_detector::detail::ComputeSha256Hex("abc"),
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+
+  // 3. "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
+  EXPECT_EQ(opentelemetry::resource_detector::detail::ComputeSha256Hex(
+                "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"),
+            "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1");
+}
 
 TEST(ProcessResourceDetectorTest, DetectPopulatesExpectedAttributes)
 {

@@ -16,13 +16,22 @@ namespace detail
 {
 
 /**
+ * Contains the path and name of the executable.
+ */
+struct ExecutableInfo
+{
+  std::string path;
+  std::string name;
+};
+
+/**
  * Forms a file path for a process type based on the given PID.
  * for example - /proc/<pid>/cmdline, /proc/<pid>/exe
  */
 std::string FormFilePath(const int32_t &pid, const char *process_type);
 
 /**
- * Retrieves the absolute file system path to the executable for a given PID.
+ * Retrieves the absolute file system path and the base name of the process executable.
  * Platform-specific behavior:
  *   - Windows: Uses OpenProcess() + GetProcessImageFileNameW().
  *   - Linux/Unix: Reads the /proc/<pid>/exe symbolic link.
@@ -30,16 +39,7 @@ std::string FormFilePath(const int32_t &pid, const char *process_type);
  *
  * @param pid Process ID.
  */
-std::string GetExecutablePath(const int32_t &pid);
-
-/**
- * Returns the base name (filename) of the process executable.
- * Derived from GetExecutablePath() by stripping the directory components.
- * Platform-specific behavior mirrors GetExecutablePath().
- *
- * @param pid Process ID.
- */
-std::string GetExecutableName(const int32_t &pid);
+ExecutableInfo GetExecutableInfo(const int32_t &pid);
 
 /**
  * Extracts the command-line arguments and the command.
@@ -78,7 +78,7 @@ std::string GetProcessCreationTime(const int32_t &pid);
  *
  * @param pid Process ID.
  */
-std::string GetProcessOwner(const int32_t &pid);
+std::string GetProcessOwner();
 
 /**
  * Computes the deterministic htlhash build ID for the process executable.
@@ -89,6 +89,12 @@ std::string GetProcessOwner(const int32_t &pid);
  * @param pid Process ID.
  */
 std::string GetExecutableBuildIdHtlhash(const int32_t &pid);
+
+/**
+ * Computes a SHA-256 hash of the given data and returns it as a lowercase hex string.
+ * This is exposed primarily for unit testing the internal SHA-256 implementation.
+ */
+std::string ComputeSha256Hex(const std::string &data);
 
 }  // namespace detail
 }  // namespace resource_detector

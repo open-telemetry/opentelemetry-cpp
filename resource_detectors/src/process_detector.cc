@@ -36,18 +36,14 @@ opentelemetry::sdk::resource::Resource ProcessResourceDetector::Detect() noexcep
 
   try
   {
-    std::string executable_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
-    if (!executable_path.empty())
+    auto exe_info = opentelemetry::resource_detector::detail::GetExecutableInfo(pid);
+    if (!exe_info.path.empty())
     {
-      attributes[semconv::process::kProcessExecutablePath] = executable_path;
+      attributes[semconv::process::kProcessExecutablePath] = std::move(exe_info.path);
 
-      // process.executable.name is the basename of the executable path.
-      std::size_t sep = executable_path.find_last_of("/\\");
-      std::string executable_name =
-          (sep == std::string::npos) ? executable_path : executable_path.substr(sep + 1);
-      if (!executable_name.empty())
+      if (!exe_info.name.empty())
       {
-        attributes[semconv::process::kProcessExecutableName] = std::move(executable_name);
+        attributes[semconv::process::kProcessExecutableName] = std::move(exe_info.name);
       }
     }
   }
@@ -91,7 +87,7 @@ opentelemetry::sdk::resource::Resource ProcessResourceDetector::Detect() noexcep
 
   try
   {
-    std::string owner = opentelemetry::resource_detector::detail::GetProcessOwner(pid);
+    std::string owner = opentelemetry::resource_detector::detail::GetProcessOwner();
     if (!owner.empty())
     {
       attributes[semconv::process::kProcessOwner] = std::move(owner);
