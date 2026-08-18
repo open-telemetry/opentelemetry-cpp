@@ -94,3 +94,14 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "service_resource_detector_test",
+    srcs = ["service_detector_test.cc"],
+    tags = ["test"],
+    deps = [
+        "//resource_detectors:service_resource_detector",
+        "//sdk/src/resource",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

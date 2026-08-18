@@ -99,3 +99,16 @@ gtest_add_tests(
   TARGET service_resource_detector_utils_test
   TEST_PREFIX resource_detector.
   TEST_LIST service_resource_detector_utils_test)
+
+#
+# service_resource_detector tests
+#
+
+add_executable(service_resource_detector_test service_detector_test.cc)
+target_link_libraries(
+  service_resource_detector_test PRIVATE opentelemetry_service_resource_detector
+                                       GTest::gtest_main)
+gtest_add_tests(
+  TARGET service_resource_detector_test
+  TEST_PREFIX resource_detector.
+  TEST_LIST service_resource_detector_test)
