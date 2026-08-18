@@ -184,7 +184,7 @@ namespace
 {
 // Parse the 22nd field (starttime, in clock ticks since boot) from /proc/<pid>/stat.
 // The comm field (2nd) may contain spaces/parens, so we scan past the closing ')'.
-bool ParseStarttimeFromProcStat(const std::string &stat_path, unsigned long long &starttime_ticks)
+bool ParseStarttimeFromProcStat(const std::string &stat_path, uint64_t &starttime_ticks)
 {
   std::ifstream f(stat_path);
   if (!f.is_open())
@@ -218,7 +218,7 @@ bool ParseStarttimeFromProcStat(const std::string &stat_path, unsigned long long
 }
 
 // Read boot time in seconds since epoch from /proc/stat.
-bool ReadBootTimeSecs(unsigned long long &boot_time)
+bool ReadBootTimeSecs(uint64_t &boot_time)
 {
   std::ifstream f("/proc/stat");
   if (!f.is_open())
@@ -266,7 +266,7 @@ std::string GetProcessCreationTime(const int32_t &pid)
   }
   // kp_proc.p_starttime is a struct timeval (seconds + microseconds).
   time_t secs        = kp.kp_proc.p_starttime.tv_sec;
-  long usecs         = kp.kp_proc.p_starttime.tv_usec;
+  int64_t usecs      = kp.kp_proc.p_starttime.tv_usec;
   struct tm utc_time = {};
   gmtime_r(&secs, &utc_time);
   char buf[32];
@@ -277,8 +277,8 @@ std::string GetProcessCreationTime(const int32_t &pid)
 
 #else
   // Linux: starttime (ticks since boot) from /proc/<pid>/stat + btime from /proc/stat.
-  unsigned long long starttime_ticks = 0;
-  unsigned long long boot_time_secs  = 0;
+  uint64_t starttime_ticks = 0;
+  uint64_t boot_time_secs  = 0;
 
   std::string stat_path = FormFilePath(pid, "stat");
   if (!ParseStarttimeFromProcStat(stat_path, starttime_ticks))
@@ -290,15 +290,15 @@ std::string GetProcessCreationTime(const int32_t &pid)
     return std::string();
   }
 
-  long clk_tck = sysconf(_SC_CLK_TCK);
+  int64_t clk_tck = sysconf(_SC_CLK_TCK);
   if (clk_tck <= 0)
   {
     return std::string();
   }
 
-  const auto clk                 = static_cast<unsigned long long>(clk_tck);
-  unsigned long long start_secs  = boot_time_secs + starttime_ticks / clk;
-  unsigned long long start_msecs = (starttime_ticks % clk) * 1000 / clk;
+  const auto clk       = static_cast<uint64_t>(clk_tck);
+  uint64_t start_secs  = boot_time_secs + starttime_ticks / clk;
+  uint64_t start_msecs = (starttime_ticks % clk) * 1000 / clk;
 
   time_t t           = static_cast<time_t>(start_secs);
   struct tm utc_time = {};
@@ -390,10 +390,10 @@ namespace
 // Reference: FIPS 180-4
 struct Sha256Context
 {
-  uint32_t state[8];
-  uint64_t bit_count;
-  uint8_t buffer[64];
-  uint32_t buffer_len;
+  uint32_t state[8]   = {0};
+  uint64_t bit_count  = 0;
+  uint8_t buffer[64]  = {0};
+  uint32_t buffer_len = 0;
 };
 
 static const uint32_t kSha256K[64] = {

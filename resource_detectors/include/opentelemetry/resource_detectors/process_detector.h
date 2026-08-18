@@ -16,11 +16,14 @@ namespace resource_detector
  * process creation time, process owner, and executable build ID, then sets attributes
  * following the OpenTelemetry semantic conventions:
  *
+ *  Process entity attributes:
  *  - process.pid                        (required)  — current process identifier
- *  - process.executable.path            (recommended) — full path via /proc or Win32 APIs
- *  - process.executable.name            (recommended) — basename of the executable path
  *  - process.creation.time              (required)  — ISO 8601 UTC creation timestamp
  *  - process.owner                      (recommended) — username of the process owner
+ *
+ *  Process Executable entity attributes:
+ *  - process.executable.path            (recommended) — full path via /proc or Win32 APIs
+ *  - process.executable.name            (recommended) — basename of the executable path
  *  - process.executable.build_id.htlhash (required) — deterministic SHA256-based build ID
  *
  * Attributes that cannot be determined on the current platform are omitted.
