@@ -91,7 +91,7 @@ public:
   /**
    * Replace the ScopeConfigurator for this meter context.
    *
-   * Note: This method is not thread safe.
+   * Note: Not thread safe. Called via MeterProvider::UpdateMeterConfigurator, which holds lock_.
    * @param meter_configurator The new configurator.
    */
   void SetMeterConfigurator(std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>

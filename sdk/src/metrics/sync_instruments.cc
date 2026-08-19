@@ -17,6 +17,7 @@
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #include "opentelemetry/sdk/metrics/sync_instruments.h"
 
@@ -42,8 +43,9 @@ bool ToInt64Value(uint64_t value, const char *operation, int64_t &converted) noe
 }  // namespace
 
 LongCounter::LongCounter(const InstrumentDescriptor &instrument_descriptor,
-                         std::unique_ptr<SyncWritableMetricStorage> storage)
-    : Synchronous(instrument_descriptor, std::move(storage))
+                         std::unique_ptr<SyncWritableMetricStorage> storage,
+                         std::shared_ptr<MeterEnabledState> meter_enabled_state)
+    : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
   if (!storage_)
   {
@@ -55,6 +57,10 @@ LongCounter::LongCounter(const InstrumentDescriptor &instrument_descriptor,
 void LongCounter::Add(uint64_t value,
                       const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   auto context = opentelemetry::context::Context{};
   if (!storage_)
   {
@@ -73,6 +79,10 @@ void LongCounter::Add(uint64_t value,
                       const opentelemetry::common::KeyValueIterable &attributes,
                       const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN("[LongCounter::Add(V,A,C)] Value not recorded - invalid storage for: "
@@ -88,6 +98,10 @@ void LongCounter::Add(uint64_t value,
 
 void LongCounter::Add(uint64_t value) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   auto context = opentelemetry::context::Context{};
   if (!storage_)
   {
@@ -104,6 +118,10 @@ void LongCounter::Add(uint64_t value) noexcept
 
 void LongCounter::Add(uint64_t value, const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN("[LongCounter::Add(V,C)] Value not recorded - invalid storage for: "
@@ -118,8 +136,9 @@ void LongCounter::Add(uint64_t value, const opentelemetry::context::Context &con
 }
 
 DoubleCounter::DoubleCounter(const InstrumentDescriptor &instrument_descriptor,
-                             std::unique_ptr<SyncWritableMetricStorage> storage)
-    : Synchronous(instrument_descriptor, std::move(storage))
+                             std::unique_ptr<SyncWritableMetricStorage> storage,
+                             std::shared_ptr<MeterEnabledState> meter_enabled_state)
+    : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
   if (!storage_)
   {
@@ -131,6 +150,10 @@ DoubleCounter::DoubleCounter(const InstrumentDescriptor &instrument_descriptor,
 void DoubleCounter::Add(double value,
                         const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (value < 0)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleCounter::Add(V,A)] Value not recorded - negative value for: "
@@ -151,6 +174,10 @@ void DoubleCounter::Add(double value,
                         const opentelemetry::common::KeyValueIterable &attributes,
                         const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (value < 0)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleCounter::Add(V,A,C)] Value not recorded - negative value for: "
@@ -168,6 +195,10 @@ void DoubleCounter::Add(double value,
 
 void DoubleCounter::Add(double value) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (value < 0)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleCounter::Add(V)] Value not recorded - negative value for: "
@@ -186,6 +217,10 @@ void DoubleCounter::Add(double value) noexcept
 
 void DoubleCounter::Add(double value, const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (value < 0)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleCounter::Add(V)] Value not recorded - negative value for: "
@@ -202,8 +237,9 @@ void DoubleCounter::Add(double value, const opentelemetry::context::Context &con
 }
 
 LongUpDownCounter::LongUpDownCounter(const InstrumentDescriptor &instrument_descriptor,
-                                     std::unique_ptr<SyncWritableMetricStorage> storage)
-    : Synchronous(instrument_descriptor, std::move(storage))
+                                     std::unique_ptr<SyncWritableMetricStorage> storage,
+                                     std::shared_ptr<MeterEnabledState> meter_enabled_state)
+    : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
   if (!storage_)
   {
@@ -216,6 +252,10 @@ LongUpDownCounter::LongUpDownCounter(const InstrumentDescriptor &instrument_desc
 void LongUpDownCounter::Add(int64_t value,
                             const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   auto context = opentelemetry::context::Context{};
   if (!storage_)
   {
@@ -231,6 +271,10 @@ void LongUpDownCounter::Add(int64_t value,
                             const opentelemetry::common::KeyValueIterable &attributes,
                             const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN(
@@ -243,6 +287,10 @@ void LongUpDownCounter::Add(int64_t value,
 
 void LongUpDownCounter::Add(int64_t value) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   auto context = opentelemetry::context::Context{};
   if (!storage_)
   {
@@ -255,6 +303,10 @@ void LongUpDownCounter::Add(int64_t value) noexcept
 
 void LongUpDownCounter::Add(int64_t value, const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN(
@@ -266,8 +318,9 @@ void LongUpDownCounter::Add(int64_t value, const opentelemetry::context::Context
 }
 
 DoubleUpDownCounter::DoubleUpDownCounter(const InstrumentDescriptor &instrument_descriptor,
-                                         std::unique_ptr<SyncWritableMetricStorage> storage)
-    : Synchronous(instrument_descriptor, std::move(storage))
+                                         std::unique_ptr<SyncWritableMetricStorage> storage,
+                                         std::shared_ptr<MeterEnabledState> meter_enabled_state)
+    : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
   if (!storage_)
   {
@@ -280,6 +333,10 @@ DoubleUpDownCounter::DoubleUpDownCounter(const InstrumentDescriptor &instrument_
 void DoubleUpDownCounter::Add(double value,
                               const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN(
@@ -294,6 +351,10 @@ void DoubleUpDownCounter::Add(double value,
                               const opentelemetry::common::KeyValueIterable &attributes,
                               const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN(
@@ -306,6 +367,10 @@ void DoubleUpDownCounter::Add(double value,
 
 void DoubleUpDownCounter::Add(double value) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN(
@@ -319,6 +384,10 @@ void DoubleUpDownCounter::Add(double value) noexcept
 
 void DoubleUpDownCounter::Add(double value, const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN(
@@ -331,8 +400,9 @@ void DoubleUpDownCounter::Add(double value, const opentelemetry::context::Contex
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 LongGauge::LongGauge(const InstrumentDescriptor &instrument_descriptor,
-                     std::unique_ptr<SyncWritableMetricStorage> storage)
-    : Synchronous(instrument_descriptor, std::move(storage))
+                     std::unique_ptr<SyncWritableMetricStorage> storage,
+                     std::shared_ptr<MeterEnabledState> meter_enabled_state)
+    : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
   if (!storage_)
   {
@@ -344,6 +414,10 @@ LongGauge::LongGauge(const InstrumentDescriptor &instrument_descriptor,
 void LongGauge::Record(int64_t value,
                        const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   auto context = opentelemetry::context::Context{};
   if (!storage_)
   {
@@ -358,6 +432,10 @@ void LongGauge::Record(int64_t value,
                        const opentelemetry::common::KeyValueIterable &attributes,
                        const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN("[LongGauge::Record(V,A,C)] Value not recorded - invalid storage for: "
@@ -369,6 +447,10 @@ void LongGauge::Record(int64_t value,
 
 void LongGauge::Record(int64_t value) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   auto context = opentelemetry::context::Context{};
   if (!storage_)
   {
@@ -381,6 +463,10 @@ void LongGauge::Record(int64_t value) noexcept
 
 void LongGauge::Record(int64_t value, const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN("[LongGauge::Record(V,C)] Value not recorded - invalid storage for: "
@@ -391,8 +477,9 @@ void LongGauge::Record(int64_t value, const opentelemetry::context::Context &con
 }
 
 DoubleGauge::DoubleGauge(const InstrumentDescriptor &instrument_descriptor,
-                         std::unique_ptr<SyncWritableMetricStorage> storage)
-    : Synchronous(instrument_descriptor, std::move(storage))
+                         std::unique_ptr<SyncWritableMetricStorage> storage,
+                         std::shared_ptr<MeterEnabledState> meter_enabled_state)
+    : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
   if (!storage_)
   {
@@ -404,6 +491,10 @@ DoubleGauge::DoubleGauge(const InstrumentDescriptor &instrument_descriptor,
 void DoubleGauge::Record(double value,
                          const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleGauge::Record(V,A)] Value not recorded - invalid storage for: "
@@ -417,6 +508,10 @@ void DoubleGauge::Record(double value,
                          const opentelemetry::common::KeyValueIterable &attributes,
                          const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleGauge::Record(V,A,C)] Value not recorded - invalid storage for: "
@@ -428,6 +523,10 @@ void DoubleGauge::Record(double value,
 
 void DoubleGauge::Record(double value) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleGauge::Record(V)] Value not recorded - invalid storage for: "
@@ -440,6 +539,10 @@ void DoubleGauge::Record(double value) noexcept
 
 void DoubleGauge::Record(double value, const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleGauge::Record(V,C)] Value not recorded - invalid storage for: "
@@ -451,8 +554,9 @@ void DoubleGauge::Record(double value, const opentelemetry::context::Context &co
 #endif
 
 LongHistogram::LongHistogram(const InstrumentDescriptor &instrument_descriptor,
-                             std::unique_ptr<SyncWritableMetricStorage> storage)
-    : Synchronous(instrument_descriptor, std::move(storage))
+                             std::unique_ptr<SyncWritableMetricStorage> storage,
+                             std::shared_ptr<MeterEnabledState> meter_enabled_state)
+    : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
   if (!storage_)
   {
@@ -465,6 +569,10 @@ void LongHistogram::Record(uint64_t value,
                            const opentelemetry::common::KeyValueIterable &attributes,
                            const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN(
@@ -481,6 +589,10 @@ void LongHistogram::Record(uint64_t value,
 
 void LongHistogram::Record(uint64_t value, const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN("[LongHistogram::Record(V,C)] Value not recorded - invalid storage for: "
@@ -498,6 +610,10 @@ void LongHistogram::Record(uint64_t value, const opentelemetry::context::Context
 void LongHistogram::Record(uint64_t value,
                            const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN("[LongHistogram::Record(V,A)] Value not recorded - invalid storage for: "
@@ -514,6 +630,10 @@ void LongHistogram::Record(uint64_t value,
 
 void LongHistogram::Record(uint64_t value) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (!storage_)
   {
     OTEL_INTERNAL_LOG_WARN("[LongHistogram::Record(V)] Value not recorded - invalid storage for: "
@@ -530,8 +650,9 @@ void LongHistogram::Record(uint64_t value) noexcept
 #endif
 
 DoubleHistogram::DoubleHistogram(const InstrumentDescriptor &instrument_descriptor,
-                                 std::unique_ptr<SyncWritableMetricStorage> storage)
-    : Synchronous(instrument_descriptor, std::move(storage))
+                                 std::unique_ptr<SyncWritableMetricStorage> storage,
+                                 std::shared_ptr<MeterEnabledState> meter_enabled_state)
+    : Synchronous(instrument_descriptor, std::move(storage), std::move(meter_enabled_state))
 {
   if (!storage_)
   {
@@ -545,6 +666,10 @@ void DoubleHistogram::Record(double value,
                              const opentelemetry::common::KeyValueIterable &attributes,
                              const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (value < 0)
   {
     OTEL_INTERNAL_LOG_WARN(
@@ -564,6 +689,10 @@ void DoubleHistogram::Record(double value,
 
 void DoubleHistogram::Record(double value, const opentelemetry::context::Context &context) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (value < 0)
   {
     OTEL_INTERNAL_LOG_WARN(
@@ -585,6 +714,10 @@ void DoubleHistogram::Record(double value, const opentelemetry::context::Context
 void DoubleHistogram::Record(double value,
                              const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (value < 0)
   {
     OTEL_INTERNAL_LOG_WARN(
@@ -605,6 +738,10 @@ void DoubleHistogram::Record(double value,
 
 void DoubleHistogram::Record(double value) noexcept
 {
+  if (!IsEnabled())
+  {
+    return;
+  }
   if (value < 0)
   {
     OTEL_INTERNAL_LOG_WARN("[DoubleHistogram::Record(V)] Value not recorded - negative value for: "
@@ -629,11 +766,16 @@ namespace
 class BoundLongCounterImpl : public opentelemetry::metrics::BoundCounter<uint64_t>
 {
 public:
-  explicit BoundLongCounterImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage) noexcept
-      : storage_(std::move(storage))
+  BoundLongCounterImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage,
+                       std::shared_ptr<MeterEnabledState> meter_enabled_state) noexcept
+      : storage_(std::move(storage)), meter_enabled_state_(std::move(meter_enabled_state))
   {}
   void Add(uint64_t value) noexcept override
   {
+    if (meter_enabled_state_ && !meter_enabled_state_->IsEnabled())
+    {
+      return;
+    }
     if (storage_)
     {
       int64_t converted = 0;
@@ -646,16 +788,22 @@ public:
 
 private:
   std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
+  std::shared_ptr<MeterEnabledState> meter_enabled_state_;
 };
 
 class BoundDoubleCounterImpl : public opentelemetry::metrics::BoundCounter<double>
 {
 public:
-  explicit BoundDoubleCounterImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage) noexcept
-      : storage_(std::move(storage))
+  BoundDoubleCounterImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage,
+                         std::shared_ptr<MeterEnabledState> meter_enabled_state) noexcept
+      : storage_(std::move(storage)), meter_enabled_state_(std::move(meter_enabled_state))
   {}
   void Add(double value) noexcept override
   {
+    if (meter_enabled_state_ && !meter_enabled_state_->IsEnabled())
+    {
+      return;
+    }
     if (value < 0)
     {
       OTEL_INTERNAL_LOG_WARN("[BoundDoubleCounter::Add(V)] Value not recorded - negative value");
@@ -669,16 +817,22 @@ public:
 
 private:
   std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
+  std::shared_ptr<MeterEnabledState> meter_enabled_state_;
 };
 
 class BoundLongHistogramImpl : public opentelemetry::metrics::BoundHistogram<uint64_t>
 {
 public:
-  explicit BoundLongHistogramImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage) noexcept
-      : storage_(std::move(storage))
+  BoundLongHistogramImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage,
+                         std::shared_ptr<MeterEnabledState> meter_enabled_state) noexcept
+      : storage_(std::move(storage)), meter_enabled_state_(std::move(meter_enabled_state))
   {}
   void Record(uint64_t value) noexcept override
   {
+    if (meter_enabled_state_ && !meter_enabled_state_->IsEnabled())
+    {
+      return;
+    }
     if (storage_)
     {
       int64_t converted = 0;
@@ -691,17 +845,22 @@ public:
 
 private:
   std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
+  std::shared_ptr<MeterEnabledState> meter_enabled_state_;
 };
 
 class BoundDoubleHistogramImpl : public opentelemetry::metrics::BoundHistogram<double>
 {
 public:
-  explicit BoundDoubleHistogramImpl(
-      std::shared_ptr<BoundSyncWritableMetricStorage> storage) noexcept
-      : storage_(std::move(storage))
+  BoundDoubleHistogramImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage,
+                           std::shared_ptr<MeterEnabledState> meter_enabled_state) noexcept
+      : storage_(std::move(storage)), meter_enabled_state_(std::move(meter_enabled_state))
   {}
   void Record(double value) noexcept override
   {
+    if (meter_enabled_state_ && !meter_enabled_state_->IsEnabled())
+    {
+      return;
+    }
     if (value < 0)
     {
       OTEL_INTERNAL_LOG_WARN(
@@ -716,6 +875,7 @@ public:
 
 private:
   std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
+  std::shared_ptr<MeterEnabledState> meter_enabled_state_;
 };
 
 }  // namespace
@@ -729,7 +889,7 @@ opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<uint64_t>>
     bound = storage_->Bind(attributes);
   }
   return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<uint64_t>>{
-      new BoundLongCounterImpl(std::move(bound))};
+      new BoundLongCounterImpl(std::move(bound), meter_enabled_state_)};
 }
 
 opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<double>> DoubleCounter::Bind(
@@ -741,7 +901,7 @@ opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<double>> D
     bound = storage_->Bind(attributes);
   }
   return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<double>>{
-      new BoundDoubleCounterImpl(std::move(bound))};
+      new BoundDoubleCounterImpl(std::move(bound), meter_enabled_state_)};
 }
 
 opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<uint64_t>>
@@ -753,7 +913,7 @@ LongHistogram::Bind(const opentelemetry::common::KeyValueIterable &attributes) n
     bound = storage_->Bind(attributes);
   }
   return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<uint64_t>>{
-      new BoundLongHistogramImpl(std::move(bound))};
+      new BoundLongHistogramImpl(std::move(bound), meter_enabled_state_)};
 }
 
 opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<double>>
@@ -765,7 +925,7 @@ DoubleHistogram::Bind(const opentelemetry::common::KeyValueIterable &attributes)
     bound = storage_->Bind(attributes);
   }
   return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<double>>{
-      new BoundDoubleHistogramImpl(std::move(bound))};
+      new BoundDoubleHistogramImpl(std::move(bound), meter_enabled_state_)};
 }
 #endif
 

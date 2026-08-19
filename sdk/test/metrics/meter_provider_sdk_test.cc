@@ -15,14 +15,17 @@
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter.h"
@@ -45,7 +48,6 @@
 
 #  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/nostd/utility.h"
-#  include "opentelemetry/nostd/variant.h"
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
 using namespace opentelemetry::sdk::metrics;
@@ -414,6 +416,44 @@ std::set<std::string> CollectScopeNames(MetricReader *reader)
   return scope_names;
 }
 
+// Collected sum of a uint64 counter, or -1 if absent (distinguishes "nothing" from "sum 0").
+int64_t CollectCounterSum(MetricReader *reader,
+                          const std::string &scope_name,
+                          const std::string &instrument_name)
+{
+  int64_t sum = -1;
+  reader->Collect([&](ResourceMetrics &metric_data) {
+    for (const auto &scope_metrics : metric_data.scope_metric_data_)
+    {
+      if (scope_metrics.scope_->GetName() != scope_name)
+      {
+        continue;
+      }
+      for (const auto &md : scope_metrics.metric_data_)
+      {
+        if (md.instrument_descriptor.name_ != instrument_name)
+        {
+          continue;
+        }
+        for (const auto &pd : md.point_data_attr_)
+        {
+          const auto *sum_point = opentelemetry::nostd::get_if<SumPointData>(&pd.point_data);
+          if (sum_point != nullptr)
+          {
+            const auto *value = opentelemetry::nostd::get_if<int64_t>(&sum_point->value_);
+            if (value != nullptr)
+            {
+              sum = (sum == -1) ? *value : sum + *value;
+            }
+          }
+        }
+      }
+    }
+    return true;
+  });
+  return sum;
+}
+
 }  // namespace
 
 TEST(MeterProvider, UpdateMeterConfiguratorDisableByName)
@@ -458,6 +498,52 @@ TEST(MeterProvider, UpdateMeterConfiguratorReEnable)
   provider->UpdateMeterConfigurator(EnableAll());
   counter->Add(1);
   EXPECT_EQ(CollectScopeNames(reader), (std::set<std::string>{"scope.toggle"}));
+
+  // The measurement recorded while the meter was disabled must not be retained: only the single
+  // Add made after re-enabling counts towards the cumulative sum.
+  EXPECT_EQ(1, CollectCounterSum(reader, "scope.toggle", "counter.toggle"));
+}
+
+// Library code holds instruments for the process lifetime, so re-enabling a meter must not depend
+// on the instrument being recreated.
+TEST(MeterProvider, UpdateMeterConfiguratorInstrumentCreatedWhileDisabledRecordsAfterEnable)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader, DisableAll());
+  ASSERT_NE(nullptr, reader);
+
+  auto meter   = provider->GetMeter("scope.revived");
+  auto counter = meter->CreateUInt64Counter("counter.revived");
+
+  counter->Add(1);
+  EXPECT_TRUE(CollectScopeNames(reader).empty());
+
+  provider->UpdateMeterConfigurator(EnableAll());
+
+  counter->Add(1);
+  EXPECT_EQ(1, CollectCounterSum(reader, "scope.revived", "counter.revived"));
+}
+
+// The mirror case: recording must stop when the meter is disabled.
+TEST(MeterProvider, UpdateMeterConfiguratorInstrumentStopsRecordingAfterDisable)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader);
+  ASSERT_NE(nullptr, reader);
+
+  auto meter   = provider->GetMeter("scope.silenced");
+  auto counter = meter->CreateUInt64Counter("counter.silenced");
+
+  counter->Add(1);
+  EXPECT_EQ(1, CollectCounterSum(reader, "scope.silenced", "counter.silenced"));
+
+  provider->UpdateMeterConfigurator(DisableAll());
+  counter->Add(1);
+  EXPECT_TRUE(CollectScopeNames(reader).empty());
+
+  // Re-enabling must not reveal the measurement that was recorded while disabled.
+  provider->UpdateMeterConfigurator(EnableAll());
+  EXPECT_EQ(1, CollectCounterSum(reader, "scope.silenced", "counter.silenced"));
 }
 
 TEST(MeterProvider, UpdateMeterConfiguratorAppliesToAllExistingMeters)
@@ -573,6 +659,58 @@ TEST(MeterProvider, UpdateMeterConfiguratorConcurrentGetMeter)
   auto counter = meter->CreateUInt64Counter("counter.final");
   counter->Add(1);
   EXPECT_FALSE(CollectScopeNames(reader).empty());
+}
+
+// Guards the lock order between UpdateMeterConfigurator (lock_) and collection (meter_lock_ then
+// lock_, via an observable callback calling GetMeter). Hangs rather than fails on regression.
+TEST(MeterProvider, UpdateMeterConfiguratorConcurrentWithCollectDoesNotDeadlock)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader);
+  ASSERT_NE(nullptr, reader);
+
+  auto meter = provider->GetMeter("scope.observable");
+
+  // Re-entering the provider from inside collection is what takes lock_ under meter_lock_.
+  static MeterProvider *callback_provider = provider.get();
+  auto observable                         = meter->CreateInt64ObservableCounter("obs.counter");
+  observable->AddCallback(
+      [](opentelemetry::metrics::ObserverResult, void *) noexcept {
+        if (callback_provider != nullptr)
+        {
+          auto reentrant = callback_provider->GetMeter("scope.observable");
+          (void)reentrant;
+        }
+      },
+      nullptr);
+
+  constexpr int kUpdateCount = 500;
+
+  std::atomic<bool> stop{false};
+  std::promise<void> collector_ready;
+  std::future<void> collector_ready_future = collector_ready.get_future();
+
+  std::thread collector([&] {
+    collector_ready.set_value();
+    while (!stop.load(std::memory_order_relaxed))
+    {
+      reader->Collect([](ResourceMetrics &) { return true; });
+    }
+  });
+
+  collector_ready_future.wait();
+
+  for (int i = 0; i < kUpdateCount; ++i)
+  {
+    provider->UpdateMeterConfigurator(i % 2 == 0 ? DisableAll() : EnableAll());
+  }
+
+  stop.store(true, std::memory_order_relaxed);
+  collector.join();
+
+  callback_provider = nullptr;
+
+  provider->UpdateMeterConfigurator(EnableAll());
 }
 
 TEST(MeterProvider, SetMeterConfiguratorNullIgnoredOnContext)

@@ -24,6 +24,7 @@
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
@@ -69,7 +70,8 @@ public:
                     ExemplarFilterType exempler_filter_type,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
-                    const AggregationConfig *aggregation_config)
+                    const AggregationConfig *aggregation_config,
+                    std::shared_ptr<MeterEnabledState> meter_enabled_state = nullptr)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_config_(AggregationConfig::GetOrDefault(aggregation_config)),
         attributes_hashmap_(
@@ -79,7 +81,8 @@ public:
         exemplar_filter_type_(exempler_filter_type),
         exemplar_reservoir_(std::move(exemplar_reservoir)),
 #endif
-        temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
+        temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config),
+        meter_enabled_state_(std::move(meter_enabled_state))
   {
     create_default_aggregation_ = [&, aggregation_type,
                                    aggregation_config]() -> std::unique_ptr<Aggregation> {
@@ -300,6 +303,8 @@ private:
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 #endif
   TemporalMetricStorage temporal_metric_storage_;
+  // Owning Meter's enabled flag; null (tests/benchmarks) means enabled. Gates Bind().
+  std::shared_ptr<MeterEnabledState> meter_enabled_state_;
   opentelemetry::common::SpinLockMutex attribute_hashmap_lock_;
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
   // NOTE: ENABLE_METRICS_BOUND_INSTRUMENTS_PREVIEW changes the layout and

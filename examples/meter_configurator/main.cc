@@ -4,7 +4,7 @@
 // This example shows how to use MeterProvider::UpdateMeterConfigurator to enable and disable
 // meters by instrumentation scope at runtime. Updating the MeterConfigurator affects all existing
 // and future meters provided by the MeterProvider. It is safe to call concurrently with
-// MeterProvider::GetMeter and with instrument creation and recording on existing meters.
+// MeterProvider::GetMeter and with instrument creation and recording on existing instruments.
 //
 // Three instrumentation scopes are shown:
 // 1. "my_application"   (example instrumented user application code),
@@ -20,14 +20,11 @@
 //          investigate. Its metrics are collected and exported again.
 // Stage 4: The investigation completes and the external_library meter is disabled again.
 //
-// IMPORTANT: a Meter that is disabled when an instrument is created returns a no-op instrument,
-// and that instrument stays no-op even if the Meter is enabled later. Create instruments while
-// the Meter is enabled (as the classes below do at startup) and then toggle the meters to start
-// and stop collection. Code that must tolerate being started with a disabled Meter has to create
-// its instruments again after the Meter is enabled.
+// Instruments observe their Meter's enabled state, so they need not be recreated after an update.
+// Measurements recorded while a Meter is disabled are dropped, not buffered.
 
-#include <stdint.h>
 #include <chrono>
+#include <cstdint>
 #include <initializer_list>
 #include <iostream>
 #include <utility>
@@ -81,7 +78,7 @@ public:
 
 private:
   nostd::shared_ptr<metrics_api::Meter> meter_;
-  nostd::unique_ptr<metrics_api::Counter<uint64_t>> request_count_;
+  nostd::unique_ptr<metrics_api::Counter<std::uint64_t>> request_count_;
 };
 }  // namespace external_library
 
@@ -105,7 +102,7 @@ public:
 
 private:
   nostd::shared_ptr<metrics_api::Meter> meter_;
-  nostd::unique_ptr<metrics_api::Counter<uint64_t>> call_count_;
+  nostd::unique_ptr<metrics_api::Counter<std::uint64_t>> call_count_;
   external_library::ExternalModule external_module_;
 };
 }  // namespace my_library
@@ -129,7 +126,7 @@ public:
 
 private:
   nostd::shared_ptr<metrics_api::Meter> meter_;
-  nostd::unique_ptr<metrics_api::Counter<uint64_t>> work_count_;
+  nostd::unique_ptr<metrics_api::Counter<std::uint64_t>> work_count_;
   my_library::MyModule my_module_;
 };
 
@@ -155,9 +152,10 @@ std::shared_ptr<metrics_sdk::MeterProvider> CreateMeterProvider(
 {
   auto exporter = metrics_exporters::OStreamMetricExporterFactory::Create();
 
-  // A long export interval is used so that this example only exports when it calls ForceFlush.
+  // Most exports come from the per-stage ForceFlush. The reader also collects once at startup,
+  // so the exact batch count and ordering is not deterministic.
   metrics_sdk::PeriodicExportingMetricReaderOptions options;
-  options.export_interval_millis = std::chrono::milliseconds(60000);
+  options.export_interval_millis = std::chrono::milliseconds(10000);
   options.export_timeout_millis  = std::chrono::milliseconds(500);
   auto reader =
       metrics_sdk::PeriodicExportingMetricReaderFactory::Create(std::move(exporter), options);

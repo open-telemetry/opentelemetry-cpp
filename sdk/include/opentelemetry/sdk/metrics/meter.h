@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <atomic>
 #include <chrono>
 #include <memory>
 #include <string>
@@ -22,6 +21,7 @@
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 #include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk_config.h"
@@ -153,7 +153,7 @@ private:
   void UpdateMeterConfig(MeterConfig config) noexcept;
 
   /** Returns whether this meter is enabled by its current MeterConfig. */
-  bool IsMeterEnabled() const noexcept { return meter_enabled_.load(std::memory_order_relaxed); }
+  bool IsEnabled() const noexcept { return meter_enabled_state_->IsEnabled(); }
 
   // order of declaration is important here - instrumentation scope should destroy after
   // meter-context.
@@ -166,16 +166,13 @@ private:
                                               InstrumentEqualNameCaseInsensitive>;
   MetricStorageMap storage_registry_;
   std::shared_ptr<ObservableRegistry> observable_registry_;
-  // MeterConfig state is stored in an atomic variable so that instrument creation and Collect()
-  // never block on a concurrent MeterProvider::UpdateMeterConfigurator.
-  std::atomic<bool> meter_enabled_{true};
+  // Shared with this meter's instruments so updates reach them; atomic so recording never blocks.
+  std::shared_ptr<MeterEnabledState> meter_enabled_state_{new MeterEnabledState()};
   std::unique_ptr<SyncWritableMetricStorage> RegisterSyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
   std::unique_ptr<AsyncWritableMetricStorage> RegisterAsyncMetricStorage(
       InstrumentDescriptor &instrument_descriptor);
   opentelemetry::common::SpinLockMutex storage_lock_;
-
-  static opentelemetry::metrics::NoopMeter kNoopMeter;
 
   static nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
   GetNoopObservableInsrument()

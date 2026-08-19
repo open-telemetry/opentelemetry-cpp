@@ -147,6 +147,9 @@ void MeterProvider::UpdateMeterConfigurator(
   const std::lock_guard<std::mutex> guard(lock_);
   context_->SetMeterConfigurator(std::move(meter_configurator));
 
+  // Meter construction and Meter::UpdateMeterConfig both hold lock_, so this span is safe. Do NOT
+  // use ForEachMeter: it takes meter_lock_, which the collect path holds before lock_, so
+  // deadlocks.
   for (auto &meter : context_->GetMeters())
   {
     MeterConfig new_config =

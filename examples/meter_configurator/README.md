@@ -30,17 +30,18 @@ workflow in four stages:
 - Stage 4: The investigation completes and the `external_library` meter is
   disabled again.
 
-A `Meter` that is disabled when an instrument is created returns a no-op
-instrument, and that instrument stays no-op even if the meter is enabled
-later. Create instruments while the meter is enabled, as the classes in
-this example do at startup, and then toggle the meters to start and stop
-collection.
+Instruments observe the enabled state of the meter that created them, so
+they do not need to be recreated after a configurator update. An instrument
+created while its meter is disabled starts recording once the meter is
+enabled, and stops again when the meter is disabled. This matters for
+third-party instrumentation, which an application cannot force to rebuild
+its instruments.
 
-Disabling a meter stops collection and export for that scope. Measurements
-recorded through already-created instruments while the meter is disabled
-are still accumulated by the aggregation, so with cumulative temporality
-they are included in the total once the meter is enabled again. This is
-why `external_library.requests` reports `3` in stage 3 rather than `2`.
+Disabling a meter stops collection and export for that scope, and
+measurements recorded while it is disabled are dropped rather than buffered.
+They are not revealed by a later export, which is why
+`external_library.requests` reports `2` in stage 3: the stage 2 measurement
+is not retained.
 
 ## Build and run
 
@@ -51,8 +52,10 @@ why `external_library.requests` reports `3` in stage 3 rather than `2`.
 **Expected output:**
 
 Metrics are exported to stdout via the `OStreamMetricExporter`. The example
-uses a long export interval and calls `ForceFlush` at the end of each
-stage, so each stage exports exactly once.
+calls `ForceFlush` at the end of each stage. The periodic reader also
+collects once when it starts, so the exact number and ordering of exported
+batches varies between runs; the transcript below shows one run and is not
+an exact expected output.
 
 ```sh
 Stage 1: startup, all meters enabled
@@ -199,7 +202,7 @@ Stage 3: investigating, external_library meter re-enabled
   description   : Requests handled by the external library
   unit          : {request}
   type          : SumPointData
-  value         : 3
+  value         : 2
   attributes            :
   resources     :
         service.name: meter_configurator_example
