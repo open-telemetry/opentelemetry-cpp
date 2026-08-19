@@ -63,6 +63,15 @@ cc_library(
 )
 
 cc_library(
+    name = "host_resource_detector_builder",
+    srcs = ["src/host_detector_builder.cc"],
+    deps = [
+        ":host_resource_detector",
+        "//sdk/src/configuration:configuration_core",
+    ],
+)
+
+cc_library(
     name = "process_resource_detector",
     srcs = [
         "src/process_detector.cc",
@@ -102,6 +111,7 @@ cc_library(
     name = "resource_detectors_builders",
     deps = [
         ":container_resource_detector_builder",
+        ":host_resource_detector_builder",
         ":process_resource_detector_builder",
     ],
 )

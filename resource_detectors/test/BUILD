@@ -60,6 +60,18 @@ cc_test(
 )
 
 cc_test(
+    name = "host_resource_detector_builder_test",
+    srcs = ["host_detector_builder_test.cc"],
+    tags = ["test"],
+    deps = [
+        "//resource_detectors:host_resource_detector_builder",
+        "//sdk/src/configuration:configuration_core",
+        "//sdk/src/resource",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "process_resource_detector_builder_test",
     srcs = ["process_detector_builder_test.cc"],
     tags = ["test"],

@@ -7,6 +7,7 @@
 #include <opentelemetry/resource_detectors/container_detector_builder.h>
 #include <opentelemetry/resource_detectors/env_entity_detector.h>
 #include <opentelemetry/resource_detectors/host_detector.h>
+#include <opentelemetry/resource_detectors/host_detector_builder.h>
 #include <opentelemetry/resource_detectors/process_detector.h>
 #include <opentelemetry/resource_detectors/process_detector_builder.h>
 #include <memory>
@@ -49,6 +50,16 @@ TEST(ResourceDetectorsInstall, ContainerDetectorBuilder)
   ASSERT_TRUE(builder != nullptr);
 
   opentelemetry::sdk::configuration::ContainerResourceDetectorConfiguration model;
+  auto detector = builder->Build(&model);
+  ASSERT_TRUE(detector != nullptr);
+}
+
+TEST(ResourceDetectorsInstall, HostDetectorBuilder)
+{
+  auto builder = std::make_unique<opentelemetry::resource_detector::HostDetectorBuilder>();
+  ASSERT_TRUE(builder != nullptr);
+
+  opentelemetry::sdk::configuration::HostResourceDetectorConfiguration model;
   auto detector = builder->Build(&model);
   ASSERT_TRUE(detector != nullptr);
 }
