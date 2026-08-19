@@ -82,9 +82,16 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(const OtlpHttpMetricExporterOptio
 #ifdef ENABLE_ASYNC_EXPORT
           ,
           options.max_concurrent_requests,
-          options.max_requests_per_connection
+          options.max_requests_per_connection,
+#else
+          ,
+          64,
+          8,
 #endif
-          )))
+          GetOtlpDefaultUserAgent(),
+          options.http_keepalive,
+          options.http_keepalive_idle,
+          options.http_keepalive_intvl)))
 {}
 
 OtlpHttpMetricExporter::OtlpHttpMetricExporter(
@@ -122,9 +129,16 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
 #ifdef ENABLE_ASYNC_EXPORT
           ,
           options.max_concurrent_requests,
-          options.max_requests_per_connection
+          options.max_requests_per_connection,
+#else
+          ,
+          64,
+          8,
 #endif
-          )))
+          GetOtlpDefaultUserAgent(),
+          options.http_keepalive,
+          options.http_keepalive_idle,
+          options.http_keepalive_intvl)))
 {}
 
 OtlpHttpMetricExporter::OtlpHttpMetricExporter(
@@ -162,9 +176,16 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
 #ifdef ENABLE_ASYNC_EXPORT
                                 ,
                                 options.max_concurrent_requests,
-                                options.max_requests_per_connection
+                                options.max_requests_per_connection,
+#else
+                                ,
+                                64,
+                                8,
 #endif
-                                ),
+                                GetOtlpDefaultUserAgent(),
+                                options.http_keepalive,
+                                options.http_keepalive_idle,
+                                options.http_keepalive_intvl),
           factory))
 {}
 
@@ -204,9 +225,16 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
 #ifdef ENABLE_ASYNC_EXPORT
                                 ,
                                 options.max_concurrent_requests,
-                                options.max_requests_per_connection
+                                options.max_requests_per_connection,
+#else
+                                ,
+                                64,
+                                8,
 #endif
-                                ),
+                                GetOtlpDefaultUserAgent(),
+                                options.http_keepalive,
+                                options.http_keepalive_idle,
+                                options.http_keepalive_intvl),
           factory))
 {}
 
@@ -245,9 +273,16 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
 #ifdef ENABLE_ASYNC_EXPORT
                                 ,
                                 options.max_concurrent_requests,
-                                options.max_requests_per_connection
+                                options.max_requests_per_connection,
+#else
+                                ,
+                                64,
+                                8,
 #endif
-                                ),
+                                GetOtlpDefaultUserAgent(),
+                                options.http_keepalive,
+                                options.http_keepalive_idle,
+                                options.http_keepalive_intvl),
           std::move(http_client)))
 {}
 
@@ -287,9 +322,16 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(
 #ifdef ENABLE_ASYNC_EXPORT
                                 ,
                                 options.max_concurrent_requests,
-                                options.max_requests_per_connection
+                                options.max_requests_per_connection,
+#else
+                                ,
+                                64,
+                                8,
 #endif
-                                ),
+                                GetOtlpDefaultUserAgent(),
+                                options.http_keepalive,
+                                options.http_keepalive_idle,
+                                options.http_keepalive_intvl),
           std::move(http_client)))
 {}
 
@@ -316,6 +358,9 @@ OtlpHttpMetricExporter::OtlpHttpMetricExporter(std::unique_ptr<OtlpHttpClient> h
   options_.max_requests_per_connection = http_client_->GetOptions().max_requests_per_connection;
 #endif
   runtime_options_.thread_instrumentation = http_client_->GetOptions().thread_instrumentation;
+  options_.http_keepalive       = http_client_->GetOptions().http_keepalive;
+  options_.http_keepalive_idle  = http_client_->GetOptions().http_keepalive_idle;
+  options_.http_keepalive_intvl = http_client_->GetOptions().http_keepalive_intvl;
 }
 // ----------------------------- Exporter methods ------------------------------
 

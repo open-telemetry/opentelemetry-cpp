@@ -1090,4 +1090,48 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
 }
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
+// ---------------------------------------------------------------------------
+// TCP keepalive configuration tests
+// ---------------------------------------------------------------------------
+
+TEST(CurlHttpRequestTest, KeepAliveDefaultsDisabled)
+{
+  curl::Request req;
+  EXPECT_FALSE(req.keepalive_allow_);
+  EXPECT_EQ(req.keepalive_idle_, std::chrono::seconds::zero());
+  EXPECT_EQ(req.keepalive_intvl_, std::chrono::seconds::zero());
+}
+
+TEST(CurlHttpRequestTest, KeepAliveEnabledWithExplicitTimings)
+{
+  curl::Request req;
+  req.SetKeepAlive(true, std::chrono::seconds{30}, std::chrono::seconds{5});
+  EXPECT_TRUE(req.keepalive_allow_);
+  EXPECT_EQ(req.keepalive_idle_, std::chrono::seconds{30});
+  EXPECT_EQ(req.keepalive_intvl_, std::chrono::seconds{5});
+}
+
+TEST(CurlHttpRequestTest, KeepAliveEnabledWithOsDefaultTimings)
+{
+  // Zero idle/intvl means "use OS default" — both fields should store zero.
+  curl::Request req;
+  req.SetKeepAlive(true);  // idle and intvl default to zero()
+  EXPECT_TRUE(req.keepalive_allow_);
+  EXPECT_EQ(req.keepalive_idle_, std::chrono::seconds::zero());
+  EXPECT_EQ(req.keepalive_intvl_, std::chrono::seconds::zero());
+}
+
+TEST(CurlHttpRequestTest, KeepAliveDisabledExplicitly)
+{
+  curl::Request req;
+  // First enable, then disable — ensure values revert.
+  req.SetKeepAlive(true, std::chrono::seconds{60}, std::chrono::seconds{10});
+  req.SetKeepAlive(false);
+  EXPECT_FALSE(req.keepalive_allow_);
+  // idle/intvl are set to their parameter values; when allow=false and defaults
+  // are used, they become zero() from the default argument.
+  EXPECT_EQ(req.keepalive_idle_, std::chrono::seconds::zero());
+  EXPECT_EQ(req.keepalive_intvl_, std::chrono::seconds::zero());
+}
+
 }  // namespace

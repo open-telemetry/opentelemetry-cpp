@@ -129,6 +129,47 @@ struct OPENTELEMETRY_EXPORT OtlpHttpMetricExporterOptions
 
   /** The backoff will be multiplied by this value after each retry attempt. */
   float retry_policy_backoff_multiplier{};
+
+  /**
+   * Enable TCP keepalive probes on the underlying curl connection.
+   *
+   * When true, the OS will send keepalive probes after the connection
+   * has been idle for @p http_keepalive_idle seconds, then repeat every
+   * @p http_keepalive_intvl seconds until the peer acknowledges or the
+   * connection is declared dead.  This detects half-open TCP connections
+   * caused by silent peer disappearance.
+   *
+   * Default: false (keepalive disabled, preserves pre-existing behavior).
+   */
+  bool http_keepalive{false};
+
+  /**
+   * Idle time in seconds before TCP keepalive probes begin.
+   *
+   * Only effective when @p http_keepalive is true.
+   * A value of zero uses the libcurl / OS default (typically 60-75 s on
+   * Linux, 7200 s on macOS).  Set to a smaller value (e.g., 30) for
+   * faster detection of half-open connections.
+   *
+   * Requires libcurl >= 7.25.0; silently ignored on older versions.
+   *
+   * Default: 0 (use OS default).
+   */
+  std::chrono::seconds http_keepalive_idle{std::chrono::seconds::zero()};
+
+  /**
+   * Interval in seconds between successive TCP keepalive probes.
+   *
+   * Only effective when @p http_keepalive is true.
+   * A value of zero uses the libcurl / OS default (typically 75 s on
+   * Linux).  Set to a smaller value (e.g., 5) to detect failures more
+   * quickly once probing has started.
+   *
+   * Requires libcurl >= 7.25.0; silently ignored on older versions.
+   *
+   * Default: 0 (use OS default).
+   */
+  std::chrono::seconds http_keepalive_intvl{std::chrono::seconds::zero()};
 };
 
 }  // namespace otlp

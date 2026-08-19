@@ -15,6 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXT] TCP keepalive is now configurable via `Request::SetKeepAlive()` and per-exporter
+  options `http_keepalive`, `http_keepalive_idle`, and `http_keepalive_intvl` on
+  `OtlpHttpExporterOptions`, `OtlpHttpLogRecordExporterOptions`,
+  `OtlpHttpMetricExporterOptions`, and `OtlpHttpClientOptions`. Keepalive is disabled
+  by default (opt-in). `CURLOPT_TCP_KEEPIDLE` and `CURLOPT_TCP_KEEPINTVL` are
+  configurable; zero values fall back to the libcurl/OS default.
+  [#4266](https://github.com/open-telemetry/opentelemetry-cpp/pull/4266)
+
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
   and merge the resource per the resource SDK specification.
@@ -161,6 +169,13 @@ Increment the:
 
 * [CODE HEALTH] Fix more clang tidy warnings (member initialization)
   [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
+
+* docs: update supported development platforms
+  [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
+
+* [RELEASE] Bump main branch to 1.29.0-dev
+  [#4259](https://github.com/open-telemetry/opentelemetry-cpp/pull/4259)
+
 
 * docs: update supported development platforms
   [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)

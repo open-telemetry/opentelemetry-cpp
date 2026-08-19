@@ -425,7 +425,10 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                              std::chrono::milliseconds http_conn_timeout,
                              bool reuse_connection,
                              bool is_log_enabled,
-                             const RetryPolicy &retry_policy)
+                             const RetryPolicy &retry_policy,
+                             bool keepalive_allow,
+                             std::chrono::seconds keepalive_idle,
+                             std::chrono::seconds keepalive_intvl)
     :  // Optional connection params
       is_raw_response_(is_raw_response),
       reuse_connection_(reuse_connection),
@@ -446,7 +449,10 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                        retry_policy.max_backoff > SecondsDecimal::zero() &&
                        retry_policy.backoff_multiplier > 0.0f)
                           ? 0
-                          : retry_policy.max_attempts)
+                          : retry_policy.max_attempts),
+      keepalive_allow_(keepalive_allow),
+      keepalive_idle_(keepalive_idle),
+      keepalive_intvl_(keepalive_intvl)
 {
   /* get a curl handle */
   curl_resource_.easy_handle = curl_easy_init();
@@ -1219,10 +1225,33 @@ CURLcode HttpOperation::Setup()
     return rc;
   }
 
-  rc = SetCurlLongOption(CURLOPT_TCP_KEEPALIVE, 1L);
+  rc = SetCurlLongOption(CURLOPT_TCP_KEEPALIVE, keepalive_allow_ ? 1L : 0L);
   if (rc != CURLE_OK)
   {
     return rc;
+  }
+
+  if (keepalive_allow_)
+  {
+#if LIBCURL_VERSION_NUM >= 0x071900 /* libcurl 7.25.0 */
+    if (keepalive_idle_.count() > 0)
+    {
+      rc = SetCurlLongOption(CURLOPT_TCP_KEEPIDLE, static_cast<long>(keepalive_idle_.count()));
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+    }
+
+    if (keepalive_intvl_.count() > 0)
+    {
+      rc = SetCurlLongOption(CURLOPT_TCP_KEEPINTVL, static_cast<long>(keepalive_intvl_.count()));
+      if (rc != CURLE_OK)
+      {
+        return rc;
+      }
+    }
+#endif
   }
 
   if (reuse_connection_)

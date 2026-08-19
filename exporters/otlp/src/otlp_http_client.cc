@@ -1043,6 +1043,8 @@ OtlpHttpClient::createSession(
   request->ReplaceHeader("User-Agent", options_.user_agent);
   request->EnableLogging(options_.console_debug);
   request->SetRetryPolicy(options_.retry_policy);
+  request->SetKeepAlive(options_.http_keepalive, options_.http_keepalive_idle,
+                        options_.http_keepalive_intvl);
 
   if (options_.compression == "gzip")
   {

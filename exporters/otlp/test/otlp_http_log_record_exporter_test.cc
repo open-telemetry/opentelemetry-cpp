@@ -1019,4 +1019,77 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportParseFailureReturnsFailure)
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
+
+// ---------------------------------------------------------------------------
+// TCP keepalive configuration tests
+// ---------------------------------------------------------------------------
+
+OPENTELEMETRY_BEGIN_NAMESPACE
+namespace exporter
+{
+namespace otlp
+{
+
+TEST(OtlpHttpLogRecordExporterOptionsTest, KeepAliveDefaultsDisabled)
+{
+  OtlpHttpLogRecordExporterOptions opts{};
+  EXPECT_FALSE(opts.http_keepalive);
+  EXPECT_EQ(opts.http_keepalive_idle, std::chrono::seconds::zero());
+  EXPECT_EQ(opts.http_keepalive_intvl, std::chrono::seconds::zero());
+}
+
+TEST(OtlpHttpLogRecordExporterOptionsTest, KeepAliveEnabledPropagatesIntoClientOptions)
+{
+  OtlpHttpLogRecordExporterOptions opts{};
+  opts.http_keepalive       = true;
+  opts.http_keepalive_idle  = std::chrono::seconds{30};
+  opts.http_keepalive_intvl = std::chrono::seconds{5};
+
+  std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation> not_instrumented;
+  OtlpHttpClientOptions client_opts(
+      opts.url, opts.ssl_insecure_skip_verify, opts.ssl_ca_cert_path, opts.ssl_ca_cert_string,
+      opts.ssl_client_key_path, opts.ssl_client_key_string, opts.ssl_client_cert_path,
+      opts.ssl_client_cert_string, opts.ssl_min_tls, opts.ssl_max_tls, opts.ssl_cipher,
+      opts.ssl_cipher_suite, opts.content_type, opts.json_bytes_mapping, opts.compression,
+      opts.use_json_name, opts.console_debug, opts.timeout, opts.http_headers,
+      opts.retry_policy_max_attempts, opts.retry_policy_initial_backoff,
+      opts.retry_policy_max_backoff, opts.retry_policy_backoff_multiplier, not_instrumented,
+      /*concurrent_sessions=*/64, /*max_requests_per_connection=*/8,
+      /*user_agent=*/GetOtlpDefaultUserAgent(),
+      /*keepalive=*/opts.http_keepalive,
+      /*keepalive_idle=*/opts.http_keepalive_idle,
+      /*keepalive_intvl=*/opts.http_keepalive_intvl);
+
+  EXPECT_TRUE(client_opts.http_keepalive);
+  EXPECT_EQ(client_opts.http_keepalive_idle, std::chrono::seconds{30});
+  EXPECT_EQ(client_opts.http_keepalive_intvl, std::chrono::seconds{5});
+}
+
+TEST(OtlpHttpLogRecordExporterOptionsTest, KeepAliveDisabledPropagatesIntoClientOptions)
+{
+  OtlpHttpLogRecordExporterOptions opts{};
+  std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation> not_instrumented;
+  OtlpHttpClientOptions client_opts(
+      opts.url, opts.ssl_insecure_skip_verify, opts.ssl_ca_cert_path, opts.ssl_ca_cert_string,
+      opts.ssl_client_key_path, opts.ssl_client_key_string, opts.ssl_client_cert_path,
+      opts.ssl_client_cert_string, opts.ssl_min_tls, opts.ssl_max_tls, opts.ssl_cipher,
+      opts.ssl_cipher_suite, opts.content_type, opts.json_bytes_mapping, opts.compression,
+      opts.use_json_name, opts.console_debug, opts.timeout, opts.http_headers,
+      opts.retry_policy_max_attempts, opts.retry_policy_initial_backoff,
+      opts.retry_policy_max_backoff, opts.retry_policy_backoff_multiplier, not_instrumented,
+      /*concurrent_sessions=*/64, /*max_requests_per_connection=*/8,
+      /*user_agent=*/GetOtlpDefaultUserAgent(),
+      /*keepalive=*/opts.http_keepalive,
+      /*keepalive_idle=*/opts.http_keepalive_idle,
+      /*keepalive_intvl=*/opts.http_keepalive_intvl);
+
+  EXPECT_FALSE(client_opts.http_keepalive);
+  EXPECT_EQ(client_opts.http_keepalive_idle, std::chrono::seconds::zero());
+  EXPECT_EQ(client_opts.http_keepalive_intvl, std::chrono::seconds::zero());
+}
+
+}  // namespace otlp
+}  // namespace exporter
+OPENTELEMETRY_END_NAMESPACE
+
 #endif /* OPENTELEMETRY_STL_VERSION */

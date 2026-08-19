@@ -278,6 +278,34 @@ public:
 
   virtual void SetRetryPolicy(const RetryPolicy &retry_policy) noexcept = 0;
 
+  /**
+   * Configure TCP keepalive for this HTTP request.
+   *
+   * When enabled, the underlying transport (e.g., libcurl) will send
+   * keepalive probes after the connection has been idle for @p idle
+   * seconds, repeating every @p intvl seconds until the peer responds
+   * or the connection is declared dead.  This allows detection of
+   * half-open TCP connections caused by silent peer disappearance.
+   *
+   * @param allow  Enable TCP keepalive probes.  When false, keepalive
+   *               is disabled and @p idle / @p intvl are ignored.
+   * @param idle   Seconds of idle time before the first probe is sent.
+   *               Zero means use the libcurl / OS default (typically
+   *               60-75 s on Linux, 7200 s on macOS).  Only effective
+   *               when @p allow is true and libcurl >= 7.25.0.
+   * @param intvl  Seconds between successive keepalive probes.
+   *               Zero means use the libcurl / OS default (typically
+   *               75 s on Linux).  Only effective when @p allow is true
+   *               and libcurl >= 7.25.0.
+   *
+   * The default implementation is a no-op; concrete implementations
+   * (e.g., the libcurl backend) override this to apply the settings.
+   */
+  virtual void SetKeepAlive(bool allow,
+                            std::chrono::seconds idle  = std::chrono::seconds::zero(),
+                            std::chrono::seconds intvl = std::chrono::seconds::zero()) noexcept
+  {}
+
   virtual ~Request() = default;
 };
 
