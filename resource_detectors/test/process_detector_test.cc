@@ -244,7 +244,6 @@ TEST(ProcessDetectorUtilsTest, GetProcessCreationTimeTest)
 
 TEST(ProcessDetectorUtilsTest, GetProcessOwnerTest)
 {
-  int32_t pid       = getpid();
   std::string owner = opentelemetry::resource_detector::detail::GetProcessOwner();
 
   // On all supported platforms the effective user name must be non-empty.
