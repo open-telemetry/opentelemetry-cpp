@@ -61,15 +61,16 @@ public:
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
                     const AggregationConfig *aggregation_config)
-      : SyncMetricStorage(instrument_descriptor,
-                          aggregation_type,
-                          std::move(attributes_processor),
+      : SyncMetricStorage(
+            instrument_descriptor,
+            aggregation_type,
+            std::move(attributes_processor),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                          exemplar_filter_type,
-                          std::move(exemplar_reservoir),
+            exemplar_filter_type,
+            std::move(exemplar_reservoir),
 #endif
-                          aggregation_config,
-                          AggregationConfig::GetOrDefault(aggregation_config)->cardinality_limit_)
+            aggregation_config,
+            AggregationConfig::GetOrDefault(aggregation_config)->GetCardinalityLimit())
   {}
 
   // `recording_cardinality_limit` sizes the storage that raw measurements are recorded into,
@@ -289,7 +290,12 @@ private:
     {
       return filtered;
     }
-    const size_t limit      = aggregation_config_->cardinality_limit_;
+    // Use the resolved recording capacity, not aggregation_config_->GetCardinalityLimit():
+    // when the limit comes from a MetricReader fallback rather than an explicit view limit,
+    // these can differ, and attributes_hashmap_ (the unbound path) is sized to
+    // recording_cardinality_limit_. Using the same value here keeps bound and unbound
+    // admission consistent.
+    const size_t limit      = recording_cardinality_limit_;
     const bool has_overflow = active_keys_.find(GetOverflowAttributes()) != active_keys_.end();
     // Mirror AttributesHashMap::IsOverflowAttributes() exactly. The configured
     // limit applies to non-overflow attribute sets, while overflow is reserved.

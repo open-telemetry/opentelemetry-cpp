@@ -84,8 +84,43 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
     metric_data.end_ts                  = collection_ts;
     last_delta_collection_ts_           = collection_ts;
 
-    // Direct conversion of delta metrics to point data
-    delta_metrics->GetAllEntries(
+    // Recording capacity is resolved once at instrument-creation time (as the highest limit
+    // across readers attached then; see ResolveRecordingCardinalityLimit() in meter.cc) and is
+    // not shrunk retroactively, so it can exceed this single collector's own (possibly
+    // stricter) current limit, e.g. if this reader was attached after instrument creation with
+    // a lower limit than was resolved then. Re-cap through a hashmap sized to this collector's
+    // effective limit before emitting, so its own limit is honored on this fast path too;
+    // mirrors the precedence applied to the general merge path below (View > Reader > SDK
+    // default).
+    const bool has_explicit_view_limit =
+        aggregation_config_ && aggregation_config_->IsCardinalityLimitExplicit();
+    const std::size_t effective_limit =
+        has_explicit_view_limit ? aggregation_config_->GetCardinalityLimit()
+                                : collector->GetCardinalityLimit(instrument_descriptor_.type_);
+
+    if (delta_metrics->Size() <= effective_limit)
+    {
+      // Direct conversion of delta metrics to point data
+      delta_metrics->GetAllEntries(
+          [&metric_data](const MetricAttributes &attributes, Aggregation &aggregation) {
+            PointDataAttributes point_data_attr;
+            point_data_attr.point_data = aggregation.ToPoint();
+            point_data_attr.attributes = attributes;
+            metric_data.point_data_attr_.emplace_back(std::move(point_data_attr));
+            return true;
+          });
+      return callback(metric_data);
+    }
+
+    AttributesHashMap recapped(effective_limit);
+    delta_metrics->GetAllEntries([&recapped, this](const MetricAttributes &attributes,
+                                                   Aggregation &aggregation) {
+      recapped.Set(attributes, DefaultAggregation::CreateAggregation(
+                                   aggregation_type_, instrument_descriptor_, aggregation_config_)
+                                   ->Merge(aggregation));
+      return true;
+    });
+    recapped.GetAllEntries(
         [&metric_data](const MetricAttributes &attributes, Aggregation &aggregation) {
           PointDataAttributes point_data_attr;
           point_data_attr.point_data = aggregation.ToPoint();
@@ -116,18 +151,18 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   // Iterate over the unreporter metrics for `collector` and store result in `merged_metrics`
   //
   // When the view has no explicit cardinality limit (aggregation_config_ == nullptr, or its
-  // cardinality_limit_ was left at the compiled-in default for an unrelated reason such as
-  // histogram boundaries; see cardinality_limit_explicit_), fall back to this specific
-  // collector's own MetricReader-level limit rather than a flat SDK default. The underlying
-  // recording storage may be sized larger (to avoid losing data for readers with a higher
-  // limit, see SyncMetricStorage/AsyncMetricStorage), so capping merged_metrics here to this
-  // collector's own limit re-applies the View > Reader > SDK default precedence per reader:
+  // limit was left at the compiled-in default for an unrelated reason such as histogram
+  // boundaries; see IsCardinalityLimitExplicit()), fall back to this specific collector's own
+  // MetricReader-level limit rather than a flat SDK default. The underlying recording storage
+  // may be sized larger (to avoid losing data for readers with a higher limit, see
+  // SyncMetricStorage/AsyncMetricStorage), so capping merged_metrics here to this collector's
+  // own limit re-applies the View > Reader > SDK default precedence per reader:
   // AttributesHashMap::Set() below routes anything beyond this capacity into the overflow point,
   // without affecting what other collectors of the same storage see.
   const bool has_explicit_view_limit =
-      aggregation_config_ && aggregation_config_->cardinality_limit_explicit_;
+      aggregation_config_ && aggregation_config_->IsCardinalityLimitExplicit();
   std::unique_ptr<AttributesHashMap> merged_metrics(new AttributesHashMap(
-      has_explicit_view_limit ? aggregation_config_->cardinality_limit_
+      has_explicit_view_limit ? aggregation_config_->GetCardinalityLimit()
                               : collector->GetCardinalityLimit(instrument_descriptor_.type_)));
   for (auto &agg_hashmap : unreported_list)
   {

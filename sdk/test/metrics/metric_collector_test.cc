@@ -720,10 +720,12 @@ TEST_F(MetricCollectorTest, ReaderCardinalityLimitFallbackSingleDeltaReader)
   auto meter   = std::shared_ptr<Meter>(new Meter(context, std::move(scope)));
   context->AddMeter(meter);
 
-  // MockMetricReader reports kDelta aggregation temporality, and with exactly one reader
-  // attached this exercises TemporalMetricStorage::buildMetrics()'s single-collector-delta
-  // fast path.
-  auto reader = std::shared_ptr<MetricReader>(new MockMetricReader());
+  // MockMetricReader's default exporter reports kCumulative, not kDelta (see
+  // MockMetricExporter's default member initializer), so an explicit kDelta exporter is
+  // required here to actually exercise TemporalMetricStorage::buildMetrics()'s
+  // single-collector-delta fast path with exactly one reader attached.
+  auto reader = std::shared_ptr<MetricReader>(new MockMetricReader(
+      std::unique_ptr<PushMetricExporter>(new MockMetricExporter(AggregationTemporality::kDelta))));
   CardinalityLimits limits;
   limits.counter = kLimit;
   reader->SetCardinalityLimits(limits);
@@ -745,6 +747,57 @@ TEST_F(MetricCollectorTest, ReaderCardinalityLimitFallbackSingleDeltaReader)
 
   // The reader's own limit must be honored even via the single-collector delta fast path,
   // not silently widened to the SDK default (2000).
+  EXPECT_LE(real_points, kLimit);
+  EXPECT_TRUE(overflow_present);
+  EXPECT_EQ(SumCounterValue(produced), static_cast<int64_t>(kUniqueAttributeSets));
+}
+
+// Regression test for a bug found during review of #4388: the single-collector delta fast path
+// in TemporalMetricStorage::buildMetrics() returned recorded data directly, without re-capping
+// to the collector's own limit. When recording capacity was resolved larger than this reader's
+// limit (because the reader was attached after the instrument already existed, so its stricter
+// limit was never part of the max-across-readers resolution at creation time), the fast path
+// could emit more attribute sets than the reader's own configured limit allows.
+TEST_F(MetricCollectorTest, ReaderCardinalityLimitFallbackSingleDeltaReaderAttachedLate)
+{
+  constexpr size_t kLimit               = 3;
+  constexpr size_t kUniqueAttributeSets = 10;
+
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+  auto scope =
+      InstrumentationScope::Create("ReaderCardinalityLimitFallbackSingleDeltaReaderAttachedLate");
+  auto meter = std::shared_ptr<Meter>(new Meter(context, std::move(scope)));
+  context->AddMeter(meter);
+
+  // No reader attached yet: recording capacity resolves to the SDK default (2000).
+  ASSERT_EQ(context->GetCollectors().size(), 0u);
+  auto counter = meter->CreateUInt64Counter("late_delta_counter");
+
+  // A single delta reader with a much stricter limit is attached only after the instrument
+  // already exists, exercising the single-collector-delta fast path with recording capacity
+  // (2000) larger than this reader's own limit (kLimit). An explicit kDelta exporter is
+  // required: MockMetricReader's default exporter reports kCumulative.
+  auto reader = std::shared_ptr<MetricReader>(new MockMetricReader(
+      std::unique_ptr<PushMetricExporter>(new MockMetricExporter(AggregationTemporality::kDelta))));
+  CardinalityLimits limits;
+  limits.counter = kLimit;
+  reader->SetCardinalityLimits(limits);
+  auto collector = AddMetricReaderToMeterContext(context, reader).lock();
+
+  for (size_t i = 0; i < kUniqueAttributeSets; ++i)
+  {
+    std::map<std::string, std::string> attrs = {{"key", std::to_string(i)}};
+    counter->Add(
+        1, opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        opentelemetry::context::Context{});
+  }
+
+  auto produced         = collector->Produce();
+  bool overflow_present = false;
+  size_t real_points    = CountRealPoints(produced, &overflow_present);
+
+  // Even though recording capacity was resolved without this reader in the picture, its own
+  // limit must still be honored on the single-collector delta fast path.
   EXPECT_LE(real_points, kLimit);
   EXPECT_TRUE(overflow_present);
   EXPECT_EQ(SumCounterValue(produced), static_cast<int64_t>(kUniqueAttributeSets));

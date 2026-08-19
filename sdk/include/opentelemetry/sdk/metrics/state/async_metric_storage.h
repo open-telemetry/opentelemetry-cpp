@@ -44,14 +44,15 @@ public:
                      nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
                      const AggregationConfig *aggregation_config)
-      : AsyncMetricStorage(instrument_descriptor,
-                           aggregation_type,
+      : AsyncMetricStorage(
+            instrument_descriptor,
+            aggregation_type,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                           exemplar_filter_type,
-                           std::move(exemplar_reservoir),
+            exemplar_filter_type,
+            std::move(exemplar_reservoir),
 #endif
-                           aggregation_config,
-                           AggregationConfig::GetOrDefault(aggregation_config)->cardinality_limit_)
+            aggregation_config,
+            AggregationConfig::GetOrDefault(aggregation_config)->GetCardinalityLimit())
   {}
 
   AsyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,

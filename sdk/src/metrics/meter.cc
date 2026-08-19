@@ -87,12 +87,12 @@ std::ostream &operator<<(std::ostream &os,
   return os;
 }
 
-// When a view sets an explicit cardinality limit (cardinality_limit_explicit_), it wins outright
-// (View > Reader > SDK default), so the raw recording storage is simply sized to that limit,
-// unchanged. A non-null AggregationConfig does not by itself mean the view set an explicit
-// cardinality limit: e.g. SdkBuilder::AddView() may build one purely to carry histogram
-// boundaries, leaving cardinality_limit_ at its compiled-in default and
-// cardinality_limit_explicit_ false.
+// When a view sets an explicit cardinality limit (IsCardinalityLimitExplicit()), it wins
+// outright (View > Reader > SDK default), so the raw recording storage is simply sized to that
+// limit, unchanged. A non-null AggregationConfig does not by itself mean the view set an
+// explicit cardinality limit: e.g. SdkBuilder::AddView() may build one purely to carry
+// histogram boundaries, leaving the limit at its compiled-in default and
+// IsCardinalityLimitExplicit() false.
 //
 // When a view has no explicit limit, the shared recording storage must be sized to the highest
 // limit configured across all MetricReaders currently attached, so no reader loses data purely
@@ -107,9 +107,9 @@ std::size_t ResolveRecordingCardinalityLimit(
         collectors,
     opentelemetry::sdk::metrics::InstrumentType instrument_type)
 {
-  if (aggregation_config && aggregation_config->cardinality_limit_explicit_)
+  if (aggregation_config && aggregation_config->IsCardinalityLimitExplicit())
   {
-    return aggregation_config->cardinality_limit_;
+    return aggregation_config->GetCardinalityLimit();
   }
   if (collectors.empty())
   {

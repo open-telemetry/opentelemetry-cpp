@@ -26,6 +26,13 @@ Increment the:
   `Base2ExponentialHistogramAggregationConfig` (e.g. one built only to carry
   histogram boundaries) is now also correctly treated as not having an
   explicit cardinality limit, matching the declarative-configuration path.
+  `AggregationConfig::cardinality_limit_`/`cardinality_limit_explicit_` are
+  now private, set together via `SetCardinalityLimit()`, so they cannot be
+  desynced by direct field assignment. The single-collector delta fast path
+  in `TemporalMetricStorage::buildMetrics()` now re-caps to the collector's
+  own limit instead of emitting the raw recording storage unchecked, and the
+  bound-instrument admission path (preview) now uses the same resolved
+  recording limit as the unbound path.
   [#4387](https://github.com/open-telemetry/opentelemetry-cpp/issues/4387)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,

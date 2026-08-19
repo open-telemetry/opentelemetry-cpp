@@ -1079,7 +1079,7 @@ TEST(SdkBuilder, AddViewEmptySelectorMatchesAllSupportedInstrumentTypes)
                               EXPECT_NE(config, nullptr);
                               if (config != nullptr)
                               {
-                                EXPECT_EQ(config->cardinality_limit_, 42u);
+                                EXPECT_EQ(config->GetCardinalityLimit(), 42u);
                                 matched++;
                               }
                               return true;
@@ -1117,7 +1117,7 @@ TEST(SdkBuilder, AddViewHistogramCardinalityLimitOnly)
         if (aggregation_config)
         {
           EXPECT_EQ(aggregation_config->GetType(), metrics_sdk::AggregationType::kHistogram);
-          EXPECT_EQ(aggregation_config->cardinality_limit_, 42u);
+          EXPECT_EQ(aggregation_config->GetCardinalityLimit(), 42u);
 
           // Pin what users actually receive: building the aggregation from this config
           // must keep the SDK's default bucket boundaries, not silently collapse to a
@@ -1168,7 +1168,7 @@ TEST(SdkBuilder, AddViewCounterCardinalityLimitOnly)
         if (aggregation_config)
         {
           EXPECT_EQ(aggregation_config->GetType(), metrics_sdk::AggregationType::kDefault);
-          EXPECT_EQ(aggregation_config->cardinality_limit_, 7u);
+          EXPECT_EQ(aggregation_config->GetCardinalityLimit(), 7u);
         }
         return true;
       });
@@ -1215,7 +1215,7 @@ TEST(SdkBuilder, AddViewHistogramBoundariesWithoutCardinalityLimitIsNotExplicit)
                             EXPECT_NE(aggregation_config, nullptr);
                             if (aggregation_config)
                             {
-                              EXPECT_FALSE(aggregation_config->cardinality_limit_explicit_);
+                              EXPECT_FALSE(aggregation_config->IsCardinalityLimitExplicit());
                             }
                             return true;
                           });
@@ -1258,8 +1258,8 @@ TEST(SdkBuilder, AddViewHistogramBoundariesWithCardinalityLimitIsExplicit)
                             EXPECT_NE(aggregation_config, nullptr);
                             if (aggregation_config)
                             {
-                              EXPECT_TRUE(aggregation_config->cardinality_limit_explicit_);
-                              EXPECT_EQ(aggregation_config->cardinality_limit_, 99u);
+                              EXPECT_TRUE(aggregation_config->IsCardinalityLimitExplicit());
+                              EXPECT_EQ(aggregation_config->GetCardinalityLimit(), 99u);
                             }
                             return true;
                           });
@@ -1297,7 +1297,7 @@ TEST(SdkBuilder, AddViewWithCardinalityLimitPreservesExplicitAggregation)
         if (aggregation_config)
         {
           EXPECT_EQ(aggregation_config->GetType(), metrics_sdk::AggregationType::kHistogram);
-          EXPECT_EQ(aggregation_config->cardinality_limit_, 42u);
+          EXPECT_EQ(aggregation_config->GetCardinalityLimit(), 42u);
           auto *histogram_config =
               static_cast<const metrics_sdk::HistogramAggregationConfig *>(aggregation_config);
           EXPECT_EQ(histogram_config->boundaries_, (std::vector<double>{1.0, 2.0}));
