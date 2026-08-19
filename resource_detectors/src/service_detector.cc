@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/resource_detectors/service_detector.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/resource_detectors/detail/service_detector_utils.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"

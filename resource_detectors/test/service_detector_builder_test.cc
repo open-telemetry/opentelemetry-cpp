@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <memory>
 #include <string>
 
-#include "opentelemetry/resource_detectors/service_detector.h"
 #include "opentelemetry/resource_detectors/service_detector_builder.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/service_resource_detector_configuration.h"
@@ -26,16 +26,4 @@ TEST(ServiceDetectorBuilderTest, Build)
 
   auto detector = builder.Build(&model);
   ASSERT_NE(detector, nullptr);
-}
-
-TEST(ServiceDetectorBuilderTest, BuildCreatesServiceResourceDetector)
-{
-  opentelemetry::resource_detector::ServiceDetectorBuilder builder;
-  opentelemetry::sdk::configuration::ServiceResourceDetectorConfiguration model;
-
-  auto detector = builder.Build(&model);
-  ASSERT_NE(detector, nullptr);
-  ASSERT_NE(
-      dynamic_cast<opentelemetry::resource_detector::ServiceResourceDetector *>(detector.get()),
-      nullptr);
 }

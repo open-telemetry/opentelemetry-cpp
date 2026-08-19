@@ -139,7 +139,7 @@ opentelemetry::resource_detector::ServiceDetectorBuilder::Register(registry.get(
 
 ## Linking with CMake
 
-### Linking to detectors directly (not required for declaritive config)
+### Linking to detectors directly (not required for declarative config)
 
 Link to all available detectors:
 
@@ -155,9 +155,9 @@ find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS resource_detectors)
 target_link_libraries(my_target PRIVATE opentelemetry-cpp::host_resource_detector)
 ```
 
-### Linking to builders for declaritive configuration
+### Linking to builders for declarative configuration
 
-Builder targets make detectors available for declaritive configuration and hide
+Builder targets make detectors available for declarative configuration and hide
 the concrete detector implementations.
 
 Link all builders:
@@ -185,14 +185,14 @@ All targets are part of the `resource_detectors` component.
 | `opentelemetry-cpp::resource_detectors` | Interface: links all detectors |
 | `opentelemetry-cpp::resource_detectors_builders` | Interface: links all builders |
 | `opentelemetry-cpp::container_resource_detector` | Container detector |
-| `opentelemetry-cpp::container_resource_detector_builder` | Container detector builder for declaritive configuration |
+| `opentelemetry-cpp::container_resource_detector_builder` | Container detector builder for declarative configuration |
 | `opentelemetry-cpp::env_entity_resource_detector` | Env entity detector |
 | `opentelemetry-cpp::host_resource_detector` | Host detector |
 | `opentelemetry-cpp::host_resource_detector_builder` | Host detector builder for declaritive configuration |
 | `opentelemetry-cpp::process_resource_detector` | Process detector |
-| `opentelemetry-cpp::process_resource_detector_builder` | Process detector builder for declaritive configuration |
+| `opentelemetry-cpp::process_resource_detector_builder` | Process detector builder for declarative configuration |
 | `opentelemetry-cpp::service_resource_detector` | Service detector |
-| `opentelemetry-cpp::service_resource_detector_builder` | Service detector builder for declaritive configuration |
+| `opentelemetry-cpp::service_resource_detector_builder` | Service detector builder for declarative configuration |
 
 ## Linking with Bazel
 

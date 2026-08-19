@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <string>
+#include <utility>
 
 #ifdef _MSC_VER
 #  include "opentelemetry/sdk/common/env_variables.h"
@@ -15,6 +16,7 @@ using opentelemetry::sdk::common::unsetenv;
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/resource_detectors/detail/service_detector_utils.h"
 #include "opentelemetry/resource_detectors/service_detector.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/semconv/schema_url.h"
 #include "opentelemetry/semconv/service_attributes.h"
 

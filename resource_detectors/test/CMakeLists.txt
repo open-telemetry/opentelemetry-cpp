@@ -90,7 +90,8 @@ gtest_add_tests(
 # service_resource_detector_utils tests
 #
 
-add_executable(service_resource_detector_utils_test service_detector_utils_test.cc)
+add_executable(service_resource_detector_utils_test
+               service_detector_utils_test.cc)
 target_link_libraries(
   service_resource_detector_utils_test
   PRIVATE opentelemetry_service_resource_detector_utils
@@ -107,7 +108,7 @@ gtest_add_tests(
 add_executable(service_resource_detector_test service_detector_test.cc)
 target_link_libraries(
   service_resource_detector_test PRIVATE opentelemetry_service_resource_detector
-                                       GTest::gtest_main)
+                                         GTest::gtest_main)
 gtest_add_tests(
   TARGET service_resource_detector_test
   TEST_PREFIX resource_detector.
@@ -117,7 +118,8 @@ gtest_add_tests(
 # service_resource_detector_builder tests
 #
 
-add_executable(service_resource_detector_builder_test service_detector_builder_test.cc)
+add_executable(service_resource_detector_builder_test
+               service_detector_builder_test.cc)
 target_link_libraries(
   service_resource_detector_builder_test
   PRIVATE opentelemetry_service_resource_detector_builder
