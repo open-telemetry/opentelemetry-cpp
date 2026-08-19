@@ -18,8 +18,7 @@ Increment the:
 * [METRICS SDK] Enforce a runtime minimum scale of `-11` for
   `Base2ExponentialHistogramAggregation`, so a recording that spans the full
   double range no longer downscales without end.
-  [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353
-
+  [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
