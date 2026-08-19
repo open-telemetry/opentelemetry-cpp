@@ -14,12 +14,14 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/registry_factory.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 
 #include "custom_log_record_exporter_builder.h"
 #include "custom_log_record_processor_builder.h"
 #include "custom_pull_metric_exporter_builder.h"
 #include "custom_push_metric_exporter_builder.h"
+#include "custom_resource_detector_builder.h"
 #include "custom_sampler_builder.h"
 #include "custom_span_exporter_builder.h"
 #include "custom_span_processor_builder.h"
@@ -52,6 +54,11 @@
 
 #ifdef OTEL_HAVE_PROMETHEUS
 #  include "opentelemetry/exporters/prometheus/prometheus_pull_builder.h"
+#endif
+
+#ifdef OTEL_HAVE_RESOURCE_DETECTORS
+#  include "opentelemetry/resource_detectors/container_detector_builder.h"
+#  include "opentelemetry/resource_detectors/process_detector_builder.h"
 #endif
 
 static bool opt_help        = false;
@@ -166,7 +173,7 @@ void InitOtel(const std::string &config_file)
   /* 1 - Create a registry */
 
   std::shared_ptr<opentelemetry::sdk::configuration::Registry> registry(
-      new opentelemetry::sdk::configuration::Registry);
+      opentelemetry::sdk::configuration::RegistryFactory::Create());
 
   /* 2 - Populate the registry with the core components supported */
 
@@ -213,6 +220,11 @@ void InitOtel(const std::string &config_file)
 #ifdef OTEL_HAVE_PROMETHEUS
     opentelemetry::exporter::metrics::PrometheusPullBuilder::Register(registry.get());
 #endif
+
+#ifdef OTEL_HAVE_RESOURCE_DETECTORS
+    opentelemetry::resource_detector::ContainerDetectorBuilder::Register(registry.get());
+    opentelemetry::resource_detector::ProcessDetectorBuilder::Register(registry.get());
+#endif
   }
 
   /* 3 - Populate the registry with external extensions plugins */
@@ -224,6 +236,7 @@ void InitOtel(const std::string &config_file)
   CustomPullMetricExporterBuilder::Register(registry.get());
   CustomLogRecordExporterBuilder::Register(registry.get());
   CustomLogRecordProcessorBuilder::Register(registry.get());
+  CustomResourceDetectorBuilder::Register(registry.get());
 
   /* 4 - Parse a config.yaml */
 

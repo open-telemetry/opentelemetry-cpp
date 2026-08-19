@@ -25,10 +25,12 @@ class ComposableAlwaysOnSamplerBuilder;
 class ComposableParentThresholdSamplerBuilder;
 class ComposableProbabilitySamplerBuilder;
 class ComposableRuleBasedSamplerBuilder;
+class CompositeSamplerBuilder;
 class ConsoleLogRecordExporterBuilder;
 class ConsolePushMetricExporterBuilder;
 class ConsoleSpanExporterBuilder;
 class ContainerResourceDetectorBuilder;
+class ExtensionComposableSamplerBuilder;
 class ExtensionLogRecordExporterBuilder;
 class ExtensionLogRecordProcessorBuilder;
 class ExtensionMetricProducerBuilder;
@@ -283,6 +285,13 @@ public:
   void SetComposableRuleBasedSamplerBuilder(
       std::unique_ptr<ComposableRuleBasedSamplerBuilder> &&builder);
 
+  const CompositeSamplerBuilder *GetCompositeSamplerBuilder() const
+  {
+    return composite_sampler_builder_.get();
+  }
+
+  void SetCompositeSamplerBuilder(std::unique_ptr<CompositeSamplerBuilder> &&builder);
+
   /* Processors. */
 
   const BatchSpanProcessorBuilder *GetBatchSpanProcessorBuilder() const
@@ -380,6 +389,13 @@ public:
   void SetExtensionSamplerBuilder(const std::string &name,
                                   std::unique_ptr<ExtensionSamplerBuilder> &&builder);
 
+  const ExtensionComposableSamplerBuilder *GetExtensionComposableSamplerBuilder(
+      const std::string &name) const;
+
+  void SetExtensionComposableSamplerBuilder(
+      const std::string &name,
+      std::unique_ptr<ExtensionComposableSamplerBuilder> &&builder);
+
   const ExtensionSpanExporterBuilder *GetExtensionSpanExporterBuilder(
       const std::string &name) const;
 
@@ -465,6 +481,7 @@ private:
   std::unique_ptr<ComposableParentThresholdSamplerBuilder>
       composable_parent_threshold_sampler_builder_;
   std::unique_ptr<ComposableRuleBasedSamplerBuilder> composable_rule_based_sampler_builder_;
+  std::unique_ptr<CompositeSamplerBuilder> composite_sampler_builder_;
 
   std::unique_ptr<BatchSpanProcessorBuilder> batch_span_processor_builder_;
   std::unique_ptr<SimpleSpanProcessorBuilder> simple_span_processor_builder_;
@@ -484,6 +501,8 @@ private:
 
   std::map<std::string, std::unique_ptr<TextMapPropagatorBuilder>> propagator_builders_;
   std::map<std::string, std::unique_ptr<ExtensionSamplerBuilder>> sampler_builders_;
+  std::map<std::string, std::unique_ptr<ExtensionComposableSamplerBuilder>>
+      composable_sampler_builders_;
   std::map<std::string, std::unique_ptr<ExtensionSpanExporterBuilder>> span_exporter_builders_;
   std::map<std::string, std::unique_ptr<ExtensionSpanProcessorBuilder>> span_processor_builders_;
   std::map<std::string, std::unique_ptr<ExtensionPushMetricExporterBuilder>>

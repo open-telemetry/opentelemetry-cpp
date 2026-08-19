@@ -8,6 +8,7 @@
 #include "opentelemetry/semconv/service_attributes.h"
 #include "opentelemetry/version.h"
 
+#include <cctype>
 #include <cstddef>
 #include <sstream>
 #include <string>
@@ -20,6 +21,43 @@ namespace resource
 
 constexpr const char *kOtelResourceAttributes = "OTEL_RESOURCE_ATTRIBUTES";
 constexpr const char *kOtelServiceName        = "OTEL_SERVICE_NAME";
+
+namespace
+{
+unsigned char HexDigitValue(unsigned char c) noexcept
+{
+  return static_cast<unsigned char>(std::isdigit(c) ? c - '0' : std::toupper(c) - 'A' + 10);
+}
+
+// Percent-decodes a value from OTEL_RESOURCE_ATTRIBUTES, per the W3C Baggage value grammar
+// the resource spec defers to
+// (https://github.com/open-telemetry/opentelemetry-specification/pull/2670). A malformed escape
+// sequence is left in the output as-is rather than dropping the attribute, since this parser has
+// never validated attribute syntax.
+std::string PercentDecode(const std::string &value)
+{
+  std::string decoded;
+  decoded.reserve(value.size());
+  for (std::size_t i = 0; i < value.size(); ++i)
+  {
+    if (value[i] == '%' && i + 2 < value.size())
+    {
+      unsigned char high = static_cast<unsigned char>(value[i + 1]);
+      unsigned char low  = static_cast<unsigned char>(value[i + 2]);
+      if (std::isxdigit(high) && std::isxdigit(low))
+      {
+        unsigned char unescaped_value =
+            static_cast<unsigned char>((HexDigitValue(high) << 4) | HexDigitValue(low));
+        decoded.push_back(static_cast<char>(unescaped_value));
+        i += 2;
+        continue;
+      }
+    }
+    decoded.push_back(value[i]);
+  }
+  return decoded;
+}
+}  // namespace
 
 Resource ResourceDetector::Create(const ResourceAttributes &attributes,
                                   const std::string &schema_url)
@@ -54,7 +92,7 @@ Resource OTELResourceDetector::Detect() noexcept
       {
         std::string key   = token.substr(0, pos);
         std::string value = token.substr(pos + 1);
-        attributes[key]   = value;
+        attributes[key]   = PercentDecode(value);
       }
     }
   }

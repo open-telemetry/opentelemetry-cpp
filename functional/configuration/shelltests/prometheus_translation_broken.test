@@ -3,6 +3,6 @@
 
 $ example_yaml --test --yaml shelltests/prometheus_translation_broken.yaml
 >
-[ERROR] <shelltests/prometheus_translation_broken.yaml>:9[10](164): Illegal TranslationStrategy: broken
+[ERROR] <shelltests/prometheus_translation_broken.yaml>:10[10](238): Illegal TranslationStrategy: broken
 FAILED TO PARSE MODEL
 >= 1

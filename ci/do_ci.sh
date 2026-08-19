@@ -182,6 +182,7 @@ elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
         -DWITH_OTLP_RETRY_PREVIEW=ON \
         -DWITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         -DWITH_CONFIGURATION=ON \
+        -DWITH_RESOURCE_DETECTORS_PREVIEW=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -457,6 +458,19 @@ elif [[ "$1" == "cmake.do_not_install.test" ]]; then
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
   exit 0
+elif [[ "$1" == "cmake.install_functions.test" ]]; then
+  cd "${BUILD_DIR}"
+  rm -rf *
+  rm -rf ${INSTALL_TEST_DIR}/*
+  export LD_LIBRARY_PATH="${INSTALL_TEST_DIR}/lib:$LD_LIBRARY_PATH"
+  mkdir -p "${BUILD_DIR}/install_functions_test"
+  cd "${BUILD_DIR}/install_functions_test"
+  cmake "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
+        "-DINSTALL_TEST_DIR=${INSTALL_TEST_DIR}" \
+        "-DOPENTELEMETRY_SOURCE_DIR=${SRC_DIR}" \
+        -S "${SRC_DIR}/install/test/cmake/install_functions_test"
+  ctest --output-on-failure
+  exit 0
 elif [[ "$1" == "cmake.install.test" ]]; then
   if [[ -n "${BUILD_SHARED_LIBS}" && "${BUILD_SHARED_LIBS}" == "ON" ]]; then
     CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=ON")
@@ -493,27 +507,34 @@ elif [[ "$1" == "cmake.install.test" ]]; then
     "ext_http_curl"
     "exporters_in_memory"
     "exporters_ostream"
-    "exporters_ostream_builder"
     "exporters_otlp_common"
     "exporters_otlp_file"
-    "exporters_otlp_file_builder"
     "exporters_otlp_grpc"
-    "exporters_otlp_grpc_builder"
     "exporters_otlp_http"
-    "exporters_otlp_http_builder"
     "exporters_prometheus"
-    "exporters_prometheus_builder"
     "exporters_elasticsearch"
     "exporters_zipkin"
     "resource_detectors"
   )
   EXPECTED_COMPONENTS_STRING=$(IFS=\;; echo "${EXPECTED_COMPONENTS[*]}")
+
+  DEPRECATED_COMPONENTS=(
+      "exporters_ostream_builder"
+      "exporters_otlp_builder_utils"
+      "exporters_otlp_file_builder"
+      "exporters_otlp_grpc_builder"
+      "exporters_otlp_http_builder"
+      "exporters_prometheus_builder"
+    )
+  DEPRECATED_COMPONENTS_STRING=$(IFS=\;; echo "${DEPRECATED_COMPONENTS[*]}")
+
   mkdir -p "${BUILD_DIR}/install_test"
   cd "${BUILD_DIR}/install_test"
   cmake  "${CMAKE_OPTIONS[@]}" \
          "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
          "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
          "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}" \
+         "-DINSTALL_TEST_DEPRECATED_COMPONENTS=${DEPRECATED_COMPONENTS_STRING}" \
          -S "${SRC_DIR}/install/test/cmake"
   ctest --output-on-failure
   exit 0
@@ -610,8 +631,8 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
   # that make this test always fail. Ignore these packages in the noexcept test here.
   # Set the api:with_cxx_stdlib=none because C++17 std::variant::get<> throws
 
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/...
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/... -//resource_detectors/...
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/... -//resource_detectors/...
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client
@@ -626,13 +647,14 @@ elif [[ "$1" == "bazel.ubsan" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test --config=ubsan $BAZEL_TEST_OPTIONS_ASYNC //...
   exit 0
 elif [[ "$1" == "bazel.tsan" ]]; then
-# TODO - potential race condition in Civetweb server used by prometheus-cpp during shutdown
-# https://github.com/civetweb/civetweb/issues/861, so removing prometheus from the test
-  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC  -- //... -//exporters/prometheus/...
+# Known intentional race in civetweb (used by prometheus-cpp) during shutdown
+# https://github.com/civetweb/civetweb/issues/1184, so excluding targets that
+# start the civetweb server from the test
+  bazel $BAZEL_STARTUP_OPTIONS test --config=tsan $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/configuration:example_yaml_kitchen_sink
   exit 0
 elif [[ "$1" == "bazel.valgrind" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS_ASYNC //...
-  bazel $BAZEL_STARTUP_OPTIONS test --test_timeout=600 --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --errors-for-leak-kinds=definite --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_TEST_OPTIONS_ASYNC //...
+  bazel $BAZEL_STARTUP_OPTIONS test --test_timeout=900 --run_under="/usr/bin/valgrind --leak-check=full --error-exitcode=1 --errors-for-leak-kinds=definite --suppressions=\"${SRC_DIR}/ci/valgrind-suppressions\"" $BAZEL_TEST_OPTIONS_ASYNC //...
   exit 0
 elif [[ "$1" == "benchmark" ]]; then
   [ -z "${BENCHMARK_DIR}" ] && export BENCHMARK_DIR=$HOME/benchmark
@@ -656,6 +678,19 @@ elif [[ "$1" == "format" ]]; then
     git diff
     exit 1
   fi
+  exit 0
+elif [[ "$1" == "validate.otel.config" ]]; then
+  OTELCFG_VERSION=$(grep "^opentelemetry-configuration=" "${SRC_DIR}/third_party_release" | cut -d= -f2)
+  if [[ -n "${OTEL_CONFIG_SCHEMA:-}" ]]; then
+    SCHEMA_FILE="${OTEL_CONFIG_SCHEMA}"
+    SCHEMA_TMPFILE=""
+  else
+    SCHEMA_TMPFILE=$(mktemp --suffix=.json)
+    SCHEMA_FILE="${SCHEMA_TMPFILE}"
+    curl -fsSL "https://raw.githubusercontent.com/open-telemetry/opentelemetry-configuration/${OTELCFG_VERSION}/opentelemetry_configuration.json" -o "${SCHEMA_FILE}"
+  fi
+  python3 "${SRC_DIR}/tools/validate_otel_config_yaml.py" --schema "${SCHEMA_FILE}" --schema-version "${OTELCFG_VERSION}"
+  [[ -n "${SCHEMA_TMPFILE}" ]] && rm -f "${SCHEMA_TMPFILE}"
   exit 0
 elif [[ "$1" == "code.coverage" ]]; then
   cd "${BUILD_DIR}"

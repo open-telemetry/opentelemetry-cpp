@@ -116,6 +116,19 @@ uint64_t CalculateThreshold(double sampling_probability) noexcept
   return kMaxThreshold - kept;
 }
 
+double ValidateRatio(double ratio, const char *sampler_name) noexcept
+{
+  // 2^-56; hex float literals would need C++17.
+  constexpr double kMinRatio = 1.0 / static_cast<double>(kMaxThreshold);
+  if (ratio == 0.0 || (ratio >= kMinRatio && ratio <= 1.0))
+  {
+    return ratio;
+  }
+  OTEL_INTERNAL_LOG_WARN("[" << sampler_name << "] ratio " << ratio
+                             << " is not 0 or within [2^-56, 1.0], using the default 1.0");
+  return 1.0;
+}
+
 uint64_t GetRandomnessFromTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept
 {
   const uint8_t *data = trace_id.Id().data();

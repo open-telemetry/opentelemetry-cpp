@@ -26,6 +26,10 @@ otel_add_component(
   opentelemetry_trace
   opentelemetry_metrics
   opentelemetry_configuration_core
+  opentelemetry_configuration_trace_builders
+  opentelemetry_configuration_metrics_builders
+  opentelemetry_configuration_logs_builders
+  opentelemetry_configuration_registry_factory
   FILES_DIRECTORY
   "include/opentelemetry/"
   FILES_DESTINATION
