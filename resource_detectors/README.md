@@ -29,7 +29,25 @@ Contributions to detect more attributes for each Entity are welcome.
 
 [Entity: Service](https://opentelemetry.io/docs/specs/semconv/registry/entities/service/)
 
-Not implemented.
+| Attribute | Description | Linux | macOS | Windows |
+| --- | --- | --- | --- | --- |
+| `service.name` | From `OTEL_SERVICE_NAME` when set | Yes | Yes | Yes |
+| `service.name` | Fallback `unknown_service:<process.executable.name>` or `unknown_service` | Yes | Yes | Yes |
+| `service.instance.id` | Stable RFC 4122 UUID version 4 for the current process | Yes | Yes | Yes |
+
+`service.name` is read only from the `OTEL_SERVICE_NAME` environment variable. When
+that variable is unset, the detector falls back to
+`unknown_service:<process.executable.name>` when the executable name is
+available for the current process, otherwise `unknown_service`.
+
+`service.instance.id` is generated once per process and remains stable until the
+process ID changes (for example after `fork()`).
+
+Limitations:
+
+- The detector does not read `OTEL_RESOURCE_ATTRIBUTES`.
+- Executable-name fallback reuses process detector utilities; on macOS the
+  executable name is available for the current process only.
 
 ### Container Resource Detector
 
@@ -102,8 +120,7 @@ resource:
       - container:
       - host:
       - process:
-      # NOTE: service detector cannot be configured currently
-      - service: # not implemented (github.com/open-telemetry/opentelemetry-cpp/issues/4414)
+      - service:
 ```
 
 Call `Register` for each builder before creating the SDK:
@@ -112,10 +129,12 @@ Call `Register` for each builder before creating the SDK:
 #include "opentelemetry/resource_detectors/container_detector_builder.h"
 #include "opentelemetry/resource_detectors/host_detector_builder.h"
 #include "opentelemetry/resource_detectors/process_detector_builder.h"
+#include "opentelemetry/resource_detectors/service_detector_builder.h"
 
 opentelemetry::resource_detector::ContainerDetectorBuilder::Register(registry.get());
 opentelemetry::resource_detector::HostDetectorBuilder::Register(registry.get());
 opentelemetry::resource_detector::ProcessDetectorBuilder::Register(registry.get());
+opentelemetry::resource_detector::ServiceDetectorBuilder::Register(registry.get());
 ```
 
 ## Linking with CMake
@@ -172,6 +191,8 @@ All targets are part of the `resource_detectors` component.
 | `opentelemetry-cpp::host_resource_detector_builder` | Host detector builder for declaritive configuration |
 | `opentelemetry-cpp::process_resource_detector` | Process detector |
 | `opentelemetry-cpp::process_resource_detector_builder` | Process detector builder for declaritive configuration |
+| `opentelemetry-cpp::service_resource_detector` | Service detector |
+| `opentelemetry-cpp::service_resource_detector_builder` | Service detector builder for declaritive configuration |
 
 ## Linking with Bazel
 
@@ -219,3 +240,5 @@ deps = ["//resource_detectors:process_resource_detector_builder"]
 | `//resource_detectors:host_resource_detector_builder` | Host detector builder |
 | `//resource_detectors:process_resource_detector` | Process detector |
 | `//resource_detectors:process_resource_detector_builder` | Process detector builder |
+| `//resource_detectors:service_resource_detector` | Service detector |
+| `//resource_detectors:service_resource_detector_builder` | Service detector builder |
