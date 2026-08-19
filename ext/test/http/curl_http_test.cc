@@ -984,6 +984,54 @@ struct GzipEventHandler : public CustomEventHandler
   std::string reason_;
 };
 
+// A request whose compression step fails is reported as a failed create and then must not be
+// sent. It used to be reported and sent anyway, with a body the failed deflate had already
+// partly rewritten and no Content-Encoding header to describe it.
+//
+// The failure is arranged rather than injected. deflateInPlace() is given the body's own size as
+// its output budget, and its comment says it fails when that budget is smaller than the header
+// plus one byte, so a body of one byte cannot fit a gzip header and the deflate reports
+// Z_BUF_ERROR. No allocator hook and no timing are involved.
+TEST_F(BasicCurlHttpTests, AFailedCompressionStopsTheRequest)
+{
+#  ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("post/");
+  request->SetMethod(http_client::Method::Post);
+
+  http_client::Body body(1, static_cast<uint8_t>('a'));
+  request->SetBody(body);
+  request->AddHeader("Content-Type", "text/plain");
+  request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
+
+  auto handler = std::make_shared<GzipEventHandler>();
+  session->SendRequest(handler);
+
+  // Asserted rather than assumed: a change that made this body compressible would otherwise leave
+  // the case passing while testing nothing.
+  ASSERT_TRUE(handler->is_called_) << "the compression did not fail, so nothing was tested";
+  ASSERT_EQ(handler->state_, http_client::SessionState::CreateFailed);
+
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  // Long enough that a request which was going to be sent has been. The server records every
+  // request it receives, including one whose body is unreadable.
+  std::this_thread::sleep_for(std::chrono::milliseconds{500});
+
+  std::unique_lock<std::mutex> lk1(mtx_requests);
+  EXPECT_TRUE(received_requests_.empty())
+      << "a request the caller was told had failed was sent anyway";
+#  else
+  GTEST_SKIP() << "gzip is not compiled in, so there is no compression step to fail";
+#  endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
+}
+
 TEST_F(BasicCurlHttpTests, GzipCompressibleData)
 {
   received_requests_.clear();
@@ -1074,19 +1122,29 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
   request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
   auto handler = std::make_shared<GzipEventHandler>();
   session->SendRequest(handler);
-  ASSERT_TRUE(waitForRequests(30, 1));
-  session->FinishSession();
+
+  // This used to require a response, on the reading that data which will not compress is sent
+  // uncompressed. The size assertion below is what that rested on, and the size is not the whole
+  // story: deflateInPlace() writes into the caller's buffer before it reports that the result
+  // would not fit, so the body keeps its length while its contents are no longer the caller's
+  // bytes. What went out was neither the payload nor a gzip stream, and carried no
+  // Content-Encoding header to describe itself either way.
+  //
+  // Refusing to send it is the narrow reading of "do not send after reporting a failure". Keeping
+  // the payload instead, by compressing into a separate buffer or by restoring the original on
+  // failure, would let incompressible data still be sent and costs a copy. That is a decision
+  // rather than a repair, so it is #4360 rather than this change.
   ASSERT_TRUE(handler->is_called_);
-  ASSERT_EQ(handler->state_, http_client::SessionState::Response);
-  ASSERT_TRUE(handler->reason_.empty());
+  ASSERT_EQ(handler->state_, http_client::SessionState::CreateFailed);
 
-  auto http_request =
-      dynamic_cast<opentelemetry::ext::http::client::curl::Request *>(request.get());
-  ASSERT_TRUE(http_request != nullptr);
-  ASSERT_EQ(http_request->body_.size(), original_size);
-
+  session->FinishSession();
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
+
+  std::this_thread::sleep_for(std::chrono::milliseconds{500});
+  std::unique_lock<std::mutex> lk1(mtx_requests);
+  EXPECT_TRUE(received_requests_.empty())
+      << "a body the compression step had already overwritten was sent anyway";
 }
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
