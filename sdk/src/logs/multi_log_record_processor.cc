@@ -74,28 +74,6 @@ void MultiLogRecordProcessor::OnEmit(std::unique_ptr<Recordable> &&record) noexc
   }
 }
 
-void MultiLogRecordProcessor::OnEmitWithContext(
-    std::unique_ptr<Recordable> &&record,
-    const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
-                                        opentelemetry::context::Context> &context) noexcept
-{
-  auto log_record = std::move(record);
-  if (!log_record)
-  {
-    return;
-  }
-  auto multi_recordable = static_cast<MultiRecordable *>(log_record.get());
-
-  for (auto &processor : processors_)
-  {
-    auto recordable = multi_recordable->ReleaseRecordable(*processor);
-    if (recordable)
-    {
-      processor->OnEmitWithContext(std::move(recordable), context);
-    }
-  }
-}
-
 bool MultiLogRecordProcessor::EnabledImplementation(
     const opentelemetry::nostd::variant<opentelemetry::trace::SpanContext,
                                         opentelemetry::context::Context> &context_or_span,
@@ -137,18 +115,6 @@ bool MultiLogRecordProcessor::RecordableEnforcesLogRecordLimits() const noexcept
   for (const auto &processor : processors_)
   {
     if (processor != nullptr && processor->RecordableEnforcesLogRecordLimits())
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
-bool MultiLogRecordProcessor::ConsumesResolvedContext() const noexcept
-{
-  for (const auto &processor : processors_)
-  {
-    if (processor != nullptr && processor->ConsumesResolvedContext())
     {
       return true;
     }

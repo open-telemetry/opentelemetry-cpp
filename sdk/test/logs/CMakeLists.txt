@@ -20,18 +20,3 @@ foreach(
     TEST_PREFIX logs.
     TEST_LIST ${testname})
 endforeach()
-
-add_executable(event_to_span_event_bridge_processor_test
-               event_to_span_event_bridge_processor_test.cc)
-target_link_libraries(
-  event_to_span_event_bridge_processor_test
-  ${GTEST_BOTH_LIBRARIES}
-  ${CMAKE_THREAD_LIBS_INIT}
-  opentelemetry_logs
-  opentelemetry_trace
-  opentelemetry_resources
-  opentelemetry_exporter_in_memory)
-gtest_add_tests(
-  TARGET event_to_span_event_bridge_processor_test
-  TEST_PREFIX logs.
-  TEST_LIST event_to_span_event_bridge_processor_test)

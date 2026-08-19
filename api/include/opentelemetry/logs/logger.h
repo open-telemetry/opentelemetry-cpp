@@ -80,30 +80,6 @@ public:
    */
   virtual void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record) noexcept = 0;
 
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-  /**
-   * Emit a Log Record object together with the context it was resolved against: the explicitly
-   * supplied context when @c EmitLogRecord(args...) below was given one, otherwise the ambient
-   * context captured at that time.
-   *
-   * The default implementation ignores @p resolved_context and forwards to
-   * @c EmitLogRecord(std::move(log_record)), so existing @c Logger implementations that only
-   * override the record-only overload keep compiling and behaving exactly as before. Only a
-   * @c Logger that needs the resolved context (for example, to hand it to a
-   * context-aware @c LogRecordProcessor) needs to override this as well.
-   *
-   * @param log_record Log record
-   * @param resolved_context the resolved context (SpanContext or Context variant)
-   */
-  virtual void EmitLogRecordWithContext(
-      nostd::unique_ptr<LogRecord> &&log_record,
-      const nostd::variant<trace::SpanContext, opentelemetry::context::Context>
-          & /*resolved_context*/) noexcept
-  {
-    EmitLogRecord(std::move(log_record));
-  }
-#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
-
   /**
    * Emit a Log Record object with arguments.
    *
@@ -139,7 +115,23 @@ public:
       return;
     }
 
-    StampLogRecordFields(log_record.get(), std::forward<ArgumentType>(args)...);
+    //
+    // Keep the parameter pack unpacking order from left to right because left
+    // ones are usually more important like severity and event_id than the
+    // attributes. The left to right unpack order could pass the more important
+    // data to processors to avoid caching and memory allocating.
+    //
+#if __cplusplus <= 201402L
+    // C++14 does not support fold expressions for parameter pack expansion.
+    int dummy[] = {(detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
+                        log_record.get(), std::forward<ArgumentType>(args)),
+                    0)...};
+    IgnoreTraitResult(dummy);
+#else
+    IgnoreTraitResult((detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
+                           log_record.get(), std::forward<ArgumentType>(args)),
+                       ...));
+#endif
 
     EmitLogRecord(std::move(log_record));
   }
@@ -223,21 +215,11 @@ public:
     }
 
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord(context_or_span);
-    if (!log_record)
-    {
-      return;
-    }
-
-    StampLogRecordFields(log_record.get(), std::forward<ArgumentType>(args)...);
-
-    // Carries the already-resolved context_or_span through, rather than letting the record-only
-    // EmitLogRecord() overload re-derive it (which would silently fall back to the ambient
-    // context and lose an explicitly supplied one).
-    EmitLogRecordWithContext(std::move(log_record), context_or_span);
 #else
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
-    EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+    EmitLogRecord(std::move(log_record), std::forward<ArgumentType>(args)...);
   }
 
   /**
@@ -660,31 +642,6 @@ private:
   template <class... ValueType>
   void IgnoreTraitResult(ValueType &&...)
   {}
-
-  // Applies each of args to log_record via LogRecordSetterTrait, left to right. Shared by every
-  // EmitLogRecord(...) overload that stamps fields from a caller-supplied argument pack, so the
-  // stamping logic has one definition regardless of which overload resolved the record.
-  template <class... ArgumentType>
-  void StampLogRecordFields(LogRecord *log_record, ArgumentType &&...args)
-  {
-    //
-    // Keep the parameter pack unpacking order from left to right because left
-    // ones are usually more important like severity and event_id than the
-    // attributes. The left to right unpack order could pass the more important
-    // data to processors to avoid caching and memory allocating.
-    //
-#if __cplusplus <= 201402L
-    // C++14 does not support fold expressions for parameter pack expansion.
-    int dummy[] = {(detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
-                        log_record, std::forward<ArgumentType>(args)),
-                    0)...};
-    IgnoreTraitResult(dummy);
-#else
-    IgnoreTraitResult((detail::LogRecordSetterTrait<typename std::decay<ArgumentType>::type>::Set(
-                           log_record, std::forward<ArgumentType>(args)),
-                       ...));
-#endif
-  }
 
   //
   // minimum_severity_ can be updated concurrently by multiple threads/cores, so race condition on

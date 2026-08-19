@@ -15,8 +15,13 @@ Increment the:
 
 ## [Unreleased]
 
-* [CONFIGURATION] Implement EventToSpanEventBridge log record processor for
-  declarative configuration
+* [CONFIGURATION] Parse the `event_to_span_event_bridge/development` log
+  record processor configuration in declarative configuration. The SDK
+  implementation of this processor is not yet available; `SdkBuilder` logs a
+  warning and skips it when configured. See
+  [#4454](https://github.com/open-telemetry/opentelemetry-cpp/issues/4454)
+  for the SDK implementation, which is blocked on new pipeline processor
+  architecture.
   [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
@@ -275,18 +280,15 @@ Breaking changes:
   * The public configuration member `max_buckets_` was renamed to `max_size_` to
     match the configuration schema. Please adjust SDK configuration accordingly.
 
-* [LOGS SDK] `LogRecordProcessor` gained the virtual methods
-  `OnEmitWithContext()` and `ConsumesResolvedContext()`
+* [CONFIGURATION] `LogRecordProcessorConfigurationVisitor` gained the virtual
+  method `VisitEventToSpanEventBridge()`
   [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
-  * Source compatible: both methods have default implementations, so existing
-    processors continue to compile and behave as before. `OnEmitWithContext()`
-    forwards to `OnEmit()` and `ConsumesResolvedContext()` returns `false`.
-  * Not ABI compatible: the added virtuals change the vtable layout of
-    `LogRecordProcessor`, so code that subclasses it must be recompiled against
-    this version of the SDK.
-  * `LogRecordProcessorConfigurationVisitor::VisitEventToSpanEventBridge()` was
-    added with a default no-op implementation, so existing visitor
-    implementations remain source compatible.
+  * Source compatible: the method has a default no-op implementation, so
+    existing visitor implementations continue to compile and behave as
+    before.
+  * Not ABI compatible: the added virtual changes the vtable layout of
+    `LogRecordProcessorConfigurationVisitor`, so code that subclasses it must
+    be recompiled against this version of the SDK.
 * [CONFIGURATION] Update prometheus config to schema v1.1.0
   [#4383](https://github.com/open-telemetry/opentelemetry-cpp/pull/4383)
   * The following YAML values for `translation_strategy` have been replaced

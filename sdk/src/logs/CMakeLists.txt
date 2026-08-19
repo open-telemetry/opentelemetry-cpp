@@ -13,8 +13,6 @@ add_library(
   event_logger.cc
   simple_log_record_processor.cc
   simple_log_record_processor_factory.cc
-  event_to_span_event_bridge_processor.cc
-  event_to_span_event_bridge_processor_factory.cc
   batch_log_record_processor.cc
   batch_log_record_processor_options.cc
   batch_log_record_processor_factory.cc
