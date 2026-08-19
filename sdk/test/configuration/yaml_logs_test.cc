@@ -217,7 +217,8 @@ logger_provider:
   auto *batch =
       reinterpret_cast<opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration *>(
           processor);
-  ASSERT_EQ(batch->schedule_delay, 5000);
+  const auto defaults = opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration{};
+  ASSERT_EQ(batch->schedule_delay, defaults.schedule_delay);
   ASSERT_EQ(batch->export_timeout, 30000);
   ASSERT_EQ(batch->max_queue_size, 2048);
   ASSERT_EQ(batch->max_export_batch_size, 512);
@@ -557,7 +558,9 @@ logger_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->logger_provider, nullptr);
   ASSERT_NE(config->logger_provider->limits, nullptr);
-  ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit, 4096);
+  const auto defaults = opentelemetry::sdk::configuration::LogRecordLimitsConfiguration{};
+  ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit,
+            defaults.attribute_value_length_limit);
   ASSERT_EQ(config->logger_provider->limits->attribute_count_limit, 128);
 }
 
