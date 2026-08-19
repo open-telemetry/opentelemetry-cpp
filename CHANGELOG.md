@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUGFIX] Stop a curl request whose gzip step failed, instead of sending
+  a body the failed compression had already overwritten
+  [#4360](https://github.com/open-telemetry/opentelemetry-cpp/issues/4360)
+
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
   and merge the resource per the resource SDK specification.
