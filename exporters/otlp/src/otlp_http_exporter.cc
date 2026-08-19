@@ -78,9 +78,16 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options)
 #ifdef ENABLE_ASYNC_EXPORT
           ,
           options.max_concurrent_requests,
-          options.max_requests_per_connection
+          options.max_requests_per_connection,
+#else
+          ,
+          64,
+          8,
 #endif
-          )))
+          GetOtlpDefaultUserAgent(),
+          options.http_keepalive,
+          options.http_keepalive_idle,
+          options.http_keepalive_intvl)))
 {}
 
 OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
@@ -115,9 +122,16 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
 #ifdef ENABLE_ASYNC_EXPORT
           ,
           options.max_concurrent_requests,
-          options.max_requests_per_connection
+          options.max_requests_per_connection,
+#else
+          ,
+          64,
+          8,
 #endif
-          )))
+          GetOtlpDefaultUserAgent(),
+          options.http_keepalive,
+          options.http_keepalive_idle,
+          options.http_keepalive_intvl)))
 {}
 
 OtlpHttpExporter::OtlpHttpExporter(
@@ -153,9 +167,16 @@ OtlpHttpExporter::OtlpHttpExporter(
 #ifdef ENABLE_ASYNC_EXPORT
                                 ,
                                 options.max_concurrent_requests,
-                                options.max_requests_per_connection
+                                options.max_requests_per_connection,
+#else
+                                ,
+                                64,
+                                8,
 #endif
-                                ),
+                                GetOtlpDefaultUserAgent(),
+                                options.http_keepalive,
+                                options.http_keepalive_idle,
+                                options.http_keepalive_intvl),
           factory))
 {}
 
@@ -193,9 +214,16 @@ OtlpHttpExporter::OtlpHttpExporter(
 #ifdef ENABLE_ASYNC_EXPORT
                                 ,
                                 options.max_concurrent_requests,
-                                options.max_requests_per_connection
+                                options.max_requests_per_connection,
+#else
+                                ,
+                                64,
+                                8,
 #endif
-                                ),
+                                GetOtlpDefaultUserAgent(),
+                                options.http_keepalive,
+                                options.http_keepalive_idle,
+                                options.http_keepalive_intvl),
           factory))
 {}
 
@@ -231,9 +259,16 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
 #ifdef ENABLE_ASYNC_EXPORT
                                 ,
                                 options.max_concurrent_requests,
-                                options.max_requests_per_connection
+                                options.max_requests_per_connection,
+#else
+                                ,
+                                64,
+                                8,
 #endif
-                                ),
+                                GetOtlpDefaultUserAgent(),
+                                options.http_keepalive,
+                                options.http_keepalive_idle,
+                                options.http_keepalive_intvl),
           std::move(http_client)))
 {}
 
@@ -270,9 +305,16 @@ OtlpHttpExporter::OtlpHttpExporter(const OtlpHttpExporterOptions &options,
 #ifdef ENABLE_ASYNC_EXPORT
                                 ,
                                 options.max_concurrent_requests,
-                                options.max_requests_per_connection
+                                options.max_requests_per_connection,
+#else
+                                ,
+                                64,
+                                8,
 #endif
-                                ),
+                                GetOtlpDefaultUserAgent(),
+                                options.http_keepalive,
+                                options.http_keepalive_idle,
+                                options.http_keepalive_intvl),
           std::move(http_client)))
 {}
 
@@ -296,6 +338,9 @@ OtlpHttpExporter::OtlpHttpExporter(std::unique_ptr<OtlpHttpClient> http_client)
   options_.max_requests_per_connection = http_client_->GetOptions().max_requests_per_connection;
 #endif
   runtime_options_.thread_instrumentation = http_client_->GetOptions().thread_instrumentation;
+  options_.http_keepalive       = http_client_->GetOptions().http_keepalive;
+  options_.http_keepalive_idle  = http_client_->GetOptions().http_keepalive_idle;
+  options_.http_keepalive_intvl = http_client_->GetOptions().http_keepalive_intvl;
 }
 // ----------------------------- Exporter methods ------------------------------
 

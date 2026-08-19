@@ -1206,6 +1206,13 @@ CURLcode HttpOperation::Setup()
     return rc;
   }
 
+  // NOLINTNEXTLINE(google-runtime-int)
+  rc = SetCurlLongOption(CURLOPT_CONNECTTIMEOUT_MS, static_cast<long>(http_conn_timeout_.count()));
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
+
   // abort if slower than 4kb/sec during 30 seconds
   rc = SetCurlLongOption(CURLOPT_LOW_SPEED_TIME, 30L);
   if (rc != CURLE_OK)

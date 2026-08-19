@@ -92,6 +92,47 @@ struct OtlpHttpClientOptions
   std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation =
       std::shared_ptr<sdk::common::ThreadInstrumentation>(nullptr);
 
+  /**
+   * Enable TCP keepalive probes on the underlying curl connection.
+   *
+   * When true, the OS will send keepalive probes after the connection
+   * has been idle for @p http_keepalive_idle seconds, then repeat every
+   * @p http_keepalive_intvl seconds until the peer acknowledges or the
+   * connection is declared dead.  This detects half-open TCP connections
+   * caused by silent peer disappearance.
+   *
+   * Default: false (keepalive disabled).
+   */
+  bool http_keepalive = false;
+
+  /**
+   * Idle time in seconds before TCP keepalive probes begin.
+   *
+   * Only effective when @p http_keepalive is true.
+   * A value of zero uses the libcurl / OS default (typically 60-75 s on
+   * Linux, 7200 s on macOS).  Set to a smaller value (e.g., 30) for
+   * faster detection of half-open connections.
+   *
+   * Requires libcurl >= 7.25.0; silently ignored on older versions.
+   *
+   * Default: 0 (use OS default).
+   */
+  std::chrono::seconds http_keepalive_idle = std::chrono::seconds::zero();
+
+  /**
+   * Interval in seconds between successive TCP keepalive probes.
+   *
+   * Only effective when @p http_keepalive is true.
+   * A value of zero uses the libcurl / OS default (typically 75 s on
+   * Linux).  Set to a smaller value (e.g., 5) to detect failures more
+   * quickly once probing has started.
+   *
+   * Requires libcurl >= 7.25.0; silently ignored on older versions.
+   *
+   * Default: 0 (use OS default).
+   */
+  std::chrono::seconds http_keepalive_intvl = std::chrono::seconds::zero();
+
   inline OtlpHttpClientOptions(
       nostd::string_view input_url,
       bool input_ssl_insecure_skip_verify,
@@ -119,7 +160,10 @@ struct OtlpHttpClientOptions
       const std::shared_ptr<sdk::common::ThreadInstrumentation> &input_thread_instrumentation,
       std::size_t input_concurrent_sessions         = 64,
       std::size_t input_max_requests_per_connection = 8,
-      nostd::string_view input_user_agent           = GetOtlpDefaultUserAgent())
+      nostd::string_view input_user_agent           = GetOtlpDefaultUserAgent(),
+      bool input_http_keepalive                     = false,
+      std::chrono::seconds input_http_keepalive_idle = std::chrono::seconds::zero(),
+      std::chrono::seconds input_http_keepalive_intvl = std::chrono::seconds::zero())
       : url(input_url),
         ssl_options(input_url,
                     input_ssl_insecure_skip_verify,
@@ -145,7 +189,10 @@ struct OtlpHttpClientOptions
         max_concurrent_requests(input_concurrent_sessions),
         max_requests_per_connection(input_max_requests_per_connection),
         user_agent(input_user_agent),
-        thread_instrumentation(input_thread_instrumentation)
+        thread_instrumentation(input_thread_instrumentation),
+        http_keepalive(input_http_keepalive),
+        http_keepalive_idle(input_http_keepalive_idle),
+        http_keepalive_intvl(input_http_keepalive_intvl)
   {}
 };
 

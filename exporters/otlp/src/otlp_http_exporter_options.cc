@@ -31,7 +31,10 @@ OtlpHttpExporterOptions::OtlpHttpExporterOptions()
       retry_policy_max_attempts(GetOtlpDefaultTracesRetryMaxAttempts()),
       retry_policy_initial_backoff(GetOtlpDefaultTracesRetryInitialBackoff()),
       retry_policy_max_backoff(GetOtlpDefaultTracesRetryMaxBackoff()),
-      retry_policy_backoff_multiplier(GetOtlpDefaultTracesRetryBackoffMultiplier())
+      retry_policy_backoff_multiplier(GetOtlpDefaultTracesRetryBackoffMultiplier()),
+      http_keepalive(false),
+      http_keepalive_idle(std::chrono::seconds::zero()),
+      http_keepalive_intvl(std::chrono::seconds::zero())
 {}
 
 OtlpHttpExporterOptions::OtlpHttpExporterOptions(void *) {}
