@@ -174,10 +174,7 @@ public:
                 std::chrono::milliseconds http_conn_timeout = kDefaultHttpConnTimeout,
                 bool reuse_connection                       = false,
                 bool is_log_enabled                         = false,
-                const opentelemetry::ext::http::client::RetryPolicy &retry_policy = {},
-                bool keepalive_allow = false,
-                std::chrono::seconds keepalive_idle = std::chrono::seconds::zero(),
-                std::chrono::seconds keepalive_intvl = std::chrono::seconds::zero());
+                const opentelemetry::ext::http::client::RetryPolicy &retry_policy = {});
 
   HttpOperation(const HttpOperation &)            = delete;
   HttpOperation(HttpOperation &&)                 = delete;
@@ -352,10 +349,6 @@ private:
   decltype(RetryPolicy::max_attempts) retry_attempts_;
   std::chrono::system_clock::time_point last_attempt_time_;
   std::chrono::system_clock::time_point retry_after_time_point_{};
-
-  const bool keepalive_allow_{false};
-  const std::chrono::seconds keepalive_idle_{std::chrono::seconds::zero()};
-  const std::chrono::seconds keepalive_intvl_{std::chrono::seconds::zero()};
 
   // Processed response headers and body
   // See CURLINFO_RESPONSE_CODE, type is long

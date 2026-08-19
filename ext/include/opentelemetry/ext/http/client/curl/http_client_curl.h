@@ -112,15 +112,6 @@ public:
     retry_policy_ = retry_policy;
   }
 
-  void SetKeepAlive(bool allow,
-                    std::chrono::seconds idle  = std::chrono::seconds::zero(),
-                    std::chrono::seconds intvl = std::chrono::seconds::zero()) noexcept override
-  {
-    keepalive_allow_ = allow;
-    keepalive_idle_  = idle;
-    keepalive_intvl_ = intvl;
-  }
-
 public:
   opentelemetry::ext::http::client::Method method_{opentelemetry::ext::http::client::Method::Get};
   opentelemetry::ext::http::client::HttpSslOptions ssl_options_;
@@ -132,9 +123,6 @@ public:
       opentelemetry::ext::http::client::Compression::kNone};
   bool is_log_enabled_{false};
   opentelemetry::ext::http::client::RetryPolicy retry_policy_;
-  bool keepalive_allow_{false};
-  std::chrono::seconds keepalive_idle_{std::chrono::seconds::zero()};
-  std::chrono::seconds keepalive_intvl_{std::chrono::seconds::zero()};
 };
 
 class Response : public opentelemetry::ext::http::client::Response

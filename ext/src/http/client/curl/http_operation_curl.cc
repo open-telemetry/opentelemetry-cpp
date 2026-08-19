@@ -425,10 +425,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                              std::chrono::milliseconds http_conn_timeout,
                              bool reuse_connection,
                              bool is_log_enabled,
-                             const RetryPolicy &retry_policy,
-                             bool keepalive_allow,
-                             std::chrono::seconds keepalive_idle,
-                             std::chrono::seconds keepalive_intvl)
+                             const RetryPolicy &retry_policy)
     :  // Optional connection params
       is_raw_response_(is_raw_response),
       reuse_connection_(reuse_connection),
@@ -449,10 +446,7 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
                        retry_policy.max_backoff > SecondsDecimal::zero() &&
                        retry_policy.backoff_multiplier > 0.0f)
                           ? 0
-                          : retry_policy.max_attempts),
-      keepalive_allow_(keepalive_allow),
-      keepalive_idle_(keepalive_idle),
-      keepalive_intvl_(keepalive_intvl)
+                          : retry_policy.max_attempts)
 {
   /* get a curl handle */
   curl_resource_.easy_handle = curl_easy_init();
@@ -1212,6 +1206,13 @@ CURLcode HttpOperation::Setup()
     return rc;
   }
 
+  // NOLINTNEXTLINE(google-runtime-int)
+  rc = SetCurlLongOption(CURLOPT_CONNECTTIMEOUT_MS, static_cast<long>(http_conn_timeout_.count()));
+  if (rc != CURLE_OK)
+  {
+    return rc;
+  }
+
   // abort if slower than 4kb/sec during 30 seconds
   rc = SetCurlLongOption(CURLOPT_LOW_SPEED_TIME, 30L);
   if (rc != CURLE_OK)
@@ -1223,35 +1224,6 @@ CURLcode HttpOperation::Setup()
   if (rc != CURLE_OK)
   {
     return rc;
-  }
-
-  rc = SetCurlLongOption(CURLOPT_TCP_KEEPALIVE, keepalive_allow_ ? 1L : 0L);
-  if (rc != CURLE_OK)
-  {
-    return rc;
-  }
-
-  if (keepalive_allow_)
-  {
-#if LIBCURL_VERSION_NUM >= 0x071900 /* libcurl 7.25.0 */
-    if (keepalive_idle_.count() > 0)
-    {
-      rc = SetCurlLongOption(CURLOPT_TCP_KEEPIDLE, static_cast<long>(keepalive_idle_.count()));
-      if (rc != CURLE_OK)
-      {
-        return rc;
-      }
-    }
-
-    if (keepalive_intvl_.count() > 0)
-    {
-      rc = SetCurlLongOption(CURLOPT_TCP_KEEPINTVL, static_cast<long>(keepalive_intvl_.count()));
-      if (rc != CURLE_OK)
-      {
-        return rc;
-      }
-    }
-#endif
   }
 
   if (reuse_connection_)

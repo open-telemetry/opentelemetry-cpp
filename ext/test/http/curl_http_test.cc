@@ -33,6 +33,7 @@
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/version.h"
 
 constexpr int HTTP_PORT{19000};
@@ -1094,44 +1095,32 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
 // TCP keepalive configuration tests
 // ---------------------------------------------------------------------------
 
-TEST(CurlHttpRequestTest, KeepAliveDefaultsDisabled)
+TEST_F(BasicCurlHttpTests, ConnectTimeoutBoundsConnectionPhase)
 {
-  curl::Request req;
-  EXPECT_FALSE(req.keepalive_allow_);
-  EXPECT_EQ(req.keepalive_idle_, std::chrono::seconds::zero());
-  EXPECT_EQ(req.keepalive_intvl_, std::chrono::seconds::zero());
-}
+  // Explicitly disable environment proxies for this direct connection test
+  setenv("no_proxy", "*", 1);
+  setenv("NO_PROXY", "*", 1);
 
-TEST(CurlHttpRequestTest, KeepAliveEnabledWithExplicitTimings)
-{
-  curl::Request req;
-  req.SetKeepAlive(true, std::chrono::seconds{30}, std::chrono::seconds{5});
-  EXPECT_TRUE(req.keepalive_allow_);
-  EXPECT_EQ(req.keepalive_idle_, std::chrono::seconds{30});
-  EXPECT_EQ(req.keepalive_intvl_, std::chrono::seconds{5});
-}
+  received_requests_.clear();
+  curl::HttpClient http_client;
 
-TEST(CurlHttpRequestTest, KeepAliveEnabledWithOsDefaultTimings)
-{
-  // Zero idle/intvl means "use OS default" — both fields should store zero.
-  curl::Request req;
-  req.SetKeepAlive(true);  // idle and intvl default to zero()
-  EXPECT_TRUE(req.keepalive_allow_);
-  EXPECT_EQ(req.keepalive_idle_, std::chrono::seconds::zero());
-  EXPECT_EQ(req.keepalive_intvl_, std::chrono::seconds::zero());
-}
+  auto session = http_client.CreateSession("http://192.0.2.0:19000/get/");
+  auto request = session->CreateRequest();
+  request->SetMethod(http_client::Method::Get);
+  request->SetUri("get/");
+  request->SetTimeoutMs(std::chrono::milliseconds(500));
 
-TEST(CurlHttpRequestTest, KeepAliveDisabledExplicitly)
-{
-  curl::Request req;
-  // First enable, then disable — ensure values revert.
-  req.SetKeepAlive(true, std::chrono::seconds{60}, std::chrono::seconds{10});
-  req.SetKeepAlive(false);
-  EXPECT_FALSE(req.keepalive_allow_);
-  // idle/intvl are set to their parameter values; when allow=false and defaults
-  // are used, they become zero() from the default argument.
-  EXPECT_EQ(req.keepalive_idle_, std::chrono::seconds::zero());
-  EXPECT_EQ(req.keepalive_intvl_, std::chrono::seconds::zero());
+  auto handler = std::make_shared<GetEventHandler>();
+  auto start_time = std::chrono::steady_clock::now();
+  session->SendRequest(handler);
+  session->FinishSession();
+  auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                     std::chrono::steady_clock::now() - start_time)
+                     .count();
+
+  ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+  ASSERT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_LT(elapsed, 2000);
 }
 
 }  // namespace

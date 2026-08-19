@@ -204,9 +204,7 @@ void Session::SendRequest(
       new HttpOperation(http_request_->method_, url, http_request_->ssl_options_, callback_ptr,
                         http_request_->headers_, http_request_->body_, http_request_->compression_,
                         false, http_request_->timeout_ms_, reuse_connection,
-                        http_request_->is_log_enabled_, http_request_->retry_policy_,
-                        http_request_->keepalive_allow_, http_request_->keepalive_idle_,
-                        http_request_->keepalive_intvl_));
+                        http_request_->is_log_enabled_, http_request_->retry_policy_));
   bool success =
       CURLE_OK == curl_operation_->SendAsync(this, [this, callback](HttpOperation &operation) {
         // Both can hold at once: cancelling only raises a flag, and the transfer may already
