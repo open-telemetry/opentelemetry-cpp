@@ -78,6 +78,26 @@ target_include_directories(
          "$<INSTALL_INTERFACE:include>")
 
 #
+# opentelemetry_host_resource_detector_builder
+#
+
+add_library(opentelemetry_host_resource_detector_builder
+            src/host_detector_builder.cc)
+
+set_target_properties(opentelemetry_host_resource_detector_builder
+                      PROPERTIES EXPORT_NAME host_resource_detector_builder)
+set_target_version(opentelemetry_host_resource_detector_builder)
+
+target_include_directories(
+  opentelemetry_host_resource_detector_builder
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+
+target_link_libraries(
+  opentelemetry_host_resource_detector_builder
+  PRIVATE opentelemetry_host_resource_detector opentelemetry_configuration_core)
+
+#
 # opentelemetry_process_resource_detector
 #
 
@@ -144,6 +164,7 @@ set_target_properties(opentelemetry_resource_detectors_builders
 target_link_libraries(
   opentelemetry_resource_detectors_builders
   INTERFACE opentelemetry_container_resource_detector_builder
+            opentelemetry_host_resource_detector_builder
             opentelemetry_process_resource_detector_builder)
 
 otel_add_component(
@@ -156,6 +177,7 @@ otel_add_component(
   opentelemetry_container_resource_detector_builder
   opentelemetry_env_entity_resource_detector
   opentelemetry_host_resource_detector
+  opentelemetry_host_resource_detector_builder
   opentelemetry_process_resource_detector
   opentelemetry_process_resource_detector_builder
   FILES_DIRECTORY
