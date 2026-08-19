@@ -13,6 +13,7 @@
 
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h"
@@ -24,6 +25,7 @@
 #include "opentelemetry/sdk/metrics/data/circular_buffer.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 
 using namespace opentelemetry::sdk::metrics;
 namespace nostd = opentelemetry::nostd;
@@ -1156,6 +1158,29 @@ Base2ExponentialHistogramPointData MakeFloorPointDataWithNarrowBuckets()
   return point;
 }
 
+// A budget the configuration validator never produces, so no downscale can ever satisfy it. Only
+// the iteration bound in GetScaleReduction() stops the search.
+Base2ExponentialHistogramPointData MakeDegenerateBudgetPointData(size_t max_buckets)
+{
+  Base2ExponentialHistogramPointData point;
+  point.max_buckets_ = max_buckets;
+  return point;
+}
+
+// Buckets that cannot be reconciled with the scale they are labelled with: at the runtime floor no
+// finite double reaches index 100, and the floor leaves no downscale to merge it away.
+Base2ExponentialHistogramPointData MakeMismatchedBucketPointData()
+{
+  Base2ExponentialHistogramPointData point;
+  point.max_buckets_ = kMaxSizeMin;
+  point.scale_       = kMinRuntimeScale;
+  point.count_       = 1;
+
+  point.positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(kMaxSizeMin);
+  EXPECT_TRUE(point.positive_buckets_->Increment(100, 1));
+  return point;
+}
+
 void ExpectFloorPointDataAcceptsFullRange(const Base2ExponentialHistogramPointData &point,
                                           nostd::string_view label)
 {
@@ -1164,6 +1189,7 @@ void ExpectFloorPointDataAcceptsFullRange(const Base2ExponentialHistogramPointDa
   EXPECT_EQ(point.max_buckets_, kMaxSizeMin);
   ExpectCountInvariant(2u, point, label);
   EXPECT_GE(point.positive_buckets_->MaxSize(), kMaxSizeMin);
+  EXPECT_LE(point.positive_buckets_->MaxSize(), point.max_buckets_);
   EXPECT_EQ(BucketSpan(*point.positive_buckets_), static_cast<int32_t>(kMaxSizeMin));
 }
 }  // namespace
@@ -1182,6 +1208,8 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationScaleFloorFullRange)
   ExpectCountInvariant(2u, point, "ScaleFloorFullRange");
   EXPECT_TRUE(point.negative_buckets_->Empty());
   EXPECT_EQ(BucketSpan(*point.positive_buckets_), static_cast<int32_t>(kMaxSizeMin));
+  // The budget is a hard cap: reaching the floor must not buy extra buckets.
+  EXPECT_LE(point.positive_buckets_->MaxSize(), point.max_buckets_);
 }
 
 TEST(Aggregation, Base2ExponentialHistogramAggregationScaleFloorFullRangeNegative)
@@ -1197,6 +1225,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationScaleFloorFullRangeNegativ
   ExpectCountInvariant(2u, point, "ScaleFloorFullRangeNegative");
   EXPECT_TRUE(point.positive_buckets_->Empty());
   EXPECT_EQ(BucketSpan(*point.negative_buckets_), static_cast<int32_t>(kMaxSizeMin));
+  EXPECT_LE(point.negative_buckets_->MaxSize(), point.max_buckets_);
 }
 
 TEST(Aggregation, Base2ExponentialHistogramAggregationScaleFloorMixedSign)
@@ -1363,4 +1392,47 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMovedPointDataKeepsFloorCa
   aggr.Aggregate(kHuge, {});
 
   ExpectFloorPointDataAcceptsFullRange(MakePointData(aggr), "MovedPointDataKeepsFloorCapacity");
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationDegenerateMaxBucketsTerminates)
+{
+  // max_buckets_ below kMaxSizeMin only arrives through the point data constructors. The span can
+  // never shrink to fit, so the reduction search has to stop and the recording still has to land.
+  for (size_t max_buckets : {size_t{0}, size_t{1}})
+  {
+    SCOPED_TRACE(max_buckets);
+    Base2ExponentialHistogramAggregation aggr(MakeDegenerateBudgetPointData(max_buckets));
+
+    aggr.Aggregate(kTiny, {});
+    aggr.Aggregate(kHuge, {});
+
+    const auto point = MakePointData(aggr);
+    EXPECT_EQ(point.scale_, kMinRuntimeScale);
+    ExpectCountInvariant(2u, point, "DegenerateMaxBucketsTerminates");
+    EXPECT_EQ(point.positive_buckets_->MaxSize(), kMaxSizeMin);
+    EXPECT_EQ(BucketSpan(*point.positive_buckets_), static_cast<int32_t>(kMaxSizeMin));
+  }
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationMismatchedBucketsDropRecordings)
+{
+  // Already at the floor, so Downscale() cannot merge the stale bucket away and every recording is
+  // dropped. The point of the test is that this reports and continues instead of aborting.
+  opentelemetry::test_common::ScopedTestLogHandler log_handler{
+      opentelemetry::sdk::common::internal_log::LogLevel::Error};
+
+  Base2ExponentialHistogramAggregation aggr(MakeMismatchedBucketPointData());
+
+  aggr.Aggregate(1.0, {});
+  aggr.Aggregate(kHuge, {});
+
+  const auto point = MakePointData(aggr);
+  EXPECT_EQ(point.scale_, kMinRuntimeScale);
+  EXPECT_EQ(point.count_, 3u);
+  EXPECT_EQ(SumAllBuckets(point), 1u);
+  EXPECT_EQ(BucketSpan(*point.positive_buckets_), 1);
+
+  // Two drops, one log line. Nothing about the state can change between recordings, so repeating
+  // the message would flood the handler from the record path.
+  EXPECT_EQ(log_handler.Drain().size(), 1u);
 }

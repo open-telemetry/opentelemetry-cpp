@@ -15,8 +15,13 @@ Increment the:
 
 ## [Unreleased]
 
-* [METRICS SDK] Enforce a runtime minimum scale for
-  `Base2ExponentialHistogramAggregation`.
+* [METRICS SDK] Enforce a runtime minimum scale of `-11` for
+  `Base2ExponentialHistogramAggregation`, so a recording that spans the full
+  double range no longer downscales without end. Exported histograms may now
+  carry a `scale` of `-11`, one step below the minimum the declarative
+  configuration accepts for `max_scale`, and a configured `max_size` is never
+  exceeded. This also stops a non-terminating scale reduction for externally
+  supplied point data whose `max_buckets_` is `0` or `1`.
   [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,

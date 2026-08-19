@@ -58,6 +58,9 @@ private:
   bool record_min_max_ = true;
   // Keeps the scale floor warning off the record hot path after the first occurrence.
   bool floor_warning_emitted_ = false;
+  // Same for the dropped-recording error, which repeats on every call once point data arrives with
+  // buckets that do not match its scale.
+  bool bucket_index_error_emitted_ = false;
 };
 
 }  // namespace metrics

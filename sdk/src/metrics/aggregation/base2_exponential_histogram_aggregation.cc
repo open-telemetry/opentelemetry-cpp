@@ -337,27 +337,31 @@ void Base2ExponentialHistogramAggregation::AggregateIntoBuckets(
   }
 
   const int32_t index = indexer_.ComputeIndex(value);
-
-  // The reduction is derived from the configured budget so max_buckets_ is enforced directly
-  // instead of relying on Increment() to fail.
-  uint32_t scale_reduction = 0;
-  if (!buckets->Empty())
+  if (buckets->Increment(index, 1))
   {
-    scale_reduction =
-        GetScaleReduction((std::min)(buckets->StartIndex(), index),
-                          (std::max)(buckets->EndIndex(), index), point_data_.max_buckets_);
+    return;
   }
+
+  // A configured max_size is never below kMaxSizeMin, so the buffer capacity equals max_buckets_
+  // and the failure above already means the span exceeds the budget.
+  const uint32_t scale_reduction =
+      GetScaleReduction((std::min)(buckets->StartIndex(), index),
+                        (std::max)(buckets->EndIndex(), index), point_data_.max_buckets_);
 
   // Downscale() may stop short of the request at the floor, so shift the index by what was
   // actually applied.
   const uint32_t applied = Downscale(scale_reduction);
-  if (!buckets->Increment(index >> applied, 1))
+  if (!buckets->Increment(index >> applied, 1) && !bucket_index_error_emitted_)
   {
+    // Unreachable for buckets this class produced: at the floor every finite double maps to -1 or
+    // 0, which fits kMaxSizeMin. It is reachable through the point data constructors, so it is a
+    // caller input error rather than an assertable invariant.
+    bucket_index_error_emitted_ = true;
     OTEL_INTERNAL_LOG_ERROR(
         "[Base2ExponentialHistogramAggregation::AggregateIntoBuckets] bucket index "
-        << (index >> applied) << " out of range at scale " << point_data_.scale_
-        << "; recording dropped from the buckets. SDK invariant violation");
-    assert(false && "AggregateIntoBuckets: bucket index out of range");
+        << (index >> applied) << " does not fit the buckets supplied at scale "
+        << point_data_.scale_
+        << "; recording dropped. Further drops on this aggregation are not logged");
   }
 }
 
