@@ -16,7 +16,8 @@ Increment the:
 ## [Unreleased]
 
 * [BUG] Prevent lost condition-variable wakeups in OTLP file exporter and periodic
-  metric exporter.
+  metric exporter
+  [#4365](https://github.com/open-telemetry/opentelemetry-cpp/pull/4365)
 
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
