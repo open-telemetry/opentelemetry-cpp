@@ -17,6 +17,10 @@ Increment the:
 
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
+* [BUGFIX] Complete an OTLP HTTP request that its client ends with
+  `Destroyed`, `ReadError` or `WriteError`, rather than logging the state
+  and leaving the caller waiting
+  [#4425](https://github.com/open-telemetry/opentelemetry-cpp/issues/4425)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
   and merge the resource per the resource SDK specification.
