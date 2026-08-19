@@ -186,6 +186,12 @@ public:
                opentelemetry::nostd::string_view reason) noexcept override
   {
     // need to modify stopping_ under lock before calling callback
+    //
+    // Every state a request can end on, because a request that ends on one nobody answers leaves
+    // the caller waiting for a callback that is not coming. Destroyed, ReadError and WriteError
+    // are the three the client can finish on that used to be logged and then dropped. Ordering is
+    // decided by the exchange below rather than here, so one of these arriving after a response
+    // has already been reported does not report a second time.
     bool need_stop = false;
     switch (state)
     {
@@ -195,6 +201,9 @@ public:
       case http_client::SessionState::SSLHandshakeFailed:
       case http_client::SessionState::TimedOut:
       case http_client::SessionState::NetworkError:
+      case http_client::SessionState::Destroyed:
+      case http_client::SessionState::ReadError:
+      case http_client::SessionState::WriteError:
       case http_client::SessionState::Cancelled: {
         need_stop = true;
       }

@@ -3,6 +3,7 @@
 
 #ifndef OPENTELEMETRY_STL_VERSION
 
+#  include <atomic>
 #  include <chrono>
 #  include <memory>
 #  include <utility>
@@ -89,6 +90,32 @@ public:
   {
     auto http_client = http_client::HttpClientTestFactory::Create();
     return {new OtlpHttpClient(MakeOtlpHttpClientOptions(), http_client), http_client};
+  }
+
+  // The same, with the outcome recorded. A request that never settles calls this no times, and one
+  // that settles twice calls it twice, so both failures the terminal states can produce are
+  // visible in the count rather than only in a timeout.
+  static void ExportOneRequest(OtlpHttpClient &otlp_client,
+                               std::shared_ptr<std::atomic<int>> calls,
+                               std::shared_ptr<sdk::common::ExportResult> result)
+  {
+    auto arena = std::make_unique<google::protobuf::Arena>();
+    auto *request =
+        google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
+            arena.get());
+    auto *response =
+        google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceResponse>(
+            arena.get());
+
+    otlp_client.Export(
+        *request, std::move(arena), response,
+        [calls, result](opentelemetry::sdk::common::ExportResult outcome,
+                        google::protobuf::Message *) {
+          calls->fetch_add(1, std::memory_order_release);
+          *result = outcome;
+          return true;
+        },
+        1);
   }
 
   // A non-zero request budget keeps the export asynchronous, so it returns while the session runs.
@@ -233,6 +260,89 @@ TEST_F(OtlpHttpExporterCustomClientTestPeer, ForceFlushReportsSuccessOnceTheSess
   sent.Finish(*pending);
 
   EXPECT_TRUE(otlp_client.ForceFlush(std::chrono::milliseconds{50}));
+}
+
+// Every state the client can finish a request on has to end that request. These three used to be
+// logged and then dropped: the switch that decides whether the request is over did not name them,
+// so a client that ended a transfer this way left the caller waiting for a callback that was not
+// coming, and ForceFlush and Shutdown could only give up on their own deadlines.
+class OtlpHttpTerminalStateTest : public OtlpHttpExporterCustomClientTestPeer,
+                                  public ::testing::WithParamInterface<http_client::SessionState>
+{};
+
+TEST_P(OtlpHttpTerminalStateTest, ATerminalClientEventEndsTheRequest)
+{
+  auto client         = http_client::HttpClientTestFactory::Create();
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto session = std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> pending;
+  EXPECT_CALL(*session, SendRequest)
+      .WillRepeatedly(
+          [&pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+            pending = std::move(callback);
+          });
+
+  OtlpHttpClient otlp_client(MakeOtlpHttpClientOptions(std::chrono::seconds{30}), client);
+
+  auto calls  = std::make_shared<std::atomic<int>>(0);
+  auto result = std::make_shared<sdk::common::ExportResult>(sdk::common::ExportResult::kSuccess);
+  ExportOneRequest(otlp_client, calls, result);
+  ASSERT_NE(pending, nullptr);
+
+  pending->OnEvent(GetParam(), "");
+
+  EXPECT_EQ(1, calls->load(std::memory_order_acquire))
+      << "the request was not ended by the state the client finished on";
+  EXPECT_EQ(sdk::common::ExportResult::kFailure, *result);
+
+  // The deadline is short on purpose. Without the request being ended above this waits it out.
+  EXPECT_TRUE(otlp_client.ForceFlush(std::chrono::milliseconds{50}));
+}
+
+INSTANTIATE_TEST_SUITE_P(TerminalStates,
+                         OtlpHttpTerminalStateTest,
+                         ::testing::Values(http_client::SessionState::ReadError,
+                                           http_client::SessionState::WriteError,
+                                           http_client::SessionState::Destroyed));
+
+// The other direction. A client is free to report one of those states after it has already
+// delivered a response, and the outcome the caller was given must not be replaced or repeated.
+TEST_F(OtlpHttpExporterCustomClientTestPeer, ALateTerminalEventDoesNotReportASecondTime)
+{
+  for (const auto state :
+       {http_client::SessionState::ReadError, http_client::SessionState::WriteError,
+        http_client::SessionState::Destroyed})
+  {
+    SCOPED_TRACE(static_cast<int>(state));
+
+    auto client         = http_client::HttpClientTestFactory::Create();
+    auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+    auto session = std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+    std::shared_ptr<opentelemetry::ext::http::client::EventHandler> pending;
+    EXPECT_CALL(*session, SendRequest)
+        .WillRepeatedly(
+            [&pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+              pending = std::move(callback);
+            });
+
+    OtlpHttpClient otlp_client(MakeOtlpHttpClientOptions(std::chrono::seconds{30}), client);
+
+    auto calls  = std::make_shared<std::atomic<int>>(0);
+    auto result = std::make_shared<sdk::common::ExportResult>(sdk::common::ExportResult::kFailure);
+    ExportOneRequest(otlp_client, calls, result);
+    ASSERT_NE(pending, nullptr);
+
+    http_client::nosend::Response sent;
+    sent.Finish(*pending);
+    ASSERT_EQ(1, calls->load(std::memory_order_acquire));
+
+    pending->OnEvent(state, "");
+
+    EXPECT_EQ(1, calls->load(std::memory_order_acquire))
+        << "a state arriving after the response reported the request a second time";
+  }
 }
 
 }  // namespace otlp
