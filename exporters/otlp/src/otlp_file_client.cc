@@ -1137,7 +1137,10 @@ public:
 
   bool Shutdown(std::chrono::microseconds timeout) noexcept override
   {
-    file_->is_shutdown.store(true, std::memory_order_release);
+    {
+      std::lock_guard<std::mutex> waker_guard{file_->background_thread_waker_lock};
+      file_->is_shutdown.store(true, std::memory_order_release);
+    }
 
     bool result = ForceFlush(timeout);
     return result;
