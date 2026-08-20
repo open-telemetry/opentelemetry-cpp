@@ -34,6 +34,12 @@ otel_add_component(
   "*.h"
   PATTERN
   "es_log_recordable.h"
+  EXCLUDE
+  PATTERN
+  "es_bulk_response.h"
+  EXCLUDE
+  PATTERN
+  "detail"
   EXCLUDE)
 
 if(OPENTELEMETRY_INSTALL)
@@ -55,4 +61,10 @@ if(BUILD_TESTING)
     TARGET es_log_record_exporter_test
     TEST_PREFIX exporter.
     TEST_LIST es_log_record_exporter_test)
+
+  # The synchronous wiring cases wait on a completion, and a regression that
+  # stops delivering one hangs the job rather than reporting. A bound turns that
+  # back into a red test. Not the asynchronous ones: their fake calls back from
+  # inside SendRequest() and Export() returns without waiting.
+  set_tests_properties(${es_log_record_exporter_test} PROPERTIES TIMEOUT 120)
 endif() # BUILD_TESTING
