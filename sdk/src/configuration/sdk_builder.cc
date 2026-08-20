@@ -2306,16 +2306,10 @@ SdkBuilder::CreateEventToSpanEventBridgeLogRecordProcessor(
     const opentelemetry::sdk::configuration::EventToSpanEventBridgeLogRecordProcessorConfiguration
         * /* model */) const
 {
-  // FIXME-SDK: the event_to_span_event_bridge/development processor has no SDK implementation
-  // yet. It requires new pipeline processor architecture (a read-write recordable, a composable
-  // pipeline processor interface, and a root processor supporting it) so it can read the
-  // resolved context and mutate a record without taking exclusive ownership away from
-  // downstream processors/exporters. Tracked by
-  // https://github.com/open-telemetry/opentelemetry-cpp/issues/4454; implement this once that
-  // architecture lands.
+  // FIXME-SDK: not yet implemented.
+  // https://github.com/open-telemetry/opentelemetry-cpp/issues/4454
   OTEL_INTERNAL_LOG_WARN(
-      "event_to_span_event_bridge/development processor is not yet supported, ignoring. See "
-      "https://github.com/open-telemetry/opentelemetry-cpp/issues/4454");
+      "event_to_span_event_bridge/development processor is not yet supported, ignoring");
   return nullptr;
 }
 

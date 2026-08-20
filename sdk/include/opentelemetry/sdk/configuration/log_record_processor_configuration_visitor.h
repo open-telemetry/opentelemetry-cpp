@@ -30,18 +30,8 @@ public:
 
   virtual void VisitBatch(const BatchLogRecordProcessorConfiguration *model)   = 0;
   virtual void VisitSimple(const SimpleLogRecordProcessorConfiguration *model) = 0;
-
-  /**
-   * Visit an event_to_span_event_bridge/development processor configuration.
-   *
-   * Unlike its siblings this method is not pure virtual: it was added after the visitor was
-   * already public, and defaulting it to a no-op keeps existing visitor implementations
-   * compiling. Visitors that support this processor type should override it.
-   */
   virtual void VisitEventToSpanEventBridge(
-      const EventToSpanEventBridgeLogRecordProcessorConfiguration * /* model */)
-  {}
-
+      const EventToSpanEventBridgeLogRecordProcessorConfiguration *model)            = 0;
   virtual void VisitExtension(const ExtensionLogRecordProcessorConfiguration *model) = 0;
 };
 
