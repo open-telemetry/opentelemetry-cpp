@@ -17,7 +17,7 @@
 #include "opentelemetry/semconv/service_attributes.h"
 #include "opentelemetry/semconv/telemetry_attributes.h"
 
-#include "sdk/src/resource/detail/percent_decode.h"
+#include "src/resource/detail/percent_decode.h"
 
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
