@@ -18,7 +18,8 @@ Increment the:
 * [BUG] Prevent lost condition-variable wakeups in OTLP file exporter and periodic
   metric exporter
   [#4365](https://github.com/open-telemetry/opentelemetry-cpp/pull/4365)
-
+* [CONFIGURATION] Add a configuration builder for the host resource detector
+  [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
   and merge the resource per the resource SDK specification.
