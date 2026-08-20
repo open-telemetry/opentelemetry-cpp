@@ -1063,8 +1063,8 @@ resource:
     detectors:
       - # Enable the container resource detector, which populates container.* attributes.
         container:
-      # - # Enable the host resource detector, which populates host.* and os.* attributes.
-      #   host:
+      - # Enable the host resource detector, which populates host.* attributes.
+        host:
       - # Enable the process resource detector, which populates process.* attributes.
         process:
       # - # Enable the service detector, which populates service.name based on the OTEL_SERVICE_NAME environment variable and service.instance.id.
