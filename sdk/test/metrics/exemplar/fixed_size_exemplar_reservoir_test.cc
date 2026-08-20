@@ -4,9 +4,9 @@
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 #  include <gtest/gtest.h>
-#  include <stdint.h>
 #  include <atomic>
 #  include <cstddef>
+#  include <cstdint>
 #  include <memory>
 #  include <string>
 #  include <thread>
@@ -34,6 +34,12 @@ public:
       const SimpleFixedSizeExemplarReservoir::SimpleFixedSizeCellSelector &selector)
   {
     return selector.measurements_seen_;
+  }
+
+  static int GetRandomCellIndex(size_t size, size_t measurement_num, uint64_t random_value)
+  {
+    return SimpleFixedSizeExemplarReservoir::SimpleFixedSizeCellSelector::GetRandomCellIndex(
+        size, measurement_num, random_value);
   }
 };
 
@@ -80,6 +86,23 @@ TEST(FixedSizeExemplarReservoirTest, SimpleReservoirRestartsSamplingEachInterval
   ASSERT_EQ(exemplars.size(), 1U);
   EXPECT_NE(exemplars[0], nullptr);
   EXPECT_EQ(SimpleFixedSizeCellSelectorTestPeer::GetMeasurementsSeen(*selector), 0U);
+}
+
+TEST(FixedSizeExemplarReservoirTest, SimpleReservoirSelectionCoversCurrentMeasurement)
+{
+  EXPECT_EQ(SimpleFixedSizeCellSelectorTestPeer::GetRandomCellIndex(1, 1, 0), 0);
+  EXPECT_EQ(SimpleFixedSizeCellSelectorTestPeer::GetRandomCellIndex(1, 1, 1), -1);
+}
+
+TEST(FixedSizeExemplarReservoirTest, SimpleReservoirWithZeroSizeDoesNotSelectCell)
+{
+  SimpleFixedSizeExemplarReservoir::SimpleFixedSizeCellSelector selector{0};
+  std::vector<ReservoirCell> cells;
+
+  EXPECT_EQ(selector.ReservoirCellIndexFor(cells, 1.0, MetricAttributes{},
+                                           opentelemetry::context::Context{}),
+            -1);
+  EXPECT_EQ(SimpleFixedSizeCellSelectorTestPeer::GetMeasurementsSeen(selector), 0U);
 }
 
 class ConcurrentAccessDetector final : public ReservoirCellSelector

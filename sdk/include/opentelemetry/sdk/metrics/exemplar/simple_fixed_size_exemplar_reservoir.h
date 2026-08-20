@@ -5,6 +5,7 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
+#  include <cstdint>
 #  include <memory>
 #  include <vector>
 
@@ -68,6 +69,11 @@ public:
       // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#simplefixedsizeexemplarreservoir
       //
 
+      if (size_ == 0)
+      {
+        return -1;
+      }
+
       size_t measurement_num = measurements_seen_++;
       size_t index           = static_cast<size_t>(-1);
 
@@ -77,12 +83,7 @@ public:
       }
       else
       {
-        size_t random_index = sdk::common::Random::GenerateRandom64() % measurement_num;
-
-        if (random_index < size_)
-        {
-          index = random_index;
-        }
+        return GetRandomCellIndex(size_, measurement_num, sdk::common::Random::GenerateRandom64());
       }
 
       return static_cast<int>(index);
@@ -91,6 +92,14 @@ public:
     void reset() override { measurements_seen_ = 0; }
 
   private:
+    static int GetRandomCellIndex(size_t size,
+                                  size_t measurement_num,
+                                  uint64_t random_value) noexcept
+    {
+      size_t random_index = random_value % (measurement_num + 1);
+      return random_index < size ? static_cast<int>(random_index) : -1;
+    }
+
     size_t measurements_seen_ = 0;
     size_t size_;
     friend class SimpleFixedSizeCellSelectorTestPeer;
