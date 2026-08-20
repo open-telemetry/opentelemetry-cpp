@@ -12,7 +12,7 @@ target_include_directories(
   opentelemetry_resources
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     resources "OpenTelemetry SDK - Resources"
     "Components for resource detection in the OpenTelemetry SDK."
