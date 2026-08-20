@@ -16,8 +16,9 @@
 
 #ifdef ENABLE_ASYNC_EXPORT
 #  include <condition_variable>
-#  include <cstddef>
+#  include <cstdint>
 #  include <mutex>
+#  include <set>
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -122,8 +123,16 @@ public:
 
   /**
    * Force flush the exporter.
+   *
+   * Waits for the asynchronous sessions already started when the call was made, bounded by the
+   * caller's timeout rather than by the exporter's response timeout.
+   *
    * @param timeout an option timeout, default to max.
-   * @return return true when all data are exported, and false when timeout
+   * @return true when each of those exports has reported a terminal outcome, false on timeout.
+   *         The outcome is published before the session is torn down, so a true return does not
+   *         mean FinishSession() has run. Nor does it mean the batch reached Elasticsearch: a
+   *         failed export reports too, through the internal log. Surfacing that here is
+   *         [#3075](https://github.com/open-telemetry/opentelemetry-cpp/issues/3075).
    */
   bool ForceFlush(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
@@ -149,13 +158,29 @@ private:
 #ifdef ENABLE_ASYNC_EXPORT
   struct SynchronizationData
   {
-    std::atomic<std::size_t> session_counter_{0};
-    std::atomic<std::size_t> finished_session_counter_{0};
+    // Identified rather than counted, so a completion can only satisfy its own waiter. Guarded by
+    // force_flush_cv_m, the mutex the wait uses, so starting and finishing cannot interleave with a
+    // waiter's snapshot or predicate.
+    //
+    // Sized independently of the platform's size_t. The wait compares ids by order, which only
+    // holds while they keep increasing, and a 32 bit counter reaches its end in days at a rate
+    // this exporter is meant to sustain.
+    std::uint64_t next_session_id{0};
+    std::set<std::uint64_t> running_sessions;
     std::condition_variable force_flush_cv;
     std::mutex force_flush_cv_m;
-    std::recursive_mutex force_flush_m;
+
+    // Test synchronization only, and not exporter state: nothing here reads it and no behaviour
+    // depends on it. Raised once per ForceFlush(), under that mutex and immediately after the
+    // call has taken its watermark. A case that has to start an export after a flush has
+    // snapshotted, and before it gives up, waits on this. The alternative is a sleep, which
+    // leaves the order to the scheduler, and the order that does not reproduce the defect is the
+    // one that would report a pass.
+    std::uint64_t watermarks_taken{0};
   };
   nostd::shared_ptr<SynchronizationData> synchronization_data_;
+
+  friend class ElasticsearchExporterTestPeer;
 #endif
 };
 }  // namespace logs

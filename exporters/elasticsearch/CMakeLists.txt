@@ -55,4 +55,12 @@ if(BUILD_TESTING)
     TARGET es_log_record_exporter_test
     TEST_PREFIX exporter.
     TEST_LIST es_log_record_exporter_test)
+
+  # AnIndefiniteFlushParksUntilTheOutcomeArrives really does park on the
+  # condition variable, so a regression there does not fail, it stalls until the
+  # exporter's own bound expires. CTest's default is 25 minutes, which is a long
+  # time to spend learning that. This is deliberately well above the bounds the
+  # cases use themselves, so that one of them expiring reports which case failed
+  # rather than being killed from the outside.
+  set_tests_properties(${es_log_record_exporter_test} PROPERTIES TIMEOUT 60)
 endif() # BUILD_TESTING
