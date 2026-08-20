@@ -11,6 +11,7 @@
 #include <functional>
 #include <list>
 #include <mutex>
+#include <ostream>
 #include <string>
 #include <thread>
 #include <unordered_map>
@@ -23,6 +24,7 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
@@ -33,8 +35,6 @@
 #  include <array>
 
 #  include "opentelemetry/nostd/type_traits.h"
-#else
-#  include "opentelemetry/sdk/common/global_log_handler.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -327,7 +327,12 @@ std::shared_ptr<opentelemetry::ext::http::client::Session> HttpClient::CreateSes
   const auto parsedUrl = common::UrlParser(std::string(url));
   if (!parsedUrl.success_)
   {
-    return std::make_shared<Session>(*this);
+    // Unregistered, but given an id all the same. Pending removals are keyed by session id, so
+    // two sessions sharing one displace each other's easy handle and header list, which nothing
+    // then frees.
+    auto unregistered = std::make_shared<Session>(*this);
+    unregistered->SetId(++next_session_id_);
+    return unregistered;
   }
   auto session =
       std::make_shared<Session>(*this, parsedUrl.scheme_, parsedUrl.host_, parsedUrl.port_);
@@ -638,9 +643,17 @@ bool HttpClient::MaybeSpawnBackgroundThread()
   return true;
 }
 
-void HttpClient::ScheduleAddSession(uint64_t session_id)
+bool HttpClient::ScheduleAddSession(uint64_t session_id)
 {
   {
+    std::lock_guard<std::mutex> sessions_lock{sessions_m_};
+    if (sessions_.end() == sessions_.find(session_id))
+    {
+      // Whatever removed the session owns its teardown. Adding it back would run an operation
+      // nobody waits on, and leave the caller waiting on one nobody runs.
+      return false;
+    }
+
     std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
     pending_to_add_session_ids_.insert(session_id);
     pending_to_remove_session_handles_.erase(session_id);
@@ -648,6 +661,7 @@ void HttpClient::ScheduleAddSession(uint64_t session_id)
   }
 
   wakeupBackgroundThread();
+  return true;
 }
 
 void HttpClient::ScheduleAbortSession(uint64_t session_id)
@@ -728,32 +742,63 @@ bool HttpClient::doAddSessions()
   }
 
   bool has_data = false;
+  std::list<std::pair<std::shared_ptr<Session>, CURLMcode>> rejected_by_multi;
 
-  std::lock_guard<std::mutex> lock_guard{sessions_m_};
-  for (auto &session_id : pending_to_add_session_ids)
   {
-    auto session = sessions_.find(session_id);
-    if (session == sessions_.end())
+    std::lock_guard<std::mutex> lock_guard{sessions_m_};
+    for (auto &session_id : pending_to_add_session_ids)
     {
-      continue;
-    }
+      auto session = sessions_.find(session_id);
+      if (session == sessions_.end())
+      {
+        continue;
+      }
 
-    if (!session->second->GetOperation())
-    {
-      continue;
-    }
+      if (!session->second->GetOperation())
+      {
+        continue;
+      }
 
-    CURL *easy_handle = session->second->GetOperation()->GetCurlEasyHandle();
-    if (nullptr == easy_handle)
-    {
-      continue;
-    }
+      CURL *easy_handle = session->second->GetOperation()->GetCurlEasyHandle();
+      if (nullptr == easy_handle)
+      {
+        continue;
+      }
 
-    curl_multi_add_handle(multi_handle_, easy_handle);
-    has_data = true;
+      const CURLMcode rc = add_handle_(multi_handle_, easy_handle);
+      if (CURLM_OK != rc)
+      {
+        // Nothing will drive this transfer. Leaving it here is what makes a caller wait on a
+        // future nobody can complete, so hand it to the loop below to be finished. Reported
+        // there too: the log handler is application code that can re-enter this client.
+        rejected_by_multi.emplace_back(session->second, rc);
+        continue;
+      }
+
+      has_data = true;
+    }
   }
 
-  return has_data;
+  // Outside sessions_m_ on purpose. FinishOperation runs the caller's handler, and a handler
+  // that cancels from it takes that lock again. See #4389.
+  for (auto &rejected : rejected_by_multi)
+  {
+    const char *reason = curl_multi_strerror(rejected.second);
+    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_multi_add_handle failed: " << reason);
+
+    // Told the same way as a session this client never registered, because it is the same thing
+    // from the handler's side: nothing is going to run this request.
+    auto &operation = rejected.first->GetOperation();
+    if (operation)
+    {
+      operation->FinishUnscheduled(reason);
+    }
+  }
+
+  // Finishing a rejected session queues its removal, and the loop's idle check has already run
+  // doRemoveSessions by the time it calls this. Answering false here lets the worker exit with
+  // that removal still queued.
+  return has_data || !rejected_by_multi.empty();
 }
 
 bool HttpClient::doAbortSessions()

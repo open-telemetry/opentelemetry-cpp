@@ -15,6 +15,11 @@ if(WITH_HTTP_CLIENT_CURL)
     TARGET ${FILENAME}
     TEST_PREFIX ext.http.curl.
     TEST_LIST ${FILENAME})
+  # These cover waits that are meant to end. When one stops ending it hangs
+  # rather than fails, and without a bound it takes the whole job with it
+  # instead of reporting. The slowest case that legitimately waits takes thirty
+  # seconds.
+  set_tests_properties(${${FILENAME}} PROPERTIES TIMEOUT 120)
 endif()
 
 set(SOCKET_TOOLS_FILENAME socket_tools_test)

@@ -20,7 +20,6 @@
 #include <random>
 #include <sstream>
 #include <string>
-#include <thread>
 #include <utility>
 #include <vector>
 
@@ -97,28 +96,6 @@ namespace client
 {
 namespace curl
 {
-
-class HttpOperationAccessor
-{
-public:
-  OPENTELEMETRY_SANITIZER_NO_THREAD static std::thread::id GetThreadId(
-      const HttpOperation::AsyncData &async_data)
-  {
-#if !(defined(OPENTELEMETRY_HAVE_THREAD_SANITIZER) && OPENTELEMETRY_HAVE_THREAD_SANITIZER)
-    std::atomic_thread_fence(std::memory_order_acquire);
-#endif
-    return async_data.callback_thread;
-  }
-
-  OPENTELEMETRY_SANITIZER_NO_THREAD static void SetThreadId(HttpOperation::AsyncData &async_data,
-                                                            std::thread::id thread_id)
-  {
-    async_data.callback_thread = thread_id;
-#if !(defined(OPENTELEMETRY_HAVE_THREAD_SANITIZER) && OPENTELEMETRY_HAVE_THREAD_SANITIZER)
-    std::atomic_thread_fence(std::memory_order_release);
-#endif
-  }
-};
 
 size_t HttpOperation::WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
@@ -401,15 +378,78 @@ int HttpOperation::OnProgressCallback(void *clientp,
 }
 #endif
 
+// The atomic member is only free of layout cost while it stays the size and alignment of the
+// enum it replaced. The standard does not promise that, so it is checked here rather than
+// asserted in prose: a toolchain where it does not hold changes an installed type and should say
+// so at build time.
+static_assert(sizeof(std::atomic<opentelemetry::ext::http::client::SessionState>) ==
+                  sizeof(opentelemetry::ext::http::client::SessionState),
+              "std::atomic<SessionState> grew, which changes the layout of HttpOperation");
+static_assert(
+    alignof(std::atomic<opentelemetry::ext::http::client::SessionState>) ==
+        alignof(opentelemetry::ext::http::client::SessionState),
+    "std::atomic<SessionState> is more aligned, which changes the layout of HttpOperation");
+
+namespace
+{
+// Which operations the calling thread is currently inside a callback for. A handler is allowed to
+// call FinishSession() on the request it is being told about, and that call must not wait for a
+// completion only the thread it is running on can publish.
+// A stack of scopes linked through the scopes themselves, so entering one allocates nothing. Each
+// lives on the stack frame that dispatches the callback, which is exactly as long as the entry
+// needs to be there. A container here would put a heap allocation on every event, and would put
+// it inside a noexcept constructor, where running out of memory calls std::terminate rather than
+// reaching whoever asked for the request.
+class CallbackScope
+{
+public:
+  explicit CallbackScope(const HttpOperation *operation) noexcept : operation_{operation}
+  {
+    current_ = this;
+  }
+
+  ~CallbackScope() { current_ = previous_; }
+
+  CallbackScope(const CallbackScope &)            = delete;
+  CallbackScope(CallbackScope &&)                 = delete;
+  CallbackScope &operator=(const CallbackScope &) = delete;
+  CallbackScope &operator=(CallbackScope &&)      = delete;
+
+  static bool InsideCallbackFor(const HttpOperation *operation) noexcept
+  {
+    for (const CallbackScope *scope = current_; nullptr != scope; scope = scope->previous_)
+    {
+      if (scope->operation_ == operation)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+private:
+  static thread_local const CallbackScope *current_;
+
+  const HttpOperation *operation_;
+  // Read before the constructor body replaces it, which is what makes the stack a stack.
+  const CallbackScope *previous_ = current_;
+};
+
+thread_local const CallbackScope *CallbackScope::current_ = nullptr;
+}  // namespace
+
 void HttpOperation::DispatchEvent(opentelemetry::ext::http::client::SessionState type,
                                   const std::string &reason)
 {
+  // Store before dispatching: a handler may cancel, and a later store would overwrite the state
+  // the background thread publishes.
+  session_state_.store(type, std::memory_order_release);
+
   if (event_handle_ != nullptr)
   {
+    const CallbackScope scope{this};
     event_handle_->OnEvent(type, reason);
   }
-
-  session_state_ = type;
 }
 
 HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
@@ -481,13 +521,14 @@ HttpOperation::~HttpOperation()
     case opentelemetry::ext::http::client::SessionState::Connecting:
     case opentelemetry::ext::http::client::SessionState::Connected:
     case opentelemetry::ext::http::client::SessionState::Sending: {
-      if (async_data_ && async_data_->result_future.valid())
+      // Not while inside a callback this operation dispatched: a handler that destroys the
+      // operation it is being told about would be waiting for a completion that only the thread
+      // running the handler can publish.
+      if (async_data_ && async_data_->result_future.valid() &&
+          !CallbackScope::InsideCallbackFor(this))
       {
-        if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
-        {
-          async_data_->result_future.wait();
-          last_curl_result_ = async_data_->result_future.get();
-        }
+        async_data_->result_future.wait();
+        last_curl_result_ = async_data_->result_future.get();
       }
       break;
     }
@@ -500,6 +541,14 @@ HttpOperation::~HttpOperation()
 
 void HttpOperation::Finish()
 {
+  // Called from inside a callback this operation dispatched, so the completion being waited for is
+  // the one this thread has not published yet. Returning before the flag below leaves the wait
+  // available to a caller that is not inside a callback.
+  if (CallbackScope::InsideCallbackFor(this))
+  {
+    return;
+  }
+
   if (is_finished_.exchange(true, std::memory_order_acq_rel))
   {
     return;
@@ -507,12 +556,8 @@ void HttpOperation::Finish()
 
   if (async_data_ && async_data_->result_future.valid())
   {
-    // We should not wait in callback from Cleanup()
-    if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
-    {
-      async_data_->result_future.wait();
-      last_curl_result_ = async_data_->result_future.get();
-    }
+    async_data_->result_future.wait();
+    last_curl_result_ = async_data_->result_future.get();
   }
 }
 
@@ -558,9 +603,8 @@ void HttpOperation::Cleanup()
     callback.swap(async_data_->callback);
     if (callback)
     {
-      HttpOperationAccessor::SetThreadId(*async_data_, std::this_thread::get_id());
+      const CallbackScope scope{this};
       callback(*this);
-      HttpOperationAccessor::SetThreadId(*async_data_, std::thread::id());
     }
 
     // Set value to promise to continue Finish()
@@ -1452,20 +1496,37 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   // Abort() with nothing to do but raise the flag.
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_NOPROGRESS, 0L);
 
-  DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
+  // Publish everything Cleanup() needs before dispatching, the callback most of all: Cleanup()
+  // reads is_cleaned_ first and swaps the callback last, so one assigned after the event would be
+  // swapped out empty and the completion would never run.
   is_finished_.store(false, std::memory_order_release);
   is_aborted_.store(false, std::memory_order_release);
   is_cleaned_.store(false, std::memory_order_release);
+  async_data_->callback       = std::move(callback);
+  async_data_->result_promise = std::promise<CURLcode>();
+  async_data_->result_future  = async_data_->result_promise.get_future();
+  async_data_->is_promise_running.store(true, std::memory_order_release);
 
+  // Last, and the only thing that makes this operation reachable from the IO thread: an abort is
+  // queued through this route, so nothing can bring the operation there before the callback and
+  // the completion above exist. Cleanup is therefore the only thing that ever fulfils the promise,
+  // at its tail, once the terminal event and the completion callback have run.
   async_data_->session.store(session, std::memory_order_release);
-  if (false == async_data_->is_promise_running.exchange(true, std::memory_order_acq_rel))
-  {
-    async_data_->result_promise = std::promise<CURLcode>();
-    async_data_->result_future  = async_data_->result_promise.get_future();
-  }
-  async_data_->callback = std::move(callback);
 
-  session->GetHttpClient().ScheduleAddSession(session->GetSessionId());
+  DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
+
+  if (WasAborted())
+  {
+    // Nothing will run this operation, so finish it here rather than leave an unfulfillable
+    // future. Cleanup() reports the cancel, which is what happened.
+    Cleanup();
+  }
+  else if (!session->GetHttpClient().ScheduleAddSession(session->GetSessionId()))
+  {
+    // The same, except nobody cancelled anything.
+    FinishUnscheduled("the session is not registered with this client");
+  }
+
   return CURLE_OK;
 }
 
@@ -1521,6 +1582,25 @@ void HttpOperation::Abort()
       session->GetHttpClient().ScheduleAbortSession(session->GetSessionId());
     }
   }
+}
+
+void HttpOperation::FinishUnscheduled(const char *reason)
+{
+  // The event first, because the operation holds the handler as a bare pointer and the only
+  // strong reference to it is the one the completion callback captured. Cleanup() takes that
+  // callback and lets it go, so an event dispatched afterwards can be talking to a handler
+  // nothing owns any more. A handler calling FinishSession() from here is inside a callback for
+  // this operation, so Finish() returns rather than waiting on a promise this thread has not
+  // published yet, which is what used to make the other order necessary.
+  //
+  // DispatchEvent stores the state before it calls the handler, so the cleanup below sees a
+  // terminal state and does not report a manual cancel for something nobody cancelled.
+  DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
+                nullptr != reason ? reason : "");
+
+  // Last, so that a Finish() on another thread waits for the terminal event and the completion
+  // callback rather than for the promise alone.
+  Cleanup();
 }
 
 void HttpOperation::PerformCurlMessage(CURLcode code)
