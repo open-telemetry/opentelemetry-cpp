@@ -128,4 +128,4 @@ if(OTELCPP_WITH_CONFIGURATION)
       "opentelemetry_configuration")
   endif()
 
-endif(WITH_CONFIGURATION)
+endif(OTELCPP_WITH_CONFIGURATION)
