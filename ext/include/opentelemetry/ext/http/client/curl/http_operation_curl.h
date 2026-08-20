@@ -285,7 +285,12 @@ public:
    *
    * @param code CURLcode
    */
-  void PerformCurlMessage(CURLcode code);
+  /**
+   * Read one completed curl message.
+   * @return true when the operation has been rewound for another attempt, and the caller is to
+   * take it on. False when the message was not this operation's to read, or it is finished.
+   */
+  bool PerformCurlMessage(CURLcode code);
 
   inline CURL *GetCurlEasyHandle() noexcept { return curl_resource_.easy_handle; }
 
