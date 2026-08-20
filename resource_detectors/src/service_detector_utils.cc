@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/resource_detectors/detail/service_detector_utils.h"
-#include "opentelemetry/nostd/span.h"
 
 #include <stddef.h>
 
 #include <cstdint>
+#include <cstring>
 #include <mutex>
 #include <string>
 
@@ -54,7 +54,11 @@ std::string FormatUuidV4(const uint8_t bytes[16]) noexcept
 std::string GenerateUuidV4() noexcept
 {
   uint8_t bytes[16];
-  opentelemetry::sdk::common::Random::GenerateRandomBuffer(bytes);
+  for (size_t i = 0; i < sizeof(bytes); i += sizeof(uint64_t))
+  {
+    uint64_t value = opentelemetry::sdk::common::Random::GenerateRandom64();
+    std::memcpy(&bytes[i], &value, sizeof(uint64_t));
+  }
   bytes[6] = static_cast<uint8_t>((bytes[6] & 0x0F) | 0x40);
   bytes[8] = static_cast<uint8_t>((bytes[8] & 0x3F) | 0x80);
   return FormatUuidV4(bytes);
