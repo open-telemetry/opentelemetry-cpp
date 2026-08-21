@@ -2554,9 +2554,8 @@ void SdkBuilder::SetResource(
       {
         if (attribute_valid)
         {
-          std::string decoded_value =
-              opentelemetry::sdk::resource::detail::PercentDecode(
-                  std::string{attribute_value.data(), attribute_value.size()});
+          std::string decoded_value = opentelemetry::sdk::resource::detail::PercentDecode(
+              std::string{attribute_value.data(), attribute_value.size()});
 
           opentelemetry::common::AttributeValue wrapped_attribute_value(decoded_value);
           list_attributes.SetAttribute(attribute_key, wrapped_attribute_value);
