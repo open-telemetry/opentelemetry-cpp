@@ -80,10 +80,7 @@ or inaccessible.
 | Attribute | Description | Linux | macOS | Windows |
 | --- | --- | --- | --- | --- |
 | `process.pid` | Process ID | Yes | Yes | Yes |
-| `process.executable.path` | Path via `/proc` (Linux) or Win32 APIs | Yes | No | Yes |
-
-Limitation: current macOS implementation does not populate
-`process.executable.path`.
+| `process.executable.path` | Path via `/proc` (Linux) or Win32 APIs | Yes | Yes | Yes |
 
 ### Env Entity Resource Detector (Experimental)
 

@@ -35,25 +35,6 @@ namespace detail
 constexpr const char *kExecutableName = "exe";
 constexpr const char *kCmdlineName    = "cmdline";
 
-namespace
-{
-std::string Basename(const std::string &path)
-{
-  if (path.empty())
-  {
-    return std::string();
-  }
-
-  const size_t pos = path.find_last_of("/\\");
-  if (pos == std::string::npos)
-  {
-    return path;
-  }
-
-  return path.substr(pos + 1);
-}
-}  // namespace
-
 std::string GetExecutablePath(const int32_t &pid)
 {
 #ifdef _MSC_VER
@@ -79,24 +60,7 @@ std::string GetExecutablePath(const int32_t &pid)
   WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL);
 
   return utf8_path;
-#else
-  std::string path = FormFilePath(pid, kExecutableName);
-  char buffer[4096];
-
-  ssize_t len = readlink(path.c_str(), buffer, sizeof(buffer) - 1);
-  if (len != -1)
-  {
-    buffer[len] = '\0';
-    return std::string(buffer);
-  }
-
-  return std::string();
-#endif
-}
-
-std::string GetExecutableName(const int32_t &pid)
-{
-#if defined(__APPLE__)
+#elif defined(__APPLE__)
   if (pid != static_cast<int32_t>(getpid()))
   {
     return std::string();
@@ -109,9 +73,19 @@ std::string GetExecutableName(const int32_t &pid)
     return std::string();
   }
 
-  return Basename(path);
+  return std::string(path);
 #else
-  return Basename(GetExecutablePath(pid));
+  std::string path = FormFilePath(pid, kExecutableName);
+  char buffer[4096];
+
+  ssize_t len = readlink(path.c_str(), buffer, sizeof(buffer) - 1);
+  if (len != -1)
+  {
+    buffer[len] = '\0';
+    return std::string(buffer);
+  }
+
+  return std::string();
 #endif
 }
 

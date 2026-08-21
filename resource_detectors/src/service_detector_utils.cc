@@ -73,7 +73,20 @@ std::string GetServiceName()
     return service_name;
   }
 
-  const std::string executable_name = GetExecutableName(static_cast<int32_t>(getpid()));
+  const std::string executable_path = GetExecutablePath(static_cast<int32_t>(getpid()));
+  std::string executable_name;
+  if (!executable_path.empty())
+  {
+    const size_t pos = executable_path.find_last_of("/\\");
+    if (pos == std::string::npos)
+    {
+      executable_name = executable_path;
+    }
+    else
+    {
+      executable_name = executable_path.substr(pos + 1);
+    }
+  }
   if (!executable_name.empty())
   {
     std::string fallback_service_name(kUnknownServicePrefix);
