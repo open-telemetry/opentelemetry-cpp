@@ -19,7 +19,7 @@ Increment the:
   (`max_export_batch_size`) before exporting, instead of draining the buffer
   whenever it is non-empty. This reduces gRPC request count and CPU usage
   under steady load while preserving `ForceFlush`/`Shutdown` drain semantics.
-  [#PR_NUMBER](https://github.com/open-telemetry/opentelemetry-cpp/pull/PR_NUMBER)
+  [#4466](https://github.com/open-telemetry/opentelemetry-cpp/pull/4466)
 
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
