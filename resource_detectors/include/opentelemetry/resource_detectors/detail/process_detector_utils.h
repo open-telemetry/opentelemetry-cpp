@@ -33,7 +33,7 @@ std::string FormFilePath(const int32_t &pid, const char *process_type);
 /**
  * Retrieves the absolute file system path and the base name of the process executable.
  * Platform-specific behavior:
- *   - Windows: Uses OpenProcess() + GetProcessImageFileNameW().
+ *   - Windows: Uses OpenProcess() + QueryFullProcessImageNameW().
  *   - Linux/Unix: Reads the /proc/<pid>/exe symbolic link.
  *   - TODO: Need to implement for Darwin
  *

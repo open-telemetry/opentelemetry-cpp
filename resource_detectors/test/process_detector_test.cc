@@ -78,22 +78,28 @@ TEST(ProcessDetectorUtilsTest, GetExecutablePathTest)
   }
   else
   {
-
     WCHAR wbuffer[MAX_PATH];
-    DWORD len = GetProcessImageFileNameW(hProcess, wbuffer, MAX_PATH);
+    DWORD len = MAX_PATH;
+    BOOL success = QueryFullProcessImageNameW(hProcess, 0, wbuffer, &len);
     CloseHandle(hProcess);
 
-    if (len == 0)
+    if (!success || len == 0)
     {
       path = std::string();
     }
     else
     {
       int size_needed = WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, NULL, 0, NULL, NULL);
-      std::string utf8_path(size_needed, 0);
-      WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL);
-
-      path = utf8_path;
+      if (size_needed > 0)
+      {
+        std::string utf8_path(size_needed, 0);
+        WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL);
+        path = utf8_path;
+      }
+      else
+      {
+        path = std::string();
+      }
     }
   }
 #else

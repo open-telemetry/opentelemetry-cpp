@@ -3,6 +3,8 @@
 
 #include "opentelemetry/resource_detectors/detail/process_detector_utils.h"
 
+#include <cstdio>
+#include <ctime>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -17,7 +19,6 @@
 #else
 #  include <sys/types.h>
 #  include <unistd.h>
-#  include <cstdio>
 #endif
 
 #ifdef __APPLE__
@@ -62,6 +63,10 @@ ExecutableInfo GetExecutableInfo(const int32_t &pid)
 
   // Convert UTF-16 to UTF-8
   int size_needed = WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, NULL, 0, NULL, NULL);
+  if (size_needed <= 0)
+  {
+    return info;
+  }
   std::string utf8_path(size_needed, 0);
   WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL);
 
@@ -551,7 +556,12 @@ std::string GetExecutableBuildIdHtlhash(const int32_t &pid)
     return std::string();
   }
 
-  auto file_size = static_cast<std::uint64_t>(f.tellg());
+  const auto end_pos = f.tellg();
+  if (end_pos < 0)
+  {
+    return std::string();
+  }
+  auto file_size = static_cast<std::uint64_t>(end_pos);
 
   constexpr std::size_t kChunkSize = 4096;
 
