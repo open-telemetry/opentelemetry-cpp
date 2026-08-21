@@ -51,6 +51,17 @@ gtest_add_tests(
   TEST_PREFIX resource_detector.
   TEST_LIST host_resource_detector_test)
 
+add_executable(host_resource_detector_builder_test
+               host_detector_builder_test.cc)
+target_link_libraries(
+  host_resource_detector_builder_test
+  PRIVATE opentelemetry_host_resource_detector_builder
+          opentelemetry_configuration_core GTest::gtest_main)
+gtest_add_tests(
+  TARGET host_resource_detector_builder_test
+  TEST_PREFIX resource_detector.
+  TEST_LIST host_resource_detector_builder_test)
+
 #
 # process_resource_detector tests
 #
