@@ -280,8 +280,8 @@ public:
   void Abort();
 
   /**
-   * Perform curl message, this function only can be called in the polling thread and it can only
-   * be called when got a CURLMSG_DONE.
+   * Process a completed curl message. This is called directly by synchronous requests or from the
+   * polling thread after receiving CURLMSG_DONE.
    *
    * @param code CURLcode
    */
@@ -316,6 +316,8 @@ private:
 
   const char *GetCurlErrorMessage(CURLcode code);
 
+  std::chrono::system_clock::time_point CalculateNextRetryTime();
+
   std::atomic<bool> is_aborted_{false};   // Set to 'true' when async callback is aborted
   std::atomic<bool> is_finished_{false};  // Set to 'true' when async callback is finished.
   std::atomic<bool> is_cleaned_{false};   // Set to 'true' when async callback is cleaned.
@@ -348,7 +350,7 @@ private:
   const RetryPolicy retry_policy_;
   decltype(RetryPolicy::max_attempts) retry_attempts_;
   std::chrono::system_clock::time_point last_attempt_time_;
-  std::chrono::system_clock::time_point retry_after_time_point_{};
+  std::chrono::system_clock::time_point next_retry_time_point_{};
 
   // Processed response headers and body
   // See CURLINFO_RESPONSE_CODE, type is long

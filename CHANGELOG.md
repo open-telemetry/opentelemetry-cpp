@@ -63,6 +63,8 @@ Increment the:
 * [BUG] Draw the curl retry jitter from a per thread generator instead of one
   shared across HTTP client threads
   ([#4399](https://github.com/open-telemetry/opentelemetry-cpp/pull/4399))
+* [BUG] Keep the curl retry deadline stable within each attempt
+  ([#4403](https://github.com/open-telemetry/opentelemetry-cpp/issues/4403))
 * [BUG] Stop the curl IO thread deadlocking on itself while recovering from a
   multi handle error
   ([#4394](https://github.com/open-telemetry/opentelemetry-cpp/pull/4394))
