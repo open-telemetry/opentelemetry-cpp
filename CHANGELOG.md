@@ -30,6 +30,10 @@ Increment the:
 
 * [RESOURCE DETECTOR] Add the host resource detector
   [#4413](https://github.com/open-telemetry/opentelemetry-cpp/issues/4413)
+
+* [CONFIGURATION] SDK signal provider builder interface
+  [#4426](https://github.com/open-telemetry/opentelemetry-cpp/pull/4426)
+
 * [CONFIGURATION] deprecate config builder cmake components
   [#4428](https://github.com/open-telemetry/opentelemetry-cpp/pull/4428)
 
