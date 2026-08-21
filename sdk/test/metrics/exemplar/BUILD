@@ -9,6 +9,7 @@ otel_cc_benchmark(
     srcs = [
         "fixed_size_exemplar_reservoir_benchmark.cc",
     ],
+    defines = ["ENABLE_METRICS_EXEMPLAR_PREVIEW"],
     tags = [
         "benchmark",
         "metrics",
@@ -17,7 +18,7 @@ otel_cc_benchmark(
     deps = [
         "//api",
         "//sdk:headers",
-        "//sdk/src/metrics",
+        "//sdk/src/common:random",
     ],
 )
 

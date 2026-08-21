@@ -6,7 +6,7 @@ if(WITH_BENCHMARK)
                  fixed_size_exemplar_reservoir_benchmark.cc)
   target_link_libraries(
     fixed_size_exemplar_reservoir_benchmark benchmark::benchmark
-    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_metrics)
+    ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
 endif()
 
 foreach(

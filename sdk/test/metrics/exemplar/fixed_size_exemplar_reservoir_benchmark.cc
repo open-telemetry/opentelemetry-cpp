@@ -28,6 +28,9 @@ using opentelemetry::sdk::metrics::SimpleFixedSizeExemplarReservoir;
 class SharedSimpleFixedSizeExemplarReservoirFixture : public benchmark::Fixture
 {
 public:
+  using benchmark::Fixture::SetUp;
+  using benchmark::Fixture::TearDown;
+
   void SetUp(benchmark::State &state) override
   {
     if (state.thread_index() != 0)
@@ -35,9 +38,9 @@ public:
       return;
     }
 
-    reservoir_ = ExemplarReservoir::GetSimpleFixedSizeExemplarReservoir(
-        1, SimpleFixedSizeExemplarReservoir::GetSimpleFixedSizeCellSelector(1),
-        &ReservoirCell::GetAndResetDouble);
+    auto selector = SimpleFixedSizeExemplarReservoir::GetSimpleFixedSizeCellSelector(1);
+    reservoir_    = shared_ptr<ExemplarReservoir>{
+        new SimpleFixedSizeExemplarReservoir{1, selector, &ReservoirCell::GetAndResetDouble}};
 
     // Model a reservoir partway through a normal collection interval. This
     // keeps the benchmark focused on the steady-state offer path.
