@@ -35,7 +35,7 @@ target_include_directories(
   opentelemetry_logs
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     logs "OpenTelemetry SDK - Logs"
     "Components for exporting logs in the OpenTelemetry SDK."

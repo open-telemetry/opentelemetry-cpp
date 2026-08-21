@@ -50,7 +50,7 @@ otel_add_component(
   "sdk/configuration/ryml_document_node.h"
   EXCLUDE)
 
-if(WITH_CONFIGURATION)
+if(OTELCPP_WITH_CONFIGURATION)
   otel_add_component(
     COMPONENT
     configuration
@@ -71,6 +71,6 @@ if(WITH_CONFIGURATION)
     "sdk/configuration/ryml_document_node.h")
 endif()
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_subdirectory(test)
 endif()
