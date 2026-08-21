@@ -100,9 +100,9 @@ resource:
   detection/development:
     detectors:
       - container:
+      - host:
       - process:
-      # NOTE: host and service detectors cannot be configured currently
-      - host:    # needs a builder (`Registry::SetHostResourceDetectorBuilder`)
+      # NOTE: service detector cannot be configured currently
       - service: # not implemented (github.com/open-telemetry/opentelemetry-cpp/issues/4414)
 ```
 
@@ -110,9 +110,11 @@ Call `Register` for each builder before creating the SDK:
 
 ```cpp
 #include "opentelemetry/resource_detectors/container_detector_builder.h"
+#include "opentelemetry/resource_detectors/host_detector_builder.h"
 #include "opentelemetry/resource_detectors/process_detector_builder.h"
 
 opentelemetry::resource_detector::ContainerDetectorBuilder::Register(registry.get());
+opentelemetry::resource_detector::HostDetectorBuilder::Register(registry.get());
 opentelemetry::resource_detector::ProcessDetectorBuilder::Register(registry.get());
 ```
 
@@ -167,6 +169,7 @@ All targets are part of the `resource_detectors` component.
 | `opentelemetry-cpp::container_resource_detector_builder` | Container detector builder for declaritive configuration |
 | `opentelemetry-cpp::env_entity_resource_detector` | Env entity detector |
 | `opentelemetry-cpp::host_resource_detector` | Host detector |
+| `opentelemetry-cpp::host_resource_detector_builder` | Host detector builder for declaritive configuration |
 | `opentelemetry-cpp::process_resource_detector` | Process detector |
 | `opentelemetry-cpp::process_resource_detector_builder` | Process detector builder for declaritive configuration |
 
@@ -213,5 +216,6 @@ deps = ["//resource_detectors:process_resource_detector_builder"]
 | `//resource_detectors:container_resource_detector_builder` | Container detector builder |
 | `//resource_detectors:env_entity_resource_detector` | Env entity detector |
 | `//resource_detectors:host_resource_detector` | Host detector |
+| `//resource_detectors:host_resource_detector_builder` | Host detector builder |
 | `//resource_detectors:process_resource_detector` | Process detector |
 | `//resource_detectors:process_resource_detector_builder` | Process detector builder |
