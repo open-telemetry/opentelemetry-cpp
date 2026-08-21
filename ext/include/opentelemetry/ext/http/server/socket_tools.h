@@ -175,8 +175,9 @@ struct SocketAddr
   /// <returns>SocketAddr</returns>
   SocketAddr() {}
 
-  SocketAddr(u_long addr, int port)
+  SocketAddr(u_long addr, u_int16_t port)
   {
+
     sockaddr_in &inet4    = reinterpret_cast<sockaddr_in &>(m_data);
     inet4.sin_family      = AF_INET;
     inet4.sin_port        = htons(static_cast<uint16_t>(port));

@@ -202,13 +202,20 @@ public:
 
   void setServerName(std::string const &name) { m_serverHost = name; }
 
-  int addListeningPort(int port)
+  int addListeningPort(uint16_t port)
   {
+
+
+    SocketTools::SocketAddr addr(0, port);
+    if (addr.port() == -1)
+    {
+      return -1;
+    }
+
     SocketTools::Socket socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     socket.setNonBlocking();
     socket.setReuseAddr();
 
-    SocketTools::SocketAddr addr(0, port);
     socket.bind(addr);
     socket.getsockname(addr);
 

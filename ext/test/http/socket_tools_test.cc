@@ -71,6 +71,13 @@ TEST(SocketAddrTest, AcceptsLeadingZeroPort)
   EXPECT_EQ(addr.port(), 80);
 }
 
+TEST(SocketAddrTest, RejectsOutOfRangeIntegerPorts)
+{
+  ExpectInvalid(SocketTools::SocketAddr(0, -1));
+  ExpectInvalid(SocketTools::SocketAddr(0, 65536));
+  ExpectInvalid(SocketTools::SocketAddr(0, 99999));
+}
+
 TEST(SocketAddrTest, RejectsOutOfRangePort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:99999");
