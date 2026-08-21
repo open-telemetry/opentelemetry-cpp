@@ -52,7 +52,7 @@ ExecutableInfo GetExecutableInfo(const int32_t &pid)
   }
 
   WCHAR wbuffer[MAX_PATH];
-  DWORD len = MAX_PATH;
+  DWORD len    = MAX_PATH;
   BOOL success = QueryFullProcessImageNameW(hProcess, 0, wbuffer, &len);
   CloseHandle(hProcess);
 
