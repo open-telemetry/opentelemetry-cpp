@@ -685,7 +685,7 @@ BENCHMARK(BM_Record_Gauge_LastValue_ByThreads)
 #endif  // OPENTELEMETRY_ABI_VERSION_NO > 1
 
 // ---------------------------------------------------------------------------
-// Exemplar filter benchmarks 
+// Exemplar filter benchmarks
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
