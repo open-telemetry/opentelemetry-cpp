@@ -325,7 +325,8 @@ private:
 
   char curl_error_message_[CURL_ERROR_SIZE]{};
   HttpCurlEasyResource curl_resource_;
-  CURLcode last_curl_result_{CURLE_OK};  // Curl result OR HTTP status code if successful
+  CURLcode last_curl_result_{CURLE_OK};     // Curl result OR HTTP status code if successful
+  CURLcode construction_result_{CURLE_OK};  // Non-OK if setup failed; Send() refuses on it
 
   opentelemetry::ext::http::client::EventHandler *event_handle_{nullptr};
 

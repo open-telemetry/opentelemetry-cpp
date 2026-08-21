@@ -364,7 +364,18 @@ private:
   bool doAbortSessions();
   bool doRemoveSessions();
   bool doRetrySessions(bool report_all);
-  void resetMultiHandle();
+  // Returns true if the background thread still owes somebody an answer. Drops what it finds
+  // that nothing can be owed for, so that a queue which is merely not empty does not read as
+  // work. Call it on the background thread only: it prunes pending_to_retry_sessions_, which
+  // has no lock because that thread is the only one that touches it.
+  bool hasActionableWork();
+  // Cleans up the multi handle if there is one, and leaves none behind either way. Call it
+  // holding multi_handle_m_. It answers with what curl_multi_cleanup said rather than reporting
+  // it, because reporting reaches a log handler the application supplies, and one that comes back
+  // into this client would do it while the caller still holds that mutex.
+  CURLMcode ReleaseMultiHandle();
+  // Returns true if the client has a multi handle afterwards.
+  bool resetMultiHandle();
 
   std::mutex multi_handle_m_;
   CURLM *multi_handle_;
@@ -387,6 +398,10 @@ private:
 
   std::chrono::milliseconds background_thread_wait_for_;
   std::atomic<bool> is_shutdown_{false};
+  // Raised by every producer. curl_multi_wakeup is how the background thread is woken out of
+  // curl_multi_poll and it needs a multi handle, so the wait taken when there is none watches
+  // this instead.
+  std::atomic<uint64_t> wakeup_generation_{0};
 
   nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };

@@ -453,8 +453,11 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
   if (!curl_resource_.easy_handle)
   {
     last_curl_result_ = CURLE_FAILED_INIT;
-    DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
-                  curl_easy_strerror(last_curl_result_));
+    // Refuses Send() and SendAsync(), which would otherwise drive a null handle into libcurl.
+    construction_result_ = CURLE_FAILED_INIT;
+    // Terminal already, and reported once by the caller that sees SendAsync refuse, the same
+    // way the header list failure below is. Nothing is dispatched from here.
+    session_state_ = opentelemetry::ext::http::client::SessionState::CreateFailed;
     return;
   }
 
@@ -464,8 +467,25 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
     for (auto &kv : this->request_headers_)
     {
       const auto header = std::string(kv.first).append(": ").append(kv.second);
-      curl_resource_.headers_chunk =
-          curl_slist_append(curl_resource_.headers_chunk, header.c_str());
+
+      // Into a temporary first. curl_slist_append returns null without freeing the list it was
+      // given, so assigning the result straight back would drop the only pointer to everything
+      // appended so far, and Setup() would then send the request with none of these headers
+      // rather than not send it.
+      curl_slist *appended = curl_slist_append(curl_resource_.headers_chunk, header.c_str());
+      if (nullptr == appended)
+      {
+        curl_slist_free_all(curl_resource_.headers_chunk);
+        curl_resource_.headers_chunk = nullptr;
+        last_curl_result_            = CURLE_OUT_OF_MEMORY;
+        construction_result_         = CURLE_OUT_OF_MEMORY;
+        // Terminal already, so Cleanup() does not later announce a cancel for an operation that
+        // never started, to a handler the caller may no longer be holding.
+        session_state_ = opentelemetry::ext::http::client::SessionState::CreateFailed;
+        return;
+      }
+
+      curl_resource_.headers_chunk = appended;
     }
   }
 
@@ -1391,6 +1411,12 @@ CURLcode HttpOperation::Setup()
 
 CURLcode HttpOperation::Send()
 {
+  if (construction_result_ != CURLE_OK)
+  {
+    last_curl_result_ = construction_result_;
+    return construction_result_;
+  }
+
   // If it is async sending, just return error
   if (async_data_ && async_data_->is_promise_running.load(std::memory_order_acquire))
   {
@@ -1421,6 +1447,12 @@ CURLcode HttpOperation::Send()
 
 CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOperation &)> callback)
 {
+  if (construction_result_ != CURLE_OK)
+  {
+    last_curl_result_ = construction_result_;
+    return construction_result_;
+  }
+
   if (nullptr == session)
   {
     return CURLE_FAILED_INIT;
