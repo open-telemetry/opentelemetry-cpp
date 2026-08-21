@@ -32,7 +32,7 @@ target_link_libraries(
           opentelemetry-cpp::ostream_metrics_exporter_builder
           opentelemetry-cpp::ostream_log_record_exporter_builder)
 
-if(WITH_OTLP_HTTP)
+if(OTELCPP_WITH_OTLP_HTTP)
   target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_OTLP_HTTP)
   target_link_libraries(
     example_yaml
@@ -41,7 +41,7 @@ if(WITH_OTLP_HTTP)
             opentelemetry-cpp::otlp_http_metric_exporter_builder)
 endif()
 
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_OTLP_GRPC)
   target_link_libraries(
     example_yaml
@@ -50,7 +50,7 @@ if(WITH_OTLP_GRPC)
             opentelemetry-cpp::otlp_grpc_metric_exporter_builder)
 endif()
 
-if(WITH_OTLP_FILE)
+if(OTELCPP_WITH_OTLP_FILE)
   target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_OTLP_FILE)
   target_link_libraries(
     example_yaml
@@ -59,13 +59,13 @@ if(WITH_OTLP_FILE)
             opentelemetry-cpp::otlp_file_metric_exporter_builder)
 endif()
 
-if(WITH_PROMETHEUS)
+if(OTELCPP_WITH_PROMETHEUS)
   target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_PROMETHEUS)
   target_link_libraries(example_yaml
                         PRIVATE opentelemetry-cpp::prometheus_exporter_builder)
 endif()
 
-if(WITH_RESOURCE_DETECTORS_PREVIEW)
+if(OTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW)
   target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_RESOURCE_DETECTORS)
   target_link_libraries(example_yaml
                         PRIVATE opentelemetry-cpp::resource_detectors_builders)
@@ -73,10 +73,10 @@ endif()
 
 if(BUILD_TESTING)
   if(WITH_OTLP_HTTP
-     AND WITH_OTLP_GRPC
-     AND WITH_OTLP_FILE
-     AND WITH_PROMETHEUS
-     AND WITH_RESOURCE_DETECTORS_PREVIEW)
+     AND OTELCPP_WITH_OTLP_GRPC
+     AND OTELCPP_WITH_OTLP_FILE
+     AND OTELCPP_WITH_PROMETHEUS
+     AND OTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW)
     add_test(NAME examples.example_yaml_kitchen_sink
              COMMAND $<TARGET_FILE:example_yaml> --test --yaml
                      ${CMAKE_CURRENT_SOURCE_DIR}/kitchen-sink.yaml)
