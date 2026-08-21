@@ -111,6 +111,10 @@ if(OTELCPP_WITH_BENCHMARK)
   target_link_libraries(
     measurements_benchmark benchmark::benchmark opentelemetry_metrics
     opentelemetry_resources ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+  add_executable(sync_instruments_benchmark sync_instruments_benchmark.cc)
+  target_link_libraries(
+    sync_instruments_benchmark benchmark::benchmark opentelemetry_metrics
+    opentelemetry_resources ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
   add_executable(sum_aggregation_benchmark sum_aggregation_benchmark.cc)
   target_link_libraries(
     sum_aggregation_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
