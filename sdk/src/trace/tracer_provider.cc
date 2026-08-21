@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <chrono>
+#include <exception>
+#include <memory>
 #include <mutex>
 #include <utility>
 #include <vector>
 
 #include "opentelemetry/common/key_value_iterable.h"  // IWYU pragma: keep
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -21,6 +24,7 @@
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/trace/noop.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -31,8 +35,37 @@ namespace trace
 namespace resource  = opentelemetry::sdk::resource;
 namespace trace_api = opentelemetry::trace;
 
-TracerProvider::TracerProvider(std::unique_ptr<TracerContext> context) noexcept
-    : context_(std::move(context))
+namespace
+{
+
+nostd::shared_ptr<trace_api::Tracer> CreateNoopTracerFallback()
+{
+  // Construct as NoopTracer so enable_shared_from_this is initialized; StartSpan
+  // relies on shared_from_this() for the static noop span.
+  nostd::shared_ptr<trace_api::NoopTracer> tracer(new trace_api::NoopTracer());
+  return nostd::shared_ptr<trace_api::Tracer>(std::move(tracer));
+}
+
+void LogGetTracerConstructionFailure(const char *detail) noexcept
+{
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    OTEL_INTERNAL_LOG_ERROR("[TracerProvider::GetTracer] Failed to construct tracer: "
+                            << detail << "; returning noop tracer.");
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (...)
+  {
+  }
+#endif
+}
+
+}  // namespace
+
+TracerProvider::TracerProvider(std::unique_ptr<TracerContext> context)
+    : context_(std::move(context)), noop_tracer_(CreateNoopTracerFallback())
 {
   OTEL_INTERNAL_LOG_DEBUG("[TracerProvider] TracerProvider created.");
 }
@@ -43,7 +76,8 @@ TracerProvider::TracerProvider(
     std::unique_ptr<Sampler> sampler,
     std::unique_ptr<IdGenerator> id_generator,
     std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator,
-    SpanLimits span_limits) noexcept
+    SpanLimits span_limits)
+    : noop_tracer_(CreateNoopTracerFallback())
 {
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor));
@@ -58,13 +92,14 @@ TracerProvider::TracerProvider(
     std::unique_ptr<Sampler> sampler,
     std::unique_ptr<IdGenerator> id_generator,
     std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator,
-    SpanLimits span_limits) noexcept
+    SpanLimits span_limits)
     : context_(std::make_shared<TracerContext>(std::move(processors),
                                                resource,
                                                std::move(sampler),
                                                std::move(id_generator),
                                                std::move(tracer_configurator),
-                                               span_limits))
+                                               span_limits)),
+      noop_tracer_(CreateNoopTracerFallback())
 {}
 
 TracerProvider::~TracerProvider()
@@ -116,13 +151,30 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
     }
   }
 
-  instrumentationscope::InstrumentationScopeAttributes attrs_map(attributes);
-  auto scope =
-      instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attrs_map);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    instrumentationscope::InstrumentationScopeAttributes attrs_map(attributes);
+    auto scope =
+        instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attrs_map);
 
-  auto tracer = std::shared_ptr<Tracer>(new Tracer(context_, std::move(scope)));
-  tracers_.push_back(tracer);
-  return nostd::shared_ptr<trace_api::Tracer>{tracer};
+    auto tracer = std::make_shared<Tracer>(context_, std::move(scope));
+    tracers_.push_back(tracer);
+    return nostd::shared_ptr<trace_api::Tracer>{tracer};
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (const std::exception &ex)
+  {
+    LogGetTracerConstructionFailure(ex.what());
+    return noop_tracer_;
+  }
+  catch (...)
+  {
+    LogGetTracerConstructionFailure("unknown exception");
+    return noop_tracer_;
+  }
+#endif
 }
 
 void TracerProvider::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept

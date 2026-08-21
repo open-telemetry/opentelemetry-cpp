@@ -99,7 +99,7 @@ opentelemetry::logs::NoopLogger Logger::kNoopLogger = opentelemetry::logs::NoopL
 Logger::Logger(
     opentelemetry::nostd::string_view name,
     std::shared_ptr<LoggerContext> context,
-    std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
+    std::unique_ptr<instrumentationscope::InstrumentationScope> instrumentation_scope)
     : logger_name_(std::string(name)),
       instrumentation_scope_(std::move(instrumentation_scope)),
       context_(std::move(context))

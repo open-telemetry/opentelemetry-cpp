@@ -97,7 +97,7 @@ metrics::NoopMeter Meter::kNoopMeter = metrics::NoopMeter();
 
 Meter::Meter(
     std::weak_ptr<MeterContext> meter_context,
-    std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
+    std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope)
     : scope_{std::move(instrumentation_scope)},
       meter_context_{std::move(meter_context)},
       observable_registry_(new ObservableRegistry()),

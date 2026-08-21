@@ -2,10 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <chrono>
+#include <exception>
+#include <memory>
 #include <mutex>
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/common/macros.h"
+#include "opentelemetry/logs/noop.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -25,11 +29,37 @@ namespace sdk
 namespace logs
 {
 
+namespace
+{
+
+nostd::shared_ptr<opentelemetry::logs::Logger> CreateNoopLoggerFallback()
+{
+  return nostd::shared_ptr<opentelemetry::logs::Logger>(new opentelemetry::logs::NoopLogger());
+}
+
+void LogGetLoggerConstructionFailure(const char *detail) noexcept
+{
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    OTEL_INTERNAL_LOG_ERROR("[LoggerProvider::GetLogger] Failed to construct logger: "
+                            << detail << "; returning noop logger.");
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (...)
+  {
+  }
+#endif
+}
+
+}  // namespace
+
 LoggerProvider::LoggerProvider(
     std::unique_ptr<LogRecordProcessor> &&processor,
     const opentelemetry::sdk::resource::Resource &resource,
-    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
-        logger_configurator) noexcept
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator)
+    : noop_logger_(CreateNoopLoggerFallback())
 {
   std::vector<std::unique_ptr<LogRecordProcessor>> processors;
   processors.emplace_back(std::move(processor));
@@ -41,19 +71,20 @@ LoggerProvider::LoggerProvider(
 LoggerProvider::LoggerProvider(
     std::vector<std::unique_ptr<LogRecordProcessor>> &&processors,
     const opentelemetry::sdk::resource::Resource &resource,
-    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
-        logger_configurator) noexcept
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator)
     : context_{std::make_shared<LoggerContext>(std::move(processors),
                                                resource,
-                                               std::move(logger_configurator))}
+                                               std::move(logger_configurator))},
+      noop_logger_(CreateNoopLoggerFallback())
 {}
 
-LoggerProvider::LoggerProvider() noexcept
-    : context_{std::make_shared<LoggerContext>(std::vector<std::unique_ptr<LogRecordProcessor>>{})}
+LoggerProvider::LoggerProvider()
+    : context_{std::make_shared<LoggerContext>(std::vector<std::unique_ptr<LogRecordProcessor>>{})},
+      noop_logger_(CreateNoopLoggerFallback())
 {}
 
-LoggerProvider::LoggerProvider(std::unique_ptr<LoggerContext> context) noexcept
-    : context_(std::move(context))
+LoggerProvider::LoggerProvider(std::unique_ptr<LoggerContext> context)
+    : context_(std::move(context)), noop_logger_(CreateNoopLoggerFallback())
 {}
 
 LoggerProvider::~LoggerProvider()
@@ -94,12 +125,29 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
     }
   }
 
-  std::unique_ptr<instrumentationscope::InstrumentationScope> lib =
-      instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attributes);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    std::unique_ptr<instrumentationscope::InstrumentationScope> lib =
+        instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attributes);
 
-  loggers_.push_back(std::shared_ptr<opentelemetry::sdk::logs::Logger>(
-      new Logger(logger_name, context_, std::move(lib))));
-  return opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>{loggers_.back()};
+    auto logger = std::make_shared<Logger>(logger_name, context_, std::move(lib));
+    loggers_.push_back(logger);
+    return opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>{logger};
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (const std::exception &ex)
+  {
+    LogGetLoggerConstructionFailure(ex.what());
+    return noop_logger_;
+  }
+  catch (...)
+  {
+    LogGetLoggerConstructionFailure("unknown exception");
+    return noop_logger_;
+  }
+#endif
 }
 
 void LoggerProvider::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept
