@@ -2,6 +2,24 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
+otel_cc_benchmark(
+    name = "fixed_size_exemplar_reservoir_benchmark",
+    srcs = [
+        "fixed_size_exemplar_reservoir_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/metrics",
+    ],
+)
 
 cc_test(
     name = "no_exemplar_reservoir_test",
