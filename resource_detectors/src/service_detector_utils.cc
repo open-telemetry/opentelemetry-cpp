@@ -3,8 +3,6 @@
 
 #include "opentelemetry/resource_detectors/detail/service_detector_utils.h"
 
-#include <stddef.h>
-
 #include <cstdint>
 #include <cstring>
 #include <mutex>
