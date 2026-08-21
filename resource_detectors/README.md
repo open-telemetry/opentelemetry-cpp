@@ -69,6 +69,7 @@ or inaccessible.
 | `process.executable.build_id.htlhash` | Deterministic SHA256-based build ID | Yes | No | Yes |
 
 Limitations:
+
 - `process.executable.path`, `process.executable.name`, and
   `process.executable.build_id.htlhash` are not populated on macOS because
   reading `/proc/<pid>/exe` is not available. A macOS implementation via
