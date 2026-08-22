@@ -1,13 +1,30 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+// Benchmarks for the synchronous instrument recording path including:
+// Counter, Histogram, and Gauge (ABI v2) and supported Bound variants.
+//
+// Each instrument type is measured across the following scenarios:
+//   - Record values with 1-4 threads contending on the same instrument with nominal attributes and
+//   the following variations:
+//        - Meter disabled
+//        - Drop aggregation
+//        - Value Aggregation (Sum for Counter, LastValue for Gauge, Explicit Buckets and Base2
+//        Exponential for Histogram)
+//   - Record values with a range of attributes from 0 to 128
+//   - Record values with a range of a nominal attribute count that creates cardinality from 10 to
+//   4000 (default limit is 2000)
+//   - Record values with ExemplarFilter set to AlwaysOff, AlwaysOn, and TraceBased.
+//   - Record values with bound instrument variants (ABI v2 preview)
+//
 // clang-format off
 //
+// Results:
 // *******************************************************************************************************
 // ABIv1 with preview options
 //    ENABLE_METRICS_EXEMPLAR_PREVIEW = ON
 //    OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW = OFF
-// *******************************************************************************************************
+// -------------------------------------------------------------------------------------------------------
 //  ~/build/sdk/test/metrics/sync_instruments_benchmark
 // 2026-08-22T18:29:21+00:00
 // Running /home/devuser/build/sdk/test/metrics/sync_instruments_benchmark
@@ -79,7 +96,7 @@
 // ABIv2 with preview options
 //    ENABLE_METRICS_EXEMPLAR_PREVIEW = ON
 //    OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW = ON
-// *******************************************************************************************************
+// -------------------------------------------------------------------------------------------------------
 // ~/build/sdk/test/metrics/sync_instruments_benchmark
 // 2026-08-22T18:35:28+00:00
 // Running /home/devuser/build/sdk/test/metrics/sync_instruments_benchmark
@@ -274,13 +291,30 @@ std::size_t GetBenchmarkThreads()
   return 4;
 }
 
+// Create a set of random values for recording into histograms
+static std::vector<double> MakeRecordingValues()
+{
+  constexpr std::size_t kNumValues = 1024;
+  constexpr double kMinValue       = 1.0;
+  constexpr double kMaxValue       = 10000.0;
+
+  thread_local std::mt19937 rng(std::random_device{}());
+  thread_local std::uniform_real_distribution<double> dist(kMinValue, kMaxValue);
+  std::vector<double> values(kNumValues);
+  for (auto &val : values)
+  {
+    val = dist(rng);
+  }
+  return values;
+}
+
 // Create a set of attributes with a given count
-static AttributeMap MakeAttributes(std::size_t count)
+static AttributeMap MakeAttributes(std::size_t count, std::string value = {})
 {
   AttributeMap attributes;
   for (std::size_t i = 0; i < count; i++)
   {
-    attributes["attr_" + std::to_string(i)] = "value_" + std::to_string(i);
+    attributes["attr_" + std::to_string(i)] = value.empty() ? "value_" + std::to_string(i) : value;
   }
   return attributes;
 }
@@ -292,12 +326,7 @@ static std::vector<AttributeMap> MakeAttributeSets(std::size_t cardinality)
   sets.reserve(cardinality);
   for (std::size_t i = 0; i < cardinality; i++)
   {
-    AttributeMap attrs;
-    for (std::size_t k = 0; k < kNominalAttributeCount; k++)
-    {
-      attrs["key_" + std::to_string(k)] = std::to_string(i);
-    }
-    sets.push_back(std::move(attrs));
+    sets.push_back(MakeAttributes(kNominalAttributeCount, "value_" + std::to_string(i)));
   }
   return sets;
 }
@@ -361,28 +390,15 @@ struct BenchmarkProvider
 
 void BM_Record_Counter_Disabled_ByThreads(benchmark::State &state)
 {
-  // Create a meter provider that disabled meters by default
-  bool meter_enabled = false;
-  static BenchmarkProvider provider(meter_enabled);
-  static auto counter = provider.meter->CreateDoubleCounter("benchmark_counter");
-  auto attribute_sets = MakeAttributeSets(kNominalCardinality);
-  std::vector<AttributesView> attribute_views;
-  attribute_views.reserve(attribute_sets.size());
-  for (auto &kv_set : attribute_sets)
-  {
-    attribute_views.emplace_back(kv_set);
-  }
-  opentelemetry::context::Context context{};
-  for (auto &kv_view : attribute_views)
-  {
-    counter->Add(1.0, kv_view, context);
-  }
-  std::size_t index = 0;
-
+  static BenchmarkProvider provider(false);
+  static auto counter   = provider.meter->CreateDoubleCounter("benchmark_counter");
+  const auto attributes = MakeAttributes(kNominalAttributeCount);
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
   for (auto _ : state)
   {
     benchmark::DoNotOptimize(counter);
-    counter->Add(1.0, attribute_views[index++ % attribute_views.size()], context);
+    counter->Add(1.0, attributes_view, context);
   }
 }
 BENCHMARK(BM_Record_Counter_Disabled_ByThreads)
@@ -390,13 +406,16 @@ BENCHMARK(BM_Record_Counter_Disabled_ByThreads)
 
 void BM_Record_Counter_Drop_ByThreads(benchmark::State &state)
 {
-  BenchmarkProvider provider;
-  provider.AddView(metrics_sdk::InstrumentType::kCounter, "benchmark_counter",
-                   metrics_sdk::AggregationType::kDrop);
-  static auto counter    = provider.meter->CreateDoubleCounter("benchmark_counter");
-  static auto attributes = MakeAttributes(kNominalAttributeCount);
-  AttributesView attributes_view(attributes);
-  opentelemetry::context::Context context{};
+  static BenchmarkProvider provider = [] {
+    BenchmarkProvider p;
+    p.AddView(metrics_sdk::InstrumentType::kCounter, "benchmark_counter",
+              metrics_sdk::AggregationType::kDrop);
+    return p;
+  }();
+  static auto counter   = provider.meter->CreateDoubleCounter("benchmark_counter");
+  const auto attributes = MakeAttributes(kNominalAttributeCount);
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
   for (auto _ : state)
   {
     benchmark::DoNotOptimize(counter);
@@ -406,13 +425,28 @@ void BM_Record_Counter_Drop_ByThreads(benchmark::State &state)
 BENCHMARK(BM_Record_Counter_Drop_ByThreads)
     ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
 
+void BM_Record_Counter_Sum_ByThreads(benchmark::State &state)
+{
+  static BenchmarkProvider provider;
+  static auto counter   = provider.meter->CreateDoubleCounter("benchmark_counter");
+  const auto attributes = MakeAttributes(kNominalAttributeCount);
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(counter);
+    counter->Add(1.0, attributes_view, context);
+  }
+}
+BENCHMARK(BM_Record_Counter_Sum_ByThreads)->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
+
 void BM_Record_Counter_Sum_ByAttributes(benchmark::State &state)
 {
   BenchmarkProvider provider;
-  auto counter    = provider.meter->CreateDoubleCounter("benchmark_counter");
-  auto attributes = MakeAttributes(state.range(0));
-  AttributesView attributes_view(attributes);
-  opentelemetry::context::Context context{};
+  auto counter          = provider.meter->CreateDoubleCounter("benchmark_counter");
+  const auto attributes = MakeAttributes(state.range(0));
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
   for (auto _ : state)
   {
     benchmark::DoNotOptimize(counter);
@@ -424,15 +458,10 @@ BENCHMARK(BM_Record_Counter_Sum_ByAttributes)->Arg(0)->Arg(1)->Arg(10)->Arg(128)
 void BM_Record_Counter_Sum_ByCardinality(benchmark::State &state)
 {
   BenchmarkProvider provider;
-  auto counter        = provider.meter->CreateDoubleCounter("benchmark_counter");
-  auto attribute_sets = MakeAttributeSets(state.range(0));
-  std::vector<AttributesView> attribute_views;
-  attribute_views.reserve(attribute_sets.size());
-  for (auto &kv_set : attribute_sets)
-  {
-    attribute_views.emplace_back(kv_set);
-  }
-  opentelemetry::context::Context context{};
+  auto counter              = provider.meter->CreateDoubleCounter("benchmark_counter");
+  const auto attribute_sets = MakeAttributeSets(state.range(0));
+  const std::vector<AttributesView> attribute_views(attribute_sets.begin(), attribute_sets.end());
+  const opentelemetry::context::Context context{};
   std::size_t index = 0;
   for (auto _ : state)
   {
@@ -446,62 +475,22 @@ BENCHMARK(BM_Record_Counter_Sum_ByCardinality)
     ->Arg(2000)
     ->Arg(4000);  //< Overflow cardinality limits (default limit is 2000)
 
-void BM_Record_Counter_Sum_ByThreads(benchmark::State &state)
-{
-  static BenchmarkProvider provider;
-  static auto counter = provider.meter->CreateDoubleCounter("benchmark_counter");
-  auto attribute_sets = MakeAttributeSets(kNominalCardinality);
-  std::vector<AttributesView> attribute_views;
-  attribute_views.reserve(attribute_sets.size());
-  for (auto &kv_set : attribute_sets)
-  {
-    attribute_views.emplace_back(kv_set);
-  }
-  opentelemetry::context::Context context{};
-  std::size_t index = 0;
-  for (auto _ : state)
-  {
-    benchmark::DoNotOptimize(counter);
-    counter->Add(1.0, attribute_views[index++ % attribute_views.size()], context);
-  }
-}
-BENCHMARK(BM_Record_Counter_Sum_ByThreads)->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
-
 // ---------------------------------------------------------------------------
 // Histogram (Explicit Buckets) benchmarks
-
-static std::vector<double> MakeRecordingValues()
-{
-  thread_local std::mt19937 rng(std::random_device{}());
-  thread_local std::uniform_real_distribution<double> dist(1.0, 10000.0);
-  std::vector<double> values(1024);
-  for (auto &kv_view : values)
-  {
-    kv_view = dist(rng);
-  }
-  return values;
-}
 
 void BM_Record_Histogram_Disabled_ByThreads(benchmark::State &state)
 {
   static BenchmarkProvider provider(false);
   static auto histogram = provider.meter->CreateDoubleHistogram("benchmark_histogram");
-  auto attribute_sets   = MakeAttributeSets(kNominalCardinality);
-  std::vector<AttributesView> attribute_views;
-  attribute_views.reserve(attribute_sets.size());
-  for (auto &kv_set : attribute_sets)
-  {
-    attribute_views.emplace_back(kv_set);
-  }
-  opentelemetry::context::Context context{};
+  const auto attributes = MakeAttributes(kNominalAttributeCount);
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
   const auto values = MakeRecordingValues();
   std::size_t index = 0;
   for (auto _ : state)
   {
     benchmark::DoNotOptimize(histogram);
-    const std::size_t i = index++;
-    histogram->Record(values[i % values.size()], attribute_views[i % attribute_views.size()],
-                      context);
+    histogram->Record(values[index++ % values.size()], attributes_view, context);
   }
 }
 BENCHMARK(BM_Record_Histogram_Disabled_ByThreads)
@@ -509,13 +498,16 @@ BENCHMARK(BM_Record_Histogram_Disabled_ByThreads)
 
 void BM_Record_Histogram_Drop_ByThreads(benchmark::State &state)
 {
-  BenchmarkProvider provider;
-  provider.AddView(metrics_sdk::InstrumentType::kHistogram, "benchmark_histogram",
-                   metrics_sdk::AggregationType::kDrop);
-  static auto histogram  = provider.meter->CreateDoubleHistogram("benchmark_histogram");
-  static auto attributes = MakeAttributes(kNominalAttributeCount);
-  AttributesView attributes_view(attributes);
-  opentelemetry::context::Context context{};
+  static BenchmarkProvider provider = [] {
+    BenchmarkProvider p;
+    p.AddView(metrics_sdk::InstrumentType::kHistogram, "benchmark_histogram",
+              metrics_sdk::AggregationType::kDrop);
+    return p;
+  }();
+  static auto histogram = provider.meter->CreateDoubleHistogram("benchmark_histogram");
+  const auto attributes = MakeAttributes(kNominalAttributeCount);
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
   const auto values = MakeRecordingValues();
   std::size_t index = 0;
   for (auto _ : state)
@@ -527,13 +519,31 @@ void BM_Record_Histogram_Drop_ByThreads(benchmark::State &state)
 BENCHMARK(BM_Record_Histogram_Drop_ByThreads)
     ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
 
+void BM_Record_Histogram_Explicit_ByThreads(benchmark::State &state)
+{
+  static BenchmarkProvider provider;
+  static auto histogram = provider.meter->CreateDoubleHistogram("benchmark_histogram");
+  const auto attributes = MakeAttributes(kNominalAttributeCount);
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
+  const auto values = MakeRecordingValues();
+  std::size_t index = 0;
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(histogram);
+    histogram->Record(values[index++ % values.size()], attributes_view, context);
+  }
+}
+BENCHMARK(BM_Record_Histogram_Explicit_ByThreads)
+    ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
+
 void BM_Record_Histogram_Explicit_ByAttributes(benchmark::State &state)
 {
   BenchmarkProvider provider;
-  auto histogram  = provider.meter->CreateDoubleHistogram("benchmark_histogram");
-  auto attributes = MakeAttributes(state.range(0));
-  AttributesView attributes_view(attributes);
-  opentelemetry::context::Context context{};
+  auto histogram        = provider.meter->CreateDoubleHistogram("benchmark_histogram");
+  const auto attributes = MakeAttributes(state.range(0));
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
   const auto values = MakeRecordingValues();
   std::size_t index = 0;
   for (auto _ : state)
@@ -547,15 +557,10 @@ BENCHMARK(BM_Record_Histogram_Explicit_ByAttributes)->Arg(0)->Arg(1)->Arg(10)->A
 void BM_Record_Histogram_Explicit_ByCardinality(benchmark::State &state)
 {
   BenchmarkProvider provider;
-  auto histogram      = provider.meter->CreateDoubleHistogram("benchmark_histogram");
-  auto attribute_sets = MakeAttributeSets(state.range(0));
-  std::vector<AttributesView> attribute_views;
-  attribute_views.reserve(attribute_sets.size());
-  for (auto &kv_set : attribute_sets)
-  {
-    attribute_views.emplace_back(kv_set);
-  }
-  opentelemetry::context::Context context{};
+  auto histogram            = provider.meter->CreateDoubleHistogram("benchmark_histogram");
+  const auto attribute_sets = MakeAttributeSets(state.range(0));
+  const std::vector<AttributesView> attribute_views(attribute_sets.begin(), attribute_sets.end());
+  const opentelemetry::context::Context context{};
   const auto values = MakeRecordingValues();
   std::size_t index = 0;
   for (auto _ : state)
@@ -568,33 +573,31 @@ void BM_Record_Histogram_Explicit_ByCardinality(benchmark::State &state)
 }
 BENCHMARK(BM_Record_Histogram_Explicit_ByCardinality)->Arg(10)->Arg(500)->Arg(2000);
 
-void BM_Record_Histogram_Explicit_ByThreads(benchmark::State &state)
+// ---------------------------------------------------------------------------
+// Histogram (Base2ExponentialHistogram) benchmarks
+
+void BM_Record_Histogram_Base2Expo_ByThreads(benchmark::State &state)
 {
-  static BenchmarkProvider provider;
+  static auto provider = []() -> BenchmarkProvider {
+    BenchmarkProvider p;
+    p.AddView(metrics_sdk::InstrumentType::kHistogram, "benchmark_histogram",
+              metrics_sdk::AggregationType::kBase2ExponentialHistogram);
+    return p;
+  }();
   static auto histogram = provider.meter->CreateDoubleHistogram("benchmark_histogram");
-  auto attribute_sets   = MakeAttributeSets(kNominalCardinality);
-  std::vector<AttributesView> attribute_views;
-  attribute_views.reserve(attribute_sets.size());
-  for (auto &kv_set : attribute_sets)
-  {
-    attribute_views.emplace_back(kv_set);
-  }
-  opentelemetry::context::Context context{};
+  const auto attributes = MakeAttributes(kNominalAttributeCount);
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
   const auto values = MakeRecordingValues();
   std::size_t index = 0;
   for (auto _ : state)
   {
     benchmark::DoNotOptimize(histogram);
-    const std::size_t i = index++;
-    histogram->Record(values[i % values.size()], attribute_views[i % attribute_views.size()],
-                      context);
+    histogram->Record(values[index++ % values.size()], attributes_view, context);
   }
 }
-BENCHMARK(BM_Record_Histogram_Explicit_ByThreads)
+BENCHMARK(BM_Record_Histogram_Base2Expo_ByThreads)
     ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
-
-// ---------------------------------------------------------------------------
-// Histogram (Base2ExponentialHistogram) benchmarks
 
 void BM_Record_Histogram_Base2Expo_ByAttributes(benchmark::State &state)
 {
@@ -603,8 +606,8 @@ void BM_Record_Histogram_Base2Expo_ByAttributes(benchmark::State &state)
                    metrics_sdk::AggregationType::kBase2ExponentialHistogram);
   auto histogram  = provider.meter->CreateDoubleHistogram("benchmark_histogram");
   auto attributes = MakeAttributes(state.range(0));
-  AttributesView attributes_view(attributes);
-  opentelemetry::context::Context context{};
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
   const auto values = MakeRecordingValues();
   std::size_t index = 0;
   for (auto _ : state)
@@ -622,13 +625,8 @@ void BM_Record_Histogram_Base2Expo_ByCardinality(benchmark::State &state)
                    metrics_sdk::AggregationType::kBase2ExponentialHistogram);
   auto histogram      = provider.meter->CreateDoubleHistogram("benchmark_histogram");
   auto attribute_sets = MakeAttributeSets(state.range(0));
-  std::vector<AttributesView> attribute_views;
-  attribute_views.reserve(attribute_sets.size());
-  for (auto &kv_set : attribute_sets)
-  {
-    attribute_views.emplace_back(kv_set);
-  }
-  opentelemetry::context::Context context{};
+  const std::vector<AttributesView> attribute_views(attribute_sets.begin(), attribute_sets.end());
+  const opentelemetry::context::Context context{};
   const auto values = MakeRecordingValues();
   std::size_t index = 0;
   for (auto _ : state)
@@ -641,36 +639,6 @@ void BM_Record_Histogram_Base2Expo_ByCardinality(benchmark::State &state)
 }
 BENCHMARK(BM_Record_Histogram_Base2Expo_ByCardinality)->Arg(10)->Arg(500)->Arg(2000);
 
-void BM_Record_Histogram_Base2Expo_ByThreads(benchmark::State &state)
-{
-  static auto provider = []() -> BenchmarkProvider {
-    BenchmarkProvider p;
-    p.AddView(metrics_sdk::InstrumentType::kHistogram, "benchmark_histogram",
-              metrics_sdk::AggregationType::kBase2ExponentialHistogram);
-    return p;
-  }();
-  static auto histogram = provider.meter->CreateDoubleHistogram("benchmark_histogram");
-  auto attribute_sets   = MakeAttributeSets(kNominalCardinality);
-  std::vector<AttributesView> attribute_views;
-  attribute_views.reserve(attribute_sets.size());
-  for (auto &kv_set : attribute_sets)
-  {
-    attribute_views.emplace_back(kv_set);
-  }
-  opentelemetry::context::Context context{};
-  const auto values = MakeRecordingValues();
-  std::size_t index = 0;
-  for (auto _ : state)
-  {
-    benchmark::DoNotOptimize(histogram);
-    const std::size_t i = index++;
-    histogram->Record(values[i % values.size()], attribute_views[i % attribute_views.size()],
-                      context);
-  }
-}
-BENCHMARK(BM_Record_Histogram_Base2Expo_ByThreads)
-    ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
-
 // ---------------------------------------------------------------------------
 // Gauge (LastValue) benchmarks
 
@@ -679,20 +647,16 @@ BENCHMARK(BM_Record_Histogram_Base2Expo_ByThreads)
 void BM_Record_Gauge_Disabled_ByThreads(benchmark::State &state)
 {
   static BenchmarkProvider provider(false);
-  static auto gauge   = provider.meter->CreateDoubleGauge("benchmark_gauge");
-  auto attribute_sets = MakeAttributeSets(kNominalCardinality);
-  std::vector<AttributesView> attribute_views;
-  attribute_views.reserve(attribute_sets.size());
-  for (auto &kv_set : attribute_sets)
-  {
-    attribute_views.emplace_back(kv_set);
-  }
-  opentelemetry::context::Context context{};
+  static auto gauge = provider.meter->CreateDoubleGauge("benchmark_gauge");
+  auto attributes   = MakeAttributes(kNominalAttributeCount);
+  const AttributesView attributes_view(attributes);
+  const auto values = MakeRecordingValues();
+  const opentelemetry::context::Context context{};
   std::size_t index = 0;
   for (auto _ : state)
   {
     benchmark::DoNotOptimize(gauge);
-    gauge->Record(1.0, attribute_views[index++ % attribute_views.size()], context);
+    gauge->Record(values[index++ % values.size()], attributes_view, context);
   }
 }
 BENCHMARK(BM_Record_Gauge_Disabled_ByThreads)
@@ -708,27 +672,49 @@ void BM_Record_Gauge_Drop_ByThreads(benchmark::State &state)
   }();
   static auto gauge = provider.meter->CreateDoubleGauge("benchmark_gauge");
   auto attributes   = MakeAttributes(kNominalAttributeCount);
-  AttributesView attributes_view(attributes);
-  opentelemetry::context::Context context{};
+  const AttributesView attributes_view(attributes);
+  const auto values = MakeRecordingValues();
+  const opentelemetry::context::Context context{};
+  std::size_t index = 0;
   for (auto _ : state)
   {
     benchmark::DoNotOptimize(gauge);
-    gauge->Record(1.0, attributes_view, context);
+    gauge->Record(values[index++ % values.size()], attributes_view, context);
   }
 }
 BENCHMARK(BM_Record_Gauge_Drop_ByThreads)->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
+
+void BM_Record_Gauge_LastValue_ByThreads(benchmark::State &state)
+{
+  static BenchmarkProvider provider;
+  static auto gauge = provider.meter->CreateDoubleGauge("benchmark_gauge");
+  auto attributes   = MakeAttributes(kNominalAttributeCount);
+  const AttributesView attributes_view(attributes);
+  const auto values = MakeRecordingValues();
+  const opentelemetry::context::Context context{};
+  std::size_t index = 0;
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(gauge);
+    gauge->Record(values[index++ % values.size()], attributes_view, context);
+  }
+}
+BENCHMARK(BM_Record_Gauge_LastValue_ByThreads)
+    ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
 
 void BM_Record_Gauge_LastValue_ByAttributes(benchmark::State &state)
 {
   BenchmarkProvider provider;
   auto gauge      = provider.meter->CreateDoubleGauge("benchmark_gauge");
   auto attributes = MakeAttributes(state.range(0));
-  AttributesView attributes_view(attributes);
-  opentelemetry::context::Context context{};
+  const AttributesView attributes_view(attributes);
+  const opentelemetry::context::Context context{};
+  const auto values = MakeRecordingValues();
+  std::size_t index = 0;
   for (auto _ : state)
   {
     benchmark::DoNotOptimize(gauge);
-    gauge->Record(1.0, attributes_view, context);
+    gauge->Record(values[index++ % values.size()], attributes_view, context);
   }
 }
 BENCHMARK(BM_Record_Gauge_LastValue_ByAttributes)->Arg(0)->Arg(1)->Arg(10)->Arg(128);
@@ -736,45 +722,20 @@ BENCHMARK(BM_Record_Gauge_LastValue_ByAttributes)->Arg(0)->Arg(1)->Arg(10)->Arg(
 void BM_Record_Gauge_LastValue_ByCardinality(benchmark::State &state)
 {
   BenchmarkProvider provider;
-  auto gauge          = provider.meter->CreateDoubleGauge("benchmark_gauge");
-  auto attribute_sets = MakeAttributeSets(state.range(0));
-  std::vector<AttributesView> attribute_views;
-  attribute_views.reserve(attribute_sets.size());
-  for (auto &kv_set : attribute_sets)
-  {
-    attribute_views.emplace_back(kv_set);
-  }
-  opentelemetry::context::Context context{};
+  auto gauge                = provider.meter->CreateDoubleGauge("benchmark_gauge");
+  const auto attribute_sets = MakeAttributeSets(state.range(0));
+  const std::vector<AttributesView> attribute_views(attribute_sets.begin(), attribute_sets.end());
+  const auto values = MakeRecordingValues();
+  const opentelemetry::context::Context context{};
   std::size_t index = 0;
   for (auto _ : state)
   {
     benchmark::DoNotOptimize(gauge);
-    gauge->Record(1.0, attribute_views[index++ % attribute_views.size()], context);
+    const std::size_t i = index++;
+    gauge->Record(values[i % values.size()], attribute_views[i % attribute_views.size()], context);
   }
 }
 BENCHMARK(BM_Record_Gauge_LastValue_ByCardinality)->Arg(10)->Arg(500)->Arg(2000);
-
-void BM_Record_Gauge_LastValue_ByThreads(benchmark::State &state)
-{
-  static BenchmarkProvider provider;
-  static auto gauge   = provider.meter->CreateDoubleGauge("benchmark_gauge");
-  auto attribute_sets = MakeAttributeSets(kNominalCardinality);
-  std::vector<AttributesView> attribute_views;
-  attribute_views.reserve(attribute_sets.size());
-  for (auto &kv_set : attribute_sets)
-  {
-    attribute_views.emplace_back(kv_set);
-  }
-  opentelemetry::context::Context context{};
-  std::size_t index = 0;
-  for (auto _ : state)
-  {
-    benchmark::DoNotOptimize(gauge);
-    gauge->Record(1.0, attribute_views[index++ % attribute_views.size()], context);
-  }
-}
-BENCHMARK(BM_Record_Gauge_LastValue_ByThreads)
-    ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
 
 #endif  // OPENTELEMETRY_ABI_VERSION_NO > 1
 
@@ -816,7 +777,7 @@ void BM_Record_Counter_Sum_Exemplar_AlwaysOff(benchmark::State &state)
   auto counter                  = provider.meter->CreateDoubleCounter("benchmark_counter");
   const AttributeMap attributes = MakeAttributes(kNominalAttributeCount);
   const AttributesView attributes_view(attributes);
-  auto context =
+  const auto context =
       MakeContext(opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled});
   for (auto _ : state)
   {
@@ -833,7 +794,7 @@ void BM_Record_Counter_Sum_Exemplar_AlwaysOn(benchmark::State &state)
   auto counter                  = provider.meter->CreateDoubleCounter("benchmark_counter");
   const AttributeMap attributes = MakeAttributes(kNominalAttributeCount);
   const AttributesView attributes_view(attributes);
-  auto context =
+  const auto context =
       MakeContext(opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled});
   for (auto _ : state)
   {
@@ -850,7 +811,7 @@ void BM_Record_Counter_Sum_Exemplar_TraceBased_EmptyContext(benchmark::State &st
   auto counter                  = provider.meter->CreateDoubleCounter("benchmark_counter");
   const AttributeMap attributes = MakeAttributes(kNominalAttributeCount);
   const AttributesView attributes_view(attributes);
-  opentelemetry::context::Context context{};
+  const opentelemetry::context::Context context{};
   for (auto _ : state)
   {
     benchmark::DoNotOptimize(counter);
@@ -866,7 +827,7 @@ void BM_Record_Counter_Sum_Exemplar_TraceBased_UnsampledContext(benchmark::State
   auto counter                  = provider.meter->CreateDoubleCounter("benchmark_counter");
   const AttributeMap attributes = MakeAttributes(kNominalAttributeCount);
   const AttributesView attributes_view(attributes);
-  auto context = MakeContext(opentelemetry::trace::TraceFlags{});
+  const auto context = MakeContext(opentelemetry::trace::TraceFlags{});
   for (auto _ : state)
   {
     benchmark::DoNotOptimize(counter);
@@ -882,7 +843,7 @@ void BM_Record_Counter_Sum_Exemplar_TraceBased_SampledContext(benchmark::State &
   auto counter                  = provider.meter->CreateDoubleCounter("benchmark_counter");
   const AttributeMap attributes = MakeAttributes(kNominalAttributeCount);
   const AttributesView attributes_view(attributes);
-  auto context =
+  const auto context =
       MakeContext(opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled});
   for (auto _ : state)
   {
@@ -899,7 +860,7 @@ void BM_Record_Histogram_Explicit_Exemplar_AlwaysOff(benchmark::State &state)
   auto histogram                = provider.meter->CreateDoubleHistogram("benchmark_histogram");
   const AttributeMap attributes = MakeAttributes(kNominalAttributeCount);
   const AttributesView attributes_view(attributes);
-  auto context =
+  const auto context =
       MakeContext(opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled});
   const auto values = MakeRecordingValues();
   std::size_t index = 0;
@@ -918,7 +879,7 @@ void BM_Record_Histogram_Explicit_Exemplar_AlwaysOn(benchmark::State &state)
   auto histogram                = provider.meter->CreateDoubleHistogram("benchmark_histogram");
   const AttributeMap attributes = MakeAttributes(kNominalAttributeCount);
   const AttributesView attributes_view(attributes);
-  auto context =
+  const auto context =
       MakeContext(opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled});
   const auto values = MakeRecordingValues();
   std::size_t index = 0;
@@ -939,7 +900,7 @@ void BM_Record_Histogram_Base2Expo_Exemplar_AlwaysOff(benchmark::State &state)
   auto histogram                = provider.meter->CreateDoubleHistogram("benchmark_histogram");
   const AttributeMap attributes = MakeAttributes(kNominalAttributeCount);
   const AttributesView attributes_view(attributes);
-  auto context =
+  const auto context =
       MakeContext(opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled});
   const auto values = MakeRecordingValues();
   std::size_t index = 0;
@@ -960,7 +921,7 @@ void BM_Record_Histogram_Base2Expo_Exemplar_AlwaysOn(benchmark::State &state)
   auto histogram                = provider.meter->CreateDoubleHistogram("benchmark_histogram");
   const AttributeMap attributes = MakeAttributes(kNominalAttributeCount);
   const AttributesView attributes_view(attributes);
-  auto context =
+  const auto context =
       MakeContext(opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled});
   const auto values = MakeRecordingValues();
   std::size_t index = 0;
