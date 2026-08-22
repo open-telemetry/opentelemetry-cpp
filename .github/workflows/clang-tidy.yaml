@@ -31,6 +31,7 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           submodules: recursive
 
       - name: Setup Environment
@@ -72,10 +73,13 @@ jobs:
 
       - name: Analyze clang-tidy output
         id: analyze
+        env:
+          BUILD_LOG: ${{ steps.build.outputs.build_log }}
+          CMAKE_OPTIONS: ${{ matrix.cmake_options }}
         run: |
           SCRIPT_OUTPUT=$(python3 ./ci/create_clang_tidy_report.py \
-            --build_log ${{ steps.build.outputs.build_log }} \
-            --output ./clang_tidy_report-${{ matrix.cmake_options }}.md)
+            --build_log "$BUILD_LOG" \
+            --output "./clang_tidy_report-${CMAKE_OPTIONS}.md")
           export $SCRIPT_OUTPUT
           echo "Found $TOTAL_WARNINGS unique warnings"
           echo "clang-tidy report generated at $REPORT_PATH"
@@ -96,11 +100,15 @@ jobs:
           path: ${{ steps.analyze.outputs.report_path }}
 
       - name: Check Warning Limits
+        env:
+          WARNING_COUNT: ${{ steps.analyze.outputs.warning_count }}
+          WARNING_LIMIT: ${{ matrix.warning_limit }}
+          CMAKE_OPTIONS: ${{ matrix.cmake_options }}
         run: |
-          readonly COUNT="${{ steps.analyze.outputs.warning_count }}"
-          readonly LIMIT="${{ matrix.warning_limit }}"
+          readonly COUNT="$WARNING_COUNT"
+          readonly LIMIT="$WARNING_LIMIT"
 
-          echo "clang-tidy reported ${COUNT} unique warning(s) with preset '${{ matrix.cmake_options }}'"
+          echo "clang-tidy reported ${COUNT} unique warning(s) with preset '${CMAKE_OPTIONS}'"
           echo "Limit is ${LIMIT}"
 
           if [ "$COUNT" -gt "$LIMIT" ]; then
