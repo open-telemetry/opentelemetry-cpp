@@ -256,7 +256,6 @@ namespace
 // ---------------------------------------------------------------------------
 // Shared benchmark components
 
-constexpr std::size_t kNominalCardinality    = 10;
 constexpr std::size_t kNominalAttributeCount = 3;
 
 using AttributeMap   = std::map<std::string, std::string>;
