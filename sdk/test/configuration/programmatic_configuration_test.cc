@@ -358,8 +358,8 @@ TEST_F(ProgrammaticConfigTest, AttributeLimitsApplyToLoggerProvider)
   ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_EQ(log_buffer_->size(), 1);
-  auto *record               = log_buffer_->front().get();
-  const auto &attributes     = record->GetAttributes();
+  auto *record           = log_buffer_->front().get();
+  const auto &attributes = record->GetAttributes();
   EXPECT_EQ(attributes.size(), 2);
   for (const auto &attr : attributes)
   {
@@ -433,8 +433,8 @@ TEST_F(ProgrammaticConfigTest, TracerProviderLimitsOverrideAttributeLimits)
   attribute_limits->attribute_count_limit        = 7;
   attribute_limits->attribute_value_length_limit = 9;
 
-  auto span_limits = std::make_unique<config_sdk::SpanLimitsConfiguration>();
-  span_limits->attribute_count_limit        = 22;
+  auto span_limits                   = std::make_unique<config_sdk::SpanLimitsConfiguration>();
+  span_limits->attribute_count_limit = 22;
   span_limits->attribute_value_length_limit = 11;
   span_limits->event_count_limit            = 33;
 
