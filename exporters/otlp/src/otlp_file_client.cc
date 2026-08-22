@@ -994,6 +994,10 @@ public:
   {
     if (file_)
     {
+      {
+        std::lock_guard<std::mutex> waker_guard{file_->background_thread_waker_lock};
+        file_->is_shutdown.store(true, std::memory_order_release);
+      }
       file_->background_thread_waker_cv.notify_all();
       std::unique_ptr<std::thread> background_flush_thread;
       {
@@ -1133,7 +1137,10 @@ public:
 
   bool Shutdown(std::chrono::microseconds timeout) noexcept override
   {
-    file_->is_shutdown.store(true, std::memory_order_release);
+    {
+      std::lock_guard<std::mutex> waker_guard{file_->background_thread_waker_lock};
+      file_->is_shutdown.store(true, std::memory_order_release);
+    }
 
     bool result = ForceFlush(timeout);
     return result;
@@ -1482,11 +1489,6 @@ private:
             break;
           }
 
-          if (concurrency_file->is_shutdown.load(std::memory_order_acquire))
-          {
-            break;
-          }
-
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
           if (thread_instrumentation != nullptr)
           {
@@ -1494,9 +1496,17 @@ private:
           }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
+          bool is_shutdown = false;
           {
             std::unique_lock<std::mutex> lk(concurrency_file->background_thread_waker_lock);
-            concurrency_file->background_thread_waker_cv.wait_for(lk, flush_interval);
+            // Even though is_shutdown is atomic, the lock guarantees that either a change to
+            // is_shutdown will be observed, or background_thread_waker_cv will see the notification
+            // at shutdown.
+            is_shutdown = concurrency_file->is_shutdown.load(std::memory_order_acquire);
+            if (!is_shutdown)
+            {
+              concurrency_file->background_thread_waker_cv.wait_for(lk, flush_interval);
+            }
           }
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
@@ -1505,6 +1515,11 @@ private:
             thread_instrumentation->AfterWait();
           }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
+          if (is_shutdown)
+          {
+            break;
+          }
 
           {
             std::size_t current_record_count =
