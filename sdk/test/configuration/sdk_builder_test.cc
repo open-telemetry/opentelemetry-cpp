@@ -28,6 +28,7 @@
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
@@ -120,6 +121,7 @@ using opentelemetry::sdk::common::unsetenv;
 #  endif
 #endif
 
+using opentelemetry::sdk::configuration::AttributeLimitsConfiguration;
 using opentelemetry::sdk::configuration::Registry;
 using opentelemetry::sdk::configuration::RegistryFactory;
 using opentelemetry::sdk::configuration::SdkBuilder;
@@ -259,6 +261,54 @@ TEST(SdkBuilder, SpanLimitsConfiguration)
   EXPECT_EQ(limits.link_count_limit, model->limits->link_count_limit);
   EXPECT_EQ(limits.event_attribute_count_limit, model->limits->event_attribute_count_limit);
   EXPECT_EQ(limits.link_attribute_count_limit, model->limits->link_attribute_count_limit);
+}
+
+TEST(SdkBuilder, SpanLimitsFromAttributeLimits)
+{
+  auto model    = std::make_unique<TracerProviderConfiguration>();
+  model->limits = nullptr;
+
+  AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_count_limit        = 7;
+  attribute_limits.attribute_value_length_limit = 9;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateTracerProvider(model, resource, &attribute_limits);
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits         = provider->GetSpanLimits();
+  const auto default_limits = opentelemetry::sdk::trace::SpanLimits{};
+
+  EXPECT_EQ(limits.attribute_count_limit, attribute_limits.attribute_count_limit);
+  EXPECT_EQ(limits.attribute_value_length_limit, attribute_limits.attribute_value_length_limit);
+  EXPECT_EQ(limits.event_count_limit, default_limits.event_count_limit);
+  EXPECT_EQ(limits.link_count_limit, default_limits.link_count_limit);
+  EXPECT_EQ(limits.event_attribute_count_limit, default_limits.event_attribute_count_limit);
+  EXPECT_EQ(limits.link_attribute_count_limit, default_limits.link_attribute_count_limit);
+}
+
+TEST(SdkBuilder, SpanLimitsOverrideAttributeLimits)
+{
+  auto model                                  = std::make_unique<TracerProviderConfiguration>();
+  model->limits                               = std::make_unique<SpanLimitsConfiguration>();
+  model->limits->attribute_value_length_limit = 1111;
+  model->limits->attribute_count_limit        = 2222;
+  model->limits->event_count_limit            = 3333;
+
+  AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_count_limit        = 7;
+  attribute_limits.attribute_value_length_limit = 9;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateTracerProvider(model, resource, &attribute_limits);
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits = provider->GetSpanLimits();
+  EXPECT_EQ(limits.attribute_value_length_limit, model->limits->attribute_value_length_limit);
+  EXPECT_EQ(limits.attribute_count_limit, model->limits->attribute_count_limit);
+  EXPECT_EQ(limits.event_count_limit, model->limits->event_count_limit);
 }
 
 #if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
