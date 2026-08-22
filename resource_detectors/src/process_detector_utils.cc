@@ -68,6 +68,7 @@ ExecutableInfo GetExecutableInfo(const int32_t &pid)
     return info;
   }
   std::string utf8_path(size_needed, 0);
+  // cppcheck-suppress containerOutOfBounds
   WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL);
 
   info.path = utf8_path;
@@ -130,8 +131,9 @@ std::vector<std::string> GetCommandWithArgs(const int32_t &pid)
     int size_needed = WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, NULL, 0, NULL, NULL);
     if (size_needed > 0)
     {
-      std::string arg(size_needed - 1, 0);
+      std::string arg(size_needed, 0);
       WideCharToMultiByte(CP_UTF8, 0, argvW[i], -1, &arg[0], size_needed, NULL, NULL);
+      arg.resize(size_needed - 1);
       args.push_back(arg);
     }
   }
@@ -367,8 +369,9 @@ std::string GetProcessOwner()
   {
     return std::string();
   }
-  std::string utf8_name(size_needed - 1, '\0');
+  std::string utf8_name(size_needed, '\0');
   WideCharToMultiByte(CP_UTF8, 0, name, -1, &utf8_name[0], size_needed, nullptr, nullptr);
+  utf8_name.resize(size_needed - 1);
   return utf8_name;
 
 #else
