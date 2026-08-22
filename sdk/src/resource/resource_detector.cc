@@ -10,6 +10,9 @@
 
 #include "src/resource/detail/percent_decode.h"
 
+#include "opentelemetry/nostd/variant.h"
+
+#include <stddef.h>
 #include <sstream>
 #include <string>
 
