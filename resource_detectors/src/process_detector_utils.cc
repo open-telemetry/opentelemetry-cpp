@@ -313,7 +313,7 @@ std::string GetProcessCreationTime(const int32_t &pid)
   char buf[32];
   std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03lluZ", utc_time.tm_year + 1900,
                 utc_time.tm_mon + 1, utc_time.tm_mday, utc_time.tm_hour, utc_time.tm_min,
-                utc_time.tm_sec, start_msecs);
+                utc_time.tm_sec, static_cast<unsigned long long>(start_msecs));
   return std::string(buf);
 #endif
 }
