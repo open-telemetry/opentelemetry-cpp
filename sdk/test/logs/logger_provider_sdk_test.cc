@@ -17,11 +17,10 @@
 #include <vector>
 
 #include "opentelemetry/common/attribute_value.h"
-#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/logger_provider.h"
-#include "opentelemetry/logs/noop.h"
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -671,7 +670,8 @@ TEST(LoggerProviderSDK, UpdateLoggerConfiguratorConcurrentEmit)
 
 TEST(LoggerProviderSDK, ConstructorsAreNotNoexcept)
 {
-  static_assert(!noexcept(LoggerProvider()), "LoggerProvider construction must be allowed to throw");
+  static_assert(!noexcept(LoggerProvider()),
+                "LoggerProvider construction must be allowed to throw");
   static_assert(!noexcept(LoggerProvider(std::unique_ptr<LoggerContext>{})),
                 "LoggerProvider construction must be allowed to throw");
   static_assert(!noexcept(Logger("", std::shared_ptr<LoggerContext>{})),
@@ -681,7 +681,7 @@ TEST(LoggerProviderSDK, ConstructorsAreNotNoexcept)
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
 TEST(LoggerProviderSDK, GetLoggerReturnsNoopOnConstructionFailure)
 {
-  auto should_throw = std::make_shared<bool>(true);
+  auto should_throw          = std::make_shared<bool>(true);
   auto throwing_configurator = std::make_unique<scope_sdk::ScopeConfigurator<LoggerConfig>>(
       scope_sdk::ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Default())
           .AddCondition(
@@ -702,16 +702,16 @@ TEST(LoggerProviderSDK, GetLoggerReturnsNoopOnConstructionFailure)
 
   auto cached = provider.GetLogger("cached-logger", "cached-scope");
   ASSERT_NE(cached, nullptr);
-#ifdef OPENTELEMETRY_RTTI_ENABLED
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
   ASSERT_NE(dynamic_cast<Logger *>(cached.get()), nullptr);
-#endif
+#  endif
   EXPECT_EQ(provider.GetLogger("cached-logger", "cached-scope"), cached);
 
   auto failed = provider.GetLogger("throwing-logger", "throwing-scope");
   ASSERT_NE(failed, nullptr);
-#ifdef OPENTELEMETRY_RTTI_ENABLED
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
   EXPECT_EQ(dynamic_cast<Logger *>(failed.get()), nullptr);
-#endif
+#  endif
   EXPECT_EQ(failed->GetName(), "noop logger");
   failed->Info("should-not-emit");
   provider.ForceFlush();
@@ -720,13 +720,13 @@ TEST(LoggerProviderSDK, GetLoggerReturnsNoopOnConstructionFailure)
   auto failed_again = provider.GetLogger("throwing-logger", "throwing-scope");
   EXPECT_EQ(failed, failed_again);
 
-  *should_throw = false;
+  *should_throw  = false;
   auto recovered = provider.GetLogger("throwing-logger", "throwing-scope");
   ASSERT_NE(recovered, nullptr);
   EXPECT_NE(recovered, failed);
-#ifdef OPENTELEMETRY_RTTI_ENABLED
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
   EXPECT_NE(dynamic_cast<Logger *>(recovered.get()), nullptr);
-#endif
+#  endif
   recovered->Info("should-emit");
   provider.ForceFlush();
   EXPECT_EQ(counting_processor->emit_count(), 1u);

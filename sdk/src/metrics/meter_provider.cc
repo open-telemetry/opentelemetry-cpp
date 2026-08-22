@@ -9,7 +9,6 @@
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable.h"  // IWYU pragma: keep
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
@@ -62,6 +61,7 @@ void LogGetMeterConstructionFailure(const char *detail) noexcept
   }
   catch (...)
   {
+    // Logging must not throw from a noexcept GetMeter path.
   }
 #endif
 }
@@ -72,12 +72,13 @@ MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context)
     : context_(std::move(context)), noop_meter_(CreateNoopMeterFallback())
 {}
 
-MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
-                             const sdk::resource::Resource &resource,
-                             std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>
-                                 meter_configurator)
-    : context_(
-          std::make_shared<MeterContext>(std::move(views), resource, std::move(meter_configurator))),
+MeterProvider::MeterProvider(
+    std::unique_ptr<ViewRegistry> views,
+    const sdk::resource::Resource &resource,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>> meter_configurator)
+    : context_(std::make_shared<MeterContext>(std::move(views),
+                                              resource,
+                                              std::move(meter_configurator))),
       noop_meter_(CreateNoopMeterFallback())
 {
   OTEL_INTERNAL_LOG_DEBUG("[MeterProvider] MeterProvider created.");

@@ -714,7 +714,7 @@ TEST(TracerProvider, ConstructorsAreNotNoexcept)
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
 TEST(TracerProvider, GetTracerReturnsNoopOnConstructionFailure)
 {
-  auto should_throw = std::make_shared<bool>(true);
+  auto should_throw          = std::make_shared<bool>(true);
   auto throwing_configurator = std::make_unique<ScopeConfigurator<TracerConfig>>(
       ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default())
           .AddCondition(
@@ -732,24 +732,23 @@ TEST(TracerProvider, GetTracerReturnsNoopOnConstructionFailure)
       new opentelemetry::exporter::memory::InMemorySpanExporter());
   auto span_data = exporter->GetData();
   auto processor = SimpleSpanProcessorFactory::Create(std::move(exporter));
-  TracerProvider provider(std::move(processor), Resource::Create({}),
-                          std::unique_ptr<Sampler>(new AlwaysOnSampler()),
-                          std::unique_ptr<IdGenerator>(new RandomIdGenerator()),
-                          std::move(throwing_configurator));
+  TracerProvider provider(
+      std::move(processor), Resource::Create({}), std::unique_ptr<Sampler>(new AlwaysOnSampler()),
+      std::unique_ptr<IdGenerator>(new RandomIdGenerator()), std::move(throwing_configurator));
 
   auto cached = provider.GetTracer("cached-scope");
   ASSERT_NE(cached, nullptr);
-#ifdef OPENTELEMETRY_RTTI_ENABLED
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
   ASSERT_NE(dynamic_cast<Tracer *>(cached.get()), nullptr);
-#endif
+#  endif
   auto cached_again = provider.GetTracer("cached-scope");
   EXPECT_EQ(cached, cached_again);
 
   auto failed = provider.GetTracer("throwing-scope");
   ASSERT_NE(failed, nullptr);
-#ifdef OPENTELEMETRY_RTTI_ENABLED
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
   EXPECT_EQ(dynamic_cast<Tracer *>(failed.get()), nullptr);
-#endif
+#  endif
   auto failed_span = failed->StartSpan("should-not-record");
   ASSERT_NE(failed_span, nullptr);
   EXPECT_FALSE(failed_span->IsRecording());
@@ -760,13 +759,13 @@ TEST(TracerProvider, GetTracerReturnsNoopOnConstructionFailure)
   auto failed_again = provider.GetTracer("throwing-scope");
   EXPECT_EQ(failed, failed_again);
 
-  *should_throw = false;
+  *should_throw  = false;
   auto recovered = provider.GetTracer("throwing-scope");
   ASSERT_NE(recovered, nullptr);
   EXPECT_NE(recovered, failed);
-#ifdef OPENTELEMETRY_RTTI_ENABLED
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
   EXPECT_NE(dynamic_cast<Tracer *>(recovered.get()), nullptr);
-#endif
+#  endif
   auto recovered_span = recovered->StartSpan("should-record");
   EXPECT_TRUE(recovered_span->IsRecording());
   recovered_span->End();

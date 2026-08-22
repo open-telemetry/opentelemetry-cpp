@@ -24,14 +24,14 @@
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
-#include "opentelemetry/sdk/metrics/view/view_registry.h"
-#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/metrics/meter_provider_factory.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/sdk/metrics/view/view_registry.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -562,16 +562,16 @@ TEST(MeterProvider, GetMeterReturnsNoopOnConstructionFailure)
 
   auto cached = provider.GetMeter("cached-scope");
   ASSERT_NE(cached, nullptr);
-#ifdef OPENTELEMETRY_RTTI_ENABLED
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
   ASSERT_NE(dynamic_cast<Meter *>(cached.get()), nullptr);
-#endif
+#  endif
   EXPECT_EQ(provider.GetMeter("cached-scope"), cached);
 
   auto failed = provider.GetMeter("throwing-scope");
   ASSERT_NE(failed, nullptr);
-#ifdef OPENTELEMETRY_RTTI_ENABLED
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
   EXPECT_EQ(dynamic_cast<Meter *>(failed.get()), nullptr);
-#endif
+#  endif
   auto failed_counter = failed->CreateUInt64Counter("requests");
   ASSERT_NE(failed_counter, nullptr);
   failed_counter->Add(1);
@@ -579,13 +579,13 @@ TEST(MeterProvider, GetMeterReturnsNoopOnConstructionFailure)
   auto failed_again = provider.GetMeter("throwing-scope");
   EXPECT_EQ(failed, failed_again);
 
-  *should_throw = false;
+  *should_throw  = false;
   auto recovered = provider.GetMeter("throwing-scope");
   ASSERT_NE(recovered, nullptr);
   EXPECT_NE(recovered, failed);
-#ifdef OPENTELEMETRY_RTTI_ENABLED
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
   EXPECT_NE(dynamic_cast<Meter *>(recovered.get()), nullptr);
-#endif
+#  endif
   auto recovered_counter = recovered->CreateUInt64Counter("requests");
   ASSERT_NE(recovered_counter, nullptr);
   recovered_counter->Add(1);

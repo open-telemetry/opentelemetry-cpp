@@ -8,7 +8,6 @@
 #include <utility>
 #include <vector>
 
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/logs/noop.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -49,6 +48,7 @@ void LogGetLoggerConstructionFailure(const char *detail) noexcept
   }
   catch (...)
   {
+    // Logging must not throw from a noexcept GetLogger path.
   }
 #endif
 }
