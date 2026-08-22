@@ -158,7 +158,6 @@
 #include <benchmark/benchmark.h>
 
 #include <chrono>
-#include <cstdint>
 #include <cstdlib>
 #include <map>
 #include <random>
@@ -171,7 +170,6 @@
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
@@ -185,15 +183,19 @@
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_flags.h"
-#include "opentelemetry/trace/trace_id.h"
+
+#include "opentelemetry/version.h"  // IWYU pragma: keep
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include <cstdint>
+#  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/trace/context.h"
 #  include "opentelemetry/trace/default_span.h"
 #  include "opentelemetry/trace/span_context.h"
+#  include "opentelemetry/trace/span_id.h"
+#  include "opentelemetry/trace/trace_flags.h"
+#  include "opentelemetry/trace/trace_id.h"
 #endif
 
 namespace metrics_sdk  = opentelemetry::sdk::metrics;
