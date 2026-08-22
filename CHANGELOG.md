@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Parse the `event_to_span_event_bridge/development` log
+  record processor configuration in declarative configuration. The SDK
+  implementation of this processor is not yet available; `SdkBuilder` logs a
+  warning and skips it when configured.
+  [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply

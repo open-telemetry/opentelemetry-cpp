@@ -272,6 +272,11 @@ public:
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> CreateSimpleLogRecordProcessor(
       const opentelemetry::sdk::configuration::SimpleLogRecordProcessorConfiguration *model) const;
 
+  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>
+  CreateEventToSpanEventBridgeLogRecordProcessor(
+      const opentelemetry::sdk::configuration::EventToSpanEventBridgeLogRecordProcessorConfiguration
+          *model) const;
+
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> CreateExtensionLogRecordProcessor(
       const opentelemetry::sdk::configuration::ExtensionLogRecordProcessorConfiguration *model)
       const;

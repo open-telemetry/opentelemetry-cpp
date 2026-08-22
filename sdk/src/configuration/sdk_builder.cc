@@ -991,6 +991,13 @@ public:
     processor = sdk_builder_->CreateSimpleLogRecordProcessor(model);
   }
 
+  void VisitEventToSpanEventBridge(
+      const opentelemetry::sdk::configuration::EventToSpanEventBridgeLogRecordProcessorConfiguration
+          *model) override
+  {
+    processor = sdk_builder_->CreateEventToSpanEventBridgeLogRecordProcessor(model);
+  }
+
   void VisitExtension(
       const opentelemetry::sdk::configuration::ExtensionLogRecordProcessorConfiguration *model)
       override
@@ -2292,6 +2299,18 @@ SdkBuilder::CreateSimpleLogRecordProcessor(
   }
   static const std::string die("No builder for SimpleLogRecordProcessor");
   throw UnsupportedException(die);
+}
+
+std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>
+SdkBuilder::CreateEventToSpanEventBridgeLogRecordProcessor(
+    const opentelemetry::sdk::configuration::EventToSpanEventBridgeLogRecordProcessorConfiguration
+        * /* model */) const
+{
+  // FIXME-SDK: not yet implemented.
+  // https://github.com/open-telemetry/opentelemetry-cpp/issues/4454
+  OTEL_INTERNAL_LOG_WARN(
+      "event_to_span_event_bridge/development processor is not yet supported, ignoring");
+  return nullptr;
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>
