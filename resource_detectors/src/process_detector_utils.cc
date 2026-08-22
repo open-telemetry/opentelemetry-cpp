@@ -175,7 +175,7 @@ std::string FileTimeToIso8601(const FILETIME &ft)
   {
     return std::string();
   }
-  char buf[32];
+  char buf[128];
   std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ", static_cast<int>(st.wYear),
                 static_cast<int>(st.wMonth), static_cast<int>(st.wDay), static_cast<int>(st.wHour),
                 static_cast<int>(st.wMinute), static_cast<int>(st.wSecond),
@@ -275,7 +275,7 @@ std::string GetProcessCreationTime(const int32_t &pid)
   int64_t usecs      = kp.kp_proc.p_starttime.tv_usec;
   struct tm utc_time = {};
   gmtime_r(&secs, &utc_time);
-  char buf[32];
+  char buf[128];
   std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03ldZ", utc_time.tm_year + 1900,
                 utc_time.tm_mon + 1, utc_time.tm_mday, utc_time.tm_hour, utc_time.tm_min,
                 utc_time.tm_sec, usecs / 1000);
@@ -310,7 +310,7 @@ std::string GetProcessCreationTime(const int32_t &pid)
   struct tm utc_time = {};
   gmtime_r(&t, &utc_time);
 
-  char buf[32];
+  char buf[128];
   std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03lluZ", utc_time.tm_year + 1900,
                 utc_time.tm_mon + 1, utc_time.tm_mday, utc_time.tm_hour, utc_time.tm_min,
                 utc_time.tm_sec, static_cast<unsigned long long>(start_msecs));
