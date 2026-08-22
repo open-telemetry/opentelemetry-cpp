@@ -9,6 +9,10 @@
 #include <string>
 #include <vector>
 
+#if defined(__APPLE__)
+#  include <mach-o/dyld.h>
+#endif
+
 #ifdef _MSC_VER
 // clang-format off
 #  include <windows.h>
@@ -23,6 +27,7 @@
 
 #ifdef __APPLE__
 #  include <sys/sysctl.h>
+#  include <mach-o/dyld.h>
 #endif
 
 #ifndef _MSC_VER
@@ -72,6 +77,14 @@ ExecutableInfo GetExecutableInfo(const int32_t &pid)
   WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL);
 
   info.path = utf8_path;
+#elif defined(__APPLE__)
+  char path[4096];
+  uint32_t size = sizeof(path);
+  if (_NSGetExecutablePath(path, &size) == 0)
+  {
+    info.path = std::string(path);
+  }
+
 #else
   std::string proc_path = FormFilePath(pid, kExecutableName);
   char buffer[4096];

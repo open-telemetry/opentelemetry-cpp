@@ -29,7 +29,25 @@ Contributions to detect more attributes for each Entity are welcome.
 
 [Entity: Service](https://opentelemetry.io/docs/specs/semconv/registry/entities/service/)
 
-Not implemented.
+| Attribute | Description | Linux | macOS | Windows |
+| --- | --- | --- | --- | --- |
+| `service.name` | From `OTEL_SERVICE_NAME` when set | Yes | Yes | Yes |
+| `service.name` | Fallback `unknown_service:<process.executable.name>` or `unknown_service` | Yes | Yes | Yes |
+| `service.instance.id` | Stable RFC 4122 UUID version 4 for the current process | Yes | Yes | Yes |
+
+`service.name` is read only from the `OTEL_SERVICE_NAME` environment variable. When
+that variable is unset, the detector falls back to
+`unknown_service:<process.executable.name>` when the executable name is
+available for the current process, otherwise `unknown_service`.
+
+`service.instance.id` is generated once per process and remains stable until the
+process ID changes (for example after `fork()`).
+
+Limitations:
+
+- The detector does not read `OTEL_RESOURCE_ATTRIBUTES`.
+- Executable-name fallback reuses process detector utilities; on macOS the
+  executable name is available for the current process only.
 
 ### Container Resource Detector
 
@@ -62,18 +80,15 @@ or inaccessible.
 | Attribute | Description | Linux | macOS | Windows |
 | --- | --- | --- | --- | --- |
 | `process.pid` | Process ID | Yes | Yes | Yes |
-| `process.executable.path` | Path via `/proc` (Linux) or Win32 APIs | Yes | No | Yes |
-| `process.executable.name` | Basename of the executable path | Yes | No | Yes |
+| `process.executable.path` | Path via `/proc` (Linux) or Win32 APIs | Yes | Yes | Yes |
+| `process.executable.name` | Basename of the executable path | Yes | Yes | Yes |
 | `process.creation.time` | Process start time in ISO 8601 UTC | Yes | Yes | Yes |
 | `process.owner` | Username of the process owner | Yes | Yes | Yes |
 | `process.executable.build_id.htlhash` | Deterministic SHA256-based build ID | Yes | No | Yes |
 
 Limitations:
 
-- `process.executable.path`, `process.executable.name`, and
-  `process.executable.build_id.htlhash` are not populated on macOS because
-  reading `/proc/<pid>/exe` is not available. A macOS implementation via
-  `proc_pidinfo()` would be a welcome contribution.
+- `process.executable.build_id.htlhash` is not populated on macOS.
 
 ### Env Entity Resource Detector (Experimental)
 
@@ -110,8 +125,7 @@ resource:
       - container:
       - host:
       - process:
-      # NOTE: service detector cannot be configured currently
-      - service: # not implemented (github.com/open-telemetry/opentelemetry-cpp/issues/4414)
+      - service:
 ```
 
 Call `Register` for each builder before creating the SDK:
@@ -120,15 +134,17 @@ Call `Register` for each builder before creating the SDK:
 #include "opentelemetry/resource_detectors/container_detector_builder.h"
 #include "opentelemetry/resource_detectors/host_detector_builder.h"
 #include "opentelemetry/resource_detectors/process_detector_builder.h"
+#include "opentelemetry/resource_detectors/service_detector_builder.h"
 
 opentelemetry::resource_detector::ContainerDetectorBuilder::Register(registry.get());
 opentelemetry::resource_detector::HostDetectorBuilder::Register(registry.get());
 opentelemetry::resource_detector::ProcessDetectorBuilder::Register(registry.get());
+opentelemetry::resource_detector::ServiceDetectorBuilder::Register(registry.get());
 ```
 
 ## Linking with CMake
 
-### Linking to detectors directly (not required for declaritive config)
+### Linking to detectors directly (not required for declarative config)
 
 Link to all available detectors:
 
@@ -144,9 +160,9 @@ find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS resource_detectors)
 target_link_libraries(my_target PRIVATE opentelemetry-cpp::host_resource_detector)
 ```
 
-### Linking to builders for declaritive configuration
+### Linking to builders for declarative configuration
 
-Builder targets make detectors available for declaritive configuration and hide
+Builder targets make detectors available for declarative configuration and hide
 the concrete detector implementations.
 
 Link all builders:
@@ -174,12 +190,14 @@ All targets are part of the `resource_detectors` component.
 | `opentelemetry-cpp::resource_detectors` | Interface: links all detectors |
 | `opentelemetry-cpp::resource_detectors_builders` | Interface: links all builders |
 | `opentelemetry-cpp::container_resource_detector` | Container detector |
-| `opentelemetry-cpp::container_resource_detector_builder` | Container detector builder for declaritive configuration |
+| `opentelemetry-cpp::container_resource_detector_builder` | Container detector builder for declarative configuration |
 | `opentelemetry-cpp::env_entity_resource_detector` | Env entity detector |
 | `opentelemetry-cpp::host_resource_detector` | Host detector |
 | `opentelemetry-cpp::host_resource_detector_builder` | Host detector builder for declaritive configuration |
 | `opentelemetry-cpp::process_resource_detector` | Process detector |
-| `opentelemetry-cpp::process_resource_detector_builder` | Process detector builder for declaritive configuration |
+| `opentelemetry-cpp::process_resource_detector_builder` | Process detector builder for declarative configuration |
+| `opentelemetry-cpp::service_resource_detector` | Service detector |
+| `opentelemetry-cpp::service_resource_detector_builder` | Service detector builder for declarative configuration |
 
 ## Linking with Bazel
 
@@ -227,3 +245,5 @@ deps = ["//resource_detectors:process_resource_detector_builder"]
 | `//resource_detectors:host_resource_detector_builder` | Host detector builder |
 | `//resource_detectors:process_resource_detector` | Process detector |
 | `//resource_detectors:process_resource_detector_builder` | Process detector builder |
+| `//resource_detectors:service_resource_detector` | Service detector |
+| `//resource_detectors:service_resource_detector_builder` | Service detector builder |
