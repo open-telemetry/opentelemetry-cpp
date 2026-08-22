@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] `BatchSpanProcessor` now waits for a full batch
+  (`max_export_batch_size`) before exporting, instead of draining the buffer
+  whenever it is non-empty. This reduces gRPC request count and CPU usage
+  under steady load while preserving `ForceFlush`/`Shutdown` drain semantics.
+  [#4466](https://github.com/open-telemetry/opentelemetry-cpp/pull/4466)
+
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply

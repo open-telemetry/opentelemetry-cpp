@@ -194,7 +194,7 @@ void BatchSpanProcessor::DoBackgroundWork()
     // Since `Export()` calls `NotifyCompletion()` which takes `force_flush_cv_m`,
     // holding `cv_m` while calling `Export()` can lead to a ABBA deadlock.
     {
-      // Wait for `timeout` milliseconds.
+      // Wait for `timeout` milliseconds, or until a full batch is available.
       std::unique_lock<std::mutex> lk(synchronization_data_->cv_m);
       synchronization_data_->cv.wait_for(lk, timeout, [this] {
         if (synchronization_data_->is_force_wakeup_background_worker.load(
@@ -203,7 +203,7 @@ void BatchSpanProcessor::DoBackgroundWork()
           return true;
         }
 
-        return !buffer_.empty();
+        return buffer_.size() >= max_export_batch_size_;
       });
       synchronization_data_->is_force_wakeup_background_worker.store(false,
                                                                      std::memory_order_release);
@@ -248,13 +248,16 @@ void BatchSpanProcessor::Export()
   }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
+  std::uint64_t notify_force_flush =
+      synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire);
+  bool should_drain = notify_force_flush != 0 ||
+                      synchronization_data_->is_shutdown.load(std::memory_order_acquire);
+
   do
   {
     std::vector<std::unique_ptr<Recordable>> spans_arr;
     size_t num_records_to_export{};
-    std::uint64_t notify_force_flush =
-        synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire);
-    if (notify_force_flush)
+    if (should_drain)
     {
       num_records_to_export = buffer_.size();
     }
@@ -285,7 +288,7 @@ void BatchSpanProcessor::Export()
 
     exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
     NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
-  } while (true);
+  } while (should_drain);
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
