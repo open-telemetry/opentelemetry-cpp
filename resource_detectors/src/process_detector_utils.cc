@@ -27,7 +27,6 @@
 
 #ifdef __APPLE__
 #  include <sys/sysctl.h>
-#  include <mach-o/dyld.h>
 #endif
 
 #ifndef _MSC_VER
