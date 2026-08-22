@@ -142,6 +142,13 @@ public:
    * Note: This reader may not receive any in-flight meter data, but will get newly created meter
    * data.
    * Note: This method is not thread safe, and should ideally be called from main thread.
+   * Note: For an instrument that already exists when this reader is added, this reader's
+   * cardinality limit for that instrument only takes effect up to whatever recording capacity
+   * was already resolved (as the highest limit across readers attached at instrument-creation
+   * time) when the instrument was first created; that capacity is fixed for the lifetime of the
+   * instrument and is not grown retroactively. A reader added with a higher limit than any
+   * reader present at instrument-creation time will not recover attribute sets that had already
+   * collapsed into the instrument's overflow point before this reader was attached.
    */
   void AddMetricReader(std::shared_ptr<MetricReader> reader,
                        std::unique_ptr<MetricFilter> metric_filter = nullptr) noexcept;

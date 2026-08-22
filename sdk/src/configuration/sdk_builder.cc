@@ -1989,6 +1989,11 @@ void SdkBuilder::AddView(
 
     if (stream->aggregation)
     {
+      // CreateAggregationConfig() may build a config purely for non-cardinality reasons (e.g.
+      // histogram boundaries) via a config's default constructor, which already leaves the
+      // cardinality limit not-explicit (see AggregationConfig's constructor) so it doesn't
+      // shadow a MetricReader-level fallback; the block below marks it explicit if
+      // aggregation_cardinality_limit is also configured.
       sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
     }
 
@@ -1997,7 +2002,7 @@ void SdkBuilder::AddView(
     {
       if (sdk_aggregation_config)
       {
-        sdk_aggregation_config->cardinality_limit_ = stream->aggregation_cardinality_limit;
+        sdk_aggregation_config->SetCardinalityLimit(stream->aggregation_cardinality_limit);
       }
       else
       {

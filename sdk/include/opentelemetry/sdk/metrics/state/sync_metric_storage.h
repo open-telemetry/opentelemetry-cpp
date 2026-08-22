@@ -50,6 +50,9 @@ class SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
 {
 
 public:
+  // Back-compat overload preserving the original constructor signature for any external caller.
+  // Sizes recording storage using the view's own cardinality limit (or the SDK default when no
+  // AggregationConfig is supplied), matching this class's original behavior exactly.
   SyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
                     const AggregationType aggregation_type,
                     std::shared_ptr<const AttributesProcessor> attributes_processor,
@@ -58,10 +61,38 @@ public:
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
                     const AggregationConfig *aggregation_config)
+      : SyncMetricStorage(
+            instrument_descriptor,
+            aggregation_type,
+            std::move(attributes_processor),
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+            exemplar_filter_type,
+            std::move(exemplar_reservoir),
+#endif
+            aggregation_config,
+            AggregationConfig::GetOrDefault(aggregation_config)->GetCardinalityLimit())
+  {}
+
+  // `recording_cardinality_limit` sizes the storage that raw measurements are recorded into,
+  // separately from `aggregation_config`. When a view sets an explicit cardinality limit,
+  // callers should pass that same limit (the overload above does this). When a view has no
+  // explicit limit, callers may pass the max cardinality limit configured across all attached
+  // MetricReaders, so no reader loses data purely because the shared recording storage was
+  // capped too low for it; each reader's own (possibly stricter) limit is then re-applied to
+  // its own output during collection. See TemporalMetricStorage::buildMetrics().
+  SyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
+                    const AggregationType aggregation_type,
+                    std::shared_ptr<const AttributesProcessor> attributes_processor,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+                    ExemplarFilterType exemplar_filter_type,
+                    nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
+#endif
+                    const AggregationConfig *aggregation_config,
+                    std::size_t recording_cardinality_limit)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_config_(AggregationConfig::GetOrDefault(aggregation_config)),
-        attributes_hashmap_(
-            std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
+        recording_cardinality_limit_(recording_cardinality_limit),
+        attributes_hashmap_(std::make_unique<AttributesHashMap>(recording_cardinality_limit_)),
         attributes_processor_(std::move(attributes_processor)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_filter_type_(exemplar_filter_type),
@@ -259,7 +290,12 @@ private:
     {
       return filtered;
     }
-    const size_t limit      = aggregation_config_->cardinality_limit_;
+    // Use the resolved recording capacity, not aggregation_config_->GetCardinalityLimit():
+    // when the limit comes from a MetricReader fallback rather than an explicit view limit,
+    // these can differ, and attributes_hashmap_ (the unbound path) is sized to
+    // recording_cardinality_limit_. Using the same value here keeps bound and unbound
+    // admission consistent.
+    const size_t limit      = recording_cardinality_limit_;
     const bool has_overflow = active_keys_.find(GetOverflowAttributes()) != active_keys_.end();
     // Mirror AttributesHashMap::IsOverflowAttributes() exactly. The configured
     // limit applies to non-overflow attribute sets, while overflow is reserved.
@@ -278,6 +314,8 @@ private:
   InstrumentDescriptor instrument_descriptor_;
   // hashmap to maintain the metrics for delta collection (i.e, collection since last Collect call)
   const AggregationConfig *aggregation_config_;
+  // Capacity used to (re)size attributes_hashmap_. See the constructor comment above.
+  const std::size_t recording_cardinality_limit_;
   std::unique_ptr<AttributesHashMap> attributes_hashmap_;
   std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
   std::shared_ptr<const AttributesProcessor> attributes_processor_;

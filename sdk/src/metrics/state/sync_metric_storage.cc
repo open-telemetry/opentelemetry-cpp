@@ -8,7 +8,6 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
-#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
@@ -53,7 +52,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
   {
     std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
     delta_metrics = std::move(attributes_hashmap_);
-    attributes_hashmap_.reset(new AttributesHashMap(aggregation_config_->cardinality_limit_));
+    attributes_hashmap_.reset(new AttributesHashMap(recording_cardinality_limit_));
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
     // Garbage-collect entries the user has dropped that have no pending data.
     // Cleanup happens during Collect(); if no collection runs, dropped bound

@@ -15,6 +15,25 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Enforce `MetricReader`-level cardinality limits as a fallback
+  during collection, when the matching view has no explicit
+  `aggregation_cardinality_limit` of its own (View > Reader > SDK default).
+  Shared recording storage for a view with no explicit limit is now sized at
+  the max limit across all attached readers, so a reader with a higher limit
+  does not lose data; each reader's own (possibly stricter) limit is then
+  re-applied to just its own collected output. A programmatically-constructed
+  `AggregationConfig`/`HistogramAggregationConfig`/
+  `Base2ExponentialHistogramAggregationConfig` (e.g. one built only to carry
+  histogram boundaries) is now also correctly treated as not having an
+  explicit cardinality limit, matching the declarative-configuration path.
+  `AggregationConfig::cardinality_limit_`/`cardinality_limit_explicit_` are
+  now private, set together via `SetCardinalityLimit()`, so they cannot be
+  desynced by direct field assignment. The single-collector delta fast path
+  in `TemporalMetricStorage::buildMetrics()` now re-caps to the collector's
+  own limit instead of emitting the raw recording storage unchecked, and the
+  bound-instrument admission path (preview) now uses the same resolved
+  recording limit as the unbound path.
+  [#4387](https://github.com/open-telemetry/opentelemetry-cpp/issues/4387)
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
