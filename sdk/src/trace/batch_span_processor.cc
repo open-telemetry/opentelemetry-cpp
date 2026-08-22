@@ -250,22 +250,16 @@ void BatchSpanProcessor::Export()
 
   std::uint64_t notify_force_flush =
       synchronization_data_->force_flush_pending_sequence.load(std::memory_order_acquire);
-  bool should_drain = notify_force_flush != 0 ||
-                      synchronization_data_->is_shutdown.load(std::memory_order_acquire);
+  bool should_drain =
+      notify_force_flush >
+          synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire) ||
+      synchronization_data_->is_shutdown.load(std::memory_order_acquire);
 
   do
   {
     std::vector<std::unique_ptr<Recordable>> spans_arr;
-    size_t num_records_to_export{};
-    if (should_drain)
-    {
-      num_records_to_export = buffer_.size();
-    }
-    else
-    {
-      num_records_to_export =
-          buffer_.size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_.size();
-    }
+    size_t num_records_to_export =
+        buffer_.size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_.size();
 
     if (num_records_to_export == 0)
     {
