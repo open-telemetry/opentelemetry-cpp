@@ -392,12 +392,14 @@ TEST(ETWTracer, GlobalSingletonTracer)
 }
 */
 
-  // Obtain a different tracer withs its own trace-id.
+  // GetTracer(name) is now idempotent per name: a second call with the same
+  // provider name returns the same cached Tracer (see #3849), so the trace
+  // id matches the global tracer's.
   auto localTracer = GetGlobalTracerProvider().GetTracer(kGlobalProviderName);
   auto s2 = localTracer->StartSpan("Span2");
   auto traceId2 = s2->GetContext().trace_id();
   s2->End();
-/* === Span 2 - "TraceId": "334bf9a1eed98d40a873a606295a9368"
+/* === Span 2 - "TraceId": "182a64258fb1864ca4e1a542eecbd9bf" (same trace as Span 1)
 {
   "Timestamp": "2021-05-10T11:45:27.0289654-07:00",
   "ProviderName": "OpenTelemetry-ETW-TLD",
@@ -418,7 +420,7 @@ TEST(ETWTracer, GlobalSingletonTracer)
     "StatusCode": 0,
     "StatusMessage": "",
     "Success": "True",
-    "TraceId": "334bf9a1eed98d40a873a606295a9368",
+    "TraceId": "182a64258fb1864ca4e1a542eecbd9bf",
     "_name": "Span"
   }
 }
@@ -455,7 +457,7 @@ TEST(ETWTracer, GlobalSingletonTracer)
   }
 }
 */
-  EXPECT_NE(traceId1, traceId2);
+  EXPECT_EQ(traceId1, traceId2);
   EXPECT_EQ(traceId1, traceId3);
 
 #  if OPENTELEMETRY_ABI_VERSION_NO == 1
