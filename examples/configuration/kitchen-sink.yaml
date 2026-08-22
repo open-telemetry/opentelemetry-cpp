@@ -1067,8 +1067,8 @@ resource:
         host:
       - # Enable the process resource detector, which populates process.* attributes.
         process:
-      # - # Enable the service detector, which populates service.name based on the OTEL_SERVICE_NAME environment variable and service.instance.id.
-      #   service:
+      - # Enable the service resource detector, which populates service.name based on the OTEL_SERVICE_NAME environment variable and service.instance.id.
+        service:
       # - # Enable an extension resource detector registered by name.
       #   my_custom_detector:
   # Configure resource schema URL.
