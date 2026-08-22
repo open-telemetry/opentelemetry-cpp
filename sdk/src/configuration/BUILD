@@ -25,6 +25,7 @@ cc_library(
         "//sdk/src/common:wildcard_match",
         "//sdk/src/logs",
         "//sdk/src/metrics",
+        "//sdk/src/resource",
         "//sdk/src/trace",
     ],
 )

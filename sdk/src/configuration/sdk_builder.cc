@@ -207,7 +207,7 @@
 #include "opentelemetry/version.h"
 #include "src/common/wildcard_match.h"
 
-#include "../resource/detail/percent_decode.h"
+#include "src/resource/detail/percent_decode.h"
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
@@ -2559,6 +2559,10 @@ void SdkBuilder::SetResource(
 
           opentelemetry::common::AttributeValue wrapped_attribute_value(decoded_value);
           list_attributes.SetAttribute(attribute_key, wrapped_attribute_value);
+        }
+        else
+        {
+          OTEL_INTERNAL_LOG_WARN("Found invalid key/value pair in attributes_list");
         }
       }
 

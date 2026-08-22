@@ -3,11 +3,12 @@
 
 #include "opentelemetry/sdk/resource/resource_detector.h"
 
-#include "detail/percent_decode.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/semconv/service_attributes.h"
 #include "opentelemetry/version.h"
+
+#include "src/resource/detail/percent_decode.h"
 
 #include <sstream>
 #include <string>
