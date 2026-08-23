@@ -514,6 +514,47 @@ CreateAsyncDoubleMetricSystemFilesystemLimit(metrics::Meter *meter)
 }
 
 /**
+  Filesystem lock counts.
+  <p>
+  updowncounter
+ */
+static constexpr const char *kMetricSystemFilesystemLockCount     = "system.filesystem.lock.count";
+static constexpr const char *descrMetricSystemFilesystemLockCount = "Filesystem lock counts.";
+static constexpr const char *unitMetricSystemFilesystemLockCount  = "{lock}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemFilesystemLockCount(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricSystemFilesystemLockCount,
+                                         descrMetricSystemFilesystemLockCount,
+                                         unitMetricSystemFilesystemLockCount);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemFilesystemLockCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemFilesystemLockCount,
+                                          descrMetricSystemFilesystemLockCount,
+                                          unitMetricSystemFilesystemLockCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemFilesystemLockCount(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(kMetricSystemFilesystemLockCount,
+                                                   descrMetricSystemFilesystemLockCount,
+                                                   unitMetricSystemFilesystemLockCount);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemFilesystemLockCount(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(kMetricSystemFilesystemLockCount,
+                                                    descrMetricSystemFilesystemLockCount,
+                                                    unitMetricSystemFilesystemLockCount);
+}
+
+/**
   Reports a filesystem's space usage across different states.
   <p>
   The sum of all @code system.filesystem.usage @endcode values over the different @code
@@ -1750,12 +1791,12 @@ CreateAsyncDoubleMetricSystemPagingOperations(metrics::Meter *meter)
 }
 
 /**
-  Unix swap or windows pagefile usage.
+  UNIX swap or windows pagefile usage.
   <p>
   updowncounter
  */
 static constexpr const char *kMetricSystemPagingUsage     = "system.paging.usage";
-static constexpr const char *descrMetricSystemPagingUsage = "Unix swap or windows pagefile usage.";
+static constexpr const char *descrMetricSystemPagingUsage = "UNIX swap or windows pagefile usage.";
 static constexpr const char *unitMetricSystemPagingUsage  = "By";
 
 static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
@@ -1787,13 +1828,13 @@ CreateAsyncDoubleMetricSystemPagingUsage(metrics::Meter *meter)
 }
 
 /**
-  Swap (unix) or pagefile (windows) utilization.
+  Swap (UNIX) or pagefile (windows) utilization.
   <p>
   gauge
  */
 static constexpr const char *kMetricSystemPagingUtilization = "system.paging.utilization";
 static constexpr const char *descrMetricSystemPagingUtilization =
-    "Swap (unix) or pagefile (windows) utilization.";
+    "Swap (UNIX) or pagefile (windows) utilization.";
 static constexpr const char *unitMetricSystemPagingUtilization = "1";
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -1904,6 +1945,47 @@ CreateAsyncDoubleMetricSystemProcessCreated(metrics::Meter *meter)
 {
   return meter->CreateDoubleObservableCounter(
       kMetricSystemProcessCreated, descrMetricSystemProcessCreated, unitMetricSystemProcessCreated);
+}
+
+/**
+  The maximum number of concurrent processes/tasks allowed by the operating system.
+  <p>
+  On Linux, this corresponds to @code /proc/sys/kernel/pid_max @endcode or @code
+  /proc/sys/kernel/threads-max @endcode. A per-user process limit may also be retrieved via @code
+  getrlimit(RLIMIT_NPROC) @endcode. On BSD-like systems, this corresponds to @code sysctl
+  kern.maxproc @endcode. This metric is unsupported on Windows systems. <p> updowncounter
+ */
+static constexpr const char *kMetricSystemProcessLimit = "system.process.limit";
+static constexpr const char *descrMetricSystemProcessLimit =
+    "The maximum number of concurrent processes/tasks allowed by the operating system.";
+static constexpr const char *unitMetricSystemProcessLimit = "{thread}";
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<int64_t>>
+CreateSyncInt64MetricSystemProcessLimit(metrics::Meter *meter)
+{
+  return meter->CreateInt64UpDownCounter(kMetricSystemProcessLimit, descrMetricSystemProcessLimit,
+                                         unitMetricSystemProcessLimit);
+}
+
+static inline nostd::unique_ptr<metrics::UpDownCounter<double>>
+CreateSyncDoubleMetricSystemProcessLimit(metrics::Meter *meter)
+{
+  return meter->CreateDoubleUpDownCounter(kMetricSystemProcessLimit, descrMetricSystemProcessLimit,
+                                          unitMetricSystemProcessLimit);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncInt64MetricSystemProcessLimit(metrics::Meter *meter)
+{
+  return meter->CreateInt64ObservableUpDownCounter(
+      kMetricSystemProcessLimit, descrMetricSystemProcessLimit, unitMetricSystemProcessLimit);
+}
+
+static inline nostd::shared_ptr<metrics::ObservableInstrument>
+CreateAsyncDoubleMetricSystemProcessLimit(metrics::Meter *meter)
+{
+  return meter->CreateDoubleObservableUpDownCounter(
+      kMetricSystemProcessLimit, descrMetricSystemProcessLimit, unitMetricSystemProcessLimit);
 }
 
 /**

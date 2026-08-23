@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <limits>
 #include <memory>
 #include <string>
@@ -15,6 +15,7 @@
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_indexer.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
@@ -51,11 +52,11 @@ uint64_t SumAllBuckets(const Base2ExponentialHistogramPointData &point)
   return total;
 }
 
-Base2ExponentialHistogramAggregationConfig MakeAggregationConfig(int max_scale, size_t max_buckets)
+Base2ExponentialHistogramAggregationConfig MakeAggregationConfig(int max_scale, size_t max_size)
 {
   Base2ExponentialHistogramAggregationConfig config;
-  config.max_scale_   = max_scale;
-  config.max_buckets_ = max_buckets;
+  config.max_scale_ = max_scale;
+  config.max_size_  = max_size;
   return config;
 }
 
@@ -98,6 +99,37 @@ constexpr int kSampleACount     = 36;
 constexpr double kSampleBStart  = 0.1;
 constexpr double kSampleBFactor = 1.5;
 constexpr int kSampleBCount     = 30;
+
+// Independent oracle for bucket placement: recompute where each recorded value belongs directly at
+// the scale the aggregation settled on. A sequence of in-place downscales has to agree with a
+// single indexing pass at the final scale.
+void ExpectBucketsMatchIndexer(const std::vector<double> &recorded,
+                               const AdaptingCircularBufferCounter &buckets,
+                               int32_t scale,
+                               double sign,
+                               nostd::string_view label = "")
+{
+  SCOPED_TRACE(label);
+  if (buckets.Empty())
+  {
+    return;
+  }
+
+  const Base2ExponentialHistogramIndexer indexer(scale);
+  for (int32_t bucket = buckets.StartIndex(); bucket <= buckets.EndIndex(); ++bucket)
+  {
+    uint64_t expected = 0;
+    for (double value : recorded)
+    {
+      const double magnitude = value * sign;
+      if (magnitude > 0 && indexer.ComputeIndex(magnitude) == bucket)
+      {
+        ++expected;
+      }
+    }
+    EXPECT_EQ(buckets.Get(bucket), expected) << "bucket " << bucket;
+  }
+}
 
 }  // namespace
 
@@ -315,7 +347,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
   auto MAX_BUCKETS0 = 7;
   Base2ExponentialHistogramAggregationConfig scale0_config;
   scale0_config.max_scale_      = SCALE0;
-  scale0_config.max_buckets_    = MAX_BUCKETS0;
+  scale0_config.max_size_       = MAX_BUCKETS0;
   scale0_config.record_min_max_ = true;
   Base2ExponentialHistogramAggregation scale0_aggr(&scale0_config);
   auto point = scale0_aggr.ToPoint();
@@ -388,7 +420,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
 
   Base2ExponentialHistogramAggregationConfig scale1_config;
   scale1_config.max_scale_      = 1;
-  scale1_config.max_buckets_    = 14;
+  scale1_config.max_size_       = 14;
   scale1_config.record_min_max_ = true;
   Base2ExponentialHistogramAggregation scale1_aggr(&scale1_config);
 
@@ -441,11 +473,41 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
   EXPECT_EQ(diffd_point.positive_buckets_->Get(2), 1);
 }
 
+TEST(Aggregation, Base2ExponentialHistogramAggregationInvalidConfigFallsBackToDefault)
+{
+  const Base2ExponentialHistogramAggregationConfig default_config;
+
+  auto point_of = [](const Base2ExponentialHistogramAggregationConfig &config) {
+    Base2ExponentialHistogramAggregation aggr(&config);
+    return nostd::get<Base2ExponentialHistogramPointData>(aggr.ToPoint());
+  };
+
+  {
+    auto point = point_of(MakeAggregationConfig(kMaxScaleMax + 1, 100));
+    EXPECT_EQ(point.scale_, default_config.max_scale_);
+    EXPECT_EQ(point.max_buckets_, 100);
+  }
+  {
+    auto point = point_of(MakeAggregationConfig(kMaxScaleMin - 1, 100));
+    EXPECT_EQ(point.scale_, default_config.max_scale_);
+  }
+  {
+    auto point = point_of(MakeAggregationConfig(0, kMaxSizeMin - 1));
+    EXPECT_EQ(point.max_buckets_, default_config.max_size_);
+    EXPECT_EQ(point.scale_, 0);
+  }
+  {
+    auto point = point_of(MakeAggregationConfig(kMaxScaleMin, kMaxSizeMin));
+    EXPECT_EQ(point.scale_, kMaxScaleMin);
+    EXPECT_EQ(point.max_buckets_, kMaxSizeMin);
+  }
+}
+
 TEST(Aggregation, Base2ExponentialHistogramAggregationMerge)
 {
   Base2ExponentialHistogramAggregationConfig config;
   config.max_scale_      = 10;
-  config.max_buckets_    = 100;
+  config.max_size_       = 100;
   config.record_min_max_ = true;
 
   Base2ExponentialHistogramAggregation aggr(&config);
@@ -468,7 +530,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationMerge)
   ASSERT_DOUBLE_EQ(aggr_point.sum_, expected_sum);
   ASSERT_EQ(aggr_point.zero_count_, 0);
   ASSERT_GT(aggr_point.scale_, -10);
-  ASSERT_EQ(aggr_point.max_buckets_, config.max_buckets_);
+  ASSERT_EQ(aggr_point.max_buckets_, config.max_size_);
 
   auto test_merge = [](const std::unique_ptr<Aggregation> &merged_aggr, int expected_count,
                        double expected_sum, int expected_zero_count, int expected_scale,
@@ -943,7 +1005,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationDefaultConfigMerge)
   ExpectCountInvariant(pb.count_, pb, "b");
   EXPECT_LE(pa.scale_, 20);
   EXPECT_LE(pb.scale_, 20);
-  EXPECT_EQ(pa.max_buckets_, config.max_buckets_);
+  EXPECT_EQ(pa.max_buckets_, config.max_size_);
   EXPECT_GT(pa.max_, pa.min_);
   EXPECT_GT(pb.max_, pb.min_);
 
@@ -972,4 +1034,86 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationDefaultConfigDiff)
   const auto diffed = MakePointData(*a.Diff(*ab));
   ExpectCountInvariant(pb.count_, diffed, "DefaultConfigDiff");
   EXPECT_EQ(SumAllBuckets(diffed), SumAllBuckets(merged) - SumAllBuckets(pa));
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationRecordPathDownscaleWrapsBuckets)
+{
+  // Scale 0 keeps the index arithmetic readable: 2^N lands in bucket N-1.
+  const auto config = MakeAggregationConfig(0, 4);
+  Base2ExponentialHistogramAggregation aggr(&config);
+
+  // The first recording fixes the base index of the bucket array, so recording
+  // below it and then above it leaves the populated range wrapped around that
+  // array when the scale reduction folds it in place.
+  aggr.Aggregate(4.0, {});   // bucket 1, becomes the base index
+  aggr.Aggregate(8.0, {});   // bucket 2
+  aggr.Aggregate(1.0, {});   // bucket -1, wraps to the tail of the array
+  aggr.Aggregate(16.0, {});  // bucket 3 no longer fits and forces a downscale
+
+  const auto point = MakePointData(aggr);
+  ExpectCountInvariant(4u, point, "RecordPathDownscaleWrapsBuckets");
+  EXPECT_EQ(point.scale_, -1);
+  ASSERT_FALSE(point.positive_buckets_->Empty());
+  EXPECT_TRUE(point.negative_buckets_->Empty());
+  EXPECT_EQ(point.positive_buckets_->StartIndex(), -1);
+  EXPECT_EQ(point.positive_buckets_->EndIndex(), 1);
+  EXPECT_EQ(point.positive_buckets_->Get(-1), 1u);  // 1.0
+  EXPECT_EQ(point.positive_buckets_->Get(0), 1u);   // 4.0
+  EXPECT_EQ(point.positive_buckets_->Get(1), 2u);   // 8.0 and 16.0
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationRecordPathDownscaleWrapsNegativeBuckets)
+{
+  const auto config = MakeAggregationConfig(0, 4);
+  Base2ExponentialHistogramAggregation aggr(&config);
+
+  // Mirror of the positive case. The empty positive buckets are downscaled too,
+  // which must stay a no-op.
+  aggr.Aggregate(-4.0, {});
+  aggr.Aggregate(-8.0, {});
+  aggr.Aggregate(-1.0, {});
+  aggr.Aggregate(-16.0, {});
+
+  const auto point = MakePointData(aggr);
+  ExpectCountInvariant(4u, point, "RecordPathDownscaleWrapsNegativeBuckets");
+  EXPECT_EQ(point.scale_, -1);
+  ASSERT_FALSE(point.negative_buckets_->Empty());
+  EXPECT_TRUE(point.positive_buckets_->Empty());
+  EXPECT_EQ(point.negative_buckets_->StartIndex(), -1);
+  EXPECT_EQ(point.negative_buckets_->EndIndex(), 1);
+  EXPECT_EQ(point.negative_buckets_->Get(-1), 1u);
+  EXPECT_EQ(point.negative_buckets_->Get(0), 1u);
+  EXPECT_EQ(point.negative_buckets_->Get(1), 2u);
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationRecordPathRepeatedDownscale)
+{
+  const auto config = MakeAggregationConfig(4, 8);
+  Base2ExponentialHistogramAggregation aggr(&config);
+
+  // Interleaving both signs over several orders of magnitude drives many scale
+  // reductions on both bucket arrays.
+  std::vector<double> recorded;
+  double value = 1.0;
+  for (int i = 0; i < 40; ++i)
+  {
+    aggr.Aggregate(value, {});
+    aggr.Aggregate(-value, {});
+    recorded.push_back(value);
+    recorded.push_back(-value);
+    value *= 1.6;
+  }
+
+  const auto point = MakePointData(aggr);
+  ExpectCountInvariant(recorded.size(), point, "RecordPathRepeatedDownscale");
+  ASSERT_LT(point.scale_, 4);
+  ASSERT_FALSE(point.positive_buckets_->Empty());
+  ASSERT_FALSE(point.negative_buckets_->Empty());
+  EXPECT_LE(point.positive_buckets_->EndIndex() - point.positive_buckets_->StartIndex() + 1,
+            static_cast<int32_t>(config.max_size_));
+  EXPECT_LE(point.negative_buckets_->EndIndex() - point.negative_buckets_->StartIndex() + 1,
+            static_cast<int32_t>(config.max_size_));
+
+  ExpectBucketsMatchIndexer(recorded, *point.positive_buckets_, point.scale_, 1.0, "positive");
+  ExpectBucketsMatchIndexer(recorded, *point.negative_buckets_, point.scale_, -1.0, "negative");
 }

@@ -23,13 +23,14 @@ jobs:
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+      uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
       with:
         egress-policy: audit
 
     - name: Checkout repository
-      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+         persist-credentials: false
          submodules: 'recursive'
     - name: Install dependencies
       run: |
@@ -56,7 +57,7 @@ jobs:
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+      uses: github/codeql-action/init@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4.37.7
       with:
         languages: cpp
         config: |
@@ -67,8 +68,8 @@ jobs:
         mkdir -p $HOME/build && cd $HOME/build
         cmake -G Ninja \
               -C ${GITHUB_WORKSPACE}/test_common/cmake/all-options-abiv2-preview.cmake \
-              -DWITH_OPENTRACING=OFF \
+              -DOTELCPP_WITH_OPENTRACING=OFF \
               "${GITHUB_WORKSPACE}"
         cmake --build . --parallel
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+      uses: github/codeql-action/analyze@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4.37.7

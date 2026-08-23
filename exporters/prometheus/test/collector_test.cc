@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 #include <prometheus/metric_family.h>
-#include <stddef.h>
 #include <chrono>
+#include <cstddef>
 #include <string>
 #include <thread>
 #include <vector>
@@ -20,6 +20,8 @@ using opentelemetry::exporter::metrics::PrometheusCollector;
 using opentelemetry::sdk::metrics::MetricProducer;
 using opentelemetry::sdk::metrics::ResourceMetrics;
 
+namespace
+{
 class MockMetricProducer : public MetricProducer
 {
   TestDataPoints test_data_points_;
@@ -43,7 +45,10 @@ private:
   std::chrono::microseconds sleep_ms_;
   size_t data_sent_size_{0};
 };
+}  // namespace
 
+namespace
+{
 class MockMetricReader : public opentelemetry::sdk::metrics::MetricReader
 {
 public:
@@ -61,6 +66,7 @@ private:
 
   void OnInitialized() noexcept override {}
 };
+}  // namespace
 
 // ==================== Test for addMetricsData() function ======================
 

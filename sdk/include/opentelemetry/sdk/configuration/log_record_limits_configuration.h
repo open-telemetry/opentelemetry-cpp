@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <cstddef>
+#include <limits>
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -16,8 +19,12 @@ namespace configuration
 class LogRecordLimitsConfiguration
 {
 public:
-  std::size_t attribute_value_length_limit;
-  std::size_t attribute_count_limit;
+  static constexpr std::size_t kDefaultAttributeValueLengthLimit =
+      (std::numeric_limits<std::size_t>::max)();
+  static constexpr std::size_t kDefaultAttributeCountLimit = 128;
+
+  std::size_t attribute_value_length_limit{kDefaultAttributeValueLengthLimit};
+  std::size_t attribute_count_limit{kDefaultAttributeCountLimit};
 };
 
 }  // namespace configuration

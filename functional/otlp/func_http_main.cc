@@ -1,9 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdio.h>
-#include <string.h>
 #include <cstdint>
+#include <cstdio>
+#include <cstring>
 #include <iostream>
 #include <string>
 #include <utility>
@@ -38,19 +38,23 @@ const int TEST_FAILED = 1;
   Command line parameters.
 */
 
+namespace
+{
 enum test_mode : std::uint8_t
 {
   MODE_NONE,
   MODE_HTTP,
   MODE_HTTPS
 };
+}  // namespace
 
 static bool opt_help   = false;
 static bool opt_list   = false;
 static bool opt_debug  = false;
 static bool opt_secure = false;
 // HTTPS by default
-static std::string opt_endpoint = "https://localhost:4318/v1/traces";
+constexpr char kDefaultOptEndpoint[] = "https://localhost:4318/v1/traces";
+static std::string opt_endpoint;
 static std::string opt_cert_dir;
 static std::string opt_test_name;
 static test_mode opt_mode = MODE_NONE;
@@ -222,7 +226,7 @@ static void instrumented_payload(const otlp::OtlpHttpExporterOptions &opts)
   cleanup();
 }
 
-static void usage(FILE *out)
+static void usage(std::FILE *out)
 {
   static const char *msg =
       "Usage: func_otlp_http [options] test_name\n"
@@ -235,7 +239,7 @@ static void usage(FILE *out)
       "                      - none: no endpoint\n"
       "                      - http: http endpoint\n"
       "                      - https: https endpoint\n";
-  fprintf(out, "%s", msg);
+  std::fprintf(out, "%s", msg);
 }
 
 static int parse_args(int argc, char *argv[])
@@ -245,19 +249,19 @@ static int parse_args(int argc, char *argv[])
 
   while (remaining_argc > 0)
   {
-    if (strcmp(*remaining_argv, "--help") == 0)
+    if (std::strcmp(*remaining_argv, "--help") == 0)
     {
       opt_help = true;
       return 0;
     }
 
-    if (strcmp(*remaining_argv, "--list") == 0)
+    if (std::strcmp(*remaining_argv, "--list") == 0)
     {
       opt_list = true;
       return 0;
     }
 
-    if (strcmp(*remaining_argv, "--debug") == 0)
+    if (std::strcmp(*remaining_argv, "--debug") == 0)
     {
       opt_debug = true;
       remaining_argc--;
@@ -267,7 +271,7 @@ static int parse_args(int argc, char *argv[])
 
     if (remaining_argc >= 2)
     {
-      if (strcmp(*remaining_argv, "--cert-dir") == 0)
+      if (std::strcmp(*remaining_argv, "--cert-dir") == 0)
       {
         remaining_argc--;
         remaining_argv++;
@@ -277,7 +281,7 @@ static int parse_args(int argc, char *argv[])
         continue;
       }
 
-      if (strcmp(*remaining_argv, "--endpoint") == 0)
+      if (std::strcmp(*remaining_argv, "--endpoint") == 0)
       {
         remaining_argc--;
         remaining_argv++;
@@ -287,7 +291,7 @@ static int parse_args(int argc, char *argv[])
         continue;
       }
 
-      if (strcmp(*remaining_argv, "--mode") == 0)
+      if (std::strcmp(*remaining_argv, "--mode") == 0)
       {
         remaining_argc--;
         remaining_argv++;
@@ -335,8 +339,8 @@ typedef int (*test_func_t)();
 
 struct test_case
 {
-  std::string m_name;
-  test_func_t m_func;
+  nostd::string_view m_name;
+  test_func_t m_func{nullptr};
 };
 
 }  // namespace
@@ -461,6 +465,8 @@ int main(int argc, char *argv[])
   // Program name
   argc--;
   argv++;
+
+  opt_endpoint = kDefaultOptEndpoint;
 
   int rc = parse_args(argc, argv);
 

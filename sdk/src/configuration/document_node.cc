@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <cctype>
+#include <cstdint>
 #include <cstdlib>
+#include <stdexcept>
 #include <string>
 
 #include "opentelemetry/sdk/common/env_variables.h"
@@ -240,7 +242,7 @@ size_t DocumentNode::IntegerFromString(const std::string &value) const
   const char *ptr = value.c_str();
   char *end       = nullptr;
   size_t len      = value.length();
-  size_t val      = strtoll(ptr, &end, 10);
+  size_t val      = std::strtoll(ptr, &end, 10);
   if (ptr + len != end)
   {
     std::string message("Illegal integer value: ");
@@ -250,12 +252,40 @@ size_t DocumentNode::IntegerFromString(const std::string &value) const
   return val;
 }
 
+std::int64_t DocumentNode::SignedIntegerFromString(const std::string &value) const
+{
+  try
+  {
+    std::size_t pos  = 0;
+    std::int64_t val = std::stoll(value, &pos);
+    if (pos != value.length())
+    {
+      std::string message("Illegal integer value: ");
+      message.append(value);
+      throw InvalidSchemaException(Location(), message);
+    }
+    return val;
+  }
+  catch (const std::invalid_argument &)
+  {
+    std::string message("Illegal integer value: ");
+    message.append(value);
+    throw InvalidSchemaException(Location(), message);
+  }
+  catch (const std::out_of_range &)
+  {
+    std::string message("Illegal integer value: ");
+    message.append(value);
+    throw InvalidSchemaException(Location(), message);
+  }
+}
+
 double DocumentNode::DoubleFromString(const std::string &value) const
 {
   const char *ptr = value.c_str();
   char *end       = nullptr;
   size_t len      = value.length();
-  double val      = strtod(ptr, &end);
+  double val      = std::strtod(ptr, &end);
   if (ptr + len != end)
   {
     std::string message("Illegal double value: ");

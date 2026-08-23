@@ -131,7 +131,7 @@ set(PROFILES_SERVICE_PB_CPP_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1development/profiles_service.pb.cc"
 )
 
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   set(PROFILES_SERVICE_GRPC_PB_H_FILE
       "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/profiles/v1development/profiles_service.grpc.pb.h"
   )
@@ -140,7 +140,7 @@ if(WITH_OTLP_GRPC)
   )
 endif()
 
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   set(TRACE_SERVICE_GRPC_PB_CPP_FILE
       "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/trace/v1/trace_service.grpc.pb.cc"
   )
@@ -154,7 +154,7 @@ set(LOGS_SERVICE_PB_CPP_FILE
 set(LOGS_SERVICE_PB_H_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
 )
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   set(LOGS_SERVICE_GRPC_PB_CPP_FILE
       "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/logs/v1/logs_service.grpc.pb.cc"
   )
@@ -168,7 +168,7 @@ set(METRICS_SERVICE_PB_CPP_FILE
 set(METRICS_SERVICE_PB_H_FILE
     "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/metrics/v1/metrics_service.pb.h"
 )
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   set(METRICS_SERVICE_GRPC_PB_CPP_FILE
       "${GENERATED_PROTOBUF_PATH}/opentelemetry/proto/collector/metrics/v1/metrics_service.grpc.pb.cc"
   )
@@ -251,7 +251,7 @@ set(PROTOBUF_GENERATED_FILES
 
 set(PROTOBUF_GENERATE_DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE})
 
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   list(APPEND PROTOBUF_GENERATE_DEPENDS ${gRPC_CPP_PLUGIN_EXECUTABLE})
   list(APPEND PROTOBUF_COMMON_FLAGS
        "--grpc_out=generate_mock_code=true:${GENERATED_PROTOBUF_PATH}"
@@ -353,7 +353,7 @@ if(Protobuf_INCLUDE_DIRS)
     PUBLIC "$<BUILD_INTERFACE:${Protobuf_INCLUDE_DIRS}>")
 endif()
 
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   add_library(
     opentelemetry_proto_grpc
     ${OTELCPP_PROTO_TARGET_OPTIONS} ${TRACE_SERVICE_GRPC_PB_CPP_FILE}
@@ -417,15 +417,6 @@ endif()
 set_target_properties(opentelemetry_proto PROPERTIES EXPORT_NAME proto)
 patch_protobuf_targets(opentelemetry_proto)
 
-if(OPENTELEMETRY_INSTALL)
-  install(
-    DIRECTORY ${GENERATED_PROTOBUF_PATH}/opentelemetry
-    DESTINATION include
-    COMPONENT exporters_otlp_common
-    FILES_MATCHING
-    PATTERN "*.h")
-endif()
-
 if(TARGET protobuf::libprotobuf)
   target_link_libraries(opentelemetry_proto PUBLIC protobuf::libprotobuf)
 else() # cmake 3.8 or lower
@@ -434,7 +425,7 @@ endif()
 
 # this is needed on some older grcp versions specifically conan recipe for
 # grpc/1.54.3
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   if(TARGET absl::synchronization)
     target_link_libraries(opentelemetry_proto_grpc
                           PUBLIC "$<BUILD_INTERFACE:absl::synchronization>")
@@ -445,4 +436,31 @@ if(BUILD_SHARED_LIBS)
   foreach(proto_target ${OPENTELEMETRY_PROTO_TARGETS})
     set_property(TARGET ${proto_target} PROPERTY POSITION_INDEPENDENT_CODE ON)
   endforeach()
+endif()
+
+if(OTELCPP_INSTALL)
+  install(
+    DIRECTORY ${GENERATED_PROTOBUF_PATH}/opentelemetry
+    DESTINATION include
+    COMPONENT exporters_otlp_common
+    FILES_MATCHING
+    PATTERN "*.h")
+
+  include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
+
+  opentelemetry_add_pkgconfig(
+    proto
+    "OpenTelemetry - Protocol"
+    "Protocols for spans, metrics, and logs."
+    "protobuf"
+  )
+
+  if(OTELCPP_WITH_OTLP_GRPC)
+    opentelemetry_add_pkgconfig(
+      proto_grpc
+      "OpenTelemetry - Protocol (gRPC)"
+      "Protocols for spans, metrics, and logs over gRPC."
+      "opentelemetry_proto grpc++ protobuf"
+    )
+  endif()
 endif()

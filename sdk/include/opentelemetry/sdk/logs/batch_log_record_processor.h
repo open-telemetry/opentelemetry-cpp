@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <stddef.h>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>
@@ -108,6 +108,11 @@ public:
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
   bool HasEnabledFilter() const noexcept override { return false; }
+
+  bool RecordableEnforcesLogRecordLimits() const noexcept override
+  {
+    return exporter_ != nullptr && exporter_->RecordableEnforcesLogRecordLimits();
+  }
 
   /**
    * Class destructor which invokes the Shutdown() method.

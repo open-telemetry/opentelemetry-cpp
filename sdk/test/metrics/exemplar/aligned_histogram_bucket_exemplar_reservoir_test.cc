@@ -5,12 +5,10 @@
 
 #  include <gtest/gtest.h>
 #  include <stdint.h>
-#  include <chrono>
 #  include <memory>
 #  include <string>
 #  include <vector>
 
-#  include "opentelemetry/common/timestamp.h"
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #  include "opentelemetry/sdk/metrics/exemplar/aligned_histogram_bucket_exemplar_reservoir.h"
@@ -23,6 +21,9 @@ namespace sdk
 {
 namespace metrics
 {
+namespace
+{
+
 class AlignedHistogramBucketExemplarReservoirTestPeer : public ::testing::Test
 {
 public:
@@ -34,11 +35,10 @@ TEST_F(AlignedHistogramBucketExemplarReservoirTestPeer, OfferMeasurement)
   auto histogram_exemplar_reservoir = ExemplarReservoir::GetAlignedHistogramBucketExemplarReservoir(
       boundaries.size(),
       AlignedHistogramBucketExemplarReservoir::GetHistogramCellSelector(boundaries), nullptr);
-  histogram_exemplar_reservoir->OfferMeasurement(
-      1.0, MetricAttributes{}, opentelemetry::context::Context{}, std::chrono::system_clock::now());
+  histogram_exemplar_reservoir->OfferMeasurement(1.0, MetricAttributes{},
+                                                 opentelemetry::context::Context{});
   histogram_exemplar_reservoir->OfferMeasurement(static_cast<int64_t>(1), MetricAttributes{},
-                                                 opentelemetry::context::Context{},
-                                                 std::chrono::system_clock::now());
+                                                 opentelemetry::context::Context{});
   auto exemplar_data = histogram_exemplar_reservoir->CollectAndReset(MetricAttributes{});
   ASSERT_TRUE(exemplar_data.empty());
 }
@@ -50,14 +50,15 @@ TEST_F(AlignedHistogramBucketExemplarReservoirTestPeer, OfferMeasurementWithNonE
       boundaries.size(),
       AlignedHistogramBucketExemplarReservoir::GetHistogramCellSelector(boundaries),
       &ReservoirCell::GetAndResetDouble);
-  histogram_exemplar_reservoir->OfferMeasurement(
-      1.0, MetricAttributes{}, opentelemetry::context::Context{}, std::chrono::system_clock::now());
+  histogram_exemplar_reservoir->OfferMeasurement(1.0, MetricAttributes{},
+                                                 opentelemetry::context::Context{});
   histogram_exemplar_reservoir->OfferMeasurement(static_cast<int64_t>(1), MetricAttributes{},
-                                                 opentelemetry::context::Context{},
-                                                 std::chrono::system_clock::now());
+                                                 opentelemetry::context::Context{});
   auto exemplar_data = histogram_exemplar_reservoir->CollectAndReset(MetricAttributes{});
   ASSERT_TRUE(!exemplar_data.empty());
 }
+
+}  // namespace
 
 }  // namespace metrics
 }  // namespace sdk

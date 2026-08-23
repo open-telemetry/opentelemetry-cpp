@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <utility>
@@ -260,9 +260,13 @@ TEST(Logger, EventLogMethodOverloads)
 
 #endif
 
+namespace
+{
+
 // Define a basic Logger class
 class TestLogger : public Logger
 {
+public:
   const nostd::string_view GetName() noexcept override { return "test logger"; }
 
   using Logger::CreateLogRecord;
@@ -280,9 +284,6 @@ class TestLogger : public Logger
     auto log_record_ptr = std::move(log_record);
   }
 };
-
-namespace
-{
 
 class EnablementAwareTestLogRecord : public opentelemetry::logs::LogRecord
 {
@@ -454,11 +455,10 @@ private:
   bool enabled_impl_result_;
 };
 
-}  // namespace
-
 // Define a basic LoggerProvider class that returns an instance of the logger class defined above
 class TestProvider : public LoggerProvider
 {
+public:
   nostd::shared_ptr<Logger> GetLogger(nostd::string_view /* logger_name */,
                                       nostd::string_view /* library_name */,
                                       nostd::string_view /* library_version */,
@@ -676,3 +676,5 @@ TEST(Logger, EmitLogRecordWithTracePartsInArgsRoutesSpanContextVariantToEnabled)
   EXPECT_EQ(logger.last_span_context_.trace_flags(), trace_flags);
 }
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+}  // namespace

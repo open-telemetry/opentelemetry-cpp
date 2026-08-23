@@ -3,10 +3,10 @@
 
 #include <gtest/gtest.h>
 
-#include <stdint.h>
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <initializer_list>  // IWYU pragma: keep
 #include <random>
 #include <string>
@@ -34,6 +34,9 @@
 using namespace opentelemetry;
 using namespace opentelemetry::sdk::instrumentationscope;
 using namespace opentelemetry::sdk::metrics;
+
+namespace
+{
 
 class MockMetricExporterForStress : public opentelemetry::sdk::metrics::PushMetricExporter
 {
@@ -175,3 +178,5 @@ TEST(HistogramStress, UnsignedInt64)
   ASSERT_EQ(expected_count, collected_count);
   ASSERT_EQ(*expected_sum, collected_sum);
 }
+
+}  // namespace

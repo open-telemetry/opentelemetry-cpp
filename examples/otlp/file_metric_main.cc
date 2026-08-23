@@ -34,14 +34,9 @@ namespace otlp_exporter = opentelemetry::exporter::otlp;
 namespace
 {
 
-otlp_exporter::OtlpFileMetricExporterOptions exporter_options;
-
-void InitMetrics()
+void InitMetrics(const otlp_exporter::OtlpFileMetricExporterOptions &exporter_options)
 {
   auto exporter = otlp_exporter::OtlpFileMetricExporterFactory::Create(exporter_options);
-
-  std::string version{"1.2.0"};
-  std::string schema{"https://opentelemetry.io/schemas/1.2.0"};
 
   // Initialize and set the global MeterProvider
   metrics_sdk::PeriodicExportingMetricReaderOptions reader_options;
@@ -69,6 +64,7 @@ void CleanupMetrics()
 
 int main(int argc, char *argv[])
 {
+  otlp_exporter::OtlpFileMetricExporterOptions exporter_options;
   std::string example_type;
   if (argc > 1)
   {
@@ -81,7 +77,7 @@ int main(int argc, char *argv[])
     }
   }
   // Removing this line will leave the default noop MetricProvider in place.
-  InitMetrics();
+  InitMetrics(exporter_options);
   std::string name{"otlp_file_metric_example"};
 
   if (example_type == "counter")

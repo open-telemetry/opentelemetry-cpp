@@ -2,15 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <mutex>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 #include "common.h"
 
+#if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
+#  include <cstdlib>
+#endif
+
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -22,9 +25,29 @@
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
+#include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
+
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
+#  include "opentelemetry/sdk/metrics/meter_context_factory.h"
+
+#  ifndef NO_GETENV
+#    include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#    include "opentelemetry/sdk/metrics/meter_config.h"
+#    include "opentelemetry/sdk/metrics/meter_context.h"
+#    include "opentelemetry/sdk/metrics/view/view_registry.h"
+#    include "opentelemetry/sdk/resource/resource.h"
+#  endif
+
+#  if defined(_MSC_VER) && !defined(NO_GETENV)
+#    include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
+#  endif
+#endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <stdint.h>
+#  include <cstdint>
 #  include <initializer_list>
 #  include <map>
 #  include <unordered_map>
@@ -37,77 +60,161 @@
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::common::internal_log;
+using opentelemetry::test_common::ScopedTestLogHandler;
 
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 namespace
 {
 
-class ScopedTestLogHandler final
+#  ifndef NO_GETENV
+constexpr char kMetricsExemplarFilterEnv[] = "OTEL_METRICS_EXEMPLAR_FILTER";
+#  endif
+
+class ExemplarFilterEnvironmentTest : public ::testing::Test
 {
-public:
-  struct Entry
+protected:
+  void SetUp() override
   {
-    LogLevel level;
-    std::string msg;
-  };
-
-private:
-  class LogHandlerImpl : public LogHandler
-  {
-  public:
-    void Handle(LogLevel level,
-                const char * /*file*/,
-                int /*line*/,
-                const char *msg,
-                const opentelemetry::sdk::common::AttributeMap & /*attrs*/) noexcept override
-    {
-      std::lock_guard<std::mutex> lk(mu_);
-      entries_.push_back({level, msg ? msg : ""});
-    }
-
-    std::vector<Entry> Drain()
-    {
-      std::lock_guard<std::mutex> lk(mu_);
-      return std::exchange(entries_, {});
-    }
-
-  private:
-    std::mutex mu_;
-    std::vector<Entry> entries_;
-  };
-
-public:
-  explicit ScopedTestLogHandler(LogLevel level)
-      : previous_handler_(GlobalLogHandler::GetLogHandler()),
-        previous_level_(GlobalLogHandler::GetLogLevel())
-  {
-    opentelemetry::nostd::shared_ptr<LogHandlerImpl> handler{new LogHandlerImpl{}};
-    handler_ = handler.get();
-
-    GlobalLogHandler::SetLogHandler(std::move(handler));
-    GlobalLogHandler::SetLogLevel(level);
+#  ifndef NO_GETENV
+    unsetenv(kMetricsExemplarFilterEnv);
+#  endif
   }
 
-  ~ScopedTestLogHandler()
+  void TearDown() override
   {
-    handler_ = nullptr;
-    GlobalLogHandler::SetLogHandler(previous_handler_);
-    GlobalLogHandler::SetLogLevel(previous_level_);
+#  ifndef NO_GETENV
+    unsetenv(kMetricsExemplarFilterEnv);
+#  endif
   }
-
-  ScopedTestLogHandler(const ScopedTestLogHandler &)            = delete;
-  ScopedTestLogHandler &operator=(const ScopedTestLogHandler &) = delete;
-  ScopedTestLogHandler(ScopedTestLogHandler &&)                 = delete;
-  ScopedTestLogHandler &operator=(ScopedTestLogHandler &&)      = delete;
-
-  std::vector<Entry> Drain() { return handler_->Drain(); }
-
-private:
-  LogHandlerImpl *handler_{nullptr};
-  opentelemetry::nostd::shared_ptr<LogHandler> previous_handler_;
-  LogLevel previous_level_;
 };
 
+TEST_F(ExemplarFilterEnvironmentTest, UsesTraceBasedDefault)
+{
+  auto context = MeterContextFactory::Create();
+  EXPECT_EQ(context->GetExemplarFilter(), ExemplarFilterType::kTraceBased);
+}
+
+#  ifndef NO_GETENV
+
+TEST_F(ExemplarFilterEnvironmentTest, UsesSupportedValuesCaseInsensitively)
+{
+  const std::pair<const char *, ExemplarFilterType> test_cases[] = {
+      {"always_on", ExemplarFilterType::kAlwaysOn},
+      {"ALWAYS_ON", ExemplarFilterType::kAlwaysOn},
+      {"always_off", ExemplarFilterType::kAlwaysOff},
+      {"Always_Off", ExemplarFilterType::kAlwaysOff},
+      {"trace_based", ExemplarFilterType::kTraceBased},
+      {"TRACE_BASED", ExemplarFilterType::kTraceBased}};
+
+  for (const auto &test_case : test_cases)
+  {
+    SCOPED_TRACE(test_case.first);
+    setenv(kMetricsExemplarFilterEnv, test_case.first, 1);
+
+    auto context = MeterContextFactory::Create();
+    EXPECT_EQ(context->GetExemplarFilter(), test_case.second);
+  }
+}
+
+TEST_F(ExemplarFilterEnvironmentTest, DirectMeterContextReadsEnvironment)
+{
+  setenv(kMetricsExemplarFilterEnv, "always_off", 1);
+
+  MeterContext context;
+  EXPECT_EQ(context.GetExemplarFilter(), ExemplarFilterType::kAlwaysOff);
+}
+
+TEST_F(ExemplarFilterEnvironmentTest, EmptyValueUsesTraceBasedDefault)
+{
+  setenv(kMetricsExemplarFilterEnv, "", 1);
+
+  auto context = MeterContextFactory::Create();
+  EXPECT_EQ(context->GetExemplarFilter(), ExemplarFilterType::kTraceBased);
+}
+
+TEST_F(ExemplarFilterEnvironmentTest, ExplicitConfigurationOverridesEnvironment)
+{
+  ScopedTestLogHandler log_handler{LogLevel::Warning};
+  setenv(kMetricsExemplarFilterEnv, "invalid", 1);
+
+  auto views    = std::unique_ptr<ViewRegistry>(new ViewRegistry());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto meter_configurator =
+      std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<MeterConfig>>(
+          opentelemetry::sdk::instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(
+              MeterConfig::Default())
+              .Build());
+
+  auto context = MeterContextFactory::Create(
+      std::move(views), resource, std::move(meter_configurator), ExemplarFilterType::kAlwaysOff);
+  EXPECT_EQ(context->GetExemplarFilter(), ExemplarFilterType::kAlwaysOff);
+  EXPECT_TRUE(log_handler.Drain().empty());
+}
+
+TEST_F(ExemplarFilterEnvironmentTest, InvalidValueWarnsAndUsesTraceBasedDefault)
+{
+  ScopedTestLogHandler log_handler{LogLevel::Warning};
+  setenv(kMetricsExemplarFilterEnv, "invalid", 1);
+
+  auto context = MeterContextFactory::Create();
+  EXPECT_EQ(context->GetExemplarFilter(), ExemplarFilterType::kTraceBased);
+
+  auto logs = log_handler.Drain();
+  ASSERT_EQ(logs.size(), 1);
+  EXPECT_EQ(logs[0].level, LogLevel::Warning);
+  EXPECT_EQ(logs[0].msg,
+            "Environment variable <OTEL_METRICS_EXEMPLAR_FILTER> has an invalid value <invalid>, "
+            "ignoring");
+}
+
+TEST_F(ExemplarFilterEnvironmentTest, MeterProviderFactoryReadsEnvironment)
+{
+  ScopedTestLogHandler log_handler{LogLevel::Warning};
+  setenv(kMetricsExemplarFilterEnv, "invalid", 1);
+
+  auto provider = MeterProviderFactory::Create();
+  ASSERT_NE(provider, nullptr);
+
+  auto logs = log_handler.Drain();
+  ASSERT_EQ(logs.size(), 1);
+  EXPECT_EQ(logs[0].level, LogLevel::Warning);
+  EXPECT_EQ(logs[0].msg,
+            "Environment variable <OTEL_METRICS_EXEMPLAR_FILTER> has an invalid value <invalid>, "
+            "ignoring");
+}
+
+TEST_F(ExemplarFilterEnvironmentTest, DirectMeterProviderReadsEnvironment)
+{
+  ScopedTestLogHandler log_handler{LogLevel::Warning};
+  setenv(kMetricsExemplarFilterEnv, "invalid", 1);
+
+  MeterProvider provider;
+
+  auto logs = log_handler.Drain();
+  ASSERT_EQ(logs.size(), 1);
+  EXPECT_EQ(logs[0].level, LogLevel::Warning);
+  EXPECT_EQ(logs[0].msg,
+            "Environment variable <OTEL_METRICS_EXEMPLAR_FILTER> has an invalid value <invalid>, "
+            "ignoring");
+}
+
+TEST_F(ExemplarFilterEnvironmentTest, ProgrammaticConfigurationOverridesEnvironment)
+{
+  setenv(kMetricsExemplarFilterEnv, "always_on", 1);
+
+  auto context      = MeterContextFactory::Create();
+  auto *context_ptr = context.get();
+  MeterProvider provider(std::move(context));
+  EXPECT_EQ(context_ptr->GetExemplarFilter(), ExemplarFilterType::kAlwaysOn);
+
+  provider.SetExemplarFilter(ExemplarFilterType::kAlwaysOff);
+  EXPECT_EQ(context_ptr->GetExemplarFilter(), ExemplarFilterType::kAlwaysOff);
+}
+
+#  endif  // NO_GETENV
+
 }  // namespace
+#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 TEST(MeterProvider, GetMeter)
 {

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <benchmark/benchmark.h>
-#include <stddef.h>
+#include <cstddef>
 #include <string>
 
 #include "opentelemetry/baggage/baggage.h"
@@ -102,7 +102,7 @@ void BM_BaggageToHeaderTenEntries(benchmark::State &state)
   auto baggage = Baggage::FromHeader(header_with_custom_entries(kNumEntries));
   while (state.KeepRunning())
   {
-    auto new_baggage = baggage->ToHeader();
+    benchmark::DoNotOptimize(baggage->ToHeader());
   }
 }
 BENCHMARK(BM_BaggageToHeaderTenEntries);
@@ -112,7 +112,7 @@ void BM_BaggageToHeader180Entries(benchmark::State &state)
   auto baggage = Baggage::FromHeader(header_with_custom_entries(Baggage::kMaxKeyValuePairs));
   while (state.KeepRunning())
   {
-    auto new_baggage = baggage->ToHeader();
+    benchmark::DoNotOptimize(baggage->ToHeader());
   }
 }
 BENCHMARK(BM_BaggageToHeader180Entries);

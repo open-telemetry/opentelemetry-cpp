@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <utility>
@@ -37,6 +37,9 @@ static std::string Hex(const T &id_item)
   id_item.ToLowerBase16(buf);
   return std::string(buf, sizeof(buf));
 }
+
+namespace
+{
 
 class TextMapCarrierTest : public context::propagation::TextMapCarrier
 {
@@ -147,3 +150,5 @@ TEST_F(CompositePropagatorTest, Inject)
   EXPECT_EQ(fields[1], trace::propagation::kTraceState);
   EXPECT_EQ(fields[2], trace::propagation::kB3CombinedHeader);
 }
+
+}  // namespace
