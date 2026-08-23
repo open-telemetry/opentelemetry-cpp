@@ -8,6 +8,7 @@
 
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
+#include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
@@ -757,3 +758,66 @@ tracer_provider:
   auto config = DoParse(yaml);
   ASSERT_EQ(config, nullptr);
 }
+
+// --- empty env var with :- fallback tests ---
+
+TEST(Yaml, empty_string_substitution_with_fallback)
+{
+  setenv("ENV_NAME", "", 1);
+
+  std::string yaml = R"(
+file_format: ${ENV_NAME:-1.0}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->file_format, "1.0");
+}
+
+TEST(Yaml, empty_boolean_substitution_with_fallback)
+{
+  setenv("ENV_NAME", "", 1);
+
+  std::string yaml = R"(
+file_format: "1.0"
+disabled: ${ENV_NAME:-true}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->disabled, true);
+}
+
+// --- GetString default-on-empty tests ---
+
+TEST(Yaml, optional_string_unset_env_var_uses_default)
+{
+  // An unset env var in an optional string field must produce the declared default,
+  // not an empty string that fails downstream parsing.
+  unsetenv("ENV_NAME");
+
+  std::string yaml = R"(
+file_format: "1.0"
+log_level: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  // default log_level is "info" -> SeverityNumber::info
+  ASSERT_EQ(config->log_level, opentelemetry::sdk::configuration::SeverityNumber::info);
+}
+
+TEST(Yaml, optional_string_set_env_var_uses_value)
+{
+  setenv("ENV_NAME", "debug", 1);
+
+  std::string yaml = R"(
+file_format: "1.0"
+log_level: ${ENV_NAME}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_EQ(config->log_level, opentelemetry::sdk::configuration::SeverityNumber::debug);
+}
+
