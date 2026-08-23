@@ -1511,10 +1511,13 @@ TEST(SdkBuilder, SetResourceAttributesNullValueSkipped)
   //
   // resource:
   //   attributes:
-  //     service.name: ${OTEL_SERVICE_NAME} # env not set
-  //     service.namespace: ${MY_SERVICE_NAMESPACE} # env not set
-  //     service.version: version-from-attributes
-  //   attributes_list: service.name=name-from-list
+  //     -name: service.name
+  //      value: ${OTEL_SERVICE_NAME} # env not set
+  //     -name: service.namespace
+  //      value: ${MY_SERVICE_NAMESPACE} # env not set
+  //     -name: service.version
+  //      value: version-from-attributes
+  //   attributes_list: "service.name=name-from-list"
   //   detection:
   //     detectors:
   //       - test_service_detector  # detects service.{name, version, namespace}

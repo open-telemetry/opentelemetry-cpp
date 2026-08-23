@@ -834,6 +834,50 @@ resource:
   ASSERT_EQ(kv.count("host.name"), 1u);
 }
 
+TEST(YamlResource, null_tilde_attribute_value_skipped)
+{
+  // value: ~ is the YAML tilde form of null — also skipped.
+  std::string yaml = R"(
+file_format: "1.0-resource"
+resource:
+  attributes:
+    - name: service.name
+      value: ~
+    - name: host.name
+      value: "my-host"
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_NE(config->resource->attributes, nullptr);
+  const auto &kv = config->resource->attributes->kv_map;
+  ASSERT_EQ(kv.count("service.name"), 0u);
+  ASSERT_EQ(kv.count("host.name"), 1u);
+}
+
+TEST(YamlResource, null_keyword_attribute_value_skipped)
+{
+  // value: null is the YAML keyword form of null — also skipped.
+  std::string yaml = R"(
+file_format: "1.0-resource"
+resource:
+  attributes:
+    - name: service.name
+      value: null
+    - name: host.name
+      value: "my-host"
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->resource, nullptr);
+  ASSERT_NE(config->resource->attributes, nullptr);
+  const auto &kv = config->resource->attributes->kv_map;
+  ASSERT_EQ(kv.count("service.name"), 0u);
+  ASSERT_EQ(kv.count("host.name"), 1u);
+}
+
 TEST(YamlResource, empty_name_attribute_parse_error)
 {
   // An empty attribute name (e.g. from an unset env var) is an invalid config.

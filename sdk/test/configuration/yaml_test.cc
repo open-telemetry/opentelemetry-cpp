@@ -820,4 +820,3 @@ log_level: ${ENV_NAME}
   ASSERT_NE(config, nullptr);
   ASSERT_EQ(config->log_level, opentelemetry::sdk::configuration::SeverityNumber::debug);
 }
-
