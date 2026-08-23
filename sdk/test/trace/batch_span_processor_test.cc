@@ -115,11 +115,14 @@ public:
       std::shared_ptr<std::atomic<std::size_t>> spans_received_count,
       std::shared_ptr<std::atomic<bool>> is_shutdown,
       std::shared_ptr<std::atomic<std::size_t>> force_flush_counter =
+          std::shared_ptr<std::atomic<std::size_t>>(new std::atomic<std::size_t>(0)),
+      std::shared_ptr<std::atomic<std::size_t>> export_call_count =
           std::shared_ptr<std::atomic<std::size_t>>(new std::atomic<std::size_t>(0))) noexcept
       : batch_sizes_(std::move(batch_sizes)),
         spans_received_count_(std::move(spans_received_count)),
         is_shutdown_(std::move(is_shutdown)),
-        force_flush_counter_(std::move(force_flush_counter))
+        force_flush_counter_(std::move(force_flush_counter)),
+        export_call_count_(std::move(export_call_count))
   {}
 
   std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override
@@ -134,6 +137,7 @@ public:
       std::lock_guard<std::mutex> lock(mutex_);
       batch_sizes_->push_back(recordables.size());
       *spans_received_count_ += recordables.size();
+      ++(*export_call_count_);
     }
 
     std::unique_lock<std::mutex> lock(mutex_);
@@ -142,7 +146,7 @@ public:
 
     for (auto &recordable : recordables)
     {
-      recordable.release();
+      recordable.reset();
     }
 
     return sdk::common::ExportResult::kSuccess;
@@ -177,6 +181,7 @@ private:
   std::shared_ptr<std::atomic<std::size_t>> spans_received_count_;
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<std::size_t>> force_flush_counter_;
+  std::shared_ptr<std::atomic<std::size_t>> export_call_count_;
 
   mutable std::mutex mutex_;
   std::condition_variable cv_;
@@ -338,9 +343,10 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlushDoesNotPermanentlyDrain)
   std::shared_ptr<std::atomic<std::size_t>> spans_received_count(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::atomic<std::size_t>> force_flush_counter(new std::atomic<std::size_t>(0));
+  std::shared_ptr<std::atomic<std::size_t>> export_call_count(new std::atomic<std::size_t>(0));
 
   auto exporter_raw = new BlockingMockSpanExporter(batch_sizes, spans_received_count, is_shutdown,
-                                                   force_flush_counter);
+                                                   force_flush_counter, export_call_count);
   auto exporter     = std::unique_ptr<sdk::trace::SpanExporter>(exporter_raw);
 
   sdk::trace::BatchSpanProcessorOptions options{};
@@ -368,12 +374,12 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlushDoesNotPermanentlyDrain)
   }
 
   auto wait_start = std::chrono::steady_clock::now();
-  while (batch_sizes->size() < 2 &&
+  while (export_call_count->load() < 2 &&
          std::chrono::steady_clock::now() - wait_start < std::chrono::seconds(2))
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
-  ASSERT_GE(batch_sizes->size(), 2u);
+  ASSERT_GE(export_call_count->load(), 2u);
   EXPECT_EQ(100u, batch_sizes->at(1));
 
   auto second_wave = GetTestSpans(batch_processor, 5);
