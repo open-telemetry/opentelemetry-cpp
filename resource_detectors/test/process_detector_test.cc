@@ -18,6 +18,9 @@
 #  include <sys/types.h>
 #  include <unistd.h>
 #  include <cstdio>
+#  if defined(__APPLE__)
+#    include <mach-o/dyld.h>
+#  endif
 #endif
 
 #include "opentelemetry/resource_detectors/detail/process_detector_utils.h"
@@ -92,6 +95,17 @@ TEST(ProcessDetectorUtilsTest, GetExecutablePathTest)
 
       path = utf8_path;
     }
+  }
+#elif defined(__APPLE__)
+  char buffer[4096];
+  uint32_t size = sizeof(buffer);
+  if (_NSGetExecutablePath(buffer, &size) != 0)
+  {
+    path = std::string();
+  }
+  else
+  {
+    path = std::string(buffer);
   }
 #else
   std::string exe_path = opentelemetry::resource_detector::detail::FormFilePath(pid, "exe");
