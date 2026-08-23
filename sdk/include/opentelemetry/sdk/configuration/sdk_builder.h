@@ -162,12 +162,8 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> CreateTracerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
-      const opentelemetry::sdk::resource::Resource &resource) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> CreateTracerProvider(
-      const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
       const opentelemetry::sdk::resource::Resource &resource,
-      const AttributeLimitsConfiguration *attribute_limits) const;
+      const AttributeLimitsConfiguration *attribute_limits = nullptr) const;
 
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreateTextMapPropagator(
       const std::string &name) const;
@@ -292,12 +288,8 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> CreateLoggerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
-      const opentelemetry::sdk::resource::Resource &resource) const;
-
-  std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> CreateLoggerProvider(
-      const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
       const opentelemetry::sdk::resource::Resource &resource,
-      const AttributeLimitsConfiguration *attribute_limits) const;
+      const AttributeLimitsConfiguration *attribute_limits = nullptr) const;
 
   std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> CreateContainerResourceDetector(
       const opentelemetry::sdk::configuration::ContainerResourceDetectorConfiguration *model) const;

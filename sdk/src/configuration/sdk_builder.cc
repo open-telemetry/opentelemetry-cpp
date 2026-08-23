@@ -1460,13 +1460,6 @@ SdkBuilder::CreateTracerConfigurator(
 
 std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTracerProvider(
     const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
-    const opentelemetry::sdk::resource::Resource &resource) const
-{
-  return CreateTracerProvider(model, resource, nullptr);
-}
-
-std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTracerProvider(
-    const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
     const opentelemetry::sdk::resource::Resource &resource,
     const AttributeLimitsConfiguration *attribute_limits) const
 {
@@ -2394,13 +2387,6 @@ SdkBuilder::CreateLoggerConfigurator(
   }
   static const std::string die("No builder for LoggerConfigurator");
   throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLoggerProvider(
-    const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
-    const opentelemetry::sdk::resource::Resource &resource) const
-{
-  return CreateLoggerProvider(model, resource, nullptr);
 }
 
 std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLoggerProvider(
