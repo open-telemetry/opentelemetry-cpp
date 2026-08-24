@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [RESOURCE DETECTOR] Add required and recommended attributes for process entity
+  [#4437](https://github.com/open-telemetry/opentelemetry-cpp/pull/4437)
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
