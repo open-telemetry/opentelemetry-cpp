@@ -176,10 +176,8 @@ attribute_limits:
   ASSERT_NE(config, nullptr);
   ASSERT_EQ(config->file_format, "1.0");
   ASSERT_NE(config->attribute_limits, nullptr);
-  const auto defaults = opentelemetry::sdk::configuration::AttributeLimitsConfiguration{};
-  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit,
-            defaults.attribute_value_length_limit);
-  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
+  ASSERT_FALSE(config->attribute_limits->attribute_value_length_limit.HasValue());
+  ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
 }
 
 TEST(Yaml, attribute_limits)
@@ -195,8 +193,27 @@ attribute_limits:
   ASSERT_NE(config, nullptr);
   ASSERT_EQ(config->file_format, "1.0");
   ASSERT_NE(config->attribute_limits, nullptr);
-  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit, 1234);
-  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 5678);
+  ASSERT_TRUE(config->attribute_limits->attribute_value_length_limit.HasValue());
+  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit.Value(), 1234);
+  ASSERT_TRUE(config->attribute_limits->attribute_count_limit.HasValue());
+  ASSERT_EQ(config->attribute_limits->attribute_count_limit.Value(), 5678);
+}
+
+TEST(Yaml, attribute_limits_null_fields)
+{
+  std::string yaml = R"(
+file_format: "1.0"
+attribute_limits:
+  attribute_value_length_limit: 4096
+  attribute_count_limit: null
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  ASSERT_TRUE(config->attribute_limits->attribute_value_length_limit.HasValue());
+  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit.Value(), 4096);
+  ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
 }
 
 TEST(Yaml, no_optional_boolean)
@@ -511,7 +528,7 @@ attribute_limits:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->attribute_limits, nullptr);
-  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
+  ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
 }
 
 TEST(Yaml, illegal_integer)
@@ -539,7 +556,7 @@ attribute_limits:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->attribute_limits, nullptr);
-  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
+  ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
 }
 
 TEST(Yaml, empty_integer_substitution)
@@ -555,7 +572,7 @@ attribute_limits:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->attribute_limits, nullptr);
-  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 128);
+  ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
 }
 
 TEST(Yaml, with_integer_substitution)
@@ -571,7 +588,8 @@ attribute_limits:
   auto config = DoParse(yaml);
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->attribute_limits, nullptr);
-  ASSERT_EQ(config->attribute_limits->attribute_count_limit, 7777);
+  ASSERT_TRUE(config->attribute_limits->attribute_count_limit.HasValue());
+  ASSERT_EQ(config->attribute_limits->attribute_count_limit.Value(), 7777);
 }
 
 TEST(Yaml, with_illegal_integer_substitution)

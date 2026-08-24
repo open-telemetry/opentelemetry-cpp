@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -49,6 +50,7 @@ public:
 
   virtual std::size_t GetRequiredInteger(const std::string &name) const                    = 0;
   virtual std::size_t GetInteger(const std::string &name, std::size_t default_value) const = 0;
+  virtual OptionalValue<std::size_t> GetOptionalInteger(const std::string &name) const     = 0;
 
   virtual std::int64_t GetSignedInteger(const std::string &name,
                                         std::int64_t default_value) const = 0;

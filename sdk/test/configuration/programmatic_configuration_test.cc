@@ -329,10 +329,11 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLogRecordLimits)
   auto *record = log_buffer_->front().get();
   EXPECT_EQ(nostd::get<std::string>(record->GetBody()), "test-message");
   const auto &attributes = record->GetAttributes();
-  EXPECT_EQ(attributes.size(), limits.attribute_count_limit);
+  EXPECT_EQ(attributes.size(), limits.attribute_count_limit.Value());
   for (const auto &attr : attributes)
   {
-    EXPECT_EQ(nostd::get<std::string>(attr.second).size(), limits.attribute_value_length_limit);
+    EXPECT_EQ(nostd::get<std::string>(attr.second).size(),
+              limits.attribute_value_length_limit.Value());
   }
 }
 
@@ -399,10 +400,49 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderLimitsOverrideAttributeLimits)
   EXPECT_EQ(log_buffer_->size(), 1);
   auto *record           = log_buffer_->front().get();
   const auto &attributes = record->GetAttributes();
-  EXPECT_EQ(attributes.size(), limits.attribute_count_limit);
+  EXPECT_EQ(attributes.size(), limits.attribute_count_limit.Value());
   for (const auto &attr : attributes)
   {
-    EXPECT_EQ(nostd::get<std::string>(attr.second).size(), limits.attribute_value_length_limit);
+    EXPECT_EQ(nostd::get<std::string>(attr.second).size(),
+              limits.attribute_value_length_limit.Value());
+  }
+}
+
+TEST_F(ProgrammaticConfigTest, LoggerProviderLimitsPartialOverrideAttributeLimits)
+{
+  auto attribute_limits = std::make_unique<config_sdk::AttributeLimitsConfiguration>();
+  attribute_limits->attribute_count_limit        = 1;
+  attribute_limits->attribute_value_length_limit = 3;
+
+  config_sdk::LogRecordLimitsConfiguration limits;
+  limits.attribute_value_length_limit = 5;
+
+  auto logger_provider_config = MakeLoggerProviderConfig();
+  logger_provider_config->limits =
+      std::make_unique<config_sdk::LogRecordLimitsConfiguration>(limits);
+
+  auto model              = std::make_unique<config_sdk::Configuration>();
+  model->attribute_limits = std::move(attribute_limits);
+  model->logger_provider  = std::move(logger_provider_config);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->logger_provider, nullptr);
+
+  auto logger = logs::Provider::GetLoggerProvider()->GetLogger("test");
+  logger->EmitLogRecord(
+      logs::Severity::kInfo, nostd::string_view("test-message"),
+      common::MakeAttributes({{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}));
+
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
+
+  EXPECT_EQ(log_buffer_->size(), 1);
+  auto *record           = log_buffer_->front().get();
+  const auto &attributes = record->GetAttributes();
+  EXPECT_EQ(attributes.size(), 1);
+  for (const auto &attr : attributes)
+  {
+    EXPECT_EQ(nostd::get<std::string>(attr.second).size(), 5);
   }
 }
 

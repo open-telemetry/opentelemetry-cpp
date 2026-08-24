@@ -461,10 +461,8 @@ logger_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->logger_provider, nullptr);
   ASSERT_NE(config->logger_provider->limits, nullptr);
-  const auto defaults = opentelemetry::sdk::configuration::LogRecordLimitsConfiguration{};
-  ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit,
-            defaults.attribute_value_length_limit);
-  ASSERT_EQ(config->logger_provider->limits->attribute_count_limit, 128);
+  ASSERT_FALSE(config->logger_provider->limits->attribute_value_length_limit.HasValue());
+  ASSERT_FALSE(config->logger_provider->limits->attribute_count_limit.HasValue());
 }
 
 TEST(YamlLogs, limits)
@@ -485,8 +483,33 @@ logger_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->logger_provider, nullptr);
   ASSERT_NE(config->logger_provider->limits, nullptr);
-  ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit, 1111);
-  ASSERT_EQ(config->logger_provider->limits->attribute_count_limit, 2222);
+  ASSERT_TRUE(config->logger_provider->limits->attribute_value_length_limit.HasValue());
+  ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit.Value(), 1111);
+  ASSERT_TRUE(config->logger_provider->limits->attribute_count_limit.HasValue());
+  ASSERT_EQ(config->logger_provider->limits->attribute_count_limit.Value(), 2222);
+}
+
+TEST(YamlLogs, limits_null_fields)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: 1024
+    attribute_count_limit: null
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->limits, nullptr);
+  ASSERT_TRUE(config->logger_provider->limits->attribute_value_length_limit.HasValue());
+  ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit.Value(), 1024);
+  ASSERT_FALSE(config->logger_provider->limits->attribute_count_limit.HasValue());
 }
 
 TEST(YamlLogs, no_logger_configurator)

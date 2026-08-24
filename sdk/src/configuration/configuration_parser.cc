@@ -17,6 +17,7 @@
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
@@ -360,13 +361,10 @@ std::unique_ptr<AttributeLimitsConfiguration>
 ConfigurationParser::ParseAttributeLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  using Config = AttributeLimitsConfiguration;
-  auto model   = std::make_unique<AttributeLimitsConfiguration>();
+  auto model = std::make_unique<AttributeLimitsConfiguration>();
 
-  model->attribute_value_length_limit =
-      node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);
-  model->attribute_count_limit =
-      node->GetInteger("attribute_count_limit", Config::kDefaultAttributeCountLimit);
+  model->attribute_value_length_limit = node->GetOptionalInteger("attribute_value_length_limit");
+  model->attribute_count_limit        = node->GetOptionalInteger("attribute_count_limit");
 
   return model;
 }
@@ -640,13 +638,10 @@ std::unique_ptr<LogRecordLimitsConfiguration>
 ConfigurationParser::ParseLogRecordLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  using Config = LogRecordLimitsConfiguration;
-  auto model   = std::make_unique<LogRecordLimitsConfiguration>();
+  auto model = std::make_unique<LogRecordLimitsConfiguration>();
 
-  model->attribute_value_length_limit =
-      node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);
-  model->attribute_count_limit =
-      node->GetInteger("attribute_count_limit", Config::kDefaultAttributeCountLimit);
+  model->attribute_value_length_limit = node->GetOptionalInteger("attribute_value_length_limit");
+  model->attribute_count_limit        = node->GetOptionalInteger("attribute_count_limit");
 
   return model;
 }
@@ -1673,29 +1668,28 @@ std::unique_ptr<PropagatorConfiguration> ConfigurationParser::ParsePropagatorCon
 std::unique_ptr<SpanLimitsConfiguration> ConfigurationParser::ParseSpanLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  using Config = SpanLimitsConfiguration;
-  auto model   = std::make_unique<SpanLimitsConfiguration>();
+  auto model = std::make_unique<SpanLimitsConfiguration>();
 
-  const auto get_valid_uint32 = [&node](const std::string &name, std::size_t default_value) {
-    std::size_t value = node->GetInteger(name, default_value);
-    if (value > std::numeric_limits<std::uint32_t>::max())
+  const auto get_optional_uint32 = [&node](const std::string &name) {
+    OptionalValue<std::size_t> value = node->GetOptionalInteger(name);
+    if (!value.HasValue())
     {
-      std::string message = "Invalid value for " + name + ": " + std::to_string(value);
+      return OptionalValue<std::uint32_t>{};
+    }
+    if (value.Value() > std::numeric_limits<std::uint32_t>::max())
+    {
+      std::string message = "Invalid value for " + name + ": " + std::to_string(value.Value());
       throw InvalidSchemaException(node->Location(), message);
     }
-    return static_cast<uint32_t>(value);
+    return OptionalValue<std::uint32_t>{static_cast<std::uint32_t>(value.Value())};
   };
 
-  model->attribute_value_length_limit =
-      node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);
-  model->attribute_count_limit =
-      get_valid_uint32("attribute_count_limit", Config::kDefaultAttributeCountLimit);
-  model->event_count_limit = get_valid_uint32("event_count_limit", Config::kDefaultEventCountLimit);
-  model->link_count_limit  = get_valid_uint32("link_count_limit", Config::kDefaultLinkCountLimit);
-  model->event_attribute_count_limit =
-      get_valid_uint32("event_attribute_count_limit", Config::kDefaultEventAttributeCountLimit);
-  model->link_attribute_count_limit =
-      get_valid_uint32("link_attribute_count_limit", Config::kDefaultLinkAttributeCountLimit);
+  model->attribute_value_length_limit = node->GetOptionalInteger("attribute_value_length_limit");
+  model->attribute_count_limit        = get_optional_uint32("attribute_count_limit");
+  model->event_count_limit            = get_optional_uint32("event_count_limit");
+  model->link_count_limit             = get_optional_uint32("link_count_limit");
+  model->event_attribute_count_limit  = get_optional_uint32("event_attribute_count_limit");
+  model->link_attribute_count_limit   = get_optional_uint32("link_attribute_count_limit");
 
   return model;
 }
