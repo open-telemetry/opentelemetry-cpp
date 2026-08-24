@@ -432,9 +432,6 @@ TEST(ElasticsearchBulkResponseTests, RejectsAnItemErrorUnderErrorsFalse)
 // that the status and the body actually reach it. A fake HTTP client drives the
 // callbacks from inside SendRequest(), which runs before Export() reaches the
 // wait, and the assertions are on the ExportResult.
-//
-// This fixture is the same one #4331 adds to this file. Whichever lands first,
-// the other drops the duplicate when it rebases.
 // ---------------------------------------------------------------------------
 namespace
 {
