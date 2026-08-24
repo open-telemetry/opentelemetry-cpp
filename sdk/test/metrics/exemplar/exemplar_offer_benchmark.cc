@@ -15,7 +15,7 @@
 #  include "opentelemetry/common/key_value_iterable_view.h"
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
-#  include "opentelemetry/nostd/utility.h" 
+#  include "opentelemetry/nostd/utility.h"
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
