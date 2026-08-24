@@ -994,7 +994,6 @@ struct GzipEventHandler : public CustomEventHandler
 // Z_BUF_ERROR. No allocator hook and no timing are involved.
 TEST_F(BasicCurlHttpTests, AFailedCompressionStopsTheRequest)
 {
-#  ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
   received_requests_.clear();
   auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
   ASSERT_TRUE(session_manager != nullptr);
@@ -1027,9 +1026,6 @@ TEST_F(BasicCurlHttpTests, AFailedCompressionStopsTheRequest)
   std::unique_lock<std::mutex> lk1(mtx_requests);
   EXPECT_TRUE(received_requests_.empty())
       << "a request the caller was told had failed was sent anyway";
-#  else
-  GTEST_SKIP() << "gzip is not compiled in, so there is no compression step to fail";
-#  endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 }
 
 TEST_F(BasicCurlHttpTests, GzipCompressibleData)
