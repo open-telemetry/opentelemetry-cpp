@@ -984,14 +984,10 @@ struct GzipEventHandler : public CustomEventHandler
   std::string reason_;
 };
 
-// A request whose compression step fails is reported as a failed create and then must not be
-// sent. It used to be reported and sent anyway, with a body the failed deflate had already
-// partly rewritten and no Content-Encoding header to describe it.
+// A request whose compression step fails reports CreateFailed and is not sent.
 //
-// The failure is arranged rather than injected. deflateInPlace() is given the body's own size as
-// its output budget, and its comment says it fails when that budget is smaller than the header
-// plus one byte, so a body of one byte cannot fit a gzip header and the deflate reports
-// Z_BUF_ERROR. No allocator hook and no timing are involved.
+// The failure is arranged, not injected: deflateInPlace() gets the body's own size as its output
+// budget, and one byte cannot hold a gzip header, so it returns Z_BUF_ERROR.
 TEST_F(BasicCurlHttpTests, AFailedCompressionStopsTheRequest)
 {
   received_requests_.clear();
@@ -1118,17 +1114,8 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
   auto handler = std::make_shared<GzipEventHandler>();
   session->SendRequest(handler);
 
-  // This used to require a response, on the reading that data which will not compress is sent
-  // uncompressed. The size assertion below is what that rested on, and the size is not the whole
-  // story: deflateInPlace() writes into the caller's buffer before it reports that the result
-  // would not fit, so the body keeps its length while its contents are no longer the caller's
-  // bytes. What went out was neither the payload nor a gzip stream, and carried no
-  // Content-Encoding header to describe itself either way.
-  //
-  // Refusing to send it is the narrow reading of "do not send after reporting a failure". Keeping
-  // the payload instead, by compressing into a separate buffer or by restoring the original on
-  // failure, would let incompressible data still be sent and costs a copy. That is a decision
-  // rather than a repair, so it is #4360 rather than this change.
+  // deflateInPlace() overwrites part of the caller's buffer before reporting that the result will
+  // not fit, so no payload survives to send uncompressed. Whether to keep one is #4360.
   ASSERT_TRUE(handler->is_called_);
   ASSERT_EQ(handler->state_, http_client::SessionState::CreateFailed);
 
