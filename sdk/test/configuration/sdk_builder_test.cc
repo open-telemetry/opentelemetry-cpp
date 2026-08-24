@@ -1300,6 +1300,22 @@ TEST(SdkBuilder, SetResourceWithoutModel)
   EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.language"), "cpp");
 }
 
+TEST(SdkBuilder, SetResourceAttributesListPercentDecodesValues)
+{
+  SdkBuilder builder(RegistryFactory::Create());
+
+  auto model             = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->attributes_list = "key1=hello%20world,key2=a%2Cb,key3=100%25,bad=50%z";
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  EXPECT_EQ(GetStringAttribute(resource, "key1"), "hello world");
+  EXPECT_EQ(GetStringAttribute(resource, "key2"), "a,b");
+  EXPECT_EQ(GetStringAttribute(resource, "key3"), "100%");
+  EXPECT_EQ(GetStringAttribute(resource, "bad"), "50%z");
+}
+
 TEST(SdkBuilder, SetResourceDetectorDispatch)
 {
   auto registry           = RegistryFactory::Create();
