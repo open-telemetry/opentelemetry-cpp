@@ -40,6 +40,7 @@ public:
   virtual std::size_t AsInteger() const = 0;
   virtual double AsDouble() const       = 0;
   virtual std::string AsString() const  = 0;
+  virtual bool IsNull() const           = 0;
 
   virtual std::unique_ptr<DocumentNode> GetRequiredChildNode(const std::string &name) const = 0;
   virtual std::unique_ptr<DocumentNode> GetChildNode(const std::string &name) const         = 0;
