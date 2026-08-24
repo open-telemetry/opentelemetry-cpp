@@ -1501,7 +1501,9 @@ private:
             std::unique_lock<std::mutex> lk(concurrency_file->background_thread_waker_lock);
             // Even though is_shutdown is atomic, the lock guarantees that either a change to
             // is_shutdown will be observed, or background_thread_waker_cv will see the notification
-            // at shutdown.
+            // at shutdown. It is important to set is_shutdown prior to `wait_for` rather than
+            // as part of a condition in `wait_for` so that a shutdown while the thread is in
+            // `wait_for` will still call `std::fflush` below.
             is_shutdown = concurrency_file->is_shutdown.load(std::memory_order_acquire);
             if (!is_shutdown)
             {
