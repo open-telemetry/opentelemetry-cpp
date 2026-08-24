@@ -26,7 +26,7 @@ target_include_directories(
 target_link_libraries(
   opentelemetry_configuration_core
   PUBLIC opentelemetry_api opentelemetry_common opentelemetry_trace
-         opentelemetry_metrics opentelemetry_logs
+         opentelemetry_metrics opentelemetry_logs opentelemetry_resources
   PRIVATE)
 
 # Trace SDK component builders
