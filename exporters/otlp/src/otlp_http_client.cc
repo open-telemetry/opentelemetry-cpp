@@ -187,11 +187,9 @@ public:
   {
     // need to modify stopping_ under lock before calling callback
     //
-    // Every state a request can end on, because a request that ends on one nobody answers leaves
-    // the caller waiting for a callback that is not coming. Destroyed, ReadError and WriteError
-    // are the three the client can finish on that used to be logged and then dropped. Ordering is
-    // decided by the exchange below rather than here, so one of these arriving after a response
-    // has already been reported does not report a second time.
+    // Every state the client can end a request on. A state missing from here leaves the caller
+    // waiting for a callback that never comes. The exchange below decides ordering, so a state
+    // arriving after a response does not report a second time.
     bool need_stop = false;
     switch (state)
     {

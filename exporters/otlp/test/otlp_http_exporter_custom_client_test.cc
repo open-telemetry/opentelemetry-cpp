@@ -92,9 +92,8 @@ public:
     return {new OtlpHttpClient(MakeOtlpHttpClientOptions(), http_client), http_client};
   }
 
-  // The same, with the outcome recorded. A request that never settles calls this no times, and one
-  // that settles twice calls it twice, so both failures the terminal states can produce are
-  // visible in the count rather than only in a timeout.
+  // Records the outcome. A request that never settles calls back no times and one that settles
+  // twice calls back twice, so both failures show in the count rather than only in a timeout.
   static void ExportOneRequest(OtlpHttpClient &otlp_client,
                                const std::shared_ptr<std::atomic<int>> &calls,
                                const std::shared_ptr<sdk::common::ExportResult> &result)
@@ -262,10 +261,8 @@ TEST_F(OtlpHttpExporterCustomClientTestPeer, ForceFlushReportsSuccessOnceTheSess
   EXPECT_TRUE(otlp_client.ForceFlush(std::chrono::milliseconds{50}));
 }
 
-// Every state the client can finish a request on has to end that request. These three used to be
-// logged and then dropped: the switch that decides whether the request is over did not name them,
-// so a client that ended a transfer this way left the caller waiting for a callback that was not
-// coming, and ForceFlush and Shutdown could only give up on their own deadlines.
+// A client that finishes a transfer on ReadError, WriteError or Destroyed ends the request: the
+// result callback runs once, and ForceFlush returns rather than waiting out its deadline.
 TEST_F(OtlpHttpExporterCustomClientTestPeer, ATerminalClientEventEndsTheRequest)
 {
   for (const auto state :
