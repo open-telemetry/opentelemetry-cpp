@@ -17,9 +17,7 @@
 #  include "opentelemetry/nostd/function_ref.h"
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/nostd/variant.h"
-#  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #  include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
-#  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
 #  include "opentelemetry/version.h"
@@ -92,28 +90,6 @@ public:
 
 private:
   bool accept_;
-};
-
-class OwnedOnlyReservoir final : public ExemplarReservoir
-{
-public:
-  using ExemplarReservoir::OfferMeasurement;
-
-  void OfferMeasurement(int64_t /* value */,
-                        const MetricAttributes & /* attributes */,
-                        const opentelemetry::context::Context & /* context */) noexcept override
-  {}
-
-  void OfferMeasurement(double /* value */,
-                        const MetricAttributes & /* attributes */,
-                        const opentelemetry::context::Context & /* context */) noexcept override
-  {}
-
-  std::vector<std::shared_ptr<ExemplarData>> CollectAndReset(
-      const MetricAttributes & /* point_attributes */) noexcept override
-  {
-    return {};
-  }
 };
 
 TEST(ExemplarAttributeOffer, RejectedLongOfferDoesNotMaterializeAttributes)

@@ -5,7 +5,7 @@
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-#  include <stddef.h>
+#  include <cstddef>
 #  include <cstdint>
 #  include <map>
 #  include <string>
@@ -36,7 +36,7 @@ using AttributeMap = std::map<std::string, std::string>;
 class DeterministicReservoir final : public ExemplarReservoir
 {
 public:
-  explicit DeterministicReservoir(size_t accept_every) noexcept : accept_every_{accept_every} {}
+  explicit DeterministicReservoir(size_t accept_every) : accept_every_{accept_every} {}
 
   void OfferMeasurement(int64_t value,
                         const MetricAttributes &attributes,
