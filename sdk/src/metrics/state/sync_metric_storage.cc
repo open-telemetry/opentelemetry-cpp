@@ -46,7 +46,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
   std::shared_ptr<AttributesHashMap> delta_metrics = nullptr;
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
   // Snapshot of bound entries (under map lock) that we will rotate without
-  // holding the map lock. Each entry has its own spinlock for the swap.
+  // holding the map lock. Each entry has its own mutex for the swap.
   std::vector<std::shared_ptr<BoundEntry>> entry_snapshot;
 #endif
   {
@@ -94,7 +94,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
   }
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
-  // Rotate dirty bound entries: under each entry's own spinlock, swap out the
+  // Rotate dirty bound entries: under each entry's own mutex, swap out the
   // current aggregation and merge it into delta_metrics so bound + unbound
   // writes for the same post-filter attribute set produce one datapoint.
   for (auto &entry : entry_snapshot)

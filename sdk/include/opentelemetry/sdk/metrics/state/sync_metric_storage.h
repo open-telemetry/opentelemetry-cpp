@@ -196,7 +196,7 @@ public:
   std::shared_ptr<BoundSyncWritableMetricStorage> Bind(
       const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 
-  // Internal: stable bound entry. Self-contained: owns its own spinlock and
+  // Internal: stable bound entry. Self-contained: owns its own mutex and
   // aggregation so the user-held handle stays safe to call even if the parent
   // SyncMetricStorage is destroyed first (writes simply have no observer).
   // Collect() rotates current_ when dirty so bound + unbound writes for the
