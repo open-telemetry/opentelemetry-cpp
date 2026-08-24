@@ -87,7 +87,8 @@ public:
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     if (ExemplarFilterEnabled(exemplar_filter_type_, context))
     {
-      exemplar_reservoir_->OfferMeasurement(value, {}, context);
+      exemplar_reservoir_->OfferMeasurement(value, opentelemetry::common::NoopKeyValueIterable{},
+                                            context);
     }
 #endif
     static MetricAttributes attr = MetricAttributes{};
@@ -144,7 +145,8 @@ public:
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     if (ExemplarFilterEnabled(exemplar_filter_type_, context))
     {
-      exemplar_reservoir_->OfferMeasurement(value, {}, context);
+      exemplar_reservoir_->OfferMeasurement(value, opentelemetry::common::NoopKeyValueIterable{},
+                                            context);
     }
 #endif
     static MetricAttributes attr = MetricAttributes{};
