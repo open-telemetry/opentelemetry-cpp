@@ -68,7 +68,7 @@ protected:
   void SetUp() override
   {
     MakeRegistry();
-    SetNullProviders();
+    SetNoopProviders();
   }
 
   void TearDown() override
@@ -87,10 +87,11 @@ protected:
     logs::Provider::SetLoggerProvider({});
     metrics::Provider::SetMeterProvider({});
 
-    ASSERT_EQ(propagation::GlobalTextMapPropagator::GetGlobalPropagator(), nullptr);
-    ASSERT_EQ(trace::Provider::GetTracerProvider(), nullptr);
-    ASSERT_EQ(logs::Provider::GetLoggerProvider(), nullptr);
-    ASSERT_EQ(metrics::Provider::GetMeterProvider(), nullptr);
+    // Installing null providers falls back to the no-op providers.
+    ASSERT_NE(propagation::GlobalTextMapPropagator::GetGlobalPropagator(), nullptr);
+    ASSERT_NE(trace::Provider::GetTracerProvider(), nullptr);
+    ASSERT_NE(logs::Provider::GetLoggerProvider(), nullptr);
+    ASSERT_NE(metrics::Provider::GetMeterProvider(), nullptr);
   }
 
   void SetNoopProviders()
@@ -213,14 +214,26 @@ TEST_F(ConfiguredSdkTest, ConfiguredSdkInstallUninstall)
 
   CreateSdk(model);
   sdk_->Install();
+  auto sdk_tracer_provider = trace::Provider::GetTracerProvider();
+  auto sdk_logger_provider = logs::Provider::GetLoggerProvider();
+  auto sdk_meter_provider  = metrics::Provider::GetMeterProvider();
+  auto sdk_propagator      = propagation::GlobalTextMapPropagator::GetGlobalPropagator();
+
+  EXPECT_NE(sdk_tracer_provider, nullptr);
+  EXPECT_NE(sdk_logger_provider, nullptr);
+  EXPECT_NE(sdk_meter_provider, nullptr);
+  EXPECT_NE(sdk_propagator, nullptr);
+
+  sdk_->UnInstall();
+  // UnInstall() releases the SDK providers, and the globals fall back to no-op
+  // providers instead of becoming null.
   EXPECT_NE(trace::Provider::GetTracerProvider(), nullptr);
   EXPECT_NE(logs::Provider::GetLoggerProvider(), nullptr);
   EXPECT_NE(metrics::Provider::GetMeterProvider(), nullptr);
   EXPECT_NE(propagation::GlobalTextMapPropagator::GetGlobalPropagator(), nullptr);
 
-  sdk_->UnInstall();
-  EXPECT_EQ(trace::Provider::GetTracerProvider(), nullptr);
-  EXPECT_EQ(logs::Provider::GetLoggerProvider(), nullptr);
-  EXPECT_EQ(metrics::Provider::GetMeterProvider(), nullptr);
-  EXPECT_EQ(propagation::GlobalTextMapPropagator::GetGlobalPropagator(), nullptr);
+  EXPECT_NE(trace::Provider::GetTracerProvider(), sdk_tracer_provider);
+  EXPECT_NE(logs::Provider::GetLoggerProvider(), sdk_logger_provider);
+  EXPECT_NE(metrics::Provider::GetMeterProvider(), sdk_meter_provider);
+  EXPECT_NE(propagation::GlobalTextMapPropagator::GetGlobalPropagator(), sdk_propagator);
 }
