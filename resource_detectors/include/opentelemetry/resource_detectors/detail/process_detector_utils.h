@@ -84,6 +84,8 @@ std::string GetProcessOwner();
 /**
  * Computes the deterministic htlhash build ID for the process executable.
  * Algorithm: SHA256(File[:4096] || File[-4096:] || BigEndianUInt64(FileLen))
+ * For files <= 4096 bytes the two slices overlap (both equal the whole file),
+ * matching the spec requirement that inputs are "not padded".
  * The result is the first 16 bytes (128 bits) of the digest as a lowercase hex string.
  * Returns an empty string if the executable cannot be read.
  *

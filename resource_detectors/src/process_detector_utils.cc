@@ -587,17 +587,16 @@ std::string GetExecutableBuildIdHtlhash(const int32_t &pid)
   std::size_t head_read = static_cast<std::size_t>(f.gcount());
   head.resize(head_read);
 
-  // Read tail (up to 4096 bytes from end) only if file is larger than 4096 bytes.
+  // Read tail (up to 4096 bytes from end). For files <= 4096 bytes the tail
+  // overlaps the head (both cover the whole file), matching the spec.
   std::string tail;
-  if (file_size > kChunkSize)
-  {
-    tail.resize(kChunkSize, '\0');
-    std::size_t tail_offset = static_cast<std::size_t>(file_size - kChunkSize);
-    f.seekg(static_cast<std::streamoff>(tail_offset), std::ios::beg);
-    f.read(&tail[0], static_cast<std::streamsize>(kChunkSize));
-    std::size_t tail_read = static_cast<std::size_t>(f.gcount());
-    tail.resize(tail_read);
-  }
+  tail.resize(kChunkSize, '\0');
+  std::size_t tail_offset =
+      (file_size < kChunkSize) ? 0 : static_cast<std::size_t>(file_size - kChunkSize);
+  f.seekg(static_cast<std::streamoff>(tail_offset), std::ios::beg);
+  f.read(&tail[0], static_cast<std::streamsize>(kChunkSize));
+  std::size_t tail_read = static_cast<std::size_t>(f.gcount());
+  tail.resize(tail_read);
 
   // Encode file length as big-endian uint64.
   std::uint64_t file_size_be = file_size;

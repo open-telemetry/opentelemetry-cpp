@@ -88,7 +88,11 @@ or inaccessible.
 
 Limitations:
 
-- `process.executable.build_id.htlhash` is not populated on macOS.
+- `process.executable.build_id.htlhash` is not populated on macOS because the
+  executable binary cannot be read from its path on that platform.
+- For executables smaller than 4096 bytes the head and tail slices of the
+  htlhash algorithm overlap (both cover the entire file), which is correct per
+  the [spec](https://opentelemetry.io/docs/specs/semconv/attributes-registry/process/#algorithm-for-processexecutablebuild_idhtlhash).
 
 ### Env Entity Resource Detector (Experimental)
 
