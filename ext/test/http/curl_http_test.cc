@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <curl/curlver.h>
+#include <stdint.h>
 #include "gtest/gtest.h"
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
@@ -1115,7 +1116,6 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
       63,  35,  21,  121, 152, 22,  242, 199, 106, 217, 199, 211, 206, 165, 88,  77,  112, 108, 193,
       122, 8,   193, 74,  91,  50,  6,   156, 185, 165, 15,  92,  116, 3,   18,  244, 165, 191, 2,
       183, 9,   164, 116, 75,  127};
-  const auto original_size = body.size();
 
   request->SetBody(body);
   request->AddHeader("Content-Type", "text/plain");
