@@ -38,11 +38,48 @@ Every in-tree consumer, read from `main`:
 
 So in the configuration almost everyone builds, every exporter blocks until its
 request is done, and two of the three do it by handing the request to an
-asynchronous client and then waiting for it. The background thread, the callback
-machinery and the `CURLM` bookkeeping are all paid for and none of it is used
-for anything the caller can observe.
+asynchronous client and then waiting for it. Those callers pay for a background
+thread, a callback contract and a `CURLM` whether or not anything they can
+observe depends on it.
 
-That is the fact the rest of this document turns on.
+That is one of the two facts this document turns on. The second one points the
+other way and is just as load bearing.
+
+## What the concurrency is for
+
+An earlier version of this document read as an argument that the default
+configuration should not carry the asynchronous machinery at all. @owent
+supplied the counterweight on #4448, from production rather than from reasoning,
+and it is worth stating in full because it changes the shape of the answer.
+
+A high volume logging workload was dropping data. The collector was not the
+bottleneck. Network latency was around 100 ms, the batch processor had already
+merged each submission past 4 MB, and production simply outran what one request
+in flight could consume. The drops stopped once roughly four requests were
+allowed in flight at once.
+
+The specification describes the same bound arithmetically. Maximum achievable
+throughput is `max_concurrent_requests * max_request_size / (network_latency +
+server_response_time)`, and it notes that in high latency networks the requests
+have to be very big or a lot of concurrent requests have to be done. That is the
+workload above, with the request size already at the top of its range.
+
+The specification's language differs by transport, which matters here because
+this document is about the HTTP one. For gRPC it says an implementation that
+needs high throughput SHOULD support concurrent unary calls and that the number
+SHOULD be configurable. For HTTP it says a client MAY send requests over several
+parallel connections, and that the maximum number SHOULD be configurable.
+
+Taken together the two facts do not select a side. They ask for a transport
+where concurrency is available, bounded and configurable, and where a caller
+that does not want it does not pay for it. Nothing below should be read as
+proposing to remove the capability.
+
+One number needs to be said out loud rather than assumed. The exporter's default
+today is `max_concurrent_requests` 64 and `max_requests_per_connection` 8. The
+workload above needed about four. Neither figure was derived from a benchmark in
+this repository, and the gap between them is a question for measurement, not for
+argument.
 
 ## Where the current model breaks
 
@@ -90,21 +127,33 @@ that blocks still pays for a background thread, a callback contract and a
 delivers curl's progress states, and a WinHTTP or `NSURLSession` implementation
 would have to invent or ignore them.
 
-## Option B: an implementation neutral request and result
+## Option B: an implementation neutral one attempt operation
 
-One attempt in, one result out. The transport is handed an immutable request and
-a deadline, and produces exactly one of a response, an invalid request, a
-transport error, a deadline, or a cancellation.
+One attempt in, one result out, submitted asynchronously. The transport is
+handed an immutable request and a deadline and returns a handle for that
+submission. Exactly one of a response, an invalid request, a transport error, a
+deadline or a cancellation eventually settles it.
 
-This matches what every default consumer already does, and it makes the
-properties that keep breaking structural rather than conventional. Exactly one
-outcome is what the interface returns. Immutability removes the borrowed request
-lifetime. There is no progress callback to re-enter from.
+The earlier draft of this section described the same contract as a blocking
+call. That was the mistake @owent's evidence exposes: a blocking interface
+cannot serve the workload above without a second model beside it, and two models
+is how the current code got here. Asynchronous submission is the general shape,
+and blocking is the special case of submitting one operation and waiting for
+that operation's own result until its own deadline. Not `ForceFlush`, which
+waits for everyone else's work as well, and which has its own open defects.
 
-The cost is that it does not by itself serve the async preview or a native
-asynchronous backend. Something has to sit between a blocking interface and a
-platform that only offers completion callbacks, and where that adapter lives is
-a real design question rather than a detail.
+What this buys is that the properties that keep breaking become structural
+rather than conventional. Exactly one outcome is what the handle settles to.
+Immutability removes the borrowed request lifetime. The submission has an
+identity that does not move when a session is reused. Progress reporting is
+separable from settlement, so there is no progress callback that can be mistaken
+for one.
+
+The cost is real and should not be glossed. It is a second interface next to the
+installed one, so it needs an adapter and a migration story rather than a
+rename, and the concurrency limit, the retry policy and the queue have to live
+somewhere. This document's position is that they belong above the transport and
+below the exporter, but that is the decision to argue about rather than assume.
 
 ## Option C: a single owner `CURLM` event loop
 
@@ -126,9 +175,9 @@ multi handle to own.
 
 ## Against the criteria in #4448
 
-| | A: current model | B: request and result | C: single owner loop |
+| | A: current model | B: one attempt operation | C: single owner loop |
 | --- | --- | --- | --- |
-| Throughput, connection reuse | keeps both | reuse yes, parallelism needs a layer above | keeps both |
+| Throughput, connection reuse | keeps both | reuse yes, in-flight count owned above it | keeps both |
 | Cancellation | flag plus races | explicit, at a defined point | explicit, owner thread applies it |
 | Shutdown | four reports open | bounded by construction | bounded, one thread to drain |
 | Retry and concurrency owner | inside the transport | left open, above the transport | inside the backend |
@@ -147,6 +196,8 @@ rather than answered here.
       diagnostics?
 - [ ] On what thread do callbacks run, and which calls may a callback make?
 - [ ] Which layer owns retry, in-flight concurrency and `Retry-After`?
+- [ ] What should the default number of requests in flight be, given that the
+      option says 64 today and the one reported workload needed about four?
 - [ ] Is a new contract introduced alongside the current one with an adapter, or
       does the current interface evolve?
 
@@ -167,12 +218,50 @@ actually wanted. Blocking and asynchronous callers then share one set of rules
 about ownership, deadlines and settlement, and differ only in how the result is
 presented.
 
-I would also want the concurrency question answered with a measurement rather
-than an assumption. The OTLP specification suggests sequential requests are
-reasonable against a local collector and that concurrency matters as round trip
-time grows. If sequential requests with connection reuse are enough for a local
-collector, the default configuration should not carry the machinery, and the
-async preview becomes the thing that opts into it.
+Concretely that is three layers rather than one interface.
+
+A portable one attempt operation over an immutable request, with an identity, a
+deadline, idempotent cancellation and exactly one settlement. A bounded
+scheduler above it owning how many requests are in flight, admission and
+backpressure, retry and `Retry-After`, and what `ForceFlush` and `Shutdown`
+mean. A backend below it, where the curl implementation can be a single owner
+`CURLM` loop and WinHTTP or `NSURLSession` can use their own execution models
+without either being visible through the contract. Blocking is then an adapter
+over the first layer and not a second transport.
+
+Putting the scheduler above the transport rather than inside it is the load
+bearing choice, and the specification points the same way: concurrent requests
+and retry are described as the exporter's responsibility. It is also the part I
+am least certain of, because a native backend that already has its own queue
+would then have two.
+
+## What has to be measured before any of this is built
+
+The concurrency question should be answered with a number, and the repository
+does not currently have one. The only OTLP HTTP benchmark here runs against
+localhost with a 1 ms timeout and no retry, which is the case where latency does
+not exist.
+
+The workload that has to be reproducible is the one from #4448, because it is
+the only evidence anyone has offered for what concurrency is worth:
+
+| Dimension | Values |
+| --- | --- |
+| Round trip time | 0, 1, 10, 50, 100, 250 ms |
+| Server processing | 0, 10, 100 ms |
+| Payload | 4 KiB, 64 KiB, 1 MiB, 4 MiB, 16 MiB |
+| Requests in flight | 1, 2, 4, 8, 16, 64 |
+| Connection policy | close, keep alive, HTTP/2 |
+| Encoding | protobuf, JSON, with and without gzip |
+
+Reported per run: acknowledged batches per second, dropped batches, p50 and p99
+latency, resident memory, thread count, open descriptors, and whether
+`ForceFlush` and `Shutdown` returned the right answer within their deadlines.
+
+The `100 ms` in the report is not qualified as one way or round trip, so the
+benchmark should define it as `netem` round trip and say so rather than inherit
+the ambiguity. Until that exists, "about four" is a credible first hand
+observation and not a number this project can defend or regress against.
 
 ## On the C++ baseline
 
