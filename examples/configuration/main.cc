@@ -58,7 +58,9 @@
 
 #ifdef OTEL_HAVE_RESOURCE_DETECTORS
 #  include "opentelemetry/resource_detectors/container_detector_builder.h"
+#  include "opentelemetry/resource_detectors/host_detector_builder.h"
 #  include "opentelemetry/resource_detectors/process_detector_builder.h"
+#  include "opentelemetry/resource_detectors/service_detector_builder.h"
 #endif
 
 static bool opt_help        = false;
@@ -223,7 +225,9 @@ void InitOtel(const std::string &config_file)
 
 #ifdef OTEL_HAVE_RESOURCE_DETECTORS
     opentelemetry::resource_detector::ContainerDetectorBuilder::Register(registry.get());
+    opentelemetry::resource_detector::HostDetectorBuilder::Register(registry.get());
     opentelemetry::resource_detector::ProcessDetectorBuilder::Register(registry.get());
+    opentelemetry::resource_detector::ServiceDetectorBuilder::Register(registry.get());
 #endif
   }
 
