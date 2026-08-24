@@ -292,7 +292,7 @@ std::string GetProcessCreationTime(const int32_t &pid)
   struct tm utc_time = {};
   gmtime_r(&secs, &utc_time);
   char buf[128];
-  std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03ldZ", utc_time.tm_year + 1900,
+  std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%03lldZ", utc_time.tm_year + 1900,
                 utc_time.tm_mon + 1, utc_time.tm_mday, utc_time.tm_hour, utc_time.tm_min,
                 utc_time.tm_sec, usecs / 1000);
   return std::string(buf);
