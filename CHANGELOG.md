@@ -30,6 +30,10 @@ Increment the:
 
 * [RESOURCE DETECTOR] Add the host resource detector
   [#4413](https://github.com/open-telemetry/opentelemetry-cpp/issues/4413)
+
+* [CONFIGURATION] Support environment variable substitution for attributes
+  [#4474](https://github.com/open-telemetry/opentelemetry-cpp/pull/4474)
+
 * [RESOURCE DETECTOR] Add the service resource detector and builder
   [#4414](https://github.com/open-telemetry/opentelemetry-cpp/issues/4414)
 * [CONFIGURATION] deprecate config builder cmake components
