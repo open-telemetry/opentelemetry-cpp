@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <curl/curlver.h>
-#include <stdint.h>
 #include "gtest/gtest.h"
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
@@ -1005,7 +1004,7 @@ TEST_F(BasicCurlHttpTests, AFailedCompressionStopsTheRequest)
   request->SetUri("post/");
   request->SetMethod(http_client::Method::Post);
 
-  http_client::Body body(1, static_cast<uint8_t>('a'));
+  http_client::Body body(1);
   request->SetBody(body);
   request->AddHeader("Content-Type", "text/plain");
   request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
