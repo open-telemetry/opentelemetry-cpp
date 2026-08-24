@@ -84,12 +84,14 @@ or inaccessible.
 | `process.executable.name` | Basename of the executable path | Yes | Yes | Yes |
 | `process.creation.time` | Process start time in ISO 8601 UTC | Yes | Yes | Yes |
 | `process.owner` | Username of the process owner | Yes | Yes | Yes |
-| `process.executable.build_id.htlhash` | Deterministic SHA256-based build ID | Yes | No | Yes |
+| `process.executable.build_id.htlhash` | Deterministic SHA256-based build ID | Yes | Yes | Yes |
 
 Limitations:
 
-- `process.executable.build_id.htlhash` is not populated on macOS because the
-  executable binary cannot be read from its path on that platform.
+- On macOS, `process.executable.path`, `process.executable.name`, and
+  `process.executable.build_id.htlhash` are resolved via `_NSGetExecutablePath()`,
+  which only works for the **current process**. These attributes are always
+  populated for the running process, but cannot be resolved for an arbitrary PID.
 - For executables smaller than 4096 bytes the head and tail slices of the
   htlhash algorithm overlap (both cover the entire file), which is correct per
   the [spec](https://opentelemetry.io/docs/specs/semconv/attributes-registry/process/#algorithm-for-processexecutablebuild_idhtlhash).

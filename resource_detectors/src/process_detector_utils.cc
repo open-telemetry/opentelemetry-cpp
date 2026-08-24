@@ -73,8 +73,10 @@ ExecutableInfo GetExecutableInfo(const int32_t &pid)
   }
   std::string utf8_path(size_needed, 0);
   // cppcheck-suppress containerOutOfBounds
-  WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL);
-
+  if (WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL) <= 0)
+  {
+    return info;
+  }
   info.path = utf8_path;
 #elif defined(__APPLE__)
   char path[4096];

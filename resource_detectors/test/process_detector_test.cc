@@ -332,8 +332,8 @@ TEST(ProcessResourceDetectorTest, DetectPopulatesExpectedAttributes)
   EXPECT_NE(attrs.find(opentelemetry::semconv::process::kProcessPid), attrs.end())
       << "process.pid must be present";
 
-#if defined(_MSC_VER) || defined(__linux__)
-  // process.executable.path — present on Linux and Windows.
+#if defined(_MSC_VER) || defined(__linux__) || defined(__APPLE__)
+  // process.executable.path — present on Linux, macOS, and Windows.
   EXPECT_NE(attrs.find(opentelemetry::semconv::process::kProcessExecutablePath), attrs.end())
       << "process.executable.path must be present on this platform";
 
@@ -341,7 +341,7 @@ TEST(ProcessResourceDetectorTest, DetectPopulatesExpectedAttributes)
   EXPECT_NE(attrs.find(opentelemetry::semconv::process::kProcessExecutableName), attrs.end())
       << "process.executable.name must be present on this platform";
 
-  // process.executable.build_id.htlhash — present on Linux and Windows.
+  // process.executable.build_id.htlhash — present on Linux, macOS, and Windows.
   EXPECT_NE(attrs.find(opentelemetry::semconv::process::kProcessExecutableBuildIdHtlhash),
             attrs.end())
       << "process.executable.build_id.htlhash must be present on this platform";
