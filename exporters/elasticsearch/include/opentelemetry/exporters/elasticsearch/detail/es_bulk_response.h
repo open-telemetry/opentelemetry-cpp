@@ -30,44 +30,16 @@ inline bool IsSuccessfulBulkStatus(int status_code) noexcept
 }
 
 /**
- * What an acknowledged index operation has to carry. Elasticsearch answers one with 201 when it
- * created the document and 200 when it replaced an existing one.
+ * Whether an acknowledged operation status is one that applied the operation. Elasticsearch
+ * answers 201 when it created the document and 200 when it replaced an existing one.
  *
- * Two overloads rather than one signed parameter, because an operation status arrives through
- * nlohmann::json and is compared in the type it was parsed as: is_number_integer() is true for
- * unsigned as well, and 2^32 + 200 narrows back to 200 on a 32 bit int.
- */
-inline bool IsAppliedStatus(nlohmann::json::number_unsigned_t value) noexcept
-{
-  return 200U == value || 201U == value;
-}
-
-inline bool IsAppliedStatus(nlohmann::json::number_integer_t value) noexcept
-{
-  return 200 == value || 201 == value;
-}
-
-/**
- * Whether an acknowledged operation status is one that applied the operation.
- *
- * The type check is here rather than left to the caller, although the one caller does it too.
- * This is noexcept, and get() on a value that is not a number throws, so a caller that forgot
- * would not get a wrong answer, it would get std::terminate. A float does not throw: it
- * truncates, so 200.5 would answer for 200.
+ * Comparing the json value rather than extracting one keeps this noexcept without relying on the
+ * type check to make an extraction safe. The check still has to be here: without it a float 200.5
+ * would answer for 200.
  */
 inline bool IsAcknowledgedStatus(const nlohmann::json &status) noexcept
 {
-  if (!status.is_number_integer())
-  {
-    return false;
-  }
-
-  if (status.is_number_unsigned())
-  {
-    return IsAppliedStatus(status.get<nlohmann::json::number_unsigned_t>());
-  }
-
-  return IsAppliedStatus(status.get<nlohmann::json::number_integer_t>());
+  return status.is_number_integer() && (status == 200 || status == 201);
 }
 
 /**
