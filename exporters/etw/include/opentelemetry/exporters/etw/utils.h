@@ -5,6 +5,8 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstdio>
+#include <cstring>
 #include <ctime>
 #include <iomanip>
 #include <locale>
@@ -260,7 +262,7 @@ static inline std::string formatUtcTimestampNsAsISO8601(int64_t timestampNs)
   tm tm;
   if (::_gmtime64_s(&tm, &seconds) != 0)
   {
-    memset(&tm, 0, sizeof(tm));
+    std::memset(&tm, 0, sizeof(tm));
   }
   ::_snprintf_s(buf, _TRUNCATE, "%04d-%02d-%02dT%02d:%02d:%02d.%09dZ", 1900 + tm.tm_year,
                 1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, nanoseconds);
@@ -271,10 +273,10 @@ static inline std::string formatUtcTimestampNsAsISO8601(int64_t timestampNs)
   bool valid = (gmtime_r(&seconds, &tm) != NULL);
   if (!valid)
   {
-    memset(&tm, 0, sizeof(tm));
+    std::memset(&tm, 0, sizeof(tm));
   }
-  (void)snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%09dZ", 1900 + tm.tm_year,
-                 1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, nanoseconds);
+  (void)std::snprintf(buf, sizeof(buf), "%04d-%02d-%02dT%02d:%02d:%02d.%09dZ", 1900 + tm.tm_year,
+                      1 + tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, nanoseconds);
 #endif
   return buf;
 }

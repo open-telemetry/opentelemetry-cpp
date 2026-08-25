@@ -348,6 +348,7 @@ private:
   const RetryPolicy retry_policy_;
   decltype(RetryPolicy::max_attempts) retry_attempts_;
   std::chrono::system_clock::time_point last_attempt_time_;
+  std::chrono::system_clock::time_point retry_after_time_point_{};
 
   // Processed response headers and body
   // See CURLINFO_RESPONSE_CODE, type is long
@@ -361,7 +362,8 @@ private:
 
   struct AsyncData
   {
-    Session *session{nullptr};  // Owner Session
+    // Read by Abort() on whichever thread cancels, cleared by Cleanup() on the IO thread.
+    std::atomic<Session *> session{nullptr};  // Owner Session
 
     std::thread::id callback_thread;
     std::function<void(HttpOperation &)> callback;

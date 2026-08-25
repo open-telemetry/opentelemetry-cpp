@@ -8,7 +8,7 @@ target_link_libraries(
           opentelemetry-cpp::ostream_span_exporter
           opentelemetry-cpp::in_memory_span_exporter)
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_test(NAME examples.multi_processor
            COMMAND "$<TARGET_FILE:example_multi_processor>")
 endif()

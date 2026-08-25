@@ -42,13 +42,13 @@ otel_add_component(
   "recordable.h"
   EXCLUDE)
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     exporter_zipkin_trace "OpenTelemetry Exporter - Zipkin"
     "Exports trace spans in Zipkin format." "opentelemetry_trace")
 endif()
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_definitions(-DGTEST_LINKED_AS_SHARED_LIBRARY=1)
 
   add_executable(zipkin_recordable_test test/zipkin_recordable_test.cc)
@@ -62,7 +62,7 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.
     TEST_LIST zipkin_recordable_test)
 
-  if(WITH_HTTP_CLIENT_CURL)
+  if(OTELCPP_WITH_HTTP_CLIENT_CURL)
     add_executable(zipkin_exporter_test test/zipkin_exporter_test.cc)
 
     target_link_libraries(
@@ -74,10 +74,13 @@ if(BUILD_TESTING)
       opentelemetry_resources
       opentelemetry_http_client_nosend
       CURL::libcurl)
+    if(WIN32)
+      target_link_libraries(zipkin_exporter_test ws2_32)
+    endif()
 
     gtest_add_tests(
       TARGET zipkin_exporter_test
       TEST_PREFIX exporter.
       TEST_LIST zipkin_exporter_test)
   endif()
-endif() # BUILD_TESTING
+endif() # OTELCPP_BUILD_TESTING

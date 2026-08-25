@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <stddef.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -37,6 +37,7 @@
 #endif
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+#  include "opentelemetry/sdk/metrics/exemplar/filter_predicate.h"
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
 #endif
@@ -49,25 +50,12 @@ namespace metrics
 class SyncMetricStorage : public MetricStorage, public SyncWritableMetricStorage
 {
 
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-
-  static inline bool EnableExamplarFilter(ExemplarFilterType filter_type,
-                                          const opentelemetry::context::Context &context)
-  {
-    return filter_type == ExemplarFilterType::kAlwaysOn ||
-           (filter_type == ExemplarFilterType::kTraceBased &&
-            opentelemetry::trace::GetSpan(context)->GetContext().IsValid() &&
-            opentelemetry::trace::GetSpan(context)->GetContext().IsSampled());
-  }
-
-#endif  // ENABLE_METRICS_EXEMPLAR_PREVIEW
-
 public:
   SyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
                     const AggregationType aggregation_type,
                     std::shared_ptr<const AttributesProcessor> attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-                    ExemplarFilterType exempler_filter_type,
+                    ExemplarFilterType exemplar_filter_type,
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
                     const AggregationConfig *aggregation_config,
@@ -78,7 +66,7 @@ public:
             std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
         attributes_processor_(std::move(attributes_processor)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-        exemplar_filter_type_(exempler_filter_type),
+        exemplar_filter_type_(exemplar_filter_type),
         exemplar_reservoir_(std::move(exemplar_reservoir)),
 #endif
         temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config),
@@ -100,13 +88,13 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    if (EnableExamplarFilter(exemplar_filter_type_, context))
+    if (ExemplarFilterEnabled(exemplar_filter_type_, context))
     {
-      exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
+      exemplar_reservoir_->OfferMeasurement(value, {}, context);
     }
 #endif
     static MetricAttributes attr = MetricAttributes{};
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
     MetricAttributes resolved = ResolveCardinality(attr);
     attributes_hashmap_->GetOrSetDefault(std::move(resolved), create_default_aggregation_)
@@ -126,15 +114,14 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    if (EnableExamplarFilter(exemplar_filter_type_, context))
+    if (ExemplarFilterEnabled(exemplar_filter_type_, context))
     {
-      exemplar_reservoir_->OfferMeasurement(value, attributes, context,
-                                            std::chrono::system_clock::now());
+      exemplar_reservoir_->OfferMeasurement(value, attributes, context);
     }
 #endif
 
     MetricAttributes attr{attributes, attributes_processor_.get()};
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
     // Resolve via the unified cardinality policy so unbound and bound paths
     // share one combined limit (see ResolveCardinality()).
@@ -158,13 +145,13 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    if (EnableExamplarFilter(exemplar_filter_type_, context))
+    if (ExemplarFilterEnabled(exemplar_filter_type_, context))
     {
-      exemplar_reservoir_->OfferMeasurement(value, {}, context, std::chrono::system_clock::now());
+      exemplar_reservoir_->OfferMeasurement(value, {}, context);
     }
 #endif
     static MetricAttributes attr = MetricAttributes{};
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
     MetricAttributes resolved = ResolveCardinality(attr);
     attributes_hashmap_->GetOrSetDefault(std::move(resolved), create_default_aggregation_)
@@ -184,14 +171,13 @@ public:
       return;
     }
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    if (EnableExamplarFilter(exemplar_filter_type_, context))
+    if (ExemplarFilterEnabled(exemplar_filter_type_, context))
     {
-      exemplar_reservoir_->OfferMeasurement(value, attributes, context,
-                                            std::chrono::system_clock::now());
+      exemplar_reservoir_->OfferMeasurement(value, attributes, context);
     }
 #endif
     MetricAttributes attr{attributes, attributes_processor_.get()};
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
     MetricAttributes resolved = ResolveCardinality(std::move(attr));
     // cppcheck-suppress accessMoved
@@ -305,7 +291,7 @@ private:
   TemporalMetricStorage temporal_metric_storage_;
   // Owning Meter's enabled flag; null (tests/benchmarks) means enabled. Gates Bind().
   std::shared_ptr<MeterEnabledState> meter_enabled_state_;
-  opentelemetry::common::SpinLockMutex attribute_hashmap_lock_;
+  std::mutex attribute_hashmap_lock_;
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
   // NOTE: ENABLE_METRICS_BOUND_INSTRUMENTS_PREVIEW changes the layout and
   // vtable of SyncMetricStorage (these conditional members and the virtual

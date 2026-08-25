@@ -63,7 +63,7 @@ if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
     TEST_PREFIX metrics.
     TEST_LIST multi_observer_test)
 
-  if(WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW)
+  if(OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW)
     add_executable(bound_sync_instruments_test bound_sync_instruments_test.cc)
     target_link_libraries(
       bound_sync_instruments_test
@@ -77,7 +77,7 @@ if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
   endif()
 endif()
 
-if(WITH_BENCHMARK)
+if(OTELCPP_WITH_BENCHMARK)
   add_executable(attributes_processor_benchmark
                  attributes_processor_benchmark.cc)
   target_link_libraries(attributes_processor_benchmark benchmark::benchmark
@@ -92,6 +92,12 @@ if(WITH_BENCHMARK)
                  base2_exponential_histogram_indexer_benchmark.cc)
   target_link_libraries(
     base2_exponential_histogram_indexer_benchmark benchmark::benchmark
+    opentelemetry_metrics ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+
+  add_executable(circular_buffer_counter_benchmark
+                 circular_buffer_counter_benchmark.cc)
+  target_link_libraries(
+    circular_buffer_counter_benchmark benchmark::benchmark
     opentelemetry_metrics ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
 
   add_executable(histogram_aggregation_benchmark
@@ -111,6 +117,6 @@ if(WITH_BENCHMARK)
     metrics_common_test_utils opentelemetry_common opentelemetry_resources)
 endif()
 
-if(WITH_METRICS_EXEMPLAR_PREVIEW)
+if(OTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW)
   add_subdirectory(exemplar)
 endif()

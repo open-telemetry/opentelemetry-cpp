@@ -11,9 +11,11 @@ foreach(
   always_off_sampler_test
   always_on_sampler_test
   parent_sampler_test
+  probability_sampler_test
   trace_id_ratio_sampler_test
   composable_sampler_test
   batch_span_processor_test
+  batch_span_processor_test_stress
   tracer_config_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
@@ -30,7 +32,7 @@ foreach(
     TEST_LIST ${testname})
 endforeach()
 
-if(WITH_BENCHMARK)
+if(OTELCPP_WITH_BENCHMARK)
   add_executable(sampler_benchmark sampler_benchmark.cc)
   target_link_libraries(
     sampler_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
@@ -40,6 +42,16 @@ if(WITH_BENCHMARK)
   add_executable(span_data_benchmark span_data_benchmark.cc)
   target_link_libraries(
     span_data_benchmark
+    benchmark::benchmark
+    ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_trace
+    opentelemetry_resources
+    opentelemetry_exporter_in_memory
+    opentelemetry_test_common)
+
+  add_executable(tracer_benchmark tracer_benchmark.cc)
+  target_link_libraries(
+    tracer_benchmark
     benchmark::benchmark
     ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_trace
