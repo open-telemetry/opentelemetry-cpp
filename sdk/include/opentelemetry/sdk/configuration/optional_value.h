@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <stdexcept>
+
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -25,7 +27,14 @@ public:
 
   bool HasValue() const { return has_value_; }
 
-  const T &Value() const { return value_; }
+  const T &Value() const
+  {
+    if (!has_value_)
+    {
+      throw std::runtime_error("OptionalValue has no value");
+    }
+    return value_;
+  }
 
   T ValueOr(T fallback) const { return has_value_ ? value_ : fallback; }
 

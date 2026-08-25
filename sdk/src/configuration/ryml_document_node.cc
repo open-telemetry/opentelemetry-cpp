@@ -302,19 +302,16 @@ OptionalValue<std::size_t> RymlDocumentNode::GetOptionalInteger(const std::strin
 {
   OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetOptionalInteger(" << name << ")");
 
-  auto ryml_child = GetRymlChildNode(name);
+  auto child = GetChildNode(name);
 
-  if (ryml_child.invalid() || !ryml_child.has_val())
+  if (!child || child->IsNull())
   {
     return OptionalValue<std::size_t>{};
   }
 
-  ryml::csubstr view = ryml_child.val();
-  std::string value(view.str, view.len);
+  std::string value = child->AsString();
 
-  value = DoSubstitution(value);
-
-  if (value.empty() || value == "~" || value == "null" || value == "Null" || value == "NULL")
+  if (value.empty())
   {
     return OptionalValue<std::size_t>{};
   }

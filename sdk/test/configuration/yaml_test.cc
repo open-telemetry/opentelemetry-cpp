@@ -218,6 +218,20 @@ attribute_limits:
   ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
 }
 
+TEST(Yaml, attribute_limits_tilde_null_field)
+{
+  std::string yaml = R"(
+file_format: "1.0"
+attribute_limits:
+  attribute_count_limit: ~
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  ASSERT_FALSE(config->attribute_limits->attribute_count_limit.HasValue());
+}
+
 TEST(Yaml, no_optional_boolean)
 {
   std::string yaml = R"(

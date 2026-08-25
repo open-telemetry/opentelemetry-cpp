@@ -6,6 +6,7 @@
 #include <chrono>
 #include <cstddef>
 #include <map>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -220,6 +221,13 @@ protected:
 };
 
 }  // namespace
+
+TEST(OptionalValue, ValueThrowsWhenEmpty)
+{
+  config_sdk::OptionalValue<std::size_t> value;
+
+  EXPECT_THROW(value.Value(), std::runtime_error);
+}
 
 //---------------------------------------------------------------------------
 // Resource configuration tests
