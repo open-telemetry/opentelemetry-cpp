@@ -308,7 +308,7 @@ static std::vector<double> MakeRecordingValues()
 }
 
 // Create a set of attributes with a given count
-static AttributeMap MakeAttributes(std::size_t count, std::string value = {})
+static AttributeMap MakeAttributes(std::size_t count, const std::string &value = {})
 {
   AttributeMap attributes;
   for (std::size_t i = 0; i < count; i++)
