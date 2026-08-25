@@ -7,7 +7,7 @@ target_link_libraries(
   PRIVATE opentelemetry-cpp::logs
           opentelemetry-cpp::ostream_log_record_exporter)
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_test(NAME examples.logger_configurator
            COMMAND "$<TARGET_FILE:example_logger_configurator>")
 endif()

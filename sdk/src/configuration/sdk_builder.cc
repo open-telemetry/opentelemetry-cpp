@@ -207,6 +207,8 @@
 #include "opentelemetry/version.h"
 #include "src/common/wildcard_match.h"
 
+#include "src/resource/detail/percent_decode.h"
+
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #endif
@@ -2552,7 +2554,10 @@ void SdkBuilder::SetResource(
       {
         if (attribute_valid)
         {
-          opentelemetry::common::AttributeValue wrapped_attribute_value(attribute_value);
+          std::string decoded_value = opentelemetry::sdk::resource::detail::PercentDecode(
+              std::string{attribute_value.data(), attribute_value.size()});
+
+          opentelemetry::common::AttributeValue wrapped_attribute_value(decoded_value);
           list_attributes.SetAttribute(attribute_key, wrapped_attribute_value);
         }
         else
@@ -2571,7 +2576,12 @@ void SdkBuilder::SetResource(
     {
       for (const auto &kv : opt_model->attributes->kv_map)
       {
-        SetResourceAttribute(sdk_attributes, kv.first, kv.second.get());
+        // kv_map values may be nullptr for programmatically-set null entries.
+        // The default behavior for resource.attributes is to ignore null values.
+        if (kv.second != nullptr)
+        {
+          SetResourceAttribute(sdk_attributes, kv.first, kv.second.get());
+        }
       }
     }
 

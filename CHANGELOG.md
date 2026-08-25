@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Add a configuration builder for the host resource detector
+  [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
   and merge the resource per the resource SDK specification.
@@ -28,6 +30,14 @@ Increment the:
 
 * [RESOURCE DETECTOR] Add the host resource detector
   [#4413](https://github.com/open-telemetry/opentelemetry-cpp/issues/4413)
+
+* [CONFIGURATION] SDK signal provider builder interface
+  [#4426](https://github.com/open-telemetry/opentelemetry-cpp/pull/4426)
+* [CONFIGURATION] Support environment variable substitution for attributes
+  [#4474](https://github.com/open-telemetry/opentelemetry-cpp/pull/4474)
+
+* [RESOURCE DETECTOR] Add the service resource detector and builder
+  [#4414](https://github.com/open-telemetry/opentelemetry-cpp/issues/4414)
 * [CONFIGURATION] deprecate config builder cmake components
   [#4428](https://github.com/open-telemetry/opentelemetry-cpp/pull/4428)
 
@@ -162,6 +172,9 @@ Increment the:
 * [CODE HEALTH] Fix more clang tidy warnings (member initialization)
   [#4270](https://github.com/open-telemetry/opentelemetry-cpp/pull/4270)
 
+* [CMAKE] Rename cmake options with prefix `OTELCPP_`
+  [#4268](https://github.com/open-telemetry/opentelemetry-cpp/pull/4268)
+
 * docs: update supported development platforms
   [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
 
@@ -243,6 +256,22 @@ Important changes:
 
 Breaking changes:
 
+* [CONFIGURATION] Align declarative configuration schema defaults with
+  OpenTelemetry Configuration Schema v1.1.0
+  [#4432](https://github.com/open-telemetry/opentelemetry-cpp/issues/4432)
+  * When a YAML field is omitted, the parsed configuration model now uses
+    these schema defaults instead of the previous legacy values:
+    * `attribute_limits.attribute_value_length_limit`,
+      `logger_provider.limits.attribute_value_length_limit`, and
+      `tracer_provider.limits.attribute_value_length_limit` default to no limit
+      (unlimited attribute value length) instead of 4096 bytes.
+    * `batch` log record processor `schedule_delay` defaults to 1000 ms instead
+      of 5000 ms (more frequent batch exports when the field is omitted).
+    * `periodic` metric reader `interval` defaults to 60000 ms instead of 5000 ms
+      (less frequent metric exports when the field is omitted).
+    * `trace_id_ratio_based` sampler `ratio` defaults to 1.0 instead of 0.0
+      (sample all traces instead of dropping all when the field is omitted).
+
 * [CONFIGURATION] SDK default component builder libraries and example
   [#4367](https://github.com/open-telemetry/opentelemetry-cpp/pull/4367)
   * The declaritive configuration registry is now empty on construction and
@@ -266,6 +295,27 @@ Breaking changes:
     which needs only the abstract `http_client_factory.h`. The two server
     headers are an embedded test server; moving them out of `ext` is tracked
     in #4332.
+* [CMAKE] Rename cmake options with prefix `OTELCPP_`
+  [#4268](https://github.com/open-telemetry/opentelemetry-cpp/pull/4268)
+  * All CMake build options were renamed with the `OTELCPP_` prefix to avoid
+    name collisions with user and third-party project variables. For example,
+    `WITH_OTLP_HTTP`, `WITH_CONFIGURATION`, and `WITH_OTLP_RETRY_PREVIEW` are
+    now `OTELCPP_WITH_OTLP_HTTP`, `OTELCPP_WITH_CONFIGURATION`, and
+    `OTELCPP_WITH_OTLP_RETRY_PREVIEW`.
+  * `BUILD_TESTING` becomes `OTELCPP_BUILD_TESTING`, but is not treated as a
+    deprecated alias:
+    * When opentelemetry-cpp is the top-level project, `BUILD_TESTING` sets the
+      default value of `OTELCPP_BUILD_TESTING`.
+    * When opentelemetry-cpp is a subproject, the parent project's
+      `BUILD_TESTING` no longer controls opentelemetry-cpp tests, which default
+      to `OFF`.
+    * Set `OTELCPP_BUILD_TESTING` explicitly to enable or disable
+      opentelemetry-cpp tests in either top-level or subproject builds.
+  * `OTELCPP_WITH_BENCHMARK` now defaults to the value of
+    `OTELCPP_BUILD_TESTING` instead of always defaulting to `ON`.
+  * The other legacy option names are still accepted but deprecated: a
+    deprecation warning is emitted at configure time, and the `OTELCPP_` name
+    takes precedence when both names are set.
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
