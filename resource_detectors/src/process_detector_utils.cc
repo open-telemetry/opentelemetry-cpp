@@ -10,7 +10,6 @@
 #include <vector>
 
 #include <openssl/evp.h>
-#include <openssl/sha.h>
 
 #if defined(__APPLE__)
 #  include <mach-o/dyld.h>
