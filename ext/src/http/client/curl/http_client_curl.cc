@@ -141,6 +141,21 @@ static int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint
 void Session::SendRequest(
     std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) noexcept
 {
+  if (send_started_.exchange(true, std::memory_order_acq_rel))
+  {
+    // The first request is not finished with this session. Its easy handle names the session in
+    // CURLOPT_PRIVATE and names its operation in every callback it was given, and the message
+    // loop resolves that name to whichever operation the session owns, so a second operation
+    // would be handed the first one's completion. Worse from a handler that sends again from
+    // OnResponse, where the operation being replaced is the one running that handler.
+    if (callback)
+    {
+      callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
+                        "a session carries one request");
+    }
+    return;
+  }
+
   is_session_active_.store(true, std::memory_order_release);
   const auto &url       = host_ + http_request_->uri_;
   auto callback_ptr     = callback.get();
