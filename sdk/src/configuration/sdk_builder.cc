@@ -26,7 +26,6 @@
 #include "opentelemetry/sdk/configuration/always_on_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
-#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
@@ -104,6 +103,7 @@
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_builder.h"
@@ -1518,9 +1518,9 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
   }
 
   using SpanLimitDefaults = SpanLimitsConfiguration;
-  span_limits.attribute_value_length_limit = ResolveLimit(
-      model_attribute_value_length_limit, general_attribute_value_length_limit,
-      SpanLimitDefaults::kDefaultAttributeValueLengthLimit);
+  span_limits.attribute_value_length_limit =
+      ResolveLimit(model_attribute_value_length_limit, general_attribute_value_length_limit,
+                   SpanLimitDefaults::kDefaultAttributeValueLengthLimit);
   span_limits.attribute_count_limit =
       ResolveLimit(model_attribute_count_limit, ToOptionalUint32(general_attribute_count_limit),
                    SpanLimitDefaults::kDefaultAttributeCountLimit);
@@ -2455,9 +2455,9 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
   }
 
   using LogLimitDefaults = LogRecordLimitsConfiguration;
-  log_record_limits.attribute_value_length_limit = ResolveLimit(
-      model_attribute_value_length_limit, general_attribute_value_length_limit,
-      LogLimitDefaults::kDefaultAttributeValueLengthLimit);
+  log_record_limits.attribute_value_length_limit =
+      ResolveLimit(model_attribute_value_length_limit, general_attribute_value_length_limit,
+                   LogLimitDefaults::kDefaultAttributeValueLengthLimit);
   log_record_limits.attribute_count_limit =
       ResolveLimit(model_attribute_count_limit, general_attribute_count_limit,
                    LogLimitDefaults::kDefaultAttributeCountLimit);
