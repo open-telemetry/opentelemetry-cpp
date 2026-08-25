@@ -40,6 +40,7 @@ public:
   std::size_t AsInteger() const override;
   double AsDouble() const override;
   std::string AsString() const override;
+  bool IsNull() const override;
 
   std::unique_ptr<DocumentNode> GetRequiredChildNode(const std::string &name) const override;
   std::unique_ptr<DocumentNode> GetChildNode(const std::string &name) const override;
