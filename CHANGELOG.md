@@ -50,8 +50,9 @@ Increment the:
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
 
-* [SDK] Replace SpinLockMutex with std::mutex in the metrics library
+* [SDK] Replace SpinLockMutex with std::mutex in the metrics storage clases
   [#4416](https://github.com/open-telemetry/opentelemetry-cpp/pull/4416)
+
 * [CONFIGURATION/BUILD] Add resource detector targets and README
   [#4430](https://github.com/open-telemetry/opentelemetry-cpp/pull/4430)
 
