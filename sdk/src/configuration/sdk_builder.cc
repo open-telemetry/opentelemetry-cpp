@@ -2576,7 +2576,12 @@ void SdkBuilder::SetResource(
     {
       for (const auto &kv : opt_model->attributes->kv_map)
       {
-        SetResourceAttribute(sdk_attributes, kv.first, kv.second.get());
+        // kv_map values may be nullptr for programmatically-set null entries.
+        // The default behavior for resource.attributes is to ignore null values.
+        if (kv.second != nullptr)
+        {
+          SetResourceAttribute(sdk_attributes, kv.first, kv.second.get());
+        }
       }
     }
 
