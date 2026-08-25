@@ -3,11 +3,12 @@
 
 #include <chrono>
 #include <exception>
-#include <memory>
 #include <mutex>
+#include <ostream>
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/logs/logger.h"
 #include "opentelemetry/logs/noop.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -46,7 +47,7 @@ void LogGetLoggerConstructionFailure(const char *detail) noexcept
                             << detail << "; returning noop logger.");
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
-  catch (...)
+  catch (...)  // NOLINT(bugprone-empty-catch)
   {
     // Logging must not throw from a noexcept GetLogger path.
   }

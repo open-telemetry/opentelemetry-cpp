@@ -4,11 +4,12 @@
 #include <atomic>
 #include <chrono>
 #include <exception>
-#include <memory>
 #include <mutex>
+#include <ostream>
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable.h"  // IWYU pragma: keep
+#include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
@@ -59,7 +60,7 @@ void LogGetMeterConstructionFailure(const char *detail) noexcept
                             << detail << "; returning noop meter.");
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
-  catch (...)
+  catch (...)  // NOLINT(bugprone-empty-catch)
   {
     // Logging must not throw from a noexcept GetMeter path.
   }

@@ -3,8 +3,8 @@
 
 #include <chrono>
 #include <exception>
-#include <memory>
 #include <mutex>
+#include <ostream>
 #include <utility>
 #include <vector>
 
@@ -24,6 +24,7 @@
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/noop.h"
+#include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -55,7 +56,7 @@ void LogGetTracerConstructionFailure(const char *detail) noexcept
                             << detail << "; returning noop tracer.");
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
-  catch (...)
+  catch (...)  // NOLINT(bugprone-empty-catch)
   {
     // Logging must not throw from a noexcept GetTracer path.
   }
