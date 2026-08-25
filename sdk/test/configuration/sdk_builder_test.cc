@@ -354,7 +354,7 @@ TEST(SdkBuilder, SetResourceWithoutModel)
 
 TEST(SdkBuilder, SetResourceAttributesListPercentDecodesValues)
 {
-  SdkBuilder builder(RegistryFactory::Create());
+  config_sdk::SdkBuilder builder(std::make_shared<config_sdk::Registry>());
 
   auto model             = std::make_unique<config_sdk::ResourceConfiguration>();
   model->attributes_list = "key1=hello%20world,key2=a%2Cb,key3=100%25,bad=50%z";
@@ -394,7 +394,7 @@ TEST(SdkBuilder, SetResourceDetectorDispatch)
 
 TEST(SdkBuilder, SetResourceExtensionDetector)
 {
-  auto registry          = RegistryFactory::Create();
+  auto registry          = std::make_shared<config_sdk::Registry>();
   auto extension_builder = std::make_unique<TestExtensionResourceDetectorBuilder>(
       opentelemetry::sdk::resource::ResourceAttributes{{"custom.key", "custom-value"}});
   auto *extension_builder_p = extension_builder.get();
@@ -630,8 +630,8 @@ TEST(SdkBuilder, SetResourceFilterAppliesToDetectedAttributesOnly)
 
 TEST(SdkBuilder, SetResourceNullAttributeValueSkipped)
 {
-  auto registry = RegistryFactory::Create();
-  SdkBuilder builder(std::move(registry));
+  auto registry = std::make_shared<config_sdk::Registry>();
+  config_sdk::SdkBuilder builder(std::move(registry));
 
   auto typed_value   = std::make_unique<config_sdk::StringAttributeValueConfiguration>();
   typed_value->value = "kept";
@@ -670,14 +670,14 @@ TEST(SdkBuilder, SetResourceAttributesNullValueSkipped)
   //     detectors:
   //       - test_service_detector  # detects service.{name, version, namespace}
 
-  auto registry     = RegistryFactory::Create();
+  auto registry     = std::make_shared<config_sdk::Registry>();
   auto ext_detector = std::make_unique<TestExtensionResourceDetectorBuilder>(
       opentelemetry::sdk::resource::ResourceAttributes{
           {"service.name", "name-from-detector"},
           {"service.namespace", "namespace-from-detector"},
           {"service.version", "version-from-detector"}});
   registry->SetExtensionResourceDetectorBuilder("test_service_detector", std::move(ext_detector));
-  SdkBuilder builder(std::move(registry));
+  config_sdk::SdkBuilder builder(std::move(registry));
 
   auto model            = std::make_unique<config_sdk::ResourceConfiguration>();
   auto detector_config  = std::make_unique<config_sdk::ExtensionResourceDetectorConfiguration>();
