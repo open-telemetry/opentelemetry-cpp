@@ -65,6 +65,10 @@ Increment the:
   in the value as-is rather than dropping the attribute.
   [#1536](https://github.com/open-telemetry/opentelemetry-cpp/issues/1536)
 
+* [BUG] Fix `MultiSpanProcessor` and `MultiLogRecordProcessor` not reporting
+  failures from `ForceFlush` and `Shutdown` when a child processor failed.
+  [#4472](https://github.com/open-telemetry/opentelemetry-cpp/pull/4472)
+
 * [BUG] Report one outcome per request when a curl session is cancelled after
   the response arrives
   ([#4363](https://github.com/open-telemetry/opentelemetry-cpp/pull/4363))
