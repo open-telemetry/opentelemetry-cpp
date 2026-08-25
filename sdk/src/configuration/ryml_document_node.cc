@@ -80,6 +80,7 @@ bool RymlDocumentNode::AsBoolean() const
   }
   ryml::csubstr view = node_.val();
   std::string value(view.str, view.len);
+  value = DoSubstitution(value);
   return BooleanFromString(value);
 }
 
@@ -93,6 +94,7 @@ size_t RymlDocumentNode::AsInteger() const
   }
   ryml::csubstr view = node_.val();
   std::string value(view.str, view.len);
+  value = DoSubstitution(value);
   return IntegerFromString(value);
 }
 
@@ -106,6 +108,7 @@ double RymlDocumentNode::AsDouble() const
   }
   ryml::csubstr view = node_.val();
   std::string value(view.str, view.len);
+  value = DoSubstitution(value);
   return DoubleFromString(value);
 }
 
@@ -119,7 +122,19 @@ std::string RymlDocumentNode::AsString() const
   }
   ryml::csubstr view = node_.val();
   std::string value(view.str, view.len);
+  value = DoSubstitution(value);
   return value;
+}
+
+bool RymlDocumentNode::IsNull() const
+{
+  OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::IsNull()");
+
+  if (!node_.is_val() && !node_.is_keyval())
+  {
+    return false;
+  }
+  return node_.val_is_null();
 }
 
 ryml::ConstNodeRef RymlDocumentNode::GetRequiredRymlChildNode(const std::string &name) const
@@ -382,6 +397,11 @@ std::string RymlDocumentNode::GetString(const std::string &name,
   std::string value(view.str, view.len);
 
   value = DoSubstitution(value);
+
+  if (value.empty())
+  {
+    return default_value;
+  }
 
   return value;
 }

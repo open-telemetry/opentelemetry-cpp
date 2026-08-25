@@ -69,6 +69,16 @@ void LogGetMeterConstructionFailure(const char *detail) noexcept
 
 }  // namespace
 
+MeterProvider::MeterProvider()
+    : context_(std::make_shared<MeterContext>(
+          std::make_unique<ViewRegistry>(),
+          resource::Resource::Create({}),
+          std::make_unique<instrumentationscope::ScopeConfigurator<MeterConfig>>(
+              instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(MeterConfig::Default())
+                  .Build()))),
+      noop_meter_(CreateNoopMeterFallback())
+{}
+
 MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context)
     : context_(std::move(context)), noop_meter_(CreateNoopMeterFallback())
 {}

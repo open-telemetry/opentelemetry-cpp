@@ -530,6 +530,7 @@ TEST(MeterProvider, ExplicitShutdownNotWarnOnDestructionCheck)
 
 TEST(MeterProvider, ConstructorsAreNotNoexcept)
 {
+  static_assert(!noexcept(MeterProvider()), "MeterProvider construction must be allowed to throw");
   static_assert(!noexcept(MeterProvider(std::unique_ptr<MeterContext>{})),
                 "MeterProvider construction must be allowed to throw");
   static_assert(!noexcept(Meter(std::weak_ptr<MeterContext>{})),
