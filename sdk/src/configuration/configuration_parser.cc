@@ -2471,10 +2471,13 @@ std::unique_ptr<StringAttributeValueConfiguration>
 ConfigurationParser::ParseStringAttributeValueConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<StringAttributeValueConfiguration>();
-
+  auto model   = std::make_unique<StringAttributeValueConfiguration>();
   model->value = node->AsString();
-
+  // Empty string (YAML null or unset env var) is treated as null per schema nullBehavior.
+  if (model->value.empty())
+  {
+    return nullptr;
+  }
   return model;
 }
 
@@ -2607,6 +2610,21 @@ std::unique_ptr<AttributesConfiguration> ConfigurationParser::ParseAttributesCon
     std::unique_ptr<AttributeValueConfiguration> value_model;
 
     name = name_child->AsString();
+
+    // An empty name is an invalid attribute key per the OTel spec.
+    if (name.empty())
+    {
+      std::string message("Attribute name must not be empty (check for unset env var)");
+      throw InvalidSchemaException(name_child->Location(), message);
+    }
+
+    // Per schema nullBehavior: skip entries with a null value.
+    if (value_child->IsNull())
+    {
+      OTEL_INTERNAL_LOG_DEBUG("Skipping attribute '" << name << "' with null value");
+      continue;
+    }
+
     if (type_child)
     {
       type = type_child->AsString();
@@ -2661,6 +2679,14 @@ std::unique_ptr<AttributesConfiguration> ConfigurationParser::ParseAttributesCon
       std::string message("Illegal attribute type: ");
       message.append(type);
       throw InvalidSchemaException(node->Location(), message);
+    }
+
+    // Per schema nullBehavior: skip entries with a null/empty value (e.g. string from unset env
+    // var).
+    if (value_model == nullptr)
+    {
+      OTEL_INTERNAL_LOG_DEBUG("Skipping attribute '" << name << "' with null/empty value");
+      continue;
     }
 
     std::pair<std::string, std::unique_ptr<AttributeValueConfiguration>> entry(
