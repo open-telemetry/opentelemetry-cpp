@@ -35,25 +35,25 @@ public:
    * @return An ObserverResultT<T> for the given instrument.
    */
   template <typename T>
-  ObserverResultT<T> &ForInstrument(const ObservableInstrument *instrument) = delete;
+  ObserverResultT<T> &ForInstrument(ObservableInstrument *instrument) = delete;
 
 protected:
   // You can't have a virtual template, and you can't overload on return type, so we need to
   // enumerate the options for the observer result type as separate methods to override.
-  virtual ObserverResultT<double> &ForInstrumentDouble(const ObservableInstrument *instrument) = 0;
-  virtual ObserverResultT<int64_t> &ForInstrumentInt64(const ObservableInstrument *instrument) = 0;
+  virtual ObserverResultT<double> &ForInstrumentDouble(ObservableInstrument *instrument) = 0;
+  virtual ObserverResultT<int64_t> &ForInstrumentInt64(ObservableInstrument *instrument) = 0;
 };
 
 template <>
 inline ObserverResultT<double> &MultiObserverResult::ForInstrument<double>(
-    const ObservableInstrument *instrument)
+    ObservableInstrument *instrument)
 {
   return ForInstrumentDouble(instrument);
 }
 
 template <>
 inline ObserverResultT<int64_t> &MultiObserverResult::ForInstrument<int64_t>(
-    const ObservableInstrument *instrument)
+    ObservableInstrument *instrument)
 {
   return ForInstrumentInt64(instrument);
 }

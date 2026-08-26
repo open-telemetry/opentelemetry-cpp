@@ -290,12 +290,11 @@ public:
   inline CURL *GetCurlEasyHandle() noexcept { return curl_resource_.easy_handle; }
 
 private:
-  CURLcode SetCurlPtrOption(CURLoption option, void *value);
+  CURLcode SetCurlPtrOption(CURLoption option, const void *value);
 
   CURLcode SetCurlStrOption(CURLoption option, const char *str)
   {
-    void *ptr = const_cast<char *>(str);
-    return SetCurlPtrOption(option, ptr);
+    return SetCurlPtrOption(option, str);
   }
 
   CURLcode SetCurlBlobOption(CURLoption option, struct curl_blob *blob)

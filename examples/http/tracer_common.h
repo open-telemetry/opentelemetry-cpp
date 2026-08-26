@@ -29,7 +29,7 @@ template <typename T>
 class HttpTextMapCarrier : public opentelemetry::context::propagation::TextMapCarrier
 {
 public:
-  HttpTextMapCarrier(T &headers) : headers_(headers) {}
+  HttpTextMapCarrier(const T &headers) : headers_(headers) {}
   HttpTextMapCarrier() = default;
   opentelemetry::nostd::string_view Get(
       opentelemetry::nostd::string_view key) const noexcept override

@@ -25,7 +25,7 @@ public:
   void RegisterInstrument(opentelemetry::metrics::ObservableInstrument *instrument);
   void DeregisterInstrument(opentelemetry::metrics::ObservableInstrument *instrument);
   size_t InstrumentCount() const;
-  bool HasInstrument(const opentelemetry::metrics::ObservableInstrument *instrument) const;
+  bool HasInstrument(opentelemetry::metrics::ObservableInstrument *instrument) const;
   void GetInstruments(
       nostd::function_ref<void(opentelemetry::metrics::ObservableInstrument *)> callback);
   void Reset();
@@ -33,9 +33,9 @@ public:
 
 protected:
   opentelemetry::metrics::ObserverResultT<double> &ForInstrumentDouble(
-      const opentelemetry::metrics::ObservableInstrument *instrument) override;
+      opentelemetry::metrics::ObservableInstrument *instrument) override;
   opentelemetry::metrics::ObserverResultT<int64_t> &ForInstrumentInt64(
-      const opentelemetry::metrics::ObservableInstrument *instrument) override;
+      opentelemetry::metrics::ObservableInstrument *instrument) override;
 
 private:
   // This is _different_ to opentelemetry::metrics::ObserverResult because this variant is

@@ -721,7 +721,7 @@ const char *HttpOperation::GetCurlErrorMessage(CURLcode code)
   return message;
 }
 
-CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, void *value)
+CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, const void *value)
 {
   /*
     curl_easy_setopt() is a macro with variadic arguments, type unsafe.
@@ -907,13 +907,12 @@ CURLcode HttpOperation::Setup()
     else if (!ssl_options_.ssl_ca_cert_string.empty())
     {
 #if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 77, 0)
-      const char *data = ssl_options_.ssl_ca_cert_string.c_str();
-      size_t data_len  = ssl_options_.ssl_ca_cert_string.length();
+      std::vector<char> blob_data(ssl_options_.ssl_ca_cert_string.begin(),
+                                  ssl_options_.ssl_ca_cert_string.end());
 
-      struct curl_blob stblob
-      {};
-      stblob.data  = const_cast<char *>(data);
-      stblob.len   = data_len;
+      struct curl_blob stblob{};
+      stblob.data  = blob_data.data();
+      stblob.len   = blob_data.size();
       stblob.flags = CURL_BLOB_COPY;
 
       rc = SetCurlBlobOption(CURLOPT_CAINFO_BLOB, &stblob);
@@ -949,13 +948,12 @@ CURLcode HttpOperation::Setup()
     else if (!ssl_options_.ssl_client_key_string.empty())
     {
 #if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 71, 0)
-      const char *data = ssl_options_.ssl_client_key_string.c_str();
-      size_t data_len  = ssl_options_.ssl_client_key_string.length();
+      std::vector<char> blob_data(ssl_options_.ssl_client_key_string.begin(),
+                                  ssl_options_.ssl_client_key_string.end());
 
-      struct curl_blob stblob
-      {};
-      stblob.data  = const_cast<char *>(data);
-      stblob.len   = data_len;
+      struct curl_blob stblob{};
+      stblob.data  = blob_data.data();
+      stblob.len   = blob_data.size();
       stblob.flags = CURL_BLOB_COPY;
 
       rc = SetCurlBlobOption(CURLOPT_SSLKEY_BLOB, &stblob);
@@ -997,13 +995,12 @@ CURLcode HttpOperation::Setup()
     else if (!ssl_options_.ssl_client_cert_string.empty())
     {
 #if LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(7, 71, 0)
-      const char *data = ssl_options_.ssl_client_cert_string.c_str();
-      size_t data_len  = ssl_options_.ssl_client_cert_string.length();
+      std::vector<char> blob_data(ssl_options_.ssl_client_cert_string.begin(),
+                                  ssl_options_.ssl_client_cert_string.end());
 
-      struct curl_blob stblob
-      {};
-      stblob.data  = const_cast<char *>(data);
-      stblob.len   = data_len;
+      struct curl_blob stblob{};
+      stblob.data  = blob_data.data();
+      stblob.len   = blob_data.size();
       stblob.flags = CURL_BLOB_COPY;
 
       rc = SetCurlBlobOption(CURLOPT_SSLCERT_BLOB, &stblob);
