@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_library(opentelemetry_resources resource.cc resource_detector.cc
-                                    detail/percent_decode.cc)
+                                    entity.cc detail/percent_decode.cc)
 
 set_target_properties(opentelemetry_resources PROPERTIES EXPORT_NAME resources)
 set_target_version(opentelemetry_resources)
