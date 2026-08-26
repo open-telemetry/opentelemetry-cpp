@@ -150,7 +150,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk:headers",
-        "//sdk/src/configuration",
+        "//sdk/src/configuration:configuration_yaml",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
@@ -170,7 +170,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk:headers",
-        "//sdk/src/configuration",
+        "//sdk/src/configuration:configuration_yaml",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
@@ -190,7 +190,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk:headers",
-        "//sdk/src/configuration",
+        "//sdk/src/configuration:configuration_yaml",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
@@ -210,7 +210,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk:headers",
-        "//sdk/src/configuration",
+        "//sdk/src/configuration:configuration_yaml",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
@@ -230,7 +230,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk:headers",
-        "//sdk/src/configuration",
+        "//sdk/src/configuration:configuration_yaml",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
@@ -250,7 +250,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk:headers",
-        "//sdk/src/configuration",
+        "//sdk/src/configuration:configuration_yaml",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
@@ -270,7 +270,7 @@ cc_test(
     deps = [
         "//api",
         "//sdk:headers",
-        "//sdk/src/configuration",
+        "//sdk/src/configuration:configuration_yaml",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",

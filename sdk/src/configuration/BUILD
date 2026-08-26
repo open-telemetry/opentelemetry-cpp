@@ -82,7 +82,7 @@ cc_library(
 )
 
 cc_library(
-    name = "configuration",
+    name = "configuration_yaml",
     srcs = [
         "configuration_parser.cc",
         "ryml_document.cc",
@@ -95,5 +95,17 @@ cc_library(
         "//api",
         "//sdk:headers",
         "@rapidyaml",
+    ],
+)
+
+cc_library(
+    name = "configuration",
+    deps = [
+        ":configuration_core",
+        ":configuration_logs_builders",
+        ":configuration_metrics_builders",
+        ":configuration_registry_factory",
+        ":configuration_trace_builders",
+        ":configuration_yaml",
     ],
 )
