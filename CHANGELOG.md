@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Apply the general `attribute_limits` to the `TracerProvider`
+  and `LoggerProvider` when their signal-specific `limits` are not configured
+  [#4467](https://github.com/open-telemetry/opentelemetry-cpp/issues/4467)
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply

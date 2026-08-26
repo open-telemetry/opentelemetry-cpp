@@ -42,6 +42,7 @@
 
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
@@ -82,6 +83,7 @@
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_config_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
@@ -325,6 +327,80 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLogRecordLimits)
   EXPECT_EQ(log_buffer_->size(), 1);
   auto *record = log_buffer_->front().get();
   EXPECT_EQ(nostd::get<std::string>(record->GetBody()), "test-message");
+  const auto &attributes = record->GetAttributes();
+  EXPECT_EQ(attributes.size(), limits.attribute_count_limit);
+  for (const auto &attr : attributes)
+  {
+    EXPECT_EQ(nostd::get<std::string>(attr.second).size(), limits.attribute_value_length_limit);
+  }
+}
+
+TEST_F(ProgrammaticConfigTest, LoggerProviderWithGeneralAttributeLimits)
+{
+  // No logger_provider.limits configured: the general attribute_limits should apply.
+  auto attribute_limits = std::make_unique<config_sdk::AttributeLimitsConfiguration>();
+  attribute_limits->attribute_count_limit        = 2;
+  attribute_limits->attribute_value_length_limit = 5;
+
+  auto model              = std::make_unique<config_sdk::Configuration>();
+  model->logger_provider  = MakeLoggerProviderConfig();
+  model->attribute_limits = std::move(attribute_limits);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->logger_provider, nullptr);
+
+  auto logger = logs::Provider::GetLoggerProvider()->GetLogger("test");
+  logger->EmitLogRecord(
+      logs::Severity::kInfo, nostd::string_view("test-message"),
+      common::MakeAttributes({{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}));
+
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
+
+  EXPECT_EQ(log_buffer_->size(), 1);
+  auto *record           = log_buffer_->front().get();
+  const auto &attributes = record->GetAttributes();
+  EXPECT_EQ(attributes.size(), 2u);
+  for (const auto &attr : attributes)
+  {
+    EXPECT_EQ(nostd::get<std::string>(attr.second).size(), 5u);
+  }
+}
+
+TEST_F(ProgrammaticConfigTest, LoggerProviderLimitsOverrideGeneralAttributeLimits)
+{
+  // Both logger_provider.limits and the general attribute_limits are configured: the
+  // logger-specific limits must win, per
+  // https://opentelemetry.io/docs/specs/otel/common/#attribute-limits
+  config_sdk::LogRecordLimitsConfiguration limits;
+  limits.attribute_count_limit        = 2;
+  limits.attribute_value_length_limit = 5;
+
+  auto logger_provider_config = MakeLoggerProviderConfig();
+  logger_provider_config->limits =
+      std::make_unique<config_sdk::LogRecordLimitsConfiguration>(limits);
+
+  auto attribute_limits = std::make_unique<config_sdk::AttributeLimitsConfiguration>();
+  attribute_limits->attribute_count_limit        = 1;
+  attribute_limits->attribute_value_length_limit = 1;
+
+  auto model              = std::make_unique<config_sdk::Configuration>();
+  model->logger_provider  = std::move(logger_provider_config);
+  model->attribute_limits = std::move(attribute_limits);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->logger_provider, nullptr);
+
+  auto logger = logs::Provider::GetLoggerProvider()->GetLogger("test");
+  logger->EmitLogRecord(
+      logs::Severity::kInfo, nostd::string_view("test-message"),
+      common::MakeAttributes({{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}));
+
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
+
+  EXPECT_EQ(log_buffer_->size(), 1);
+  auto *record           = log_buffer_->front().get();
   const auto &attributes = record->GetAttributes();
   EXPECT_EQ(attributes.size(), limits.attribute_count_limit);
   for (const auto &attr : attributes)
@@ -784,6 +860,79 @@ TEST_F(ProgrammaticConfigTest, TracerProviderWithDefaults)
   ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
 
   EXPECT_EQ(span_buffer_->size(), 1);
+}
+
+TEST_F(ProgrammaticConfigTest, TracerProviderWithGeneralAttributeLimits)
+{
+  // No tracer_provider.limits configured: the general attribute_limits should apply.
+  auto attribute_limits = std::make_unique<config_sdk::AttributeLimitsConfiguration>();
+  attribute_limits->attribute_count_limit        = 2;
+  attribute_limits->attribute_value_length_limit = 5;
+
+  auto model              = std::make_unique<config_sdk::Configuration>();
+  model->tracer_provider  = MakeTracerProviderConfig();
+  model->attribute_limits = std::move(attribute_limits);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->tracer_provider, nullptr);
+
+  auto tracer = trace::Provider::GetTracerProvider()->GetTracer("test");
+  tracer
+      ->StartSpan("test-span", common::MakeAttributes(
+                                   {{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}))
+      ->End();
+
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
+
+  EXPECT_EQ(span_buffer_->size(), 1);
+  const auto &attributes = span_buffer_->front()->GetAttributes();
+  EXPECT_EQ(attributes.size(), 2u);
+  for (const auto &attr : attributes)
+  {
+    EXPECT_EQ(nostd::get<std::string>(attr.second).size(), 5u);
+  }
+}
+
+TEST_F(ProgrammaticConfigTest, TracerProviderLimitsOverrideGeneralAttributeLimits)
+{
+  // Both tracer_provider.limits and the general attribute_limits are configured: the
+  // tracer-specific limits must win, per
+  // https://opentelemetry.io/docs/specs/otel/common/#attribute-limits
+  config_sdk::SpanLimitsConfiguration limits;
+  limits.attribute_count_limit        = 2;
+  limits.attribute_value_length_limit = 5;
+
+  auto tracer_provider_config    = MakeTracerProviderConfig();
+  tracer_provider_config->limits = std::make_unique<config_sdk::SpanLimitsConfiguration>(limits);
+
+  auto attribute_limits = std::make_unique<config_sdk::AttributeLimitsConfiguration>();
+  attribute_limits->attribute_count_limit        = 1;
+  attribute_limits->attribute_value_length_limit = 1;
+
+  auto model              = std::make_unique<config_sdk::Configuration>();
+  model->tracer_provider  = std::move(tracer_provider_config);
+  model->attribute_limits = std::move(attribute_limits);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->tracer_provider, nullptr);
+
+  auto tracer = trace::Provider::GetTracerProvider()->GetTracer("test");
+  tracer
+      ->StartSpan("test-span", common::MakeAttributes(
+                                   {{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}))
+      ->End();
+
+  ASSERT_TRUE(sdk_->tracer_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->tracer_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
+
+  EXPECT_EQ(span_buffer_->size(), 1);
+  const auto &attributes = span_buffer_->front()->GetAttributes();
+  EXPECT_EQ(attributes.size(), limits.attribute_count_limit);
+  for (const auto &attr : attributes)
+  {
+    EXPECT_EQ(nostd::get<std::string>(attr.second).size(), limits.attribute_value_length_limit);
+  }
 }
 
 TEST_F(ProgrammaticConfigTest, TracerProviderWithTracerConfigurator)
