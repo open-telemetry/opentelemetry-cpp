@@ -53,7 +53,7 @@ public:
         exemplar_filter_type_(exemplar_filter_type),
         exemplar_reservoir_(std::move(exemplar_reservoir)),
 #endif
-        temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
+        temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config, true)
   {}
 
   template <class T>
@@ -134,6 +134,12 @@ public:
       delta_metrics = std::move(delta_hash_map_);
       delta_hash_map_ =
           std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_);
+      // cumulative_hash_map_ is intentionally NOT pruned here.
+      // It preserves the last-seen absolute value for every attribute set so that
+      // delta computation in Record() remains correct if an attribute set reappears
+      // after being absent for one or more collection cycles.
+      // Stale entries are suppressed at export time by the is_async_ guard in
+      // TemporalMetricStorage::buildMetrics() instead.
     }
 
     auto status =
