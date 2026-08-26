@@ -641,4 +641,271 @@ TEST(ResourceTest, CopyAndAssignmentPreservesEntities)
   EXPECT_EQ(assigned.GetSchemaURL(), original.GetSchemaURL());
 }
 
+TEST(ResourceTest, MergeExample1EntityReplacesLooseAttribute)
+{
+  Resource old_resource(ResourceAttributes{{"host.name", "old-name"}, {"env", "prod"}},
+                        std::string{});
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}},
+              ResourceAttributes{{"host.name", "new-name"}});
+  Resource updating(ResourceAttributes{}, std::string{}, {host});
+  auto merged = old_resource.Merge(updating);
+
+  ASSERT_EQ(merged.GetEntities().size(), 1);
+  EXPECT_EQ(merged.GetEntities()[0].GetType(), "host");
+  EXPECT_EQ(merged.GetUnassociatedAttributes().size(), 1);
+  EXPECT_EQ(nostd::get<std::string>(merged.GetUnassociatedAttributes().at("env")), "prod");
+  EXPECT_TRUE(merged.GetUnassociatedAttributes().find("host.name") ==
+              merged.GetUnassociatedAttributes().end());
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("host.id")), "H1");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("host.name")), "new-name");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("env")), "prod");
+}
+
+TEST(ResourceTest, MergeExample2LooseAttributeEvictsEntity)
+{
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}},
+              ResourceAttributes{{"host.name", "detected-name"}});
+  Entity process("process", ResourceAttributes{{"process.pid", "12345"}});
+  Resource old_resource(ResourceAttributes{}, std::string{}, {host, process});
+  Resource updating(ResourceAttributes{{"host.id", "H2"}, {"env", "prod"}}, std::string{});
+  auto merged = old_resource.Merge(updating);
+
+  ASSERT_EQ(merged.GetEntities().size(), 1);
+  EXPECT_EQ(merged.GetEntities()[0].GetType(), "process");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetUnassociatedAttributes().at("host.id")), "H2");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetUnassociatedAttributes().at("env")), "prod");
+  EXPECT_TRUE(merged.GetUnassociatedAttributes().find("host.name") ==
+              merged.GetUnassociatedAttributes().end());
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("process.pid")), "12345");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("host.id")), "H2");
+  EXPECT_TRUE(merged.GetAttributes().find("host.name") == merged.GetAttributes().end());
+}
+
+TEST(ResourceTest, MergeExample3IdentityConflictKeepsUpdatingHostRank)
+{
+  Entity old_host("host", ResourceAttributes{{"host.id", "H1"}},
+                  ResourceAttributes{{"env", "prod"}});
+  Resource old_resource(ResourceAttributes{}, std::string{}, {old_host});
+  Entity updating_host("host", ResourceAttributes{{"host.id", "H2"}});
+  Entity service("service", ResourceAttributes{{"service.name", "S1"}},
+                 ResourceAttributes{{"env", "dev"}});
+  Resource updating(ResourceAttributes{}, std::string{}, {updating_host, service});
+  auto merged = old_resource.Merge(updating);
+
+  ASSERT_EQ(merged.GetEntities().size(), 1);
+  EXPECT_EQ(merged.GetEntities()[0].GetType(), "host");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetEntities()[0].GetIdentity().at("host.id")), "H1");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("env")), "prod");
+  EXPECT_TRUE(merged.GetAttributes().find("service.name") == merged.GetAttributes().end());
+}
+
+TEST(ResourceTest, MergeSameTypeSameIdentityOverlaysDescription)
+{
+  const std::string schema_url = "https://opentelemetry.io/schemas/1.21.0";
+  Entity old_host("host", ResourceAttributes{{"host.id", "H1"}},
+                  ResourceAttributes{{"env", "prod"}, {"host.type", "machine"}}, schema_url);
+  Entity updating_host("host", ResourceAttributes{{"host.id", "H1"}},
+                       ResourceAttributes{{"env", "dev"}}, schema_url);
+  Resource old_resource(ResourceAttributes{}, std::string{}, {old_host});
+  Resource updating(ResourceAttributes{}, std::string{}, {updating_host});
+  auto merged = old_resource.Merge(updating);
+
+  ASSERT_EQ(merged.GetEntities().size(), 1);
+  EXPECT_EQ(nostd::get<std::string>(merged.GetEntities()[0].GetDescription().at("env")), "dev");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetEntities()[0].GetDescription().at("host.type")),
+            "machine");
+  EXPECT_EQ(merged.GetEntities()[0].GetSchemaURL(), schema_url);
+}
+
+TEST(ResourceTest, MergeSameTypeDifferentIdentityKeepsOld)
+{
+  Entity old_host("host", ResourceAttributes{{"host.id", "H1"}});
+  Entity updating_host("host", ResourceAttributes{{"host.id", "H2"}});
+  auto merged = Resource(ResourceAttributes{}, std::string{}, {old_host})
+                    .Merge(Resource(ResourceAttributes{}, std::string{}, {updating_host}));
+
+  ASSERT_EQ(merged.GetEntities().size(), 1);
+  EXPECT_EQ(nostd::get<std::string>(merged.GetEntities()[0].GetIdentity().at("host.id")), "H1");
+}
+
+TEST(ResourceTest, MergeSameTypeDifferentSchemaKeepsOld)
+{
+  Entity old_host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{},
+                  "https://opentelemetry.io/schemas/1.21.0");
+  Entity updating_host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{},
+                       "https://opentelemetry.io/schemas/1.22.0");
+  auto merged = Resource(ResourceAttributes{}, std::string{}, {old_host})
+                    .Merge(Resource(ResourceAttributes{}, std::string{}, {updating_host}));
+
+  ASSERT_EQ(merged.GetEntities().size(), 1);
+  EXPECT_EQ(merged.GetEntities()[0].GetSchemaURL(), "https://opentelemetry.io/schemas/1.21.0");
+}
+
+TEST(ResourceTest, MergeDifferentTypesAppend)
+{
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}});
+  Entity service("service", ResourceAttributes{{"service.name", "app"}});
+  auto merged = Resource(ResourceAttributes{}, std::string{}, {host})
+                    .Merge(Resource(ResourceAttributes{}, std::string{}, {service}));
+
+  ASSERT_EQ(merged.GetEntities().size(), 2);
+  EXPECT_EQ(merged.GetEntities()[0].GetType(), "service");
+  EXPECT_EQ(merged.GetEntities()[1].GetType(), "host");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("host.id")), "H1");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("service.name")), "app");
+}
+
+TEST(ResourceTest, MergeUpdatingTypeRankBeatsOldOnlyType)
+{
+  Entity service("service", ResourceAttributes{{"service.name", "app"}},
+                 ResourceAttributes{{"env", "prod"}});
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{{"env", "dev"}});
+  auto merged = Resource(ResourceAttributes{}, std::string{}, {service})
+                    .Merge(Resource(ResourceAttributes{}, std::string{}, {host}));
+
+  ASSERT_EQ(merged.GetEntities().size(), 1);
+  EXPECT_EQ(merged.GetEntities()[0].GetType(), "host");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("env")), "dev");
+}
+
+TEST(ResourceTest, MergeCascadingKeyConflictKeepsHighestAndUnrelated)
+{
+  Entity mid("mid", ResourceAttributes{{"x", "from-mid"}, {"y", "from-mid"}});
+  Entity a("a", ResourceAttributes{{"x", "from-a"}});
+  Entity c("c", ResourceAttributes{{"y", "from-c"}});
+  auto merged = Resource(ResourceAttributes{}, std::string{}, {mid})
+                    .Merge(Resource(ResourceAttributes{}, std::string{}, {a, c}));
+
+  ASSERT_EQ(merged.GetEntities().size(), 2);
+  EXPECT_EQ(merged.GetEntities()[0].GetType(), "a");
+  EXPECT_EQ(merged.GetEntities()[1].GetType(), "c");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("x")), "from-a");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("y")), "from-c");
+}
+
+TEST(ResourceTest, MergeAllEntitiesDroppedUsesClassicSchema)
+{
+  const std::string old_schema      = "https://opentelemetry.io/schemas/1.21.0";
+  const std::string updating_schema = "https://opentelemetry.io/schemas/1.22.0";
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{}, old_schema);
+  Resource old_resource(ResourceAttributes{}, old_schema, {host});
+  Resource updating(ResourceAttributes{{"host.id", "H2"}}, updating_schema);
+  auto merged = old_resource.Merge(updating);
+
+  EXPECT_TRUE(merged.GetEntities().empty());
+  EXPECT_EQ(merged.GetSchemaURL(), updating_schema);
+  EXPECT_EQ(nostd::get<std::string>(merged.GetUnassociatedAttributes().at("host.id")), "H2");
+}
+
+TEST(ResourceTest, MergeSurvivingEntitiesSetResourceSchema)
+{
+  const std::string entity_schema = "https://opentelemetry.io/schemas/1.21.0";
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{}, entity_schema);
+  Resource old_resource(ResourceAttributes{}, "https://opentelemetry.io/schemas/1.2.0");
+  Resource updating(ResourceAttributes{{"env", "prod"}}, "https://opentelemetry.io/schemas/9.9.9",
+                    {host});
+  auto merged = old_resource.Merge(updating);
+
+  EXPECT_EQ(merged.GetSchemaURL(), entity_schema);
+  EXPECT_EQ(nostd::get<std::string>(merged.GetUnassociatedAttributes().at("env")), "prod");
+}
+
+TEST(ResourceTest, MergeMixedEntitySchemaUrls)
+{
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{},
+              "https://opentelemetry.io/schemas/1.21.0");
+  Entity service("service", ResourceAttributes{{"service.name", "app"}}, ResourceAttributes{},
+                 "https://opentelemetry.io/schemas/1.22.0");
+  auto merged = Resource(ResourceAttributes{}, std::string{}, {host})
+                    .Merge(Resource(ResourceAttributes{}, std::string{}, {service}));
+
+  EXPECT_TRUE(merged.GetSchemaURL().empty());
+  ASSERT_EQ(merged.GetEntities().size(), 2);
+}
+
+TEST(ResourceTest, MergeUpdatingLooseBeatsOldLoose)
+{
+  Resource old_resource(ResourceAttributes{{"foo", "old"}, {"keep", "old"}}, std::string{},
+                        {Entity("host", ResourceAttributes{{"host.id", "H1"}})});
+  Resource updating(ResourceAttributes{{"foo", "new"}}, std::string{},
+                    {Entity("service", ResourceAttributes{{"service.name", "app"}})});
+  auto merged = old_resource.Merge(updating);
+
+  ASSERT_EQ(merged.GetEntities().size(), 2);
+  EXPECT_EQ(nostd::get<std::string>(merged.GetUnassociatedAttributes().at("foo")), "new");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetUnassociatedAttributes().at("keep")), "old");
+  EXPECT_TRUE(merged.GetUnassociatedAttributes().find("host.id") ==
+              merged.GetUnassociatedAttributes().end());
+  EXPECT_TRUE(merged.GetUnassociatedAttributes().find("service.name") ==
+              merged.GetUnassociatedAttributes().end());
+}
+
+TEST(ResourceTest, MergeCopyAssignmentPreservesMergedEntities)
+{
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}});
+  auto merged = Resource(ResourceAttributes{{"env", "prod"}}, std::string{})
+                    .Merge(Resource(ResourceAttributes{}, std::string{}, {host}));
+
+  Resource copied(merged);
+  EXPECT_EQ(copied.GetEntities(), merged.GetEntities());
+  EXPECT_EQ(copied.GetUnassociatedAttributes(), merged.GetUnassociatedAttributes());
+  EXPECT_EQ(copied.GetAttributes(), merged.GetAttributes());
+  EXPECT_EQ(copied.GetSchemaURL(), merged.GetSchemaURL());
+
+  Resource assigned;
+  assigned = merged;
+  EXPECT_EQ(assigned.GetEntities(), merged.GetEntities());
+  EXPECT_EQ(assigned.GetAttributes(), merged.GetAttributes());
+}
+
+TEST(ResourceTest, CreateEmptyEntitiesMatchesTwoArg)
+{
+  ResourceAttributes attributes = {{"service", "backend"}};
+  auto two_arg                  = Resource::Create(attributes);
+  auto three_arg                = Resource::Create(attributes, std::string{}, {});
+
+  EXPECT_TRUE(two_arg.GetEntities().empty());
+  EXPECT_TRUE(three_arg.GetEntities().empty());
+  EXPECT_EQ(two_arg.GetAttributes(), three_arg.GetAttributes());
+  EXPECT_EQ(two_arg.GetSchemaURL(), three_arg.GetSchemaURL());
+}
+
+TEST(ResourceTest, CreateWithEntityPreservesEntityAndSdkDefaults)
+{
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}});
+  auto resource = Resource::Create(ResourceAttributes{{"env", "prod"}}, std::string{}, {host});
+
+  ASSERT_EQ(resource.GetEntities().size(), 1);
+  EXPECT_EQ(resource.GetEntities()[0].GetType(), "host");
+  EXPECT_EQ(nostd::get<std::string>(resource.GetAttributes().at("host.id")), "H1");
+  EXPECT_EQ(nostd::get<std::string>(resource.GetUnassociatedAttributes().at("env")), "prod");
+  EXPECT_EQ(nostd::get<std::string>(
+                resource.GetAttributes().at(semconv::telemetry::kTelemetrySdkLanguage)),
+            "cpp");
+  EXPECT_EQ(nostd::get<std::string>(resource.GetAttributes().at(semconv::service::kServiceName)),
+            "unknown_service");
+}
+
+TEST(ResourceTest, CreateEntityOwnedServiceNameSkipsFallback)
+{
+  Entity service("service", ResourceAttributes{{"service.name", "from-entity"}});
+  auto resource = Resource::Create(ResourceAttributes{}, std::string{}, {service});
+
+  ASSERT_EQ(resource.GetEntities().size(), 1);
+  EXPECT_EQ(nostd::get<std::string>(resource.GetAttributes().at(semconv::service::kServiceName)),
+            "from-entity");
+  EXPECT_TRUE(resource.GetUnassociatedAttributes().find(semconv::service::kServiceName) ==
+              resource.GetUnassociatedAttributes().end());
+}
+
+TEST(ResourceTest, CreateWithEntitySchemaUrl)
+{
+  const std::string entity_schema = "https://opentelemetry.io/schemas/1.21.0";
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{}, entity_schema);
+  auto resource =
+      Resource::Create(ResourceAttributes{}, "https://opentelemetry.io/schemas/1.2.0", {host});
+
+  EXPECT_EQ(resource.GetSchemaURL(), entity_schema);
+}
+
 }  // namespace
