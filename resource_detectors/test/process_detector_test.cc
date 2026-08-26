@@ -272,55 +272,9 @@ TEST(ProcessDetectorUtilsTest, GetProcessOwnerTest)
   EXPECT_EQ(owner.find('\n'), std::string::npos) << "Owner should not contain newline";
 }
 
-TEST(ProcessDetectorUtilsTest, GetExecutableBuildIdHtlhashTest)
-{
-  int32_t pid          = getpid();
-  std::string exe_path = opentelemetry::resource_detector::detail::GetExecutableInfo(pid).path;
-  std::string hash1    = opentelemetry::resource_detector::detail::GetExecutableBuildIdHtlhash(pid);
-  std::string hash2    = opentelemetry::resource_detector::detail::GetExecutableBuildIdHtlhash(pid);
-
-  if (exe_path.empty())
-  {
-    EXPECT_TRUE(hash1.empty()) << "htlhash should be empty when executable path is empty";
-    return;
-  }
-
-  EXPECT_FALSE(hash1.empty()) << "Build ID htlhash must not be empty";
-
-  if (!hash1.empty())
-  {
-    // Must be exactly 32 lowercase hex characters (16 bytes).
-    EXPECT_EQ(hash1.size(), 32u) << "htlhash must be 32 hex chars, got: " << hash1;
-    for (char c : hash1)
-    {
-      EXPECT_TRUE((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'))
-          << "Non-hex character '" << c << "' in htlhash: " << hash1;
-    }
-    // Must be deterministic: two calls on the same process → same result.
-    EXPECT_EQ(hash1, hash2) << "htlhash must be deterministic";
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Integration test — Detect() attribute presence
 // ---------------------------------------------------------------------------
-
-TEST(ProcessDetectorUtilsTest, ComputeSha256HexTest)
-{
-  // Test vectors from NIST FIPS 180-4
-  // 1. Empty string
-  EXPECT_EQ(opentelemetry::resource_detector::detail::ComputeSha256Hex(""),
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
-
-  // 2. "abc"
-  EXPECT_EQ(opentelemetry::resource_detector::detail::ComputeSha256Hex("abc"),
-            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
-
-  // 3. "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
-  EXPECT_EQ(opentelemetry::resource_detector::detail::ComputeSha256Hex(
-                "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"),
-            "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1");
-}
 
 TEST(ProcessResourceDetectorTest, DetectPopulatesExpectedAttributes)
 {
@@ -341,10 +295,6 @@ TEST(ProcessResourceDetectorTest, DetectPopulatesExpectedAttributes)
   EXPECT_NE(attrs.find(opentelemetry::semconv::process::kProcessExecutableName), attrs.end())
       << "process.executable.name must be present on this platform";
 
-  // process.executable.build_id.htlhash — present on Linux, macOS, and Windows.
-  EXPECT_NE(attrs.find(opentelemetry::semconv::process::kProcessExecutableBuildIdHtlhash),
-            attrs.end())
-      << "process.executable.build_id.htlhash must be present on this platform";
 #endif
 
 #if defined(_MSC_VER) || defined(__linux__) || defined(__APPLE__)

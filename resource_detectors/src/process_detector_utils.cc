@@ -9,8 +9,6 @@
 #include <string>
 #include <vector>
 
-#include <openssl/evp.h>
-
 #if defined(__APPLE__)
 #  include <mach-o/dyld.h>
 #endif
@@ -402,110 +400,6 @@ std::string GetProcessOwner()
   }
   return std::string(result->pw_name);
 #endif
-}
-
-// ---------------------------------------------------------------------------
-// GetExecutableBuildIdHtlhash  (self-contained SHA-256, no external deps)
-// ---------------------------------------------------------------------------
-
-namespace
-{
-
-// Encode the first `byte_count` bytes of `digest` as lowercase hex.
-std::string DigestToHex(const uint8_t *digest, std::size_t byte_count)
-{
-  static const char kHex[] = "0123456789abcdef";
-  std::string result;
-  result.reserve(byte_count * 2);
-  for (std::size_t i = 0; i < byte_count; ++i)
-  {
-    result += kHex[(digest[i] >> 4) & 0x0F];
-    result += kHex[digest[i] & 0x0F];
-  }
-  return result;
-}
-
-}  // namespace
-
-std::string GetExecutableBuildIdHtlhash(const int32_t &pid)
-{
-  std::string exe_path = GetExecutableInfo(pid).path;
-  if (exe_path.empty())
-  {
-    return std::string();
-  }
-
-  std::ifstream f(exe_path, std::ios::binary | std::ios::ate);
-  if (!f.is_open())
-  {
-    return std::string();
-  }
-
-  const auto end_pos = f.tellg();
-  if (end_pos < 0)
-  {
-    return std::string();
-  }
-  auto file_size = static_cast<std::uint64_t>(end_pos);
-
-  constexpr std::size_t kChunkSize = 4096;
-
-  // Read head (up to 4096 bytes).
-  std::string head(kChunkSize, '\0');
-  f.seekg(0, std::ios::beg);
-  f.read(&head[0], static_cast<std::streamsize>(kChunkSize));
-  std::size_t head_read = static_cast<std::size_t>(f.gcount());
-  head.resize(head_read);
-
-  // Read tail (up to 4096 bytes from end). For files <= 4096 bytes the tail
-  // overlaps the head (both cover the whole file), matching the spec.
-  std::string tail;
-  tail.resize(kChunkSize, '\0');
-  std::size_t tail_offset =
-      (file_size < kChunkSize) ? 0 : static_cast<std::size_t>(file_size - kChunkSize);
-  f.seekg(static_cast<std::streamoff>(tail_offset), std::ios::beg);
-  f.read(&tail[0], static_cast<std::streamsize>(kChunkSize));
-  std::size_t tail_read = static_cast<std::size_t>(f.gcount());
-  tail.resize(tail_read);
-
-  // Encode file length as big-endian uint64.
-  std::uint64_t file_size_be = file_size;
-  uint8_t len_bytes[8];
-  for (int i = 7; i >= 0; --i)
-  {
-    len_bytes[i] = static_cast<uint8_t>(file_size_be & 0xFF);
-    file_size_be >>= 8;
-  }
-
-  // SHA256(head || tail || len_bytes).
-  EVP_MD_CTX *ctx = EVP_MD_CTX_new();
-  EVP_DigestInit_ex(ctx, EVP_sha256(), nullptr);
-  EVP_DigestUpdate(ctx, reinterpret_cast<const uint8_t *>(head.data()), head.size());
-  EVP_DigestUpdate(ctx, reinterpret_cast<const uint8_t *>(tail.data()), tail.size());
-  EVP_DigestUpdate(ctx, len_bytes, 8);
-
-  uint8_t digest[EVP_MAX_MD_SIZE];
-  unsigned int digest_len = 0;
-  EVP_DigestFinal_ex(ctx, digest, &digest_len);
-  EVP_MD_CTX_free(ctx);
-
-  // Return first 16 bytes (128 bits) as hex (32 hex chars).
-  return DigestToHex(digest, 16);
-}
-
-std::string ComputeSha256Hex(const std::string &data)
-{
-  EVP_MD_CTX *ctx = EVP_MD_CTX_new();
-  EVP_DigestInit_ex(ctx, EVP_sha256(), nullptr);
-  EVP_DigestUpdate(ctx, reinterpret_cast<const uint8_t *>(data.data()), data.size());
-
-  uint8_t digest[EVP_MAX_MD_SIZE];
-  unsigned int digest_len = 0;
-  EVP_DigestFinal_ex(ctx, digest, &digest_len);
-  EVP_MD_CTX_free(ctx);
-
-  // Return all 32 bytes (256 bits) as hex (64 hex chars).
-  return DigestToHex(digest, 32);
 }
 
 }  // namespace detail

@@ -5,8 +5,6 @@
 # opentelemetry_container_resource_detector
 #
 
-find_package(OpenSSL REQUIRED)
-
 add_library(opentelemetry_container_resource_detector
             src/container_detector.cc src/container_detector_utils.cc)
 
@@ -24,8 +22,6 @@ target_include_directories(
 #
 # opentelemetry_container_resource_detector_builder
 #
-
-find_package(OpenSSL REQUIRED)
 
 add_library(opentelemetry_container_resource_detector_builder
             src/container_detector_builder.cc)
@@ -113,8 +109,7 @@ set_target_properties(opentelemetry_process_resource_detector
 set_target_version(opentelemetry_process_resource_detector)
 
 target_link_libraries(opentelemetry_process_resource_detector
-                      PUBLIC opentelemetry_resources
-                      PRIVATE OpenSSL::Crypto)
+                      PUBLIC opentelemetry_resources)
 target_include_directories(
   opentelemetry_process_resource_detector
   PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"

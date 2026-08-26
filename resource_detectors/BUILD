@@ -23,7 +23,6 @@ cc_library(
         "//resource_detectors:headers",
         "//sdk:headers",
         "//sdk/src/resource",
-        "@boringssl//:crypto",
     ],
 )
 

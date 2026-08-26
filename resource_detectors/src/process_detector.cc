@@ -99,21 +99,6 @@ opentelemetry::sdk::resource::Resource ProcessResourceDetector::Detect() noexcep
                                                            << ex.what());
   }
 
-  try
-  {
-    std::string build_id =
-        opentelemetry::resource_detector::detail::GetExecutableBuildIdHtlhash(pid);
-    if (!build_id.empty())
-    {
-      attributes[semconv::process::kProcessExecutableBuildIdHtlhash] = std::move(build_id);
-    }
-  }
-  catch (const std::exception &ex)
-  {
-    OTEL_INTERNAL_LOG_ERROR("[Process Resource Detector] "
-                            << "Error computing executable build id (htlhash): " << ex.what());
-  }
-
   return ResourceDetector::Create(attributes);
 }
 
