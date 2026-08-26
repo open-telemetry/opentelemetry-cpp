@@ -860,6 +860,44 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   delete handler;
 }
 
+// Setup() applies the TLS version range and the cipher list to the easy handle, and returns early
+// on either if curl rejects it. A plain http request reaches both, so the outcome says the options
+// were accepted rather than that a handshake succeeded.
+TEST_F(BasicCurlHttpTests, TlsVersionRangeAndCipherListAreAccepted)
+{
+  RetryEventHandler handler;
+  http_client::HttpSslOptions ssl_options;
+  ssl_options.use_ssl     = true;
+  ssl_options.ssl_min_tls = "1.2";
+  ssl_options.ssl_max_tls = "1.3";
+  ssl_options.ssl_cipher  = "ECDHE-RSA-AES128-GCM-SHA256";
+  http_client::Body body;
+  http_client::Headers headers;
+
+  curl::HttpOperation operation(http_client::Method::Get, "http://127.0.0.1:19000/get/",
+                                ssl_options, &handler, headers, body);
+
+  ASSERT_EQ(CURLE_OK, operation.Send());
+  ASSERT_EQ(200, operation.GetResponseCode());
+}
+
+// An unknown version is refused rather than passed to curl, which is the branch above returning
+// before CURLOPT_SSLVERSION is set at all.
+TEST_F(BasicCurlHttpTests, AnUnknownTlsVersionIsRefused)
+{
+  RetryEventHandler handler;
+  http_client::HttpSslOptions ssl_options;
+  ssl_options.use_ssl     = true;
+  ssl_options.ssl_min_tls = "1.1";
+  http_client::Body body;
+  http_client::Headers headers;
+
+  curl::HttpOperation operation(http_client::Method::Get, "http://127.0.0.1:19000/get/",
+                                ssl_options, &handler, headers, body);
+
+  ASSERT_EQ(CURLE_UNKNOWN_OPTION, operation.Send());
+}
+
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
 TEST_F(BasicCurlHttpTests, RetryPolicyEnabled)
 {
