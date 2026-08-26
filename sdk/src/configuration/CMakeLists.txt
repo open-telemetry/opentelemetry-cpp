@@ -23,11 +23,12 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>"
          "$<INSTALL_INTERFACE:include>")
 
+# TODO: Remove trace, metrics and logs library links from config core. See:
+# https://github.com/open-telemetry/opentelemetry-cpp/issues/4352
 target_link_libraries(
   opentelemetry_configuration_core
-  PUBLIC opentelemetry_api opentelemetry_common opentelemetry_trace
-         opentelemetry_metrics opentelemetry_logs opentelemetry_resources
-  PRIVATE)
+  PUBLIC opentelemetry_api opentelemetry_common opentelemetry_resources
+         opentelemetry_trace opentelemetry_metrics opentelemetry_logs)
 
 # Trace SDK component builders
 add_library(opentelemetry_configuration_trace_builders trace_builders.cc)
@@ -43,8 +44,7 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_configuration_trace_builders
-  PUBLIC opentelemetry_trace
-  PRIVATE opentelemetry_configuration_core)
+  PUBLIC opentelemetry_trace opentelemetry_configuration_core)
 
 # Logs SDK component builders
 add_library(opentelemetry_configuration_logs_builders logs_builders.cc)
@@ -60,8 +60,7 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_configuration_logs_builders
-  PUBLIC opentelemetry_logs
-  PRIVATE opentelemetry_configuration_core)
+  PUBLIC opentelemetry_logs opentelemetry_configuration_core)
 
 # Metrics SDK component builders
 add_library(opentelemetry_configuration_metrics_builders metrics_builders.cc)
@@ -77,8 +76,7 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_configuration_metrics_builders
-  PUBLIC opentelemetry_metrics
-  PRIVATE opentelemetry_configuration_core)
+  PUBLIC opentelemetry_metrics opentelemetry_configuration_core)
 
 # Registry factory for to register all SDK component builders
 add_library(opentelemetry_configuration_registry_factory registry_factory.cc)
@@ -95,9 +93,9 @@ target_include_directories(
 target_link_libraries(
   opentelemetry_configuration_registry_factory
   PUBLIC opentelemetry_configuration_core
-         opentelemetry_configuration_trace_builders
-         opentelemetry_configuration_metrics_builders
-         opentelemetry_configuration_logs_builders)
+  PRIVATE opentelemetry_configuration_trace_builders
+          opentelemetry_configuration_metrics_builders
+          opentelemetry_configuration_logs_builders)
 
 if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(
