@@ -19,16 +19,19 @@ jobs:
       CXX_STANDARD: '17'
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
         with:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           submodules: 'recursive'
       - name: Build dependencies with vcpkg submodule
         run: |
           ./ci/setup_windows_ci_environment.ps1
+      - name: Run Install Functions Tests
+        run: ./ci/do_ci.ps1 cmake.install_functions.test
       - name: Run Tests
         run: ./ci/do_ci.ps1 cmake.install.test
       - name: Run DLL Tests
@@ -41,16 +44,19 @@ jobs:
       CXX_STANDARD: '20'
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
         with:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           submodules: 'recursive'
       - name: Build dependencies with vcpkg submodule
         run: |
           ./ci/setup_windows_ci_environment.ps1
+      - name: Run Install Functions Tests
+        run: ./ci/do_ci.ps1 cmake.install_functions.test
       - name: Run Tests
         run: ./ci/do_ci.ps1 cmake.install.test
 
@@ -64,11 +70,12 @@ jobs:
       BUILD_TYPE: 'Debug'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+      uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        persist-credentials: false
         submodules: 'recursive'
     - name: Setup CI Environment
       run: |
@@ -78,6 +85,8 @@ jobs:
         sudo -E apt-get update
         sudo -E apt-get install -y libabsl-dev libcurl4-openssl-dev zlib1g-dev nlohmann-json3-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "googletest;benchmark"
+    - name: Run Install Functions Tests
+      run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -96,11 +105,12 @@ jobs:
       BUILD_TYPE: 'Debug'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+      uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        persist-credentials: false
         submodules: 'recursive'
     - name: Setup CI Environment
       run: |
@@ -108,6 +118,8 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_latest
+    - name: Run Install Functions Tests
+      run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -126,11 +138,12 @@ jobs:
       BUILD_TYPE: 'Debug'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+      uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        persist-credentials: false
         submodules: 'recursive'
     - name: Setup CI Environment
       run: |
@@ -138,6 +151,8 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_stable
+    - name: Run Install Functions Tests
+      run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -159,11 +174,12 @@ jobs:
       BUILD_TYPE: 'Debug'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+      uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
       with:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        persist-credentials: false
         submodules: 'recursive'
     - name: Setup CI Environment
       run: |
@@ -172,6 +188,8 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file install/cmake/third_party_minimum
+    - name: Run Install Functions Tests
+      run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
       env:
           BUILD_SHARED_LIBS: 'OFF'
@@ -191,12 +209,13 @@ jobs:
       BUILD_TYPE: 'Debug'
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
         with:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           submodules: 'recursive'
       - name: Free Disk Space
         run: ./ci/free_disk_space.sh
@@ -209,6 +228,8 @@ jobs:
         run: |
           conan install install/conan/conanfile_stable.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
           conan cache clean --source --build
+      - name: Run Install Functions Tests
+        run: ./ci/do_ci.sh cmake.install_functions.test
       - name: Run Tests (static libs)
         env:
           BUILD_SHARED_LIBS: 'OFF'
@@ -230,12 +251,13 @@ jobs:
       BUILD_TYPE: 'Debug'
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
         with:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           submodules: 'recursive'
       - name: Free Disk Space
         run: ./ci/free_disk_space.sh
@@ -248,6 +270,8 @@ jobs:
         run: |
           conan install install/conan/conanfile_latest.txt --build=missing -of /home/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
           conan cache clean --source --build
+      - name: Run Install Functions Tests
+        run: ./ci/do_ci.sh cmake.install_functions.test
       - name: Run Tests (static libs)
         env:
           BUILD_SHARED_LIBS: 'OFF'
@@ -270,12 +294,13 @@ jobs:
       BUILD_TYPE: 'Debug'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+      uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
       with:
         egress-policy: audit
 
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        persist-credentials: false
         submodules: 'recursive'
     - name: Install CMake
       run: |
@@ -288,6 +313,8 @@ jobs:
       run: |
         conan install install/conan/conanfile_stable.txt --build=missing -of /Users/runner/conan -s build_type=${BUILD_TYPE} -s compiler.cppstd=${CXX_STANDARD}
         conan cache clean --source --build
+    - name: Run Install Functions Tests
+      run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'
@@ -302,12 +329,13 @@ jobs:
       BUILD_TYPE: 'Debug'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+      uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
       with:
         egress-policy: audit
 
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        persist-credentials: false
         submodules: 'recursive'
     - name: Install Dependencies with Homebrew
       run: |
@@ -320,6 +348,8 @@ jobs:
         brew install grpc
         brew install nlohmann-json
         brew install prometheus-cpp
+    - name: Run Install Functions Tests
+      run: ./ci/do_ci.sh cmake.install_functions.test
     - name: Run Tests (static libs)
       env:
         BUILD_SHARED_LIBS: 'OFF'

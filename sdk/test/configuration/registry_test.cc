@@ -16,10 +16,12 @@
 #include "opentelemetry/sdk/configuration/composable_parent_threshold_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_probability_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/container_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/extension_metric_producer_builder.h"
@@ -32,7 +34,9 @@
 #include "opentelemetry/sdk/configuration/host_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_builder.h"
+#include "opentelemetry/sdk/configuration/logger_provider_builder.h"
 #include "opentelemetry/sdk/configuration/meter_configurator_builder.h"
+#include "opentelemetry/sdk/configuration/meter_provider_builder.h"
 #include "opentelemetry/sdk/configuration/open_census_metric_producer_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_builder.h"
@@ -56,6 +60,7 @@
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_builder.h"
+#include "opentelemetry/sdk/configuration/tracer_provider_builder.h"
 
 #include "opentelemetry/context/propagation/text_map_propagator.h"      // IWYU pragma: keep
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"  // IWYU pragma: keep
@@ -208,6 +213,17 @@ public:
       const override
   {
     auto unused = std::move(rule_samplers);
+    return nullptr;
+  }
+};
+
+class TestCompositeSamplerBuilder : public configuration::CompositeSamplerBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> Build(
+      std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> &&sampler) const override
+  {
+    auto unused = std::move(sampler);
     return nullptr;
   }
 };
@@ -540,6 +556,17 @@ public:
   }
 };
 
+class TestExtensionComposableSamplerBuilder
+    : public configuration::ExtensionComposableSamplerBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::ComposableSampler> Build(
+      const configuration::ExtensionComposableSamplerConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
 class TestExtensionSpanExporterBuilder : public configuration::ExtensionSpanExporterBuilder
 {
 public:
@@ -599,6 +626,39 @@ class TestExtensionLogRecordProcessorBuilder
 public:
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> Build(
       const configuration::ExtensionLogRecordProcessorConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestTracerProviderBuilder : public configuration::TracerProviderBuilder
+{
+public:
+  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> Build(
+      const configuration::TracerProviderBuilderContext & /* context */,
+      const configuration::TracerProviderConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestLoggerProviderBuilder : public configuration::LoggerProviderBuilder
+{
+public:
+  std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> Build(
+      const configuration::LoggerProviderBuilderContext & /* context */,
+      const configuration::LoggerProviderConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestMeterProviderBuilder : public configuration::MeterProviderBuilder
+{
+public:
+  std::shared_ptr<opentelemetry::sdk::metrics::MeterProvider> Build(
+      const configuration::MeterProviderBuilderContext & /* context */,
+      const configuration::MeterProviderConfiguration * /* model */) const override
   {
     return nullptr;
   }
@@ -725,6 +785,12 @@ TEST(Registry, ComposableRuleBasedSamplerBuilder)
   TestTypedSlot<TestComposableRuleBasedSamplerBuilder>(
       &configuration::Registry::GetComposableRuleBasedSamplerBuilder,
       &configuration::Registry::SetComposableRuleBasedSamplerBuilder);
+}
+
+TEST(Registry, CompositeSamplerBuilder)
+{
+  TestTypedSlot<TestCompositeSamplerBuilder>(&configuration::Registry::GetCompositeSamplerBuilder,
+                                             &configuration::Registry::SetCompositeSamplerBuilder);
 }
 
 TEST(Registry, BatchSpanProcessorBuilder)
@@ -913,19 +979,9 @@ TEST(Registry, OtlpFileLogRecordBuilder)
 
 TEST(Registry, PeriodicMetricReaderBuilder)
 {
-  // Registry pre-populates this slot; test replace lifecycle only.
-  configuration::Registry registry;
-  ASSERT_NE(registry.GetPeriodicMetricReaderBuilder(), nullptr);
-
-  auto first            = std::make_unique<TestPeriodicMetricReaderBuilder>();
-  const auto *first_ptr = first.get();
-  registry.SetPeriodicMetricReaderBuilder(std::move(first));
-  ASSERT_EQ(registry.GetPeriodicMetricReaderBuilder(), first_ptr);
-
-  auto second            = std::make_unique<TestPeriodicMetricReaderBuilder>();
-  const auto *second_ptr = second.get();
-  registry.SetPeriodicMetricReaderBuilder(std::move(second));
-  ASSERT_EQ(registry.GetPeriodicMetricReaderBuilder(), second_ptr);
+  TestTypedSlot<TestPeriodicMetricReaderBuilder>(
+      &configuration::Registry::GetPeriodicMetricReaderBuilder,
+      &configuration::Registry::SetPeriodicMetricReaderBuilder);
 }
 
 TEST(Registry, PrometheusPullMetricExporterBuilder)
@@ -958,6 +1014,13 @@ TEST(Registry, ExtensionSamplerBuilder)
   TestNamedSlot<TestExtensionSamplerBuilder>(&configuration::Registry::GetExtensionSamplerBuilder,
                                              &configuration::Registry::SetExtensionSamplerBuilder,
                                              "my_sampler");
+}
+
+TEST(Registry, ExtensionComposableSamplerBuilder)
+{
+  TestNamedSlot<TestExtensionComposableSamplerBuilder>(
+      &configuration::Registry::GetExtensionComposableSamplerBuilder,
+      &configuration::Registry::SetExtensionComposableSamplerBuilder, "my_composable_sampler");
 }
 
 TEST(Registry, ExtensionSpanExporterBuilder)
@@ -1000,4 +1063,22 @@ TEST(Registry, ExtensionLogRecordProcessorBuilder)
   TestNamedSlot<TestExtensionLogRecordProcessorBuilder>(
       &configuration::Registry::GetExtensionLogRecordProcessorBuilder,
       &configuration::Registry::SetExtensionLogRecordProcessorBuilder, "my_processor");
+}
+
+TEST(Registry, TracerProviderBuilder)
+{
+  TestTypedSlot<TestTracerProviderBuilder>(&configuration::Registry::GetTracerProviderBuilder,
+                                           &configuration::Registry::SetTracerProviderBuilder);
+}
+
+TEST(Registry, LoggerProviderBuilder)
+{
+  TestTypedSlot<TestLoggerProviderBuilder>(&configuration::Registry::GetLoggerProviderBuilder,
+                                           &configuration::Registry::SetLoggerProviderBuilder);
+}
+
+TEST(Registry, MeterProviderBuilder)
+{
+  TestTypedSlot<TestMeterProviderBuilder>(&configuration::Registry::GetMeterProviderBuilder,
+                                          &configuration::Registry::SetMeterProviderBuilder);
 }

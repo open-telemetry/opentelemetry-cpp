@@ -23,6 +23,61 @@ cc_library(
         "//api",
         "//sdk:headers",
         "//sdk/src/common:wildcard_match",
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+    ],
+)
+
+cc_library(
+    name = "configuration_trace_builders",
+    srcs = ["trace_builders.cc"],
+    include_prefix = "src/configuration",
+    deps = [
+        ":configuration_core",
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/common:wildcard_match",
+    ],
+)
+
+cc_library(
+    name = "configuration_logs_builders",
+    srcs = ["logs_builders.cc"],
+    include_prefix = "src/configuration",
+    deps = [
+        ":configuration_core",
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/common:wildcard_match",
+    ],
+)
+
+cc_library(
+    name = "configuration_metrics_builders",
+    srcs = ["metrics_builders.cc"],
+    include_prefix = "src/configuration",
+    deps = [
+        ":configuration_core",
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/common:wildcard_match",
+        "//sdk/src/metrics",
+    ],
+)
+
+cc_library(
+    name = "configuration_registry_factory",
+    srcs = ["registry_factory.cc"],
+    include_prefix = "src/configuration",
+    deps = [
+        ":configuration_core",
+        ":configuration_logs_builders",
+        ":configuration_metrics_builders",
+        ":configuration_trace_builders",
+        "//api",
+        "//sdk:headers",
     ],
 )
 

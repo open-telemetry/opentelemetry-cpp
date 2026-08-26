@@ -25,10 +25,12 @@ class ComposableAlwaysOnSamplerBuilder;
 class ComposableParentThresholdSamplerBuilder;
 class ComposableProbabilitySamplerBuilder;
 class ComposableRuleBasedSamplerBuilder;
+class CompositeSamplerBuilder;
 class ConsoleLogRecordExporterBuilder;
 class ConsolePushMetricExporterBuilder;
 class ConsoleSpanExporterBuilder;
 class ContainerResourceDetectorBuilder;
+class ExtensionComposableSamplerBuilder;
 class ExtensionLogRecordExporterBuilder;
 class ExtensionLogRecordProcessorBuilder;
 class ExtensionMetricProducerBuilder;
@@ -41,7 +43,9 @@ class ExtensionSpanProcessorBuilder;
 class HostResourceDetectorBuilder;
 class JaegerRemoteSamplerBuilder;
 class LoggerConfiguratorBuilder;
+class LoggerProviderBuilder;
 class MeterConfiguratorBuilder;
+class MeterProviderBuilder;
 class OpenCensusMetricProducerBuilder;
 class OtlpFileLogRecordExporterBuilder;
 class OtlpFilePushMetricExporterBuilder;
@@ -64,6 +68,7 @@ class SimpleSpanProcessorBuilder;
 class TextMapPropagatorBuilder;
 class TraceIdRatioBasedSamplerBuilder;
 class TracerConfiguratorBuilder;
+class TracerProviderBuilder;
 
 class OPENTELEMETRY_EXPORT Registry
 {
@@ -283,6 +288,13 @@ public:
   void SetComposableRuleBasedSamplerBuilder(
       std::unique_ptr<ComposableRuleBasedSamplerBuilder> &&builder);
 
+  const CompositeSamplerBuilder *GetCompositeSamplerBuilder() const
+  {
+    return composite_sampler_builder_.get();
+  }
+
+  void SetCompositeSamplerBuilder(std::unique_ptr<CompositeSamplerBuilder> &&builder);
+
   /* Processors. */
 
   const BatchSpanProcessorBuilder *GetBatchSpanProcessorBuilder() const
@@ -337,6 +349,29 @@ public:
 
   void SetLoggerConfiguratorBuilder(std::unique_ptr<LoggerConfiguratorBuilder> &&builder);
 
+  /* Provider builders. */
+
+  const TracerProviderBuilder *GetTracerProviderBuilder() const
+  {
+    return tracer_provider_builder_.get();
+  }
+
+  void SetTracerProviderBuilder(std::unique_ptr<TracerProviderBuilder> &&builder);
+
+  const MeterProviderBuilder *GetMeterProviderBuilder() const
+  {
+    return meter_provider_builder_.get();
+  }
+
+  void SetMeterProviderBuilder(std::unique_ptr<MeterProviderBuilder> &&builder);
+
+  const LoggerProviderBuilder *GetLoggerProviderBuilder() const
+  {
+    return logger_provider_builder_.get();
+  }
+
+  void SetLoggerProviderBuilder(std::unique_ptr<LoggerProviderBuilder> &&builder);
+
   /* Resource detectors. */
 
   const ContainerResourceDetectorBuilder *GetContainerResourceDetectorBuilder() const
@@ -379,6 +414,13 @@ public:
 
   void SetExtensionSamplerBuilder(const std::string &name,
                                   std::unique_ptr<ExtensionSamplerBuilder> &&builder);
+
+  const ExtensionComposableSamplerBuilder *GetExtensionComposableSamplerBuilder(
+      const std::string &name) const;
+
+  void SetExtensionComposableSamplerBuilder(
+      const std::string &name,
+      std::unique_ptr<ExtensionComposableSamplerBuilder> &&builder);
 
   const ExtensionSpanExporterBuilder *GetExtensionSpanExporterBuilder(
       const std::string &name) const;
@@ -465,6 +507,7 @@ private:
   std::unique_ptr<ComposableParentThresholdSamplerBuilder>
       composable_parent_threshold_sampler_builder_;
   std::unique_ptr<ComposableRuleBasedSamplerBuilder> composable_rule_based_sampler_builder_;
+  std::unique_ptr<CompositeSamplerBuilder> composite_sampler_builder_;
 
   std::unique_ptr<BatchSpanProcessorBuilder> batch_span_processor_builder_;
   std::unique_ptr<SimpleSpanProcessorBuilder> simple_span_processor_builder_;
@@ -475,6 +518,10 @@ private:
   std::unique_ptr<MeterConfiguratorBuilder> meter_configurator_builder_;
   std::unique_ptr<LoggerConfiguratorBuilder> logger_configurator_builder_;
 
+  std::unique_ptr<TracerProviderBuilder> tracer_provider_builder_;
+  std::unique_ptr<MeterProviderBuilder> meter_provider_builder_;
+  std::unique_ptr<LoggerProviderBuilder> logger_provider_builder_;
+
   std::unique_ptr<OpenCensusMetricProducerBuilder> open_census_metric_producer_builder_;
 
   std::unique_ptr<ContainerResourceDetectorBuilder> container_resource_detector_builder_;
@@ -484,6 +531,8 @@ private:
 
   std::map<std::string, std::unique_ptr<TextMapPropagatorBuilder>> propagator_builders_;
   std::map<std::string, std::unique_ptr<ExtensionSamplerBuilder>> sampler_builders_;
+  std::map<std::string, std::unique_ptr<ExtensionComposableSamplerBuilder>>
+      composable_sampler_builders_;
   std::map<std::string, std::unique_ptr<ExtensionSpanExporterBuilder>> span_exporter_builders_;
   std::map<std::string, std::unique_ptr<ExtensionSpanProcessorBuilder>> span_processor_builders_;
   std::map<std::string, std::unique_ptr<ExtensionPushMetricExporterBuilder>>
