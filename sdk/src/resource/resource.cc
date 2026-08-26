@@ -20,15 +20,27 @@ namespace sdk
 namespace resource
 {
 
-Resource::Resource() noexcept : attributes_(), schema_url_() {}
+Resource::Resource() noexcept : entities_(), unassociated_attributes_(), schema_url_()
+{
+  RefreshFlattenedAttributes();
+}
 
 Resource::Resource(const ResourceAttributes &attributes) noexcept
-    : attributes_(attributes), schema_url_()
-{}
+    : entities_(), unassociated_attributes_(attributes), schema_url_()
+{
+  RefreshFlattenedAttributes();
+}
 
 Resource::Resource(const ResourceAttributes &attributes, const std::string &schema_url) noexcept
-    : attributes_(attributes), schema_url_(schema_url)
-{}
+    : entities_(), unassociated_attributes_(attributes), schema_url_(schema_url)
+{
+  RefreshFlattenedAttributes();
+}
+
+void Resource::RefreshFlattenedAttributes() noexcept
+{
+  attributes_ = unassociated_attributes_;
+}
 
 Resource Resource::Merge(const Resource &other) const noexcept
 {
@@ -44,16 +56,18 @@ Resource Resource::Create(const ResourceAttributes &attributes, const std::strin
   auto resource =
       Resource::GetDefault().Merge(otel_resource).Merge(Resource{attributes, schema_url});
 
-  if (resource.attributes_.find(semconv::service::kServiceName) == resource.attributes_.end())
+  if (resource.unassociated_attributes_.find(semconv::service::kServiceName) ==
+      resource.unassociated_attributes_.end())
   {
     std::string default_service_name = "unknown_service";
     auto it_process_executable_name =
-        resource.attributes_.find(semconv::process::kProcessExecutableName);
-    if (it_process_executable_name != resource.attributes_.end())
+        resource.unassociated_attributes_.find(semconv::process::kProcessExecutableName);
+    if (it_process_executable_name != resource.unassociated_attributes_.end())
     {
       default_service_name += ":" + nostd::get<std::string>(it_process_executable_name->second);
     }
-    resource.attributes_[semconv::service::kServiceName] = default_service_name;
+    resource.unassociated_attributes_[semconv::service::kServiceName] = default_service_name;
+    resource.RefreshFlattenedAttributes();
   }
   return resource;
 }
@@ -82,6 +96,16 @@ const ResourceAttributes &Resource::GetAttributes() const noexcept
 const std::string &Resource::GetSchemaURL() const noexcept
 {
   return schema_url_;
+}
+
+const std::vector<Entity> &Resource::GetEntities() const noexcept
+{
+  return entities_;
+}
+
+const ResourceAttributes &Resource::GetUnassociatedAttributes() const noexcept
+{
+  return unassociated_attributes_;
 }
 
 }  // namespace resource

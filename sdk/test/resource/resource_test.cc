@@ -358,4 +358,99 @@ TEST(ResourceTest, DerivedResourceDetector)
   EXPECT_TRUE(received_attributes.find("key") != received_attributes.end());
 }
 
+TEST(ResourceTest, EmptyHasNoEntities)
+{
+  Resource empty;
+  EXPECT_TRUE(empty.GetEntities().empty());
+  EXPECT_TRUE(empty.GetUnassociatedAttributes().empty());
+  EXPECT_EQ(empty.GetUnassociatedAttributes(), empty.GetAttributes());
+
+  Resource &get_empty = Resource::GetEmpty();
+  EXPECT_TRUE(get_empty.GetEntities().empty());
+  EXPECT_TRUE(get_empty.GetUnassociatedAttributes().empty());
+  EXPECT_EQ(get_empty.GetUnassociatedAttributes(), get_empty.GetAttributes());
+}
+
+TEST(ResourceTest, ConstructFromAttributes)
+{
+  ResourceAttributes attributes = {{"service", "backend"}, {"host", "service-host"}};
+  Resource resource(attributes);
+
+  EXPECT_TRUE(resource.GetEntities().empty());
+  EXPECT_EQ(resource.GetUnassociatedAttributes(), attributes);
+  EXPECT_EQ(resource.GetAttributes(), resource.GetUnassociatedAttributes());
+  EXPECT_TRUE(resource.GetSchemaURL().empty());
+}
+
+TEST(ResourceTest, ConstructFromAttributesAndSchemaUrl)
+{
+  ResourceAttributes attributes = {{"service", "backend"}};
+  const std::string schema_url  = "https://opentelemetry.io/schemas/1.2.0";
+  Resource resource(attributes, schema_url);
+
+  EXPECT_TRUE(resource.GetEntities().empty());
+  EXPECT_EQ(resource.GetUnassociatedAttributes(), attributes);
+  EXPECT_EQ(resource.GetAttributes(), resource.GetUnassociatedAttributes());
+  EXPECT_EQ(resource.GetSchemaURL(), schema_url);
+}
+
+TEST(ResourceTest, GetDefaultHasNoEntities)
+{
+  Resource &resource = Resource::GetDefault();
+  EXPECT_TRUE(resource.GetEntities().empty());
+  EXPECT_EQ(resource.GetUnassociatedAttributes(), resource.GetAttributes());
+  EXPECT_FALSE(resource.GetAttributes().empty());
+}
+
+TEST(ResourceTest, CreateUnassociatedMatchesFlattened)
+{
+  ResourceAttributes attributes = {{"service", "backend"}};
+  auto without_name             = Resource::Create(attributes);
+  EXPECT_TRUE(without_name.GetEntities().empty());
+  EXPECT_EQ(without_name.GetUnassociatedAttributes(), without_name.GetAttributes());
+  EXPECT_EQ(
+      nostd::get<std::string>(without_name.GetAttributes().at(semconv::service::kServiceName)),
+      "unknown_service");
+
+  ResourceAttributes with_name = {{"service.name", "backend"}};
+  auto named                   = Resource::Create(with_name);
+  EXPECT_TRUE(named.GetEntities().empty());
+  EXPECT_EQ(named.GetUnassociatedAttributes(), named.GetAttributes());
+  EXPECT_EQ(nostd::get<std::string>(named.GetAttributes().at(semconv::service::kServiceName)),
+            "backend");
+}
+
+TEST(ResourceTest, MergeUnassociatedMatchesFlattened)
+{
+  TestResource resource1(ResourceAttributes({{"service", "backend"}}));
+  TestResource resource2(ResourceAttributes({{"host", "service-host"}}));
+  auto merged = resource1.Merge(resource2);
+
+  EXPECT_TRUE(merged.GetEntities().empty());
+  EXPECT_EQ(merged.GetUnassociatedAttributes(), merged.GetAttributes());
+  EXPECT_EQ(merged.GetAttributes().size(), 2);
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("service")), "backend");
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("host")), "service-host");
+}
+
+TEST(ResourceTest, CopyAndAssignmentPreservesNewMembers)
+{
+  ResourceAttributes attributes = {{"service", "backend"}};
+  const std::string schema_url  = "https://opentelemetry.io/schemas/1.2.0";
+  Resource original(attributes, schema_url);
+
+  Resource copied(original);
+  EXPECT_TRUE(copied.GetEntities().empty());
+  EXPECT_EQ(copied.GetUnassociatedAttributes(), original.GetUnassociatedAttributes());
+  EXPECT_EQ(copied.GetAttributes(), original.GetAttributes());
+  EXPECT_EQ(copied.GetSchemaURL(), original.GetSchemaURL());
+
+  Resource assigned;
+  assigned = original;
+  EXPECT_TRUE(assigned.GetEntities().empty());
+  EXPECT_EQ(assigned.GetUnassociatedAttributes(), original.GetUnassociatedAttributes());
+  EXPECT_EQ(assigned.GetAttributes(), original.GetAttributes());
+  EXPECT_EQ(assigned.GetSchemaURL(), original.GetSchemaURL());
+}
+
 }  // namespace
