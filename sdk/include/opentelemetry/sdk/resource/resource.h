@@ -55,12 +55,16 @@ public:
 
   /**
    * Returns a new, merged {@link Resource} by merging the current Resource
-   * with the other Resource. In case of a collision, the other Resource takes
-   * precedence.
+   * (old) with the other Resource (updating). In case of a collision, the
+   * other Resource takes precedence for unassociated attributes.
    *
-   * The specification notes that if schema urls collide, the resulting
-   * schema url is implementation-defined. In the C++ implementation, the
-   * schema url of @p other is picked.
+   * When neither Resource has entities, attributes and schema URLs follow the
+   * historical merge rules. If schema urls collide, the resulting schema url
+   * is implementation-defined; this implementation picks @p other.
+   *
+   * When either Resource has entities, merge follows the entity-aware
+   * resource data model: type-rank, description overlay, updating unassociated
+   * keys evicting entities, then construction-time key uniqueness.
    *
    * @param other the Resource that will be merged with this.
    * @returns the newly merged Resource.
@@ -78,6 +82,16 @@ public:
 
   static Resource Create(const ResourceAttributes &attributes,
                          const std::string &schema_url = std::string{});
+
+  /**
+   * Returns a newly created Resource with the specified attributes and
+   * entities. SDK attributes and OTEL attributes are merged in as with the
+   * two-argument Create.
+   */
+
+  static Resource Create(const ResourceAttributes &attributes,
+                         const std::string &schema_url,
+                         const std::vector<Entity> &entities);
 
   /**
    * Returns an Empty resource.
