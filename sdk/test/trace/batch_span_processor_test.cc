@@ -351,7 +351,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlushDoesNotPermanentlyDrain)
 
   sdk::trace::BatchSpanProcessorOptions options{};
   options.max_export_batch_size = 100;
-  options.schedule_delay_millis = std::chrono::milliseconds(200);
+  options.schedule_delay_millis = std::chrono::milliseconds(2000);
   options.max_queue_size        = 1000;
 
   auto batch_processor = std::shared_ptr<sdk::trace::BatchSpanProcessor>(
