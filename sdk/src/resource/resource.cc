@@ -1,10 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
+#include <cstddef>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -21,6 +24,56 @@ namespace sdk
 {
 namespace resource
 {
+namespace
+{
+
+bool EntityOwnsKey(const Entity &entity, const std::string &key)
+{
+  return entity.GetIdentity().find(key) != entity.GetIdentity().end() ||
+         entity.GetDescription().find(key) != entity.GetDescription().end();
+}
+
+bool CanMergeEntities(const Entity &existing, const Entity &incoming)
+{
+  return existing.GetIdentity() == incoming.GetIdentity() &&
+         existing.GetSchemaURL() == incoming.GetSchemaURL();
+}
+
+Entity OverlayDescription(const Entity &existing, const Entity &incoming)
+{
+  ResourceAttributes description = existing.GetDescription();
+  for (const auto &kv : incoming.GetDescription())
+  {
+    description[kv.first] = kv.second;
+  }
+  return Entity(existing.GetType(), existing.GetIdentity(), description, existing.GetSchemaURL());
+}
+
+std::unordered_map<std::string, std::size_t> BuildTypeRanks(const Resource &old_resource,
+                                                            const Resource &updating)
+{
+  std::unordered_map<std::string, std::size_t> rank;
+  const auto &updating_entities = updating.GetEntities();
+  for (std::size_t i = 0; i < updating_entities.size(); ++i)
+  {
+    const std::string &type = updating_entities[i].GetType();
+    if (rank.find(type) == rank.end())
+    {
+      rank[type] = i;
+    }
+  }
+  std::size_t old_only = updating_entities.size();
+  for (const auto &entity : old_resource.GetEntities())
+  {
+    if (rank.find(entity.GetType()) == rank.end())
+    {
+      rank[entity.GetType()] = old_only++;
+    }
+  }
+  return rank;
+}
+
+}  // namespace
 
 Resource::Resource() noexcept : entities_(), unassociated_attributes_(), schema_url_()
 {
@@ -143,25 +196,103 @@ void Resource::RefreshFlattenedAttributes() noexcept
 
 Resource Resource::Merge(const Resource &other) const noexcept
 {
-  ResourceAttributes merged_resource_attributes(other.attributes_);
-  merged_resource_attributes.insert(attributes_.begin(), attributes_.end());
-  return Resource(merged_resource_attributes,
-                  other.schema_url_.empty() ? schema_url_ : other.schema_url_);
+  if (entities_.empty() && other.entities_.empty())
+  {
+    ResourceAttributes merged_resource_attributes(other.attributes_);
+    merged_resource_attributes.insert(attributes_.begin(), attributes_.end());
+    return Resource(merged_resource_attributes,
+                    other.schema_url_.empty() ? schema_url_ : other.schema_url_);
+  }
+
+  const Resource &updating = other;
+  auto rank                = BuildTypeRanks(*this, updating);
+
+  std::vector<Entity> merged_entities = GetEntities();
+  for (const auto &incoming : updating.GetEntities())
+  {
+    if (!incoming.IsValid())
+    {
+      continue;
+    }
+
+    auto existing = std::find_if(
+        merged_entities.begin(), merged_entities.end(),
+        [&incoming](const Entity &entity) { return entity.GetType() == incoming.GetType(); });
+    if (existing != merged_entities.end())
+    {
+      if (CanMergeEntities(*existing, incoming))
+      {
+        *existing = OverlayDescription(*existing, incoming);
+      }
+      else
+      {
+        OTEL_INTERNAL_LOG_WARN(
+            "[Resource] Dropping Entity that cannot merge with an existing type.");
+      }
+    }
+    else
+    {
+      merged_entities.push_back(incoming);
+    }
+  }
+
+  ResourceAttributes unassociated(updating.GetUnassociatedAttributes());
+  unassociated.insert(GetUnassociatedAttributes().begin(), GetUnassociatedAttributes().end());
+
+  std::vector<Entity> after_eviction;
+  after_eviction.reserve(merged_entities.size());
+  for (const auto &entity : merged_entities)
+  {
+    bool evicted = false;
+    for (const auto &kv : updating.GetUnassociatedAttributes())
+    {
+      if (EntityOwnsKey(entity, kv.first))
+      {
+        evicted = true;
+        break;
+      }
+    }
+    if (evicted)
+    {
+      OTEL_INTERNAL_LOG_WARN("[Resource] Dropping Entity due to updating unassociated attribute.");
+      continue;
+    }
+    after_eviction.push_back(entity);
+  }
+
+  std::stable_sort(
+      after_eviction.begin(), after_eviction.end(), [&rank](const Entity &lhs, const Entity &rhs) {
+        auto left              = rank.find(lhs.GetType());
+        auto right             = rank.find(rhs.GetType());
+        std::size_t left_rank  = left == rank.end() ? static_cast<std::size_t>(-1) : left->second;
+        std::size_t right_rank = right == rank.end() ? static_cast<std::size_t>(-1) : right->second;
+        return left_rank < right_rank;
+      });
+
+  const std::string classic_schema =
+      updating.GetSchemaURL().empty() ? GetSchemaURL() : updating.GetSchemaURL();
+  return Resource(unassociated, classic_schema, after_eviction);
 }
 
 Resource Resource::Create(const ResourceAttributes &attributes, const std::string &schema_url)
 {
+  return Create(attributes, schema_url, {});
+}
+
+Resource Resource::Create(const ResourceAttributes &attributes,
+                          const std::string &schema_url,
+                          const std::vector<Entity> &entities)
+{
   static auto otel_resource = OTELResourceDetector().Detect();
   auto resource =
-      Resource::GetDefault().Merge(otel_resource).Merge(Resource{attributes, schema_url});
+      Resource::GetDefault().Merge(otel_resource).Merge(Resource{attributes, schema_url, entities});
 
-  if (resource.unassociated_attributes_.find(semconv::service::kServiceName) ==
-      resource.unassociated_attributes_.end())
+  if (resource.attributes_.find(semconv::service::kServiceName) == resource.attributes_.end())
   {
     std::string default_service_name = "unknown_service";
     auto it_process_executable_name =
-        resource.unassociated_attributes_.find(semconv::process::kProcessExecutableName);
-    if (it_process_executable_name != resource.unassociated_attributes_.end())
+        resource.attributes_.find(semconv::process::kProcessExecutableName);
+    if (it_process_executable_name != resource.attributes_.end())
     {
       default_service_name += ":" + nostd::get<std::string>(it_process_executable_name->second);
     }
