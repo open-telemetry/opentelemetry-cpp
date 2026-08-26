@@ -27,6 +27,20 @@ public:
 
   Resource(const ResourceAttributes &attributes, const std::string &schema_url) noexcept;
 
+  /**
+   * Constructs a Resource from attributes, a schema URL, and entities.
+   *
+   * Invalid entities, later entities of a duplicate type, and entities that
+   * share attribute keys with a higher-priority (earlier) entity are dropped.
+   * Keys owned by surviving entities are removed from unassociated attributes.
+   * If any entity survives, the Resource schema URL is taken from those
+   * entities (common URL, or empty if they differ); the constructor schema
+   * URL is used only when no entity survives.
+   */
+  Resource(const ResourceAttributes &attributes,
+           const std::string &schema_url,
+           const std::vector<Entity> &entities) noexcept;
+
   Resource(const Resource &)            = default;
   Resource(Resource &&)                 = default;
   Resource &operator=(const Resource &) = default;
@@ -78,6 +92,7 @@ public:
   static Resource &GetDefault();
 
 private:
+  void NormalizeEntities(const std::vector<Entity> &entities) noexcept;
   void RefreshFlattenedAttributes() noexcept;
 
   std::vector<Entity> entities_;
