@@ -453,4 +453,192 @@ TEST(ResourceTest, CopyAndAssignmentPreservesNewMembers)
   EXPECT_EQ(assigned.GetSchemaURL(), original.GetSchemaURL());
 }
 
+TEST(ResourceTest, ConstructEntitiesOnly)
+{
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}});
+  const std::string constructor_schema = "https://opentelemetry.io/schemas/1.2.0";
+  Resource resource(ResourceAttributes{}, constructor_schema, {host});
+
+  ASSERT_EQ(resource.GetEntities().size(), 1);
+  EXPECT_EQ(resource.GetEntities()[0], host);
+  EXPECT_TRUE(resource.GetUnassociatedAttributes().empty());
+  ASSERT_EQ(resource.GetAttributes().size(), 1);
+  EXPECT_EQ(nostd::get<std::string>(resource.GetAttributes().at("host.id")), "H1");
+  EXPECT_TRUE(resource.GetSchemaURL().empty());
+}
+
+TEST(ResourceTest, ConstructAttributesAndEntity)
+{
+  ResourceAttributes attributes = {{"env", "prod"}};
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}},
+              ResourceAttributes{{"host.name", "entity-host"}});
+  Resource resource(attributes, std::string{}, {host});
+
+  ASSERT_EQ(resource.GetEntities().size(), 1);
+  EXPECT_EQ(resource.GetUnassociatedAttributes().size(), 1);
+  EXPECT_EQ(nostd::get<std::string>(resource.GetUnassociatedAttributes().at("env")), "prod");
+  EXPECT_TRUE(resource.GetUnassociatedAttributes().find("host.id") ==
+              resource.GetUnassociatedAttributes().end());
+  EXPECT_TRUE(resource.GetUnassociatedAttributes().find("host.name") ==
+              resource.GetUnassociatedAttributes().end());
+  EXPECT_EQ(nostd::get<std::string>(resource.GetAttributes().at("host.id")), "H1");
+  EXPECT_EQ(nostd::get<std::string>(resource.GetAttributes().at("host.name")), "entity-host");
+  EXPECT_EQ(nostd::get<std::string>(resource.GetAttributes().at("env")), "prod");
+}
+
+TEST(ResourceTest, ConstructLooseAttributeYieldsToEntity)
+{
+  ResourceAttributes attributes = {{"host.name", "loose"}};
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}},
+              ResourceAttributes{{"host.name", "entity"}});
+  Resource resource(attributes, std::string{}, {host});
+
+  EXPECT_TRUE(resource.GetUnassociatedAttributes().empty());
+  EXPECT_EQ(nostd::get<std::string>(resource.GetAttributes().at("host.name")), "entity");
+  EXPECT_EQ(nostd::get<std::string>(resource.GetAttributes().at("host.id")), "H1");
+}
+
+TEST(ResourceTest, ConstructDropsInvalidEntities)
+{
+  Entity empty_type("", ResourceAttributes{{"service.name", "app"}});
+  Entity empty_identity("host", ResourceAttributes{});
+  Entity valid("service", ResourceAttributes{{"service.name", "app"}});
+
+  Resource empty_type_only(ResourceAttributes{}, std::string{}, {empty_type});
+  EXPECT_TRUE(empty_type_only.GetEntities().empty());
+
+  Resource empty_identity_only(ResourceAttributes{}, std::string{}, {empty_identity});
+  EXPECT_TRUE(empty_identity_only.GetEntities().empty());
+
+  Resource mixed(ResourceAttributes{{"env", "prod"}}, std::string{},
+                 {empty_type, valid, empty_identity});
+  ASSERT_EQ(mixed.GetEntities().size(), 1);
+  EXPECT_EQ(mixed.GetEntities()[0], valid);
+  EXPECT_EQ(nostd::get<std::string>(mixed.GetUnassociatedAttributes().at("env")), "prod");
+}
+
+TEST(ResourceTest, ConstructDuplicateTypeFirstWins)
+{
+  Entity first("host", ResourceAttributes{{"host.id", "H1"}});
+  Entity second("host", ResourceAttributes{{"host.id", "H2"}});
+  Resource resource(ResourceAttributes{}, std::string{}, {first, second});
+
+  ASSERT_EQ(resource.GetEntities().size(), 1);
+  EXPECT_EQ(resource.GetEntities()[0], first);
+  EXPECT_EQ(nostd::get<std::string>(resource.GetAttributes().at("host.id")), "H1");
+}
+
+TEST(ResourceTest, ConstructTwoEntityTypesNoKeyConflict)
+{
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}});
+  Entity service("service", ResourceAttributes{{"service.name", "app"}});
+  Resource resource(ResourceAttributes{{"env", "prod"}}, std::string{}, {host, service});
+
+  ASSERT_EQ(resource.GetEntities().size(), 2);
+  EXPECT_EQ(resource.GetEntities()[0], host);
+  EXPECT_EQ(resource.GetEntities()[1], service);
+  EXPECT_EQ(nostd::get<std::string>(resource.GetUnassociatedAttributes().at("env")), "prod");
+  EXPECT_EQ(resource.GetAttributes().size(), 3);
+}
+
+TEST(ResourceTest, ConstructSharedEntityKeyDropsLowerPriority)
+{
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{{"env", "prod"}});
+  Entity service("service", ResourceAttributes{{"service.name", "app"}},
+                 ResourceAttributes{{"env", "dev"}});
+  Resource description_conflict(ResourceAttributes{}, std::string{}, {host, service});
+
+  ASSERT_EQ(description_conflict.GetEntities().size(), 1);
+  EXPECT_EQ(description_conflict.GetEntities()[0], host);
+  EXPECT_EQ(nostd::get<std::string>(description_conflict.GetAttributes().at("env")), "prod");
+  EXPECT_TRUE(description_conflict.GetAttributes().find("service.name") ==
+              description_conflict.GetAttributes().end());
+
+  Entity host_identity("host", ResourceAttributes{{"shared.id", "from-host"}});
+  Entity service_identity("service", ResourceAttributes{{"shared.id", "from-service"}});
+  Resource identity_conflict(ResourceAttributes{}, std::string{},
+                             {host_identity, service_identity});
+  ASSERT_EQ(identity_conflict.GetEntities().size(), 1);
+  EXPECT_EQ(identity_conflict.GetEntities()[0], host_identity);
+}
+
+TEST(ResourceTest, ConstructMixedEntitySchemaUrls)
+{
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{},
+              "https://opentelemetry.io/schemas/1.21.0");
+  Entity service("service", ResourceAttributes{{"service.name", "app"}}, ResourceAttributes{},
+                 "https://opentelemetry.io/schemas/1.22.0");
+  Resource resource(ResourceAttributes{}, "https://opentelemetry.io/schemas/1.2.0",
+                    {host, service});
+
+  EXPECT_TRUE(resource.GetSchemaURL().empty());
+  ASSERT_EQ(resource.GetEntities().size(), 2);
+}
+
+TEST(ResourceTest, ConstructEqualEntitySchemaUrls)
+{
+  const std::string entity_schema      = "https://opentelemetry.io/schemas/1.21.0";
+  const std::string constructor_schema = "https://opentelemetry.io/schemas/1.2.0";
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{}, entity_schema);
+  Entity service("service", ResourceAttributes{{"service.name", "app"}}, ResourceAttributes{},
+                 entity_schema);
+  Resource resource(ResourceAttributes{}, constructor_schema, {host, service});
+
+  EXPECT_EQ(resource.GetSchemaURL(), entity_schema);
+  ASSERT_EQ(resource.GetEntities().size(), 2);
+}
+
+TEST(ResourceTest, ConstructEmptyEntityVector)
+{
+  ResourceAttributes attributes = {{"service", "backend"}};
+  const std::string schema_url  = "https://opentelemetry.io/schemas/1.2.0";
+  Resource with_empty_vector(attributes, schema_url, {});
+  Resource two_arg(attributes, schema_url);
+
+  EXPECT_TRUE(with_empty_vector.GetEntities().empty());
+  EXPECT_EQ(with_empty_vector.GetSchemaURL(), schema_url);
+  EXPECT_EQ(with_empty_vector.GetUnassociatedAttributes(), attributes);
+  EXPECT_EQ(with_empty_vector.GetUnassociatedAttributes(), with_empty_vector.GetAttributes());
+  EXPECT_EQ(with_empty_vector.GetAttributes(), two_arg.GetAttributes());
+  EXPECT_EQ(with_empty_vector.GetSchemaURL(), two_arg.GetSchemaURL());
+}
+
+TEST(ResourceTest, ConstructAllInvalidEntities)
+{
+  ResourceAttributes attributes = {{"service", "backend"}};
+  const std::string schema_url  = "https://opentelemetry.io/schemas/1.2.0";
+  Entity empty_type("", ResourceAttributes{{"host.id", "H1"}});
+  Entity empty_identity("host", ResourceAttributes{});
+  Resource resource(attributes, schema_url, {empty_type, empty_identity});
+
+  EXPECT_TRUE(resource.GetEntities().empty());
+  EXPECT_EQ(resource.GetUnassociatedAttributes(), attributes);
+  EXPECT_EQ(resource.GetAttributes(), resource.GetUnassociatedAttributes());
+  EXPECT_EQ(resource.GetSchemaURL(), schema_url);
+}
+
+TEST(ResourceTest, CopyAndAssignmentPreservesEntities)
+{
+  ResourceAttributes attributes = {{"env", "prod"}};
+  const std::string schema_url  = "https://opentelemetry.io/schemas/1.21.0";
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{}, schema_url);
+  Resource original(attributes, "https://opentelemetry.io/schemas/1.2.0", {host});
+
+  Resource copied(original);
+  ASSERT_EQ(copied.GetEntities().size(), 1);
+  EXPECT_EQ(copied.GetEntities()[0], original.GetEntities()[0]);
+  EXPECT_EQ(copied.GetUnassociatedAttributes(), original.GetUnassociatedAttributes());
+  EXPECT_EQ(copied.GetAttributes(), original.GetAttributes());
+  EXPECT_EQ(copied.GetSchemaURL(), original.GetSchemaURL());
+  EXPECT_EQ(copied.GetSchemaURL(), schema_url);
+
+  Resource assigned;
+  assigned = original;
+  ASSERT_EQ(assigned.GetEntities().size(), 1);
+  EXPECT_EQ(assigned.GetEntities()[0], original.GetEntities()[0]);
+  EXPECT_EQ(assigned.GetUnassociatedAttributes(), original.GetUnassociatedAttributes());
+  EXPECT_EQ(assigned.GetAttributes(), original.GetAttributes());
+  EXPECT_EQ(assigned.GetSchemaURL(), original.GetSchemaURL());
+}
+
 }  // namespace

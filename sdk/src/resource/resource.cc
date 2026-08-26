@@ -3,9 +3,11 @@
 
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/version/version.h"
@@ -37,9 +39,106 @@ Resource::Resource(const ResourceAttributes &attributes, const std::string &sche
   RefreshFlattenedAttributes();
 }
 
+Resource::Resource(const ResourceAttributes &attributes,
+                   const std::string &schema_url,
+                   const std::vector<Entity> &entities) noexcept
+    : entities_(), unassociated_attributes_(attributes), schema_url_(schema_url)
+{
+  NormalizeEntities(entities);
+  RefreshFlattenedAttributes();
+}
+
+void Resource::NormalizeEntities(const std::vector<Entity> &entities) noexcept
+{
+  std::vector<Entity> accepted;
+  std::unordered_set<std::string> accepted_types;
+  std::unordered_set<std::string> accepted_keys;
+  accepted.reserve(entities.size());
+
+  for (const auto &entity : entities)
+  {
+    if (!entity.IsValid())
+    {
+      OTEL_INTERNAL_LOG_WARN("[Resource] Dropping invalid Entity.");
+      continue;
+    }
+
+    if (accepted_types.find(entity.GetType()) != accepted_types.end())
+    {
+      OTEL_INTERNAL_LOG_WARN("[Resource] Dropping Entity of duplicate type.");
+      continue;
+    }
+
+    bool key_conflict = false;
+    for (const auto &kv : entity.GetIdentity())
+    {
+      if (accepted_keys.find(kv.first) != accepted_keys.end())
+      {
+        key_conflict = true;
+        break;
+      }
+    }
+    if (!key_conflict)
+    {
+      for (const auto &kv : entity.GetDescription())
+      {
+        if (accepted_keys.find(kv.first) != accepted_keys.end())
+        {
+          key_conflict = true;
+          break;
+        }
+      }
+    }
+    if (key_conflict)
+    {
+      OTEL_INTERNAL_LOG_WARN("[Resource] Dropping Entity due to attribute key conflict.");
+      continue;
+    }
+
+    accepted_types.insert(entity.GetType());
+    for (const auto &kv : entity.GetIdentity())
+    {
+      accepted_keys.insert(kv.first);
+    }
+    for (const auto &kv : entity.GetDescription())
+    {
+      accepted_keys.insert(kv.first);
+    }
+    accepted.push_back(entity);
+  }
+
+  entities_ = std::move(accepted);
+
+  for (const auto &key : accepted_keys)
+  {
+    unassociated_attributes_.erase(key);
+  }
+
+  if (!entities_.empty())
+  {
+    const std::string &common_schema_url = entities_.front().GetSchemaURL();
+    bool all_equal                       = true;
+    for (const auto &entity : entities_)
+    {
+      if (entity.GetSchemaURL() != common_schema_url)
+      {
+        all_equal = false;
+        break;
+      }
+    }
+    schema_url_ = all_equal ? common_schema_url : std::string{};
+  }
+}
+
 void Resource::RefreshFlattenedAttributes() noexcept
 {
-  attributes_ = unassociated_attributes_;
+  attributes_.clear();
+  for (const auto &entity : entities_)
+  {
+    attributes_.insert(entity.GetIdentity().begin(), entity.GetIdentity().end());
+    attributes_.insert(entity.GetDescription().begin(), entity.GetDescription().end());
+  }
+  attributes_.insert(unassociated_attributes_.begin(), unassociated_attributes_.end());
 }
 
 Resource Resource::Merge(const Resource &other) const noexcept
