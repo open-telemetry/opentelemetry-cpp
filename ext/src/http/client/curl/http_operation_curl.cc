@@ -910,7 +910,8 @@ CURLcode HttpOperation::Setup()
       std::vector<char> blob_data(ssl_options_.ssl_ca_cert_string.begin(),
                                   ssl_options_.ssl_ca_cert_string.end());
 
-      struct curl_blob stblob{};
+      struct curl_blob stblob
+      {};
       stblob.data  = blob_data.data();
       stblob.len   = blob_data.size();
       stblob.flags = CURL_BLOB_COPY;
@@ -951,7 +952,8 @@ CURLcode HttpOperation::Setup()
       std::vector<char> blob_data(ssl_options_.ssl_client_key_string.begin(),
                                   ssl_options_.ssl_client_key_string.end());
 
-      struct curl_blob stblob{};
+      struct curl_blob stblob
+      {};
       stblob.data  = blob_data.data();
       stblob.len   = blob_data.size();
       stblob.flags = CURL_BLOB_COPY;
@@ -998,7 +1000,8 @@ CURLcode HttpOperation::Setup()
       std::vector<char> blob_data(ssl_options_.ssl_client_cert_string.begin(),
                                   ssl_options_.ssl_client_cert_string.end());
 
-      struct curl_blob stblob{};
+      struct curl_blob stblob
+      {};
       stblob.data  = blob_data.data();
       stblob.len   = blob_data.size();
       stblob.flags = CURL_BLOB_COPY;
