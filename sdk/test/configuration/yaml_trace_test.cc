@@ -645,6 +645,78 @@ tracer_provider:
   ASSERT_EQ(config->tracer_provider->limits->link_attribute_count_limit, 6666);
 }
 
+TEST(YamlTrace, limits_partial_count)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_count_limit: 2222
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->limits, nullptr);
+  EXPECT_TRUE(config->tracer_provider->limits->has_attribute_count_limit);
+  EXPECT_FALSE(config->tracer_provider->limits->has_attribute_value_length_limit);
+  EXPECT_EQ(config->tracer_provider->limits->attribute_count_limit, 2222u);
+  EXPECT_EQ(config->tracer_provider->limits->attribute_value_length_limit,
+            opentelemetry::sdk::configuration::SpanLimitsConfiguration::kDefaultAttributeValueLengthLimit);
+}
+
+TEST(YamlTrace, limits_partial_length)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: 1111
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->limits, nullptr);
+  EXPECT_FALSE(config->tracer_provider->limits->has_attribute_count_limit);
+  EXPECT_TRUE(config->tracer_provider->limits->has_attribute_value_length_limit);
+  EXPECT_EQ(config->tracer_provider->limits->attribute_count_limit, 128u);
+  EXPECT_EQ(config->tracer_provider->limits->attribute_value_length_limit, 1111u);
+}
+
+TEST(YamlTrace, limits_null_values)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit:
+    attribute_count_limit:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->limits, nullptr);
+  EXPECT_FALSE(config->tracer_provider->limits->has_attribute_count_limit);
+  EXPECT_FALSE(config->tracer_provider->limits->has_attribute_value_length_limit);
+  EXPECT_EQ(config->tracer_provider->limits->attribute_count_limit, 128u);
+  EXPECT_EQ(config->tracer_provider->limits->attribute_value_length_limit,
+            opentelemetry::sdk::configuration::SpanLimitsConfiguration::kDefaultAttributeValueLengthLimit);
+}
+
 TEST(YamlTrace, limits_with_invalid_values)
 {
   std::string invalid_attribute_count_yaml = R"(

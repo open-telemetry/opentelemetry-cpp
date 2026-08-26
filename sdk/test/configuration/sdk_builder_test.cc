@@ -28,6 +28,7 @@
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
@@ -53,7 +54,9 @@
 #include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
@@ -83,7 +86,9 @@
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
@@ -259,6 +264,171 @@ TEST(SdkBuilder, SpanLimitsConfiguration)
   EXPECT_EQ(limits.link_count_limit, model->limits->link_count_limit);
   EXPECT_EQ(limits.event_attribute_count_limit, model->limits->event_attribute_count_limit);
   EXPECT_EQ(limits.link_attribute_count_limit, model->limits->link_attribute_count_limit);
+}
+
+TEST(SdkBuilder, GeneralAttributeLimitsTracerAndLogger)
+{
+  config_sdk::AttributeLimitsConfiguration attr_limits;
+  attr_limits.attribute_count_limit        = 50;
+  attr_limits.attribute_value_length_limit = 1000;
+  attr_limits.has_attribute_count_limit    = true;
+  attr_limits.has_attribute_value_length_limit = true;
+
+  auto tracer_model    = std::make_unique<config_sdk::TracerProviderConfiguration>();
+  tracer_model->limits = nullptr;
+
+  auto logger_model    = std::make_unique<config_sdk::LoggerProviderConfiguration>();
+  logger_model->limits = nullptr;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+
+  auto tracer_provider = builder.CreateTracerProvider(tracer_model, resource, &attr_limits);
+  ASSERT_NE(tracer_provider, nullptr);
+  const auto span_limits = tracer_provider->GetSpanLimits();
+  EXPECT_EQ(span_limits.attribute_count_limit, 50u);
+  EXPECT_EQ(span_limits.attribute_value_length_limit, 1000u);
+  EXPECT_EQ(span_limits.event_count_limit, 128u);
+
+  auto logger_provider = builder.CreateLoggerProvider(logger_model, resource, &attr_limits);
+  ASSERT_NE(logger_provider, nullptr);
+}
+
+TEST(SdkBuilder, GeneralAttributeLimitsTracerOverride)
+{
+  config_sdk::AttributeLimitsConfiguration attr_limits;
+  attr_limits.attribute_count_limit        = 50;
+  attr_limits.attribute_value_length_limit = 1000;
+  attr_limits.has_attribute_count_limit    = true;
+  attr_limits.has_attribute_value_length_limit = true;
+
+  auto tracer_model                           = std::make_unique<config_sdk::TracerProviderConfiguration>();
+  tracer_model->limits                        = std::make_unique<config_sdk::SpanLimitsConfiguration>();
+  tracer_model->limits->attribute_count_limit = 20;
+  tracer_model->limits->attribute_value_length_limit = 500;
+  tracer_model->limits->has_attribute_count_limit = true;
+  tracer_model->limits->has_attribute_value_length_limit = true;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+
+  auto tracer_provider = builder.CreateTracerProvider(tracer_model, resource, &attr_limits);
+  ASSERT_NE(tracer_provider, nullptr);
+  const auto span_limits = tracer_provider->GetSpanLimits();
+  EXPECT_EQ(span_limits.attribute_count_limit, 20u);
+  EXPECT_EQ(span_limits.attribute_value_length_limit, 500u);
+}
+
+TEST(SdkBuilder, GeneralAttributeLimitsTracerPartialOverrideCount)
+{
+  config_sdk::AttributeLimitsConfiguration attr_limits;
+  attr_limits.attribute_count_limit        = 50;
+  attr_limits.attribute_value_length_limit = 1000;
+  attr_limits.has_attribute_count_limit    = true;
+  attr_limits.has_attribute_value_length_limit = true;
+
+  auto tracer_model                           = std::make_unique<config_sdk::TracerProviderConfiguration>();
+  tracer_model->limits                        = std::make_unique<config_sdk::SpanLimitsConfiguration>();
+  tracer_model->limits->attribute_count_limit = 20;
+  tracer_model->limits->has_attribute_count_limit = true;
+  tracer_model->limits->has_attribute_value_length_limit = false;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+
+  auto tracer_provider = builder.CreateTracerProvider(tracer_model, resource, &attr_limits);
+  ASSERT_NE(tracer_provider, nullptr);
+  const auto span_limits = tracer_provider->GetSpanLimits();
+  EXPECT_EQ(span_limits.attribute_count_limit, 20u);
+  EXPECT_EQ(span_limits.attribute_value_length_limit, 1000u);
+}
+
+TEST(SdkBuilder, GeneralAttributeLimitsTracerPartialOverrideLength)
+{
+  config_sdk::AttributeLimitsConfiguration attr_limits;
+  attr_limits.attribute_count_limit        = 50;
+  attr_limits.attribute_value_length_limit = 1000;
+  attr_limits.has_attribute_count_limit    = true;
+  attr_limits.has_attribute_value_length_limit = true;
+
+  auto tracer_model                                  = std::make_unique<config_sdk::TracerProviderConfiguration>();
+  tracer_model->limits                               = std::make_unique<config_sdk::SpanLimitsConfiguration>();
+  tracer_model->limits->attribute_value_length_limit = 500;
+  tracer_model->limits->has_attribute_value_length_limit = true;
+  tracer_model->limits->has_attribute_count_limit = false;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+
+  auto tracer_provider = builder.CreateTracerProvider(tracer_model, resource, &attr_limits);
+  ASSERT_NE(tracer_provider, nullptr);
+  const auto span_limits = tracer_provider->GetSpanLimits();
+  EXPECT_EQ(span_limits.attribute_count_limit, 50u);
+  EXPECT_EQ(span_limits.attribute_value_length_limit, 500u);
+}
+
+TEST(SdkBuilder, GeneralAttributeLimitsLoggerOverride)
+{
+  config_sdk::AttributeLimitsConfiguration attr_limits;
+  attr_limits.attribute_count_limit        = 50;
+  attr_limits.attribute_value_length_limit = 1000;
+  attr_limits.has_attribute_count_limit    = true;
+  attr_limits.has_attribute_value_length_limit = true;
+
+  auto logger_model                           = std::make_unique<config_sdk::LoggerProviderConfiguration>();
+  logger_model->limits                        = std::make_unique<config_sdk::LogRecordLimitsConfiguration>();
+  logger_model->limits->attribute_count_limit = 20;
+  logger_model->limits->attribute_value_length_limit = 500;
+  logger_model->limits->has_attribute_count_limit = true;
+  logger_model->limits->has_attribute_value_length_limit = true;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+
+  auto logger_provider = builder.CreateLoggerProvider(logger_model, resource, &attr_limits);
+  ASSERT_NE(logger_provider, nullptr);
+}
+
+TEST(SdkBuilder, GeneralAttributeLimitsLoggerPartialOverrideCount)
+{
+  config_sdk::AttributeLimitsConfiguration attr_limits;
+  attr_limits.attribute_count_limit        = 50;
+  attr_limits.attribute_value_length_limit = 1000;
+  attr_limits.has_attribute_count_limit    = true;
+  attr_limits.has_attribute_value_length_limit = true;
+
+  auto logger_model                           = std::make_unique<config_sdk::LoggerProviderConfiguration>();
+  logger_model->limits                        = std::make_unique<config_sdk::LogRecordLimitsConfiguration>();
+  logger_model->limits->attribute_count_limit = 20;
+  logger_model->limits->has_attribute_count_limit = true;
+  logger_model->limits->has_attribute_value_length_limit = false;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+
+  auto logger_provider = builder.CreateLoggerProvider(logger_model, resource, &attr_limits);
+  ASSERT_NE(logger_provider, nullptr);
+}
+
+TEST(SdkBuilder, GeneralAttributeLimitsLoggerPartialOverrideLength)
+{
+  config_sdk::AttributeLimitsConfiguration attr_limits;
+  attr_limits.attribute_count_limit        = 50;
+  attr_limits.attribute_value_length_limit = 1000;
+  attr_limits.has_attribute_count_limit    = true;
+  attr_limits.has_attribute_value_length_limit = true;
+
+  auto logger_model                                  = std::make_unique<config_sdk::LoggerProviderConfiguration>();
+  logger_model->limits                               = std::make_unique<config_sdk::LogRecordLimitsConfiguration>();
+  logger_model->limits->attribute_value_length_limit = 500;
+  logger_model->limits->has_attribute_value_length_limit = true;
+  logger_model->limits->has_attribute_count_limit = false;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+
+  auto logger_provider = builder.CreateLoggerProvider(logger_model, resource, &attr_limits);
+  ASSERT_NE(logger_provider, nullptr);
 }
 
 #if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)

@@ -200,6 +200,60 @@ attribute_limits:
   ASSERT_EQ(config->attribute_limits->attribute_count_limit, 5678);
 }
 
+TEST(Yaml, attribute_limits_partial_count)
+{
+  std::string yaml = R"(
+file_format: "1.0"
+attribute_limits:
+  attribute_count_limit: 5678
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  EXPECT_TRUE(config->attribute_limits->has_attribute_count_limit);
+  EXPECT_FALSE(config->attribute_limits->has_attribute_value_length_limit);
+  EXPECT_EQ(config->attribute_limits->attribute_count_limit, 5678u);
+  EXPECT_EQ(config->attribute_limits->attribute_value_length_limit,
+            opentelemetry::sdk::configuration::AttributeLimitsConfiguration::kDefaultAttributeValueLengthLimit);
+}
+
+TEST(Yaml, attribute_limits_partial_length)
+{
+  std::string yaml = R"(
+file_format: "1.0"
+attribute_limits:
+  attribute_value_length_limit: 1234
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  EXPECT_FALSE(config->attribute_limits->has_attribute_count_limit);
+  EXPECT_TRUE(config->attribute_limits->has_attribute_value_length_limit);
+  EXPECT_EQ(config->attribute_limits->attribute_count_limit, 128u);
+  EXPECT_EQ(config->attribute_limits->attribute_value_length_limit, 1234u);
+}
+
+TEST(Yaml, attribute_limits_null_values)
+{
+  std::string yaml = R"(
+file_format: "1.0"
+attribute_limits:
+  attribute_value_length_limit:
+  attribute_count_limit:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  EXPECT_FALSE(config->attribute_limits->has_attribute_count_limit);
+  EXPECT_FALSE(config->attribute_limits->has_attribute_value_length_limit);
+  EXPECT_EQ(config->attribute_limits->attribute_count_limit, 128u);
+  EXPECT_EQ(config->attribute_limits->attribute_value_length_limit,
+            opentelemetry::sdk::configuration::AttributeLimitsConfiguration::kDefaultAttributeValueLengthLimit);
+}
+
 TEST(Yaml, no_optional_boolean)
 {
   std::string yaml = R"(

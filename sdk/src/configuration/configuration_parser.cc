@@ -363,6 +363,21 @@ ConfigurationParser::ParseAttributeLimitsConfiguration(
   using Config = AttributeLimitsConfiguration;
   auto model   = std::make_unique<AttributeLimitsConfiguration>();
 
+  if (auto child = node->GetChildNode("attribute_value_length_limit"))
+  {
+    if (!child->IsNull())
+    {
+      model->has_attribute_value_length_limit = true;
+    }
+  }
+  if (auto child = node->GetChildNode("attribute_count_limit"))
+  {
+    if (!child->IsNull())
+    {
+      model->has_attribute_count_limit = true;
+    }
+  }
+
   model->attribute_value_length_limit =
       node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);
   model->attribute_count_limit =
@@ -642,6 +657,21 @@ ConfigurationParser::ParseLogRecordLimitsConfiguration(
 {
   using Config = LogRecordLimitsConfiguration;
   auto model   = std::make_unique<LogRecordLimitsConfiguration>();
+
+  if (auto child = node->GetChildNode("attribute_value_length_limit"))
+  {
+    if (!child->IsNull())
+    {
+      model->has_attribute_value_length_limit = true;
+    }
+  }
+  if (auto child = node->GetChildNode("attribute_count_limit"))
+  {
+    if (!child->IsNull())
+    {
+      model->has_attribute_count_limit = true;
+    }
+  }
 
   model->attribute_value_length_limit =
       node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);
@@ -1685,6 +1715,21 @@ std::unique_ptr<SpanLimitsConfiguration> ConfigurationParser::ParseSpanLimitsCon
     }
     return static_cast<uint32_t>(value);
   };
+
+  if (auto child = node->GetChildNode("attribute_value_length_limit"))
+  {
+    if (!child->IsNull())
+    {
+      model->has_attribute_value_length_limit = true;
+    }
+  }
+  if (auto child = node->GetChildNode("attribute_count_limit"))
+  {
+    if (!child->IsNull())
+    {
+      model->has_attribute_count_limit = true;
+    }
+  }
 
   model->attribute_value_length_limit =
       node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);

@@ -27,6 +27,9 @@ public:
   static constexpr std::uint32_t kDefaultEventAttributeCountLimit = 128;
   static constexpr std::uint32_t kDefaultLinkAttributeCountLimit  = 128;
 
+  bool has_attribute_value_length_limit{false};
+  bool has_attribute_count_limit{false};
+
   std::size_t attribute_value_length_limit{kDefaultAttributeValueLengthLimit};
   std::uint32_t attribute_count_limit{kDefaultAttributeCountLimit};
   std::uint32_t event_count_limit{kDefaultEventCountLimit};

@@ -23,6 +23,9 @@ public:
       (std::numeric_limits<std::size_t>::max)();
   static constexpr std::size_t kDefaultAttributeCountLimit = 128;
 
+  bool has_attribute_value_length_limit{false};
+  bool has_attribute_count_limit{false};
+
   std::size_t attribute_value_length_limit{kDefaultAttributeValueLengthLimit};
   std::size_t attribute_count_limit{kDefaultAttributeCountLimit};
 };

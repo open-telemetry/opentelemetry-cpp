@@ -489,6 +489,78 @@ logger_provider:
   ASSERT_EQ(config->logger_provider->limits->attribute_count_limit, 2222);
 }
 
+TEST(YamlLogs, limits_partial_count)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_count_limit: 2222
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->limits, nullptr);
+  EXPECT_TRUE(config->logger_provider->limits->has_attribute_count_limit);
+  EXPECT_FALSE(config->logger_provider->limits->has_attribute_value_length_limit);
+  EXPECT_EQ(config->logger_provider->limits->attribute_count_limit, 2222u);
+  EXPECT_EQ(config->logger_provider->limits->attribute_value_length_limit,
+            opentelemetry::sdk::configuration::LogRecordLimitsConfiguration::kDefaultAttributeValueLengthLimit);
+}
+
+TEST(YamlLogs, limits_partial_length)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: 1111
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->limits, nullptr);
+  EXPECT_FALSE(config->logger_provider->limits->has_attribute_count_limit);
+  EXPECT_TRUE(config->logger_provider->limits->has_attribute_value_length_limit);
+  EXPECT_EQ(config->logger_provider->limits->attribute_count_limit, 128u);
+  EXPECT_EQ(config->logger_provider->limits->attribute_value_length_limit, 1111u);
+}
+
+TEST(YamlLogs, limits_null_values)
+{
+  std::string yaml = R"(
+file_format: "1.0-logs"
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit:
+    attribute_count_limit:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->limits, nullptr);
+  EXPECT_FALSE(config->logger_provider->limits->has_attribute_count_limit);
+  EXPECT_FALSE(config->logger_provider->limits->has_attribute_value_length_limit);
+  EXPECT_EQ(config->logger_provider->limits->attribute_count_limit, 128u);
+  EXPECT_EQ(config->logger_provider->limits->attribute_value_length_limit,
+            opentelemetry::sdk::configuration::LogRecordLimitsConfiguration::kDefaultAttributeValueLengthLimit);
+}
+
 TEST(YamlLogs, no_logger_configurator)
 {
   std::string yaml = R"(

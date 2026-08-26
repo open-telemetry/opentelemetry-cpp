@@ -1423,7 +1423,8 @@ SdkBuilder::CreateTracerConfigurator(
 
 std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTracerProvider(
     const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
-    const opentelemetry::sdk::resource::Resource &resource) const
+    const opentelemetry::sdk::resource::Resource &resource,
+    const opentelemetry::sdk::configuration::AttributeLimitsConfiguration *attribute_limits) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> sdk;
 
@@ -1451,14 +1452,33 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
   }
 
   opentelemetry::sdk::trace::SpanLimits span_limits;
+  if (attribute_limits)
+  {
+    if (attribute_limits->has_attribute_value_length_limit || !model->limits)
+    {
+      span_limits.attribute_value_length_limit = attribute_limits->attribute_value_length_limit;
+    }
+    if (attribute_limits->has_attribute_count_limit || !model->limits)
+    {
+      span_limits.attribute_count_limit =
+          static_cast<std::uint32_t>(attribute_limits->attribute_count_limit);
+    }
+  }
+
   if (model->limits)
   {
-    span_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
-    span_limits.attribute_count_limit        = model->limits->attribute_count_limit;
-    span_limits.event_count_limit            = model->limits->event_count_limit;
-    span_limits.link_count_limit             = model->limits->link_count_limit;
-    span_limits.event_attribute_count_limit  = model->limits->event_attribute_count_limit;
-    span_limits.link_attribute_count_limit   = model->limits->link_attribute_count_limit;
+    if (model->limits->has_attribute_value_length_limit || !attribute_limits)
+    {
+      span_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
+    }
+    if (model->limits->has_attribute_count_limit || !attribute_limits)
+    {
+      span_limits.attribute_count_limit = model->limits->attribute_count_limit;
+    }
+    span_limits.event_count_limit           = model->limits->event_count_limit;
+    span_limits.link_count_limit            = model->limits->link_count_limit;
+    span_limits.event_attribute_count_limit = model->limits->event_attribute_count_limit;
+    span_limits.link_attribute_count_limit  = model->limits->link_attribute_count_limit;
   }
 
   if (model->tracer_configurator)
@@ -2349,7 +2369,8 @@ SdkBuilder::CreateLoggerConfigurator(
 
 std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLoggerProvider(
     const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
-    const opentelemetry::sdk::resource::Resource &resource) const
+    const opentelemetry::sdk::resource::Resource &resource,
+    const opentelemetry::sdk::configuration::AttributeLimitsConfiguration *attribute_limits) const
 {
   std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> sdk;
 
@@ -2361,10 +2382,29 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
   }
 
   opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
+  if (attribute_limits)
+  {
+    if (attribute_limits->has_attribute_value_length_limit || !model->limits)
+    {
+      log_record_limits.attribute_value_length_limit =
+          attribute_limits->attribute_value_length_limit;
+    }
+    if (attribute_limits->has_attribute_count_limit || !model->limits)
+    {
+      log_record_limits.attribute_count_limit = attribute_limits->attribute_count_limit;
+    }
+  }
+
   if (model->limits)
   {
-    log_record_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
-    log_record_limits.attribute_count_limit        = model->limits->attribute_count_limit;
+    if (model->limits->has_attribute_value_length_limit || !attribute_limits)
+    {
+      log_record_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
+    }
+    if (model->limits->has_attribute_count_limit || !attribute_limits)
+    {
+      log_record_limits.attribute_count_limit = model->limits->attribute_count_limit;
+    }
   }
 
   std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
@@ -2644,16 +2684,10 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
   {
     SetResource(sdk->resource, model->resource);
 
-    if (model->attribute_limits)
-    {
-      // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3303
-      // FIXME-SDK: Implement attribute limits
-      OTEL_INTERNAL_LOG_WARN("attribute_limits not supported, ignoring");
-    }
-
     if (model->tracer_provider)
     {
-      sdk->tracer_provider = CreateTracerProvider(model->tracer_provider, sdk->resource);
+      sdk->tracer_provider = CreateTracerProvider(
+          model->tracer_provider, sdk->resource, model->attribute_limits.get());
     }
 
     if (model->propagator)
@@ -2668,7 +2702,8 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
 
     if (model->logger_provider)
     {
-      sdk->logger_provider = CreateLoggerProvider(model->logger_provider, sdk->resource);
+      sdk->logger_provider = CreateLoggerProvider(
+          model->logger_provider, sdk->resource, model->attribute_limits.get());
     }
   }
 
