@@ -4,8 +4,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "opentelemetry/sdk/common/attribute_utils.h"
+#include "opentelemetry/sdk/resource/entity.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -34,6 +36,8 @@ public:
 
   const ResourceAttributes &GetAttributes() const noexcept;
   const std::string &GetSchemaURL() const noexcept;
+  const std::vector<Entity> &GetEntities() const noexcept;
+  const ResourceAttributes &GetUnassociatedAttributes() const noexcept;
 
   /**
    * Returns a new, merged {@link Resource} by merging the current Resource
@@ -74,6 +78,10 @@ public:
   static Resource &GetDefault();
 
 private:
+  void RefreshFlattenedAttributes() noexcept;
+
+  std::vector<Entity> entities_;
+  ResourceAttributes unassociated_attributes_;
   ResourceAttributes attributes_;
   std::string schema_url_;
 };
