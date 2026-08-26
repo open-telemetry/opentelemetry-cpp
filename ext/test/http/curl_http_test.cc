@@ -501,6 +501,26 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   delete handler;
 }
 
+// A CA certificate supplied as a string goes to curl as a blob rather than a path. curl copies it
+// and does not read it until a handshake, so a plain request reaches the option and no certificate
+// has to be valid for this.
+TEST_F(BasicCurlHttpTests, ACaCertificateStringIsPassedAsABlob)
+{
+  RetryEventHandler handler;
+  http_client::HttpSslOptions ssl_options;
+  ssl_options.use_ssl = true;
+  ssl_options.ssl_ca_cert_string =
+      "-----BEGIN CERTIFICATE-----\nnot a certificate\n-----END CERTIFICATE-----\n";
+  http_client::Body body;
+  http_client::Headers headers;
+
+  curl::HttpOperation operation(http_client::Method::Get, "http://127.0.0.1:19000/get/",
+                                ssl_options, &handler, headers, body);
+
+  ASSERT_EQ(CURLE_OK, operation.Send());
+  ASSERT_EQ(200, operation.GetResponseCode());
+}
+
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
 TEST_F(BasicCurlHttpTests, RetryPolicyEnabled)
 {
