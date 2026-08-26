@@ -60,9 +60,10 @@ void LogGetMeterConstructionFailure(const char *detail) noexcept
                             << detail << "; returning noop meter.");
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
-  catch (...)  // NOLINT(bugprone-empty-catch)
+  catch (const std::exception &)  // NOLINT(bugprone-empty-catch)
   {
-    // Logging must not throw from a noexcept GetMeter path.
+    // Logging can throw (typically std::bad_alloc from the string stream).
+    // Swallow it so the noexcept GetMeter path cannot throw.
   }
 #endif
 }
@@ -147,6 +148,8 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     LogGetMeterConstructionFailure(ex.what());
     return noop_meter_;
   }
+  // User-provided scope configurators can throw any exception type, not just
+  // std::exception. Catch everything so GetMeter stays noexcept.
   catch (...)
   {
     LogGetMeterConstructionFailure("unknown exception");

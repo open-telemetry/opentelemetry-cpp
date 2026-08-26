@@ -47,9 +47,10 @@ void LogGetLoggerConstructionFailure(const char *detail) noexcept
                             << detail << "; returning noop logger.");
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
-  catch (...)  // NOLINT(bugprone-empty-catch)
+  catch (const std::exception &)  // NOLINT(bugprone-empty-catch)
   {
-    // Logging must not throw from a noexcept GetLogger path.
+    // Logging can throw (typically std::bad_alloc from the string stream).
+    // Swallow it so the noexcept GetLogger path cannot throw.
   }
 #endif
 }
@@ -143,6 +144,8 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
     LogGetLoggerConstructionFailure(ex.what());
     return noop_logger_;
   }
+  // User-provided scope configurators can throw any exception type, not just
+  // std::exception. Catch everything so GetLogger stays noexcept.
   catch (...)
   {
     LogGetLoggerConstructionFailure("unknown exception");
