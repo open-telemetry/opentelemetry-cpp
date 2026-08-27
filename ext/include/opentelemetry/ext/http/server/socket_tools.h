@@ -326,10 +326,10 @@ static_assert(sizeof(SocketAddr) == sizeof(sockaddr),
 struct Socket
 {
 #ifdef _WIN32
-  typedef SOCKET Type;
+  using Type                = SOCKET;
   static Type const Invalid = INVALID_SOCKET;
 #else
-  typedef int Type;
+  using Type                = int;
   static Type const Invalid = -1;
 #endif
 
