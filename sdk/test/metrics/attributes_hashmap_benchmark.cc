@@ -48,7 +48,7 @@ void BM_AttributseHashMap(benchmark::State &state)
   {
     for (size_t i = 0; i < MAX_THREADS; i++)
     {
-      workers.push_back(std::thread(work, i));
+      workers.emplace_back(work, i);
     }
   }
 

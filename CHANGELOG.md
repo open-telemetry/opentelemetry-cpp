@@ -77,6 +77,10 @@ Increment the:
   in the value as-is rather than dropping the attribute.
   [#1536](https://github.com/open-telemetry/opentelemetry-cpp/issues/1536)
 
+* [CLEANUP] Replace `push_back` with `emplace_back` where applicable to
+  construct objects in-place, avoiding unnecessary temporaries.
+  [#4476](https://github.com/open-telemetry/opentelemetry-cpp/pull/4476)
+
 * [BUG] Fix `MultiSpanProcessor` and `MultiLogRecordProcessor` not reporting
   failures from `ForceFlush` and `Shutdown` when a child processor failed.
   [#4472](https://github.com/open-telemetry/opentelemetry-cpp/pull/4472)
