@@ -17,9 +17,9 @@ jobs:
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 133
+            warning_limit: 113
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 144
+            warning_limit: 124
     env:
       CC: /usr/bin/clang-22
       CXX: /usr/bin/clang++-22

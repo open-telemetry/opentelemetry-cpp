@@ -601,7 +601,7 @@ TEST_F(SdkInstallTest, ConfigurationCoreCheck)
   {
     const std::string propagator_name{"noop"};
 
-    auto registry = config_sdk::RegistryFactory::Create();
+    std::shared_ptr<config_sdk::Registry> registry = config_sdk::RegistryFactory::Create();
     registry->SetConsoleSpanBuilder(std::make_unique<NoopConsoleSpanBuilder>());
     registry->SetConsoleLogRecordBuilder(std::make_unique<NoopConsoleLogRecordBuilder>());
     registry->SetConsolePushMetricExporterBuilder(std::make_unique<NoopConsolePushMetricBuilder>());

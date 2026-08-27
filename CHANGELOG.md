@@ -30,6 +30,12 @@ Increment the:
 
 * [RESOURCE DETECTOR] Add the host resource detector
   [#4413](https://github.com/open-telemetry/opentelemetry-cpp/issues/4413)
+
+* [CONFIGURATION] SDK signal provider builder interface
+  [#4426](https://github.com/open-telemetry/opentelemetry-cpp/pull/4426)
+* [CONFIGURATION] Support environment variable substitution for attributes
+  [#4474](https://github.com/open-telemetry/opentelemetry-cpp/pull/4474)
+
 * [RESOURCE DETECTOR] Add the service resource detector and builder
   [#4414](https://github.com/open-telemetry/opentelemetry-cpp/issues/4414)
 * [CONFIGURATION] deprecate config builder cmake components
@@ -46,6 +52,9 @@ Increment the:
   when building the SDK, with exclude patterns taking precedence.
   [#3546](https://github.com/open-telemetry/opentelemetry-cpp/issues/3546)
 
+* [CONFIGURATION] Update registry factory to return a unique_ptr
+  [#4487](https://github.com/open-telemetry/opentelemetry-cpp/pull/4487)
+
 * [CONFIGURATION] Add support for the composite sampler configuration
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
@@ -58,6 +67,14 @@ Increment the:
   grammar the resource spec defers to. A malformed escape sequence is left
   in the value as-is rather than dropping the attribute.
   [#1536](https://github.com/open-telemetry/opentelemetry-cpp/issues/1536)
+
+* [CLEANUP] Replace `push_back` with `emplace_back` where applicable to
+  construct objects in-place, avoiding unnecessary temporaries.
+  [#4476](https://github.com/open-telemetry/opentelemetry-cpp/pull/4476)
+
+* [BUG] Fix `MultiSpanProcessor` and `MultiLogRecordProcessor` not reporting
+  failures from `ForceFlush` and `Shutdown` when a child processor failed.
+  [#4472](https://github.com/open-telemetry/opentelemetry-cpp/pull/4472)
 
 * [BUG] Report one outcome per request when a curl session is cancelled after
   the response arrives
