@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -255,18 +256,15 @@ void BatchSpanProcessor::Export()
           synchronization_data_->force_flush_notified_sequence.load(std::memory_order_acquire) ||
       synchronization_data_->is_shutdown.load(std::memory_order_acquire);
 
-  do
+  // snapshot the target ONCE, before exporting anything
+  size_t remaining = should_drain ? buffer_.size()
+                                  : std::min(buffer_.size(), max_export_batch_size_);
+
+  while (remaining > 0)
   {
+    size_t num_records_to_export = std::min(remaining, max_export_batch_size_);
+
     std::vector<std::unique_ptr<Recordable>> spans_arr;
-    size_t num_records_to_export =
-        buffer_.size() >= max_export_batch_size_ ? max_export_batch_size_ : buffer_.size();
-
-    if (num_records_to_export == 0)
-    {
-      NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
-      break;
-    }
-
     // Reserve space for the number of records
     spans_arr.reserve(num_records_to_export);
 
@@ -281,8 +279,10 @@ void BatchSpanProcessor::Export()
                     });
 
     exporter_->Export(nostd::span<std::unique_ptr<Recordable>>(spans_arr.data(), spans_arr.size()));
-    NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
-  } while (should_drain);
+    remaining -= num_records_to_export;
+  }
+
+  NotifyCompletion(notify_force_flush, exporter_, synchronization_data_);
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
