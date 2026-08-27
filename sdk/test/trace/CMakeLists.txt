@@ -7,6 +7,7 @@ foreach(
   tracer_provider_test
   span_data_test
   simple_processor_test
+  multi_span_processor_test
   tracer_test
   always_off_sampler_test
   always_on_sampler_test
