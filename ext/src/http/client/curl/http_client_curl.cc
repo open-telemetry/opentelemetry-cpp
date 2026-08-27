@@ -286,31 +286,25 @@ static CURLM *initMultiHandle()
 }
 
 HttpClient::HttpClient()
-    : multi_handle_(nullptr),
+    : curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()),
+      multi_handle_(initMultiHandle()),
       next_session_id_{0},
       max_sessions_per_connection_{8},
       background_thread_instrumentation_(nullptr),
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
-      background_thread_wait_for_{std::chrono::minutes{1}},
-      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
-{
-  // Not in the initialiser list: curl_global_initializer_ is declared later and has to run first.
-  multi_handle_ = initMultiHandle();
-}
+      background_thread_wait_for_{std::chrono::minutes{1}}
+{}
 
 HttpClient::HttpClient(
     const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation)
-    : multi_handle_(nullptr),
+    : curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()),
+      multi_handle_(initMultiHandle()),
       next_session_id_{0},
       max_sessions_per_connection_{8},
       background_thread_instrumentation_(thread_instrumentation),
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
-      background_thread_wait_for_{std::chrono::minutes{1}},
-      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
-{
-  // Not in the initialiser list: curl_global_initializer_ is declared later and has to run first.
-  multi_handle_ = initMultiHandle();
-}
+      background_thread_wait_for_{std::chrono::minutes{1}}
+{}
 
 HttpClient::~HttpClient()
 {

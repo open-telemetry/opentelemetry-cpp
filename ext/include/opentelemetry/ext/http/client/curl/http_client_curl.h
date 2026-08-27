@@ -377,6 +377,10 @@ private:
   // Returns true if the client has a multi handle afterwards.
   bool resetMultiHandle();
 
+  // Declared before multi_handle_ on purpose: members are initialised in declaration
+  // order, and curl_multi_init() may not run before curl_global_init().
+  nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
+
   std::mutex multi_handle_m_;
   CURLM *multi_handle_;
   std::atomic<uint64_t> next_session_id_{0};
@@ -402,8 +406,6 @@ private:
   // curl_multi_poll and it needs a multi handle, so the wait taken when there is none watches
   // this instead.
   std::atomic<uint64_t> wakeup_generation_{0};
-
-  nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };
 
 }  // namespace curl
