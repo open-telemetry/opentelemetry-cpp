@@ -21,7 +21,7 @@ BENCHMARK(BM_RandomIdGeneration);
 
 void BM_RandomIdStdGeneration(benchmark::State &state)
 {
-  std::mt19937_64 generator{0};
+  std::mt19937_64 generator{std::random_device{}()};
   while (state.KeepRunning())
   {
     benchmark::DoNotOptimize(generator());

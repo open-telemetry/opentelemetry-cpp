@@ -54,7 +54,7 @@ void HistogramAggregation(benchmark::State &state, std::unique_ptr<ViewRegistry>
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
   auto h = m->CreateDoubleHistogram("histogram1", "histogram1_description", "histogram1_unit");
-  std::default_random_engine generator;
+  std::default_random_engine generator{std::random_device{}()};
   std::uniform_int_distribution<int> distribution(0, 1000000);
   // Generate 100000 measurements
   constexpr size_t TOTAL_MEASUREMENTS = 100000;
