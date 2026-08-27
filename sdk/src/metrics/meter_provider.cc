@@ -7,6 +7,7 @@
 #include <mutex>
 #include <ostream>
 #include <utility>
+#include <vector>
 
 #include "opentelemetry/common/key_value_iterable.h"  // IWYU pragma: keep
 #include "opentelemetry/metrics/meter.h"

@@ -6,8 +6,8 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <future>
-#include <memory>
 #include <mutex>
 #include <stdexcept>
 #include <string>
@@ -732,5 +732,36 @@ TEST(LoggerProviderSDK, GetLoggerReturnsNoopOnConstructionFailure)
   EXPECT_EQ(counting_processor->emit_count(), 1u);
 
   EXPECT_EQ(provider.GetLogger("cached-logger", "cached-scope"), cached);
+}
+
+TEST(LoggerProviderSDK, GetLoggerReturnsNoopOnNonStdConstructionFailure)
+{
+  auto throwing_configurator = std::make_unique<scope_sdk::ScopeConfigurator<LoggerConfig>>(
+      scope_sdk::ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Default())
+          .AddCondition(
+              [](const scope_sdk::InstrumentationScope &scope) {
+                if (scope.GetName() == "throwing-scope")
+                {
+                  throw 1;
+                }
+                return false;
+              },
+              LoggerConfig::Default())
+          .Build());
+
+  auto *counting_processor = new CountingProcessor();
+  std::unique_ptr<LogRecordProcessor> processor(counting_processor);
+  LoggerProvider provider(std::move(processor), opentelemetry::sdk::resource::Resource::Create({}),
+                          std::move(throwing_configurator));
+
+  auto failed = provider.GetLogger("throwing-logger", "throwing-scope");
+  ASSERT_NE(failed, nullptr);
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  EXPECT_EQ(dynamic_cast<Logger *>(failed.get()), nullptr);
+#  endif
+  EXPECT_EQ(failed->GetName(), "noop logger");
+  failed->Info("should-not-emit");
+  provider.ForceFlush();
+  EXPECT_EQ(counting_processor->emit_count(), 0u);
 }
 #endif  // OPENTELEMETRY_HAVE_EXCEPTIONS

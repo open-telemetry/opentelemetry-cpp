@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <functional>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -15,6 +16,7 @@
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -38,14 +40,6 @@
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/meter_context_factory.h"
 
-#  ifndef NO_GETENV
-#    include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
-#    include "opentelemetry/sdk/metrics/meter_config.h"
-#    include "opentelemetry/sdk/metrics/meter_context.h"
-#    include "opentelemetry/sdk/metrics/view/view_registry.h"
-#    include "opentelemetry/sdk/resource/resource.h"
-#  endif
-
 #  if defined(_MSC_VER) && !defined(NO_GETENV)
 #    include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
@@ -62,7 +56,6 @@ using opentelemetry::sdk::common::unsetenv;
 #  include "opentelemetry/common/attribute_value.h"
 #  include "opentelemetry/nostd/utility.h"
 #  include "opentelemetry/nostd/variant.h"
-#  include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #endif /* OPENTELEMETRY_ABI_VERSION_NO >= 2 */
 
 using namespace opentelemetry::sdk::metrics;
@@ -592,5 +585,36 @@ TEST(MeterProvider, GetMeterReturnsNoopOnConstructionFailure)
   recovered_counter->Add(1);
 
   EXPECT_EQ(provider.GetMeter("cached-scope"), cached);
+}
+
+TEST(MeterProvider, GetMeterReturnsNoopOnNonStdConstructionFailure)
+{
+  auto throwing_configurator =
+      std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<MeterConfig>>(
+          opentelemetry::sdk::instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(
+              MeterConfig::Default())
+              .AddCondition(
+                  [](const opentelemetry::sdk::instrumentationscope::InstrumentationScope &scope) {
+                    if (scope.GetName() == "throwing-scope")
+                    {
+                      throw 1;
+                    }
+                    return false;
+                  },
+                  MeterConfig::Default())
+              .Build());
+
+  MeterProvider provider(std::unique_ptr<ViewRegistry>(new ViewRegistry()),
+                         opentelemetry::sdk::resource::Resource::Create({}),
+                         std::move(throwing_configurator));
+
+  auto failed = provider.GetMeter("throwing-scope");
+  ASSERT_NE(failed, nullptr);
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  EXPECT_EQ(dynamic_cast<Meter *>(failed.get()), nullptr);
+#  endif
+  auto failed_counter = failed->CreateUInt64Counter("requests");
+  ASSERT_NE(failed_counter, nullptr);
+  failed_counter->Add(1);
 }
 #endif  // OPENTELEMETRY_HAVE_EXCEPTIONS
