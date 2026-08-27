@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <string>
+#include <unordered_map>
 #include <utility>
 
 #include "opentelemetry/nostd/variant.h"

@@ -11,6 +11,7 @@
 
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/resource/entity.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/version/version.h"
@@ -57,17 +58,16 @@ std::unordered_map<std::string, std::size_t> BuildTypeRanks(const Resource &old_
   for (std::size_t i = 0; i < updating_entities.size(); ++i)
   {
     const std::string &type = updating_entities[i].GetType();
-    if (rank.find(type) == rank.end())
-    {
-      rank.emplace(type,i);
-    }
+    rank.emplace(type, i);
   }
+
   std::size_t old_only = updating_entities.size();
   for (const auto &entity : old_resource.GetEntities())
   {
-    if (rank.find(entity.GetType()) == rank.end())
+    auto result = rank.emplace(entity.GetType(), old_only);
+    if (result.second)
     {
-      rank.emplace(entity.GetType(), old_only++);
+      ++old_only;
     }
   }
   return rank;
