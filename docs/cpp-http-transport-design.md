@@ -71,15 +71,78 @@ SHOULD be configurable. For HTTP it says a client MAY send requests over several
 parallel connections, and that the maximum number SHOULD be configurable.
 
 Taken together the two facts do not select a side. They ask for a transport
-where concurrency is available, bounded and configurable, and where a caller
-that does not want it does not pay for it. Nothing below should be read as
-proposing to remove the capability.
+where concurrency is available, bounded and configurable. What a blocking caller
+should not need is a second set of semantics; whether it also avoids a
+background thread is a cost to measure rather than something to promise here.
+Nothing below should be read as proposing to remove the capability.
 
 One number needs to be said out loud rather than assumed. The exporter's default
 today is `max_concurrent_requests` 64 and `max_requests_per_connection` 8. The
 workload above needed about four. Neither figure was derived from a benchmark in
 this repository, and the gap between them is a question for measurement, not for
 argument.
+
+## What the two existing options actually do
+
+@owent's second reply on #4448 says these were written around curl and that a
+replacement need not be bound by them. Reading them settles what a replacement
+would have to keep, which is less than their names suggest.
+
+`max_concurrent_requests`, default 64, is not an admission limit. `Export()`
+builds the request, hands it to the HTTP client, and only then waits for the
+count of running sessions to fall below it. It is a watermark applied after
+submission, so the request already exists in memory by the time it applies.
+
+`max_requests_per_connection`, default 8, is not a per connection counter.
+Nothing counts requests against a connection. `Session::SendRequest` computes
+
+```cpp
+reuse_connection = session_id_ % max_sessions_per_connection != 0;
+```
+
+and every Nth session by global id then sets `CURLOPT_FRESH_CONNECT` and
+`CURLOPT_FORBID_REUSE`, which opens a new connection and closes it after one
+use. It is a periodic rotation keyed on a counter that spans every session, not
+a quota.
+
+Neither controls the shape of what is on the wire, because the client never asks
+for it. Grepping `ext/` and `exporters/` for the options that would:
+
+| option | set anywhere |
+| --- | --- |
+| `CURLMOPT_MAX_HOST_CONNECTIONS` | no |
+| `CURLMOPT_MAX_TOTAL_CONNECTIONS` | no |
+| `CURLMOPT_MAX_CONCURRENT_STREAMS` | no |
+| `CURLMOPT_PIPELINING` | no |
+| `CURLOPT_HTTP_VERSION` | no |
+
+So the connection count, the stream count and the protocol are all whatever
+libcurl negotiates, and the same two option values can mean different things
+against different servers or against a different system libcurl. That is worth
+fixing whatever contract wins.
+
+## Where "queued and executed serially" holds
+
+@owent's reply says that adding requests to one `CURLM` without disabling reuse
+can look concurrent while running serially underneath. That is right, and the
+qualifier matters for what the replacement has to expose.
+
+It holds on one connection that cannot multiplex. HTTP/1.1 responses arrive in
+request order, and libcurl removed HTTP/1 pipelining, so in practice one such
+connection carries one exchange at a time. It does not hold generally: a `CURLM`
+may open several connections to the same host, and HTTP/2 and HTTP/3 carry
+several streams on one connection subject to the server's own limits.
+
+Which is why one number cannot express it. A replacement has to separate
+
+- export operations admitted and in flight,
+- HTTP attempts, since one operation may make several,
+- physical connections,
+- streams per connection,
+- and bytes retained for requests that have not settled.
+
+`max_concurrent_requests` today stands in for the first and, through the
+rotation heuristic, indirectly for the third. It says nothing about the rest.
 
 ## Where the current model breaks
 
@@ -198,6 +261,11 @@ rather than answered here.
 - [ ] Which layer owns retry, in-flight concurrency and `Retry-After`?
 - [ ] What should the default number of requests in flight be, given that the
       option says 64 today and the one reported workload needed about four?
+- [ ] Is the budget a count of requests, a number of bytes retained, or both?
+      64 requests at the 4 MB the reported workload was sending is 256 MB of
+      request payload before responses, retries or compression buffers.
+- [ ] Do an export operation and an HTTP attempt get separate identities, so
+      that a retry is one operation and several attempts?
 - [ ] Is a new contract introduced alongside the current one with an adapter, or
       does the current interface evolve?
 
@@ -257,6 +325,17 @@ the only evidence anyone has offered for what concurrency is worth:
 Reported per run: acknowledged batches per second, dropped batches, p50 and p99
 latency, resident memory, thread count, open descriptors, and whether
 `ForceFlush` and `Shutdown` returned the right answer within their deadlines.
+
+Rates have to name their unit. The reported workload is "roughly 10 to 20K QPS"
+of log volume, which is not the same number as HTTP requests per second, so the
+run should report both, along with records and serialized bytes per request.
+Otherwise the figure cannot be compared with anything.
+
+The run also has to read back what libcurl actually did, not only what it was
+asked for: `CURLINFO_HTTP_VERSION` for the negotiated protocol and
+`CURLINFO_NUM_CONNECTS` for connections opened. Without those, a result at four
+in flight cannot be told apart from four connections, four streams on one
+connection, or four requests serialized behind each other.
 
 The `100 ms` in the report is not qualified as one way or round trip, so the
 benchmark should define it as `netem` round trip and say so rather than inherit
