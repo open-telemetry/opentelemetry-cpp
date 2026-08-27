@@ -257,8 +257,8 @@ void BatchSpanProcessor::Export()
       synchronization_data_->is_shutdown.load(std::memory_order_acquire);
 
   // snapshot the target ONCE, before exporting anything
-  size_t remaining = should_drain ? buffer_.size()
-                                  : std::min(buffer_.size(), max_export_batch_size_);
+  size_t remaining =
+      should_drain ? buffer_.size() : std::min(buffer_.size(), max_export_batch_size_);
 
   while (remaining > 0)
   {

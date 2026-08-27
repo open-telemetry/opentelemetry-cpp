@@ -417,12 +417,12 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlushExportsAllBufferedSpans)
   std::shared_ptr<std::atomic<std::size_t>> spans_received_count(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
   std::shared_ptr<std::atomic<std::size_t>> force_flush_counter(new std::atomic<std::size_t>(0));
+  std::shared_ptr<std::atomic<std::size_t>> export_call_count(new std::atomic<std::size_t>(0));
 
-  auto exporter_raw = new BlockingMockSpanExporter(
-      batch_sizes, spans_received_count, is_shutdown, force_flush_counter,
-      std::shared_ptr<std::atomic<std::size_t>>(new std::atomic<std::size_t>(0)),
-      std::chrono::milliseconds(100));
-  auto exporter = std::unique_ptr<sdk::trace::SpanExporter>(exporter_raw);
+  auto exporter_raw = new BlockingMockSpanExporter(batch_sizes, spans_received_count, is_shutdown,
+                                                   force_flush_counter, export_call_count,
+                                                   std::chrono::milliseconds(100));
+  auto exporter     = std::unique_ptr<sdk::trace::SpanExporter>(exporter_raw);
 
   sdk::trace::BatchSpanProcessorOptions options{};
   options.max_export_batch_size = 100;
