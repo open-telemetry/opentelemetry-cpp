@@ -56,6 +56,12 @@ using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
 #  endif
 
+#  if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
+          (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
+      defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
+#    define OTELCPP_GRPC_ASYNC_API_IS_STABLE
+#  endif
+
 using namespace testing;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -70,8 +76,7 @@ class OtlpMockTraceServiceStub : public proto::collector::trace::v1::MockTraceSe
 {
 public:
 // Some old toolchains can only use gRPC 1.33 and it's experimental.
-#  if defined(GRPC_CPP_VERSION_MAJOR) && \
-      (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+#  if defined(OTELCPP_GRPC_ASYNC_API_IS_STABLE)
   using async_interface_base =
       proto::collector::trace::v1::TraceService::StubInterface::async_interface;
 #  else
@@ -104,9 +109,7 @@ public:
     }
 
 // Some old toolchains can only use gRPC 1.33 and it's experimental.
-#  if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
-          (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
-      defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
+#  if defined(OTELCPP_GRPC_ASYNC_API_IS_STABLE)
     void Export(
         ::grpc::ClientContext * /*context*/,
         const ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest * /*request*/,
@@ -126,8 +129,7 @@ public:
     OtlpMockTraceServiceStub *stub_;
   };
 
-#  if defined(GRPC_CPP_VERSION_MAJOR) && \
-      (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+#  if defined(OTELCPP_GRPC_ASYNC_API_IS_STABLE)
   async_interface_base *async() override { return &async_interface_; }
 #  else
   async_interface_base *experimental_async() override { return &async_interface_; }

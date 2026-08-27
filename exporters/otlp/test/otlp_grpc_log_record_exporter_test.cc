@@ -67,6 +67,12 @@ using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
 #endif
 
+#if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
+        (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
+    defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
+#  define OTELCPP_GRPC_ASYNC_API_IS_STABLE
+#endif
+
 using namespace testing;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -80,8 +86,7 @@ namespace
 class OtlpMockTraceServiceStub : public proto::collector::trace::v1::MockTraceServiceStub
 {
 public:
-#if defined(GRPC_CPP_VERSION_MAJOR) && \
-    (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+#if defined(OTELCPP_GRPC_ASYNC_API_IS_STABLE)
   using async_interface_base =
       proto::collector::trace::v1::TraceService::StubInterface::async_interface;
 #else
@@ -106,9 +111,7 @@ public:
       callback(stub_->last_async_status_);
     }
 
-#if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
-        (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
-    defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
+#if defined(OTELCPP_GRPC_ASYNC_API_IS_STABLE)
     void Export(
         ::grpc::ClientContext * /*context*/,
         const ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest * /*request*/,
@@ -128,8 +131,7 @@ public:
     OtlpMockTraceServiceStub *stub_;
   };
 
-#if defined(GRPC_CPP_VERSION_MAJOR) && \
-    (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+#if defined(OTELCPP_GRPC_ASYNC_API_IS_STABLE)
   async_interface_base *async() override { return &async_interface_; }
 #else
   async_interface_base *experimental_async() override { return &async_interface_; }
@@ -145,8 +147,7 @@ private:
 class OtlpMockLogsServiceStub : public proto::collector::logs::v1::MockLogsServiceStub
 {
 public:
-#if defined(GRPC_CPP_VERSION_MAJOR) && \
-    (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+#if defined(OTELCPP_GRPC_ASYNC_API_IS_STABLE)
   using async_interface_base =
       proto::collector::logs::v1::LogsService::StubInterface::async_interface;
 #else
@@ -171,9 +172,7 @@ public:
       callback(stub_->last_async_status_);
     }
 
-#if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
-        (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
-    defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
+#if defined(OTELCPP_GRPC_ASYNC_API_IS_STABLE)
     void Export(
         ::grpc::ClientContext * /*context*/,
         const ::opentelemetry::proto::collector::logs::v1::ExportLogsServiceRequest * /*request*/,
@@ -193,8 +192,7 @@ public:
     OtlpMockLogsServiceStub *stub_;
   };
 
-#if defined(GRPC_CPP_VERSION_MAJOR) && \
-    (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+#if defined(OTELCPP_GRPC_ASYNC_API_IS_STABLE)
   async_interface_base *async() override { return &async_interface_; }
 #else
   async_interface_base *experimental_async() override { return &async_interface_; }
