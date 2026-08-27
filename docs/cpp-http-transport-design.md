@@ -236,6 +236,27 @@ This is a backend implementation choice. It does not have to appear in the
 public interface, and it should not: a native Windows or Apple transport has no
 multi handle to own.
 
+## The words this needs, since one of them is doing too much work
+
+`max_concurrent_requests` currently stands for several different quantities, and
+the sections above only make sense if they are named apart.
+
+| term | what it counts |
+| --- | --- |
+| record rate | records the application produces per second |
+| export operation | one batch, from first attempt to final outcome |
+| attempt | one HTTP request; a retried operation has several |
+| admitted | attempts the governor has let start |
+| pending | attempts waiting for capacity rather than for the network |
+| running transfer | attempts libcurl is currently working on |
+| connection | one TCP or QUIC connection to an origin |
+| stream | one exchange on a connection; one at a time on HTTP/1.1 |
+| retained bytes | serialized request bytes held for attempts that have not settled |
+
+The reported workload is a record rate. The "about four" is an attempt count.
+They are not the same number and a benchmark that reports one as the other
+cannot be compared with anything.
+
 ## Against the criteria in #4448
 
 | | A: current model | B: one attempt operation | C: single owner loop |
@@ -243,15 +264,28 @@ multi handle to own.
 | Throughput, connection reuse | keeps both | reuse yes, in-flight count owned above it | keeps both |
 | Cancellation | flag plus races | explicit, at a defined point | explicit, owner thread applies it |
 | Shutdown | four reports open | bounded by construction | bounded, one thread to drain |
-| Retry and concurrency owner | inside the transport | left open, above the transport | inside the backend |
+| Admission and retry owner | inside the transport | above the transport | above the transport |
+| Connection and stream scheduling | implicit, libcurl decides | backend policy | backend policy, one owner thread |
 | Installed interfaces | unchanged | new interface plus an adapter | unchanged, backend only |
 | Custom clients | must be re-entrant, undocumented | one method to implement | unaffected |
 | Native backends | awkward | natural | not applicable |
 
 ## What this needs decided
 
-These are the questions a design cannot avoid. They are listed as decisions
-rather than answered here.
+Two lists rather than one. The first is what the discussion on #4448 has already
+settled, written down so a reviewer can disagree with a specific line instead of
+re-reading the thread. The second is what is genuinely still open.
+
+**Settled, unless someone objects to a line here.** A backend neutral contract
+rather than a curl shaped one. Asynchronous submission of one attempt over a
+request that does not change after it is submitted. Exactly one settlement per
+export operation. Bounded resources, in bytes as well as in count. The existing
+interface kept working through an adapter rather than replaced. One owner thread
+per `CURLM`. The two existing options treated as curl compatibility controls
+rather than as requirements of the replacement.
+
+**Open.** These are the questions a design cannot avoid, and they are listed
+rather than answered.
 
 - [ ] Is a `Session` single use, reusable after completion, or a legacy adapter?
 - [ ] Does submitting a request snapshot it or take ownership of it?
@@ -274,6 +308,24 @@ interfaces and `http_client_factory_curl.h` but not the concrete curl headers,
 while Bazel's `//ext:headers` still globs everything under `ext/include`. The
 two surfaces disagree today, and whichever direction is chosen has to say what
 happens to a Bazel consumer that includes a concrete header.
+
+## What a replacement has to hold, whichever shape wins
+
+These are requirements rather than questions, because no answer to the open
+decisions below makes any of them optional.
+
+- Total bytes retained for attempts that have not settled is bounded. A count of
+  requests does not bound it: 64 in flight at the 4 MB the reported workload was
+  sending is 256 MB of request payload.
+- Compression working memory counts against that bound. Today the gzip step
+  works in the caller's own buffer, so it is invisible to any request count.
+- A retry does not silently multiply retained payload. One export operation
+  holds one serialized body however many attempts it makes.
+- An export operation and an attempt have separate identities. `ForceFlush`
+  answers for operations accepted before its watermark, not for whichever
+  attempts happen to be running.
+- Exactly one outcome is delivered per export operation, and it is the
+  operation's, not the last attempt's.
 
 ## A recommendation
 
