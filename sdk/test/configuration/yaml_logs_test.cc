@@ -26,6 +26,12 @@
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
 
+#if defined(_MSC_VER)
+#  include "opentelemetry/sdk/common/env_variables.h"
+using opentelemetry::sdk::common::setenv;
+using opentelemetry::sdk::common::unsetenv;
+#endif
+
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
     const std::string &yaml)
 {
@@ -511,6 +517,88 @@ logger_provider:
   ASSERT_TRUE(config->logger_provider->limits->attribute_value_length_limit.HasValue());
   ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit.Value(), 1024);
   ASSERT_FALSE(config->logger_provider->limits->attribute_count_limit.HasValue());
+}
+
+TEST(YamlLogs, limits_environment_substitution)
+{
+  setenv("MY_LIMIT", "1234", 1);
+
+  std::string yaml = R"(
+file_format: "1.0-logs"
+attribute_limits:
+  attribute_value_length_limit: 4096
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: ${MY_LIMIT}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  ASSERT_TRUE(config->attribute_limits->attribute_value_length_limit.HasValue());
+  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit.Value(), 4096);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->limits, nullptr);
+  ASSERT_TRUE(config->logger_provider->limits->attribute_value_length_limit.HasValue());
+  ASSERT_EQ(config->logger_provider->limits->attribute_value_length_limit.Value(), 1234);
+}
+
+TEST(YamlLogs, empty_limit_environment_substitution_uses_global_limit)
+{
+  setenv("MY_LIMIT", "", 1);
+
+  std::string yaml = R"(
+file_format: "1.0-logs"
+attribute_limits:
+  attribute_value_length_limit: 4096
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: ${MY_LIMIT}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  ASSERT_TRUE(config->attribute_limits->attribute_value_length_limit.HasValue());
+  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit.Value(), 4096);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->limits, nullptr);
+  ASSERT_FALSE(config->logger_provider->limits->attribute_value_length_limit.HasValue());
+}
+
+TEST(YamlLogs, unset_limit_environment_substitution_uses_global_limit)
+{
+  unsetenv("MY_LIMIT");
+
+  std::string yaml = R"(
+file_format: "1.0-logs"
+attribute_limits:
+  attribute_value_length_limit: 4096
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: ${MY_LIMIT}
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->attribute_limits, nullptr);
+  ASSERT_TRUE(config->attribute_limits->attribute_value_length_limit.HasValue());
+  ASSERT_EQ(config->attribute_limits->attribute_value_length_limit.Value(), 4096);
+  ASSERT_NE(config->logger_provider, nullptr);
+  ASSERT_NE(config->logger_provider->limits, nullptr);
+  ASSERT_FALSE(config->logger_provider->limits->attribute_value_length_limit.HasValue());
 }
 
 TEST(YamlLogs, no_logger_configurator)

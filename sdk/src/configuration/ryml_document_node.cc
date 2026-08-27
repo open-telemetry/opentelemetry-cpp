@@ -310,6 +310,7 @@ OptionalValue<std::size_t> RymlDocumentNode::GetOptionalInteger(const std::strin
   }
 
   std::string value = child->AsString();
+  value             = DoSubstitution(value);
 
   if (value.empty())
   {
