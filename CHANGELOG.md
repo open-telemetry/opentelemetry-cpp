@@ -17,7 +17,6 @@ Increment the:
 
 * [SDK] Add Entity support to Resource
   [#3652](https://github.com/open-telemetry/opentelemetry-cpp/issues/3652)
-  
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
