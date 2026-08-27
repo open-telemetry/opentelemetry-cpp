@@ -61,6 +61,9 @@ Increment the:
   when building the SDK, with exclude patterns taking precedence.
   [#3546](https://github.com/open-telemetry/opentelemetry-cpp/issues/3546)
 
+* [CONFIGURATION] Update registry factory to return a unique_ptr
+  [#4487](https://github.com/open-telemetry/opentelemetry-cpp/pull/4487)
+
 * [CONFIGURATION] Add support for the composite sampler configuration
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
