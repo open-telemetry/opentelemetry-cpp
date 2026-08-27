@@ -57,7 +57,7 @@ using OwnedAttributeValue = nostd::variant<bool,
                                            std::vector<uint64_t>,
                                            std::vector<uint8_t>>;
 
-enum OwnedAttributeType : std::uint8_t
+enum class OwnedAttributeType : std::uint8_t
 {
   kTypeBool,
   kTypeInt,

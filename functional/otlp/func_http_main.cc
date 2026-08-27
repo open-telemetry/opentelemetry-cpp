@@ -40,7 +40,7 @@ const int TEST_FAILED = 1;
 
 namespace
 {
-enum test_mode : std::uint8_t
+enum test_mode : std::uint8_t  // NOLINT(cppcoreguidelines-use-enum-class)
 {
   MODE_NONE,
   MODE_HTTP,
