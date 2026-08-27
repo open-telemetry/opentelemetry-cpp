@@ -59,7 +59,7 @@ std::unordered_map<std::string, std::size_t> BuildTypeRanks(const Resource &old_
     const std::string &type = updating_entities[i].GetType();
     if (rank.find(type) == rank.end())
     {
-      rank[type] = i;
+      rank.try_emplace(type,i);
     }
   }
   std::size_t old_only = updating_entities.size();
@@ -67,7 +67,7 @@ std::unordered_map<std::string, std::size_t> BuildTypeRanks(const Resource &old_
   {
     if (rank.find(entity.GetType()) == rank.end())
     {
-      rank[entity.GetType()] = old_only++;
+      rank.try_emplace(entity.GetType(), old_only++);
     }
   }
   return rank;
