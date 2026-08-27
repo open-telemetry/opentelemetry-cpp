@@ -17,11 +17,7 @@
 #  include "opentelemetry/nostd/string_view.h"
 #  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/version.h"
-
-#  if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#    include "opentelemetry/sdk/metrics/data/exemplar_data.h"
-#  endif
-
+#  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #  include "opentelemetry/sdk/metrics/exemplar/fixed_size_exemplar_reservoir.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
