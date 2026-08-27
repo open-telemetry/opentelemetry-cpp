@@ -874,8 +874,14 @@ TEST_F(BasicCurlHttpTests, TlsVersionRangeAndCipherListAreAccepted)
   http_client::Body body;
   http_client::Headers headers;
 
+  http_client::Compression compression = http_client::Compression::kNone;
+  http_client::RetryPolicy retry_policy;
+
+  // Every argument is named. The defaulted ones would be temporaries, and the operation keeps
+  // references to them past the end of this expression.
   curl::HttpOperation operation(http_client::Method::Get, "http://127.0.0.1:19000/get/",
-                                ssl_options, &handler, headers, body);
+                                ssl_options, &handler, headers, body, compression, false,
+                                curl::kDefaultHttpConnTimeout, false, false, retry_policy);
 
   ASSERT_EQ(CURLE_OK, operation.Send());
   ASSERT_EQ(200, operation.GetResponseCode());
@@ -892,8 +898,14 @@ TEST_F(BasicCurlHttpTests, AnUnknownTlsVersionIsRefused)
   http_client::Body body;
   http_client::Headers headers;
 
+  http_client::Compression compression = http_client::Compression::kNone;
+  http_client::RetryPolicy retry_policy;
+
+  // Every argument is named. The defaulted ones would be temporaries, and the operation keeps
+  // references to them past the end of this expression.
   curl::HttpOperation operation(http_client::Method::Get, "http://127.0.0.1:19000/get/",
-                                ssl_options, &handler, headers, body);
+                                ssl_options, &handler, headers, body, compression, false,
+                                curl::kDefaultHttpConnTimeout, false, false, retry_policy);
 
   ASSERT_EQ(CURLE_UNKNOWN_OPTION, operation.Send());
 }
