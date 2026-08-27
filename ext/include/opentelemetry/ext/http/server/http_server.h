@@ -223,7 +223,7 @@ public:
   HttpRequestHandler &addHandler(const std::string &root, HttpRequestCallback &handler)
   {
     // No thread-safety here!
-    m_handlers.push_back({root, &handler});
+    m_handlers.emplace_back(root, &handler);
     LOG_INFO("HttpServer: Added handler for %s", root.c_str());
     return m_handlers.back();
   }
@@ -231,7 +231,7 @@ public:
   HttpRequestHandler &operator[](const std::string &root)
   {
     // No thread-safety here!
-    m_handlers.push_back({root, nullptr});
+    m_handlers.emplace_back(root, nullptr);
     LOG_INFO("HttpServer: Added handler for %s", root.c_str());
     return m_handlers.back();
   }
@@ -239,7 +239,7 @@ public:
   HttpServer &operator+=(std::pair<const std::string &, HttpRequestCallback &> other)
   {
     LOG_INFO("HttpServer: Added handler for %s", other.first.c_str());
-    m_handlers.push_back(HttpRequestHandler(other.first, &other.second));
+    m_handlers.emplace_back(other.first, &other.second);
     return (*this);
   }
 

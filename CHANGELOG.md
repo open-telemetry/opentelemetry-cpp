@@ -52,6 +52,9 @@ Increment the:
   when building the SDK, with exclude patterns taking precedence.
   [#3546](https://github.com/open-telemetry/opentelemetry-cpp/issues/3546)
 
+* [CONFIGURATION] Update registry factory to return a unique_ptr
+  [#4487](https://github.com/open-telemetry/opentelemetry-cpp/pull/4487)
+
 * [CONFIGURATION] Add support for the composite sampler configuration
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
@@ -64,6 +67,10 @@ Increment the:
   grammar the resource spec defers to. A malformed escape sequence is left
   in the value as-is rather than dropping the attribute.
   [#1536](https://github.com/open-telemetry/opentelemetry-cpp/issues/1536)
+
+* [CLEANUP] Replace `push_back` with `emplace_back` where applicable to
+  construct objects in-place, avoiding unnecessary temporaries.
+  [#4476](https://github.com/open-telemetry/opentelemetry-cpp/pull/4476)
 
 * [BUG] Fix `MultiSpanProcessor` and `MultiLogRecordProcessor` not reporting
   failures from `ForceFlush` and `Shutdown` when a child processor failed.
