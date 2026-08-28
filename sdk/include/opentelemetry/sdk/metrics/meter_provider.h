@@ -59,13 +59,13 @@ public:
       std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>> meter_configurator =
           std::make_unique<instrumentationscope::ScopeConfigurator<MeterConfig>>(
               instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(MeterConfig::Default())
-                  .Build())) noexcept;
+                  .Build()));
 
   /**
    * Initialize a new meter provider with a specified context
    * @param context The owned meter configuration/pipeline for this provider.
    */
-  explicit MeterProvider(std::unique_ptr<MeterContext> context) noexcept;
+  explicit MeterProvider(std::unique_ptr<MeterContext> context);
 
   MeterProvider(const MeterProvider &)            = delete;
   MeterProvider(MeterProvider &&)                 = delete;
@@ -152,6 +152,8 @@ public:
 private:
   std::shared_ptr<MeterContext> context_;
   std::mutex lock_;
+  // Allocated during provider construction so GetMeter can return it without allocating.
+  nostd::shared_ptr<opentelemetry::metrics::Meter> noop_meter_;
 
 #if defined(__cpp_lib_atomic_value_initialization) && \
     __cpp_lib_atomic_value_initialization >= 201911L

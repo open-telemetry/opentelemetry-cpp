@@ -6,16 +6,19 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <functional>
 #include <future>
 #include <limits>
+#include <memory>
+#include <stdexcept>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
 
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
@@ -29,6 +32,7 @@
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/span_data.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
@@ -56,6 +60,7 @@ using opentelemetry::sdk::common::unsetenv;
 
 using namespace opentelemetry::sdk::trace;
 using namespace opentelemetry::sdk::resource;
+using opentelemetry::sdk::instrumentationscope::InstrumentationScope;
 using opentelemetry::sdk::instrumentationscope::ScopeConfigurator;
 
 TEST(TracerProvider, GetTracer)
@@ -699,3 +704,108 @@ TEST(TracerProvider, SpanLimitsTracerProviderFactoryCreateDefault)
   EXPECT_EQ(limits.link_attribute_count_limit, no_limits.link_attribute_count_limit);
   EXPECT_EQ(limits.attribute_value_length_limit, no_limits.attribute_value_length_limit);
 }
+
+TEST(TracerProvider, ConstructorsAreNotNoexcept)
+{
+  static_assert(!noexcept(TracerProvider(std::unique_ptr<TracerContext>{})),
+                "TracerProvider construction must be allowed to throw");
+  static_assert(!noexcept(Tracer(std::shared_ptr<TracerContext>{})),
+                "Tracer construction must be allowed to throw");
+}
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+TEST(TracerProvider, GetTracerReturnsNoopOnConstructionFailure)
+{
+  auto should_throw          = std::make_shared<bool>(true);
+  auto throwing_configurator = std::make_unique<ScopeConfigurator<TracerConfig>>(
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default())
+          .AddCondition(
+              [should_throw](const InstrumentationScope &scope) {
+                if (scope.GetName() == "throwing-scope" && *should_throw)
+                {
+                  throw std::runtime_error("injected tracer construction failure");
+                }
+                return false;
+              },
+              TracerConfig::Default())
+          .Build());
+
+  std::unique_ptr<opentelemetry::exporter::memory::InMemorySpanExporter> exporter(
+      new opentelemetry::exporter::memory::InMemorySpanExporter());
+  auto span_data = exporter->GetData();
+  auto processor = SimpleSpanProcessorFactory::Create(std::move(exporter));
+  TracerProvider provider(
+      std::move(processor), Resource::Create({}), std::unique_ptr<Sampler>(new AlwaysOnSampler()),
+      std::unique_ptr<IdGenerator>(new RandomIdGenerator()), std::move(throwing_configurator));
+
+  auto cached = provider.GetTracer("cached-scope");
+  ASSERT_NE(cached, nullptr);
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  ASSERT_NE(dynamic_cast<Tracer *>(cached.get()), nullptr);
+#  endif
+  auto cached_again = provider.GetTracer("cached-scope");
+  EXPECT_EQ(cached, cached_again);
+
+  auto failed = provider.GetTracer("throwing-scope");
+  ASSERT_NE(failed, nullptr);
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  EXPECT_EQ(dynamic_cast<Tracer *>(failed.get()), nullptr);
+#  endif
+  auto failed_span = failed->StartSpan("should-not-record");
+  ASSERT_NE(failed_span, nullptr);
+  EXPECT_FALSE(failed_span->IsRecording());
+  failed_span->End();
+  provider.ForceFlush();
+  EXPECT_EQ(span_data->GetSpans().size(), 0u);
+
+  auto failed_again = provider.GetTracer("throwing-scope");
+  EXPECT_EQ(failed, failed_again);
+
+  *should_throw  = false;
+  auto recovered = provider.GetTracer("throwing-scope");
+  ASSERT_NE(recovered, nullptr);
+  EXPECT_NE(recovered, failed);
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  EXPECT_NE(dynamic_cast<Tracer *>(recovered.get()), nullptr);
+#  endif
+  auto recovered_span = recovered->StartSpan("should-record");
+  EXPECT_TRUE(recovered_span->IsRecording());
+  recovered_span->End();
+  provider.ForceFlush();
+  EXPECT_EQ(span_data->GetSpans().size(), 1u);
+
+  EXPECT_EQ(provider.GetTracer("cached-scope"), cached);
+}
+
+TEST(TracerProvider, GetTracerReturnsNoopOnNonStdConstructionFailure)
+{
+  auto throwing_configurator = std::make_unique<ScopeConfigurator<TracerConfig>>(
+      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default())
+          .AddCondition(
+              [](const InstrumentationScope &scope) {
+                if (scope.GetName() == "throwing-scope")
+                {
+                  throw 1;
+                }
+                return false;
+              },
+              TracerConfig::Default())
+          .Build());
+
+  std::unique_ptr<opentelemetry::exporter::memory::InMemorySpanExporter> exporter(
+      new opentelemetry::exporter::memory::InMemorySpanExporter());
+  auto processor = SimpleSpanProcessorFactory::Create(std::move(exporter));
+  TracerProvider provider(
+      std::move(processor), Resource::Create({}), std::unique_ptr<Sampler>(new AlwaysOnSampler()),
+      std::unique_ptr<IdGenerator>(new RandomIdGenerator()), std::move(throwing_configurator));
+
+  auto failed = provider.GetTracer("throwing-scope");
+  ASSERT_NE(failed, nullptr);
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  EXPECT_EQ(dynamic_cast<Tracer *>(failed.get()), nullptr);
+#  endif
+  auto failed_span = failed->StartSpan("should-not-record");
+  ASSERT_NE(failed_span, nullptr);
+  EXPECT_FALSE(failed_span->IsRecording());
+}
+#endif  // OPENTELEMETRY_HAVE_EXCEPTIONS

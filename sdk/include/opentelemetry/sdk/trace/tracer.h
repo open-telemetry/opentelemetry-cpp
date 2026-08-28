@@ -40,7 +40,7 @@ public:
   /** Construct a new Tracer with the given context pipeline. */
   explicit Tracer(std::shared_ptr<TracerContext> context,
                   std::unique_ptr<InstrumentationScope> instrumentation_scope =
-                      InstrumentationScope::Create("")) noexcept;
+                      InstrumentationScope::Create(""));
 
   nostd::shared_ptr<opentelemetry::trace::Span> StartSpan(
       nostd::string_view name,

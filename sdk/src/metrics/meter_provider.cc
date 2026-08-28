@@ -3,11 +3,15 @@
 
 #include <atomic>
 #include <chrono>
+#include <exception>
 #include <mutex>
+#include <ostream>
 #include <utility>
 #include <vector>
 
 #include "opentelemetry/common/key_value_iterable.h"  // IWYU pragma: keep
+#include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/noop.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -39,25 +43,56 @@ namespace metrics
 namespace resource    = opentelemetry::sdk::resource;
 namespace metrics_api = opentelemetry::metrics;
 
+namespace
+{
+
+nostd::shared_ptr<metrics_api::Meter> CreateNoopMeterFallback()
+{
+  return nostd::shared_ptr<metrics_api::Meter>(new metrics_api::NoopMeter());
+}
+
+void LogGetMeterConstructionFailure(const char *detail) noexcept
+{
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    OTEL_INTERNAL_LOG_ERROR("[MeterProvider::GetMeter] Failed to construct meter: "
+                            << detail << "; returning noop meter.");
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (const std::exception &)  // NOLINT(bugprone-empty-catch)
+  {
+    // Logging can throw (typically std::bad_alloc from the string stream).
+    // Swallow it so the noexcept GetMeter path cannot throw.
+  }
+#endif
+}
+
+}  // namespace
+
 MeterProvider::MeterProvider()
     : context_(std::make_shared<MeterContext>(
           std::make_unique<ViewRegistry>(),
           resource::Resource::Create({}),
           std::make_unique<instrumentationscope::ScopeConfigurator<MeterConfig>>(
               instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(MeterConfig::Default())
-                  .Build())))
+                  .Build()))),
+      noop_meter_(CreateNoopMeterFallback())
 {}
 
-MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context) noexcept
-    : context_(std::move(context))
+MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context)
+    : context_(std::move(context)), noop_meter_(CreateNoopMeterFallback())
 {}
 
-MeterProvider::MeterProvider(std::unique_ptr<ViewRegistry> views,
-                             const sdk::resource::Resource &resource,
-                             std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>>
-                                 meter_configurator) noexcept
-    : context_(
-          std::make_shared<MeterContext>(std::move(views), resource, std::move(meter_configurator)))
+MeterProvider::MeterProvider(
+    std::unique_ptr<ViewRegistry> views,
+    const sdk::resource::Resource &resource,
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<MeterConfig>> meter_configurator)
+    : context_(std::make_shared<MeterContext>(std::move(views),
+                                              resource,
+                                              std::move(meter_configurator))),
+      noop_meter_(CreateNoopMeterFallback())
 {
   OTEL_INTERNAL_LOG_DEBUG("[MeterProvider] MeterProvider created.");
 }
@@ -96,13 +131,32 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     }
   }
 
-  instrumentationscope::InstrumentationScopeAttributes attrs_map(attributes);
-  auto scope =
-      instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attrs_map);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    instrumentationscope::InstrumentationScopeAttributes attrs_map(attributes);
+    auto scope =
+        instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attrs_map);
 
-  auto meter = std::shared_ptr<Meter>(new Meter(context_, std::move(scope)));
-  context_->AddMeter(meter);
-  return nostd::shared_ptr<metrics_api::Meter>{meter};
+    auto meter = std::make_shared<Meter>(context_, std::move(scope));
+    context_->AddMeter(meter);
+    return nostd::shared_ptr<metrics_api::Meter>{meter};
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (const std::exception &ex)
+  {
+    LogGetMeterConstructionFailure(ex.what());
+    return noop_meter_;
+  }
+  // User-provided scope configurators can throw any exception type, not just
+  // std::exception. Catch everything so GetMeter stays noexcept.
+  catch (...)
+  {
+    LogGetMeterConstructionFailure("unknown exception");
+    return noop_meter_;
+  }
+#endif
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
