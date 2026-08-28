@@ -58,7 +58,7 @@ using AttributeValue =
                    nostd::span<const uint8_t>>;
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-enum class AttributeType : std::uint8_t
+enum AttributeType : std::uint8_t  // NOLINT(cppcoreguidelines-use-enum-class)
 #else
 enum AttributeType  // NOLINT(performance-enum-size,cppcoreguidelines-use-enum-class)
 #endif
