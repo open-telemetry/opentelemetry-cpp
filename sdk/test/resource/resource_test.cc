@@ -446,6 +446,12 @@ TEST(ResourceTest, CopyAndAssignmentPreservesNewMembers)
   EXPECT_EQ(copied.GetAttributes(), original.GetAttributes());
   EXPECT_EQ(copied.GetSchemaURL(), original.GetSchemaURL());
 
+  copied = Resource();
+  EXPECT_TRUE(original.GetEntities().empty());
+  EXPECT_EQ(original.GetUnassociatedAttributes(), attributes);
+  EXPECT_EQ(original.GetAttributes(), attributes);
+  EXPECT_EQ(original.GetSchemaURL(), schema_url);
+
   Resource assigned;
   assigned = original;
   EXPECT_TRUE(assigned.GetEntities().empty());
@@ -632,6 +638,12 @@ TEST(ResourceTest, CopyAndAssignmentPreservesEntities)
   EXPECT_EQ(copied.GetAttributes(), original.GetAttributes());
   EXPECT_EQ(copied.GetSchemaURL(), original.GetSchemaURL());
   EXPECT_EQ(copied.GetSchemaURL(), schema_url);
+
+  copied = Resource();
+  ASSERT_EQ(original.GetEntities().size(), 1);
+  EXPECT_EQ(original.GetEntities()[0], host);
+  EXPECT_EQ(original.GetUnassociatedAttributes(), attributes);
+  EXPECT_EQ(original.GetSchemaURL(), schema_url);
 
   Resource assigned;
   assigned = original;
@@ -852,6 +864,11 @@ TEST(ResourceTest, MergeCopyAssignmentPreservesMergedEntities)
   EXPECT_EQ(copied.GetUnassociatedAttributes(), merged.GetUnassociatedAttributes());
   EXPECT_EQ(copied.GetAttributes(), merged.GetAttributes());
   EXPECT_EQ(copied.GetSchemaURL(), merged.GetSchemaURL());
+
+  copied = Resource();
+  ASSERT_EQ(merged.GetEntities().size(), 1);
+  EXPECT_EQ(merged.GetEntities()[0], host);
+  EXPECT_EQ(nostd::get<std::string>(merged.GetUnassociatedAttributes().at("env")), "prod");
 
   Resource assigned;
   assigned = merged;
