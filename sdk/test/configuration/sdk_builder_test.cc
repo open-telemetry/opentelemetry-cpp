@@ -28,6 +28,7 @@
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
@@ -54,6 +55,7 @@
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
@@ -120,6 +122,7 @@ using opentelemetry::sdk::common::unsetenv;
 #  endif
 #endif
 
+using opentelemetry::sdk::configuration::AttributeLimitsConfiguration;
 using opentelemetry::sdk::configuration::Registry;
 using opentelemetry::sdk::configuration::RegistryFactory;
 using opentelemetry::sdk::configuration::SdkBuilder;
@@ -253,12 +256,110 @@ TEST(SdkBuilder, SpanLimitsConfiguration)
   ASSERT_NE(provider, nullptr);
 
   auto limits = provider->GetSpanLimits();
-  EXPECT_EQ(limits.attribute_value_length_limit, model->limits->attribute_value_length_limit);
-  EXPECT_EQ(limits.attribute_count_limit, model->limits->attribute_count_limit);
-  EXPECT_EQ(limits.event_count_limit, model->limits->event_count_limit);
-  EXPECT_EQ(limits.link_count_limit, model->limits->link_count_limit);
-  EXPECT_EQ(limits.event_attribute_count_limit, model->limits->event_attribute_count_limit);
-  EXPECT_EQ(limits.link_attribute_count_limit, model->limits->link_attribute_count_limit);
+  EXPECT_EQ(limits.attribute_value_length_limit,
+            model->limits->attribute_value_length_limit.Value());
+  EXPECT_EQ(limits.attribute_count_limit, model->limits->attribute_count_limit.Value());
+  EXPECT_EQ(limits.event_count_limit, model->limits->event_count_limit.Value());
+  EXPECT_EQ(limits.link_count_limit, model->limits->link_count_limit.Value());
+  EXPECT_EQ(limits.event_attribute_count_limit, model->limits->event_attribute_count_limit.Value());
+  EXPECT_EQ(limits.link_attribute_count_limit, model->limits->link_attribute_count_limit.Value());
+}
+
+TEST(SdkBuilder, SpanLimitsFromAttributeLimits)
+{
+  auto model    = std::make_unique<TracerProviderConfiguration>();
+  model->limits = nullptr;
+
+  AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_count_limit        = 7;
+  attribute_limits.attribute_value_length_limit = 9;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateTracerProvider(model, resource, &attribute_limits);
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits         = provider->GetSpanLimits();
+  const auto default_limits = opentelemetry::sdk::trace::SpanLimits{};
+
+  EXPECT_EQ(limits.attribute_count_limit, attribute_limits.attribute_count_limit.Value());
+  EXPECT_EQ(limits.attribute_value_length_limit,
+            attribute_limits.attribute_value_length_limit.Value());
+  EXPECT_EQ(limits.event_count_limit, default_limits.event_count_limit);
+  EXPECT_EQ(limits.link_count_limit, default_limits.link_count_limit);
+  EXPECT_EQ(limits.event_attribute_count_limit, default_limits.event_attribute_count_limit);
+  EXPECT_EQ(limits.link_attribute_count_limit, default_limits.link_attribute_count_limit);
+}
+
+TEST(SdkBuilder, SpanLimitsOverrideAttributeLimits)
+{
+  auto model                                  = std::make_unique<TracerProviderConfiguration>();
+  model->limits                               = std::make_unique<SpanLimitsConfiguration>();
+  model->limits->attribute_value_length_limit = 1111;
+  model->limits->attribute_count_limit        = 2222;
+  model->limits->event_count_limit            = 3333;
+
+  AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_count_limit        = 7;
+  attribute_limits.attribute_value_length_limit = 9;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateTracerProvider(model, resource, &attribute_limits);
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits = provider->GetSpanLimits();
+  EXPECT_EQ(limits.attribute_value_length_limit,
+            model->limits->attribute_value_length_limit.Value());
+  EXPECT_EQ(limits.attribute_count_limit, model->limits->attribute_count_limit.Value());
+  EXPECT_EQ(limits.event_count_limit, model->limits->event_count_limit.Value());
+}
+
+TEST(SdkBuilder, SpanLimitsPerFieldAttributeLimits)
+{
+  auto model                                 = std::make_unique<TracerProviderConfiguration>();
+  model->limits                              = std::make_unique<SpanLimitsConfiguration>();
+  model->limits->event_count_limit           = 64;
+  model->limits->link_count_limit            = 64;
+  model->limits->event_attribute_count_limit = 8;
+  model->limits->link_attribute_count_limit  = 8;
+
+  AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_value_length_limit = 4096;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateTracerProvider(model, resource, &attribute_limits);
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits         = provider->GetSpanLimits();
+  const auto default_limits = opentelemetry::sdk::trace::SpanLimits{};
+  EXPECT_EQ(limits.attribute_value_length_limit, 4096);
+  EXPECT_EQ(limits.attribute_count_limit, default_limits.attribute_count_limit);
+  EXPECT_EQ(limits.event_count_limit, 64);
+  EXPECT_EQ(limits.link_count_limit, 64);
+  EXPECT_EQ(limits.event_attribute_count_limit, 8);
+  EXPECT_EQ(limits.link_attribute_count_limit, 8);
+}
+
+TEST(SdkBuilder, SpanLimitsPartialOverrideAttributeLimits)
+{
+  auto model                           = std::make_unique<TracerProviderConfiguration>();
+  model->limits                        = std::make_unique<SpanLimitsConfiguration>();
+  model->limits->attribute_count_limit = 22;
+
+  AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_count_limit        = 7;
+  attribute_limits.attribute_value_length_limit = 9;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateTracerProvider(model, resource, &attribute_limits);
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits = provider->GetSpanLimits();
+  EXPECT_EQ(limits.attribute_count_limit, 22);
+  EXPECT_EQ(limits.attribute_value_length_limit, 9);
 }
 
 #if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
@@ -1260,18 +1361,24 @@ public:
 class TestExtensionResourceDetectorBuilder : public config_sdk::ExtensionResourceDetectorBuilder
 {
 public:
+  explicit TestExtensionResourceDetectorBuilder(
+      opentelemetry::sdk::resource::ResourceAttributes attributes)
+      : attributes_(std::move(attributes))
+  {}
+
   std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> Build(
       const config_sdk::ExtensionResourceDetectorConfiguration *model) const override
   {
     called = true;
     name   = model->name;
-    return std::make_unique<TestResourceDetector>(
-        opentelemetry::sdk::resource::ResourceAttributes{{"custom.key", "custom-value"}},
-        std::string{});
+    return std::make_unique<TestResourceDetector>(attributes_, std::string{});
   }
 
   mutable bool called{false};
   mutable std::string name;
+
+private:
+  opentelemetry::sdk::resource::ResourceAttributes attributes_;
 };
 
 std::string GetStringAttribute(const opentelemetry::sdk::resource::Resource &resource,
@@ -1300,6 +1407,22 @@ TEST(SdkBuilder, SetResourceWithoutModel)
   EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.language"), "cpp");
 }
 
+TEST(SdkBuilder, SetResourceAttributesListPercentDecodesValues)
+{
+  SdkBuilder builder(RegistryFactory::Create());
+
+  auto model             = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->attributes_list = "key1=hello%20world,key2=a%2Cb,key3=100%25,bad=50%z";
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  EXPECT_EQ(GetStringAttribute(resource, "key1"), "hello world");
+  EXPECT_EQ(GetStringAttribute(resource, "key2"), "a,b");
+  EXPECT_EQ(GetStringAttribute(resource, "key3"), "100%");
+  EXPECT_EQ(GetStringAttribute(resource, "bad"), "50%z");
+}
+
 TEST(SdkBuilder, SetResourceDetectorDispatch)
 {
   auto registry           = RegistryFactory::Create();
@@ -1326,8 +1449,9 @@ TEST(SdkBuilder, SetResourceDetectorDispatch)
 
 TEST(SdkBuilder, SetResourceExtensionDetector)
 {
-  auto registry             = RegistryFactory::Create();
-  auto extension_builder    = std::make_unique<TestExtensionResourceDetectorBuilder>();
+  auto registry          = RegistryFactory::Create();
+  auto extension_builder = std::make_unique<TestExtensionResourceDetectorBuilder>(
+      opentelemetry::sdk::resource::ResourceAttributes{{"custom.key", "custom-value"}});
   auto *extension_builder_p = extension_builder.get();
   registry->SetExtensionResourceDetectorBuilder("my_custom_detector", std::move(extension_builder));
   SdkBuilder builder(std::move(registry));
@@ -1455,4 +1579,82 @@ TEST(SdkBuilder, SetResourceFilterAppliesToDetectedAttributesOnly)
   // attributes and attributes_list fields, even when their keys match.
   EXPECT_EQ(GetStringAttribute(resource, "process.pid"), "from-list");
   EXPECT_EQ(GetStringAttribute(resource, "process.command_args"), "from-attributes");
+}
+
+TEST(SdkBuilder, SetResourceNullAttributeValueSkipped)
+{
+  auto registry = RegistryFactory::Create();
+  SdkBuilder builder(std::move(registry));
+
+  auto typed_value   = std::make_unique<config_sdk::StringAttributeValueConfiguration>();
+  typed_value->value = "kept";
+
+  auto model        = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->attributes = std::make_unique<config_sdk::AttributesConfiguration>();
+  model->attributes->kv_map.emplace("present", std::move(typed_value));
+  model->attributes->kv_map.emplace("null-entry", nullptr);  // should be skipped
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  EXPECT_EQ(GetStringAttribute(resource, "present"), "kept");
+  const auto &attrs = resource.GetAttributes();
+  EXPECT_EQ(attrs.find("null-entry"), attrs.end());
+}
+
+TEST(SdkBuilder, SetResourceAttributesNullValueSkipped)
+{
+  // The default behavior for the resource.attributes field must skip null values.
+  // This allows optional env values to be set (e.g. OTEL_SERVICE_NAME).
+  // If the env var is not set then the attribute should be ignored.
+
+  // Example config created programmatically below
+  //
+  // resource:
+  //   attributes:
+  //     -name: service.name
+  //      value: ${OTEL_SERVICE_NAME} # env not set
+  //     -name: service.namespace
+  //      value: ${MY_SERVICE_NAMESPACE} # env not set
+  //     -name: service.version
+  //      value: version-from-attributes
+  //   attributes_list: "service.name=name-from-list"
+  //   detection:
+  //     detectors:
+  //       - test_service_detector  # detects service.{name, version, namespace}
+
+  auto registry     = RegistryFactory::Create();
+  auto ext_detector = std::make_unique<TestExtensionResourceDetectorBuilder>(
+      opentelemetry::sdk::resource::ResourceAttributes{
+          {"service.name", "name-from-detector"},
+          {"service.namespace", "namespace-from-detector"},
+          {"service.version", "version-from-detector"}});
+  registry->SetExtensionResourceDetectorBuilder("test_service_detector", std::move(ext_detector));
+  SdkBuilder builder(std::move(registry));
+
+  auto model            = std::make_unique<config_sdk::ResourceConfiguration>();
+  auto detector_config  = std::make_unique<config_sdk::ExtensionResourceDetectorConfiguration>();
+  detector_config->name = "test_service_detector";
+  model->detection      = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(std::move(detector_config));
+  model->attributes_list = "service.name=name-from-list,service.version=version-from-list";
+
+  // Simulate null values from unset env variables.
+  model->attributes = std::make_unique<config_sdk::AttributesConfiguration>();
+  model->attributes->kv_map.emplace("service.name", nullptr);  // simulate unset OTEL_SERVICE_NAME
+  model->attributes->kv_map.emplace("service.namespace",
+                                    nullptr);  // simulate unset MY_SERVICE_NAMESPACE
+  auto typed_value   = std::make_unique<config_sdk::StringAttributeValueConfiguration>();
+  typed_value->value = "version-from-attributes";
+  model->attributes->kv_map.emplace("service.version", std::move(typed_value));
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  // attributes_list wins over detection for service.name; nullptr in attributes doesn't override.
+  EXPECT_EQ(GetStringAttribute(resource, "service.name"), "name-from-list");
+  // detected value survives for service.namespace (no attributes_list entry, nullptr skipped).
+  EXPECT_EQ(GetStringAttribute(resource, "service.namespace"), "namespace-from-detector");
+  // attribute value for service.version overrides both list and detection.
+  EXPECT_EQ(GetStringAttribute(resource, "service.version"), "version-from-attributes");
 }
