@@ -175,11 +175,11 @@ struct SocketAddr
   /// <returns>SocketAddr</returns>
   SocketAddr() {}
 
-  SocketAddr(u_long addr, int port)
+  SocketAddr(u_long addr, uint16_t port)
   {
     sockaddr_in &inet4    = reinterpret_cast<sockaddr_in &>(m_data);
     inet4.sin_family      = AF_INET;
-    inet4.sin_port        = htons(static_cast<uint16_t>(port));
+    inet4.sin_port        = htons(port);
     inet4.sin_addr.s_addr = htonl(addr);
   }
 
@@ -223,8 +223,8 @@ struct SocketAddr
     // accept a leading sign or whitespace and depend on the locale.
     if (ok && colon)
     {
-      char const *p     = colon + 1;
-      unsigned int port = 0;
+      char const *p = colon + 1;
+      uint16_t port = 0;
       if (*p == '\0')
       {
         ok = false;  // empty port, e.g. "127.0.0.1:"
@@ -247,7 +247,7 @@ struct SocketAddr
       }
       if (ok)
       {
-        parsed.sin_port = htons(static_cast<uint16_t>(port));
+        parsed.sin_port = htons(port);
       }
     }
 
