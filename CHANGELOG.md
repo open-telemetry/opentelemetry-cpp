@@ -256,6 +256,10 @@ Increment the:
   `AlwaysOff`/`TraceBased`)
   [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
 
+* [RESOURCE DETECTOR] Add required and recommended attributes (except htlhash)
+  for process entity
+  [#4437](https://github.com/open-telemetry/opentelemetry-cpp/pull/4437)
+
 Important changes:
 
 * [API] Never set a null global provider or propagator
