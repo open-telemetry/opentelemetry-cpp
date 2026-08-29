@@ -15,6 +15,15 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
+  If a model-specific limit is set it is used, otherwise the matching general
+  limit, otherwise the model-specific default. Limit fields on
+  `AttributeLimitsConfiguration`, `SpanLimitsConfiguration`, and
+  `LogRecordLimitsConfiguration` are now optional so omitted keys and YAML
+  `null` are distinct from explicit values. This is a breaking change to the
+  experimental configuration model.
+  [#4467](https://github.com/open-telemetry/opentelemetry-cpp/issues/4467)
+
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
@@ -246,6 +255,10 @@ Increment the:
 * [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
   `AlwaysOff`/`TraceBased`)
   [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+
+* [RESOURCE DETECTOR] Add required and recommended attributes (except htlhash)
+  for process entity
+  [#4437](https://github.com/open-telemetry/opentelemetry-cpp/pull/4437)
 
 * [METRICS SDK] Avoid materializing owned exemplar attributes before
   fixed-size reservoir selection.
