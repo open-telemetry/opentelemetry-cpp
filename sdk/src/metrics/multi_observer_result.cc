@@ -92,8 +92,9 @@ void MultiObserverResult::StoreResults(opentelemetry::common::SystemTimestamp co
     auto *instrument = el.first;
     auto &result     = el.second;
 
-    auto storage = static_cast<const opentelemetry::sdk::metrics::ObservableInstrument *>(instrument)
-                       ->GetMetricStorage();
+    auto storage =
+        static_cast<const opentelemetry::sdk::metrics::ObservableInstrument *>(instrument)
+            ->GetMetricStorage();
     nostd::visit(StoreResultVisitor{storage, collection_ts}, result);
   }
 }
