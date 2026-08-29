@@ -15,6 +15,15 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
+  If a model-specific limit is set it is used, otherwise the matching general
+  limit, otherwise the model-specific default. Limit fields on
+  `AttributeLimitsConfiguration`, `SpanLimitsConfiguration`, and
+  `LogRecordLimitsConfiguration` are now optional so omitted keys and YAML
+  `null` are distinct from explicit values. This is a breaking change to the
+  experimental configuration model.
+  [#4467](https://github.com/open-telemetry/opentelemetry-cpp/issues/4467)
+
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
@@ -58,6 +67,9 @@ Increment the:
 * [CONFIGURATION] Add support for the composite sampler configuration
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
+
+* [SDK] Replace SpinLockMutex with std::mutex in the metrics storage clases
+  [#4416](https://github.com/open-telemetry/opentelemetry-cpp/pull/4416)
 
 * [CONFIGURATION/BUILD] Add resource detector targets and README
   [#4430](https://github.com/open-telemetry/opentelemetry-cpp/pull/4430)
@@ -114,6 +126,9 @@ Increment the:
   `std::mutex` blocks the waiter instead. Only this one contended lock changes;
   the API `SpinLockMutex` and all other SDK locks are unchanged.
   [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
+
+* [SDK] Create instrumentation scope library
+  [#4351](https://github.com/open-telemetry/opentelemetry-cpp/pull/4351)
 
 * [CONFIGURATION] Update ViewSelector to comply with schema v1.1.0
   [#4384](https://github.com/open-telemetry/opentelemetry-cpp/pull/4384)
@@ -246,6 +261,10 @@ Increment the:
 * [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
   `AlwaysOff`/`TraceBased`)
   [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+
+* [RESOURCE DETECTOR] Add required and recommended attributes (except htlhash)
+  for process entity
+  [#4437](https://github.com/open-telemetry/opentelemetry-cpp/pull/4437)
 
 Important changes:
 
