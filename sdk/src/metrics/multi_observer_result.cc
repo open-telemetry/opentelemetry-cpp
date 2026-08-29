@@ -63,9 +63,10 @@ size_t MultiObserverResult::InstrumentCount() const
 }
 
 bool MultiObserverResult::HasInstrument(
-    opentelemetry::metrics::ObservableInstrument *instrument) const
+    const opentelemetry::metrics::ObservableInstrument *instrument) const
 {
-  return observer_results_.find(instrument) != observer_results_.end();
+  return observer_results_.find(const_cast<opentelemetry::metrics::ObservableInstrument *>(
+             instrument)) != observer_results_.end();
 }
 
 void MultiObserverResult::GetInstruments(
@@ -99,10 +100,13 @@ void MultiObserverResult::StoreResults(opentelemetry::common::SystemTimestamp co
 }
 
 opentelemetry::metrics::ObserverResultT<double> &MultiObserverResult::ForInstrumentDouble(
-    opentelemetry::metrics::ObservableInstrument *instrument)
+    const opentelemetry::metrics::ObservableInstrument *instrument)
 {
   static opentelemetry::sdk::metrics::ObserverResultT<double> null_result;
-  auto it = observer_results_.find(instrument);
+  // const_cast is appropriate here, because we're _not_ modifying the passed-in pointer;
+  // we just need to make it non-const to be able to look it up in our map.
+  auto it = observer_results_.find(
+      const_cast<opentelemetry::metrics::ObservableInstrument *>(instrument));
   if (it == observer_results_.end())
   {
     OTEL_INTERNAL_LOG_ERROR("[MultiObserverResult::ForInstrumentDouble]"
@@ -121,10 +125,11 @@ opentelemetry::metrics::ObserverResultT<double> &MultiObserverResult::ForInstrum
 }
 
 opentelemetry::metrics::ObserverResultT<int64_t> &MultiObserverResult::ForInstrumentInt64(
-    opentelemetry::metrics::ObservableInstrument *instrument)
+    const opentelemetry::metrics::ObservableInstrument *instrument)
 {
   static opentelemetry::sdk::metrics::ObserverResultT<int64_t> null_result;
-  auto it = observer_results_.find(instrument);
+  auto it = observer_results_.find(
+      const_cast<opentelemetry::metrics::ObservableInstrument *>(instrument));
   if (it == observer_results_.end())
   {
     OTEL_INTERNAL_LOG_ERROR("[MultiObserverResult::ForInstrumentInt64]"
