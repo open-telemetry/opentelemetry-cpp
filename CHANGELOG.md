@@ -127,6 +127,9 @@ Increment the:
   the API `SpinLockMutex` and all other SDK locks are unchanged.
   [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
 
+* [SDK] Create instrumentation scope library
+  [#4351](https://github.com/open-telemetry/opentelemetry-cpp/pull/4351)
+
 * [CONFIGURATION] Update ViewSelector to comply with schema v1.1.0
   [#4384](https://github.com/open-telemetry/opentelemetry-cpp/pull/4384)
 
