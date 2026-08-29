@@ -236,7 +236,7 @@ struct SocketAddr
           ok = false;
           break;
         }
-        unsigned int const digit = static_cast<unsigned int>(*p - '0');
+        const uint16_t digit = static_cast<uint16_t>(*p - '0');
         if (port > (65535u - digit) / 10u)
         {
           ok = false;  // would exceed 65535
