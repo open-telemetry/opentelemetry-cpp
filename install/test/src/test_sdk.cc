@@ -189,6 +189,7 @@
 #include <opentelemetry/sdk/configuration/metric_reader_configuration.h>
 #include <opentelemetry/sdk/configuration/metric_reader_configuration_visitor.h>
 #include <opentelemetry/sdk/configuration/open_census_metric_producer_configuration.h>
+#include <opentelemetry/sdk/configuration/optional_value.h>
 #include <opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h>
 #include <opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h>
 #include <opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h>
@@ -601,7 +602,7 @@ TEST_F(SdkInstallTest, ConfigurationCoreCheck)
   {
     const std::string propagator_name{"noop"};
 
-    auto registry = config_sdk::RegistryFactory::Create();
+    std::shared_ptr<config_sdk::Registry> registry = config_sdk::RegistryFactory::Create();
     registry->SetConsoleSpanBuilder(std::make_unique<NoopConsoleSpanBuilder>());
     registry->SetConsoleLogRecordBuilder(std::make_unique<NoopConsoleLogRecordBuilder>());
     registry->SetConsolePushMetricExporterBuilder(std::make_unique<NoopConsolePushMetricBuilder>());
