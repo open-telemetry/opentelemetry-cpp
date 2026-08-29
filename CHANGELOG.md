@@ -15,6 +15,15 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
+  If a model-specific limit is set it is used, otherwise the matching general
+  limit, otherwise the model-specific default. Limit fields on
+  `AttributeLimitsConfiguration`, `SpanLimitsConfiguration`, and
+  `LogRecordLimitsConfiguration` are now optional so omitted keys and YAML
+  `null` are distinct from explicit values. This is a breaking change to the
+  experimental configuration model.
+  [#4467](https://github.com/open-telemetry/opentelemetry-cpp/issues/4467)
+
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
@@ -55,6 +64,9 @@ Increment the:
   when building the SDK, with exclude patterns taking precedence.
   [#3546](https://github.com/open-telemetry/opentelemetry-cpp/issues/3546)
 
+* [CONFIGURATION] Update registry factory to return a unique_ptr
+  [#4487](https://github.com/open-telemetry/opentelemetry-cpp/pull/4487)
+
 * [CONFIGURATION] Add support for the composite sampler configuration
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
@@ -67,6 +79,14 @@ Increment the:
   grammar the resource spec defers to. A malformed escape sequence is left
   in the value as-is rather than dropping the attribute.
   [#1536](https://github.com/open-telemetry/opentelemetry-cpp/issues/1536)
+
+* [CLEANUP] Replace `push_back` with `emplace_back` where applicable to
+  construct objects in-place, avoiding unnecessary temporaries.
+  [#4476](https://github.com/open-telemetry/opentelemetry-cpp/pull/4476)
+
+* [BUG] Fix `MultiSpanProcessor` and `MultiLogRecordProcessor` not reporting
+  failures from `ForceFlush` and `Shutdown` when a child processor failed.
+  [#4472](https://github.com/open-telemetry/opentelemetry-cpp/pull/4472)
 
 * [BUG] Report one outcome per request when a curl session is cancelled after
   the response arrives
@@ -238,6 +258,10 @@ Increment the:
 * [SDK] Complete exemplar filtering: the exemplar filter(`AlwaysOn`/
   `AlwaysOff`/`TraceBased`)
   [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
+
+* [RESOURCE DETECTOR] Add required and recommended attributes (except htlhash)
+  for process entity
+  [#4437](https://github.com/open-telemetry/opentelemetry-cpp/pull/4437)
 
 Important changes:
 

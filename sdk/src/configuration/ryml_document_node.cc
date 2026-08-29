@@ -12,6 +12,7 @@
 
 #include "opentelemetry/sdk/configuration/document_node.h"
 #include "opentelemetry/sdk/configuration/invalid_schema_exception.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/ryml_document.h"
 #include "opentelemetry/sdk/configuration/ryml_document_node.h"
 #include "opentelemetry/version.h"
@@ -305,6 +306,28 @@ size_t RymlDocumentNode::GetInteger(const std::string &name, size_t default_valu
   }
 
   return IntegerFromString(value);
+}
+
+OptionalValue<std::size_t> RymlDocumentNode::GetOptionalInteger(const std::string &name) const
+{
+  OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetOptionalInteger(" << name << ")");
+
+  auto child = GetChildNode(name);
+
+  if (!child || child->IsNull())
+  {
+    return OptionalValue<std::size_t>{};
+  }
+
+  std::string value = child->AsString();
+  value             = DoSubstitution(value);
+
+  if (value.empty())
+  {
+    return OptionalValue<std::size_t>{};
+  }
+
+  return OptionalValue<std::size_t>{IntegerFromString(value)};
 }
 
 std::int64_t RymlDocumentNode::GetSignedInteger(const std::string &name,
