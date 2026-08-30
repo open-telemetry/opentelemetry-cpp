@@ -47,6 +47,10 @@ Increment the:
 
 * [RESOURCE DETECTOR] Add the service resource detector and builder
   [#4414](https://github.com/open-telemetry/opentelemetry-cpp/issues/4414)
+
+* [BENCHMARK] Sync instrument recording benchmarks
+  [#4470](https://github.com/open-telemetry/opentelemetry-cpp/pull/4470)
+
 * [CONFIGURATION] deprecate config builder cmake components
   [#4428](https://github.com/open-telemetry/opentelemetry-cpp/pull/4428)
 
