@@ -310,7 +310,7 @@ size_t RymlDocumentNode::GetInteger(const std::string &name, size_t default_valu
 
 OptionalValue<std::size_t> RymlDocumentNode::GetOptionalInteger(const std::string &name) const
 {
-  OTEL_INTERNAL_LOG_DEBUG("RymlDocumentNode::GetOptionalInteger(" << name << ")");
+  RYML_DOC_LOG_DEBUG("RymlDocumentNode::GetOptionalInteger(" << name << ")");
 
   auto child = GetChildNode(name);
 
