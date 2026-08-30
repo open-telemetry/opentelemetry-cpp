@@ -4,6 +4,7 @@
 #include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -19,14 +20,135 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 #include "nlohmann/json.hpp"
+
+namespace
+{
+namespace http_client = opentelemetry::ext::http::client;
+
+// A response shaped like a successful Elasticsearch bulk reply: the exporter looks for
+// `"failed" : 0` in the body (see ElasticsearchLogRecordExporter::Export) in addition to the
+// status code before reporting success.
+class FakeResponse final : public http_client::Response
+{
+public:
+  FakeResponse()
+  {
+    static const std::string kSuccessBody = R"({"errors": false, "failed" : 0})";
+    body_.assign(kSuccessBody.begin(), kSuccessBody.end());
+  }
+
+  const http_client::Body &GetBody() const noexcept override { return body_; }
+
+  bool ForEachHeader(opentelemetry::nostd::function_ref<bool(opentelemetry::nostd::string_view,
+                                                             opentelemetry::nostd::string_view)>)
+      const noexcept override
+  {
+    return true;
+  }
+
+  bool ForEachHeader(const opentelemetry::nostd::string_view &,
+                     opentelemetry::nostd::function_ref<bool(opentelemetry::nostd::string_view,
+                                                             opentelemetry::nostd::string_view)>)
+      const noexcept override
+  {
+    return true;
+  }
+
+  http_client::StatusCode GetStatusCode() const noexcept override { return 200; }
+
+private:
+  http_client::Body body_;
+};
+
+// A request that accepts and discards everything set on it: the synchronous export path only
+// needs a Request to exist, not to inspect what was written to it.
+class FakeRequest final : public http_client::Request
+{
+public:
+  void SetMethod(http_client::Method) noexcept override {}
+  void SetUri(opentelemetry::nostd::string_view) noexcept override {}
+  void SetSslOptions(const http_client::HttpSslOptions &) noexcept override {}
+  void SetBody(http_client::Body &) noexcept override {}
+  void AddHeader(opentelemetry::nostd::string_view,
+                 opentelemetry::nostd::string_view) noexcept override
+  {}
+  void ReplaceHeader(opentelemetry::nostd::string_view,
+                     opentelemetry::nostd::string_view) noexcept override
+  {}
+  void SetTimeoutMs(std::chrono::milliseconds) noexcept override {}
+  void SetCompression(const http_client::Compression &) noexcept override {}
+  void EnableLogging(bool) noexcept override {}
+  void SetRetryPolicy(const http_client::RetryPolicy &) noexcept override {}
+};
+
+// A session whose SendRequest() answers synchronously with a successful FakeResponse, so the
+// exporter's own wait for a response returns immediately without needing a real connection.
+class FakeSession final : public http_client::Session
+{
+public:
+  std::shared_ptr<http_client::Request> CreateRequest() noexcept override
+  {
+    return std::make_shared<FakeRequest>();
+  }
+
+  void SendRequest(std::shared_ptr<http_client::EventHandler> handler) noexcept override
+  {
+    FakeResponse response;
+    handler->OnResponse(response);
+  }
+
+  bool IsSessionActive() noexcept override { return true; }
+  bool CancelSession() noexcept override { return true; }
+  bool FinishSession() noexcept override { return true; }
+};
+
+class FakeHttpClient final : public http_client::HttpClient
+{
+public:
+  std::shared_ptr<http_client::Session> CreateSession(
+      opentelemetry::nostd::string_view) noexcept override
+  {
+    return std::make_shared<FakeSession>();
+  }
+
+  bool CancelAllSessions() noexcept override { return true; }
+  bool FinishAllSessions() noexcept override { return true; }
+  void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
+};
+
+}  // namespace
 
 namespace sdklogs       = opentelemetry::sdk::logs;
 namespace logs_api      = opentelemetry::logs;
 namespace nostd         = opentelemetry::nostd;
 namespace logs_exporter = opentelemetry::exporter::logs;
+
+// Regression test: a log record whose body carries bytes that are not valid UTF-8 used to
+// abort the process. ElasticSearchRecordable::WriteValue stores the value as given, and
+// Export() previously called nlohmann::json::dump() with its default strict error handler,
+// which throws on invalid UTF-8; since Export() is noexcept, that throw became
+// std::terminate(). The exporter now tolerates it instead of crashing.
+TEST(ElasticsearchLogsExporterTests, ExportingARecordWithInvalidUtf8DoesNotAbort)
+{
+  logs_exporter::ElasticsearchExporterOptions options;
+  auto http_client = std::make_shared<FakeHttpClient>();
+  auto exporter    = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
+
+  auto record      = exporter->MakeRecordable();
+  std::string body = "payload ";
+  body += "\xC3\x28";  // a two byte sequence that is not valid UTF-8
+  record->SetBody(body);
+
+  auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
+
+  EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
+}
 
 TEST(ElasticsearchLogsExporterTests, CustomClientConstructionSucceeds)
 {
