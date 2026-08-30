@@ -205,11 +205,12 @@ protected:
   }
 
   std::shared_ptr<trace_sdk::TracerProvider> MakeTracerProvider(
-      std::unique_ptr<config_sdk::TracerProviderConfiguration> model)
+      std::unique_ptr<config_sdk::TracerProviderConfiguration> model,
+      const config_sdk::AttributeLimitsConfiguration *attribute_limits = nullptr)
   {
     auto resource = opentelemetry::sdk::resource::Resource::Create({});
     config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateTracerProvider(model, resource);
+    return builder.CreateTracerProvider(model, resource, attribute_limits);
   }
 
   std::unique_ptr<trace_sdk::SpanProcessor> MakeSpanProcessor(
@@ -358,7 +359,7 @@ TEST_F(TraceBuildersTest, SpanLimitsFromAttributeLimits)
   attribute_limits.attribute_count_limit        = 7;
   attribute_limits.attribute_value_length_limit = 9;
 
-  auto provider = MakeTracerProvider(std::move(model));
+  auto provider = MakeTracerProvider(std::move(model), &attribute_limits);
   ASSERT_NE(provider, nullptr);
 
   const auto limits         = provider->GetSpanLimits();
@@ -385,14 +386,13 @@ TEST_F(TraceBuildersTest, SpanLimitsOverrideAttributeLimits)
   attribute_limits.attribute_count_limit        = 7;
   attribute_limits.attribute_value_length_limit = 9;
 
-  auto provider = MakeTracerProvider(std::move(model));
+  auto provider = MakeTracerProvider(std::move(model), &attribute_limits);
   ASSERT_NE(provider, nullptr);
 
   const auto limits = provider->GetSpanLimits();
-  EXPECT_EQ(limits.attribute_value_length_limit,
-            model->limits->attribute_value_length_limit.Value());
-  EXPECT_EQ(limits.attribute_count_limit, model->limits->attribute_count_limit.Value());
-  EXPECT_EQ(limits.event_count_limit, model->limits->event_count_limit.Value());
+  EXPECT_EQ(limits.attribute_value_length_limit, 1111);
+  EXPECT_EQ(limits.attribute_count_limit, 2222);
+  EXPECT_EQ(limits.event_count_limit, 3333);
 }
 
 TEST_F(TraceBuildersTest, SpanLimitsPerFieldAttributeLimits)
@@ -407,7 +407,7 @@ TEST_F(TraceBuildersTest, SpanLimitsPerFieldAttributeLimits)
   config_sdk::AttributeLimitsConfiguration attribute_limits;
   attribute_limits.attribute_value_length_limit = 4096;
 
-  auto provider = MakeTracerProvider(std::move(model));
+  auto provider = MakeTracerProvider(std::move(model), &attribute_limits);
   ASSERT_NE(provider, nullptr);
 
   const auto limits         = provider->GetSpanLimits();
@@ -430,7 +430,7 @@ TEST_F(TraceBuildersTest, SpanLimitsPartialOverrideAttributeLimits)
   attribute_limits.attribute_count_limit        = 7;
   attribute_limits.attribute_value_length_limit = 9;
 
-  auto provider = MakeTracerProvider(std::move(model));
+  auto provider = MakeTracerProvider(std::move(model), &attribute_limits);
   ASSERT_NE(provider, nullptr);
 
   const auto limits = provider->GetSpanLimits();
