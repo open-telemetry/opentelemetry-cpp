@@ -20,14 +20,10 @@
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/multi_log_record_processor.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
 #include "opentelemetry/trace/span_context.h"
-#include "opentelemetry/trace/span_id.h"
-#include "opentelemetry/trace/trace_flags.h"
-#include "opentelemetry/trace/trace_id.h"
 
 using namespace opentelemetry::sdk::logs;
 using namespace opentelemetry::sdk::common;
@@ -272,10 +268,7 @@ struct EnabledCallState
   std::string scope_name;
   logs_api::Severity severity = logs_api::Severity::kInvalid;
   std::string event_name;
-  size_t call_count                      = 0;
-  size_t on_emit_with_context_call_count = 0;
-  nostd::variant<opentelemetry::trace::SpanContext, context::Context> last_emitted_context{
-      opentelemetry::trace::SpanContext::GetInvalid()};
+  size_t call_count = 0;
 };
 
 class EnabledProcessor final : public LogRecordProcessor
@@ -295,19 +288,6 @@ public:
   {
     auto ignored = std::move(record);
     static_cast<void>(ignored);
-  }
-
-  void OnEmitWithContext(std::unique_ptr<Recordable> &&record,
-                         const nostd::variant<opentelemetry::trace::SpanContext, context::Context>
-                             &context_or_span) noexcept override
-  {
-    auto ignored = std::move(record);
-    static_cast<void>(ignored);
-    if (call_state_ != nullptr)
-    {
-      ++call_state_->on_emit_with_context_call_count;
-      call_state_->last_emitted_context = context_or_span;
-    }
   }
 
   bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }
@@ -371,97 +351,6 @@ TEST(SimpleLogRecordProcessorTest, EnabledForwardsArgumentsToImplementation)
   EXPECT_EQ(call_state->severity, logs_api::Severity::kWarn);
   EXPECT_EQ(call_state->event_name, "test-event-name");
   EXPECT_EQ(call_state->call_count, 1U);
-}
-
-TEST(SimpleLogRecordProcessorTest, MultiLogRecordProcessorEnabledWhenAnyChildEnabled)
-{
-  auto first_state  = std::make_shared<EnabledCallState>();
-  auto second_state = std::make_shared<EnabledCallState>();
-
-  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
-  processors.emplace_back(new EnabledProcessor(false, first_state));
-  processors.emplace_back(new EnabledProcessor(true, second_state));
-  MultiLogRecordProcessor processor(std::move(processors));
-
-  context::Context test_context{"test-key", true};
-  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
-
-  EXPECT_TRUE(
-      processor.Enabled(test_context, *scope, logs_api::Severity::kError, "test-event-name"));
-  EXPECT_EQ(first_state->call_count, 1U);
-  EXPECT_EQ(second_state->call_count, 1U);
-  EXPECT_EQ(second_state->event_name, "test-event-name");
-}
-
-TEST(SimpleLogRecordProcessorTest, MultiLogRecordProcessorDisabledWhenAllChildrenDisabled)
-{
-  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
-  processors.emplace_back(new EnabledProcessor(false));
-  processors.emplace_back(new EnabledProcessor(false));
-  MultiLogRecordProcessor processor(std::move(processors));
-
-  context::Context test_context{"test-key", true};
-  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
-
-  EXPECT_FALSE(
-      processor.Enabled(test_context, *scope, logs_api::Severity::kError, "test-event-name"));
-}
-
-TEST(SimpleLogRecordProcessorTest, MultiLogRecordProcessorOnEmitWithContextFansOutToChildren)
-{
-  auto first_state  = std::make_shared<EnabledCallState>();
-  auto second_state = std::make_shared<EnabledCallState>();
-
-  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
-  processors.emplace_back(new EnabledProcessor(true, first_state));
-  processors.emplace_back(new EnabledProcessor(true, second_state));
-  MultiLogRecordProcessor processor(std::move(processors));
-
-  const uint8_t trace_id_bytes[opentelemetry::trace::TraceId::kSize] = {
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-  const uint8_t span_id_bytes[opentelemetry::trace::SpanId::kSize] = {1, 2, 3, 4, 5, 6, 7, 8};
-  const opentelemetry::trace::SpanContext span_context(
-      opentelemetry::trace::TraceId(trace_id_bytes), opentelemetry::trace::SpanId(span_id_bytes),
-      opentelemetry::trace::TraceFlags{opentelemetry::trace::TraceFlags::kIsSampled}, false);
-  const nostd::variant<opentelemetry::trace::SpanContext, context::Context> resolved_context{
-      span_context};
-
-  auto recordable = processor.MakeRecordable();
-  processor.OnEmitWithContext(std::move(recordable), resolved_context);
-
-  ASSERT_EQ(first_state->on_emit_with_context_call_count, 1U);
-  ASSERT_EQ(second_state->on_emit_with_context_call_count, 1U);
-  const auto *received_span_context =
-      nostd::get_if<opentelemetry::trace::SpanContext>(&first_state->last_emitted_context);
-  ASSERT_NE(received_span_context, nullptr);
-  EXPECT_EQ(received_span_context->trace_id(), span_context.trace_id());
-  EXPECT_EQ(received_span_context->span_id(), span_context.span_id());
-}
-
-TEST(SimpleLogRecordProcessorTest, MultiLogRecordProcessorOnEmitWithContextIgnoresNullRecord)
-{
-  auto first_state = std::make_shared<EnabledCallState>();
-
-  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
-  processors.emplace_back(new EnabledProcessor(true, first_state));
-  MultiLogRecordProcessor processor(std::move(processors));
-
-  const nostd::variant<opentelemetry::trace::SpanContext, context::Context> resolved_context{
-      opentelemetry::trace::SpanContext::GetInvalid()};
-  processor.OnEmitWithContext(std::unique_ptr<Recordable>(nullptr), resolved_context);
-
-  EXPECT_EQ(first_state->on_emit_with_context_call_count, 0U);
-}
-
-TEST(SimpleLogRecordProcessorTest, EmptyMultiLogRecordProcessorIsDisabled)
-{
-  MultiLogRecordProcessor processor(std::vector<std::unique_ptr<LogRecordProcessor>>{});
-
-  context::Context test_context{"test-key", true};
-  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
-
-  EXPECT_FALSE(
-      processor.Enabled(test_context, *scope, logs_api::Severity::kDebug, "test-event-name"));
 }
 
 }  // namespace
