@@ -26,7 +26,7 @@ target_include_directories(
 target_link_libraries(
   opentelemetry_configuration_core
   PUBLIC opentelemetry_api opentelemetry_common opentelemetry_trace
-         opentelemetry_metrics opentelemetry_logs
+         opentelemetry_metrics opentelemetry_logs opentelemetry_resources
   PRIVATE)
 
 # Trace SDK component builders
@@ -99,7 +99,7 @@ target_link_libraries(
          opentelemetry_configuration_metrics_builders
          opentelemetry_configuration_logs_builders)
 
-if(WITH_CONFIGURATION)
+if(OTELCPP_WITH_CONFIGURATION)
 
   # YAML configuration parser
   add_library(
@@ -128,4 +128,4 @@ if(WITH_CONFIGURATION)
       "opentelemetry_configuration")
   endif()
 
-endif(WITH_CONFIGURATION)
+endif(OTELCPP_WITH_CONFIGURATION)

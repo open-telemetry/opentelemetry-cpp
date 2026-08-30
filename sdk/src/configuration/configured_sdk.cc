@@ -17,12 +17,15 @@
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
-#include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/sdk/metrics/meter_provider.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
+
+// Include the SDK provider headers to support the compile-time upcast in the Install() method.
+// This can be done without creating a link time dependency on the SDK signal libraries.
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
@@ -67,18 +70,24 @@ void ConfiguredSdk::Install()
 
   if (tracer_provider)
   {
+    // The upcast to API TracerProvider shared_ptr requires the SDK TracerProvider header to be
+    // included
     std::shared_ptr<opentelemetry::trace::TracerProvider> api_tracer_provider = tracer_provider;
     opentelemetry::trace::Provider::SetTracerProvider(api_tracer_provider);
   }
 
   if (meter_provider)
   {
+    // The upcast to API MeterProvider shared_ptr requires the SDK MeterProvider header to be
+    // included
     std::shared_ptr<opentelemetry::metrics::MeterProvider> api_meter_provider = meter_provider;
     opentelemetry::metrics::Provider::SetMeterProvider(api_meter_provider);
   }
 
   if (logger_provider)
   {
+    // The upcast to API LoggerProvider shared_ptr requires the SDK LoggerProvider header to be
+    // included
     std::shared_ptr<opentelemetry::logs::LoggerProvider> api_logger_provider = logger_provider;
     opentelemetry::logs::Provider::SetLoggerProvider(api_logger_provider);
   }

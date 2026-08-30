@@ -626,7 +626,7 @@ public:
         EV_SET(&event, event.ident, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
         kevent(kq, &event, 1, NULL, 0, NULL);
 #endif
-        m_sockets.push_back(SocketData());
+        m_sockets.emplace_back();
         m_sockets.back().socket = socket;
         m_sockets.back().flags  = 0;
         it                      = m_sockets.end() - 1;
