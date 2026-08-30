@@ -6,6 +6,7 @@
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/logs/severity.h"
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/utility.h"
@@ -20,10 +21,8 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <string>
 #include <utility>
-#include <vector>
 #include "nlohmann/json.hpp"
 
 namespace
