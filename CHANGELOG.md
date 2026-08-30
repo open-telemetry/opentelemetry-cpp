@@ -47,6 +47,10 @@ Increment the:
 
 * [RESOURCE DETECTOR] Add the service resource detector and builder
   [#4414](https://github.com/open-telemetry/opentelemetry-cpp/issues/4414)
+
+* [BENCHMARK] Sync instrument recording benchmarks
+  [#4470](https://github.com/open-telemetry/opentelemetry-cpp/pull/4470)
+
 * [CONFIGURATION] deprecate config builder cmake components
   [#4428](https://github.com/open-telemetry/opentelemetry-cpp/pull/4428)
 
@@ -70,6 +74,9 @@ Increment the:
 * [CONFIGURATION] Add support for the composite sampler configuration
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
+
+* [SDK] Replace SpinLockMutex with std::mutex in the metrics storage clases
+  [#4416](https://github.com/open-telemetry/opentelemetry-cpp/pull/4416)
 
 * [CONFIGURATION/BUILD] Add resource detector targets and README
   [#4430](https://github.com/open-telemetry/opentelemetry-cpp/pull/4430)
@@ -126,6 +133,9 @@ Increment the:
   `std::mutex` blocks the waiter instead. Only this one contended lock changes;
   the API `SpinLockMutex` and all other SDK locks are unchanged.
   [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
+
+* [SDK] Create instrumentation scope library
+  [#4351](https://github.com/open-telemetry/opentelemetry-cpp/pull/4351)
 
 * [CONFIGURATION] Update ViewSelector to comply with schema v1.1.0
   [#4384](https://github.com/open-telemetry/opentelemetry-cpp/pull/4384)
