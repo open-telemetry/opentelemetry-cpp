@@ -349,7 +349,6 @@ std::unique_ptr<HeadersConfiguration> ConfigurationParser::ParseHeadersConfigura
     name  = name_child->AsString();
     value = value_child->AsString();
 
-    OTEL_INTERNAL_LOG_DEBUG("ParseHeadersConfiguration() name = " << name << ", value = " << value);
     std::pair<std::string, std::string> entry(name, value);
     model->kv_map.insert(entry);
   }
@@ -2621,7 +2620,8 @@ std::unique_ptr<AttributesConfiguration> ConfigurationParser::ParseAttributesCon
     // Per schema nullBehavior: skip entries with a null value.
     if (value_child->IsNull())
     {
-      OTEL_INTERNAL_LOG_DEBUG("Skipping attribute '" << name << "' with null value");
+      OTEL_INTERNAL_LOG_DEBUG("[Config Parser] Skipping attribute '" << name
+                                                                     << "' with null value");
       continue;
     }
 
@@ -2685,7 +2685,8 @@ std::unique_ptr<AttributesConfiguration> ConfigurationParser::ParseAttributesCon
     // var).
     if (value_model == nullptr)
     {
-      OTEL_INTERNAL_LOG_DEBUG("Skipping attribute '" << name << "' with null/empty value");
+      OTEL_INTERNAL_LOG_DEBUG("[Config Parser] Skipping attribute '" << name
+                                                                     << "' with null/empty value");
       continue;
     }
 
@@ -2904,6 +2905,8 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
     version_minor_ = minor;
   }
 
+  OTEL_INTERNAL_LOG_DEBUG("[Config Parser] Parsing file with file_format: " << model->file_format);
+
   model->disabled = node->GetBoolean("disabled", false);
 
   const std::string log_level = node->GetString("log_level", "info");
@@ -2947,7 +2950,13 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
     model->resource = ParseResourceConfiguration(child);
   }
 
-  // FIXME: instrumentation/development
+  child = node->GetChildNode("instrumentation/development");
+  if (child)
+  {
+    // FIXME-CONFIG: implement the instrumentation/development model
+    OTEL_INTERNAL_LOG_WARN(
+        "[Config Parser] instrumentation/development is not yet supported, ignoring");
+  }
 
   child = node->GetChildNode("distribution");
   if (child)

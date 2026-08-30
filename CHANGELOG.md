@@ -58,6 +58,9 @@ Increment the:
   resource detectors
   [#4412](https://github.com/open-telemetry/opentelemetry-cpp/issues/4412)
 
+* [CONFIGURATION] Internal logging cleanup
+  [#4479](https://github.com/open-telemetry/opentelemetry-cpp/pull/4479)
+
 * [CONFIGURATION] Add support for composable sampler extensions.
   [#4409](https://github.com/open-telemetry/opentelemetry-cpp/issues/4409)
 
