@@ -10,7 +10,7 @@
 opentelemetry::sdk::common::ExportResult CustomPushMetricExporter::Export(
     const opentelemetry::sdk::metrics::ResourceMetrics & /* data */) noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomPushMetricExporter::Export(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_INFO("CustomPushMetricExporter::Export(): YOUR CODE HERE");
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 }
 
@@ -18,18 +18,18 @@ opentelemetry::sdk::metrics::AggregationTemporality
 CustomPushMetricExporter::GetAggregationTemporality(
     opentelemetry::sdk::metrics::InstrumentType /* instrument_type */) const noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomPushMetricExporter::GetAggregationTemporality(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_INFO("CustomPushMetricExporter::GetAggregationTemporality(): YOUR CODE HERE");
   return opentelemetry::sdk::metrics::AggregationTemporality::kCumulative;
 }
 
 bool CustomPushMetricExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomPushMetricExporter::ForceFlush(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_INFO("CustomPushMetricExporter::ForceFlush(): YOUR CODE HERE");
   return true;
 }
 
 bool CustomPushMetricExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomPushMetricExporter::Shutdown(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_INFO("CustomPushMetricExporter::Shutdown(): YOUR CODE HERE");
   return true;
 }
