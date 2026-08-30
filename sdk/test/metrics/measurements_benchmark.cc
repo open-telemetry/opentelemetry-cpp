@@ -98,7 +98,8 @@ void BM_MeasurementsTest(benchmark::State &state)
     for (size_t i = 0; i < NUM_CORES; i++)
     {
       threads.emplace_back([&h, &cur_processed, &MAX_MEASUREMENTS, &attributes]() {
-        std::mt19937 rng{std::random_device{}()};
+        // NOLINTNEXTLINE(bugprone-random-generator-seed)
+        std::mt19937 rng{1234};
         std::uniform_int_distribution<size_t> dist(0, 999);
         while (cur_processed++ <= MAX_MEASUREMENTS)
         {
@@ -146,7 +147,8 @@ void BM_MeasurementsThreadsShareCounterTest(benchmark::State &state)
     {
       threads.emplace_back(
           [&h, &cur_processed, &MAX_MEASUREMENTS, &attributes](size_t /*thread_id*/) {
-            std::mt19937 rng{std::random_device{}()};
+            // NOLINTNEXTLINE(bugprone-random-generator-seed)
+            std::mt19937 rng{1234};
             std::uniform_int_distribution<size_t> dist(0, 999);
             while (cur_processed++ <= MAX_MEASUREMENTS)
             {
@@ -199,7 +201,8 @@ void BM_MeasurementsPerThreadCounterTest(benchmark::State &state)
             std::string description = "counter1_description_thread_" + std::to_string(thread_id);
             auto per_thread_counter =
                 m->CreateDoubleCounter("counter1", description, "counter1_unit");
-            std::mt19937 rng{std::random_device{}()};
+            // NOLINTNEXTLINE(bugprone-random-generator-seed)
+            std::mt19937 rng{1234};
             std::uniform_int_distribution<size_t> dist(0, 999);
             while (cur_processed++ <= MAX_MEASUREMENTS)
             {
