@@ -41,8 +41,8 @@ void BM_SumAggregation(benchmark::State &state)
   std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
   mp.AddMetricReader(reader);
   auto h = m->CreateDoubleCounter("counter1", "counter1_description", "counter1_unit");
-  std::mt19937 generator(
-      1234);  // NOLINT(cert-msc32-c,cert-msc51-cpp,bugprone-random-generator-seed)
+  // NOLINTNEXTLINE(bugprone-random-generator-seed)
+  std::mt19937 generator(1234);
   std::uniform_int_distribution<int> distribution(0, 1000000);
   // Generate 100000 measurements
   constexpr size_t TOTAL_MEASUREMENTS = 100000;
