@@ -6,15 +6,13 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "logs",
-    srcs = glob(["**/*.cc"]),
-    include_prefix = "src/logs",
+    name = "instrumentationscope",
+    srcs = [
+        "instrumentation_scope.cc",
+    ],
+    include_prefix = "src/instrumentationscope",
     deps = [
         "//api",
         "//sdk:headers",
-        "//sdk/src/common:disabled",
-        "//sdk/src/common:global_log_handler",
-        "//sdk/src/instrumentationscope",
-        "//sdk/src/resource",
     ],
 )

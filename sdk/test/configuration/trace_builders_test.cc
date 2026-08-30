@@ -33,6 +33,7 @@
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_builder.h"
@@ -65,6 +66,7 @@
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_builder.h"
@@ -345,6 +347,95 @@ TEST_F(TraceBuildersTest, SpanLimitsConfiguration)
   EXPECT_EQ(limits.link_count_limit, 4444);
   EXPECT_EQ(limits.event_attribute_count_limit, 5555);
   EXPECT_EQ(limits.link_attribute_count_limit, 6666);
+}
+
+TEST_F(TraceBuildersTest, SpanLimitsFromAttributeLimits)
+{
+  auto model    = std::make_unique<config_sdk::TracerProviderConfiguration>();
+  model->limits = nullptr;
+
+  config_sdk::AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_count_limit        = 7;
+  attribute_limits.attribute_value_length_limit = 9;
+
+  auto provider = MakeTracerProvider(std::move(model));
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits         = provider->GetSpanLimits();
+  const auto default_limits = opentelemetry::sdk::trace::SpanLimits{};
+
+  EXPECT_EQ(limits.attribute_count_limit, attribute_limits.attribute_count_limit.Value());
+  EXPECT_EQ(limits.attribute_value_length_limit,
+            attribute_limits.attribute_value_length_limit.Value());
+  EXPECT_EQ(limits.event_count_limit, default_limits.event_count_limit);
+  EXPECT_EQ(limits.link_count_limit, default_limits.link_count_limit);
+  EXPECT_EQ(limits.event_attribute_count_limit, default_limits.event_attribute_count_limit);
+  EXPECT_EQ(limits.link_attribute_count_limit, default_limits.link_attribute_count_limit);
+}
+
+TEST_F(TraceBuildersTest, SpanLimitsOverrideAttributeLimits)
+{
+  auto model    = std::make_unique<config_sdk::TracerProviderConfiguration>();
+  model->limits = std::make_unique<config_sdk::SpanLimitsConfiguration>();
+  model->limits->attribute_value_length_limit = 1111;
+  model->limits->attribute_count_limit        = 2222;
+  model->limits->event_count_limit            = 3333;
+
+  config_sdk::AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_count_limit        = 7;
+  attribute_limits.attribute_value_length_limit = 9;
+
+  auto provider = MakeTracerProvider(std::move(model));
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits = provider->GetSpanLimits();
+  EXPECT_EQ(limits.attribute_value_length_limit,
+            model->limits->attribute_value_length_limit.Value());
+  EXPECT_EQ(limits.attribute_count_limit, model->limits->attribute_count_limit.Value());
+  EXPECT_EQ(limits.event_count_limit, model->limits->event_count_limit.Value());
+}
+
+TEST_F(TraceBuildersTest, SpanLimitsPerFieldAttributeLimits)
+{
+  auto model                       = std::make_unique<config_sdk::TracerProviderConfiguration>();
+  model->limits                    = std::make_unique<config_sdk::SpanLimitsConfiguration>();
+  model->limits->event_count_limit = 64;
+  model->limits->link_count_limit  = 64;
+  model->limits->event_attribute_count_limit = 8;
+  model->limits->link_attribute_count_limit  = 8;
+
+  config_sdk::AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_value_length_limit = 4096;
+
+  auto provider = MakeTracerProvider(std::move(model));
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits         = provider->GetSpanLimits();
+  const auto default_limits = opentelemetry::sdk::trace::SpanLimits{};
+  EXPECT_EQ(limits.attribute_value_length_limit, 4096);
+  EXPECT_EQ(limits.attribute_count_limit, default_limits.attribute_count_limit);
+  EXPECT_EQ(limits.event_count_limit, 64);
+  EXPECT_EQ(limits.link_count_limit, 64);
+  EXPECT_EQ(limits.event_attribute_count_limit, 8);
+  EXPECT_EQ(limits.link_attribute_count_limit, 8);
+}
+
+TEST_F(TraceBuildersTest, SpanLimitsPartialOverrideAttributeLimits)
+{
+  auto model    = std::make_unique<config_sdk::TracerProviderConfiguration>();
+  model->limits = std::make_unique<config_sdk::SpanLimitsConfiguration>();
+  model->limits->attribute_count_limit = 22;
+
+  config_sdk::AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_count_limit        = 7;
+  attribute_limits.attribute_value_length_limit = 9;
+
+  auto provider = MakeTracerProvider(std::move(model));
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits = provider->GetSpanLimits();
+  EXPECT_EQ(limits.attribute_count_limit, 22);
+  EXPECT_EQ(limits.attribute_value_length_limit, 9);
 }
 
 TEST_F(TraceBuildersTest, BatchSpanProcessorDispatch)

@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstddef>
 #include <map>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -35,6 +36,7 @@
 
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
@@ -62,6 +64,7 @@
 #include "opentelemetry/sdk/configuration/meter_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
@@ -75,6 +78,7 @@
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_config_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
@@ -91,6 +95,7 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/noop.h"
@@ -219,6 +224,13 @@ protected:
 
 }  // namespace
 
+TEST(OptionalValue, ValueThrowsWhenEmpty)
+{
+  config_sdk::OptionalValue<std::size_t> value;
+
+  EXPECT_THROW(value.Value(), std::runtime_error);
+}
+
 //---------------------------------------------------------------------------
 // Resource configuration tests
 
@@ -328,11 +340,169 @@ TEST_F(ProgrammaticConfigTest, LoggerProviderWithLogRecordLimits)
   auto *record = log_buffer_->front().get();
   EXPECT_EQ(nostd::get<std::string>(record->GetBody()), "test-message");
   const auto &attributes = record->GetAttributes();
-  EXPECT_EQ(attributes.size(), limits.attribute_count_limit);
+  EXPECT_EQ(attributes.size(), limits.attribute_count_limit.Value());
   for (const auto &attr : attributes)
   {
-    EXPECT_EQ(nostd::get<std::string>(attr.second).size(), limits.attribute_value_length_limit);
+    EXPECT_EQ(nostd::get<std::string>(attr.second).size(),
+              limits.attribute_value_length_limit.Value());
   }
+}
+
+TEST_F(ProgrammaticConfigTest, AttributeLimitsApplyToLoggerProvider)
+{
+  auto attribute_limits = std::make_unique<config_sdk::AttributeLimitsConfiguration>();
+  attribute_limits->attribute_count_limit        = 2;
+  attribute_limits->attribute_value_length_limit = 5;
+
+  auto model              = std::make_unique<config_sdk::Configuration>();
+  model->attribute_limits = std::move(attribute_limits);
+  model->logger_provider  = MakeLoggerProviderConfig();
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->logger_provider, nullptr);
+
+  auto logger = logs::Provider::GetLoggerProvider()->GetLogger("test");
+  logger->EmitLogRecord(
+      logs::Severity::kInfo, nostd::string_view("test-message"),
+      common::MakeAttributes({{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}));
+
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
+
+  EXPECT_EQ(log_buffer_->size(), 1);
+  auto *record           = log_buffer_->front().get();
+  const auto &attributes = record->GetAttributes();
+  EXPECT_EQ(attributes.size(), 2);
+  for (const auto &attr : attributes)
+  {
+    EXPECT_EQ(nostd::get<std::string>(attr.second).size(), 5);
+  }
+}
+
+TEST_F(ProgrammaticConfigTest, LoggerProviderLimitsOverrideAttributeLimits)
+{
+  auto attribute_limits = std::make_unique<config_sdk::AttributeLimitsConfiguration>();
+  attribute_limits->attribute_count_limit        = 1;
+  attribute_limits->attribute_value_length_limit = 3;
+
+  config_sdk::LogRecordLimitsConfiguration limits;
+  limits.attribute_count_limit        = 2;
+  limits.attribute_value_length_limit = 5;
+
+  auto logger_provider_config = MakeLoggerProviderConfig();
+  logger_provider_config->limits =
+      std::make_unique<config_sdk::LogRecordLimitsConfiguration>(limits);
+
+  auto model              = std::make_unique<config_sdk::Configuration>();
+  model->attribute_limits = std::move(attribute_limits);
+  model->logger_provider  = std::move(logger_provider_config);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->logger_provider, nullptr);
+
+  auto logger = logs::Provider::GetLoggerProvider()->GetLogger("test");
+  logger->EmitLogRecord(
+      logs::Severity::kInfo, nostd::string_view("test-message"),
+      common::MakeAttributes({{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}));
+
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
+
+  EXPECT_EQ(log_buffer_->size(), 1);
+  auto *record           = log_buffer_->front().get();
+  const auto &attributes = record->GetAttributes();
+  EXPECT_EQ(attributes.size(), limits.attribute_count_limit.Value());
+  for (const auto &attr : attributes)
+  {
+    EXPECT_EQ(nostd::get<std::string>(attr.second).size(),
+              limits.attribute_value_length_limit.Value());
+  }
+}
+
+TEST_F(ProgrammaticConfigTest, LoggerProviderLimitsPartialOverrideAttributeLimits)
+{
+  auto attribute_limits = std::make_unique<config_sdk::AttributeLimitsConfiguration>();
+  attribute_limits->attribute_count_limit        = 1;
+  attribute_limits->attribute_value_length_limit = 3;
+
+  config_sdk::LogRecordLimitsConfiguration limits;
+  limits.attribute_value_length_limit = 5;
+
+  auto logger_provider_config = MakeLoggerProviderConfig();
+  logger_provider_config->limits =
+      std::make_unique<config_sdk::LogRecordLimitsConfiguration>(limits);
+
+  auto model              = std::make_unique<config_sdk::Configuration>();
+  model->attribute_limits = std::move(attribute_limits);
+  model->logger_provider  = std::move(logger_provider_config);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->logger_provider, nullptr);
+
+  auto logger = logs::Provider::GetLoggerProvider()->GetLogger("test");
+  logger->EmitLogRecord(
+      logs::Severity::kInfo, nostd::string_view("test-message"),
+      common::MakeAttributes({{"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}}));
+
+  ASSERT_TRUE(sdk_->logger_provider->ForceFlush(std::chrono::milliseconds(kProcessTimeout)));
+  ASSERT_TRUE(sdk_->logger_provider->Shutdown(std::chrono::milliseconds(kProcessTimeout)));
+
+  EXPECT_EQ(log_buffer_->size(), 1);
+  auto *record           = log_buffer_->front().get();
+  const auto &attributes = record->GetAttributes();
+  EXPECT_EQ(attributes.size(), 1);
+  for (const auto &attr : attributes)
+  {
+    EXPECT_EQ(nostd::get<std::string>(attr.second).size(), 5);
+  }
+}
+
+TEST_F(ProgrammaticConfigTest, AttributeLimitsApplyToTracerProvider)
+{
+  auto attribute_limits = std::make_unique<config_sdk::AttributeLimitsConfiguration>();
+  attribute_limits->attribute_count_limit        = 7;
+  attribute_limits->attribute_value_length_limit = 9;
+
+  auto model              = std::make_unique<config_sdk::Configuration>();
+  model->attribute_limits = std::move(attribute_limits);
+  model->tracer_provider  = MakeTracerProviderConfig();
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->tracer_provider, nullptr);
+
+  const auto limits         = sdk_->tracer_provider->GetSpanLimits();
+  const auto default_limits = opentelemetry::sdk::trace::SpanLimits{};
+  EXPECT_EQ(limits.attribute_count_limit, 7);
+  EXPECT_EQ(limits.attribute_value_length_limit, 9);
+  EXPECT_EQ(limits.event_count_limit, default_limits.event_count_limit);
+  EXPECT_EQ(limits.link_count_limit, default_limits.link_count_limit);
+}
+
+TEST_F(ProgrammaticConfigTest, TracerProviderLimitsOverrideAttributeLimits)
+{
+  auto attribute_limits = std::make_unique<config_sdk::AttributeLimitsConfiguration>();
+  attribute_limits->attribute_count_limit        = 7;
+  attribute_limits->attribute_value_length_limit = 9;
+
+  auto span_limits                   = std::make_unique<config_sdk::SpanLimitsConfiguration>();
+  span_limits->attribute_count_limit = 22;
+  span_limits->attribute_value_length_limit = 11;
+  span_limits->event_count_limit            = 33;
+
+  auto tracer_provider_config    = MakeTracerProviderConfig();
+  tracer_provider_config->limits = std::move(span_limits);
+
+  auto model              = std::make_unique<config_sdk::Configuration>();
+  model->attribute_limits = std::move(attribute_limits);
+  model->tracer_provider  = std::move(tracer_provider_config);
+
+  CreateAndInstallSdk(model);
+  ASSERT_NE(sdk_->tracer_provider, nullptr);
+
+  const auto limits = sdk_->tracer_provider->GetSpanLimits();
+  EXPECT_EQ(limits.attribute_count_limit, 22);
+  EXPECT_EQ(limits.attribute_value_length_limit, 11);
+  EXPECT_EQ(limits.event_count_limit, 33);
 }
 
 TEST_F(ProgrammaticConfigTest, LoggerProviderWithLoggerConfigurator)
