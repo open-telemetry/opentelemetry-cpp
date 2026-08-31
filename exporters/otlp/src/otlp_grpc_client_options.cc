@@ -19,11 +19,7 @@ OtlpGrpcClientOptions::OtlpGrpcClientOptions()
       timeout(GetOtlpDefaultGrpcClientTimeout()),
       metadata(GetOtlpDefaultGrpcClientHeaders()),
       user_agent(GetOtlpDefaultUserAgent()),
-      max_threads(0),
       compression(GetOtlpDefaultGrpcClientCompression()),
-#ifdef ENABLE_ASYNC_EXPORT
-      max_concurrent_requests(64),
-#endif
       retry_policy_max_attempts(GetOtlpDefaultGrpcClientRetryMaxAttempts()),
       retry_policy_initial_backoff(GetOtlpDefaultGrpcClientRetryInitialBackoff()),
       retry_policy_max_backoff(GetOtlpDefaultGrpcClientRetryMaxBackoff()),
@@ -37,15 +33,7 @@ OtlpGrpcClientOptions::OtlpGrpcClientOptions()
 #endif
 }
 
-OtlpGrpcClientOptions::OtlpGrpcClientOptions(void *)
-{
-  use_ssl_credentials = true;
-  max_threads         = 0;
-
-#ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests = 64;
-#endif
-}
+OtlpGrpcClientOptions::OtlpGrpcClientOptions(void *) {}
 
 OtlpGrpcClientOptions::~OtlpGrpcClientOptions() {}
 

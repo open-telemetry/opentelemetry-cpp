@@ -32,6 +32,11 @@ public:
 #endif
   }
 
+  ScopedEnvVar(const ScopedEnvVar &)            = delete;
+  ScopedEnvVar &operator=(const ScopedEnvVar &) = delete;
+  ScopedEnvVar(ScopedEnvVar &&)                 = delete;
+  ScopedEnvVar &operator=(ScopedEnvVar &&)      = delete;
+
   ~ScopedEnvVar()
   {
 #ifdef _MSC_VER
