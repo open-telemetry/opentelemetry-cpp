@@ -29,17 +29,10 @@ OtlpGrpcLogRecordExporterOptions::OtlpGrpcLogRecordExporterOptions()
   ssl_client_cert_string = GetOtlpDefaultLogsSslClientCertificateString();
 #endif
 
-  timeout    = GetOtlpDefaultLogsTimeout();
-  metadata   = GetOtlpDefaultLogsHeaders();
-  user_agent = GetOtlpDefaultUserAgent();
-
-  max_threads = 0;
-
-  compression = GetOtlpDefaultLogsCompression();
-#ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests = 64;
-#endif
-
+  timeout                         = GetOtlpDefaultLogsTimeout();
+  metadata                        = GetOtlpDefaultLogsHeaders();
+  user_agent                      = GetOtlpDefaultUserAgent();
+  compression                     = GetOtlpDefaultLogsCompression();
   retry_policy_max_attempts       = GetOtlpDefaultLogsRetryMaxAttempts();
   retry_policy_initial_backoff    = GetOtlpDefaultLogsRetryInitialBackoff();
   retry_policy_max_backoff        = GetOtlpDefaultLogsRetryMaxBackoff();
@@ -60,10 +53,6 @@ OtlpGrpcLogRecordExporterOptions::OtlpGrpcLogRecordExporterOptions(
     timeout = signal_timeout;
   }
   metadata = GetOtlpDefaultLogsHeaders();
-
-#ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests = client_options.max_concurrent_requests;
-#endif
 }
 
 OtlpGrpcLogRecordExporterOptions::~OtlpGrpcLogRecordExporterOptions() {}

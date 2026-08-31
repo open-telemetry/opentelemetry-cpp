@@ -50,10 +50,6 @@ OtlpGrpcExporterOptions::OtlpGrpcExporterOptions(const OtlpGrpcClientOptions &cl
     timeout = signal_timeout;
   }
   metadata = GetOtlpDefaultTracesHeaders();
-
-#ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests = client_options.max_concurrent_requests;
-#endif
 }
 
 OtlpGrpcExporterOptions::~OtlpGrpcExporterOptions() {}

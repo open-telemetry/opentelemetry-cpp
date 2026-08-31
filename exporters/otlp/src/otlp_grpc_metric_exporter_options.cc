@@ -30,17 +30,10 @@ OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions()
   ssl_client_cert_string = GetOtlpDefaultMetricsSslClientCertificateString();
 #endif
 
-  timeout    = GetOtlpDefaultMetricsTimeout();
-  metadata   = GetOtlpDefaultMetricsHeaders();
-  user_agent = GetOtlpDefaultUserAgent();
-
-  max_threads = 0;
-
-  compression = GetOtlpDefaultMetricsCompression();
-#ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests = 64;
-#endif
-
+  timeout                         = GetOtlpDefaultMetricsTimeout();
+  metadata                        = GetOtlpDefaultMetricsHeaders();
+  user_agent                      = GetOtlpDefaultUserAgent();
+  compression                     = GetOtlpDefaultMetricsCompression();
   retry_policy_max_attempts       = GetOtlpDefaultMetricsRetryMaxAttempts();
   retry_policy_initial_backoff    = GetOtlpDefaultMetricsRetryInitialBackoff();
   retry_policy_max_backoff        = GetOtlpDefaultMetricsRetryMaxBackoff();
@@ -61,10 +54,6 @@ OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions(
     timeout = signal_timeout;
   }
   metadata = GetOtlpDefaultMetricsHeaders();
-
-#ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests = client_options.max_concurrent_requests;
-#endif
 }
 
 OtlpGrpcMetricExporterOptions::~OtlpGrpcMetricExporterOptions() {}
