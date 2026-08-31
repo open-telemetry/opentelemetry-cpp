@@ -15,7 +15,7 @@ validate_package() {
 }
 
 # Core packages
-for library in api common logs metrics resources trace version; do
+for library in api common logs instrumentation_scope metrics resources trace version; do
   pkg-config --validate opentelemetry_${library} --print-errors
 done
 

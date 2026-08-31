@@ -53,5 +53,5 @@ if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     metrics "OpenTelemetry SDK - Metrics"
     "Components for exporting metrics in the OpenTelemetry SDK."
-    "opentelemetry_resources")
+    "opentelemetry_resources" "opentelemetry_instrumentation_scope")
 endif()
