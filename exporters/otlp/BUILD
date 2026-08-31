@@ -770,8 +770,8 @@ cc_test(
     deps = [
         ":otlp_grpc_client",
         ":otlp_grpc_exporter",
-        ":otlp_grpc_metric_exporter",
         ":otlp_grpc_log_record_exporter",
+        ":otlp_grpc_metric_exporter",
         "@com_google_googletest//:gtest_main",
     ],
 )

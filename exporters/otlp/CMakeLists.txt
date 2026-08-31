@@ -895,8 +895,11 @@ if(OTELCPP_BUILD_TESTING)
     add_executable(otlp_grpc_client_options_test
                    test/otlp_grpc_client_options_test.cc)
     target_link_libraries(
-      otlp_grpc_client_options_test ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc
+      otlp_grpc_client_options_test
+      ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT}
+      ${GMOCK_LIB}
+      opentelemetry_exporter_otlp_grpc
       opentelemetry_exporter_otlp_grpc_log
       opentelemetry_exporter_otlp_grpc_metrics)
     gtest_add_tests(
