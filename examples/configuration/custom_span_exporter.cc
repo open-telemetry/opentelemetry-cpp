@@ -19,18 +19,18 @@ opentelemetry::sdk::common::ExportResult CustomSpanExporter::Export(
     const opentelemetry::nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>>
         & /* spans */) noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomSpanExporter::Export(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_INFO("CustomSpanExporter::Export(): YOUR CODE HERE");
   return opentelemetry::sdk::common::ExportResult::kSuccess;
 }
 
 bool CustomSpanExporter::ForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomSpanExporter::ForceFlush(): YOUR CODE HERE");
-  return false;
+  OTEL_INTERNAL_LOG_INFO("CustomSpanExporter::ForceFlush(): YOUR CODE HERE");
+  return true;
 }
 
 bool CustomSpanExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomSpanExporter::Shutdown(): YOUR CODE HERE");
-  return false;
+  OTEL_INTERNAL_LOG_INFO("CustomSpanExporter::Shutdown(): YOUR CODE HERE");
+  return true;
 }
