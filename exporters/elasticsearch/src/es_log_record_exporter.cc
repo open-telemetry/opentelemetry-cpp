@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/exporters/elasticsearch/detail/es_bulk_response.h"
 #include "opentelemetry/exporters/elasticsearch/es_log_record_exporter.h"
 #include "opentelemetry/exporters/elasticsearch/es_log_recordable.h"
 #include "opentelemetry/ext/http/client/detail/default_factory.h"
@@ -75,37 +76,42 @@ public:
    */
   void OnResponse(http_client::Response &response) noexcept override
   {
-    std::string log_message;
+    std::string described;
+    bool decided = false;
 
     // Lock the private members so they can't be read while being modified
     {
       std::unique_lock<std::mutex> lk(mutex_);
 
-      // Store the body of the request
-      body_ = std::string(response.GetBody().begin(), response.GetBody().end());
+      std::string body(response.GetBody().begin(), response.GetBody().end());
 
-      if (!(response.GetStatusCode() >= 200 && response.GetStatusCode() <= 299))
+      // Kept with the outcome it decides, and only by the call that decides it. Export() folds the
+      // status into the ExportResult, since storing the body alone let a non-2xx response be
+      // reported as a success, and a status from one response beside a body from another is not
+      // something the server sent. Export() is the single place that logs the failure, so a
+      // non-2xx response is not logged a second time here with the full body.
+      if (completion_ == CompletionState::Pending)
       {
-        log_message = BuildResponseLogMessage(response, body_);
-
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Export failed, " << log_message);
-      }
-
-      if (console_debug_)
-      {
-        if (log_message.empty())
+        if (console_debug_)
         {
-          log_message = BuildResponseLogMessage(response, body_);
+          described = BuildResponseLogMessage(response, body);
         }
-
-        OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Got response from Elasticsearch, "
-                                << log_message);
+        status_code_ = response.GetStatusCode();
+        body_        = std::move(body);
+        recordCompletionLocked(CompletionState::Success);
+        decided = true;
       }
-
-      // Record the outcome and notify any threads waiting on this result
-      recordCompletionLocked(CompletionState::Success);
     }
     cv_.notify_all();
+
+    // Outside the lock and only for the response that decided the outcome. The log handler is
+    // replaceable application code, so one that reaches back into this exporter would otherwise do
+    // it while this thread holds mutex_, and a line for a response whose status and body were
+    // discarded describes an answer the caller was never given.
+    if (decided && console_debug_)
+    {
+      OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Got response from Elasticsearch, " << described);
+    }
   }
 
   /**
@@ -122,14 +128,21 @@ public:
     return completion_ == CompletionState::Success;
   }
 
-  /**
-   * Returns the body of the response
-   */
-  std::string GetResponseBody()
+  /// The status and body of the response the recorded outcome was decided from.
+  struct Response
   {
-    // Lock so that body_ can't be written to while returning it
+    int status_code = 0;
+    std::string body;
+  };
+
+  /**
+   * Returns the response the outcome was decided from. Both halves together, since reading them
+   * one lock at a time can pair a status with a body that arrived in a different response.
+   */
+  Response GetResponse()
+  {
     std::unique_lock<std::mutex> lk(mutex_);
-    return body_;
+    return Response{status_code_, body_};
   }
 
   // Callback method when an http event occurs
@@ -236,6 +249,9 @@ private:
   // A string to store the response body
   std::string body_ = "";
 
+  // The HTTP status code of the response
+  int status_code_ = 0;
+
   // Whether to print the results from the callback
   bool console_debug_ = false;
 };
@@ -253,9 +269,11 @@ public:
   AsyncResponseHandler(
       std::shared_ptr<ext::http::client::Session> session,
       std::function<bool(opentelemetry::sdk::common::ExportResult)> &&result_callback,
+      std::size_t submitted_operations,
       bool console_debug = false)
       : session_{std::move(session)},
         result_callback_{std::move(result_callback)},
+        submitted_operations_{submitted_operations},
         console_debug_{console_debug}
   {}
 
@@ -275,18 +293,20 @@ public:
   void OnResponse(http_client::Response &response) noexcept override
   {
 
-    // Store the body of the response
-    body_ = std::string(response.GetBody().begin(), response.GetBody().end());
+    // Local, since nothing outside this call reads it and a member would be written twice over by
+    // a client that delivers two responses for one request.
+    const std::string body(response.GetBody().begin(), response.GetBody().end());
     if (console_debug_)
     {
       OTEL_INTERNAL_LOG_DEBUG(
-          "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body_);
+          "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body);
     }
-    if (body_.find("\"failed\" : 0") == std::string::npos)
+    std::string failure_reason;
+    if (!detail::IsBulkResponseSuccessful(response.GetStatusCode(), body, submitted_operations_,
+                                          failure_reason))
     {
-      OTEL_INTERNAL_LOG_ERROR(
-          "[ES Log Exporter] Logs were not written to Elasticsearch correctly, response body: "
-          << body_);
+      OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Logs were not written to Elasticsearch correctly, "
+                              << failure_reason << ", response body: " << body);
       result_callback_(sdk::common::ExportResult::kFailure);
     }
     else
@@ -344,8 +364,8 @@ private:
   // Callback to call to on receiving events
   std::function<bool(opentelemetry::sdk::common::ExportResult)> result_callback_;
 
-  // A string to store the response body
-  std::string body_ = "";
+  // How many operations this request submitted, which is how many the response has to answer
+  std::size_t submitted_operations_ = 0;
 
   // Whether to print the results from the callback
   bool console_debug_ = false;
@@ -406,7 +426,7 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   auto request = session->CreateRequest();
 
   // Populate the request with headers and methods
-  request->SetUri(options_.index_ + "/_bulk?pretty");
+  request->SetUri(options_.index_ + "/_bulk");
   request->SetMethod(http_client::Method::Post);
   request->AddHeader("Content-Type", "application/json");
 
@@ -423,7 +443,7 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   for (auto &record : records)
   {
     // Append {"index":{}} before JSON body, which tells Elasticsearch to write to index specified
-    // in URI
+    // in URI. detail/es_bulk_response.h requires each acknowledgement to name this same action.
     body += "{\"index\" : {}}\n";
 
     // Add the context of the Recordable
@@ -458,7 +478,7 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
         synchronization_data->force_flush_cv.notify_all();
         return true;
       },
-      options_.console_debug_);
+      span_count, options_.console_debug_);
   session->SendRequest(handler);
   return sdk::common::ExportResult::kSuccess;
 #else
@@ -485,12 +505,13 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   }
 
   // Parse the response output to determine if Elasticsearch consumed it correctly
-  std::string responseBody = handler->GetResponseBody();
-  if (responseBody.find("\"failed\" : 0") == std::string::npos)
+  const auto response = handler->GetResponse();
+  std::string failure_reason;
+  if (!detail::IsBulkResponseSuccessful(response.status_code, response.body, records.size(),
+                                        failure_reason))
   {
-    OTEL_INTERNAL_LOG_ERROR(
-        "[ES Log Exporter] Logs were not written to Elasticsearch correctly, response body: "
-        << responseBody);
+    OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Logs were not written to Elasticsearch correctly, "
+                            << failure_reason << ", response body: " << response.body);
     // TODO: Retry logic
     return sdk::common::ExportResult::kFailure;
   }
