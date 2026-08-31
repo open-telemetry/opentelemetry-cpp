@@ -47,5 +47,11 @@ for exporter in prometheus prometheus_builder zipkin_trace elasticsearch_logs in
   validate_package "opentelemetry_exporter_${exporter}"
 done
 
-# Optional features
+# SDK configuration core and builders
+for pkg in configuration_core configuration_trace_builders configuration_logs_builders configuration_metrics_builders configuration_registry_factory; do
+  pkg-config --validate "opentelemetry_${pkg}" --print-errors
+done
+
+# Optional features (YAML parser and full interface)
+validate_package "opentelemetry_configuration_yaml"
 validate_package "opentelemetry_configuration"

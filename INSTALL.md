@@ -242,8 +242,13 @@ build configuration.
 |                            | opentelemetry-cpp::trace                                                                         |
 |                            | opentelemetry-cpp::metrics                                                                       |
 |                            | opentelemetry-cpp::logs                                                                          |
-|                            | opentelemetry-cpp::configuration_core  (EXPERIMENTAL: Programmatic configuration)                |
-| **configuration**          | opentelemetry-cpp::configuration       (EXPERIMENTAL: YAML configuration)                        |
+|                            | opentelemetry-cpp::configuration_core              (EXPERIMENTAL: Model, Builder and Interfaces) |
+|                            | opentelemetry-cpp::configuration_trace_builders    (EXPERIMENTAL: Trace SDK default builders)    |
+|                            | opentelemetry-cpp::configuration_metrics_builders  (EXPERIMENTAL: Metrics SDK default builders)  |
+|                            | opentelemetry-cpp::configuration_logs_builders     (EXPERIMENTAL: Logs SDK default builders)     |
+|                            | opentelemetry-cpp::configuration_registry_factory  (EXPERIMENTAL: Built-in registry creator)     |
+| **configuration**          | opentelemetry-cpp::configuration_yaml              (EXPERIMENTAL: YAML configuration)            |
+|                            | opentelemetry-cpp::configuration                   (EXPERIMENTAL: All config targets interface)  |
 | **ext_common**             | opentelemetry-cpp::ext                                                                           |
 | **ext_http_curl**          | opentelemetry-cpp::http_client_curl                                                              |
 | **ext_dll**                | opentelemetry-cpp::opentelemetry_cpp                                                             |
