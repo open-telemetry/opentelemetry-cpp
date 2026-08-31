@@ -318,7 +318,7 @@ static int parse_args(int argc, char *argv[])
   return 0;
 }
 
-typedef int (*test_func_t)();
+using test_func_t = int (*)();
 
 struct test_case
 {
@@ -330,7 +330,7 @@ struct test_case
 
 static int test_basic();
 
-static int test_cert_not_found();
+// static int test_cert_not_found();  // disabled: see TODO above all_tests
 static int test_cert_invalid();
 static int test_cert_unreadable();
 
@@ -345,8 +345,10 @@ static int test_client_key_unreadable();
 static int test_mtls_ok();
 #endif  // ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
 
+// TODO: re-enable "cert-not-found" once gRPC releases grpc/grpc#42608 (OpenSSL NO_ATEXIT fix for
+// grpc/grpc#38539).
 static const test_case all_tests[] = {{"basic", test_basic},
-                                      {"cert-not-found", test_cert_not_found},
+                                      // {"cert-not-found", test_cert_not_found},
                                       {"cert-invalid", test_cert_invalid},
                                       {"cert-unreadable", test_cert_unreadable},
 #ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
@@ -516,6 +518,7 @@ static int test_basic()
   return expect_connection_failed();
 }
 
+#if 0  // disabled: see TODO above all_tests
 static int test_cert_not_found()
 {
   otlp::OtlpGrpcExporterOptions opts;
@@ -542,6 +545,7 @@ static int test_cert_not_found()
 
   return expect_connection_failed();
 }
+#endif
 
 static int test_cert_invalid()
 {

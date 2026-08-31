@@ -195,8 +195,8 @@ void Session::SendRequest(
     deflateEnd(&zs);
 #else
     OTEL_INTERNAL_LOG_ERROR(
-        "[HTTP Client Curl] Set WITH_OTLP_HTTP_COMPRESSION=ON to use gzip compression with the "
-        "OTLP HTTP Exporter");
+        "[HTTP Client Curl] Set OTELCPP_WITH_OTLP_HTTP_COMPRESSION=ON to use gzip compression with "
+        "the OTLP HTTP Exporter");
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
   }
 
@@ -884,8 +884,12 @@ bool HttpClient::doRetrySessions(bool /* report_all */)
 void HttpClient::resetMultiHandle()
 {
   std::list<std::shared_ptr<Session>> sessions;
-  std::lock_guard<std::mutex> session_lock_guard{sessions_m_};
   {
+    // Only the snapshot needs these. CancelSession and doRemoveSessions below both take
+    // sessions_m_ again, and it is not recursive, so holding it across them stops the IO
+    // thread here for good. Cleanup also runs the caller's handler, which this lock was
+    // never meant to cover.
+    std::lock_guard<std::mutex> session_lock_guard{sessions_m_};
     std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
     for (auto &session : sessions_)
     {

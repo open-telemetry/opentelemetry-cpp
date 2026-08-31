@@ -30,6 +30,7 @@ add_library(
   aggregation/sum_aggregation.cc
   data/circular_buffer.cc
   exemplar/reservoir.cc
+  view/attributes_processor.cc
   view/instrument_selector_factory.cc
   view/meter_selector_factory.cc
   view/view_factory.cc
@@ -40,14 +41,15 @@ add_library(
 set_target_properties(opentelemetry_metrics PROPERTIES EXPORT_NAME metrics)
 set_target_version(opentelemetry_metrics)
 
-target_link_libraries(opentelemetry_metrics PUBLIC opentelemetry_common
-                                                   opentelemetry_resources)
+target_link_libraries(
+  opentelemetry_metrics PUBLIC opentelemetry_common opentelemetry_resources
+                               opentelemetry_instrumentation_scope)
 
 target_include_directories(
   opentelemetry_metrics
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     metrics "OpenTelemetry SDK - Metrics"
     "Components for exporting metrics in the OpenTelemetry SDK."

@@ -61,6 +61,12 @@ using opentelemetry::sdk::common::setenv;
 using opentelemetry::sdk::common::unsetenv;
 #endif
 
+#if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
+        (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
+    defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
+#  define OTELCPP_GRPC_ASYNC_API_IS_STABLE
+#endif
+
 using namespace testing;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -75,8 +81,7 @@ class OtlpMockTraceServiceStub : public proto::collector::trace::v1::MockTraceSe
 {
 public:
 // Some old toolchains can only use gRPC 1.33 and it's experimental.
-#if defined(GRPC_CPP_VERSION_MAJOR) && \
-    (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039
+#if defined(OTELCPP_GRPC_ASYNC_API_IS_STABLE)
   using async_interface_base =
       proto::collector::trace::v1::TraceService::StubInterface::async_interface;
 #else
@@ -97,14 +102,19 @@ public:
         ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceResponse *response,
         std::function<void(::grpc::Status)> callback) override
     {
+      if (stub_->defer_completions_)
+      {
+        std::lock_guard<std::mutex> guard(stub_->deferred_lock_);
+        stub_->deferred_.push_back(std::move(callback));
+        return;
+      }
+
       stub_->last_async_status_ = stub_->Export(context, *request, response);
       callback(stub_->last_async_status_);
     }
 
 // Some old toolchains can only use gRPC 1.33 and it's experimental.
-#if defined(GRPC_CPP_VERSION_MAJOR) &&                                      \
-        (GRPC_CPP_VERSION_MAJOR * 1000 + GRPC_CPP_VERSION_MINOR) >= 1039 || \
-    defined(GRPC_CALLBACK_API_NONEXPERIMENTAL)
+#if defined(OTELCPP_GRPC_ASYNC_API_IS_STABLE)
     void Export(
         ::grpc::ClientContext * /*context*/,
         const ::opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest * /*request*/,
@@ -124,14 +134,74 @@ public:
     OtlpMockTraceServiceStub *stub_;
   };
 
+#if defined(OTELCPP_GRPC_ASYNC_API_IS_STABLE)
   async_interface_base *async() override { return &async_interface_; }
-  async_interface_base *experimental_async() { return &async_interface_; }
+#else
+  async_interface_base *experimental_async() override { return &async_interface_; }
+#endif
 
   ::grpc::Status GetLastAsyncStatus() const noexcept { return last_async_status_; }
 
+  // Keep the completion callbacks instead of running them inline, so a test can call ForceFlush()
+  // with requests still in flight. Call before the first export.
+  void DeferCompletions() noexcept { defer_completions_ = true; }
+
+  std::size_t DeferredCount()
+  {
+    std::lock_guard<std::mutex> guard(deferred_lock_);
+    return deferred_.size();
+  }
+
+  // Completes whichever deferred request has been waiting longest, false when there is none.
+  bool CompleteOneDeferred()
+  {
+    std::function<void(::grpc::Status)> callback;
+    {
+      std::lock_guard<std::mutex> guard(deferred_lock_);
+      if (deferred_.empty())
+      {
+        return false;
+      }
+      callback = std::move(deferred_.front());
+      deferred_.erase(deferred_.begin());
+    }
+
+    callback(::grpc::Status::OK);
+    return true;
+  }
+
+  void CompleteAllDeferred()
+  {
+    while (CompleteOneDeferred())
+    {
+    }
+  }
+
 private:
   ::grpc::Status last_async_status_;
+  bool defer_completions_{false};
+  std::mutex deferred_lock_;
+  std::vector<std::function<void(::grpc::Status)>> deferred_;
   async_interface async_interface_;
+};
+
+// Completes whatever is still deferred on the way out. ~OtlpGrpcClient waits for
+// running_requests to reach zero with no deadline, and TryCancel() cannot move it for a request
+// the stub is holding, so an assertion that ends a case early would hang the binary instead of
+// failing it. Declare after the exporter, so this runs first.
+class DrainDeferredCompletions
+{
+public:
+  explicit DrainDeferredCompletions(OtlpMockTraceServiceStub *stub) noexcept : stub_(stub) {}
+  ~DrainDeferredCompletions() { stub_->CompleteAllDeferred(); }
+
+  DrainDeferredCompletions(const DrainDeferredCompletions &)            = delete;
+  DrainDeferredCompletions &operator=(const DrainDeferredCompletions &) = delete;
+  DrainDeferredCompletions(DrainDeferredCompletions &&)                 = delete;
+  DrainDeferredCompletions &operator=(DrainDeferredCompletions &&)      = delete;
+
+private:
+  OtlpMockTraceServiceStub *stub_;
 };
 
 using opentelemetry::test_common::ScopedTestLogHandler;
@@ -254,6 +324,92 @@ TEST_F(OtlpGrpcExporterTestPeer, ExportPartialSuccess)
   EXPECT_TRUE(contains("21 span(s) rejected"));
   EXPECT_TRUE(contains("too many spans!!"));
 }
+
+namespace
+{
+// ForceFlush() only has requests to wait for when the client tracks them, which it does under
+// ENABLE_ASYNC_EXPORT. gtest_add_tests registers by source text, so the cases below have to exist
+// in every build and opt out here rather than be compiled away.
+class OtlpGrpcExporterFlushTestPeer : public OtlpGrpcExporterTestPeer
+{
+protected:
+  void SetUp() override
+  {
+#if !defined(ENABLE_ASYNC_EXPORT)
+    GTEST_SKIP() << "ForceFlush has no in-flight requests to wait for without async export";
+#endif
+  }
+};
+
+// The wait is bounded by the exporter's timeout, so a caller asking for less than that used to
+// wait for the larger of the two.
+TEST_F(OtlpGrpcExporterFlushTestPeer, ForceFlushReturnsWithinTheCallerDeadline)
+{
+  auto *mock_stub = new OtlpMockTraceServiceStub();
+  mock_stub->DeferCompletions();
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(stub_interface);
+  DrainDeferredCompletions drain{mock_stub};
+
+  auto recordable = exporter->MakeRecordable();
+  recordable->SetName("Test span");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> batch(&recordable, 1);
+  exporter->Export(batch);
+  ASSERT_EQ(1u, mock_stub->DeferredCount());
+
+  const auto started = std::chrono::steady_clock::now();
+  const bool flushed = exporter->ForceFlush(std::chrono::milliseconds{50});
+  const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - started);
+
+  EXPECT_FALSE(flushed);
+  EXPECT_LT(elapsed.count(), 1000)
+      << "waited on the export timeout rather than the one it was given";
+}
+
+// A completion for one request used to end the wait for every other request, and the leftover
+// deadline was then reported as success.
+TEST_F(OtlpGrpcExporterFlushTestPeer, ForceFlushKeepsWaitingWhenAnotherRequestCompletes)
+{
+  auto *mock_stub = new OtlpMockTraceServiceStub();
+  mock_stub->DeferCompletions();
+  std::unique_ptr<proto::collector::trace::v1::TraceService::StubInterface> stub_interface(
+      mock_stub);
+  auto exporter = GetExporter(stub_interface);
+  DrainDeferredCompletions drain{mock_stub};
+
+  auto first = exporter->MakeRecordable();
+  first->SetName("Test span 1");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> first_batch(&first, 1);
+  exporter->Export(first_batch);
+
+  auto second = exporter->MakeRecordable();
+  second->SetName("Test span 2");
+  nostd::span<std::unique_ptr<sdk::trace::Recordable>> second_batch(&second, 1);
+  exporter->Export(second_batch);
+
+  ASSERT_EQ(2u, mock_stub->DeferredCount());
+
+  // Completed once the flush below is parked, so it arrives as a notification rather than as a
+  // counter the loop condition reads on its way in.
+  std::thread completer([mock_stub] {
+    std::this_thread::sleep_for(std::chrono::milliseconds{100});
+    mock_stub->CompleteOneDeferred();
+  });
+
+  const auto started = std::chrono::steady_clock::now();
+  const bool flushed = exporter->ForceFlush(std::chrono::milliseconds{1000});
+  const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - started);
+  completer.join();
+
+  EXPECT_FALSE(flushed);
+  // Ran its own deadline down rather than returning on the notification.
+  EXPECT_GE(elapsed.count(), 500);
+  EXPECT_EQ(1u, mock_stub->DeferredCount());
+}
+}  // namespace
 
 // Create spans, let processor call Export()
 TEST_F(OtlpGrpcExporterTestPeer, ExportIntegrationTest)

@@ -3,9 +3,11 @@
 
 #pragma once
 
+#include <cstddef>
 #include <memory>
 
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
@@ -15,13 +17,16 @@
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/container_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/host_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/integer_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
@@ -38,11 +43,15 @@
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detector_configuration.h"
+#include "opentelemetry/sdk/configuration/service_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/string_array_attribute_value_configuration.h"
@@ -56,6 +65,7 @@
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
+#include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
@@ -67,8 +77,15 @@
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
+namespace trace
+{
+class ComposableSampler;
+}  // namespace trace
+
 namespace configuration
 {
+
+class ComposableSamplerConfiguration;
 
 class SdkBuilder
 {
@@ -103,6 +120,9 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateSampler(
       const std::unique_ptr<opentelemetry::sdk::configuration::SamplerConfiguration> &model) const;
+
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateCompositeSampler(
+      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model) const;
 
   std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpHttpSpanExporter(
       const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) const;
@@ -142,7 +162,8 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> CreateTracerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
-      const opentelemetry::sdk::resource::Resource &resource) const;
+      const opentelemetry::sdk::resource::Resource &resource,
+      const AttributeLimitsConfiguration *attribute_limits = nullptr) const;
 
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreateTextMapPropagator(
       const std::string &name) const;
@@ -267,7 +288,31 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> CreateLoggerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
-      const opentelemetry::sdk::resource::Resource &resource) const;
+      const opentelemetry::sdk::resource::Resource &resource,
+      const AttributeLimitsConfiguration *attribute_limits = nullptr) const;
+
+  std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> CreateContainerResourceDetector(
+      const opentelemetry::sdk::configuration::ContainerResourceDetectorConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> CreateHostResourceDetector(
+      const opentelemetry::sdk::configuration::HostResourceDetectorConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> CreateProcessResourceDetector(
+      const opentelemetry::sdk::configuration::ProcessResourceDetectorConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> CreateServiceResourceDetector(
+      const opentelemetry::sdk::configuration::ServiceResourceDetectorConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> CreateExtensionResourceDetector(
+      const opentelemetry::sdk::configuration::ExtensionResourceDetectorConfiguration *model) const;
+
+  std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> CreateResourceDetector(
+      const std::unique_ptr<opentelemetry::sdk::configuration::ResourceDetectorConfiguration>
+          &model) const;
+
+  opentelemetry::sdk::resource::Resource CreateDetectedResource(
+      const std::unique_ptr<opentelemetry::sdk::configuration::ResourceDetectionConfiguration>
+          &model) const;
 
   void SetResourceAttribute(
       opentelemetry::sdk::resource::ResourceAttributes &resource_attributes,

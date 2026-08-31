@@ -34,6 +34,7 @@
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_attribute_values_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/composite_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configuration_parser.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
@@ -51,6 +52,7 @@
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/exemplar_filter.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_metric_producer_configuration.h"
@@ -85,6 +87,7 @@
 #include "opentelemetry/sdk/configuration/metric_producer_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/open_census_metric_producer_configuration.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
@@ -346,7 +349,6 @@ std::unique_ptr<HeadersConfiguration> ConfigurationParser::ParseHeadersConfigura
     name  = name_child->AsString();
     value = value_child->AsString();
 
-    OTEL_INTERNAL_LOG_DEBUG("ParseHeadersConfiguration() name = " << name << ", value = " << value);
     std::pair<std::string, std::string> entry(name, value);
     model->kv_map.insert(entry);
   }
@@ -358,13 +360,10 @@ std::unique_ptr<AttributeLimitsConfiguration>
 ConfigurationParser::ParseAttributeLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  using Config = AttributeLimitsConfiguration;
-  auto model   = std::make_unique<AttributeLimitsConfiguration>();
+  auto model = std::make_unique<AttributeLimitsConfiguration>();
 
-  model->attribute_value_length_limit =
-      node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);
-  model->attribute_count_limit =
-      node->GetInteger("attribute_count_limit", Config::kDefaultAttributeCountLimit);
+  model->attribute_value_length_limit = node->GetOptionalInteger("attribute_value_length_limit");
+  model->attribute_count_limit        = node->GetOptionalInteger("attribute_count_limit");
 
   return model;
 }
@@ -638,13 +637,10 @@ std::unique_ptr<LogRecordLimitsConfiguration>
 ConfigurationParser::ParseLogRecordLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  using Config = LogRecordLimitsConfiguration;
-  auto model   = std::make_unique<LogRecordLimitsConfiguration>();
+  auto model = std::make_unique<LogRecordLimitsConfiguration>();
 
-  model->attribute_value_length_limit =
-      node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);
-  model->attribute_count_limit =
-      node->GetInteger("attribute_count_limit", Config::kDefaultAttributeCountLimit);
+  model->attribute_value_length_limit = node->GetOptionalInteger("attribute_value_length_limit");
+  model->attribute_count_limit        = node->GetOptionalInteger("attribute_count_limit");
 
   return model;
 }
@@ -898,22 +894,22 @@ TranslationStrategy ConfigurationParser::ParseTranslationStrategy(
     const std::unique_ptr<DocumentNode> &node,
     const std::string &name) const
 {
-  if (name == "UnderscoreEscapingWithSuffixes")
+  if (name == "underscore_escaping_with_suffixes")
   {
     return TranslationStrategy::UnderscoreEscapingWithSuffixes;
   }
 
-  if (name == "UnderscoreEscapingWithoutSuffixes")
+  if (name == "underscore_escaping_without_suffixes/development")
   {
     return TranslationStrategy::UnderscoreEscapingWithoutSuffixes;
   }
 
-  if (name == "NoUTF8EscapingWithSuffixes")
+  if (name == "no_utf8_escaping_with_suffixes/development")
   {
     return TranslationStrategy::NoUTF8EscapingWithSuffixes;
   }
 
-  if (name == "NoTranslation")
+  if (name == "no_translation/development")
   {
     return TranslationStrategy::NoTranslation;
   }
@@ -965,7 +961,7 @@ ConfigurationParser::ParsePrometheusPullMetricExporterConfiguration(
   }
 
   std::string translation_strategy =
-      node->GetString("translation_strategy", "UnderscoreEscapingWithSuffixes");
+      node->GetString("translation_strategy", "underscore_escaping_with_suffixes");
   model->translation_strategy = ParseTranslationStrategy(node, translation_strategy);
 
   return model;
@@ -1272,6 +1268,11 @@ InstrumentType ConfigurationParser::ParseInstrumentType(const std::unique_ptr<Do
   if (name == "counter")
   {
     return InstrumentType::counter;
+  }
+
+  if (name == "gauge")
+  {
+    return InstrumentType::gauge;
   }
 
   if (name == "histogram")
@@ -1666,29 +1667,28 @@ std::unique_ptr<PropagatorConfiguration> ConfigurationParser::ParsePropagatorCon
 std::unique_ptr<SpanLimitsConfiguration> ConfigurationParser::ParseSpanLimitsConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  using Config = SpanLimitsConfiguration;
-  auto model   = std::make_unique<SpanLimitsConfiguration>();
+  auto model = std::make_unique<SpanLimitsConfiguration>();
 
-  const auto get_valid_uint32 = [&node](const std::string &name, std::size_t default_value) {
-    std::size_t value = node->GetInteger(name, default_value);
-    if (value > std::numeric_limits<std::uint32_t>::max())
+  const auto get_optional_uint32 = [&node](const std::string &name) {
+    OptionalValue<std::size_t> value = node->GetOptionalInteger(name);
+    if (!value.HasValue())
     {
-      std::string message = "Invalid value for " + name + ": " + std::to_string(value);
+      return OptionalValue<std::uint32_t>{};
+    }
+    if (value.Value() > std::numeric_limits<std::uint32_t>::max())
+    {
+      std::string message = "Invalid value for " + name + ": " + std::to_string(value.Value());
       throw InvalidSchemaException(node->Location(), message);
     }
-    return static_cast<uint32_t>(value);
+    return OptionalValue<std::uint32_t>{static_cast<std::uint32_t>(value.Value())};
   };
 
-  model->attribute_value_length_limit =
-      node->GetInteger("attribute_value_length_limit", Config::kDefaultAttributeValueLengthLimit);
-  model->attribute_count_limit =
-      get_valid_uint32("attribute_count_limit", Config::kDefaultAttributeCountLimit);
-  model->event_count_limit = get_valid_uint32("event_count_limit", Config::kDefaultEventCountLimit);
-  model->link_count_limit  = get_valid_uint32("link_count_limit", Config::kDefaultLinkCountLimit);
-  model->event_attribute_count_limit =
-      get_valid_uint32("event_attribute_count_limit", Config::kDefaultEventAttributeCountLimit);
-  model->link_attribute_count_limit =
-      get_valid_uint32("link_attribute_count_limit", Config::kDefaultLinkAttributeCountLimit);
+  model->attribute_value_length_limit = node->GetOptionalInteger("attribute_value_length_limit");
+  model->attribute_count_limit        = get_optional_uint32("attribute_count_limit");
+  model->event_count_limit            = get_optional_uint32("event_count_limit");
+  model->link_count_limit             = get_optional_uint32("link_count_limit");
+  model->event_attribute_count_limit  = get_optional_uint32("event_attribute_count_limit");
+  model->link_attribute_count_limit   = get_optional_uint32("link_attribute_count_limit");
 
   return model;
 }
@@ -1843,6 +1843,13 @@ ConfigurationParser::ParseComposableProbabilitySamplerConfiguration(
   using Config = ComposableProbabilitySamplerConfiguration;
   auto model   = std::make_unique<ComposableProbabilitySamplerConfiguration>();
   model->ratio = node->GetDouble("ratio", Config::kDefaultRatio);
+  if (!(model->ratio >= Config::kMinRatio && model->ratio <= Config::kMaxRatio))
+  {
+    std::string message("Illegal ratio: ");
+    message.append(std::to_string(model->ratio));
+    throw InvalidSchemaException(node->Location(), message);
+  }
+
   return model;
 }
 
@@ -2025,9 +2032,22 @@ ConfigurationParser::ParseComposableSamplerConfiguration(const std::unique_ptr<D
   if (name == "rule_based")
     return ParseComposableRuleBasedSamplerConfiguration(child, depth);
 
-  std::string message("Illegal composable sampler type: ");
-  message.append(name);
-  throw InvalidSchemaException(node->Location(), message);
+  return ParseComposableSamplerExtensionConfiguration(name, std::move(child), depth);
+}
+
+std::unique_ptr<ExtensionComposableSamplerConfiguration>
+ConfigurationParser::ParseComposableSamplerExtensionConfiguration(
+    const std::string &name,
+    std::unique_ptr<DocumentNode> node,
+    size_t depth) const
+{
+  auto model = std::make_unique<ExtensionComposableSamplerConfiguration>();
+
+  model->name  = name;
+  model->node  = std::move(node);
+  model->depth = depth;
+
+  return model;
 }
 // NOLINTEND(misc-no-recursion)
 
@@ -2107,7 +2127,9 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
   }
   else if (name == "composite/development")
   {
-    model = ParseComposableSamplerConfiguration(child, depth);
+    auto composite                = std::make_unique<CompositeSamplerConfiguration>();
+    composite->composable_sampler = ParseComposableSamplerConfiguration(child, depth);
+    model                         = std::move(composite);
   }
   else
   {
@@ -2448,10 +2470,13 @@ std::unique_ptr<StringAttributeValueConfiguration>
 ConfigurationParser::ParseStringAttributeValueConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
-  auto model = std::make_unique<StringAttributeValueConfiguration>();
-
+  auto model   = std::make_unique<StringAttributeValueConfiguration>();
   model->value = node->AsString();
-
+  // Empty string (YAML null or unset env var) is treated as null per schema nullBehavior.
+  if (model->value.empty())
+  {
+    return nullptr;
+  }
   return model;
 }
 
@@ -2584,6 +2609,22 @@ std::unique_ptr<AttributesConfiguration> ConfigurationParser::ParseAttributesCon
     std::unique_ptr<AttributeValueConfiguration> value_model;
 
     name = name_child->AsString();
+
+    // An empty name is an invalid attribute key per the OTel spec.
+    if (name.empty())
+    {
+      std::string message("Attribute name must not be empty (check for unset env var)");
+      throw InvalidSchemaException(name_child->Location(), message);
+    }
+
+    // Per schema nullBehavior: skip entries with a null value.
+    if (value_child->IsNull())
+    {
+      OTEL_INTERNAL_LOG_DEBUG("[Config Parser] Skipping attribute '" << name
+                                                                     << "' with null value");
+      continue;
+    }
+
     if (type_child)
     {
       type = type_child->AsString();
@@ -2638,6 +2679,15 @@ std::unique_ptr<AttributesConfiguration> ConfigurationParser::ParseAttributesCon
       std::string message("Illegal attribute type: ");
       message.append(type);
       throw InvalidSchemaException(node->Location(), message);
+    }
+
+    // Per schema nullBehavior: skip entries with a null/empty value (e.g. string from unset env
+    // var).
+    if (value_model == nullptr)
+    {
+      OTEL_INTERNAL_LOG_DEBUG("[Config Parser] Skipping attribute '" << name
+                                                                     << "' with null/empty value");
+      continue;
     }
 
     std::pair<std::string, std::unique_ptr<AttributeValueConfiguration>> entry(
@@ -2855,6 +2905,8 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
     version_minor_ = minor;
   }
 
+  OTEL_INTERNAL_LOG_DEBUG("[Config Parser] Parsing file with file_format: " << model->file_format);
+
   model->disabled = node->GetBoolean("disabled", false);
 
   const std::string log_level = node->GetString("log_level", "info");
@@ -2898,7 +2950,13 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
     model->resource = ParseResourceConfiguration(child);
   }
 
-  // FIXME: instrumentation/development
+  child = node->GetChildNode("instrumentation/development");
+  if (child)
+  {
+    // FIXME-CONFIG: implement the instrumentation/development model
+    OTEL_INTERNAL_LOG_WARN(
+        "[Config Parser] instrumentation/development is not yet supported, ignoring");
+  }
 
   child = node->GetChildNode("distribution");
   if (child)

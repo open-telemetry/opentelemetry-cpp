@@ -1,8 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <cstdint>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <string>
 
@@ -14,12 +14,18 @@
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/registry_factory.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
+
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/metrics/meter_provider.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 
 #include "custom_log_record_exporter_builder.h"
 #include "custom_log_record_processor_builder.h"
 #include "custom_pull_metric_exporter_builder.h"
 #include "custom_push_metric_exporter_builder.h"
+#include "custom_resource_detector_builder.h"
 #include "custom_sampler_builder.h"
 #include "custom_span_exporter_builder.h"
 #include "custom_span_processor_builder.h"
@@ -54,6 +60,13 @@
 #  include "opentelemetry/exporters/prometheus/prometheus_pull_builder.h"
 #endif
 
+#ifdef OTEL_HAVE_RESOURCE_DETECTORS
+#  include "opentelemetry/resource_detectors/container_detector_builder.h"
+#  include "opentelemetry/resource_detectors/host_detector_builder.h"
+#  include "opentelemetry/resource_detectors/process_detector_builder.h"
+#  include "opentelemetry/resource_detectors/service_detector_builder.h"
+#endif
+
 static bool opt_help        = false;
 static bool opt_debug       = false;
 static bool opt_test        = false;
@@ -64,6 +77,15 @@ static std::unique_ptr<opentelemetry::sdk::configuration::ConfiguredSdk> sdk;
 
 namespace
 {
+enum class ReturnCode : std::uint8_t
+{
+  kSuccess          = 0,
+  kYamlParseError   = 1,
+  kSdkCreationError = 2,
+  kSdkInitError     = 3,
+  kSdkCleanupError  = 4,
+  kInvalidArguments = 5,
+};
 
 class CheckerLogHandler : public opentelemetry::sdk::common::internal_log::LogHandler
 {
@@ -120,7 +142,6 @@ void PrintModelParsedForTesting(bool pass)
     else
     {
       std::fprintf(stdout, "FAILED TO PARSE MODEL\n");
-      std::exit(1);
     }
   }
 }
@@ -136,7 +157,6 @@ void PrintSdkCreatedForTesting(bool pass)
     else
     {
       std::fprintf(stdout, "FAILED TO CREATE SDK\n");
-      std::exit(2);
     }
   }
 }
@@ -152,7 +172,7 @@ void SetSilentLoggerForTesting()
   }
 }
 
-void InitOtel(const std::string &config_file)
+ReturnCode InitOtel(const std::string &config_file)
 {
   auto level = opentelemetry::sdk::common::internal_log::LogLevel::Info;
 
@@ -166,7 +186,7 @@ void InitOtel(const std::string &config_file)
   /* 1 - Create a registry */
 
   std::shared_ptr<opentelemetry::sdk::configuration::Registry> registry(
-      new opentelemetry::sdk::configuration::Registry);
+      opentelemetry::sdk::configuration::RegistryFactory::Create());
 
   /* 2 - Populate the registry with the core components supported */
 
@@ -213,6 +233,13 @@ void InitOtel(const std::string &config_file)
 #ifdef OTEL_HAVE_PROMETHEUS
     opentelemetry::exporter::metrics::PrometheusPullBuilder::Register(registry.get());
 #endif
+
+#ifdef OTEL_HAVE_RESOURCE_DETECTORS
+    opentelemetry::resource_detector::ContainerDetectorBuilder::Register(registry.get());
+    opentelemetry::resource_detector::HostDetectorBuilder::Register(registry.get());
+    opentelemetry::resource_detector::ProcessDetectorBuilder::Register(registry.get());
+    opentelemetry::resource_detector::ServiceDetectorBuilder::Register(registry.get());
+#endif
   }
 
   /* 3 - Populate the registry with external extensions plugins */
@@ -224,6 +251,7 @@ void InitOtel(const std::string &config_file)
   CustomPullMetricExporterBuilder::Register(registry.get());
   CustomLogRecordExporterBuilder::Register(registry.get());
   CustomLogRecordProcessorBuilder::Register(registry.get());
+  CustomResourceDetectorBuilder::Register(registry.get());
 
   /* 4 - Parse a config.yaml */
 
@@ -234,6 +262,11 @@ void InitOtel(const std::string &config_file)
   // Functional test helpers, ignore.
   PrintModelParsedForTesting(model != nullptr);
 
+  if (model == nullptr)
+  {
+    return ReturnCode::kYamlParseError;
+  }
+
   /* 5 - Build the SDK from the parsed config.yaml */
 
   sdk = opentelemetry::sdk::configuration::ConfiguredSdk::Create(registry, model);
@@ -241,21 +274,47 @@ void InitOtel(const std::string &config_file)
   // Functional test helpers, ignore.
   PrintSdkCreatedForTesting(sdk != nullptr);
 
+  if (sdk == nullptr)
+  {
+    return ReturnCode::kSdkCreationError;
+  }
+
   /* 6 - Deploy the SDK */
 
   if (sdk != nullptr)
   {
     sdk->Install();
   }
+
+  return ReturnCode::kSuccess;
 }
 
-void CleanupOtel()
+ReturnCode CleanupOtel()
 {
+  bool success = true;
+
   if (sdk != nullptr)
   {
+    if (sdk->tracer_provider != nullptr)
+    {
+      success = success && sdk->tracer_provider->ForceFlush();
+      success = success && sdk->tracer_provider->Shutdown();
+    }
+    if (sdk->meter_provider != nullptr)
+    {
+      success = success && sdk->meter_provider->ForceFlush();
+      success = success && sdk->meter_provider->Shutdown();
+    }
+    if (sdk->logger_provider != nullptr)
+    {
+      success = success && sdk->logger_provider->ForceFlush();
+      success = success && sdk->logger_provider->Shutdown();
+    }
     sdk->UnInstall();
   }
   sdk.reset(nullptr);
+
+  return success ? ReturnCode::kSuccess : ReturnCode::kSdkCleanupError;
 }
 }  // namespace
 
@@ -358,19 +417,23 @@ int main(int argc, char *argv[])
   if (rc != 0)
   {
     usage(stderr);
-    return 1;
+    return static_cast<int>(ReturnCode::kInvalidArguments);
   }
 
   if (opt_help)
   {
     usage(stdout);
-    return 0;
+    return static_cast<int>(ReturnCode::kSuccess);
   }
 
   // Functional test helpers, ignore.
   SetLoggerForTesting();
 
-  InitOtel(yaml_file_path);
+  auto return_code = InitOtel(yaml_file_path);
+  if (return_code != ReturnCode::kSuccess)
+  {
+    return static_cast<int>(return_code);
+  }
 
   // Functional test helpers, ignore.
   SetSilentLoggerForTesting();
@@ -380,6 +443,6 @@ int main(int argc, char *argv[])
   foo_library::observable_counter_example("yaml");
   foo_library::histogram_example("yaml");
 
-  CleanupOtel();
-  return 0;
+  return_code = CleanupOtel();
+  return static_cast<int>(return_code);
 }

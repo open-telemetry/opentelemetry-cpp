@@ -18,6 +18,8 @@ cc_library(
         "//sdk/src/common:env_variables",
         "//sdk/src/common:global_log_handler",
         "//sdk/src/common:random",
+        "//sdk/src/common:wildcard_match",
+        "//sdk/src/instrumentationscope",
         "//sdk/src/resource",
     ],
 )

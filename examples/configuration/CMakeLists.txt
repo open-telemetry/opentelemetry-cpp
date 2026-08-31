@@ -17,18 +17,22 @@ add_executable(
   custom_log_record_exporter.cc
   custom_log_record_exporter_builder.cc
   custom_log_record_processor.cc
-  custom_log_record_processor_builder.cc)
+  custom_log_record_processor_builder.cc
+  custom_resource_detector.cc
+  custom_resource_detector_builder.cc)
 
 target_link_libraries(
   example_yaml
   PRIVATE ${CMAKE_THREAD_LIBS_INIT}
+          opentelemetry-cpp::configuration_registry_factory
+          opentelemetry-cpp::configuration
           common_metrics_foo_library
           common_logs_foo_library
           opentelemetry-cpp::ostream_span_exporter_builder
           opentelemetry-cpp::ostream_metrics_exporter_builder
           opentelemetry-cpp::ostream_log_record_exporter_builder)
 
-if(WITH_OTLP_HTTP)
+if(OTELCPP_WITH_OTLP_HTTP)
   target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_OTLP_HTTP)
   target_link_libraries(
     example_yaml
@@ -37,7 +41,7 @@ if(WITH_OTLP_HTTP)
             opentelemetry-cpp::otlp_http_metric_exporter_builder)
 endif()
 
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_OTLP_GRPC)
   target_link_libraries(
     example_yaml
@@ -46,7 +50,7 @@ if(WITH_OTLP_GRPC)
             opentelemetry-cpp::otlp_grpc_metric_exporter_builder)
 endif()
 
-if(WITH_OTLP_FILE)
+if(OTELCPP_WITH_OTLP_FILE)
   target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_OTLP_FILE)
   target_link_libraries(
     example_yaml
@@ -55,24 +59,34 @@ if(WITH_OTLP_FILE)
             opentelemetry-cpp::otlp_file_metric_exporter_builder)
 endif()
 
-if(WITH_PROMETHEUS)
+if(OTELCPP_WITH_PROMETHEUS)
   target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_PROMETHEUS)
   target_link_libraries(example_yaml
                         PRIVATE opentelemetry-cpp::prometheus_exporter_builder)
 endif()
 
-if(DEFINED OPENTELEMETRY_BUILD_DLL)
-  target_compile_definitions(example_yaml
-                             PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
+if(OTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW)
+  target_compile_definitions(example_yaml PRIVATE OTEL_HAVE_RESOURCE_DETECTORS)
   target_link_libraries(example_yaml
-                        PRIVATE opentelemetry-cpp::opentelemetry_cpp)
-else()
-  target_link_libraries(
-    example_yaml
-    PRIVATE opentelemetry-cpp::configuration opentelemetry-cpp::common
-            opentelemetry-cpp::trace opentelemetry-cpp::logs)
+                        PRIVATE opentelemetry-cpp::resource_detectors_builders)
 endif()
 
 if(BUILD_TESTING)
-  add_test(NAME examples.example_yaml COMMAND "$<TARGET_FILE:example_yaml>")
+  if(WITH_OTLP_HTTP
+     AND OTELCPP_WITH_OTLP_GRPC
+     AND OTELCPP_WITH_OTLP_FILE
+     AND OTELCPP_WITH_PROMETHEUS
+     AND OTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW)
+    add_test(NAME examples.example_yaml_kitchen_sink
+             COMMAND $<TARGET_FILE:example_yaml> --debug --yaml
+                     ${CMAKE_CURRENT_SOURCE_DIR}/kitchen-sink.yaml)
+  endif()
+
+  add_test(NAME examples.example_yaml_extensions
+           COMMAND $<TARGET_FILE:example_yaml> --debug --yaml
+                   ${CMAKE_CURRENT_SOURCE_DIR}/extensions.yaml)
+
+  add_test(NAME examples.example_yaml_sdk_default
+           COMMAND $<TARGET_FILE:example_yaml> --debug --yaml
+                   ${CMAKE_CURRENT_SOURCE_DIR}/sdk-default.yaml)
 endif()
