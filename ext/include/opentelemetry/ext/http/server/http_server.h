@@ -101,7 +101,7 @@ protected:
     SocketTools::Socket socket;
     std::string receiveBuffer;
     std::string sendBuffer;
-    enum : std::uint8_t
+    enum : std::uint8_t  // NOLINT(cppcoreguidelines-use-enum-class)
     {
       Idle,
       ReceivingHeaders,

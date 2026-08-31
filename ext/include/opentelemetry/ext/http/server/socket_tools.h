@@ -326,10 +326,10 @@ static_assert(sizeof(SocketAddr) == sizeof(sockaddr),
 struct Socket
 {
 #ifdef _WIN32
-  typedef SOCKET Type;
+  using Type                = SOCKET;
   static Type const Invalid = INVALID_SOCKET;
 #else
-  typedef int Type;
+  using Type                = int;
   static Type const Invalid = -1;
 #endif
 
@@ -465,7 +465,7 @@ struct Socket
 #endif
   }
 
-  enum  // NOLINT(performance-enum-size)
+  enum  // NOLINT(performance-enum-size,cppcoreguidelines-use-enum-class)
   {
 #ifdef _WIN32
     ErrorWouldBlock = WSAEWOULDBLOCK
@@ -474,7 +474,7 @@ struct Socket
 #endif
   };
 
-  enum  // NOLINT(performance-enum-size)
+  enum  // NOLINT(performance-enum-size,cppcoreguidelines-use-enum-class)
   {
 #ifdef _WIN32
     ShutdownReceive = SD_RECEIVE,
@@ -527,7 +527,7 @@ struct Reactor : protected common::Thread
   /// <summary>
   /// Socket State
   /// </summary>
-  enum State : std::uint8_t
+  enum State : std::uint8_t  // NOLINT(cppcoreguidelines-use-enum-class)
   {
     Readable   = 1,
     Writable   = 2,
