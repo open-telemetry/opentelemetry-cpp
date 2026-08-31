@@ -10,6 +10,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/temporality_preference.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -31,6 +32,14 @@ void ConsolePushMetricBuilder::Register(opentelemetry::sdk::configuration::Regis
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> ConsolePushMetricBuilder::Build(
     const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration *model) const
 {
+  // FIXME-SDK: default_histogram_aggregation is parsed but not implemented by the SDK.
+  if (model->default_histogram_aggregation !=
+      opentelemetry::sdk::configuration::DefaultHistogramAggregation::explicit_bucket_histogram)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Console Exporter] default_histogram_aggregation is not supported and will be ignored");
+  }
+
   sdk::metrics::AggregationTemporality aggregation_temporality{
       sdk::metrics::AggregationTemporality::kUnspecified};
 

@@ -7,6 +7,7 @@ foreach(
   tracer_provider_test
   span_data_test
   simple_processor_test
+  multi_span_processor_test
   tracer_test
   always_off_sampler_test
   always_on_sampler_test
@@ -32,7 +33,7 @@ foreach(
     TEST_LIST ${testname})
 endforeach()
 
-if(WITH_BENCHMARK)
+if(OTELCPP_WITH_BENCHMARK)
   add_executable(sampler_benchmark sampler_benchmark.cc)
   target_link_libraries(
     sampler_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}

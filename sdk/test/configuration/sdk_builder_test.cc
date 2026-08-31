@@ -13,6 +13,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -27,6 +28,9 @@
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/attributes_configuration.h"
 #include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_on_sampler_configuration.h"
@@ -43,23 +47,33 @@
 #include "opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/extension_resource_detector_configuration.h"
+#include "opentelemetry/sdk/configuration/host_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
 #include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/process_resource_detector_builder.h"
+#include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/registry_factory.h"
+#include "opentelemetry/sdk/configuration/resource_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
+#include "opentelemetry/sdk/configuration/resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/string_array_configuration.h"
+#include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/unsupported_exception.h"
@@ -82,6 +96,7 @@
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/composable_always_on.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
@@ -107,6 +122,7 @@ using opentelemetry::sdk::common::unsetenv;
 #  endif
 #endif
 
+using opentelemetry::sdk::configuration::AttributeLimitsConfiguration;
 using opentelemetry::sdk::configuration::Registry;
 using opentelemetry::sdk::configuration::RegistryFactory;
 using opentelemetry::sdk::configuration::SdkBuilder;
@@ -240,12 +256,110 @@ TEST(SdkBuilder, SpanLimitsConfiguration)
   ASSERT_NE(provider, nullptr);
 
   auto limits = provider->GetSpanLimits();
-  EXPECT_EQ(limits.attribute_value_length_limit, model->limits->attribute_value_length_limit);
-  EXPECT_EQ(limits.attribute_count_limit, model->limits->attribute_count_limit);
-  EXPECT_EQ(limits.event_count_limit, model->limits->event_count_limit);
-  EXPECT_EQ(limits.link_count_limit, model->limits->link_count_limit);
-  EXPECT_EQ(limits.event_attribute_count_limit, model->limits->event_attribute_count_limit);
-  EXPECT_EQ(limits.link_attribute_count_limit, model->limits->link_attribute_count_limit);
+  EXPECT_EQ(limits.attribute_value_length_limit,
+            model->limits->attribute_value_length_limit.Value());
+  EXPECT_EQ(limits.attribute_count_limit, model->limits->attribute_count_limit.Value());
+  EXPECT_EQ(limits.event_count_limit, model->limits->event_count_limit.Value());
+  EXPECT_EQ(limits.link_count_limit, model->limits->link_count_limit.Value());
+  EXPECT_EQ(limits.event_attribute_count_limit, model->limits->event_attribute_count_limit.Value());
+  EXPECT_EQ(limits.link_attribute_count_limit, model->limits->link_attribute_count_limit.Value());
+}
+
+TEST(SdkBuilder, SpanLimitsFromAttributeLimits)
+{
+  auto model    = std::make_unique<TracerProviderConfiguration>();
+  model->limits = nullptr;
+
+  AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_count_limit        = 7;
+  attribute_limits.attribute_value_length_limit = 9;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateTracerProvider(model, resource, &attribute_limits);
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits         = provider->GetSpanLimits();
+  const auto default_limits = opentelemetry::sdk::trace::SpanLimits{};
+
+  EXPECT_EQ(limits.attribute_count_limit, attribute_limits.attribute_count_limit.Value());
+  EXPECT_EQ(limits.attribute_value_length_limit,
+            attribute_limits.attribute_value_length_limit.Value());
+  EXPECT_EQ(limits.event_count_limit, default_limits.event_count_limit);
+  EXPECT_EQ(limits.link_count_limit, default_limits.link_count_limit);
+  EXPECT_EQ(limits.event_attribute_count_limit, default_limits.event_attribute_count_limit);
+  EXPECT_EQ(limits.link_attribute_count_limit, default_limits.link_attribute_count_limit);
+}
+
+TEST(SdkBuilder, SpanLimitsOverrideAttributeLimits)
+{
+  auto model                                  = std::make_unique<TracerProviderConfiguration>();
+  model->limits                               = std::make_unique<SpanLimitsConfiguration>();
+  model->limits->attribute_value_length_limit = 1111;
+  model->limits->attribute_count_limit        = 2222;
+  model->limits->event_count_limit            = 3333;
+
+  AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_count_limit        = 7;
+  attribute_limits.attribute_value_length_limit = 9;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateTracerProvider(model, resource, &attribute_limits);
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits = provider->GetSpanLimits();
+  EXPECT_EQ(limits.attribute_value_length_limit,
+            model->limits->attribute_value_length_limit.Value());
+  EXPECT_EQ(limits.attribute_count_limit, model->limits->attribute_count_limit.Value());
+  EXPECT_EQ(limits.event_count_limit, model->limits->event_count_limit.Value());
+}
+
+TEST(SdkBuilder, SpanLimitsPerFieldAttributeLimits)
+{
+  auto model                                 = std::make_unique<TracerProviderConfiguration>();
+  model->limits                              = std::make_unique<SpanLimitsConfiguration>();
+  model->limits->event_count_limit           = 64;
+  model->limits->link_count_limit            = 64;
+  model->limits->event_attribute_count_limit = 8;
+  model->limits->link_attribute_count_limit  = 8;
+
+  AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_value_length_limit = 4096;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateTracerProvider(model, resource, &attribute_limits);
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits         = provider->GetSpanLimits();
+  const auto default_limits = opentelemetry::sdk::trace::SpanLimits{};
+  EXPECT_EQ(limits.attribute_value_length_limit, 4096);
+  EXPECT_EQ(limits.attribute_count_limit, default_limits.attribute_count_limit);
+  EXPECT_EQ(limits.event_count_limit, 64);
+  EXPECT_EQ(limits.link_count_limit, 64);
+  EXPECT_EQ(limits.event_attribute_count_limit, 8);
+  EXPECT_EQ(limits.link_attribute_count_limit, 8);
+}
+
+TEST(SdkBuilder, SpanLimitsPartialOverrideAttributeLimits)
+{
+  auto model                           = std::make_unique<TracerProviderConfiguration>();
+  model->limits                        = std::make_unique<SpanLimitsConfiguration>();
+  model->limits->attribute_count_limit = 22;
+
+  AttributeLimitsConfiguration attribute_limits;
+  attribute_limits.attribute_count_limit        = 7;
+  attribute_limits.attribute_value_length_limit = 9;
+
+  SdkBuilder builder(RegistryFactory::Create());
+  auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto provider = builder.CreateTracerProvider(model, resource, &attribute_limits);
+  ASSERT_NE(provider, nullptr);
+
+  const auto limits = provider->GetSpanLimits();
+  EXPECT_EQ(limits.attribute_count_limit, 22);
+  EXPECT_EQ(limits.attribute_value_length_limit, 9);
 }
 
 #if defined(ENABLE_METRICS_EXEMPLAR_PREVIEW) && !defined(NO_GETENV)
@@ -1202,4 +1316,345 @@ TEST(SdkBuilder, AddViewWithCardinalityLimitPreservesExplicitAggregation)
       });
 
   EXPECT_EQ(matched, 1);
+}
+
+//------------------------------------------------------------------------------
+// Resource detection (SetResource)
+
+namespace
+{
+
+class TestResourceDetector : public opentelemetry::sdk::resource::ResourceDetector
+{
+public:
+  TestResourceDetector(opentelemetry::sdk::resource::ResourceAttributes attributes,
+                       std::string schema_url)
+      : attributes_(std::move(attributes)), schema_url_(std::move(schema_url))
+  {}
+
+  opentelemetry::sdk::resource::Resource Detect() override
+  {
+    return Create(attributes_, schema_url_);
+  }
+
+private:
+  opentelemetry::sdk::resource::ResourceAttributes attributes_;
+  std::string schema_url_;
+};
+
+class TestProcessResourceDetectorBuilder : public config_sdk::ProcessResourceDetectorBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> Build(
+      const config_sdk::ProcessResourceDetectorConfiguration * /* model */) const override
+  {
+    called = true;
+    return std::make_unique<TestResourceDetector>(
+        opentelemetry::sdk::resource::ResourceAttributes{{"process.pid", "12345"},
+                                                         {"process.command_args", "detected-args"}},
+        "https://opentelemetry.io/schemas/1.0.0");
+  }
+
+  mutable bool called{false};
+};
+
+class TestExtensionResourceDetectorBuilder : public config_sdk::ExtensionResourceDetectorBuilder
+{
+public:
+  explicit TestExtensionResourceDetectorBuilder(
+      opentelemetry::sdk::resource::ResourceAttributes attributes)
+      : attributes_(std::move(attributes))
+  {}
+
+  std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> Build(
+      const config_sdk::ExtensionResourceDetectorConfiguration *model) const override
+  {
+    called = true;
+    name   = model->name;
+    return std::make_unique<TestResourceDetector>(attributes_, std::string{});
+  }
+
+  mutable bool called{false};
+  mutable std::string name;
+
+private:
+  opentelemetry::sdk::resource::ResourceAttributes attributes_;
+};
+
+std::string GetStringAttribute(const opentelemetry::sdk::resource::Resource &resource,
+                               const std::string &key)
+{
+  const auto &attributes = resource.GetAttributes();
+  auto it                = attributes.find(key);
+  if (it == attributes.end())
+  {
+    return std::string{};
+  }
+  return opentelemetry::nostd::get<std::string>(it->second);
+}
+
+}  // namespace
+
+TEST(SdkBuilder, SetResourceWithoutModel)
+{
+  SdkBuilder builder(RegistryFactory::Create());
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  std::unique_ptr<config_sdk::ResourceConfiguration> model;
+  builder.SetResource(resource, model);
+
+  EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.name"), "opentelemetry");
+  EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.language"), "cpp");
+}
+
+TEST(SdkBuilder, SetResourceAttributesListPercentDecodesValues)
+{
+  SdkBuilder builder(RegistryFactory::Create());
+
+  auto model             = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->attributes_list = "key1=hello%20world,key2=a%2Cb,key3=100%25,bad=50%z";
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  EXPECT_EQ(GetStringAttribute(resource, "key1"), "hello world");
+  EXPECT_EQ(GetStringAttribute(resource, "key2"), "a,b");
+  EXPECT_EQ(GetStringAttribute(resource, "key3"), "100%");
+  EXPECT_EQ(GetStringAttribute(resource, "bad"), "50%z");
+}
+
+TEST(SdkBuilder, SetResourceDetectorDispatch)
+{
+  auto registry           = RegistryFactory::Create();
+  auto process_builder    = std::make_unique<TestProcessResourceDetectorBuilder>();
+  auto *process_builder_p = process_builder.get();
+  registry->SetProcessResourceDetectorBuilder(std::move(process_builder));
+  SdkBuilder builder(std::move(registry));
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(
+      std::make_unique<config_sdk::ProcessResourceDetectorConfiguration>());
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  EXPECT_TRUE(process_builder_p->called);
+  EXPECT_EQ(GetStringAttribute(resource, "process.pid"), "12345");
+  // Detected attributes win over the default resource.
+  EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.name"), "opentelemetry");
+  // The detected schema url is preserved.
+  EXPECT_EQ(resource.GetSchemaURL(), "https://opentelemetry.io/schemas/1.0.0");
+}
+
+TEST(SdkBuilder, SetResourceExtensionDetector)
+{
+  auto registry          = RegistryFactory::Create();
+  auto extension_builder = std::make_unique<TestExtensionResourceDetectorBuilder>(
+      opentelemetry::sdk::resource::ResourceAttributes{{"custom.key", "custom-value"}});
+  auto *extension_builder_p = extension_builder.get();
+  registry->SetExtensionResourceDetectorBuilder("my_custom_detector", std::move(extension_builder));
+  SdkBuilder builder(std::move(registry));
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  auto extension   = std::make_unique<config_sdk::ExtensionResourceDetectorConfiguration>();
+  extension->name  = "my_custom_detector";
+  model->detection->detectors.push_back(std::move(extension));
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  EXPECT_TRUE(extension_builder_p->called);
+  EXPECT_EQ(extension_builder_p->name, "my_custom_detector");
+  EXPECT_EQ(GetStringAttribute(resource, "custom.key"), "custom-value");
+}
+
+TEST(SdkBuilder, SetResourceUnregisteredDetectorFails)
+{
+  SdkBuilder builder(RegistryFactory::Create());
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(
+      std::make_unique<config_sdk::HostResourceDetectorConfiguration>());
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  EXPECT_THROW(builder.SetResource(resource, model),
+               opentelemetry::sdk::configuration::UnsupportedException);
+}
+
+TEST(SdkBuilder, SetResourceDetectionAttributeFilter)
+{
+  auto registry = RegistryFactory::Create();
+  registry->SetProcessResourceDetectorBuilder(
+      std::make_unique<TestProcessResourceDetectorBuilder>());
+  SdkBuilder builder(std::move(registry));
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(
+      std::make_unique<config_sdk::ProcessResourceDetectorConfiguration>());
+
+  auto filter                    = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+  filter->included               = std::make_unique<config_sdk::StringArrayConfiguration>();
+  filter->included->string_array = {"process.*"};
+  filter->excluded               = std::make_unique<config_sdk::StringArrayConfiguration>();
+  filter->excluded->string_array = {"process.command_args"};
+  model->detection->attributes   = std::move(filter);
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  // Matched by included.
+  EXPECT_EQ(GetStringAttribute(resource, "process.pid"), "12345");
+  // Matched by included AND excluded: excluded wins.
+  EXPECT_EQ(GetStringAttribute(resource, "process.command_args"), "");
+  // The filter applies to detected attributes only, not to the default resource.
+  EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.name"), "opentelemetry");
+}
+
+TEST(SdkBuilder, SetResourceMergePriority)
+{
+  auto registry = RegistryFactory::Create();
+  registry->SetProcessResourceDetectorBuilder(
+      std::make_unique<TestProcessResourceDetectorBuilder>());
+  SdkBuilder builder(std::move(registry));
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(
+      std::make_unique<config_sdk::ProcessResourceDetectorConfiguration>());
+
+  // process.pid: detected, then overridden by attributes_list, then by attributes.
+  model->attributes_list = "process.pid=from-list,list.only=list-value";
+
+  auto typed_value   = std::make_unique<config_sdk::StringAttributeValueConfiguration>();
+  typed_value->value = "from-attributes";
+  model->attributes  = std::make_unique<config_sdk::AttributesConfiguration>();
+  model->attributes->kv_map.emplace("process.pid", std::move(typed_value));
+
+  model->schema_url = "https://opentelemetry.io/schemas/1.2.0";
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  EXPECT_EQ(GetStringAttribute(resource, "process.pid"), "from-attributes");
+  EXPECT_EQ(GetStringAttribute(resource, "list.only"), "list-value");
+  EXPECT_EQ(GetStringAttribute(resource, "process.command_args"), "detected-args");
+  EXPECT_EQ(GetStringAttribute(resource, "telemetry.sdk.name"), "opentelemetry");
+  EXPECT_EQ(resource.GetSchemaURL(), "https://opentelemetry.io/schemas/1.2.0");
+}
+
+TEST(SdkBuilder, SetResourceFilterAppliesToDetectedAttributesOnly)
+{
+  auto registry = RegistryFactory::Create();
+  registry->SetProcessResourceDetectorBuilder(
+      std::make_unique<TestProcessResourceDetectorBuilder>());
+  SdkBuilder builder(std::move(registry));
+
+  auto model       = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->detection = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(
+      std::make_unique<config_sdk::ProcessResourceDetectorConfiguration>());
+
+  // Exclude everything the detector produced.
+  auto filter                    = std::make_unique<config_sdk::IncludeExcludeConfiguration>();
+  filter->excluded               = std::make_unique<config_sdk::StringArrayConfiguration>();
+  filter->excluded->string_array = {"process.*"};
+  model->detection->attributes   = std::move(filter);
+
+  // Attributes matching the excluded pattern, from attributes_list and attributes.
+  model->attributes_list = "process.pid=from-list";
+
+  auto typed_value   = std::make_unique<config_sdk::StringAttributeValueConfiguration>();
+  typed_value->value = "from-attributes";
+  model->attributes  = std::make_unique<config_sdk::AttributesConfiguration>();
+  model->attributes->kv_map.emplace("process.command_args", std::move(typed_value));
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  // The filter removed every detected attribute, but does not apply to the
+  // attributes and attributes_list fields, even when their keys match.
+  EXPECT_EQ(GetStringAttribute(resource, "process.pid"), "from-list");
+  EXPECT_EQ(GetStringAttribute(resource, "process.command_args"), "from-attributes");
+}
+
+TEST(SdkBuilder, SetResourceNullAttributeValueSkipped)
+{
+  auto registry = RegistryFactory::Create();
+  SdkBuilder builder(std::move(registry));
+
+  auto typed_value   = std::make_unique<config_sdk::StringAttributeValueConfiguration>();
+  typed_value->value = "kept";
+
+  auto model        = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->attributes = std::make_unique<config_sdk::AttributesConfiguration>();
+  model->attributes->kv_map.emplace("present", std::move(typed_value));
+  model->attributes->kv_map.emplace("null-entry", nullptr);  // should be skipped
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  EXPECT_EQ(GetStringAttribute(resource, "present"), "kept");
+  const auto &attrs = resource.GetAttributes();
+  EXPECT_EQ(attrs.find("null-entry"), attrs.end());
+}
+
+TEST(SdkBuilder, SetResourceAttributesNullValueSkipped)
+{
+  // The default behavior for the resource.attributes field must skip null values.
+  // This allows optional env values to be set (e.g. OTEL_SERVICE_NAME).
+  // If the env var is not set then the attribute should be ignored.
+
+  // Example config created programmatically below
+  //
+  // resource:
+  //   attributes:
+  //     -name: service.name
+  //      value: ${OTEL_SERVICE_NAME} # env not set
+  //     -name: service.namespace
+  //      value: ${MY_SERVICE_NAMESPACE} # env not set
+  //     -name: service.version
+  //      value: version-from-attributes
+  //   attributes_list: "service.name=name-from-list"
+  //   detection:
+  //     detectors:
+  //       - test_service_detector  # detects service.{name, version, namespace}
+
+  auto registry     = RegistryFactory::Create();
+  auto ext_detector = std::make_unique<TestExtensionResourceDetectorBuilder>(
+      opentelemetry::sdk::resource::ResourceAttributes{
+          {"service.name", "name-from-detector"},
+          {"service.namespace", "namespace-from-detector"},
+          {"service.version", "version-from-detector"}});
+  registry->SetExtensionResourceDetectorBuilder("test_service_detector", std::move(ext_detector));
+  SdkBuilder builder(std::move(registry));
+
+  auto model            = std::make_unique<config_sdk::ResourceConfiguration>();
+  auto detector_config  = std::make_unique<config_sdk::ExtensionResourceDetectorConfiguration>();
+  detector_config->name = "test_service_detector";
+  model->detection      = std::make_unique<config_sdk::ResourceDetectionConfiguration>();
+  model->detection->detectors.push_back(std::move(detector_config));
+  model->attributes_list = "service.name=name-from-list,service.version=version-from-list";
+
+  // Simulate null values from unset env variables.
+  model->attributes = std::make_unique<config_sdk::AttributesConfiguration>();
+  model->attributes->kv_map.emplace("service.name", nullptr);  // simulate unset OTEL_SERVICE_NAME
+  model->attributes->kv_map.emplace("service.namespace",
+                                    nullptr);  // simulate unset MY_SERVICE_NAMESPACE
+  auto typed_value   = std::make_unique<config_sdk::StringAttributeValueConfiguration>();
+  typed_value->value = "version-from-attributes";
+  model->attributes->kv_map.emplace("service.version", std::move(typed_value));
+
+  auto resource = opentelemetry::sdk::resource::Resource::GetEmpty();
+  builder.SetResource(resource, model);
+
+  // attributes_list wins over detection for service.name; nullptr in attributes doesn't override.
+  EXPECT_EQ(GetStringAttribute(resource, "service.name"), "name-from-list");
+  // detected value survives for service.namespace (no attributes_list entry, nullptr skipped).
+  EXPECT_EQ(GetStringAttribute(resource, "service.namespace"), "namespace-from-detector");
+  // attribute value for service.version overrides both list and detection.
+  EXPECT_EQ(GetStringAttribute(resource, "service.version"), "version-from-attributes");
 }
