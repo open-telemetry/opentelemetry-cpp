@@ -40,7 +40,7 @@ const int TEST_FAILED = 1;
 
 namespace
 {
-enum test_mode : std::uint8_t
+enum test_mode : std::uint8_t  // NOLINT(cppcoreguidelines-use-enum-class)
 {
   MODE_NONE,
   MODE_HTTP,
@@ -335,7 +335,7 @@ static int parse_args(int argc, char *argv[])
   return 0;
 }
 
-typedef int (*test_func_t)();
+using test_func_t = int (*)();
 
 struct test_case
 {

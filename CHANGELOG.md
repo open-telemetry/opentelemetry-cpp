@@ -81,6 +81,9 @@ Increment the:
 * [CONFIGURATION/BUILD] Add resource detector targets and README
   [#4430](https://github.com/open-telemetry/opentelemetry-cpp/pull/4430)
 
+* [CODE HEALTH] Resolve multiple clang tidy warnings
+  [#4492](https://github.com/open-telemetry/opentelemetry-cpp/pull/4492)
+
 * [SDK] `OTELResourceDetector` now percent-decodes values parsed from the
   `OTEL_RESOURCE_ATTRIBUTES` environment variable, per the W3C Baggage value
   grammar the resource spec defers to. A malformed escape sequence is left
