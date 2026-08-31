@@ -12,7 +12,7 @@
 
 #include "opentelemetry/nostd/variant.h"
 
-#include <stddef.h>
+#include <cstddef>
 #include <sstream>
 #include <string>
 

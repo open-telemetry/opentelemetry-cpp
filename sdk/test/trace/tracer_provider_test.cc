@@ -268,7 +268,7 @@ TEST(TracerProvider, GetTracerAbiv2)
     EXPECT_EQ(opentelemetry::nostd::get<int>(attr->second), 42);
   }
 
-  typedef std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> KV;
+  using KV = std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue>;
 
   std::initializer_list<KV> attrs7 = {{"foo", 3.14}, {"bar", "2"}};
   auto t7                          = tp.GetTracer("name7", "version7", "url7", attrs7);

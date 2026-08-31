@@ -22,6 +22,7 @@ otel_add_component(
   opentelemetry_common
   opentelemetry_resources
   opentelemetry_version
+  opentelemetry_instrumentation_scope
   opentelemetry_logs
   opentelemetry_trace
   opentelemetry_metrics

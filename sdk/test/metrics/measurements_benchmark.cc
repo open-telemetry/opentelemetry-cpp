@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <map>
+#include <random>
 #include <string>
 #include <thread>
 #include <vector>
@@ -96,16 +97,19 @@ void BM_MeasurementsTest(benchmark::State &state)
     std::atomic<size_t> cur_processed{0};
     for (size_t i = 0; i < NUM_CORES; i++)
     {
-      threads.push_back(std::thread([&h, &cur_processed, &MAX_MEASUREMENTS, &attributes]() {
+      threads.emplace_back([&h, &cur_processed, &MAX_MEASUREMENTS, &attributes]() {
+        // NOLINTNEXTLINE(bugprone-random-generator-seed)
+        std::mt19937 rng{1234};
+        std::uniform_int_distribution<size_t> dist(0, 999);
         while (cur_processed++ <= MAX_MEASUREMENTS)
         {
-          size_t index = rand() % 1000;
+          size_t index = dist(rng);
           h->Add(1.0,
                  opentelemetry::common::KeyValueIterableView<std::map<std::string, uint32_t>>(
                      attributes[index]),
                  opentelemetry::context::Context{});
         }
-      }));
+      });
     }
     for (auto &thread : threads)
     {
@@ -141,18 +145,21 @@ void BM_MeasurementsThreadsShareCounterTest(benchmark::State &state)
     std::atomic<size_t> cur_processed{0};
     for (size_t i = 0; i < NUM_CORES; i++)
     {
-      threads.push_back(std::thread(
+      threads.emplace_back(
           [&h, &cur_processed, &MAX_MEASUREMENTS, &attributes](size_t /*thread_id*/) {
+            // NOLINTNEXTLINE(bugprone-random-generator-seed)
+            std::mt19937 rng{1234};
+            std::uniform_int_distribution<size_t> dist(0, 999);
             while (cur_processed++ <= MAX_MEASUREMENTS)
             {
-              size_t index = rand() % 1000;
+              size_t index = dist(rng);
               h->Add(1.0,
                      opentelemetry::common::KeyValueIterableView<std::map<std::string, uint32_t>>(
                          attributes[index]),
                      opentelemetry::context::Context{});
             }
           },
-          i));
+          i);
     }
     for (auto &thread : threads)
     {
@@ -187,16 +194,19 @@ void BM_MeasurementsPerThreadCounterTest(benchmark::State &state)
     std::atomic<size_t> cur_processed{0};
     for (size_t i = 0; i < NUM_CORES; i++)
     {
-      threads.push_back(std::thread(
+      threads.emplace_back(
           [&m, &cur_processed, &MAX_MEASUREMENTS, &attributes](size_t thread_id) {
             // Each thread creates its own counter with the same name but a unique description
             // encoding the thread id, ensuring no shared underlying storage.
             std::string description = "counter1_description_thread_" + std::to_string(thread_id);
             auto per_thread_counter =
                 m->CreateDoubleCounter("counter1", description, "counter1_unit");
+            // NOLINTNEXTLINE(bugprone-random-generator-seed)
+            std::mt19937 rng{1234};
+            std::uniform_int_distribution<size_t> dist(0, 999);
             while (cur_processed++ <= MAX_MEASUREMENTS)
             {
-              size_t index = rand() % 1000;
+              size_t index = dist(rng);
               per_thread_counter->Add(
                   1.0,
                   opentelemetry::common::KeyValueIterableView<std::map<std::string, uint32_t>>(
@@ -204,7 +214,7 @@ void BM_MeasurementsPerThreadCounterTest(benchmark::State &state)
                   opentelemetry::context::Context{});
             }
           },
-          i));
+          i);
     }
     for (auto &thread : threads)
     {
