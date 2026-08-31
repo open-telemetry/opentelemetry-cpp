@@ -348,7 +348,7 @@ public:
   // return true if create background thread, false is already exist background thread
   bool MaybeSpawnBackgroundThread();
 
-  void ScheduleAddSession(uint64_t session_id);
+  bool ScheduleAddSession(uint64_t session_id);
   void ScheduleAbortSession(uint64_t session_id);
   void ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource);
 
@@ -368,6 +368,12 @@ private:
 
   std::mutex multi_handle_m_;
   CURLM *multi_handle_;
+
+  // How a session is handed to the multi handle. Only a test replaces it, so that a case about
+  // what happens to a refused session can name the code libcurl returns instead of arranging a
+  // multi handle libcurl documents as unusable and relying on what it does with one.
+  CURLMcode (*add_handle_)(CURLM *, CURL *) = &curl_multi_add_handle;
+
   std::atomic<uint64_t> next_session_id_{0};
   uint64_t max_sessions_per_connection_;
 

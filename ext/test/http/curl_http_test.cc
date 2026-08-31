@@ -1,11 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curl.h>
 #include <curl/curlver.h>
 #include "gtest/gtest.h"
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <curl/curl.h>
 #  include "gmock/gmock.h"
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
@@ -13,12 +13,13 @@
 #  include <numeric>
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <cstring>
+#include <functional>
 #include <map>
-#include <memory>
 #include <mutex>
 #include <sstream>
 #include <string>
@@ -32,13 +33,16 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 
 constexpr int HTTP_PORT{19000};
 
 namespace curl        = opentelemetry::ext::http::client::curl;
 namespace http_client = opentelemetry::ext::http::client;
+namespace sdk_common  = opentelemetry::sdk::common;
 namespace nostd       = opentelemetry::nostd;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -56,6 +60,29 @@ class HttpClientTestPeer
 {
 public:
   static void ResetMultiHandle(HttpClient &client) { client.resetMultiHandle(); }
+
+  static bool AddSessions(HttpClient &client) { return client.doAddSessions(); }
+
+  static bool RemoveSessions(HttpClient &client) { return client.doRemoveSessions(); }
+
+  // Refuses every add with a code the case chooses. A case about what happens to a refused
+  // session then says which refusal it means, instead of arranging a multi handle libcurl
+  // documents as unusable and depending on what libcurl does with one.
+  static void RefuseAdds(HttpClient &client)
+  {
+    client.add_handle_ = [](CURLM *, CURL *) { return CURLM_BAD_EASY_HANDLE; };
+  }
+
+  static void AllowAdds(HttpClient &client) { client.add_handle_ = &curl_multi_add_handle; }
+
+  // A multi handle that failed to initialize refuses every add, which is the state the case
+  // below needs and the one thing no transfer can be arranged into.
+  static CURLM *ExchangeMultiHandle(HttpClient &client, CURLM *replacement)
+  {
+    CURLM *previous      = client.multi_handle_;
+    client.multi_handle_ = replacement;
+    return previous;
+  }
 };
 }  // namespace curl
 }  // namespace client
@@ -95,7 +122,7 @@ public:
 
 // Counts the terminal notifications one request produces. Set cancel_at_response_ to cancel from
 // inside the Response event, which is the one moment both arms of the completion callback are
-// eligible: DispatchEvent notifies the handler before it stores the new state, and the callback
+// eligible: DispatchEvent stores the new state before it notifies the handler, and the callback
 // runs after both, so it sees an aborted operation that also has a response.
 class TerminalCountingHandler : public CustomEventHandler
 {
@@ -108,9 +135,16 @@ public:
 
   void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
   {
-    if (state == http_client::SessionState::Cancelled)
+    if (state == http_client::SessionState::CreateFailed)
     {
       terminal_count_.fetch_add(1, std::memory_order_release);
+      create_failed_.fetch_add(1, std::memory_order_release);
+      last_reason_empty_.store(reason.empty(), std::memory_order_release);
+    }
+    else if (state == http_client::SessionState::Cancelled)
+    {
+      terminal_count_.fetch_add(1, std::memory_order_release);
+      cancelled_.fetch_add(1, std::memory_order_release);
       // Cleanup dispatches its own Cancelled carrying a curl message, and GetCurlErrorMessage
       // never yields an empty one, so an empty reason is the completion callback and only it.
       if (reason.empty())
@@ -134,6 +168,9 @@ public:
   std::thread::id cancelled_from_{};
   std::atomic<int> terminal_count_{0};
   std::atomic<int> cancelled_from_callback_{0};
+  std::atomic<int> create_failed_{0};
+  std::atomic<int> cancelled_{0};
+  std::atomic<bool> last_reason_empty_{true};
 };
 
 class GetEventHandler : public CustomEventHandler
@@ -629,6 +666,289 @@ TEST_F(BasicCurlHttpTests, ResetMultiHandleWithASessionDoesNotDeadlock)
   client->FinishAllSessions();
 }
 
+class RecordingHandler : public CustomEventHandler
+{
+public:
+  void OnResponse(http_client::Response & /* response */) noexcept override
+  {
+    got_response_.store(true, std::memory_order_release);
+  }
+
+  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
+  {
+    std::lock_guard<std::mutex> lock_guard{states_m_};
+    states_.push_back(state);
+  }
+
+  std::vector<http_client::SessionState> States()
+  {
+    std::lock_guard<std::mutex> lock_guard{states_m_};
+    return states_;
+  }
+
+private:
+  std::mutex states_m_;
+  std::vector<http_client::SessionState> states_;
+};
+
+// Owned by the case rather than by the handler, so the order survives the handler being
+// destroyed. That is what lets the case below tell "the event ran while the handler was alive"
+// from "the event ran on memory nothing owned any more" without depending on a sanitizer,
+// though AddressSanitizer reports the second one outright.
+struct LifetimeProbe
+{
+  std::atomic<int> next{0};
+  std::atomic<int> event_at{-1};
+  std::atomic<int> destroyed_at{-1};
+};
+
+class ProbedHandler : public CustomEventHandler
+{
+public:
+  explicit ProbedHandler(std::shared_ptr<LifetimeProbe> probe) : probe_{std::move(probe)} {}
+
+  ~ProbedHandler() override
+  {
+    probe_->destroyed_at.store(probe_->next.fetch_add(1, std::memory_order_acq_rel),
+                               std::memory_order_release);
+  }
+
+  ProbedHandler(const ProbedHandler &)            = delete;
+  ProbedHandler(ProbedHandler &&)                 = delete;
+  ProbedHandler &operator=(const ProbedHandler &) = delete;
+  ProbedHandler &operator=(ProbedHandler &&)      = delete;
+
+  void OnResponse(http_client::Response & /* response */) noexcept override {}
+
+  void OnEvent(http_client::SessionState /* state */,
+               nostd::string_view /* reason */) noexcept override
+  {
+    probe_->event_at.store(probe_->next.fetch_add(1, std::memory_order_acq_rel),
+                           std::memory_order_release);
+  }
+
+private:
+  std::shared_ptr<LifetimeProbe> probe_;
+};
+
+// The operation holds the handler as a bare pointer, and what keeps the caller's handler alive
+// past SendRequest is the shared_ptr the completion callback captured. Cleanup() takes that
+// callback and lets it go, so anything dispatched after Cleanup() is talking to whatever is left
+// of the handler. This case is the only one in the file that leaves the completion callback as
+// the sole owner, which is exactly what Session::SendRequest arranges for every real caller.
+TEST_F(BasicCurlHttpTests, AnUnscheduledSessionTellsAHandlerNothingElseHolds)
+{
+  curl::HttpClient client;
+
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  ASSERT_TRUE(session != nullptr);
+  auto curl_session = std::static_pointer_cast<curl::Session>(session);
+
+  auto probe   = std::make_shared<LifetimeProbe>();
+  auto handler = std::make_shared<ProbedHandler>(probe);
+
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::RetryPolicy no_retry{};
+  http_client::Compression compression = http_client::Compression::kNone;
+
+  curl_session->GetOperation().reset(new curl::HttpOperation(
+      http_client::Method::Get, "http://127.0.0.1:19000/get/", no_ssl, handler.get(), headers, body,
+      compression, false, curl::kDefaultHttpConnTimeout, false, false, no_retry));
+
+  std::atomic<int> completed{0};
+  ASSERT_EQ(CURLE_OK,
+            curl_session->GetOperation()->SendAsync(
+                curl_session.get(), [handler, &completed](curl::HttpOperation & /* operation */) {
+                  completed.fetch_add(1, std::memory_order_release);
+                }));
+
+  // Deliberately the last reference the case holds, the same as a caller that hands its handler
+  // to SendRequest and keeps nothing of its own.
+  handler.reset();
+
+  http_client::curl::HttpClientTestPeer::RefuseAdds(client);
+  const bool has_data = http_client::curl::HttpClientTestPeer::AddSessions(client);
+  http_client::curl::HttpClientTestPeer::AllowAdds(client);
+
+  EXPECT_TRUE(has_data);
+  EXPECT_EQ(1, completed.load(std::memory_order_acquire));
+
+  const int event_at     = probe->event_at.load(std::memory_order_acquire);
+  const int destroyed_at = probe->destroyed_at.load(std::memory_order_acquire);
+  ASSERT_GE(event_at, 0) << "the handler was never told that nothing would run its request";
+  ASSERT_GE(destroyed_at, 0) << "the handler outlived the operation, so this case is not holding "
+                             << "the ownership it says it is";
+  EXPECT_LT(event_at, destroyed_at)
+      << "the terminal event reached the handler after the last reference to it had gone";
+
+  http_client::curl::HttpClientTestPeer::RemoveSessions(client);
+}
+
+// Restores the global log handler and level whatever the case does, since both are process wide
+// and gtest runs one process per case only under CTest.
+class ScopedLogHandler
+{
+public:
+  explicit ScopedLogHandler(const nostd::shared_ptr<sdk_common::internal_log::LogHandler> &handler)
+      : previous_handler_(sdk_common::internal_log::GlobalLogHandler::GetLogHandler()),
+        previous_level_(sdk_common::internal_log::GlobalLogHandler::GetLogLevel())
+  {
+    sdk_common::internal_log::GlobalLogHandler::SetLogHandler(handler);
+
+    // Error rather than Debug: it is the level the refusal is written at, and anything wider
+    // hands this observer unrelated lines from the same path.
+    sdk_common::internal_log::GlobalLogHandler::SetLogLevel(
+        sdk_common::internal_log::LogLevel::Error);
+  }
+
+  ~ScopedLogHandler()
+  {
+    sdk_common::internal_log::GlobalLogHandler::SetLogHandler(previous_handler_);
+    sdk_common::internal_log::GlobalLogHandler::SetLogLevel(previous_level_);
+  }
+
+  ScopedLogHandler(const ScopedLogHandler &)            = delete;
+  ScopedLogHandler(ScopedLogHandler &&)                 = delete;
+  ScopedLogHandler &operator=(const ScopedLogHandler &) = delete;
+  ScopedLogHandler &operator=(ScopedLogHandler &&)      = delete;
+
+private:
+  nostd::shared_ptr<sdk_common::internal_log::LogHandler> previous_handler_;
+  sdk_common::internal_log::LogLevel previous_level_;
+};
+
+// Runs whatever the case gives it, on the thread that wrote the log line.
+class ObservingLogHandler : public sdk_common::internal_log::LogHandler
+{
+public:
+  explicit ObservingLogHandler(std::function<void()> observe) : observe_(std::move(observe)) {}
+
+  void Handle(sdk_common::internal_log::LogLevel /* level */,
+              const char * /* file */,
+              int /* line */,
+              const char * /* msg */,
+              const sdk_common::AttributeMap & /* attributes */) noexcept override
+  {
+    observe_();
+  }
+
+private:
+  std::function<void()> observe_;
+};
+
+// The refusal is reported through the global log handler, which is application code that can call
+// back into this client. Reporting before the operation is settled leaves a handler that answers
+// with FinishSession() waiting on a promise only this thread can fulfil.
+TEST_F(BasicCurlHttpTests, ARejectedSessionIsSettledBeforeItIsReported)
+{
+  curl::HttpClient client;
+
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  ASSERT_TRUE(session != nullptr);
+  auto curl_session = std::static_pointer_cast<curl::Session>(session);
+
+  auto handler = std::make_shared<RecordingHandler>();
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::RetryPolicy no_retry{};
+  http_client::Compression compression = http_client::Compression::kNone;
+
+  curl_session->GetOperation().reset(new curl::HttpOperation(
+      http_client::Method::Get, "http://127.0.0.1:19000/get/", no_ssl, handler.get(), headers, body,
+      compression, false, curl::kDefaultHttpConnTimeout, false, false, no_retry));
+
+  ASSERT_EQ(CURLE_OK, curl_session->GetOperation()->SendAsync(
+                          curl_session.get(), [](curl::HttpOperation & /* operation */) {}));
+
+  std::atomic<int> log_calls{0};
+  std::atomic<int> settled_when_logged{0};
+  auto observer = nostd::shared_ptr<sdk_common::internal_log::LogHandler>(
+      new ObservingLogHandler([&handler, &log_calls, &settled_when_logged]() {
+        log_calls.fetch_add(1, std::memory_order_release);
+
+        // The terminal event specifically. Created arrives during setup, so "the handler has
+        // seen something" is true in either order.
+        const std::vector<http_client::SessionState> states = handler->States();
+        if (std::find(states.begin(), states.end(), http_client::SessionState::CreateFailed) !=
+            states.end())
+        {
+          settled_when_logged.fetch_add(1, std::memory_order_release);
+        }
+      }));
+
+  {
+    ScopedLogHandler scoped{observer};
+    http_client::curl::HttpClientTestPeer::RefuseAdds(client);
+    http_client::curl::HttpClientTestPeer::AddSessions(client);
+    http_client::curl::HttpClientTestPeer::AllowAdds(client);
+  }
+
+  ASSERT_EQ(1, log_calls.load(std::memory_order_acquire))
+      << "the refusal was not reported once, so this case is not observing what it says it is";
+  EXPECT_EQ(1, settled_when_logged.load(std::memory_order_acquire))
+      << "the refusal was reported while the operation was still unsettled, so a log handler "
+      << "calling FinishSession() from here would wait on a promise only this thread fulfils";
+
+  http_client::curl::HttpClientTestPeer::RemoveSessions(client);
+}
+
+// The third way an operation ends up with nothing to run it. SendAsync does the whole async
+// setup and Session::SendRequest is what spawns the worker, so the add runs here on one thread
+// against a multi handle that refuses it, which is what a multi handle that failed to initialize
+// does to every add.
+TEST_F(BasicCurlHttpTests, ASessionTheMultiHandleRefusesIsFinished)
+{
+  curl::HttpClient client;
+
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  ASSERT_TRUE(session != nullptr);
+  auto curl_session = std::static_pointer_cast<curl::Session>(session);
+
+  auto handler = std::make_shared<RecordingHandler>();
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::RetryPolicy no_retry{};
+
+  // Named, and outliving the operation: it keeps a reference to the ssl options, the headers,
+  // the body and this rather than a copy of any of them.
+  http_client::Compression compression = http_client::Compression::kNone;
+
+  curl_session->GetOperation().reset(new curl::HttpOperation(
+      http_client::Method::Get, "http://127.0.0.1:19000/get/", no_ssl, handler.get(), headers, body,
+      compression, false, curl::kDefaultHttpConnTimeout, false, false, no_retry));
+
+  std::atomic<int> completed{0};
+  ASSERT_EQ(CURLE_OK, curl_session->GetOperation()->SendAsync(
+                          curl_session.get(), [&completed](curl::HttpOperation & /* operation */) {
+                            completed.fetch_add(1, std::memory_order_release);
+                          }));
+
+  http_client::curl::HttpClientTestPeer::RefuseAdds(client);
+  const bool has_data = http_client::curl::HttpClientTestPeer::AddSessions(client);
+  http_client::curl::HttpClientTestPeer::AllowAdds(client);
+
+  // The removal the finish queues is the reason this has to answer true: the worker checks it
+  // after it has already run doRemoveSessions for this round, and nothing else would drain it.
+  EXPECT_TRUE(has_data);
+  EXPECT_EQ(1, completed.load(std::memory_order_acquire));
+
+  // Told the same way as a session this client never registered. Not Cancelled: the enum calls
+  // that one manually cancelled and both exporters print that word, and nobody cancelled this.
+  const auto states = handler->States();
+  ASSERT_FALSE(states.empty());
+  EXPECT_EQ(http_client::SessionState::CreateFailed, states.back());
+  for (const auto state : states)
+  {
+    EXPECT_NE(http_client::SessionState::Cancelled, state);
+  }
+
+  http_client::curl::HttpClientTestPeer::RemoveSessions(client);
+}
+
 // The caller-thread side of the same cancel. The server handler takes mtx_requests before it
 // answers, so holding it keeps a response from racing the cancel and the abort lands while the
 // IO thread is still driving the easy handle. That pairing is what #4369 caught.
@@ -687,6 +1007,498 @@ TEST_F(BasicCurlHttpTests, RepeatedCallerThreadCancelsAreClean)
   // A lower bound, not a count: #4360 tracks the same cancel arriving twice, and how many
   // arrive is not what this case decides.
   EXPECT_GE(terminal_total, 20);
+}
+
+// A handler is allowed to cancel from the events SendRequest dispatches, so the flags and the
+// cancel route have to be published before the dispatch. Publish them after it and the cancel
+// is thrown away, the request is neither sent nor completed, and FinishSession() waits on a
+// promise nobody can fulfil. See #4390.
+TEST_F(BasicCurlHttpTests, CancelFromCreatedCompletes)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<TerminalCountingHandler>();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::Created;
+
+  session->SendRequest(handler);
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  // Exact, and the classification with it, because a count alone cannot tell an honoured cancel
+  // from a request that was never registered. What it reports today is the second one: Created is
+  // dispatched from the constructor, before curl_operation_ holds this operation, so the cancel
+  // reaches the Session but not the operation, and scheduling then finds no registration. The
+  // caller asked to cancel and is told the create failed. Moving the first events out of the
+  // constructor is what would make this a cancel, and that is the startup ordering #4390 is
+  // about rather than something to bolt on here. Pinned so the day it changes is visible.
+  EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire));
+  EXPECT_EQ(0, handler->cancelled_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, handler->create_failed_.load(std::memory_order_acquire));
+}
+
+TEST_F(BasicCurlHttpTests, CancelFromConnectingCompletes)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<TerminalCountingHandler>();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::Connecting;
+
+  session->SendRequest(handler);
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  // Two, and one is the goal rather than the behaviour: cancelling once the transfer has been
+  // handed to the IO thread produces a terminal event from Cleanup and another from the
+  // completion callback. That is #4360, and pinning the number here makes any change to it
+  // visible instead of letting an at-least-one assertion absorb it.
+  EXPECT_EQ(2, handler->terminal_count_.load(std::memory_order_acquire));
+}
+
+// CreateSession hands back an unregistered session when the URL does not parse, and
+// CURLOPT_URL is not checked when it is set, so nothing on this path stops the operation
+// reaching the same dead end with no handler involved at all. See #4393.
+// Pending removals are keyed by session id. Two sessions whose URL never parsed must not share
+// one: the map's move assignment swaps the displaced easy handle and header list into a
+// temporary whose destructor frees neither.
+TEST_F(BasicCurlHttpTests, UnparsableUrlsReleaseTheirOwnResources)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto first  = session_manager->CreateSession("http://127.0.0.1:not-a-port");
+  auto second = session_manager->CreateSession("http://127.0.0.1:also-not-a-port");
+
+  const auto first_id  = static_cast<http_client::curl::Session *>(first.get())->GetSessionId();
+  const auto second_id = static_cast<http_client::curl::Session *>(second.get())->GetSessionId();
+  EXPECT_NE(0U, first_id) << "an unregistered session kept the default id";
+  EXPECT_NE(first_id, second_id) << "two unregistered sessions share a pending removal key";
+
+  auto first_request = first->CreateRequest();
+  first_request->SetUri("get/");
+  auto second_request = second->CreateRequest();
+  second_request->SetUri("get/");
+
+  auto first_handler  = std::make_shared<TerminalCountingHandler>();
+  auto second_handler = std::make_shared<TerminalCountingHandler>();
+  first->SendRequest(first_handler);
+  second->SendRequest(second_handler);
+  first->FinishSession();
+  second->FinishSession();
+  session_manager->FinishAllSessions();
+
+  EXPECT_EQ(1, first_handler->terminal_count_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, second_handler->terminal_count_.load(std::memory_order_acquire));
+}
+
+namespace
+{
+// The event is dispatched after the operation is finished, so a handler is free to call
+// FinishSession() from it. Reporting first instead leaves this waiting on a promise that only the
+// Cleanup() below the dispatch can fulfil, which hangs rather than fails, so this case has to run.
+class FinishFromEventHandler : public TerminalCountingHandler
+{
+public:
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    TerminalCountingHandler::OnEvent(state, reason);
+    if (state == finish_at_ && finish_target_ != nullptr)
+    {
+      auto *target   = finish_target_;
+      finish_target_ = nullptr;
+      entered_.store(true, std::memory_order_release);
+      target->FinishSession();
+      returned_.store(true, std::memory_order_release);
+    }
+  }
+
+  http_client::Session *finish_target_ = nullptr;
+  http_client::SessionState finish_at_ = http_client::SessionState::CreateFailed;
+  std::atomic<bool> entered_{false};
+  std::atomic<bool> returned_{false};
+};
+}  // namespace
+
+TEST_F(BasicCurlHttpTests, FinishFromTheCreateFailedEventReturns)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:not-a-port");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<FinishFromEventHandler>();
+  handler->finish_target_ = session.get();
+
+  session->SendRequest(handler);
+
+  ASSERT_TRUE(handler->entered_.load(std::memory_order_acquire))
+      << "the failure never reached the handler, so nothing was tested";
+  EXPECT_TRUE(handler->returned_.load(std::memory_order_acquire))
+      << "FinishSession from this event waited on a promise only its own caller can set";
+
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+}
+
+TEST_F(BasicCurlHttpTests, InvalidUrlCompletes)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:not-a-port");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler = std::make_shared<TerminalCountingHandler>();
+
+  session->SendRequest(handler);
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  // Exact, so a duplicate notification or a failure dressed as a manual cancel fails here
+  // rather than passing as at least one of something.
+  EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, handler->create_failed_.load(std::memory_order_acquire))
+      << "an unregistered session was not reported as a failed create";
+  EXPECT_FALSE(handler->last_reason_empty_.load(std::memory_order_acquire))
+      << "the failure was reported without saying what failed";
+}
+
+// The counters say whether the IO thread reached this handler while the caller was still
+// inside an event of its own. They are relaxed on purpose. An acquire or a release on them
+// would give the two threads an ordering the code under test does not have, and a state store
+// racing another would stop being reported.
+class OverlappingCancelHandler : public TerminalCountingHandler
+{
+public:
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    const int depth = inside_events_.fetch_add(1, std::memory_order_relaxed) + 1;
+    int highest     = max_concurrent_events_.load(std::memory_order_relaxed);
+    while (depth > highest &&
+           !max_concurrent_events_.compare_exchange_weak(highest, depth, std::memory_order_relaxed,
+                                                         std::memory_order_relaxed))
+    {
+    }
+
+    TerminalCountingHandler::OnEvent(state, reason);
+
+    if (state == cancel_at_)
+    {
+      // Cancelling wakes the IO thread, which finishes the operation and dispatches a Cancelled
+      // of its own. Stay in this event until that one arrives so the two really do overlap, and
+      // give up rather than hang if it never does.
+      //
+      // On the count that only goes up. inside_events_ is lowered again on the way out of that
+      // event, which is a few atomics long, so sampling it every millisecond almost never catches
+      // it and the bound below is spent in full even though the overlap did happen.
+      const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(30);
+      while (max_concurrent_events_.load(std::memory_order_relaxed) < 2 &&
+             std::chrono::steady_clock::now() < deadline)
+      {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
+
+      if (max_concurrent_events_.load(std::memory_order_relaxed) < 2)
+      {
+        // Only a run where the overlap never happened reaches this, and it is worth saying so:
+        // the count checked at the end would otherwise read as the client dispatching one event
+        // rather than as the other thread never turning up.
+        overlap_timed_out_.store(true, std::memory_order_release);
+      }
+    }
+
+    inside_events_.fetch_sub(1, std::memory_order_relaxed);
+  }
+
+  std::atomic<int> inside_events_{0};
+  std::atomic<int> max_concurrent_events_{0};
+  std::atomic<bool> overlap_timed_out_{false};
+};
+
+// A client spawns its IO thread only after a request has been scheduled, so cancelling from
+// the first event of the first request has nothing to overlap. On a client that is already
+// polling, the IO thread finishes the operation while the handler is still inside that event,
+// and the caller reaches the end of SendAsync with the operation already cleaned up.
+namespace
+{
+// Cancels from Connecting, then holds inside the terminal event for a bounded 200 ms. The bound is
+// its own, so this can never block for good and a case built on it can only fail, not hang.
+class LatchedCancelHandler : public TerminalCountingHandler
+{
+public:
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    TerminalCountingHandler::OnEvent(state, reason);
+    if (state == http_client::SessionState::Cancelled)
+    {
+      entries_.fetch_add(1, std::memory_order_relaxed);
+      if (std::this_thread::get_id() == owner_)
+      {
+        on_owner_thread_.fetch_add(1, std::memory_order_relaxed);
+      }
+      inside_.fetch_add(1, std::memory_order_release);
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+      inside_.fetch_sub(1, std::memory_order_release);
+    }
+  }
+
+  std::thread::id owner_{};
+  std::atomic<int> entries_{0};
+  std::atomic<int> on_owner_thread_{0};
+  std::atomic<int> inside_{0};
+};
+}  // namespace
+
+// Holds that Finish does not return while a handler is still running. Which thread delivers the
+// terminal event is not something this case can choose: when the caller thread delivers it there
+// is nothing for Finish to wait for and the case only confirms that. Measured across separate
+// runs, the IO thread takes it roughly one time in three, and that is the run that matters. So
+// this asserts a true invariant on either schedule but does not on its own discriminate the
+// ordering change it came from; the evidence for that is in the commit that made it.
+TEST_F(BasicCurlHttpTests, FinishDoesNotReturnWhileAHandlerIsRunning)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  {
+    auto warm         = session_manager->CreateSession("http://127.0.0.1:19000");
+    auto warm_request = warm->CreateRequest();
+    warm_request->SetUri("get/");
+    auto warm_handler = std::make_shared<TerminalCountingHandler>();
+    warm->SendRequest(warm_handler);
+    ASSERT_TRUE(waitForRequests(30, 1));
+    warm->FinishSession();
+  }
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19937");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<LatchedCancelHandler>();
+  handler->owner_         = std::this_thread::get_id();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::Connecting;
+
+  session->SendRequest(handler);
+
+  const auto start = std::chrono::steady_clock::now();
+  session->FinishSession();
+  const auto finished = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::steady_clock::now() - start)
+                            .count();
+  const int still_inside = handler->inside_.load(std::memory_order_acquire);
+  session_manager->FinishAllSessions();
+
+  EXPECT_EQ(0, still_inside) << "Finish returned after " << finished
+                             << " ms with a handler still running";
+  EXPECT_GE(handler->entries_.load(std::memory_order_relaxed), 1)
+      << "the terminal event never arrived, so nothing was tested";
+}
+
+namespace
+{
+// Stays inside the terminal event until the case lets it out, so another thread's FinishSession()
+// has something to be held up by.
+class HeldTerminalHandler : public CustomEventHandler
+{
+public:
+  std::atomic<bool> inside_{false};
+  std::atomic<bool> release_{false};
+
+  void OnResponse(http_client::Response & /* response */) noexcept override {}
+
+  void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
+  {
+    if (http_client::SessionState::CreateFailed != state)
+    {
+      return;
+    }
+    inside_.store(true, std::memory_order_release);
+    while (!release_.load(std::memory_order_acquire))
+    {
+      std::this_thread::yield();
+    }
+    inside_.store(false, std::memory_order_release);
+  }
+};
+
+// Polls a condition to a deadline rather than sleeping for a fixed time, so a pass costs only as
+// long as the thing being waited for takes and a failure is a bounded wait rather than a hang.
+template <typename Predicate>
+bool WaitFor(Predicate ready, std::chrono::milliseconds budget)
+{
+  const auto deadline = std::chrono::steady_clock::now() + budget;
+  while (std::chrono::steady_clock::now() < deadline)
+  {
+    if (ready())
+    {
+      return true;
+    }
+    std::this_thread::yield();
+  }
+  return ready();
+}
+}  // namespace
+
+// A handler is allowed to finish the request it is being told about. On the IO thread's events
+// that used to be a deadlock, because Finish() waited on a promise only the thread running the
+// handler goes on to fulfil. Fixes #4402.
+TEST_F(BasicCurlHttpTests, FinishSessionFromAnEventTheIoThreadDelivers)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19937");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<FinishFromEventHandler>();
+  handler->finish_target_ = session.get();
+  handler->finish_at_     = http_client::SessionState::ConnectFailed;
+
+  // The handler has to be the first caller: a FinishSession() from here would take is_finished_
+  // and every later one would return without ever reaching the wait.
+  session->SendRequest(handler);
+
+  const bool entered =
+      WaitFor([&handler]() { return handler->entered_.load(std::memory_order_acquire); },
+              std::chrono::seconds(30));
+  ASSERT_TRUE(entered) << "the connect never failed, so no handler ran and nothing was tested";
+
+  const bool returned =
+      WaitFor([&handler]() { return handler->returned_.load(std::memory_order_acquire); },
+              std::chrono::seconds(30));
+  EXPECT_TRUE(returned) << "FinishSession() called from the event did not return";
+
+  session_manager->FinishAllSessions();
+}
+
+// The other half of the same ordering: an outside Finish() has to wait for the terminal event and
+// the completion callback, not just for the promise. The handler holds the event open and the
+// case watches the other thread stay inside FinishSession() until it lets go.
+TEST_F(BasicCurlHttpTests, FinishFromAnotherThreadWaitsForTheTerminalEvent)
+{
+  curl::HttpClient client;
+
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  ASSERT_TRUE(session != nullptr);
+  auto curl_session = std::static_pointer_cast<curl::Session>(session);
+
+  auto handler = std::make_shared<HeldTerminalHandler>();
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::RetryPolicy no_retry{};
+  http_client::Compression compression = http_client::Compression::kNone;
+
+  curl_session->GetOperation().reset(new curl::HttpOperation(
+      http_client::Method::Get, "http://127.0.0.1:19000/get/", no_ssl, handler.get(), headers, body,
+      compression, false, curl::kDefaultHttpConnTimeout, false, false, no_retry));
+
+  ASSERT_EQ(CURLE_OK, curl_session->GetOperation()->SendAsync(
+                          curl_session.get(), [](curl::HttpOperation & /* operation */) {}));
+
+  http_client::curl::HttpClientTestPeer::RefuseAdds(client);
+
+  std::atomic<bool> finish_returned{false};
+  std::thread finisher([&curl_session, &finish_returned]() {
+    curl_session->FinishSession();
+    finish_returned.store(true, std::memory_order_release);
+  });
+
+  // This thread is the one that dispatches the terminal event, so it is the one that parks inside
+  // the handler. Whoever lets it out has to be somebody else, and that somebody is also the only
+  // one placed to watch the finisher while the event is still running.
+  std::atomic<bool> observed_held{false};
+  std::atomic<bool> returned_early{false};
+  std::thread watcher([&handler, &finish_returned, &observed_held, &returned_early]() {
+    if (WaitFor([&handler]() { return handler->inside_.load(std::memory_order_acquire); },
+                std::chrono::seconds(30)))
+    {
+      observed_held.store(true, std::memory_order_release);
+      returned_early.store(
+          WaitFor([&finish_returned]() { return finish_returned.load(std::memory_order_acquire); },
+                  std::chrono::milliseconds(200)),
+          std::memory_order_release);
+    }
+    handler->release_.store(true, std::memory_order_release);
+  });
+
+  http_client::curl::HttpClientTestPeer::AddSessions(client);
+  http_client::curl::HttpClientTestPeer::AllowAdds(client);
+
+  watcher.join();
+  finisher.join();
+
+  ASSERT_TRUE(observed_held.load(std::memory_order_acquire))
+      << "the terminal event never reached the handler, so nothing was tested";
+  EXPECT_FALSE(returned_early.load(std::memory_order_acquire))
+      << "FinishSession() on another thread returned while the handler was still inside the "
+      << "terminal event";
+  EXPECT_TRUE(finish_returned.load(std::memory_order_acquire));
+
+  http_client::curl::HttpClientTestPeer::RemoveSessions(client);
+}
+
+TEST_F(BasicCurlHttpTests, CancelFromConnectingWhilePollingCompletes)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  {
+    auto warm         = session_manager->CreateSession("http://127.0.0.1:19000");
+    auto warm_request = warm->CreateRequest();
+    warm_request->SetUri("get/");
+    auto warm_handler = std::make_shared<TerminalCountingHandler>();
+    warm->SendRequest(warm_handler);
+    ASSERT_TRUE(waitForRequests(30, 1));
+    warm->FinishSession();
+    ASSERT_TRUE(warm_handler->got_response_.load(std::memory_order_acquire));
+  }
+
+  // Nothing listens on 19937, so this operation cannot answer on its own.
+  auto session = session_manager->CreateSession("http://127.0.0.1:19937");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<OverlappingCancelHandler>();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::Connecting;
+
+  session->SendRequest(handler);
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  // Two callbacks are in the handler at once here. That is what this client does today, not
+  // something EventHandler promises: the interface says nothing about whether one request's
+  // callbacks can overlap, so a handler written against it is not obliged to be re-entrant. The
+  // number is pinned because this case exists to reach that overlap, and a client that started
+  // serialising callbacks per operation would be an improvement worth noticing rather than a
+  // silent change. Read it as a record of the shape, not as a contract to preserve.
+  EXPECT_FALSE(handler->overlap_timed_out_.load(std::memory_order_acquire));
+  EXPECT_EQ(2, handler->max_concurrent_events_.load(std::memory_order_acquire));
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, handler->cancelled_from_callback_.load(std::memory_order_acquire));
+  EXPECT_FALSE(session->IsSessionActive());
 }
 
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
@@ -917,6 +1729,40 @@ TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
       ASSERT_TRUE(handlers[i]->got_response_.load(std::memory_order_acquire));
     }
   }
+}
+
+TEST_F(BasicCurlHttpTests, ASessionResetTookBeforeItWasQueuedIsFinished)
+{
+  auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(client != nullptr);
+  auto *concrete = static_cast<http_client::curl::HttpClient *>(client.get());
+
+  auto session = client->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  // The interleaving, in program order, which is what makes it a case rather than a window.
+  // A reset keeps the sessions whose ids are already in pending_to_add_session_ids_ and takes
+  // the rest, and a request that has not reached ScheduleAddSession yet is one of the rest:
+  // the caller is between CreateSession, which registered it, and SendAsync, which is what
+  // queues the id. Nothing here is sent, so the IO thread does not exist and this thread is
+  // standing exactly where it would be standing.
+  http_client::curl::HttpClientTestPeer::ResetMultiHandle(*concrete);
+
+  auto handler = std::make_shared<RecordingHandler>();
+  session->SendRequest(handler);
+
+  // Nothing is going to run this operation: the session it names is not registered any more,
+  // and adding the id back would leave the caller waiting on a transfer nobody arranged. So
+  // what has to happen is that it is finished. Returning from here is the assertion, and
+  // without it this hangs rather than fails.
+  session->FinishSession();
+
+  const auto states = handler->States();
+  ASSERT_FALSE(states.empty());
+  EXPECT_EQ(http_client::SessionState::CreateFailed, states.back());
+
+  client->FinishAllSessions();
 }
 
 TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
