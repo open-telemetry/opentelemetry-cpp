@@ -267,7 +267,30 @@ public:
   /**
    * Cleans up the session in the destructor.
    */
-  ~AsyncResponseHandler() override { session_->FinishSession(); }
+  ~AsyncResponseHandler() override
+  {
+    // An outcome is owed even here, or a waiter is left on a session that cannot finish.
+    // Reported before FinishSession(), which can block.
+    CompleteOnce(sdk::common::ExportResult::kFailure);
+    session_->FinishSession();
+  }
+
+  /**
+   * Report the outcome of this export, at most once. The HTTP client can deliver both a response
+   * and a terminal session event for one request, and the exporter counts one finished session
+   * per export, so only the first outcome is reported.
+   * @return whether this call is the one that reported.
+   */
+  bool CompleteOnce(sdk::common::ExportResult result) noexcept
+  {
+    bool expected = false;
+    if (!completed_.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
+    {
+      return false;
+    }
+    result_callback_(result);
+    return true;
+  }
 
   /**
    * Automatically called when the response is received
@@ -275,66 +298,88 @@ public:
   void OnResponse(http_client::Response &response) noexcept override
   {
 
-    // Store the body of the response
-    body_ = std::string(response.GetBody().begin(), response.GetBody().end());
+    const std::string body(response.GetBody().begin(), response.GetBody().end());
+    const bool written = body.find("\"failed\" : 0") != std::string::npos;
+
+    // Reported before anything is logged. CompleteOnce() retires the session and wakes
+    // ForceFlush() before it returns, and the log handler is replaceable, so one that calls
+    // ForceFlush() would otherwise wait for the session this call has not let go of. A response
+    // that loses the exchange says nothing either, since the outcome it would describe is not the
+    // one the caller was given.
+    if (!CompleteOnce(written ? sdk::common::ExportResult::kSuccess
+                              : sdk::common::ExportResult::kFailure))
+    {
+      return;
+    }
+
     if (console_debug_)
     {
       OTEL_INTERNAL_LOG_DEBUG(
-          "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body_);
+          "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body);
     }
-    if (body_.find("\"failed\" : 0") == std::string::npos)
+    if (!written)
     {
       OTEL_INTERNAL_LOG_ERROR(
           "[ES Log Exporter] Logs were not written to Elasticsearch correctly, response body: "
-          << body_);
-      result_callback_(sdk::common::ExportResult::kFailure);
-    }
-    else
-    {
-      result_callback_(sdk::common::ExportResult::kSuccess);
+          << body);
     }
   }
 
   // Callback method when an http event occurs
   void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
   {
-    bool need_stop = false;
+    // No default label, so -Wswitch reports a state added upstream rather than leaving it
+    // uncounted.
+    const char *failure = nullptr;
     switch (state)
     {
+      // On the way to an outcome, so nothing to report and, in particular, nothing to log: the
+      // session is still registered, and a replaceable log handler that flushed from here would
+      // wait on the export whose call stack it is standing in.
+      case http_client::SessionState::Created:
+      case http_client::SessionState::Connecting:
+      case http_client::SessionState::Connected:
+      case http_client::SessionState::Sending:
+      // The body arrives through OnResponse(), which is what reports the outcome.
+      case http_client::SessionState::Response:
+        break;
       case http_client::SessionState::CreateFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Create request to elasticsearch failed");
-        need_stop = true;
+        failure = "[ES Log Exporter] Create request to elasticsearch failed";
+        break;
+      case http_client::SessionState::Destroyed:
+        failure = "[ES Log Exporter] Session to elasticsearch destroyed before a response";
         break;
       case http_client::SessionState::ConnectFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Connection to elasticsearch failed");
-        need_stop = true;
+        failure = "[ES Log Exporter] Connection to elasticsearch failed";
         break;
       case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request failed to be sent to elasticsearch");
-        need_stop = true;
+        failure = "[ES Log Exporter] Request failed to be sent to elasticsearch";
         break;
       case http_client::SessionState::SSLHandshakeFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] SSL handshake to elasticsearch failed");
-        need_stop = true;
+        failure = "[ES Log Exporter] SSL handshake to elasticsearch failed";
         break;
       case http_client::SessionState::TimedOut:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch timed out");
-        need_stop = true;
+        failure = "[ES Log Exporter] Request to elasticsearch timed out";
         break;
       case http_client::SessionState::NetworkError:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error to elasticsearch");
-        need_stop = true;
+        failure = "[ES Log Exporter] Network error to elasticsearch";
+        break;
+      case http_client::SessionState::ReadError:
+        failure = "[ES Log Exporter] Read error";
+        break;
+      case http_client::SessionState::WriteError:
+        failure = "[ES Log Exporter] Write error";
         break;
       case http_client::SessionState::Cancelled:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch cancelled");
-        need_stop = true;
-        break;
-      default:
+        failure = "[ES Log Exporter] Request to elasticsearch cancelled";
         break;
     }
-    if (need_stop)
+
+    // Logged only when this event is the outcome. These can arrive after a response, and an
+    // error line there would describe a failure the caller was never told about.
+    if (failure != nullptr && CompleteOnce(sdk::common::ExportResult::kFailure))
     {
-      result_callback_(sdk::common::ExportResult::kFailure);
+      OTEL_INTERNAL_LOG_ERROR(failure);
     }
   }
 
@@ -344,8 +389,8 @@ private:
   // Callback to call to on receiving events
   std::function<bool(opentelemetry::sdk::common::ExportResult)> result_callback_;
 
-  // A string to store the response body
-  std::string body_ = "";
+  // Whether the outcome has already been reported
+  std::atomic<bool> completed_{false};
 
   // Whether to print the results from the callback
   bool console_debug_ = false;
@@ -446,12 +491,12 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
         {
           OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] ERROR: Export "
                                                << span_count
-                                               << " trace span(s) error: " << static_cast<int>(result));
+                                               << " log record(s) error: " << static_cast<int>(result));
         }
         else
         {
           OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Export " << span_count
-                                                                           << " trace span(s) success");
+                                                                           << " log record(s) success");
         }
 
         synchronization_data->finished_session_counter_.fetch_add(1, std::memory_order_release);

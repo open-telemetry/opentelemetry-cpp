@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Elasticsearch: report an asynchronous export's outcome exactly once
+  ([#4502](https://github.com/open-telemetry/opentelemetry-cpp/pull/4502))
+
 * [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
   If a model-specific limit is set it is used, otherwise the matching general
   limit, otherwise the model-specific default. Limit fields on
