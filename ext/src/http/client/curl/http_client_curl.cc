@@ -184,12 +184,22 @@ void Session::SendRequest(
 
     if (stream != Z_OK)
     {
+      // zs.msg points into the stream deflateEnd() releases.
+      const std::string reason = (nullptr != zs.msg) ? zs.msg : "";
+      deflateEnd(&zs);
+
+      // The handler may start another request on this session or drop the last reference to it,
+      // so nothing below this point may touch the session.
+      is_session_active_.store(false, std::memory_order_release);
+
       if (callback)
       {
-        callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
-                          zs.msg ? zs.msg : "");
+        callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed, reason);
       }
-      is_session_active_.store(false, std::memory_order_release);
+
+      // deflateInPlace() rewrote part of the body before reporting that it would not fit, and no
+      // Content-Encoding header describes what is left. The request does not go out.
+      return;
     }
 
     deflateEnd(&zs);

@@ -984,6 +984,46 @@ struct GzipEventHandler : public CustomEventHandler
   std::string reason_;
 };
 
+// A request whose compression step fails reports CreateFailed and is not sent.
+//
+// The failure is arranged, not injected: deflateInPlace() gets the body's own size as its output
+// budget, and one byte cannot hold a gzip header, so it returns Z_BUF_ERROR.
+TEST_F(BasicCurlHttpTests, AFailedCompressionStopsTheRequest)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("post/");
+  request->SetMethod(http_client::Method::Post);
+
+  http_client::Body body(1);
+  request->SetBody(body);
+  request->AddHeader("Content-Type", "text/plain");
+  request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
+
+  auto handler = std::make_shared<GzipEventHandler>();
+  session->SendRequest(handler);
+
+  // Asserted rather than assumed: a change that made this body compressible would otherwise leave
+  // the case passing while testing nothing.
+  ASSERT_TRUE(handler->is_called_) << "the compression did not fail, so nothing was tested";
+  ASSERT_EQ(handler->state_, http_client::SessionState::CreateFailed);
+
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  // Long enough that a request which was going to be sent has been. The server records every
+  // request it receives, including one whose body is unreadable.
+  std::this_thread::sleep_for(std::chrono::milliseconds{500});
+
+  std::unique_lock<std::mutex> lk1(mtx_requests);
+  EXPECT_TRUE(received_requests_.empty())
+      << "a request the caller was told had failed was sent anyway";
+}
+
 TEST_F(BasicCurlHttpTests, GzipCompressibleData)
 {
   received_requests_.clear();
@@ -1067,26 +1107,26 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
       63,  35,  21,  121, 152, 22,  242, 199, 106, 217, 199, 211, 206, 165, 88,  77,  112, 108, 193,
       122, 8,   193, 74,  91,  50,  6,   156, 185, 165, 15,  92,  116, 3,   18,  244, 165, 191, 2,
       183, 9,   164, 116, 75,  127};
-  const auto original_size = body.size();
 
   request->SetBody(body);
   request->AddHeader("Content-Type", "text/plain");
   request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
   auto handler = std::make_shared<GzipEventHandler>();
   session->SendRequest(handler);
-  ASSERT_TRUE(waitForRequests(30, 1));
-  session->FinishSession();
+
+  // deflateInPlace() overwrites part of the caller's buffer before reporting that the result will
+  // not fit, so no payload survives to send uncompressed. Whether to keep one is #4360.
   ASSERT_TRUE(handler->is_called_);
-  ASSERT_EQ(handler->state_, http_client::SessionState::Response);
-  ASSERT_TRUE(handler->reason_.empty());
+  ASSERT_EQ(handler->state_, http_client::SessionState::CreateFailed);
 
-  auto http_request =
-      dynamic_cast<opentelemetry::ext::http::client::curl::Request *>(request.get());
-  ASSERT_TRUE(http_request != nullptr);
-  ASSERT_EQ(http_request->body_.size(), original_size);
-
+  session->FinishSession();
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
+
+  std::this_thread::sleep_for(std::chrono::milliseconds{500});
+  std::unique_lock<std::mutex> lk1(mtx_requests);
+  EXPECT_TRUE(received_requests_.empty())
+      << "a body the compression step had already overwritten was sent anyway";
 }
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
