@@ -784,7 +784,6 @@ bool HttpClient::doAddSessions()
   for (auto &rejected : rejected_by_multi)
   {
     const char *reason = curl_multi_strerror(rejected.second);
-    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_multi_add_handle failed: " << reason);
 
     // Told the same way as a session this client never registered, because it is the same thing
     // from the handler's side: nothing is going to run this request.
@@ -793,6 +792,11 @@ bool HttpClient::doAddSessions()
     {
       operation->FinishUnscheduled(reason);
     }
+
+    // Settled first. A log handler is replaceable application code, and one that calls
+    // FinishSession() from here would otherwise wait on a promise only the line above fulfils,
+    // on this thread.
+    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_multi_add_handle failed: " << reason);
   }
 
   // Finishing a rejected session queues its removal, and the loop's idle check has already run

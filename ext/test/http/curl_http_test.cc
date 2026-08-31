@@ -13,13 +13,13 @@
 #  include <numeric>
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <cstring>
 #include <functional>
 #include <map>
-#include <memory>
 #include <mutex>
 #include <sstream>
 #include <string>
@@ -33,13 +33,16 @@
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 
 constexpr int HTTP_PORT{19000};
 
 namespace curl        = opentelemetry::ext::http::client::curl;
 namespace http_client = opentelemetry::ext::http::client;
+namespace sdk_common  = opentelemetry::sdk::common;
 namespace nostd       = opentelemetry::nostd;
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -779,6 +782,115 @@ TEST_F(BasicCurlHttpTests, AnUnscheduledSessionTellsAHandlerNothingElseHolds)
                              << "the ownership it says it is";
   EXPECT_LT(event_at, destroyed_at)
       << "the terminal event reached the handler after the last reference to it had gone";
+
+  http_client::curl::HttpClientTestPeer::RemoveSessions(client);
+}
+
+// Restores the global log handler and level whatever the case does, since both are process wide
+// and gtest runs one process per case only under CTest.
+class ScopedLogHandler
+{
+public:
+  explicit ScopedLogHandler(const nostd::shared_ptr<sdk_common::internal_log::LogHandler> &handler)
+      : previous_handler_(sdk_common::internal_log::GlobalLogHandler::GetLogHandler()),
+        previous_level_(sdk_common::internal_log::GlobalLogHandler::GetLogLevel())
+  {
+    sdk_common::internal_log::GlobalLogHandler::SetLogHandler(handler);
+
+    // Error rather than Debug: it is the level the refusal is written at, and anything wider
+    // hands this observer unrelated lines from the same path.
+    sdk_common::internal_log::GlobalLogHandler::SetLogLevel(
+        sdk_common::internal_log::LogLevel::Error);
+  }
+
+  ~ScopedLogHandler()
+  {
+    sdk_common::internal_log::GlobalLogHandler::SetLogHandler(previous_handler_);
+    sdk_common::internal_log::GlobalLogHandler::SetLogLevel(previous_level_);
+  }
+
+  ScopedLogHandler(const ScopedLogHandler &)            = delete;
+  ScopedLogHandler(ScopedLogHandler &&)                 = delete;
+  ScopedLogHandler &operator=(const ScopedLogHandler &) = delete;
+  ScopedLogHandler &operator=(ScopedLogHandler &&)      = delete;
+
+private:
+  nostd::shared_ptr<sdk_common::internal_log::LogHandler> previous_handler_;
+  sdk_common::internal_log::LogLevel previous_level_;
+};
+
+// Runs whatever the case gives it, on the thread that wrote the log line.
+class ObservingLogHandler : public sdk_common::internal_log::LogHandler
+{
+public:
+  explicit ObservingLogHandler(std::function<void()> observe) : observe_(std::move(observe)) {}
+
+  void Handle(sdk_common::internal_log::LogLevel /* level */,
+              const char * /* file */,
+              int /* line */,
+              const char * /* msg */,
+              const sdk_common::AttributeMap & /* attributes */) noexcept override
+  {
+    observe_();
+  }
+
+private:
+  std::function<void()> observe_;
+};
+
+// The refusal is reported through the global log handler, which is application code that can call
+// back into this client. Reporting before the operation is settled leaves a handler that answers
+// with FinishSession() waiting on a promise only this thread can fulfil.
+TEST_F(BasicCurlHttpTests, ARejectedSessionIsSettledBeforeItIsReported)
+{
+  curl::HttpClient client;
+
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  ASSERT_TRUE(session != nullptr);
+  auto curl_session = std::static_pointer_cast<curl::Session>(session);
+
+  auto handler = std::make_shared<RecordingHandler>();
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::RetryPolicy no_retry{};
+  http_client::Compression compression = http_client::Compression::kNone;
+
+  curl_session->GetOperation().reset(new curl::HttpOperation(
+      http_client::Method::Get, "http://127.0.0.1:19000/get/", no_ssl, handler.get(), headers, body,
+      compression, false, curl::kDefaultHttpConnTimeout, false, false, no_retry));
+
+  ASSERT_EQ(CURLE_OK, curl_session->GetOperation()->SendAsync(
+                          curl_session.get(), [](curl::HttpOperation & /* operation */) {}));
+
+  std::atomic<int> log_calls{0};
+  std::atomic<int> settled_when_logged{0};
+  auto observer = nostd::shared_ptr<sdk_common::internal_log::LogHandler>(
+      new ObservingLogHandler([&handler, &log_calls, &settled_when_logged]() {
+        log_calls.fetch_add(1, std::memory_order_release);
+
+        // The terminal event specifically. Created arrives during setup, so "the handler has
+        // seen something" is true in either order.
+        const std::vector<http_client::SessionState> states = handler->States();
+        if (std::find(states.begin(), states.end(), http_client::SessionState::CreateFailed) !=
+            states.end())
+        {
+          settled_when_logged.fetch_add(1, std::memory_order_release);
+        }
+      }));
+
+  {
+    ScopedLogHandler scoped{observer};
+    http_client::curl::HttpClientTestPeer::RefuseAdds(client);
+    http_client::curl::HttpClientTestPeer::AddSessions(client);
+    http_client::curl::HttpClientTestPeer::AllowAdds(client);
+  }
+
+  ASSERT_EQ(1, log_calls.load(std::memory_order_acquire))
+      << "the refusal was not reported once, so this case is not observing what it says it is";
+  EXPECT_EQ(1, settled_when_logged.load(std::memory_order_acquire))
+      << "the refusal was reported while the operation was still unsettled, so a log handler "
+      << "calling FinishSession() from here would wait on a promise only this thread fulfils";
 
   http_client::curl::HttpClientTestPeer::RemoveSessions(client);
 }
