@@ -12,6 +12,7 @@
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
 #include "opentelemetry/sdk/metrics/sync_instruments.h"
@@ -26,7 +27,8 @@ TEST(SyncInstruments, LongCounter)
   InstrumentDescriptor instrument_descriptor = {
       "long_counter", "description", "1", InstrumentType::kCounter, InstrumentValueType::kLong};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  LongCounter counter(instrument_descriptor, std::move(metric_storage));
+  LongCounter counter(instrument_descriptor, std::move(metric_storage),
+                      std::make_shared<MeterEnabledState>());
   counter.Add(10);
   counter.Add(10, opentelemetry::context::Context{});
 
@@ -43,7 +45,8 @@ TEST(SyncInstruments, DoubleCounter)
   InstrumentDescriptor instrument_descriptor = {
       "double_counter", "description", "1", InstrumentType::kCounter, InstrumentValueType::kDouble};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  DoubleCounter counter(instrument_descriptor, std::move(metric_storage));
+  DoubleCounter counter(instrument_descriptor, std::move(metric_storage),
+                        std::make_shared<MeterEnabledState>());
   counter.Add(10.10);
   counter.Add(10.10, opentelemetry::context::Context{});
 
@@ -63,7 +66,8 @@ TEST(SyncInstruments, LongUpDownCounter)
                                                 InstrumentType::kUpDownCounter,
                                                 InstrumentValueType::kLong};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  LongUpDownCounter counter(instrument_descriptor, std::move(metric_storage));
+  LongUpDownCounter counter(instrument_descriptor, std::move(metric_storage),
+                            std::make_shared<MeterEnabledState>());
   counter.Add(10);
   counter.Add(10, opentelemetry::context::Context{});
 
@@ -93,7 +97,8 @@ TEST(SyncInstruments, DoubleUpDownCounter)
                                                 InstrumentType::kUpDownCounter,
                                                 InstrumentValueType::kDouble};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  DoubleUpDownCounter counter(instrument_descriptor, std::move(metric_storage));
+  DoubleUpDownCounter counter(instrument_descriptor, std::move(metric_storage),
+                              std::make_shared<MeterEnabledState>());
   counter.Add(10.10);
   counter.Add(10.10, opentelemetry::context::Context{});
 
@@ -113,7 +118,8 @@ TEST(SyncInstruments, LongGauge)
   InstrumentDescriptor instrument_descriptor = {"long_gauge", "description", "1",
                                                 InstrumentType::kGauge, InstrumentValueType::kLong};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  LongGauge gauge(instrument_descriptor, std::move(metric_storage));
+  LongGauge gauge(instrument_descriptor, std::move(metric_storage),
+                  std::make_shared<MeterEnabledState>());
   gauge.Record(10);
   gauge.Record(10, opentelemetry::context::Context{});
 
@@ -131,7 +137,8 @@ TEST(SyncInstruments, DoubleGauge)
   InstrumentDescriptor instrument_descriptor = {
       "double_gauge", "description", "1", InstrumentType::kGauge, InstrumentValueType::kDouble};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  DoubleGauge gauge(instrument_descriptor, std::move(metric_storage));
+  DoubleGauge gauge(instrument_descriptor, std::move(metric_storage),
+                    std::make_shared<MeterEnabledState>());
   gauge.Record(10.10);
   gauge.Record(10.10, opentelemetry::context::Context{});
 
@@ -151,7 +158,8 @@ TEST(SyncInstruments, LongHistogram)
   InstrumentDescriptor instrument_descriptor = {
       "long_histogram", "description", "1", InstrumentType::kHistogram, InstrumentValueType::kLong};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  LongHistogram histogram(instrument_descriptor, std::move(metric_storage));
+  LongHistogram histogram(instrument_descriptor, std::move(metric_storage),
+                          std::make_shared<MeterEnabledState>());
   histogram.Record(10, opentelemetry::context::Context{});
 
   histogram.Record(10,
@@ -172,7 +180,8 @@ TEST(SyncInstruments, DoubleHistogram)
                                                 InstrumentType::kHistogram,
                                                 InstrumentValueType::kDouble};
   std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
-  DoubleHistogram histogram(instrument_descriptor, std::move(metric_storage));
+  DoubleHistogram histogram(instrument_descriptor, std::move(metric_storage),
+                            std::make_shared<MeterEnabledState>());
   histogram.Record(10.10, opentelemetry::context::Context{});
   histogram.Record(-10.10, opentelemetry::context::Context{});  // This is ignored.
   histogram.Record(std::numeric_limits<double>::quiet_NaN(),
@@ -185,4 +194,24 @@ TEST(SyncInstruments, DoubleHistogram)
                    opentelemetry::context::Context{});
   histogram.Record(10.10, opentelemetry::common::KeyValueIterableView<M>({}),
                    opentelemetry::context::Context{});
+}
+
+TEST(SyncInstruments, DisabledMeterStateSuppressesRecording)
+{
+  InstrumentDescriptor instrument_descriptor = {
+      "long_counter", "description", "1", InstrumentType::kCounter, InstrumentValueType::kLong};
+  std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
+  auto meter_enabled_state = std::make_shared<MeterEnabledState>(false);
+  LongCounter counter(instrument_descriptor, std::move(metric_storage), meter_enabled_state);
+
+  EXPECT_FALSE(counter.IsEnabled());
+  counter.Add(10);
+
+  // Enabling the meter enables the instrument without recreating it.
+  meter_enabled_state->SetEnabled(true);
+  EXPECT_TRUE(counter.IsEnabled());
+  counter.Add(10);
+
+  meter_enabled_state->SetEnabled(false);
+  EXPECT_FALSE(counter.IsEnabled());
 }

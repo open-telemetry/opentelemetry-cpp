@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add `MeterProvider::UpdateMeterConfigurator()` and example. Instruments
+  observe the enabled state of the Meter that created them, so a disabled Meter
+  behaves as a no-op Meter without instruments having to be recreated
+  [#4256](https://github.com/open-telemetry/opentelemetry-cpp/issues/4256)
 * [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
   If a model-specific limit is set it is used, otherwise the matching general
   limit, otherwise the model-specific default. Limit fields on
