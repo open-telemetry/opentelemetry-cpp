@@ -7,6 +7,7 @@
 #include <cstring>
 #include <limits>
 #include <map>
+#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>

@@ -9,6 +9,7 @@
 #include <functional>
 #include <map>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 #include "gmock/gmock.h"
@@ -44,7 +45,6 @@
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
 #  include <cstddef>
 #  include <future>
-#  include <thread>
 #  include <tuple>
 #  include <variant>
 
