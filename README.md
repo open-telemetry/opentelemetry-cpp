@@ -108,7 +108,6 @@ you're more than welcome to participate!
 ### Maintainers
 
 * [Doug Barker](https://github.com/dbarker)
-* [Ehsan Saei](https://github.com/esigo)
 * [Lalit Kumar Bhasin](https://github.com/lalitb), Microsoft
 * [Marc Alff](https://github.com/marcalff), Oracle
 * [Tom Tan](https://github.com/ThomsonTan), Microsoft
@@ -124,6 +123,7 @@ For more information about the approver role, see the [community repository](htt
 ### Emeritus
 
 * [Alolita Sharma](https://github.com/alolita), Triager
+* [Ehsan Saei](https://github.com/esigo), Maintainer
 * [Emil Mikulic](https://github.com/g-easy), Maintainer
 * [Jodee Varney](https://github.com/jodeev), Triager
 * [Johannes Tax](https://github.com/pyohannes), Approver
