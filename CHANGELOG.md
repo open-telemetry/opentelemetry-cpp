@@ -26,6 +26,10 @@ Increment the:
 
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
+
+* [CONFIGURATION] Cleanup build targets and docs
+  [#4486](https://github.com/open-telemetry/opentelemetry-cpp/pull/4486)
+
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
   and merge the resource per the resource SDK specification.
@@ -58,6 +62,9 @@ Increment the:
   resource detectors
   [#4412](https://github.com/open-telemetry/opentelemetry-cpp/issues/4412)
 
+* [CONFIGURATION] Internal logging cleanup
+  [#4479](https://github.com/open-telemetry/opentelemetry-cpp/pull/4479)
+
 * [CONFIGURATION] Add support for composable sampler extensions.
   [#4409](https://github.com/open-telemetry/opentelemetry-cpp/issues/4409)
 
@@ -77,6 +84,9 @@ Increment the:
 
 * [CONFIGURATION/BUILD] Add resource detector targets and README
   [#4430](https://github.com/open-telemetry/opentelemetry-cpp/pull/4430)
+
+* [CODE HEALTH] Resolve multiple clang tidy warnings
+  [#4492](https://github.com/open-telemetry/opentelemetry-cpp/pull/4492)
 
 * [SDK] `OTELResourceDetector` now percent-decodes values parsed from the
   `OTEL_RESOURCE_ATTRIBUTES` environment variable, per the W3C Baggage value
