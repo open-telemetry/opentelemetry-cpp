@@ -9,12 +9,17 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <memory>
 #include <string>
+
+#ifdef ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
+#  include <memory>
+#endif
 
 namespace grpc
 {
+#ifdef ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
 class ChannelCredentials;
+#endif
 class ChannelArguments;
 }  // namespace grpc
 
