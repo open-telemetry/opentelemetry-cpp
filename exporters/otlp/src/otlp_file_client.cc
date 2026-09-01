@@ -565,17 +565,17 @@ public:
             }
             else
             {
-              out.push_back(token);
+              out.emplace_back(token);
             }
           }
           else if (0 != std::strcmp(".", token))
           {
-            out.push_back(token);
+            out.emplace_back(token);
           }
         }
         else
         {
-          out.push_back(token);
+          out.emplace_back(token);
         }
       }
       token = SAFE_STRTOK_S(nullptr, "\\/", &saveptr);

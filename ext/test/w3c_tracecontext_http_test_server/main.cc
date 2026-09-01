@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 
         for (auto &part : body)
         {
-          auto headers_2 = const_cast<std::map<std::string, std::string> &>(req.headers);
+          auto headers_2 = req.headers;
 
           const TextMapCarrierTest carrier(headers_2);
           auto current_ctx = context::RuntimeContext::GetCurrent();

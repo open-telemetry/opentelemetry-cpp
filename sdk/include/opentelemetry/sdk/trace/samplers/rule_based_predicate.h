@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -42,8 +43,8 @@ struct RuleBasedPredicateOptions
   bool match_span_kind_producer = false;
   bool match_span_kind_consumer = false;
 
-  // Significant digits used to format double attribute values for matching.
-  int double_precision = 6;
+  // Significant digits used to format double attribute values for matching, capped at 17.
+  std::uint32_t double_precision = 6;
 };
 
 /**

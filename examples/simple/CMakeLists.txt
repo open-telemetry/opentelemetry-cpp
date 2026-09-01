@@ -4,7 +4,7 @@
 add_executable(example_simple main.cc)
 target_link_libraries(example_simple PRIVATE common_foo_library)
 
-if(DEFINED OPENTELEMETRY_BUILD_DLL)
+if(OTELCPP_BUILD_DLL)
   target_compile_definitions(example_simple
                              PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
   target_link_libraries(example_simple
@@ -15,6 +15,6 @@ else()
                            opentelemetry-cpp::ostream_span_exporter)
 endif()
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_test(NAME examples.simple COMMAND "$<TARGET_FILE:example_simple>")
 endif()
