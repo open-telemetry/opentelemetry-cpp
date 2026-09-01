@@ -26,6 +26,10 @@ Increment the:
 
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
+
+* [CONFIGURATION] Cleanup build targets and docs
+  [#4486](https://github.com/open-telemetry/opentelemetry-cpp/pull/4486)
+
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
   and merge the resource per the resource SDK specification.
