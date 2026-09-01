@@ -297,7 +297,8 @@ static std::vector<double> MakeRecordingValues()
   constexpr double kMinValue       = 1.0;
   constexpr double kMaxValue       = 10000.0;
 
-  thread_local std::mt19937 rng(std::random_device{}());
+  // NOLINTNEXTLINE(bugprone-random-generator-seed)
+  thread_local std::mt19937 rng(1234);
   thread_local std::uniform_real_distribution<double> dist(kMinValue, kMaxValue);
   std::vector<double> values(kNumValues);
   for (auto &val : values)
