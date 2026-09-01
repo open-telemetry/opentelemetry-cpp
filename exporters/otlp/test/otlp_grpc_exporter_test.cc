@@ -3,11 +3,13 @@
 
 #include <grpcpp/grpcpp.h>
 #include <gtest/gtest.h>
-#include <stdlib.h>
 #include <algorithm>
 #include <chrono>
+#include <cstddef>
+#include <cstdlib>
 #include <functional>
 #include <map>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <utility>
@@ -43,7 +45,6 @@
 // IWYU pragma: no_include <grpcpp/support/status.h>
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <cstddef>
 #  include <future>
 #  include <tuple>
 #  include <variant>

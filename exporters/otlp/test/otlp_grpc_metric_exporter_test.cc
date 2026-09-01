@@ -3,9 +3,9 @@
 
 #include <grpcpp/grpcpp.h>
 #include <gtest/gtest.h>
-#include <stdlib.h>
 #include <algorithm>
 #include <chrono>
+#include <cstdlib>
 #include <functional>
 #include <map>
 #include <string>

@@ -40,6 +40,14 @@
 
 using namespace testing;
 
+namespace google
+{
+namespace protobuf
+{
+class Message;
+}
+}  // namespace google
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
