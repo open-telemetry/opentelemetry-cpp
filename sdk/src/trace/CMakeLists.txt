@@ -52,5 +52,5 @@ if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     trace "OpenTelemetry SDK - Trace"
     "Components for exporting traces in the OpenTelemetry SDK."
-    "opentelemetry_resources")
+    "opentelemetry_resources" "opentelemetry_instrumentation_scope")
 endif()

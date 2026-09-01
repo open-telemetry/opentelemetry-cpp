@@ -24,7 +24,6 @@ add_executable(
 target_link_libraries(
   example_yaml
   PRIVATE ${CMAKE_THREAD_LIBS_INIT}
-          opentelemetry-cpp::configuration_registry_factory
           opentelemetry-cpp::configuration
           common_metrics_foo_library
           common_logs_foo_library
@@ -78,15 +77,15 @@ if(BUILD_TESTING)
      AND OTELCPP_WITH_PROMETHEUS
      AND OTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW)
     add_test(NAME examples.example_yaml_kitchen_sink
-             COMMAND $<TARGET_FILE:example_yaml> --test --yaml
+             COMMAND $<TARGET_FILE:example_yaml> --debug --yaml
                      ${CMAKE_CURRENT_SOURCE_DIR}/kitchen-sink.yaml)
   endif()
 
   add_test(NAME examples.example_yaml_extensions
-           COMMAND $<TARGET_FILE:example_yaml> --test --yaml
+           COMMAND $<TARGET_FILE:example_yaml> --debug --yaml
                    ${CMAKE_CURRENT_SOURCE_DIR}/extensions.yaml)
 
   add_test(NAME examples.example_yaml_sdk_default
-           COMMAND $<TARGET_FILE:example_yaml> --test --yaml
+           COMMAND $<TARGET_FILE:example_yaml> --debug --yaml
                    ${CMAKE_CURRENT_SOURCE_DIR}/sdk-default.yaml)
 endif()
