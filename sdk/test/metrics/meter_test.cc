@@ -114,21 +114,20 @@ public:
     {
       case LogLevel::Warning: {
         warnings.emplace_back(msg);
-        std::cout << "[Warning] " << msg << std::endl;
         break;
       }
       case LogLevel::Error: {
         errors.emplace_back(msg);
-        std::cout << "[Error] " << msg << std::endl;
         break;
       }
       case LogLevel::None:
       case LogLevel::Info:
       case LogLevel::Debug:
       default:
-        std::cout << "[" << LevelToString(level) << "] " << msg << std::endl;
         break;
     }
+
+    std::cout << "[" << LevelToString(level) << "] " << msg << "\n";
   }
 
   bool HasNameCaseConflictWarning() const
