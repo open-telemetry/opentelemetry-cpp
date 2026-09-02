@@ -21,7 +21,7 @@ public:
   InstrumentSelector(opentelemetry::sdk::metrics::InstrumentType instrument_type,
                      const std::string &name,
                      const std::string &units)
-      : name_filter_{PredicateFactory::GetPredicate(name, PredicateType::kPattern)},
+      : name_filter_{PredicateFactory::GetPredicate(name, PredicateType::kWildcard)},
         unit_filter_{PredicateFactory::GetPredicate(units, PredicateType::kExact)},
         instrument_type_{instrument_type}
   {}
