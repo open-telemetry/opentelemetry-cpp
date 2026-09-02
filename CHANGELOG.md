@@ -19,6 +19,13 @@ Increment the:
   `Base2ExponentialHistogramAggregation`, so a recording that spans the full
   double range no longer downscales without end.
   [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
+* [EXPORTER] Fix the Elasticsearch log exporter aborting the process when a log
+  record's body or attributes contain bytes that are not valid UTF-8. The
+  exporter now substitutes the replacement character for the invalid bytes
+  and continues, instead of `nlohmann::json::dump()` throwing out of a
+  `noexcept` function.
+  [#4439](https://github.com/open-telemetry/opentelemetry-cpp/issues/4439)
+
 * [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
   If a model-specific limit is set it is used, otherwise the matching general
   limit, otherwise the model-specific default. Limit fields on
