@@ -11,6 +11,7 @@
 #include <functional>
 #include <list>
 #include <mutex>
+#include <ostream>
 #include <string>
 #include <thread>
 #include <unordered_map>
@@ -23,6 +24,7 @@
 #include "opentelemetry/ext/http/common/url_parser.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
@@ -33,8 +35,6 @@
 #  include <array>
 
 #  include "opentelemetry/nostd/type_traits.h"
-#else
-#  include "opentelemetry/sdk/common/global_log_handler.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -46,6 +46,35 @@ namespace client
 {
 namespace curl
 {
+
+namespace
+{
+// Only ever called with the handle detached, either because it has been given back or because
+// the multi handle that held it has been cleaned up.
+//
+// The reset clears the callbacks and the pointers they are given, so that freeing the handle
+// cannot reach the operation or the event handler the caller has let go of by then. The header
+// list goes next, because libcurl does not copy it and the reset is what stops it being read.
+void ReleaseCurlResource(HttpCurlEasyResource &resource) noexcept
+{
+  if (nullptr != resource.easy_handle)
+  {
+    curl_easy_reset(resource.easy_handle);
+  }
+
+  if (nullptr != resource.headers_chunk)
+  {
+    curl_slist_free_all(resource.headers_chunk);
+    resource.headers_chunk = nullptr;
+  }
+
+  if (nullptr != resource.easy_handle)
+  {
+    curl_easy_cleanup(resource.easy_handle);
+    resource.easy_handle = nullptr;
+  }
+}
+}  // namespace
 
 HttpCurlGlobalInitializer::HttpCurlGlobalInitializer()
 {
@@ -318,6 +347,36 @@ HttpClient::~HttpClient()
   {
     std::lock_guard<std::mutex> lock_guard{multi_handle_m_};
     curl_multi_cleanup(multi_handle_);
+
+    // Nothing is attached to a multi handle that no longer exists, and clearing the pointer
+    // keeps anything released below from reaching for the one just destroyed.
+    attached_handles_.clear();
+    multi_handle_ = nullptr;
+  }
+
+  // The background thread has stopped, so nothing else is coming back for what it left behind.
+  // A batch at a time and with no lock held: a record owns the session it names, and letting one
+  // go runs a destructor that comes back through ScheduleRemoveSession. That can only queue what
+  // a session still held, and no more sessions are made here, so this ends.
+  releaseQuarantinedHandles();
+
+  while (true)
+  {
+    std::list<PendingCurlRemoval> pending_to_remove_session_handles;
+    {
+      std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
+      pending_to_remove_session_handles_.swap(pending_to_remove_session_handles);
+    }
+
+    if (pending_to_remove_session_handles.empty())
+    {
+      break;
+    }
+
+    for (auto &pending : pending_to_remove_session_handles)
+    {
+      ReleaseCurlResource(pending.resource);
+    }
   }
 }
 
@@ -394,19 +453,13 @@ void HttpClient::CleanupSession(uint64_t session_id)
     std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
     pending_to_add_session_ids_.erase(session_id);
 
-    if (session)
+    // A handle of this session that is queued for removal already holds the session, so there
+    // is nothing to decide about one here.
+    if (session && session->IsSessionActive() && session->GetOperation())
     {
-      if (pending_to_remove_session_handles_.end() !=
-          pending_to_remove_session_handles_.find(session_id))
-      {
-        pending_to_remove_sessions_.emplace_back(std::move(session));
-      }
-      else if (session->IsSessionActive() && session->GetOperation())
-      {
-        // If this session is already running, give it to the background thread for cleanup.
-        pending_to_abort_sessions_[session_id] = std::move(session);
-        need_wakeup_background_thread          = true;
-      }
+      // If this session is already running, give it to the background thread for cleanup.
+      pending_to_abort_sessions_[session_id] = std::move(session);
+      need_wakeup_background_thread          = true;
     }
   }
 
@@ -524,9 +577,11 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               {
                 // Session can not be destroyed when calling PerformCurlMessage
                 auto hold_session = session->shared_from_this();
-                operation->PerformCurlMessage(result);
 
-                if (operation->IsRetryable())
+                // Reading the message and taking it on for another attempt are one decision.
+                // Asking again afterwards reads whatever the last message left behind, which for
+                // an operation that has since been cleaned up is a status from before that.
+                if (operation->PerformCurlMessage(result))
                 {
                   self->pending_to_retry_sessions_.push_back(hold_session);
                 }
@@ -643,7 +698,6 @@ void HttpClient::ScheduleAddSession(uint64_t session_id)
   {
     std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
     pending_to_add_session_ids_.insert(session_id);
-    pending_to_remove_session_handles_.erase(session_id);
     pending_to_abort_sessions_.erase(session_id);
   }
 
@@ -676,9 +730,23 @@ void HttpClient::ScheduleAbortSession(uint64_t session_id)
 void HttpClient::ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource)
 {
   {
-    std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
+    // The session is taken here, in the same breath as the record. Looking it up when the record
+    // is drained instead leaves a gap the calling thread runs through: it returns from
+    // FinishSession, CleanupSession takes the session out of sessions_, and by then this queue
+    // has been swapped away, so neither side would be holding a session the handle still names.
+    std::lock_guard<std::mutex> session_lock_guard{sessions_m_};
+    std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
+
+    std::shared_ptr<Session> owner;
+    auto session = sessions_.find(session_id);
+    if (session != sessions_.end())
+    {
+      owner = session->second;
+    }
+
     pending_to_add_session_ids_.erase(session_id);
-    pending_to_remove_session_handles_[session_id] = std::move(resource);
+    pending_to_remove_session_handles_.push_back(
+        PendingCurlRemoval{session_id, std::move(resource), std::move(owner)});
   }
 
   wakeupBackgroundThread();
@@ -749,7 +817,18 @@ bool HttpClient::doAddSessions()
       continue;
     }
 
-    curl_multi_add_handle(multi_handle_, easy_handle);
+    const CURLMcode rc = curl_multi_add_handle(multi_handle_, easy_handle);
+    if (CURLM_OK != rc)
+    {
+      // The request never starts. Leaving the handle unrecorded is what stops the release path
+      // from asking the multi handle to give back something it was never given.
+      OTEL_INTERNAL_LOG_ERROR(
+          "[HTTP Client Curl] curl_multi_add_handle failed, this request will not be sent: "
+          << curl_multi_strerror(rc));
+      continue;
+    }
+
+    attached_handles_.insert(easy_handle);
     has_data = true;
   }
 
@@ -765,7 +844,7 @@ bool HttpClient::doAbortSessions()
   }
 
   bool has_data = false;
-  for (const auto &session : pending_to_abort_sessions)
+  for (auto &session : pending_to_abort_sessions)
   {
     if (!session.second)
     {
@@ -777,6 +856,20 @@ bool HttpClient::doAbortSessions()
       session.second->FinishOperation();
       has_data = true;
     }
+
+    // Aborting took this session out of sessions_ before FinishOperation queued its easy
+    // handle, so the record could not take the session for itself and is given it here. Nothing
+    // drains the queue in between: both run on this thread, one after the other.
+    {
+      std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
+      for (auto &pending : pending_to_remove_session_handles_)
+      {
+        if (pending.session_id == session.first && !pending.owner)
+        {
+          pending.owner = session.second;
+        }
+      }
+    }
   }
   return has_data;
 }
@@ -787,12 +880,11 @@ bool HttpClient::doRemoveSessions()
   bool should_continue{false};
   do
   {
-    std::unordered_map<uint64_t, HttpCurlEasyResource> pending_to_remove_session_handles;
-    std::list<std::shared_ptr<Session>> pending_to_remove_sessions;
+    std::list<PendingCurlRemoval> pending_to_remove_session_handles;
+    std::unordered_map<uint64_t, std::shared_ptr<Session>> pending_to_remove_sessions;
     {
       std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
       pending_to_remove_session_handles_.swap(pending_to_remove_session_handles);
-      pending_to_remove_sessions_.swap(pending_to_remove_sessions);
     }
     {
       // If user callback do not call CancelSession or FinishSession, We still need to remove it
@@ -800,10 +892,10 @@ bool HttpClient::doRemoveSessions()
       std::lock_guard<std::mutex> session_lock_guard{sessions_m_};
       for (auto &removing_handle : pending_to_remove_session_handles)
       {
-        auto session = sessions_.find(removing_handle.first);
+        auto session = sessions_.find(removing_handle.session_id);
         if (session != sessions_.end())
         {
-          pending_to_remove_sessions.emplace_back(std::move(session->second));
+          pending_to_remove_sessions.emplace(session->first, std::move(session->second));
           sessions_.erase(session);
         }
       }
@@ -811,19 +903,30 @@ bool HttpClient::doRemoveSessions()
 
     for (auto &removing_handle : pending_to_remove_session_handles)
     {
-      if (nullptr != removing_handle.second.headers_chunk)
+      auto &resource = removing_handle.resource;
+      if (nullptr == resource.easy_handle)
       {
-        curl_slist_free_all(removing_handle.second.headers_chunk);
+        continue;
       }
 
-      curl_multi_remove_handle(multi_handle_, removing_handle.second.easy_handle);
-      curl_easy_cleanup(removing_handle.second.easy_handle);
+      // Give the handle back first. libcurl does not copy the header list, so it stays in use
+      // for as long as the multi handle has a transfer running on this handle.
+      if (!detachHandle(resource.easy_handle))
+      {
+        // Still held, so a transfer may still be running on it and its CURLOPT_PRIVATE still
+        // names this session. The record carries that session already, so keeping the record
+        // keeps both.
+        quarantined_handles_.push_back(std::move(removing_handle));
+        continue;
+      }
+
+      ReleaseCurlResource(resource);
     }
 
     for (auto &removing_session : pending_to_remove_sessions)
     {
       // This operation may add more pending_to_remove_session_handles
-      removing_session->FinishOperation();
+      removing_session.second->FinishOperation();
     }
 
     should_continue =
@@ -860,8 +963,25 @@ bool HttpClient::doRetrySessions(bool report_all)
     else if (operation->NextRetryTime() < now)
     {
       auto easy_handle = operation->GetCurlEasyHandle();
-      curl_multi_remove_handle(multi_handle_, easy_handle);
-      curl_multi_add_handle(multi_handle_, easy_handle);
+
+      // If the multi handle will not give it back, the add below is answered with
+      // CURLM_ADDED_ALREADY and the transfer carries on where it was.
+      detachHandle(easy_handle);
+
+      const CURLMcode rc = curl_multi_add_handle(multi_handle_, easy_handle);
+      if (CURLM_OK == rc)
+      {
+        attached_handles_.insert(easy_handle);
+      }
+      else
+      {
+        // The session leaves the retry queue either way, so say so rather than let a request
+        // that was never re-armed look like one that was.
+        OTEL_INTERNAL_LOG_ERROR(
+            "[HTTP Client Curl] curl_multi_add_handle failed, this retry will not be sent: "
+            << curl_multi_strerror(rc));
+      }
+
       retry_it = pending_to_retry_sessions_.erase(retry_it);
       has_data = true;
     }
@@ -908,12 +1028,55 @@ void HttpClient::resetMultiHandle()
 
   doRemoveSessions();
 
-  // We will modify the multi_handle_, so we need to lock it
-  std::lock_guard<std::mutex> lock_guard{multi_handle_m_};
-  curl_multi_cleanup(multi_handle_);
+  {
+    // We will modify the multi_handle_, so we need to lock it
+    std::lock_guard<std::mutex> lock_guard{multi_handle_m_};
+    curl_multi_cleanup(multi_handle_);
 
-  // Create a another multi handle to continue pending sessions
-  multi_handle_ = curl_multi_init();
+    // The cleanup detached everything the old handle held, so nothing is attached any more and
+    // nothing may be offered back to the handle created below.
+    attached_handles_.clear();
+
+    // Create a another multi handle to continue pending sessions
+    multi_handle_ = curl_multi_init();
+  }
+
+  releaseQuarantinedHandles();
+}
+
+bool HttpClient::detachHandle(CURL *easy_handle)
+{
+  if (attached_handles_.end() == attached_handles_.find(easy_handle))
+  {
+    // The multi handle was never given this one, so it has nothing to give back. Asking libcurl
+    // is not a way to find that out: 8.10 and 8.11 reject a handle the multi handle does not
+    // hold, and a multi handle that failed to initialize rejects every handle.
+    return true;
+  }
+
+  const CURLMcode rc = curl_multi_remove_handle(multi_handle_, easy_handle);
+  if (CURLM_OK != rc)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[HTTP Client Curl] curl_multi_remove_handle failed, the handle stays "
+        "with the multi handle: "
+        << curl_multi_strerror(rc));
+    return false;
+  }
+
+  attached_handles_.erase(easy_handle);
+  return true;
+}
+
+void HttpClient::releaseQuarantinedHandles()
+{
+  std::list<PendingCurlRemoval> quarantined_handles;
+  quarantined_handles.swap(quarantined_handles_);
+
+  for (auto &quarantined : quarantined_handles)
+  {
+    ReleaseCurlResource(quarantined.resource);
+  }
 }
 
 }  // namespace curl
