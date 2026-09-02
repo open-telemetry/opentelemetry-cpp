@@ -274,6 +274,10 @@ Increment the:
   shutdown and force flush.
   [#4382](https://github.com/open-telemetry/opentelemetry-cpp/pull/4382)
 
+* [SDK] Fix lost-wakeups in BatchLogRecordProcessor to prevent stalls during
+  shutdown and force flush.
+  [#4400](https://github.com/open-telemetry/opentelemetry-cpp/issues/4400)
+
 * [METRICS SDK] Support `OTEL_METRICS_EXEMPLAR_FILTER` when metrics exemplars
   are enabled. The default exemplar filter changes from `always_off` to
   `trace_based` to match the specification.
