@@ -620,7 +620,7 @@ TEST_F(MeterCreateInstrumentTest, IdenticalSyncInstruments)
   counter1->Add(1.0, {{"key", "value1"}});
   counter2->Add(2.5, {{"key", "value2"}});
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"my_counter", "desc", "unit", InstrumentType::kCounter,
@@ -642,7 +642,7 @@ TEST_F(MeterCreateInstrumentTest, NameCaseConflictSyncInstruments)
   counter1->Add(1);
   counter2->Add(2);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"My_CountER", "desc", "unit", InstrumentType::kCounter,
@@ -672,7 +672,7 @@ TEST_F(MeterCreateInstrumentTest, ViewCorrectedNameCaseConflictSyncInstruments)
   counter1->Add(1);
   counter2->Add(2);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"my_counter", "desc", "unit", InstrumentType::kCounter,
@@ -694,7 +694,7 @@ TEST_F(MeterCreateInstrumentTest, DuplicateSyncInstrumentsByKind)
   counter1->Add(1, {{"key", "value1"}});
   counter2->Add(1, {{"key", "value2"}});
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 2);
     InstrumentDescriptor double_descriptor{"my_counter", "desc", "unit", InstrumentType::kCounter,
@@ -721,7 +721,7 @@ TEST_F(MeterCreateInstrumentTest, DuplicateSyncInstrumentsByUnits)
   counter1->Add(1, {{"key", "value1"}});
   counter2->Add(1, {{"key", "value2"}});
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 2);
     InstrumentDescriptor unit_descriptor{"my_counter", "desc", "unit", InstrumentType::kCounter,
@@ -749,7 +749,7 @@ TEST_F(MeterCreateInstrumentTest, DuplicateSyncInstrumentsByDescription)
   counter1->Add(1, {{"key", "value1"}});
   counter2->Add(1, {{"key", "value2"}});
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 2);
     InstrumentDescriptor desc_descriptor{"my_counter", "desc", "unit", InstrumentType::kCounter,
@@ -782,7 +782,7 @@ TEST_F(MeterCreateInstrumentTest, ViewCorrectedDuplicateSyncInstrumentsByDescrip
   counter1->Add(1, {{"key", "value1"}});
   counter2->Add(1, {{"key", "value2"}});
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     // only one metric_data object expected after correction with the view
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
@@ -808,7 +808,7 @@ TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithDropAggregation)
   counter1->Add(1, {{"key", "value1"}});
   counter2->Add(1, {{"key", "value2"}});
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor dropped_descriptor{"counter_one", "desc", "unit", InstrumentType::kCounter,
@@ -839,7 +839,7 @@ TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithCatchAllDropAggregation)
   counter1->Add(1, {{"key", "value1"}});
   counter2->Add(1, {{"key", "value2"}});
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor dropped_descriptor{"counter_two", "desc", "unit", InstrumentType::kCounter,
@@ -867,7 +867,7 @@ TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithConflictingAggregation)
 
   counter1->Add(1, {{"key", "value1"}});
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"counter_one", "desc", "unit", InstrumentType::kCounter,
@@ -896,7 +896,7 @@ TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithMultipleAggregations)
   counter1->Add(1, {{"key", "value1"}});
   counter1->Add(4, {{"key", "value2"}});
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 2);
     InstrumentDescriptor descriptor_default{"counter_one", "desc", "unit", InstrumentType::kCounter,
@@ -926,7 +926,7 @@ TEST_F(MeterCreateInstrumentTest, IdenticalAsyncInstruments)
   observable_counter1->AddCallback(ObservableResultDouble::Callback, &callback1);
   observable_counter2->AddCallback(ObservableResultDouble::Callback, &callback2);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"observable_counter", "desc", "unit",
@@ -954,7 +954,7 @@ TEST_F(MeterCreateInstrumentTest, NameCaseConflictAsyncInstruments)
   observable_counter1->AddCallback(ObservableResultDouble::Callback, &callback1);
   observable_counter2->AddCallback(ObservableResultDouble::Callback, &callback2);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"OBServable_CounTER", "desc", "unit",
@@ -986,7 +986,7 @@ TEST_F(MeterCreateInstrumentTest, ViewCorrectedNameCaseConflictAsyncInstruments)
   observable_counter1->AddCallback(ObservableResultDouble::Callback, &callback1);
   observable_counter2->AddCallback(ObservableResultDouble::Callback, &callback2);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"observable_counter", "desc", "unit",
@@ -1013,7 +1013,7 @@ TEST_F(MeterCreateInstrumentTest, DuplicateAsyncInstrumentsByKind)
   observable_counter1->AddCallback(ObservableResultDouble::Callback, &callback1);
   observable_counter2->AddCallback(ObservableResultDouble::Callback, &callback2);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 2);
     InstrumentDescriptor counter_descriptor{"observable_counter", "", "",
@@ -1047,7 +1047,7 @@ TEST_F(MeterCreateInstrumentTest, DuplicateAsyncInstrumentsByUnits)
   observable_counter1->AddCallback(ObservableResultDouble::Callback, &callback1);
   observable_counter2->AddCallback(ObservableResultDouble::Callback, &callback2);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 2);
     InstrumentDescriptor unit_descriptor{"observable_counter", "desc", "unit",
@@ -1081,7 +1081,7 @@ TEST_F(MeterCreateInstrumentTest, DuplicateAsyncInstrumentsByDescription)
   observable_counter1->AddCallback(ObservableResultDouble::Callback, &callback1);
   observable_counter2->AddCallback(ObservableResultDouble::Callback, &callback2);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 2);
     InstrumentDescriptor desc_descriptor{"observable_counter", "desc", "unit",
@@ -1121,7 +1121,7 @@ TEST_F(MeterCreateInstrumentTest, ViewCorrectedDuplicateAsyncInstrumentsByDescri
   observable_counter1->AddCallback(ObservableResultDouble::Callback, &callback1);
   observable_counter2->AddCallback(ObservableResultDouble::Callback, &callback2);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"observable_counter", "desc", "unit",
@@ -1153,7 +1153,7 @@ TEST_F(MeterCreateInstrumentTest, AsyncInstrumentWithDropAggregation)
   observable_counter1->AddCallback(ObservableResultDouble::Callback, &callback1);
   observable_counter2->AddCallback(ObservableResultDouble::Callback, &callback2);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor dropped_descriptor{"observable_counter_one", "desc", "unit",
@@ -1192,7 +1192,7 @@ TEST_F(MeterCreateInstrumentTest, ASyncInstrumentWithCatchAllDropAggregation)
   observable_counter1->AddCallback(ObservableResultDouble::Callback, &callback1);
   observable_counter2->AddCallback(ObservableResultDouble::Callback, &callback2);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor_kept{"observable_counter_one", "desc", "unit",
@@ -1226,7 +1226,7 @@ TEST_F(MeterCreateInstrumentTest, ASyncInstrumentWithConflictingAggregation)
 
   observable_counter1->AddCallback(ObservableResultDouble::Callback, &callback1);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"observable_counter_one", "desc", "unit",
@@ -1259,7 +1259,7 @@ TEST_F(MeterCreateInstrumentTest, ASyncInstrumentWithMultipleAggregations)
 
   observable_counter1->AddCallback(ObservableResultDouble::Callback, &callback1);
 
-  metric_reader_ptr_->Collect([this](ResourceMetrics &metric_data) {
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
     const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
     EXPECT_EQ(data.size(), 2);
     InstrumentDescriptor descriptor_default{"observable_counter", "desc", "unit",
