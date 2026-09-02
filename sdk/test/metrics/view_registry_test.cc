@@ -18,6 +18,23 @@
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::instrumentationscope;
 
+TEST(InstrumentSelector, NameFilterUsesWildcardMatching)
+{
+  InstrumentSelector star_selector{InstrumentType::kCounter, "my_counter*", ""};
+  EXPECT_TRUE(star_selector.GetNameFilter()->Match("my_counter"));
+  EXPECT_TRUE(star_selector.GetNameFilter()->Match("my_counter_one"));
+  EXPECT_TRUE(star_selector.GetNameFilter()->Match("my_counter_two"));
+  EXPECT_FALSE(star_selector.GetNameFilter()->Match("other_counter"));
+
+  InstrumentSelector question_selector{InstrumentType::kCounter, "my_counter_?", ""};
+  EXPECT_TRUE(question_selector.GetNameFilter()->Match("my_counter_1"));
+  EXPECT_FALSE(question_selector.GetNameFilter()->Match("my_counter_12"));
+
+  InstrumentSelector literal_selector{InstrumentType::kCounter, "my.counter*", ""};
+  EXPECT_TRUE(literal_selector.GetNameFilter()->Match("my.counter_one"));
+  EXPECT_FALSE(literal_selector.GetNameFilter()->Match("myXcounter_one"));
+}
+
 TEST(ViewRegistry, FindViewsEmptyRegistry)
 {
   InstrumentDescriptor default_instrument_descriptor = {
