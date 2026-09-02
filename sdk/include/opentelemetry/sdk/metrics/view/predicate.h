@@ -3,9 +3,11 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/wildcard_match.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
@@ -54,6 +56,19 @@ private:
 #else
   std::string reg_key_;
 #endif
+};
+
+class WildcardPredicate : public Predicate
+{
+public:
+  WildcardPredicate(opentelemetry::nostd::string_view pattern) : pattern_{pattern} {}
+  bool Match(opentelemetry::nostd::string_view str) const noexcept override
+  {
+    return opentelemetry::sdk::common::WildcardMatch(pattern_, str);
+  }
+
+private:
+  std::string pattern_;
 };
 
 class ExactPredicate : public Predicate
