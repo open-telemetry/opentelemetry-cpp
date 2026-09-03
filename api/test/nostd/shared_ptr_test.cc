@@ -221,7 +221,7 @@ static void SharedPtrTest_Sort(size_t size = 10)
 
   for (int i = static_cast<int>(size); i > 0; i--)
   {
-    nums.push_back(shared_ptr<int>(new int(i)));
+    nums.emplace_back(new int(i));
   }
 
   auto nums2 = nums;

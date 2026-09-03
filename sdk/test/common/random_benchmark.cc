@@ -21,7 +21,8 @@ BENCHMARK(BM_RandomIdGeneration);
 
 void BM_RandomIdStdGeneration(benchmark::State &state)
 {
-  std::mt19937_64 generator{0};
+  // NOLINTNEXTLINE(bugprone-random-generator-seed)
+  std::mt19937_64 generator{1234};
   while (state.KeepRunning())
   {
     benchmark::DoNotOptimize(generator());

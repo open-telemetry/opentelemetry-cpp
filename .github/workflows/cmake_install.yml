@@ -25,6 +25,7 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           submodules: 'recursive'
       - name: Build dependencies with vcpkg submodule
         run: |
@@ -49,6 +50,7 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           submodules: 'recursive'
       - name: Build dependencies with vcpkg submodule
         run: |
@@ -73,6 +75,7 @@ jobs:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        persist-credentials: false
         submodules: 'recursive'
     - name: Setup CI Environment
       run: |
@@ -107,6 +110,7 @@ jobs:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        persist-credentials: false
         submodules: 'recursive'
     - name: Setup CI Environment
       run: |
@@ -139,6 +143,7 @@ jobs:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        persist-credentials: false
         submodules: 'recursive'
     - name: Setup CI Environment
       run: |
@@ -174,6 +179,7 @@ jobs:
         egress-policy: audit
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        persist-credentials: false
         submodules: 'recursive'
     - name: Setup CI Environment
       run: |
@@ -209,6 +215,7 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           submodules: 'recursive'
       - name: Free Disk Space
         run: ./ci/free_disk_space.sh
@@ -250,6 +257,7 @@ jobs:
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           submodules: 'recursive'
       - name: Free Disk Space
         run: ./ci/free_disk_space.sh
@@ -292,6 +300,7 @@ jobs:
 
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        persist-credentials: false
         submodules: 'recursive'
     - name: Install CMake
       run: |
@@ -326,6 +335,7 @@ jobs:
 
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+        persist-credentials: false
         submodules: 'recursive'
     - name: Install Dependencies with Homebrew
       run: |

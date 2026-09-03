@@ -14,12 +14,12 @@
       "ctestCommandArgs": "",
       "variables": [
         {
-          "name": "WITH_OTLP_GRPC",
+          "name": "OTELCPP_WITH_OTLP_GRPC",
           "value": "True",
           "type": "BOOL"
         },
         {
-          "name": "WITH_EXAMPLES",
+          "name": "OTELCPP_WITH_EXAMPLES",
           "value": "true",
           "type": "BOOL"
         }
@@ -40,12 +40,12 @@
       "cmakeToolchain": "",
       "variables": [
         {
-          "name": "WITH_OTLP_GRPC",
+          "name": "OTELCPP_WITH_OTLP_GRPC",
           "value": "True",
           "type": "BOOL"
         },
         {
-          "name": "WITH_EXAMPLES",
+          "name": "OTELCPP_WITH_EXAMPLES",
           "value": "true",
           "type": "BOOL"
         }
@@ -65,22 +65,22 @@
       "ctestCommandArgs": "",
       "variables": [
         {
-          "name": "WITH_STL",
+          "name": "OTELCPP_WITH_STL",
           "value": "True",
           "type": "BOOL"
         },
         {
-          "name": "WITH_OTLP_GRPC",
+          "name": "OTELCPP_WITH_OTLP_GRPC",
           "value": "True",
           "type": "BOOL"
         },
         {
-          "name": "WITH_EXAMPLES",
+          "name": "OTELCPP_WITH_EXAMPLES",
           "value": "true",
           "type": "BOOL"
         },
         {
-          "name": "WITH_PROMETHEUS",
+          "name": "OTELCPP_WITH_PROMETHEUS",
           "value": "True",
           "type": "BOOL"
         }
@@ -101,22 +101,22 @@
       "cmakeToolchain": "",
       "variables": [
         {
-          "name": "WITH_STL",
+          "name": "OTELCPP_WITH_STL",
           "value": "True",
           "type": "BOOL"
         },
         {
-          "name": "WITH_OTLP_GRPC",
+          "name": "OTELCPP_WITH_OTLP_GRPC",
           "value": "True",
           "type": "BOOL"
         },
         {
-          "name": "WITH_EXAMPLES",
+          "name": "OTELCPP_WITH_EXAMPLES",
           "value": "true",
           "type": "BOOL"
         },
         {
-          "name": "WITH_PROMETHEUS",
+          "name": "OTELCPP_WITH_PROMETHEUS",
           "value": "True",
           "type": "BOOL"
         }

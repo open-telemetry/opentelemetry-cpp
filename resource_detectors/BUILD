@@ -95,6 +95,43 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "service_resource_detector_utils",
+    srcs = ["src/service_detector_utils.cc"],
+    copts = ["-fexceptions"],
+    deps = [
+        ":process_resource_detector",
+        "//api",
+        "//resource_detectors:headers",
+        "//sdk:headers",
+        "//sdk/src/common:env_variables",
+        "//sdk/src/common:random",
+        "//sdk/src/resource",
+    ],
+)
+
+cc_library(
+    name = "service_resource_detector",
+    srcs = ["src/service_detector.cc"],
+    copts = ["-fexceptions"],
+    deps = [
+        ":service_resource_detector_utils",
+        "//api",
+        "//resource_detectors:headers",
+        "//sdk:headers",
+        "//sdk/src/resource",
+    ],
+)
+
+cc_library(
+    name = "service_resource_detector_builder",
+    srcs = ["src/service_detector_builder.cc"],
+    deps = [
+        ":service_resource_detector",
+        "//sdk/src/configuration:configuration_core",
+    ],
+)
+
 # Convenience target linking all resource detectors.
 cc_library(
     name = "resource_detectors",
@@ -103,6 +140,7 @@ cc_library(
         ":env_entity_resource_detector",
         ":host_resource_detector",
         ":process_resource_detector",
+        ":service_resource_detector",
     ],
 )
 
@@ -113,5 +151,6 @@ cc_library(
         ":container_resource_detector_builder",
         ":host_resource_detector_builder",
         ":process_resource_detector_builder",
+        ":service_resource_detector_builder",
     ],
 )
