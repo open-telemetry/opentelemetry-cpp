@@ -118,7 +118,15 @@ public:
         cancelled_from_callback_.fetch_add(1, std::memory_order_release);
       }
     }
-    else if (state == cancel_at_ && cancel_target_ != nullptr)
+
+    if (state == http_client::SessionState::ConnectFailed ||
+        state == http_client::SessionState::SendFailed)
+    {
+      terminal_count_.fetch_add(1, std::memory_order_release);
+      failed_count_.fetch_add(1, std::memory_order_release);
+    }
+
+    if (state == cancel_at_ && cancel_target_ != nullptr)
     {
       auto *session   = cancel_target_;
       cancel_target_  = nullptr;
@@ -134,6 +142,7 @@ public:
   std::thread::id cancelled_from_{};
   std::atomic<int> terminal_count_{0};
   std::atomic<int> cancelled_from_callback_{0};
+  std::atomic<int> failed_count_{0};
 };
 
 class GetEventHandler : public CustomEventHandler
