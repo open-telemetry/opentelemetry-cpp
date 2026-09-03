@@ -20,12 +20,13 @@ namespace resource_detector
 {
 
 /**
- * This is the file path from where we can get container.id on cgroup v1
+ * This is the file path from where we can get container.id from cgroup paths
  */
 constexpr const char *kCGroupPath = "/proc/self/cgroup";
 
 /**
- * This is the file path from where we can get container.id on cgroup v2
+ * Fallback file path from where we can get container.id from container runtime bind mount paths
+ * (needed on cgroup v2 with a private cgroup namespace, where /proc/self/cgroup is just "0::/")
  */
 constexpr const char *kMountInfoPath = "/proc/self/mountinfo";
 

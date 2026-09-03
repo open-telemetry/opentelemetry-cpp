@@ -15,7 +15,7 @@ namespace detail
 {
 
 /**
- * Reads the container.id from /proc/self/cgroup file (cgroup v1).
+ * Reads the container.id from /proc/self/cgroup file.
  * @param file_path file path of cgroup
  * @return container.id as string or an empty string if not found on error
  */
@@ -29,7 +29,9 @@ std::string GetContainerIDFromCgroup(const char *file_path);
 std::string ExtractContainerIDFromLine(nostd::string_view line);
 
 /**
- * Reads the container.id from /proc/self/mountinfo file (cgroup v2).
+ * Reads the container.id from container runtime bind mount paths in /proc/self/mountinfo.
+ * Used as a fallback when /proc/self/cgroup does not contain the id (e.g. cgroup v2 with a
+ * private cgroup namespace).
  * @param file_path file path of mountinfo
  * @return container.id as string or an empty string if not found on error
  */

@@ -75,7 +75,8 @@ std::string ExtractContainerIDFromMountInfoLine(nostd::string_view line)
 {
   /**
    * This regex is designed to extract container IDs from /proc/self/mountinfo file lines.
-   * On cgroup v2 hosts the container id is present in the bind mount source paths of
+   * When /proc/self/cgroup does not contain the id (e.g. cgroup v2 with a private cgroup
+   * namespace) the container id is still present in the bind mount source paths of
    * /etc/hostname, /etc/hosts and /etc/resolv.conf, e.g.:
    * /docker/containers/e9974a495c2e01d17b9c71d4469cd6636ca733cd514e6ee49e1435fc03a93592/hostname
    * The line must contain "containers" or "hostname" and the id is a 64 character hex path
