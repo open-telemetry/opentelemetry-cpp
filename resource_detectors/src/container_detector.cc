@@ -17,14 +17,24 @@ namespace resource_detector
 {
 
 /**
- * This is the file path from where we can get container.id
+ * This is the file path from where we can get container.id on cgroup v1
  */
 constexpr const char *kCGroupPath = "/proc/self/cgroup";
+
+/**
+ * This is the file path from where we can get container.id on cgroup v2
+ */
+constexpr const char *kMountInfoPath = "/proc/self/mountinfo";
 
 opentelemetry::sdk::resource::Resource ContainerResourceDetector::Detect() noexcept
 {
   std::string container_id =
       opentelemetry::resource_detector::detail::GetContainerIDFromCgroup(kCGroupPath);
+  if (container_id.empty())
+  {
+    container_id =
+        opentelemetry::resource_detector::detail::GetContainerIDFromMountInfo(kMountInfoPath);
+  }
   if (container_id.empty())
   {
     return ResourceDetector::Create({});

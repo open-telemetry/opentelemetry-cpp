@@ -55,6 +55,44 @@ std::string ExtractContainerIDFromLine(nostd::string_view line)
   return std::string();
 }
 
+std::string GetContainerIDFromMountInfo(const char *file_path)
+{
+  std::ifstream mountinfo_file(file_path);
+  std::string line;
+
+  while (std::getline(mountinfo_file, line))
+  {
+    std::string container_id = ExtractContainerIDFromMountInfoLine(line);
+    if (!container_id.empty())
+    {
+      return container_id;
+    }
+  }
+  return std::string();
+}
+
+std::string ExtractContainerIDFromMountInfoLine(nostd::string_view line)
+{
+  /**
+   * This regex is designed to extract container IDs from /proc/self/mountinfo file lines.
+   * On cgroup v2 hosts the container id is present in the bind mount source paths of
+   * /etc/hostname, /etc/hosts and /etc/resolv.conf, e.g.:
+   * /docker/containers/e9974a495c2e01d17b9c71d4469cd6636ca733cd514e6ee49e1435fc03a93592/hostname
+   * The line must contain "containers" or "hostname" and the id is a 64 character hex path
+   * segment delimited by '/' on both sides (or end of path).
+   */
+  static const std::regex container_id_regex(
+      R"(^(?=.*(?:containers|hostname)).*?/([0-9a-f]{64})(?:/|\s|$))");
+  std::match_results<const char *> match;
+
+  if (std::regex_search(line.data(), line.data() + line.size(), match, container_id_regex))
+  {
+    return match.str(1);
+  }
+
+  return std::string();
+}
+
 }  // namespace detail
 }  // namespace resource_detector
 OPENTELEMETRY_END_NAMESPACE
