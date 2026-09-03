@@ -121,7 +121,7 @@ public:
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
     // Resolve via the unified cardinality policy so unbound and bound paths
     // share one combined limit (see ResolveCardinality()).
-    MetricAttributes resolved = ResolveCardinality(std::move(attr));
+    MetricAttributes resolved = ResolveCardinality(attr);
     // cppcheck-suppress accessMoved
     attributes_hashmap_->GetOrSetDefault(std::move(resolved), create_default_aggregation_)
         ->Aggregate(value);
@@ -175,7 +175,7 @@ public:
     MetricAttributes attr{attributes, attributes_processor_.get()};
     std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
-    MetricAttributes resolved = ResolveCardinality(std::move(attr));
+    MetricAttributes resolved = ResolveCardinality(attr);
     // cppcheck-suppress accessMoved
     attributes_hashmap_->GetOrSetDefault(std::move(resolved), create_default_aggregation_)
         ->Aggregate(value);
