@@ -33,6 +33,12 @@ class PatternPredicate : public Predicate
 {
 public:
   explicit PatternPredicate(opentelemetry::nostd::string_view pattern);
+
+  PatternPredicate(const PatternPredicate &)            = delete;
+  PatternPredicate(PatternPredicate &&)                 = delete;
+  PatternPredicate &operator=(const PatternPredicate &) = delete;
+  PatternPredicate &operator=(PatternPredicate &&)      = delete;
+
   ~PatternPredicate() override;
 
   bool Match(opentelemetry::nostd::string_view str) const noexcept override;
