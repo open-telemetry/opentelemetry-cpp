@@ -18,6 +18,7 @@ namespace metrics
 enum class PredicateType : uint8_t
 {
   kPattern,
+  kWildcard,
   kExact
 };
 
@@ -35,6 +36,10 @@ public:
     if (type == PredicateType::kPattern)
     {
       return std::unique_ptr<Predicate>(new PatternPredicate(pattern));
+    }
+    if (type == PredicateType::kWildcard)
+    {
+      return std::unique_ptr<Predicate>(new WildcardPredicate(pattern));
     }
     if (type == PredicateType::kExact)
     {
