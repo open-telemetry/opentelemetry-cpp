@@ -110,7 +110,13 @@ size_t BucketCapacity(size_t max_buckets) noexcept
 void EnsureBucketCapacity(std::unique_ptr<AdaptingCircularBufferCounter> &buckets,
                           size_t capacity) noexcept
 {
-  if (!buckets || buckets->MaxSize() >= capacity)
+  if (!buckets)
+  {
+    buckets = std::make_unique<AdaptingCircularBufferCounter>(capacity);
+    return;
+  }
+
+  if (buckets->MaxSize() >= capacity)
   {
     return;
   }
@@ -131,6 +137,41 @@ void EnsureBucketCapacity(std::unique_ptr<AdaptingCircularBufferCounter> &bucket
     }
   }
   buckets = std::move(widened);
+}
+
+bool BucketIndicesMatchScale(const AdaptingCircularBufferCounter &buckets,
+                             int32_t min_index,
+                             int32_t max_index) noexcept
+{
+  return buckets.Empty() ||
+         (buckets.StartIndex() >= min_index && buckets.EndIndex() <= max_index);
+}
+
+void NormalizeSuppliedPointData(Base2ExponentialHistogramPointData &point_data) noexcept
+{
+  const size_t capacity = BucketCapacity(point_data.max_buckets_);
+  EnsureBucketCapacity(point_data.positive_buckets_, capacity);
+  EnsureBucketCapacity(point_data.negative_buckets_, capacity);
+
+  const Base2ExponentialHistogramIndexer indexer(point_data.scale_);
+  const int32_t min_index = indexer.ComputeIndex((std::numeric_limits<double>::denorm_min)());
+  const int32_t max_index = indexer.ComputeIndex((std::numeric_limits<double>::max)());
+  if (BucketIndicesMatchScale(*point_data.positive_buckets_, min_index, max_index) &&
+      BucketIndicesMatchScale(*point_data.negative_buckets_, min_index, max_index))
+  {
+    return;
+  }
+
+  OTEL_INTERNAL_LOG_ERROR(
+      "[Base2ExponentialHistogramAggregation] supplied bucket indexes do not match scale "
+      << point_data.scale_ << "; point data discarded");
+  point_data.sum_        = 0.0;
+  point_data.min_        = (std::numeric_limits<double>::max)();
+  point_data.max_        = (std::numeric_limits<double>::min)();
+  point_data.count_      = 0;
+  point_data.zero_count_ = 0;
+  point_data.positive_buckets_->Clear();
+  point_data.negative_buckets_->Clear();
 }
 
 // Truncates `requested` to the reduction that can be applied without pushing `current_scale` below
@@ -264,8 +305,7 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
         std::make_unique<AdaptingCircularBufferCounter>(*point_data.negative_buckets_);
   }
 
-  EnsureBucketCapacity(point_data_.positive_buckets_, BucketCapacity(point_data_.max_buckets_));
-  EnsureBucketCapacity(point_data_.negative_buckets_, BucketCapacity(point_data_.max_buckets_));
+  NormalizeSuppliedPointData(point_data_);
 }
 
 Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
@@ -274,8 +314,7 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
       indexer_(point_data_.scale_),
       record_min_max_{point_data_.record_min_max_}
 {
-  EnsureBucketCapacity(point_data_.positive_buckets_, BucketCapacity(point_data_.max_buckets_));
-  EnsureBucketCapacity(point_data_.negative_buckets_, BucketCapacity(point_data_.max_buckets_));
+  NormalizeSuppliedPointData(point_data_);
 }
 
 void Base2ExponentialHistogramAggregation::Aggregate(
@@ -351,17 +390,12 @@ void Base2ExponentialHistogramAggregation::AggregateIntoBuckets(
   // Downscale() may stop short of the request at the floor, so shift the index by what was
   // actually applied.
   const uint32_t applied = Downscale(scale_reduction);
-  if (!buckets->Increment(index >> applied, 1) && !bucket_index_error_emitted_)
+  if (!buckets->Increment(index >> applied, 1))
   {
-    // Unreachable for buckets this class produced: at the floor every finite double maps to -1 or
-    // 0, which fits kMaxSizeMin. It is reachable through the point data constructors, so it is a
-    // caller input error rather than an assertable invariant.
-    bucket_index_error_emitted_ = true;
     OTEL_INTERNAL_LOG_ERROR(
         "[Base2ExponentialHistogramAggregation::AggregateIntoBuckets] bucket index "
-        << (index >> applied) << " does not fit the buckets supplied at scale "
-        << point_data_.scale_
-        << "; recording dropped. Further drops on this aggregation are not logged");
+        << (index >> applied) << " out of range; count dropped. SDK invariant violation");
+    assert(false && "AggregateIntoBuckets: bucket index out of range");
   }
 }
 
@@ -531,9 +565,9 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
       (right.zero_count_ >= left.zero_count_) ? (right.zero_count_ - left.zero_count_) : 0;
 
   result_value.positive_buckets_ =
-      std::make_unique<AdaptingCircularBufferCounter>(BucketCapacity(right.max_buckets_));
+      std::make_unique<AdaptingCircularBufferCounter>(BucketCapacity(result_value.max_buckets_));
   result_value.negative_buckets_ =
-      std::make_unique<AdaptingCircularBufferCounter>(BucketCapacity(right.max_buckets_));
+      std::make_unique<AdaptingCircularBufferCounter>(BucketCapacity(result_value.max_buckets_));
 
   if (!left.positive_buckets_->Empty() || !right.positive_buckets_->Empty())
   {

@@ -993,6 +993,25 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationDiffScaleMismatch)
   ExpectCountInvariant(right_pt.count_ - 1u, diffed_point, "DiffScaleMismatch");
 }
 
+TEST(Aggregation, Base2ExponentialHistogramAggregationDiffUsesReportedBucketBudget)
+{
+  const auto narrow_config = MakeAggregationConfig(-1, kMaxSizeMin);
+  Base2ExponentialHistogramAggregation left(&narrow_config);
+  left.Aggregate(1.0, {});
+
+  const auto wide_config = MakeAggregationConfig(0, 8);
+  Base2ExponentialHistogramAggregation next(&wide_config);
+  next.Aggregate(1.0, {});
+  next.Aggregate(4.0, {});
+
+  const auto diffed_point = MakePointData(*left.Diff(next));
+
+  ExpectCountInvariant(1u, diffed_point, "DiffUsesReportedBucketBudget");
+  EXPECT_EQ(diffed_point.max_buckets_, kMaxSizeMin);
+  EXPECT_EQ(diffed_point.positive_buckets_->MaxSize(), diffed_point.max_buckets_);
+  EXPECT_EQ(diffed_point.negative_buckets_->MaxSize(), diffed_point.max_buckets_);
+}
+
 TEST(Aggregation, Base2ExponentialHistogramAggregationDefaultConfigMerge)
 {
   Base2ExponentialHistogramAggregationConfig config;
@@ -1168,7 +1187,7 @@ Base2ExponentialHistogramPointData MakeDegenerateBudgetPointData(size_t max_buck
 }
 
 // Buckets that cannot be reconciled with the scale they are labelled with: at the runtime floor no
-// finite double reaches index 100, and the floor leaves no downscale to merge it away.
+// finite double reaches index 100.
 Base2ExponentialHistogramPointData MakeMismatchedBucketPointData()
 {
   Base2ExponentialHistogramPointData point;
@@ -1414,25 +1433,31 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationDegenerateMaxBucketsTermin
   }
 }
 
-TEST(Aggregation, Base2ExponentialHistogramAggregationMismatchedBucketsDropRecordings)
+TEST(Aggregation, Base2ExponentialHistogramAggregationRejectsMismatchedBuckets)
 {
-  // Already at the floor, so Downscale() cannot merge the stale bucket away and every recording is
-  // dropped. The point of the test is that this reports and continues instead of aborting.
   opentelemetry::test_common::ScopedTestLogHandler log_handler{
       opentelemetry::sdk::common::internal_log::LogLevel::Error};
 
-  Base2ExponentialHistogramAggregation aggr(MakeMismatchedBucketPointData());
+  const auto malformed = MakeMismatchedBucketPointData();
+  Base2ExponentialHistogramAggregation recorded(malformed);
+  recorded.Aggregate(1.0, {});
+  ExpectCountInvariant(1u, MakePointData(recorded), "MismatchedRecord");
 
-  aggr.Aggregate(1.0, {});
-  aggr.Aggregate(kHuge, {});
+  Base2ExponentialHistogramAggregation merge_left(MakeMismatchedBucketPointData());
+  merge_left.Aggregate(kTiny, {});
+  const auto config = FloorConfig();
+  Base2ExponentialHistogramAggregation merge_right(&config);
+  merge_right.Aggregate(kHuge, {});
+  const auto merged = merge_left.Merge(merge_right);
+  ExpectCountInvariant(2u, MakePointData(*merged), "MismatchedMerge");
 
-  const auto point = MakePointData(aggr);
-  EXPECT_EQ(point.scale_, kMinRuntimeScale);
-  EXPECT_EQ(point.count_, 3u);
-  EXPECT_EQ(SumAllBuckets(point), 1u);
-  EXPECT_EQ(BucketSpan(*point.positive_buckets_), 1);
+  Base2ExponentialHistogramAggregation diff_left(MakeMismatchedBucketPointData());
+  diff_left.Aggregate(kTiny, {});
+  Base2ExponentialHistogramAggregation diff_extra(&config);
+  diff_extra.Aggregate(kHuge, {});
+  const auto diff_right = diff_left.Merge(diff_extra);
+  const auto diffed      = diff_left.Diff(*diff_right);
+  ExpectCountInvariant(1u, MakePointData(*diffed), "MismatchedDiff");
 
-  // Two drops, one log line. Nothing about the state can change between recordings, so repeating
-  // the message would flood the handler from the record path.
-  EXPECT_EQ(log_handler.Drain().size(), 1u);
+  EXPECT_EQ(log_handler.Drain().size(), 3u);
 }
