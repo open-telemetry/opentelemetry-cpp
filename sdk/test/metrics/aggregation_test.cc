@@ -1456,7 +1456,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationRejectsMismatchedBuckets)
   Base2ExponentialHistogramAggregation diff_extra(&config);
   diff_extra.Aggregate(kHuge, {});
   const auto diff_right = diff_left.Merge(diff_extra);
-  const auto diffed      = diff_left.Diff(*diff_right);
+  const auto diffed     = diff_left.Diff(*diff_right);
   ExpectCountInvariant(1u, MakePointData(*diffed), "MismatchedDiff");
 
   EXPECT_EQ(log_handler.Drain().size(), 3u);

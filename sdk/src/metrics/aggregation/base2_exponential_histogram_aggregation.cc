@@ -143,8 +143,7 @@ bool BucketIndicesMatchScale(const AdaptingCircularBufferCounter &buckets,
                              int32_t min_index,
                              int32_t max_index) noexcept
 {
-  return buckets.Empty() ||
-         (buckets.StartIndex() >= min_index && buckets.EndIndex() <= max_index);
+  return buckets.Empty() || (buckets.StartIndex() >= min_index && buckets.EndIndex() <= max_index);
 }
 
 void NormalizeSuppliedPointData(Base2ExponentialHistogramPointData &point_data) noexcept
