@@ -8,6 +8,7 @@
 #  include <memory>
 #  include <vector>
 
+#  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
@@ -49,18 +50,46 @@ public:
   public:
     HistogramCellSelector(const std::vector<double> &boundaries) : boundaries_(boundaries) {}
 
-    int ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
+    int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
                               int64_t value,
-                              const MetricAttributes &attributes,
-                              const opentelemetry::context::Context &context) override
+                              const MetricAttributes & /* attributes */,
+                              const opentelemetry::context::Context & /* context */) override
     {
-      return ReservoirCellIndexFor(cells, static_cast<double>(value), attributes, context);
+      return FindCellIndex(static_cast<double>(value));
     }
 
     int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
                               double value,
                               const MetricAttributes & /* attributes */,
                               const opentelemetry::context::Context & /* context */) override
+    {
+      return FindCellIndex(value);
+    }
+
+    int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
+                              int64_t value,
+                              const opentelemetry::common::KeyValueIterable & /* attributes */,
+                              const opentelemetry::context::Context & /* context */) override
+    {
+      return FindCellIndex(static_cast<double>(value));
+    }
+
+    int ReservoirCellIndexFor(const std::vector<ReservoirCell> & /* cells */,
+                              double value,
+                              const opentelemetry::common::KeyValueIterable & /* attributes */,
+                              const opentelemetry::context::Context & /* context */) override
+    {
+      return FindCellIndex(value);
+    }
+
+  public:
+    void reset() override
+    {
+      // Do nothing
+    }
+
+  private:
+    int FindCellIndex(double value) const
     {
       size_t max_size = boundaries_.size();
       for (size_t i = 0; i < max_size; ++i)
@@ -75,13 +104,6 @@ public:
       return static_cast<int>(max_size);
     }
 
-  public:
-    void reset() override
-    {
-      // Do nothing
-    }
-
-  private:
     std::vector<double> boundaries_;
   };
 };
