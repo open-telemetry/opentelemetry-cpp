@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <map>
 #include <memory>
 #include <ostream>
@@ -24,6 +25,7 @@
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
@@ -101,6 +103,7 @@
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_builder.h"
@@ -254,6 +257,44 @@ static opentelemetry::sdk::metrics::CardinalityLimits ToCardinalityLimits(
                                ? cfg.up_down_counter
                                : d;
   return limits;
+}
+
+static std::uint32_t ToUint32Limit(std::size_t value)
+{
+  constexpr auto kMax = (std::numeric_limits<std::uint32_t>::max)();
+  if (value > kMax)
+  {
+    return kMax;
+  }
+  return static_cast<std::uint32_t>(value);
+}
+
+/// Resolve one limit per
+/// https://opentelemetry.io/docs/specs/otel/common/#attribute-limits
+/// model-specific if set, else general if set, else the model-specific default.
+template <typename T>
+static T ResolveLimit(const OptionalValue<T> &model_specific,
+                      const OptionalValue<T> &general,
+                      T model_default)
+{
+  if (model_specific.HasValue())
+  {
+    return model_specific.Value();
+  }
+  if (general.HasValue())
+  {
+    return general.Value();
+  }
+  return model_default;
+}
+
+static OptionalValue<std::uint32_t> ToOptionalUint32(const OptionalValue<std::size_t> &value)
+{
+  if (!value.HasValue())
+  {
+    return OptionalValue<std::uint32_t>{};
+  }
+  return OptionalValue<std::uint32_t>{ToUint32Limit(value.Value())};
 }
 
 class ResourceAttributeValueSetter
@@ -418,7 +459,7 @@ public:
         registry_->GetComposableAlwaysOffSamplerBuilder();
     if (builder != nullptr)
     {
-      OTEL_INTERNAL_LOG_DEBUG("VisitComposableAlwaysOff() using registered builder");
+      OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] VisitComposableAlwaysOff() using registered builder");
       sampler = builder->Build(model);
       return;
     }
@@ -434,7 +475,7 @@ public:
         registry_->GetComposableAlwaysOnSamplerBuilder();
     if (builder != nullptr)
     {
-      OTEL_INTERNAL_LOG_DEBUG("VisitComposableAlwaysOn() using registered builder");
+      OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] VisitComposableAlwaysOn() using registered builder");
       sampler = builder->Build(model);
       return;
     }
@@ -450,7 +491,8 @@ public:
         registry_->GetComposableProbabilitySamplerBuilder();
     if (builder != nullptr)
     {
-      OTEL_INTERNAL_LOG_DEBUG("VisitComposableProbability() using registered builder");
+      OTEL_INTERNAL_LOG_DEBUG(
+          "[SDK Builder] VisitComposableProbability() using registered builder");
       sampler = builder->Build(model);
       return;
     }
@@ -484,7 +526,8 @@ public:
         registry_->GetComposableParentThresholdSamplerBuilder();
     if (builder != nullptr)
     {
-      OTEL_INTERNAL_LOG_DEBUG("VisitComposableParentThreshold() using registered builder");
+      OTEL_INTERNAL_LOG_DEBUG(
+          "[SDK Builder] VisitComposableParentThreshold() using registered builder");
       sampler = builder->Build(model, std::move(root));
       return;
     }
@@ -513,7 +556,7 @@ public:
         registry_->GetComposableRuleBasedSamplerBuilder();
     if (builder != nullptr)
     {
-      OTEL_INTERNAL_LOG_DEBUG("VisitComposableRuleBased() using registered builder");
+      OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] VisitComposableRuleBased() using registered builder");
       sampler = builder->Build(model, std::move(rule_samplers));
       return;
     }
@@ -529,7 +572,7 @@ public:
         registry_->GetExtensionComposableSamplerBuilder(model->name);
     if (builder != nullptr)
     {
-      OTEL_INTERNAL_LOG_DEBUG("VisitComposableExtension() using registered builder "
+      OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] VisitComposableExtension() using registered builder "
                               << model->name);
       sampler = builder->Build(model);
       return;
@@ -1062,7 +1105,7 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateAlwaysOffS
   const AlwaysOffSamplerBuilder *builder = registry_->GetAlwaysOffSamplerBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateAlwaysOffSampler() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateAlwaysOffSampler() using registered builder");
     return builder->Build(model);
   }
   static const std::string die("No builder for AlwaysOffSampler");
@@ -1075,7 +1118,7 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateAlwaysOnSa
   const AlwaysOnSamplerBuilder *builder = registry_->GetAlwaysOnSamplerBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateAlwaysOnSampler() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateAlwaysOnSampler() using registered builder");
     return builder->Build(model);
   }
   static const std::string die("No builder for AlwaysOnSampler");
@@ -1090,7 +1133,7 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateJaegerRemo
   {
     static const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration kAlwaysOn;
     auto initial_sampler = CreateAlwaysOnSampler(&kAlwaysOn);
-    OTEL_INTERNAL_LOG_DEBUG("CreateJaegerRemoteSampler() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateJaegerRemoteSampler() using registered builder");
     return builder->Build(model, std::move(initial_sampler));
   }
   static const std::string die("No builder for JaegerRemoteSampler");
@@ -1160,7 +1203,7 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateParentBase
   const ParentBasedSamplerBuilder *builder = registry_->GetParentBasedSamplerBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateParentBasedSampler() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateParentBasedSampler() using registered builder");
     return builder->Build(model, std::move(root_sdk), std::move(remote_parent_sampled_sdk),
                           std::move(remote_parent_not_sampled_sdk),
                           std::move(local_parent_sampled_sdk),
@@ -1177,7 +1220,7 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateCompositeS
   const CompositeSamplerBuilder *builder = registry_->GetCompositeSamplerBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateCompositeSampler() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateCompositeSampler() using registered builder");
     ComposableSamplerBuilder composable_builder(registry_.get(), 1);
     model->Accept(&composable_builder);
     return builder->Build(std::move(composable_builder.sampler));
@@ -1193,7 +1236,7 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateProbabilit
   const ProbabilitySamplerBuilder *builder = registry_->GetProbabilitySamplerBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateProbabilitySampler() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateProbabilitySampler() using registered builder");
     return builder->Build(model);
   }
   static const std::string die("No builder for ProbabilitySampler");
@@ -1206,7 +1249,8 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateTraceIdRat
   const TraceIdRatioBasedSamplerBuilder *builder = registry_->GetTraceIdRatioBasedSamplerBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateTraceIdRatioBasedSampler() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateTraceIdRatioBasedSampler() using registered builder");
     return builder->Build(model);
   }
   static const std::string die("No builder for TraceIdRatioBasedSampler");
@@ -1223,7 +1267,8 @@ std::unique_ptr<opentelemetry::sdk::trace::Sampler> SdkBuilder::CreateExtensionS
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionSampler() using registered builder " << name);
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateExtensionSampler() using registered builder "
+                            << name);
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1252,7 +1297,8 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpH
   const OtlpHttpSpanExporterBuilder *builder = registry_->GetOtlpHttpSpanBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpHttpSpanExporter() using registered http builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateOtlpHttpSpanExporter() using registered http builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1268,7 +1314,8 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpG
   const OtlpGrpcSpanExporterBuilder *builder = registry_->GetOtlpGrpcSpanBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpGrpcSpanExporter() using registered grpc builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateOtlpGrpcSpanExporter() using registered grpc builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1284,7 +1331,8 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateOtlpF
   const OtlpFileSpanExporterBuilder *builder = registry_->GetOtlpFileSpanBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpFileSpanExporter() using registered file builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateOtlpFileSpanExporter() using registered file builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1301,7 +1349,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateConso
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateConsoleSpanExporter() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateConsoleSpanExporter() using registered builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1320,7 +1368,8 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> SdkBuilder::CreateExten
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionSpanExporter() using registered builder " << name);
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateExtensionSpanExporter() using registered builder "
+                            << name);
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1351,7 +1400,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateBatc
   const BatchSpanProcessorBuilder *builder = registry_->GetBatchSpanProcessorBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateBatchSpanProcessor() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateBatchSpanProcessor() using registered builder");
     return builder->Build(model, std::move(exporter_sdk));
   }
   static const std::string die("No builder for BatchSpanProcessor");
@@ -1366,7 +1415,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateSimp
   const SimpleSpanProcessorBuilder *builder = registry_->GetSimpleSpanProcessorBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateSimpleSpanProcessor() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateSimpleSpanProcessor() using registered builder");
     return builder->Build(model, std::move(exporter_sdk));
   }
   static const std::string die("No builder for SimpleSpanProcessor");
@@ -1383,7 +1432,8 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> SdkBuilder::CreateExte
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionSpanProcessor() using registered builder " << name);
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateExtensionSpanProcessor() using registered builder "
+                            << name);
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1414,7 +1464,7 @@ SdkBuilder::CreateTracerConfigurator(
   const TracerConfiguratorBuilder *builder = registry_->GetTracerConfiguratorBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateTracerConfigurator() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateTracerConfigurator() using registered builder");
     return builder->Build(model.get());
   }
   static const std::string die("No builder for TracerConfigurator");
@@ -1423,7 +1473,8 @@ SdkBuilder::CreateTracerConfigurator(
 
 std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTracerProvider(
     const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
-    const opentelemetry::sdk::resource::Resource &resource) const
+    const opentelemetry::sdk::resource::Resource &resource,
+    const AttributeLimitsConfiguration *attribute_limits) const
 {
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> sdk;
 
@@ -1451,15 +1502,49 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> SdkBuilder::CreateTra
   }
 
   opentelemetry::sdk::trace::SpanLimits span_limits;
+  OptionalValue<std::size_t> model_attribute_value_length_limit;
+  OptionalValue<std::uint32_t> model_attribute_count_limit;
+  OptionalValue<std::uint32_t> model_event_count_limit;
+  OptionalValue<std::uint32_t> model_link_count_limit;
+  OptionalValue<std::uint32_t> model_event_attribute_count_limit;
+  OptionalValue<std::uint32_t> model_link_attribute_count_limit;
   if (model->limits)
   {
-    span_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
-    span_limits.attribute_count_limit        = model->limits->attribute_count_limit;
-    span_limits.event_count_limit            = model->limits->event_count_limit;
-    span_limits.link_count_limit             = model->limits->link_count_limit;
-    span_limits.event_attribute_count_limit  = model->limits->event_attribute_count_limit;
-    span_limits.link_attribute_count_limit   = model->limits->link_attribute_count_limit;
+    model_attribute_value_length_limit = model->limits->attribute_value_length_limit;
+    model_attribute_count_limit        = model->limits->attribute_count_limit;
+    model_event_count_limit            = model->limits->event_count_limit;
+    model_link_count_limit             = model->limits->link_count_limit;
+    model_event_attribute_count_limit  = model->limits->event_attribute_count_limit;
+    model_link_attribute_count_limit   = model->limits->link_attribute_count_limit;
   }
+
+  OptionalValue<std::size_t> general_attribute_value_length_limit;
+  OptionalValue<std::size_t> general_attribute_count_limit;
+  if (attribute_limits)
+  {
+    general_attribute_value_length_limit = attribute_limits->attribute_value_length_limit;
+    general_attribute_count_limit        = attribute_limits->attribute_count_limit;
+  }
+
+  using SpanLimitDefaults = SpanLimitsConfiguration;
+  span_limits.attribute_value_length_limit =
+      ResolveLimit(model_attribute_value_length_limit, general_attribute_value_length_limit,
+                   SpanLimitDefaults::kDefaultAttributeValueLengthLimit);
+  span_limits.attribute_count_limit =
+      ResolveLimit(model_attribute_count_limit, ToOptionalUint32(general_attribute_count_limit),
+                   SpanLimitDefaults::kDefaultAttributeCountLimit);
+  span_limits.event_count_limit =
+      ResolveLimit(model_event_count_limit, OptionalValue<std::uint32_t>{},
+                   SpanLimitDefaults::kDefaultEventCountLimit);
+  span_limits.link_count_limit =
+      ResolveLimit(model_link_count_limit, OptionalValue<std::uint32_t>{},
+                   SpanLimitDefaults::kDefaultLinkCountLimit);
+  span_limits.event_attribute_count_limit =
+      ResolveLimit(model_event_attribute_count_limit, OptionalValue<std::uint32_t>{},
+                   SpanLimitDefaults::kDefaultEventAttributeCountLimit);
+  span_limits.link_attribute_count_limit =
+      ResolveLimit(model_link_attribute_count_limit, OptionalValue<std::uint32_t>{},
+                   SpanLimitDefaults::kDefaultLinkAttributeCountLimit);
 
   if (model->tracer_configurator)
   {
@@ -1491,7 +1576,8 @@ SdkBuilder::CreateTextMapPropagator(const std::string &name) const
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateTextMapPropagator() using registered builder " << name);
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateTextMapPropagator() using registered builder "
+                            << name);
     sdk = builder->Build();
     return sdk;
   }
@@ -1660,7 +1746,8 @@ SdkBuilder::CreateOtlpHttpPushMetricExporter(
       registry_->GetOtlpHttpPushMetricExporterBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpHttpPushMetricExporter() using registered http builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateOtlpHttpPushMetricExporter() using registered http builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1678,7 +1765,8 @@ SdkBuilder::CreateOtlpGrpcPushMetricExporter(
       registry_->GetOtlpGrpcPushMetricExporterBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpGrpcPushMetricExporter() using registered grpc builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateOtlpGrpcPushMetricExporter() using registered grpc builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1696,7 +1784,8 @@ SdkBuilder::CreateOtlpFilePushMetricExporter(
       registry_->GetOtlpFilePushMetricExporterBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpFilePushMetricExporter() using registered file builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateOtlpFilePushMetricExporter() using registered file builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1716,7 +1805,8 @@ SdkBuilder::CreateConsolePushMetricExporter(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateConsolePushMetricExporter() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateConsolePushMetricExporter() using registered builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1737,8 +1827,8 @@ SdkBuilder::CreateExtensionPushMetricExporter(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionPushMetricExporter() using registered builder "
-                            << name);
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateExtensionPushMetricExporter() using registered builder " << name);
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1759,7 +1849,8 @@ SdkBuilder::CreatePrometheusPullMetricExporter(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreatePrometheusPullMetricExporter() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreatePrometheusPullMetricExporter() using registered builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1780,8 +1871,8 @@ SdkBuilder::CreateExtensionPullMetricExporter(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionPullMetricExporter() using registered builder "
-                            << name);
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateExtensionPullMetricExporter() using registered builder " << name);
     sdk = builder->Build(model);
     return sdk;
   }
@@ -1827,14 +1918,14 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePer
 
   if (model->producers.size() > 0)
   {
-    OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
+    OTEL_INTERNAL_LOG_WARN("[SDK Builder] metric producer is yet not supported, ignoring");
   }
 
   const PeriodicMetricReaderBuilder *builder = registry_->GetPeriodicMetricReaderBuilder();
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreatePeriodicMetricReader() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreatePeriodicMetricReader() using registered builder");
     sdk = builder->Build(model, std::move(exporter_sdk));
   }
   else
@@ -1860,7 +1951,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePul
 
   if (model->producers.size() > 0)
   {
-    OTEL_INTERNAL_LOG_WARN("metric producer not supported, ignoring");
+    OTEL_INTERNAL_LOG_WARN("[SDK Builder] metric producer is yet not supported, ignoring");
   }
 
   if (model->cardinality_limits != nullptr)
@@ -2046,7 +2137,6 @@ void SdkBuilder::AddView(
 
     std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk_attribute_processor;
 
-    // FIXME-SDK: The CreateAttributesProcessor method is not implemented yet.
     if (stream->attribute_keys != nullptr)
     {
       sdk_attribute_processor = CreateAttributesProcessor(stream->attribute_keys);
@@ -2089,7 +2179,7 @@ SdkBuilder::CreateMeterConfigurator(
   const MeterConfiguratorBuilder *builder = registry_->GetMeterConfiguratorBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateMeterConfigurator() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateMeterConfigurator() using registered builder");
     return builder->Build(model.get());
   }
   static const std::string die("No builder for MeterConfigurator");
@@ -2168,7 +2258,8 @@ SdkBuilder::CreateOtlpHttpLogRecordExporter(
   const OtlpHttpLogRecordExporterBuilder *builder = registry_->GetOtlpHttpLogRecordBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpHttpLogRecordExporter() using registered http builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateOtlpHttpLogRecordExporter() using registered http builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -2185,7 +2276,8 @@ SdkBuilder::CreateOtlpGrpcLogRecordExporter(
   const OtlpGrpcLogRecordExporterBuilder *builder = registry_->GetOtlpGrpcLogRecordBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpGrpcLogRecordExporter() using registered grpc builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateOtlpGrpcLogRecordExporter() using registered grpc builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -2202,7 +2294,8 @@ SdkBuilder::CreateOtlpFileLogRecordExporter(
   const OtlpFileLogRecordExporterBuilder *builder = registry_->GetOtlpFileLogRecordBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateOtlpFileLogRecordExporter() using registered file builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateOtlpFileLogRecordExporter() using registered file builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -2220,7 +2313,8 @@ SdkBuilder::CreateConsoleLogRecordExporter(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateConsoleLogRecordExporter() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateConsoleLogRecordExporter() using registered builder");
     sdk = builder->Build(model);
     return sdk;
   }
@@ -2241,7 +2335,8 @@ SdkBuilder::CreateExtensionLogRecordExporter(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionLogRecordExporter() using registered builder " << name);
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateExtensionLogRecordExporter() using registered builder " << name);
     sdk = builder->Build(model);
     return sdk;
   }
@@ -2273,7 +2368,8 @@ SdkBuilder::CreateBatchLogRecordProcessor(
   const BatchLogRecordProcessorBuilder *builder = registry_->GetBatchLogRecordProcessorBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateBatchLogRecordProcessor() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateBatchLogRecordProcessor() using registered builder");
     return builder->Build(model, std::move(exporter_sdk));
   }
   static const std::string die("No builder for BatchLogRecordProcessor");
@@ -2289,7 +2385,8 @@ SdkBuilder::CreateSimpleLogRecordProcessor(
   const SimpleLogRecordProcessorBuilder *builder = registry_->GetSimpleLogRecordProcessorBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateSimpleLogRecordProcessor() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateSimpleLogRecordProcessor() using registered builder");
     return builder->Build(model, std::move(exporter_sdk));
   }
   static const std::string die("No builder for SimpleLogRecordProcessor");
@@ -2308,8 +2405,8 @@ SdkBuilder::CreateExtensionLogRecordProcessor(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionLogRecordProcessor() using registered builder "
-                            << name);
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateExtensionLogRecordProcessor() using registered builder " << name);
     sdk = builder->Build(model);
     return sdk;
   }
@@ -2340,7 +2437,7 @@ SdkBuilder::CreateLoggerConfigurator(
   const LoggerConfiguratorBuilder *builder = registry_->GetLoggerConfiguratorBuilder();
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateLoggerConfigurator() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateLoggerConfigurator() using registered builder");
     return builder->Build(model.get());
   }
   static const std::string die("No builder for LoggerConfigurator");
@@ -2349,7 +2446,8 @@ SdkBuilder::CreateLoggerConfigurator(
 
 std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLoggerProvider(
     const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
-    const opentelemetry::sdk::resource::Resource &resource) const
+    const opentelemetry::sdk::resource::Resource &resource,
+    const AttributeLimitsConfiguration *attribute_limits) const
 {
   std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> sdk;
 
@@ -2361,11 +2459,29 @@ std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> SdkBuilder::CreateLogg
   }
 
   opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
+  OptionalValue<std::size_t> model_attribute_value_length_limit;
+  OptionalValue<std::size_t> model_attribute_count_limit;
   if (model->limits)
   {
-    log_record_limits.attribute_value_length_limit = model->limits->attribute_value_length_limit;
-    log_record_limits.attribute_count_limit        = model->limits->attribute_count_limit;
+    model_attribute_value_length_limit = model->limits->attribute_value_length_limit;
+    model_attribute_count_limit        = model->limits->attribute_count_limit;
   }
+
+  OptionalValue<std::size_t> general_attribute_value_length_limit;
+  OptionalValue<std::size_t> general_attribute_count_limit;
+  if (attribute_limits)
+  {
+    general_attribute_value_length_limit = attribute_limits->attribute_value_length_limit;
+    general_attribute_count_limit        = attribute_limits->attribute_count_limit;
+  }
+
+  using LogLimitDefaults = LogRecordLimitsConfiguration;
+  log_record_limits.attribute_value_length_limit =
+      ResolveLimit(model_attribute_value_length_limit, general_attribute_value_length_limit,
+                   LogLimitDefaults::kDefaultAttributeValueLengthLimit);
+  log_record_limits.attribute_count_limit =
+      ResolveLimit(model_attribute_count_limit, general_attribute_count_limit,
+                   LogLimitDefaults::kDefaultAttributeCountLimit);
 
   std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
       opentelemetry::sdk::logs::LoggerConfig>>
@@ -2395,7 +2511,8 @@ SdkBuilder::CreateContainerResourceDetector(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateContainerResourceDetector() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateContainerResourceDetector() using registered builder");
     return builder->Build(model);
   }
 
@@ -2411,7 +2528,7 @@ SdkBuilder::CreateHostResourceDetector(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateHostResourceDetector() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateHostResourceDetector() using registered builder");
     return builder->Build(model);
   }
 
@@ -2427,7 +2544,8 @@ SdkBuilder::CreateProcessResourceDetector(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateProcessResourceDetector() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateProcessResourceDetector() using registered builder");
     return builder->Build(model);
   }
 
@@ -2443,7 +2561,8 @@ SdkBuilder::CreateServiceResourceDetector(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateServiceResourceDetector() using registered builder");
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateServiceResourceDetector() using registered builder");
     return builder->Build(model);
   }
 
@@ -2462,7 +2581,8 @@ SdkBuilder::CreateExtensionResourceDetector(
 
   if (builder != nullptr)
   {
-    OTEL_INTERNAL_LOG_DEBUG("CreateExtensionResourceDetector() using registered builder " << name);
+    OTEL_INTERNAL_LOG_DEBUG(
+        "[SDK Builder] CreateExtensionResourceDetector() using registered builder " << name);
     return builder->Build(model);
   }
 
@@ -2562,7 +2682,7 @@ void SdkBuilder::SetResource(
         }
         else
         {
-          OTEL_INTERNAL_LOG_WARN("Found invalid key/value pair in attributes_list");
+          OTEL_INTERNAL_LOG_WARN("[SDK Builder] Found invalid key/value pair in attributes_list");
         }
       }
 
@@ -2644,16 +2764,10 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
   {
     SetResource(sdk->resource, model->resource);
 
-    if (model->attribute_limits)
-    {
-      // FIXME-SDK: https://github.com/open-telemetry/opentelemetry-cpp/issues/3303
-      // FIXME-SDK: Implement attribute limits
-      OTEL_INTERNAL_LOG_WARN("attribute_limits not supported, ignoring");
-    }
-
     if (model->tracer_provider)
     {
-      sdk->tracer_provider = CreateTracerProvider(model->tracer_provider, sdk->resource);
+      sdk->tracer_provider = CreateTracerProvider(model->tracer_provider, sdk->resource,
+                                                  model->attribute_limits.get());
     }
 
     if (model->propagator)
@@ -2668,9 +2782,28 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
 
     if (model->logger_provider)
     {
-      sdk->logger_provider = CreateLoggerProvider(model->logger_provider, sdk->resource);
+      sdk->logger_provider = CreateLoggerProvider(model->logger_provider, sdk->resource,
+                                                  model->attribute_limits.get());
     }
+
+    if (model->distribution)
+    {
+      // FIXME-CONFIG: Implement distribution configuration support
+      OTEL_INTERNAL_LOG_WARN("[SDK Builder] the distribution model is not yet supported, ignoring");
+    }
+
+    // FIXME-CONFIG: Implement instrumentation/development support
+    // if(model->instrumentation)
+    // {
+    //   OTEL_INTERNAL_LOG_WARN("[SDK Builder] instrumentation is not yet supported, ignoring");
+    // }
   }
+
+  // Set the log level if the SDK has been created successfully.
+  opentelemetry::sdk::common::internal_log::GlobalLogHandler::SetLogLevel(sdk->log_level);
+
+  OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] Configured SDK is "
+                          << (model->disabled ? "disabled" : "enabled"));
 
   return sdk;
 }

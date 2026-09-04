@@ -87,7 +87,7 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
 
     std::vector<std::string> fields;
     format.Fields([&fields](nostd::string_view field) {
-      fields.push_back(field.data());
+      fields.emplace_back(field.data());
       return true;
     });
     EXPECT_EQ(fields.size(), 1);

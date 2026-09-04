@@ -81,6 +81,16 @@ or inaccessible.
 | --- | --- | --- | --- | --- |
 | `process.pid` | Process ID | Yes | Yes | Yes |
 | `process.executable.path` | Path via `/proc` (Linux) or Win32 APIs | Yes | Yes | Yes |
+| `process.executable.name` | Basename of the executable path | Yes | Yes | Yes |
+| `process.creation.time` | Process start time in ISO 8601 UTC | Yes | Yes | Yes |
+| `process.owner` | Username of the process owner | Yes | Yes | Yes |
+
+Limitations:
+
+- On macOS, `process.executable.path` and `process.executable.name`
+  are resolved via `_NSGetExecutablePath()`,
+  which only works for the **current process**. These attributes are always
+  populated for the running process, but cannot be resolved for an arbitrary PID.
 
 ### Env Entity Resource Detector (Experimental)
 
