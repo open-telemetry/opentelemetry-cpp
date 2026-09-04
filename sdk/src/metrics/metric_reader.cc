@@ -111,12 +111,6 @@ std::size_t MetricReader::GetCardinalityLimit(InstrumentType instrument_type) co
 void MetricReader::SetCardinalityLimits(const CardinalityLimits &limits) noexcept
 {
   cardinality_limits_ = limits;
-  // TODO: Reader-level limits are stored but not yet enforced as a per-collector
-  // fallback during the collection path. Enforcement will be added in a follow-up.
-  OTEL_INTERNAL_LOG_WARN(
-      "MetricReader::SetCardinalityLimits - reader-level cardinality limits are stored "
-      "but not yet enforced during collection. Use view-level AggregationConfig to "
-      "enforce limits today.");
 }
 
 }  // namespace metrics

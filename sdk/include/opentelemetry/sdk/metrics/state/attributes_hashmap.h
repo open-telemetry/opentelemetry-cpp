@@ -122,7 +122,12 @@ public:
     return result.first->second.get();
   }
   /**
-   * Set the value for given key, overwriting the value if already present
+   * Set the value for given key, overwriting the value if already present.
+   *
+   * When `attributes` is a new key that has to be routed to the overflow entry (capacity
+   * reached), this merges into any existing overflow aggregation rather than replacing it, so
+   * that a second and later over-capacity attribute set doesn't discard values already
+   * accumulated there from an earlier one.
    */
   void Set(const MetricAttributes &attributes, std::unique_ptr<Aggregation> aggr)
   {
@@ -133,7 +138,7 @@ public:
     }
     else if (IsOverflowAttributes(attributes))
     {
-      hash_map_[GetOverflowAttributes()] = std::move(aggr);
+      SetOverflowMerged(std::move(aggr));
     }
     else
     {
@@ -150,7 +155,7 @@ public:
     }
     else if (IsOverflowAttributes(attributes))
     {
-      hash_map_[GetOverflowAttributes()] = std::move(aggr);
+      SetOverflowMerged(std::move(aggr));
     }
     else
     {
@@ -205,6 +210,23 @@ private:
 
     auto result = hash_map_.emplace(GetOverflowAttributes(), std::move(agg));
     return result.first->second.get();
+  }
+
+  // Merges `agg` into the existing overflow aggregation if one is already present, otherwise
+  // installs it as the overflow entry. Used by Set() when routing a new over-capacity key to
+  // overflow, so multiple distinct attribute sets funneled into the single overflow bucket
+  // accumulate rather than each replacing the last.
+  void SetOverflowMerged(std::unique_ptr<Aggregation> agg)
+  {
+    auto it = hash_map_.find(GetOverflowAttributes());
+    if (it != hash_map_.end())
+    {
+      hash_map_[GetOverflowAttributes()] = it->second->Merge(*agg);
+    }
+    else
+    {
+      hash_map_[GetOverflowAttributes()] = std::move(agg);
+    }
   }
 
   bool IsOverflowAttributes(const MetricAttributes &attributes) const
