@@ -3,8 +3,11 @@
 
 #include "opentelemetry/sdk/metrics/view/predicate.h"
 
-#include <regex>
 #include <string>
+
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
+#  include <regex>
+#endif
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
