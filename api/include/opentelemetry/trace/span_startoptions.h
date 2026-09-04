@@ -35,14 +35,14 @@ struct StartSpanOptions
    * Explicitly sets the parent of the Span.
    *
    * A valid `SpanContext` identifies the parent directly. An invalid
-  * `SpanContext` falls back to the currently active Span, if one exists;
-  * otherwise, the new Span is created as a root Span.
+   * `SpanContext` falls back to the currently active Span, if one exists;
+   * otherwise, the new Span is created as a root Span.
    *
    * When a `context::Context` is provided, a valid Span in that Context is used
    * as the parent. Otherwise, if the Context contains `is_root_span` set to
    * `true`, the new Span is created without a parent. If neither is present,
-  * the currently active Span is used as the parent, if one exists; otherwise,
-  * the new Span is created as a root Span.
+   * the currently active Span is used as the parent, if one exists; otherwise,
+   * the new Span is created as a root Span.
    *
    * Example:
    * ```cpp
