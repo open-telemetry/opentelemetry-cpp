@@ -1189,6 +1189,37 @@ TEST(SdkBuilder, AddViewEmptySelectorMatchesAllSupportedInstrumentTypes)
   }
 }
 
+TEST(SdkBuilder, AddViewUsesWildcardMatchingForInstrumentName)
+{
+  namespace metrics_sdk = opentelemetry::sdk::metrics;
+
+  auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::counter, 42);
+  model->selector->instrument_name = "my.counter*";
+
+  auto registry = std::make_shared<config_sdk::Registry>();
+  config_sdk::SdkBuilder builder(registry);
+  metrics_sdk::ViewRegistry view_registry;
+  builder.AddView(&view_registry, model);
+
+  auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
+
+  auto count_matches = [&](const std::string &name) {
+    metrics_sdk::InstrumentDescriptor instrument_descriptor{
+        name, "test description", "units", metrics_sdk::InstrumentType::kCounter,
+        metrics_sdk::InstrumentValueType::kLong};
+    int matched = 0;
+    view_registry.FindViews(instrument_descriptor, *instrumentation_scope,
+                            [&](const metrics_sdk::View &) {
+                              ++matched;
+                              return true;
+                            });
+    return matched;
+  };
+
+  EXPECT_EQ(count_matches("my.counter_one"), 1);
+  EXPECT_EQ(count_matches("myXcounter_one"), 0);
+}
+
 TEST(SdkBuilder, AddViewHistogramCardinalityLimitOnly)
 {
   namespace metrics_sdk = opentelemetry::sdk::metrics;

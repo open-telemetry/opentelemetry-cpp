@@ -12,11 +12,42 @@
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
+#include "opentelemetry/sdk/metrics/view/predicate.h"
+#include "opentelemetry/sdk/metrics/view/predicate_factory.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 
 using namespace opentelemetry::sdk::metrics;
 using namespace opentelemetry::sdk::instrumentationscope;
+
+TEST(InstrumentSelector, NameFilterSupportsExplicitWildcardMatching)
+{
+  InstrumentSelector star_selector{
+      InstrumentType::kCounter, "my_counter*", "", PredicateType::kWildcard};
+  EXPECT_TRUE(star_selector.GetNameFilter()->Match("my_counter"));
+  EXPECT_TRUE(star_selector.GetNameFilter()->Match("my_counter_one"));
+  EXPECT_TRUE(star_selector.GetNameFilter()->Match("my_counter_two"));
+  EXPECT_FALSE(star_selector.GetNameFilter()->Match("other_counter"));
+
+  InstrumentSelector question_selector{
+      InstrumentType::kCounter, "my_counter_?", "", PredicateType::kWildcard};
+  EXPECT_TRUE(question_selector.GetNameFilter()->Match("my_counter_1"));
+  EXPECT_FALSE(question_selector.GetNameFilter()->Match("my_counter_12"));
+
+  InstrumentSelector literal_selector{
+      InstrumentType::kCounter, "my.counter*", "", PredicateType::kWildcard};
+  EXPECT_TRUE(literal_selector.GetNameFilter()->Match("my.counter_one"));
+  EXPECT_FALSE(literal_selector.GetNameFilter()->Match("myXcounter_one"));
+}
+
+#if OPENTELEMETRY_HAVE_WORKING_REGEX
+TEST(InstrumentSelector, NameFilterDefaultsToPatternMatching)
+{
+  InstrumentSelector selector{InstrumentType::kCounter, "my\\.counter.*", ""};
+  EXPECT_TRUE(selector.GetNameFilter()->Match("my.counter_one"));
+  EXPECT_FALSE(selector.GetNameFilter()->Match("myXcounter_one"));
+}
+#endif
 
 TEST(ViewRegistry, FindViewsEmptyRegistry)
 {

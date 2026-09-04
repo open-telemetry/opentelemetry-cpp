@@ -191,6 +191,7 @@
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
+#include "opentelemetry/sdk/metrics/view/predicate_factory.h"
 #include "opentelemetry/sdk/metrics/view/meter_selector.h"
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
@@ -2068,7 +2069,8 @@ void SdkBuilder::AddView(
 
     auto sdk_instrument_selector =
         std::make_unique<opentelemetry::sdk::metrics::InstrumentSelector>(
-            sdk_instrument_type, instrument_name, selector->unit);
+            sdk_instrument_type, instrument_name, selector->unit,
+            opentelemetry::sdk::metrics::PredicateType::kWildcard);
 
     auto sdk_meter_selector = std::make_unique<opentelemetry::sdk::metrics::MeterSelector>(
         selector->meter_name, selector->meter_version, selector->meter_schema_url);
