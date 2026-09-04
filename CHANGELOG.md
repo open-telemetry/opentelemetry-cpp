@@ -15,9 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+* [CONFIGURATION] Parse the `event_to_span_event_bridge/development` log
+  record processor configuration in declarative configuration. The SDK
+  implementation of this processor is not yet available; `SdkBuilder` logs a
+  warning and skips it when configured.
+  [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
+
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
   [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
-
 * [EXPORTER] Fix the Elasticsearch log exporter aborting the process when a log
   record's body or attributes contain bytes that are not valid UTF-8. The
   exporter now substitutes the replacement character for the invalid bytes
