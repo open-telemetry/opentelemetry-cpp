@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] `BatchSpanProcessor` now waits for a full batch
+  (`max_export_batch_size`) before exporting, instead of draining the buffer
+  whenever it is non-empty. This reduces gRPC request count and CPU usage
+  under steady load while preserving `ForceFlush`/`Shutdown` drain semantics.
+  [#4466](https://github.com/open-telemetry/opentelemetry-cpp/pull/4466)
+
 * [EXPORTER] Fix the Elasticsearch log exporter aborting the process when a log
   record's body or attributes contain bytes that are not valid UTF-8. The
   exporter now substitutes the replacement character for the invalid bytes
