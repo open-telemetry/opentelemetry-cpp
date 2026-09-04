@@ -5,6 +5,7 @@
 #include <string>
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
 #include "opentelemetry/version.h"
 
@@ -28,17 +29,10 @@ OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions()
   ssl_client_cert_string = GetOtlpDefaultMetricsSslClientCertificateString();
 #endif
 
-  timeout    = GetOtlpDefaultMetricsTimeout();
-  metadata   = GetOtlpDefaultMetricsHeaders();
-  user_agent = GetOtlpDefaultUserAgent();
-
-  max_threads = 0;
-
-  compression = GetOtlpDefaultMetricsCompression();
-#ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests = 64;
-#endif
-
+  timeout                         = GetOtlpDefaultMetricsTimeout();
+  metadata                        = GetOtlpDefaultMetricsHeaders();
+  user_agent                      = GetOtlpDefaultUserAgent();
+  compression                     = GetOtlpDefaultMetricsCompression();
   retry_policy_max_attempts       = GetOtlpDefaultMetricsRetryMaxAttempts();
   retry_policy_initial_backoff    = GetOtlpDefaultMetricsRetryInitialBackoff();
   retry_policy_max_backoff        = GetOtlpDefaultMetricsRetryMaxBackoff();
@@ -46,13 +40,19 @@ OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions()
 }
 
 OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions(void *)
-{
-  use_ssl_credentials = true;
-  max_threads         = 0;
+    : OtlpGrpcClientOptions(nullptr)
+{}
 
-#ifdef ENABLE_ASYNC_EXPORT
-  max_concurrent_requests = 64;
-#endif
+OtlpGrpcMetricExporterOptions::OtlpGrpcMetricExporterOptions(
+    const OtlpGrpcClientOptions &client_options)
+    : OtlpGrpcClientOptions(client_options)
+{
+  std::chrono::system_clock::duration signal_timeout;
+  if (GetOtlpDefaultMetricsTimeoutOverride(signal_timeout))
+  {
+    timeout = signal_timeout;
+  }
+  metadata = GetOtlpDefaultMetricsHeaders();
 }
 
 OtlpGrpcMetricExporterOptions::~OtlpGrpcMetricExporterOptions() {}
