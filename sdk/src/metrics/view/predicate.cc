@@ -9,8 +9,10 @@
 #  include <regex>
 #endif
 
-#include "opentelemetry/common/macros.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
+#if !OPENTELEMETRY_HAVE_WORKING_REGEX
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+#endif
+
 #include "src/common/wildcard_match.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
