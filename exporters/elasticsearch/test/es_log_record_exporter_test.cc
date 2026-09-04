@@ -157,6 +157,43 @@ TEST(ElasticsearchLogsExporterTests, CustomClientConstructionSucceeds)
   ASSERT_NE(exporter, nullptr);
 }
 
+// Regression test: Shutdown() used to ignore its timeout parameter entirely and always return
+// true, whether or not anything had actually flushed. It should now report what flushing (via
+// ForceFlush) actually found. With FakeHttpClient, every export completes synchronously inside
+// Export() itself, so there is nothing left pending by the time Shutdown() runs.
+TEST(ElasticsearchLogsExporterTests, ShutdownReportsFlushCompletion)
+{
+  logs_exporter::ElasticsearchExporterOptions options;
+  auto http_client = std::make_shared<FakeHttpClient>();
+  auto exporter    = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
+
+  auto record = exporter->MakeRecordable();
+  record->SetBody("shutdown regression test");
+  auto export_result =
+      exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
+  ASSERT_EQ(export_result, opentelemetry::sdk::common::ExportResult::kSuccess);
+
+  EXPECT_TRUE(exporter->Shutdown(std::chrono::seconds(1)));
+}
+
+// Regression test: once Shutdown() has been called, any later Export() must fail rather than
+// silently trying to register a session against an exporter that is already tearing down.
+TEST(ElasticsearchLogsExporterTests, ExportAfterShutdownFails)
+{
+  logs_exporter::ElasticsearchExporterOptions options;
+  auto http_client = std::make_shared<FakeHttpClient>();
+  auto exporter    = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
+
+  ASSERT_TRUE(exporter->Shutdown(std::chrono::seconds(1)));
+
+  auto record = exporter->MakeRecordable();
+  auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
+
+  EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
+}
+
 // Attempt to write a log to an invalid host/port, test that the Export() returns failure
 TEST(DISABLED_ElasticsearchLogsExporterTests, InvalidEndpoint)
 {
