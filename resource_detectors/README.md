@@ -60,9 +60,9 @@ Limitations:
 Limitation: this detector depends on Linux `/proc` data and may return no value
 outside containers or when neither source contains the container ID. On cgroup
 v2 hosts with a private cgroup namespace `/proc/self/cgroup` does not contain
-the ID, so detection relies on the container runtime bind mounting
-`/etc/hostname`, `/etc/hosts` or `/etc/resolv.conf` from a path containing the
-container ID.
+the ID, so detection relies on the container runtime bind mounting files (such
+as `/etc/hostname` or `/run/secrets`) from a `.../containers/<id>/...` path, as
+Docker, Podman and CRI-O do.
 
 ### Host Resource Detector
 
