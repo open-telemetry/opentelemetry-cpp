@@ -2068,7 +2068,8 @@ void SdkBuilder::AddView(
 
     auto sdk_instrument_selector =
         std::make_unique<opentelemetry::sdk::metrics::InstrumentSelector>(
-            sdk_instrument_type, instrument_name, selector->unit);
+            sdk_instrument_type, instrument_name, selector->unit,
+            opentelemetry::sdk::metrics::PredicateType::kWildcard);
 
     auto sdk_meter_selector = std::make_unique<opentelemetry::sdk::metrics::MeterSelector>(
         selector->meter_name, selector->meter_version, selector->meter_schema_url);
