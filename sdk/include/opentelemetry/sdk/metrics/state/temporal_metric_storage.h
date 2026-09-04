@@ -34,7 +34,8 @@ class TemporalMetricStorage
 public:
   TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
                         AggregationType aggregation_type,
-                        const AggregationConfig *aggregation_config);
+                        const AggregationConfig *aggregation_config,
+                        bool is_async = false);
 
   bool buildMetrics(CollectorHandle *collector,
                     nostd::span<std::shared_ptr<CollectorHandle>> collectors,
@@ -64,6 +65,7 @@ private:
   // See https://github.com/open-telemetry/opentelemetry-specification (logs/metrics
   // SDK specs) and issue #4062.
   const opentelemetry::common::SystemTimestamp instrument_creation_ts_;
+  bool is_async_ = false;
 };
 }  // namespace metrics
 }  // namespace sdk

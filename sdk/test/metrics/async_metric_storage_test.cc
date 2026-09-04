@@ -322,4 +322,169 @@ INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestObservableGaugeFixtureLong,
                          ::testing::Values(AggregationTemporality::kCumulative,
                                            AggregationTemporality::kDelta));
 
+// Regression test for https://github.com/open-telemetry/opentelemetry-cpp/issues/4108
+//
+// Async instruments under cumulative temporality must NOT carry forward attribute sets that were
+// not reported by the callback in the current collection cycle.
+TEST(AsyncMetricStorageRegressionTest, StaleAttributeSetDroppedInCumulativeExport)
+{
+  InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kObservableCounter,
+                                     InstrumentValueType::kLong};
+
+  auto sdk_start_ts = std::chrono::system_clock::now();
+  // Some computation here
+  auto collection_ts = sdk_start_ts + std::chrono::seconds(5);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kCumulative));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors;
+  collectors.push_back(collector);
+
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
+      instr_desc, AggregationType::kSum,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+      nullptr);
+
+  // Collection 1: both GET and PUT reported.
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
+      {{{"RequestType", "GET"}}, 10}, {{{"RequestType", "PUT"}}, 5}};
+  storage.RecordLong(measurements1,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  int get_count = 0;
+  int put_count = 0;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
+                  [&](const MetricData &metric_data) {
+                    for (const auto &data_attr : metric_data.point_data_attr_)
+                    {
+                      const auto &key = opentelemetry::nostd::get<std::string>(
+                          data_attr.attributes.find("RequestType")->second);
+                      if (key == "GET")
+                        get_count++;
+                      else if (key == "PUT")
+                        put_count++;
+                    }
+                    return true;
+                  });
+  EXPECT_EQ(get_count, 1);
+  EXPECT_EQ(put_count, 1);
+
+  // Collection 2: only GET reported – PUT is dropped by callback.
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2 = {
+      {{{"RequestType", "GET"}}, 20}};
+  storage.RecordLong(measurements2,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  get_count         = 0;
+  put_count         = 0;
+  int64_t get_value = 0;
+  storage.Collect(collector.get(), collectors, sdk_start_ts,
+                  collection_ts + std::chrono::seconds(5), [&](const MetricData &metric_data) {
+                    for (const auto &data_attr : metric_data.point_data_attr_)
+                    {
+                      const auto &key = opentelemetry::nostd::get<std::string>(
+                          data_attr.attributes.find("RequestType")->second);
+                      if (key == "GET")
+                      {
+                        get_count++;
+                        get_value = opentelemetry::nostd::get<int64_t>(
+                            opentelemetry::nostd::get<SumPointData>(data_attr.point_data).value_);
+                      }
+                      else if (key == "PUT")
+                      {
+                        put_count++;
+                      }
+                    }
+                    return true;
+                  });
+
+  // PUT must not appear – it was absent from the callback this cycle.
+  EXPECT_EQ(put_count, 0) << "Stale PUT attribute set must be dropped from cumulative export";
+  EXPECT_EQ(get_count, 1);
+  EXPECT_EQ(get_value, 20);
+}
+
+// Regression test for https://github.com/open-telemetry/opentelemetry-cpp/issues/4108
+//
+// Under delta temporality an attribute set that disappears for one collection cycle and then
+// reappears must emit only the increment since the last observed value, not the full new absolute
+// value. The cumulative baseline (cumulative_hash_map_) is preserved across absent cycles so that
+// the delta computation in Record() remains correct.
+TEST(AsyncMetricStorageRegressionTest, AttributeReappearanceAfterGapDeltaTemporality)
+{
+  InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kObservableCounter,
+                                     InstrumentValueType::kLong};
+
+  auto sdk_start_ts = std::chrono::system_clock::now();
+  // Some computation here
+  auto collection_ts = sdk_start_ts + std::chrono::seconds(5);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors;
+  collectors.push_back(collector);
+
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
+      instr_desc, AggregationType::kSum,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+      nullptr);
+
+  // Collection 1: A=10 → delta should be 10.
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
+      {{{"attr", "A"}}, 10}};
+  storage.RecordLong(measurements1,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  int64_t delta_value = -1;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
+                  [&](const MetricData &metric_data) {
+                    for (const auto &data_attr : metric_data.point_data_attr_)
+                    {
+                      delta_value = opentelemetry::nostd::get<int64_t>(
+                          opentelemetry::nostd::get<SumPointData>(data_attr.point_data).value_);
+                    }
+                    return true;
+                  });
+  EXPECT_EQ(delta_value, 10);
+
+  // Collection 2: attribute A absent – nothing recorded, nothing emitted.
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2;
+  storage.RecordLong(measurements2,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  int attr_count = 0;
+  storage.Collect(collector.get(), collectors, sdk_start_ts,
+                  collection_ts + std::chrono::seconds(5), [&](const MetricData &metric_data) {
+                    attr_count += static_cast<int>(metric_data.point_data_attr_.size());
+                    return true;
+                  });
+  EXPECT_EQ(attr_count, 0) << "No data points expected when attribute set is absent";
+
+  // Collection 3: A reappears with absolute value 11.
+  // The cumulative baseline (10) was preserved across the absent cycle, so
+  // delta = 11 - 10 = 1 — the correct increment since the attribute was last seen.
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements3 = {
+      {{{"attr", "A"}}, 11}};
+  storage.RecordLong(measurements3,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  delta_value = -1;
+  storage.Collect(collector.get(), collectors, sdk_start_ts,
+                  collection_ts + std::chrono::seconds(10), [&](const MetricData &metric_data) {
+                    for (const auto &data_attr : metric_data.point_data_attr_)
+                    {
+                      delta_value = opentelemetry::nostd::get<int64_t>(
+                          opentelemetry::nostd::get<SumPointData>(data_attr.point_data).value_);
+                    }
+                    return true;
+                  });
+  // Baseline was preserved: delta = new_value - last_seen_value = 11 - 10 = 1.
+  EXPECT_EQ(delta_value, 1)
+      << "After a gap, reappearing attribute must emit the increment since last seen";
+}
+
 }  // namespace
