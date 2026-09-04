@@ -135,3 +135,100 @@ TEST(ViewRegistry, AddViewWithAllNullParameters)
   // Should not throw or abort, just log and ignore
   registry.AddView(nullptr, nullptr, nullptr);
 }
+
+// Test wildcard matching for instrument names in views
+TEST(ViewRegistry, WildcardInstrumentNameMatching)
+{
+  // Test cases: (pattern, test_string, should_match)
+  struct TestCase {
+    std::string pattern;
+    std::string instrument_name;
+    bool should_match;
+  };
+
+  const std::vector<TestCase> test_cases = {
+    // Basic wildcard tests
+    {"*", "anything", true},
+    {"*", "", true},
+    {"prefix*", "prefix", true},
+    {"prefix*", "prefix_anything", true},
+    {"prefix*", "preffix", false},  // different spelling
+    {"*suffix", "suffix", true},
+    {"*suffix", "prefix_suffix", true},
+    {"*suffix", "prefix_sufixx", false},  // different spelling
+    {"pre*fix", "prefix", true},
+    {"pre*fix", "pre_fix", true},
+    {"pre*fix", "prexxfix", true},
+    {"pre*fix", "fix", false},  // missing pre
+
+    // Question mark tests
+    {"?", "a", true},
+    {"?", "ab", false},  // too long
+    {"?", "", false},    // too short
+    {"?at", "cat", true},
+    {"?at", "bat", true},
+    {"?at", "at", false}, // too short
+    {"?at", "chat", false}, // too long
+
+    // Combined tests
+    {"a*b", "ab", true},
+    {"a*b", "a_b", true},
+    {"a*b", "axb", true},
+    {"a*b", "axbyb", true},
+    {"a*b", "acb", true},
+    {"a*b", "ab", true},  // * matches zero characters
+    {"a*b", "ac", false}, // missing b
+
+    // Specific examples from the issue
+    {"my_counter*", "my_counter", true},
+    {"my_counter*", "my_counter_one", true},
+    {"my_counter*", "my_counter_two", true},
+    {"my_counter*", "mycounter", false}, // missing underscore
+    {"my_counter*", "my_count", false},  // missing er
+  };
+
+  const std::string view_name               = "test_view";
+  const std::string instrumentation_name    = "test_inst";
+  const std::string instrumentation_version = "1.0.0";
+  const std::string instrumentation_schema  = "https://opentelemetry.io/schemas/1.7.0";
+
+  for (const auto& test_case : test_cases) {
+    SCOPED_TRACE(tests::internal::GetCurrentTestInfo()->name() +
+                 " - Testing pattern: \"" + test_case.pattern +
+                 "\" with instrument: \"" + test_case.instrument_name + "\"");
+
+    std::unique_ptr<InstrumentSelector> instrument_selector{
+        new InstrumentSelector(InstrumentType::kCounter, test_case.pattern, "" /* unit */)};
+    std::unique_ptr<MeterSelector> meter_selector{
+        new MeterSelector(instrumentation_name, instrumentation_version, instrumentation_schema)};
+    std::unique_ptr<View> view{new View(view_name, "test description")};
+
+    ViewRegistry registry;
+    registry.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
+
+    InstrumentDescriptor instrument_descriptor = {
+        test_case.instrument_name,  // name
+        "test description",         // description
+        "",                         // unit
+        InstrumentType::kCounter,   // instrument type
+        InstrumentValueType::kLong};
+
+    auto instrumentation_scope = InstrumentationScope::Create(
+        instrumentation_name, instrumentation_version, instrumentation_schema);
+    int count = 0;
+    auto status =
+        registry.FindViews(instrument_descriptor, *instrumentation_scope.get(),
+                           [&count](const View &view) {
+                             count++;
+                             return true;
+                           });
+
+    if (test_case.should_match) {
+      EXPECT_EQ(count, 1);
+      EXPECT_EQ(status, true);
+    } else {
+      EXPECT_EQ(count, 0);
+      EXPECT_EQ(status, true);  // Should still return true, just with 0 matches
+    }
+  }
+}

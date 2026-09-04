@@ -7,6 +7,7 @@
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/common/wildcard_match.h"
 
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
 #  include <regex>
@@ -83,6 +84,21 @@ class MatchNothingPattern : public Predicate
 {
 public:
   bool Match(opentelemetry::nostd::string_view /* str */) const noexcept override { return false; }
+};
+
+class WildcardPredicate : public Predicate
+{
+public:
+  explicit WildcardPredicate(opentelemetry::nostd::string_view pattern) noexcept
+      : pattern_{pattern} {}
+
+  bool Match(opentelemetry::nostd::string_view str) const noexcept override
+  {
+    return opentelemetry::sdk::common::WildcardMatch(pattern_, str);
+  }
+
+private:
+  std::string pattern_;
 };
 }  // namespace metrics
 }  // namespace sdk
