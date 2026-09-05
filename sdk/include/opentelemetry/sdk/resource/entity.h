@@ -22,14 +22,7 @@ public:
   Entity(const std::string &type,
          const ResourceAttributes &identity,
          const ResourceAttributes &description = ResourceAttributes{},
-         const std::string &schema_url         = std::string{}) noexcept;
-
-  Entity(const Entity &)            = default;
-  Entity(Entity &&)                 = default;
-  Entity &operator=(const Entity &) = default;
-  Entity &operator=(Entity &&)      = default;
-
-  ~Entity() = default;
+         const std::string &schema_url         = std::string{});
 
   const std::string &GetType() const noexcept;
   const ResourceAttributes &GetIdentity() const noexcept;
