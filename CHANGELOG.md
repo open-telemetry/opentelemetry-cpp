@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add Entity support to Resource
+  [#3652](https://github.com/open-telemetry/opentelemetry-cpp/issues/3652)
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
   [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
 
