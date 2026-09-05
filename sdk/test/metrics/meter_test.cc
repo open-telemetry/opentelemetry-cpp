@@ -33,6 +33,7 @@
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/exemplar_data.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
@@ -224,9 +225,9 @@ protected:
     provider_->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
   }
 
-  static size_t CountPointData(const std::vector<MetricData> &data,
-                               const InstrumentDescriptor &descriptor,
-                               bool expected_match = true)
+  static size_t GetPointDataSize(const std::vector<MetricData> &data,
+                                 const InstrumentDescriptor &descriptor,
+                                 bool expected_match = true)
   {
     size_t match_count = 0;
     size_t point_count = 0;
@@ -246,16 +247,64 @@ protected:
     return point_count;
   }
 
-  static double SumPointData(const std::vector<MetricData> &data,
-                             const InstrumentDescriptor &descriptor)
+  static double GetPointDataTotalSum(const std::vector<MetricData> &data,
+                                     const InstrumentDescriptor &descriptor,
+                                     AggregationType aggregation_type = AggregationType::kDefault,
+                                     std::size_t expected_conflict_count = 0)
   {
-    auto value_to_double = [](const ValueType &value) {
+    auto value_to_double = [](const ValueType &value) -> double {
       return nostd::holds_alternative<double>(value)
                  ? nostd::get<double>(value)
                  : static_cast<double>(nostd::get<int64_t>(value));
     };
 
-    double total = 0;
+    struct PointDataSum
+    {
+      AggregationType type = AggregationType::kDefault;
+      double sum           = 0;
+    };
+
+    auto get_point_data_sum = [&value_to_double](const PointType &point_data) -> PointDataSum {
+      if (auto *sum_point_data = nostd::get_if<sdk::metrics::SumPointData>(&point_data))
+      {
+        return PointDataSum{AggregationType::kSum, value_to_double(sum_point_data->value_)};
+      }
+      else if (auto *histogram_point_data =
+                   nostd::get_if<sdk::metrics::HistogramPointData>(&point_data))
+      {
+        return PointDataSum{AggregationType::kHistogram,
+                            value_to_double(histogram_point_data->sum_)};
+      }
+      else if (auto *last_value_point_data =
+                   nostd::get_if<sdk::metrics::LastValuePointData>(&point_data))
+      {
+        return PointDataSum{AggregationType::kLastValue,
+                            value_to_double(last_value_point_data->value_)};
+      }
+      else if (auto *base2_exponential_histogram_point_data =
+                   nostd::get_if<sdk::metrics::Base2ExponentialHistogramPointData>(&point_data))
+      {
+        return PointDataSum{AggregationType::kBase2ExponentialHistogram,
+                            value_to_double(base2_exponential_histogram_point_data->sum_)};
+      }
+      else if (auto *drop_point_data = nostd::get_if<sdk::metrics::DropPointData>(&point_data))
+      {
+        (void)drop_point_data;
+        return PointDataSum{AggregationType::kDrop, 0};
+      }
+      return PointDataSum{AggregationType::kDefault, 0};
+    };
+
+    if (aggregation_type == AggregationType::kDefault)
+    {
+      bool is_monotonic{};
+      aggregation_type = opentelemetry::sdk::metrics::DefaultAggregation::GetDefaultAggregationType(
+          descriptor.type_, is_monotonic);
+    }
+
+    double expected_total   = 0;
+    double unexpected_total = 0;
+
     for (const auto &md : data)
     {
       if (md.instrument_descriptor.name_ != descriptor.name_ ||
@@ -268,24 +317,24 @@ protected:
       }
       for (const auto &point_data_attr : md.point_data_attr_)
       {
-        if (auto *sum_point_data =
-                nostd::get_if<sdk::metrics::SumPointData>(&point_data_attr.point_data))
+        auto point_data_sum = get_point_data_sum(point_data_attr.point_data);
+        if (point_data_sum.type == aggregation_type)
         {
-          total += value_to_double(sum_point_data->value_);
+          expected_total += point_data_sum.sum;
         }
-        else if (auto *histogram_point_data =
-                     nostd::get_if<sdk::metrics::HistogramPointData>(&point_data_attr.point_data))
+        else
         {
-          total += value_to_double(histogram_point_data->sum_);
-        }
-        else if (auto *last_value_point_data =
-                     nostd::get_if<sdk::metrics::LastValuePointData>(&point_data_attr.point_data))
-        {
-          total += value_to_double(last_value_point_data->value_);
+          std::cout << "Unexpected aggregation type found for instrument " << descriptor.name_
+                    << ": "
+                    << ", expected: " << AggregationUtil::GetAggregationTypeString(aggregation_type)
+                    << ", actual: "
+                    << AggregationUtil::GetAggregationTypeString(point_data_sum.type) << "\n";
+          unexpected_total += point_data_sum.sum;
         }
       }
     }
-    return total;
+    EXPECT_EQ(unexpected_total, expected_conflict_count);
+    return expected_total;
   }
 
 protected:
@@ -625,8 +674,8 @@ TEST_F(MeterCreateInstrumentTest, IdenticalSyncInstruments)
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"my_counter", "desc", "unit", InstrumentType::kCounter,
                                     InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, descriptor), 2u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor), 3.5);
+    EXPECT_EQ(GetPointDataSize(data, descriptor), 2u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor), 3.5);
     return true;
   });
 
@@ -647,8 +696,8 @@ TEST_F(MeterCreateInstrumentTest, NameCaseConflictSyncInstruments)
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"My_CountER", "desc", "unit", InstrumentType::kCounter,
                                     InstrumentValueType::kLong};
-    EXPECT_EQ(CountPointData(data, descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor), 3);
+    EXPECT_EQ(GetPointDataSize(data, descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor), 3);
     return true;
   });
 
@@ -677,8 +726,8 @@ TEST_F(MeterCreateInstrumentTest, ViewCorrectedNameCaseConflictSyncInstruments)
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"my_counter", "desc", "unit", InstrumentType::kCounter,
                                     InstrumentValueType::kLong};
-    EXPECT_EQ(CountPointData(data, descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor), 3);
+    EXPECT_EQ(GetPointDataSize(data, descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor), 3);
     return true;
   });
 
@@ -701,10 +750,10 @@ TEST_F(MeterCreateInstrumentTest, DuplicateSyncInstrumentsByKind)
                                            InstrumentValueType::kDouble};
     InstrumentDescriptor long_descriptor{"my_counter", "desc", "unit", InstrumentType::kCounter,
                                          InstrumentValueType::kLong};
-    EXPECT_EQ(CountPointData(data, double_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, double_descriptor), 1);
-    EXPECT_EQ(CountPointData(data, long_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, long_descriptor), 1);
+    EXPECT_EQ(GetPointDataSize(data, double_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, double_descriptor), 1);
+    EXPECT_EQ(GetPointDataSize(data, long_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, long_descriptor), 1);
     return true;
   });
 
@@ -729,10 +778,10 @@ TEST_F(MeterCreateInstrumentTest, DuplicateSyncInstrumentsByUnits)
     InstrumentDescriptor another_unit_descriptor{"my_counter", "desc", "another_unit",
                                                  InstrumentType::kCounter,
                                                  InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, unit_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, unit_descriptor), 1);
-    EXPECT_EQ(CountPointData(data, another_unit_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, another_unit_descriptor), 1);
+    EXPECT_EQ(GetPointDataSize(data, unit_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, unit_descriptor), 1);
+    EXPECT_EQ(GetPointDataSize(data, another_unit_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, another_unit_descriptor), 1);
     return true;
   });
 
@@ -757,10 +806,10 @@ TEST_F(MeterCreateInstrumentTest, DuplicateSyncInstrumentsByDescription)
     InstrumentDescriptor another_desc_descriptor{"my_counter", "another_desc", "unit",
                                                  InstrumentType::kCounter,
                                                  InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, desc_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, desc_descriptor), 1);
-    EXPECT_EQ(CountPointData(data, another_desc_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, another_desc_descriptor), 1);
+    EXPECT_EQ(GetPointDataSize(data, desc_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, desc_descriptor), 1);
+    EXPECT_EQ(GetPointDataSize(data, another_desc_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, another_desc_descriptor), 1);
     return true;
   });
 
@@ -788,8 +837,8 @@ TEST_F(MeterCreateInstrumentTest, ViewCorrectedDuplicateSyncInstrumentsByDescrip
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"my_counter", "desc", "unit", InstrumentType::kCounter,
                                     InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, descriptor), 2u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor), 2);
+    EXPECT_EQ(GetPointDataSize(data, descriptor), 2u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor), 2);
     return true;
   });
 
@@ -815,9 +864,9 @@ TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithDropAggregation)
                                             InstrumentValueType::kLong};
     InstrumentDescriptor kept_descriptor{"counter_two", "desc", "unit", InstrumentType::kCounter,
                                          InstrumentValueType::kLong};
-    EXPECT_EQ(CountPointData(data, dropped_descriptor, false), 0u);
-    EXPECT_EQ(CountPointData(data, kept_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, kept_descriptor), 1);
+    EXPECT_EQ(GetPointDataSize(data, dropped_descriptor, false), 0u);
+    EXPECT_EQ(GetPointDataSize(data, kept_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, kept_descriptor), 1);
     return true;
   });
 
@@ -846,16 +895,16 @@ TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithCatchAllDropAggregation)
                                             InstrumentValueType::kLong};
     InstrumentDescriptor kept_descriptor{"counter_one", "desc", "unit", InstrumentType::kCounter,
                                          InstrumentValueType::kLong};
-    EXPECT_EQ(CountPointData(data, dropped_descriptor, false), 0u);
-    EXPECT_EQ(CountPointData(data, kept_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, kept_descriptor), 1);
+    EXPECT_EQ(GetPointDataSize(data, dropped_descriptor, false), 0u);
+    EXPECT_EQ(GetPointDataSize(data, kept_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, kept_descriptor), 1);
     return true;
   });
   EXPECT_FALSE(log_handler_->HasErrors());
   EXPECT_FALSE(log_handler_->HasWarnings());
 }
 
-TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithConflictingAggregation)
+TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithDuplicateAggregation)
 {
   // Specific view for counter_one
   AddView("counter_one", "", InstrumentType::kCounter, "", AggregationType::kSum);
@@ -872,8 +921,34 @@ TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithConflictingAggregation)
     EXPECT_EQ(data.size(), 1);
     InstrumentDescriptor descriptor{"counter_one", "desc", "unit", InstrumentType::kCounter,
                                     InstrumentValueType::kLong};
-    EXPECT_EQ(CountPointData(data, descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor), 1);
+    EXPECT_EQ(GetPointDataSize(data, descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor), 1);
+    return true;
+  });
+  EXPECT_FALSE(log_handler_->HasErrors());
+  EXPECT_TRUE(log_handler_->HasSemanticErrorWarning());
+}
+
+TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithConflictingAggregation)
+{
+  // Specific view for counter_one
+  AddView("counter_one", "", InstrumentType::kCounter, "", AggregationType::kHistogram);
+
+  // Catch-all view
+  AddView("*", "", InstrumentType::kCounter, "", AggregationType::kSum);
+
+  auto counter1 = meter_->CreateUInt64Counter("counter_one", "desc", "unit");
+
+  counter1->Add(1, {{"key", "value1"}});
+
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
+    const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
+    EXPECT_EQ(data.size(), 1);
+    InstrumentDescriptor descriptor{"counter_one", "desc", "unit", InstrumentType::kCounter,
+                                    InstrumentValueType::kLong};
+    EXPECT_EQ(GetPointDataSize(data, descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor, AggregationType::kHistogram, 0), 1);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor, AggregationType::kSum, 1), 0);
     return true;
   });
   EXPECT_FALSE(log_handler_->HasErrors());
@@ -903,10 +978,11 @@ TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithMultipleAggregations)
                                             InstrumentValueType::kLong};
     InstrumentDescriptor descriptor_histogram{"counter_one_as_histogram", "desc", "unit",
                                               InstrumentType::kCounter, InstrumentValueType::kLong};
-    EXPECT_EQ(CountPointData(data, descriptor_default), 2u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor_default), 5);
-    EXPECT_EQ(CountPointData(data, descriptor_histogram), 2u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor_histogram), 5);
+    EXPECT_EQ(GetPointDataSize(data, descriptor_default), 2u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor_default, AggregationType::kSum), 5);
+    EXPECT_EQ(GetPointDataSize(data, descriptor_histogram), 2u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor_histogram, AggregationType::kHistogram),
+                     5);
     return true;
   });
   EXPECT_FALSE(log_handler_->HasErrors());
@@ -932,8 +1008,8 @@ TEST_F(MeterCreateInstrumentTest, IdenticalAsyncInstruments)
     InstrumentDescriptor descriptor{"observable_counter", "desc", "unit",
                                     InstrumentType::kObservableCounter,
                                     InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, descriptor), 2u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor), 77.7);
+    EXPECT_EQ(GetPointDataSize(data, descriptor), 2u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor), 77.7);
     return true;
   });
 
@@ -960,8 +1036,8 @@ TEST_F(MeterCreateInstrumentTest, NameCaseConflictAsyncInstruments)
     InstrumentDescriptor descriptor{"OBServable_CounTER", "desc", "unit",
                                     InstrumentType::kObservableCounter,
                                     InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, descriptor), 2u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor), 77.7);
+    EXPECT_EQ(GetPointDataSize(data, descriptor), 2u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor), 77.7);
     return true;
   });
 
@@ -992,8 +1068,8 @@ TEST_F(MeterCreateInstrumentTest, ViewCorrectedNameCaseConflictAsyncInstruments)
     InstrumentDescriptor descriptor{"observable_counter", "desc", "unit",
                                     InstrumentType::kObservableCounter,
                                     InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, descriptor), 2u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor), 77.7);
+    EXPECT_EQ(GetPointDataSize(data, descriptor), 2u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor), 77.7);
     return true;
   });
 
@@ -1022,10 +1098,10 @@ TEST_F(MeterCreateInstrumentTest, DuplicateAsyncInstrumentsByKind)
     InstrumentDescriptor gauge_descriptor{"observable_counter", "", "",
                                           InstrumentType::kObservableGauge,
                                           InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, counter_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, counter_descriptor), 22.2);
-    EXPECT_EQ(CountPointData(data, gauge_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, gauge_descriptor), 55.5);
+    EXPECT_EQ(GetPointDataSize(data, counter_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, counter_descriptor), 22.2);
+    EXPECT_EQ(GetPointDataSize(data, gauge_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, gauge_descriptor), 55.5);
     return true;
   });
 
@@ -1056,10 +1132,10 @@ TEST_F(MeterCreateInstrumentTest, DuplicateAsyncInstrumentsByUnits)
     InstrumentDescriptor another_unit_descriptor{"observable_counter", "desc", "another_unit",
                                                  InstrumentType::kObservableCounter,
                                                  InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, unit_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, unit_descriptor), 22.2);
-    EXPECT_EQ(CountPointData(data, another_unit_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, another_unit_descriptor), 55.5);
+    EXPECT_EQ(GetPointDataSize(data, unit_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, unit_descriptor), 22.2);
+    EXPECT_EQ(GetPointDataSize(data, another_unit_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, another_unit_descriptor), 55.5);
     return true;
   });
 
@@ -1090,10 +1166,10 @@ TEST_F(MeterCreateInstrumentTest, DuplicateAsyncInstrumentsByDescription)
     InstrumentDescriptor another_desc_descriptor{"observable_counter", "another_desc", "unit",
                                                  InstrumentType::kObservableCounter,
                                                  InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, desc_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, desc_descriptor), 22.2);
-    EXPECT_EQ(CountPointData(data, another_desc_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, another_desc_descriptor), 55.5);
+    EXPECT_EQ(GetPointDataSize(data, desc_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, desc_descriptor), 22.2);
+    EXPECT_EQ(GetPointDataSize(data, another_desc_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, another_desc_descriptor), 55.5);
     return true;
   });
 
@@ -1127,8 +1203,8 @@ TEST_F(MeterCreateInstrumentTest, ViewCorrectedDuplicateAsyncInstrumentsByDescri
     InstrumentDescriptor descriptor{"observable_counter", "desc", "unit",
                                     InstrumentType::kObservableCounter,
                                     InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, descriptor), 2u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor), 77.7);
+    EXPECT_EQ(GetPointDataSize(data, descriptor), 2u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor), 77.7);
     return true;
   });
 
@@ -1162,9 +1238,9 @@ TEST_F(MeterCreateInstrumentTest, AsyncInstrumentWithDropAggregation)
     InstrumentDescriptor kept_descriptor{"observable_counter_two", "desc", "unit",
                                          InstrumentType::kObservableCounter,
                                          InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, dropped_descriptor, false), 0u);
-    EXPECT_EQ(CountPointData(data, kept_descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, kept_descriptor), 55.5);
+    EXPECT_EQ(GetPointDataSize(data, dropped_descriptor, false), 0u);
+    EXPECT_EQ(GetPointDataSize(data, kept_descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, kept_descriptor), 55.5);
     return true;
   });
 
@@ -1201,16 +1277,16 @@ TEST_F(MeterCreateInstrumentTest, ASyncInstrumentWithCatchAllDropAggregation)
     InstrumentDescriptor descriptor_dropped{"observable_counter_two", "desc", "unit",
                                             InstrumentType::kObservableCounter,
                                             InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, descriptor_dropped, false), 0u);
-    EXPECT_EQ(CountPointData(data, descriptor_kept), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor_kept), 22.2);
+    EXPECT_EQ(GetPointDataSize(data, descriptor_dropped, false), 0u);
+    EXPECT_EQ(GetPointDataSize(data, descriptor_kept), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor_kept), 22.2);
     return true;
   });
   EXPECT_FALSE(log_handler_->HasErrors());
   EXPECT_FALSE(log_handler_->HasWarnings());
 }
 
-TEST_F(MeterCreateInstrumentTest, ASyncInstrumentWithConflictingAggregation)
+TEST_F(MeterCreateInstrumentTest, ASyncInstrumentWithDuplicateAggregation)
 {
   // Specific view for counter_one
   AddView("observable_counter_one", "", InstrumentType::kObservableCounter, "",
@@ -1232,8 +1308,38 @@ TEST_F(MeterCreateInstrumentTest, ASyncInstrumentWithConflictingAggregation)
     InstrumentDescriptor descriptor{"observable_counter_one", "desc", "unit",
                                     InstrumentType::kObservableCounter,
                                     InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, descriptor), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor), 22.2);
+    EXPECT_EQ(GetPointDataSize(data, descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor), 22.2);
+    return true;
+  });
+  EXPECT_FALSE(log_handler_->HasErrors());
+  EXPECT_TRUE(log_handler_->HasSemanticErrorWarning());
+}
+
+TEST_F(MeterCreateInstrumentTest, ASyncInstrumentWithConflictingAggregation)
+{
+  // Specific view for counter_one
+  AddView("observable_counter_one", "", InstrumentType::kObservableCounter, "",
+          AggregationType::kSum);
+
+  // Catch-all non-drop view
+  AddView("*", "", InstrumentType::kObservableCounter, "", AggregationType::kLastValue);
+
+  auto observable_counter1 =
+      meter_->CreateDoubleObservableCounter("observable_counter_one", "desc", "unit");
+
+  auto callback1 = ObservableResultDouble{22.2, {{"key", "value1"}}};
+
+  observable_counter1->AddCallback(ObservableResultDouble::Callback, &callback1);
+
+  metric_reader_ptr_->Collect([](ResourceMetrics &metric_data) {
+    const auto &data = metric_data.scope_metric_data_.at(0).metric_data_;
+    EXPECT_EQ(data.size(), 1);
+    InstrumentDescriptor descriptor{"observable_counter_one", "desc", "unit",
+                                    InstrumentType::kObservableCounter,
+                                    InstrumentValueType::kDouble};
+    EXPECT_EQ(GetPointDataSize(data, descriptor), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor), 22.2);
     return true;
   });
   EXPECT_FALSE(log_handler_->HasErrors());
@@ -1249,7 +1355,7 @@ TEST_F(MeterCreateInstrumentTest, ASyncInstrumentWithMultipleAggregations)
   // Catch-all to set the default aggregation and a cardinality limit
   auto aggregation_config                = std::make_shared<sdk::metrics::AggregationConfig>();
   aggregation_config->cardinality_limit_ = 100;
-  AddView("*", "", InstrumentType::kObservableCounter, "", AggregationType::kDefault,
+  AddView("*", "", InstrumentType::kObservableCounter, "", AggregationType::kSum,
           aggregation_config);
 
   auto observable_counter1 =
@@ -1268,10 +1374,11 @@ TEST_F(MeterCreateInstrumentTest, ASyncInstrumentWithMultipleAggregations)
     InstrumentDescriptor descriptor_histogram{"observable_counter_as_histogram", "desc", "unit",
                                               InstrumentType::kObservableCounter,
                                               InstrumentValueType::kDouble};
-    EXPECT_EQ(CountPointData(data, descriptor_default), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor_default), 55.5);
-    EXPECT_EQ(CountPointData(data, descriptor_histogram), 1u);
-    EXPECT_DOUBLE_EQ(SumPointData(data, descriptor_histogram), 55.5);
+    EXPECT_EQ(GetPointDataSize(data, descriptor_default), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor_default, AggregationType::kSum), 55.5);
+    EXPECT_EQ(GetPointDataSize(data, descriptor_histogram), 1u);
+    EXPECT_DOUBLE_EQ(GetPointDataTotalSum(data, descriptor_histogram, AggregationType::kHistogram),
+                     55.5);
     return true;
   });
   EXPECT_FALSE(log_handler_->HasErrors());

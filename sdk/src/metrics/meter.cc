@@ -590,12 +590,11 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
           storage_registry_.insert({view_instr_desc, sync_storage});
         }
         auto sync_multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
-        if (sync_multi_storage->HasStorage(sync_storage))
+        if (!sync_multi_storage->AddStorage(sync_storage))
         {
           WarnOnViewSemanticError(GetInstrumentationScope(), instrument_descriptor, view);
           return true;
         }
-        sync_multi_storage->AddStorage(sync_storage);
         return true;
       });
 
@@ -678,12 +677,12 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
           storage_registry_.insert({view_instr_desc, async_storage});
         }
         auto async_multi_storage = static_cast<AsyncMultiMetricStorage *>(storages.get());
-        if (async_multi_storage->HasStorage(async_storage))
+        if (!async_multi_storage->AddStorage(async_storage))
         {
           WarnOnViewSemanticError(GetInstrumentationScope(), instrument_descriptor, view);
           return true;
         }
-        async_multi_storage->AddStorage(async_storage);
+
         return true;
       });
   if (!success)
