@@ -18,7 +18,7 @@ namespace resource
 Entity::Entity(const std::string &type,
                const ResourceAttributes &identity,
                const ResourceAttributes &description,
-               const std::string &schema_url) noexcept
+               const std::string &schema_url)
     : type_(type), identity_(identity), description_(description), schema_url_(schema_url)
 {
   for (const auto &kv : identity_)
