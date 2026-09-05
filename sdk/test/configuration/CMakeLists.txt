@@ -37,11 +37,21 @@ target_link_libraries(
   metrics_builders_test
   PRIVATE ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
           opentelemetry_configuration_metrics_builders
-          opentelemetry_configuration_core)
+          opentelemetry_configuration_core opentelemetry_test_common)
 gtest_add_tests(
   TARGET metrics_builders_test
   TEST_PREFIX config.
   TEST_LIST metrics_builders_test)
+
+add_executable(propagator_builders_test propagator_builders_test.cc)
+target_link_libraries(
+  propagator_builders_test
+  PRIVATE ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+          opentelemetry_configuration_core)
+gtest_add_tests(
+  TARGET propagator_builders_test
+  TEST_PREFIX config.
+  TEST_LIST propagator_builders_test)
 
 foreach(testname sdk_builder_test configured_sdk_test
                  programmatic_configuration_test)

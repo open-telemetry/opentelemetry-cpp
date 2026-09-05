@@ -26,7 +26,6 @@ cc_test(
 cc_test(
     name = "sdk_builder_test",
     srcs = [
-        "config_test_common.h",
         "sdk_builder_test.cc",
     ],
     tags = [
@@ -48,7 +47,9 @@ cc_test(
 cc_test(
     name = "configured_sdk_test",
     srcs = [
-        "config_test_common.h",
+        "config_test_logs.h",
+        "config_test_metrics.h",
+        "config_test_trace.h",
         "configured_sdk_test.cc",
     ],
     tags = [
@@ -69,7 +70,10 @@ cc_test(
 cc_test(
     name = "programmatic_configuration_test",
     srcs = [
-        "config_test_common.h",
+        "config_test_logs.h",
+        "config_test_metrics.h",
+        "config_test_propagators.h",
+        "config_test_trace.h",
         "programmatic_configuration_test.cc",
     ],
     tags = [
@@ -90,6 +94,7 @@ cc_test(
 cc_test(
     name = "trace_builders_test",
     srcs = [
+        "config_test_trace.h",
         "trace_builders_test.cc",
     ],
     tags = [
@@ -107,6 +112,7 @@ cc_test(
 cc_test(
     name = "logs_builders_test",
     srcs = [
+        "config_test_logs.h",
         "logs_builders_test.cc",
     ],
     tags = [
@@ -124,6 +130,7 @@ cc_test(
 cc_test(
     name = "metrics_builders_test",
     srcs = [
+        "config_test_metrics.h",
         "metrics_builders_test.cc",
     ],
     tags = [
@@ -134,6 +141,23 @@ cc_test(
         "//sdk:headers",
         "//sdk/src/configuration:configuration_metrics_builders",
         "//sdk/src/metrics",
+        "//test_common:headers",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "propagator_builders_test",
+    srcs = [
+        "propagator_builders_test.cc",
+    ],
+    tags = [
+        "config",
+        "test",
+    ],
+    deps = [
+        "//sdk:headers",
+        "//sdk/src/configuration:configuration_core",
         "@com_google_googletest//:gtest_main",
     ],
 )
