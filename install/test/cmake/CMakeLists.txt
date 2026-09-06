@@ -114,6 +114,36 @@ foreach(component ${INSTALL_TEST_COMPONENTS})
     COMMAND ${CMAKE_BINARY_DIR}/build-${component}-test/${component}_test)
 endforeach()
 
+# -----------------------------------------------------------
+# Pkg-config consumer tests (compile/link/run against installed .pc files)
+find_package(PkgConfig QUIET)
+if(PKG_CONFIG_FOUND)
+  add_test(
+    NAME pkgconfig-test-config-test
+    COMMAND
+      ${CMAKE_COMMAND} --log-level=DEBUG -S
+      ${CMAKE_SOURCE_DIR}/pkgconfig_test -B build-pkgconfig-test
+      "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+      "-DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR}"
+      ${INSTALL_TEST_CMAKE_OPTIONS})
+
+  set_tests_properties(
+    pkgconfig-test-config-test
+    PROPERTIES ENVIRONMENT "PKG_CONFIG_PATH=${CMAKE_PREFIX_PATH}/lib/pkgconfig")
+
+  add_test(
+    NAME pkgconfig-test-build-test
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/build-pkgconfig-test
+            --parallel)
+
+  add_test(
+    NAME pkgconfig-test-run-test
+    COMMAND ${CMAKE_CTEST_COMMAND} --test-dir
+            ${CMAKE_BINARY_DIR}/build-pkgconfig-test --output-on-failure)
+else()
+  message(STATUS "PkgConfig not found; skipping pkg-config install tests")
+endif()
+
 set(OPENTELEMETRY_CPP_EXAMPLES_SRC_DIR "${CMAKE_SOURCE_DIR}/../../../examples")
 
 # Configure the examples with the installed package
