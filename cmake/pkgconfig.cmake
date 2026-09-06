@@ -37,22 +37,23 @@ function(opentelemetry_add_pkgconfig library name description)
 
   set_target_properties(
     "${_target}"
-    PROPERTIES OTEL_PKGCONFIG_SHORT_NAME "${library}" OTEL_PKGCONFIG_NAME
-               "${name}" OTEL_PKGCONFIG_DESCRIPTION "${description}"
-               OTEL_PKGCONFIG_REQUIRES "${ARGN}")
+    PROPERTIES INTERFACE_OTEL_PKGCONFIG_SHORT_NAME "${library}"
+               INTERFACE_OTEL_PKGCONFIG_NAME "${name}"
+               INTERFACE_OTEL_PKGCONFIG_DESCRIPTION "${description}"
+               INTERFACE_OTEL_PKGCONFIG_REQUIRES "${ARGN}")
 endfunction()
 
 # Generate and install a pkg-config file for a target that registered metadata
 # via opentelemetry_add_pkgconfig().
 function(_otel_install_target_pkgconfig _TARGET _COMPONENT)
-  get_target_property(_short_name "${_TARGET}" OTEL_PKGCONFIG_SHORT_NAME)
+  get_target_property(_short_name "${_TARGET}" INTERFACE_OTEL_PKGCONFIG_SHORT_NAME)
   if(NOT _short_name OR _short_name STREQUAL "_short_name-NOTFOUND")
     return()
   endif()
 
-  get_target_property(_pc_name "${_TARGET}" OTEL_PKGCONFIG_NAME)
-  get_target_property(_pc_desc "${_TARGET}" OTEL_PKGCONFIG_DESCRIPTION)
-  get_target_property(_pc_requires "${_TARGET}" OTEL_PKGCONFIG_REQUIRES)
+  get_target_property(_pc_name "${_TARGET}" INTERFACE_OTEL_PKGCONFIG_NAME)
+  get_target_property(_pc_desc "${_TARGET}" INTERFACE_OTEL_PKGCONFIG_DESCRIPTION)
+  get_target_property(_pc_requires "${_TARGET}" INTERFACE_OTEL_PKGCONFIG_REQUIRES)
 
   opentelemetry_set_pkgconfig_paths()
 
