@@ -1209,8 +1209,12 @@ TEST(SdkBuilder, AddViewUsesWildcardMatchingForInstrumentName)
         metrics_sdk::InstrumentValueType::kLong};
     int matched = 0;
     view_registry.FindViews(instrument_descriptor, *instrumentation_scope,
-                            [&](const metrics_sdk::View &) {
-                              ++matched;
+                            [&](const metrics_sdk::View &view) {
+                              auto *config = view.GetAggregationConfig();
+                              if (config != nullptr && config->cardinality_limit_ == 42u)
+                              {
+                                ++matched;
+                              }
                               return true;
                             });
     return matched;
