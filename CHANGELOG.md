@@ -29,6 +29,15 @@ Increment the:
   change.
   [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
 
+* [EXPORTER] Fix the Elasticsearch log exporter's synchronous export path
+  waiting with no deadline of its own, trusting an injected `HttpClient` to
+  always eventually deliver a terminal event. A client that accepts a
+  request and never calls back (a dead thread, a reused socket, a swallowed
+  error) left `Export()` blocked for the life of the process. The wait now
+  has its own deadline derived from the configured response timeout, so a
+  non-responding client fails the export instead of hanging it.
+  [#4362](https://github.com/open-telemetry/opentelemetry-cpp/issues/4362)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
