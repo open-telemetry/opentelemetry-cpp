@@ -1,8 +1,6 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <nlohmann/json.hpp>
-
 #include <atomic>
 #include <chrono>
 #include <climits>
@@ -13,6 +11,7 @@
 #include <ctime>
 #include <fstream>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -103,20 +102,22 @@
 #  define OTLP_FILE_OPEN(f, path, mode) f = std::fopen(path, mode)
 #endif
 
+#include "opentelemetry/exporters/otlp/detail/default_json_writer_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_runtime_options.h"
+#include "opentelemetry/exporters/otlp/otlp_json_converter.h"
+#include "opentelemetry/exporters/otlp/otlp_json_writer.h"
+#include "opentelemetry/exporters/otlp/otlp_json_writer_factory.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/base64.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
-#include "google/protobuf/descriptor.h"
 #include "google/protobuf/message.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
@@ -713,266 +714,6 @@ public:
   }
 #endif
 };
-
-static inline char HexEncode(unsigned char byte)
-{
-#if defined(HAVE_GSL)
-  Expects(byte <= 16);
-#else
-  assert(byte <= 16);
-#endif
-  if (byte >= 10)
-  {
-    return static_cast<char>(byte - 10 + 'a');
-  }
-  else
-  {
-    return static_cast<char>(byte + '0');
-  }
-}
-
-static std::string HexEncode(const std::string &bytes)
-{
-  std::string ret;
-  ret.reserve(bytes.size() * 2);
-  for (std::string::size_type i = 0; i < bytes.size(); ++i)
-  {
-    unsigned char byte = static_cast<unsigned char>(bytes[i]);
-    ret.push_back(HexEncode(byte >> 4));
-    ret.push_back(HexEncode(byte & 0x0f));
-  }
-  return ret;
-}
-
-static std::string BytesMapping(const std::string &bytes,
-                                const google::protobuf::FieldDescriptor *field_descriptor)
-{
-  if (field_descriptor->lowercase_name() == "trace_id" ||
-      field_descriptor->lowercase_name() == "span_id" ||
-      field_descriptor->lowercase_name() == "parent_span_id")
-  {
-    return HexEncode(bytes);
-  }
-  else
-  {
-    return opentelemetry::sdk::common::Base64Escape(bytes);
-  }
-}
-
-static void ConvertGenericFieldToJson(nlohmann::json &value,
-                                      const google::protobuf::Message &message,
-                                      const google::protobuf::FieldDescriptor *field_descriptor);
-
-static void ConvertListFieldToJson(nlohmann::json &value,
-                                   const google::protobuf::Message &message,
-                                   const google::protobuf::FieldDescriptor *field_descriptor);
-
-// NOLINTBEGIN(misc-no-recursion)
-static void ConvertGenericMessageToJson(nlohmann::json &value,
-                                        const google::protobuf::Message &message)
-{
-  std::vector<const google::protobuf::FieldDescriptor *> fields_with_data;
-  message.GetReflection()->ListFields(message, &fields_with_data);
-  for (std::size_t i = 0; i < fields_with_data.size(); ++i)
-  {
-    const google::protobuf::FieldDescriptor *field_descriptor = fields_with_data[i];
-    nlohmann::json &child_value = value[field_descriptor->camelcase_name()];
-    if (field_descriptor->is_repeated())
-    {
-      ConvertListFieldToJson(child_value, message, field_descriptor);
-    }
-    else
-    {
-      ConvertGenericFieldToJson(child_value, message, field_descriptor);
-    }
-  }
-}
-
-void ConvertGenericFieldToJson(nlohmann::json &value,
-                               const google::protobuf::Message &message,
-                               const google::protobuf::FieldDescriptor *field_descriptor)
-{
-  switch (field_descriptor->cpp_type())
-  {
-    case google::protobuf::FieldDescriptor::CPPTYPE_INT32: {
-      value = message.GetReflection()->GetInt32(message, field_descriptor);
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_INT64: {
-      // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded as
-      // decimal strings, and either numbers or strings are accepted when decoding.
-      value = std::to_string(message.GetReflection()->GetInt64(message, field_descriptor));
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_UINT32: {
-      value = message.GetReflection()->GetUInt32(message, field_descriptor);
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_UINT64: {
-      // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded as
-      // decimal strings, and either numbers or strings are accepted when decoding.
-      value = std::to_string(message.GetReflection()->GetUInt64(message, field_descriptor));
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
-      std::string empty;
-      if (field_descriptor->type() == google::protobuf::FieldDescriptor::TYPE_BYTES)
-      {
-        value = BytesMapping(
-            message.GetReflection()->GetStringReference(message, field_descriptor, &empty),
-            field_descriptor);
-      }
-      else
-      {
-        value = message.GetReflection()->GetStringReference(message, field_descriptor, &empty);
-      }
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE: {
-      ConvertGenericMessageToJson(
-          value, message.GetReflection()->GetMessage(message, field_descriptor, nullptr));
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE: {
-      value = message.GetReflection()->GetDouble(message, field_descriptor);
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT: {
-      value = message.GetReflection()->GetFloat(message, field_descriptor);
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_BOOL: {
-      value = message.GetReflection()->GetBool(message, field_descriptor);
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_ENUM: {
-      value = message.GetReflection()->GetEnumValue(message, field_descriptor);
-      break;
-    }
-    default: {
-      break;
-    }
-  }
-}
-
-void ConvertListFieldToJson(nlohmann::json &value,
-                            const google::protobuf::Message &message,
-                            const google::protobuf::FieldDescriptor *field_descriptor)
-{
-  auto field_size = message.GetReflection()->FieldSize(message, field_descriptor);
-
-  switch (field_descriptor->cpp_type())
-  {
-    case google::protobuf::FieldDescriptor::CPPTYPE_INT32: {
-      for (int i = 0; i < field_size; ++i)
-      {
-        value.push_back(message.GetReflection()->GetRepeatedInt32(message, field_descriptor, i));
-      }
-
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_INT64: {
-      for (int i = 0; i < field_size; ++i)
-      {
-        // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded
-        // as decimal strings, and either numbers or strings are accepted when decoding.
-        value.push_back(std::to_string(
-            message.GetReflection()->GetRepeatedInt64(message, field_descriptor, i)));
-      }
-
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_UINT32: {
-      for (int i = 0; i < field_size; ++i)
-      {
-        value.push_back(message.GetReflection()->GetRepeatedUInt32(message, field_descriptor, i));
-      }
-
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_UINT64: {
-      for (int i = 0; i < field_size; ++i)
-      {
-        // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded
-        // as decimal strings, and either numbers or strings are accepted when decoding.
-        value.push_back(std::to_string(
-            message.GetReflection()->GetRepeatedUInt64(message, field_descriptor, i)));
-      }
-
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
-      std::string empty;
-      if (field_descriptor->type() == google::protobuf::FieldDescriptor::TYPE_BYTES)
-      {
-        for (int i = 0; i < field_size; ++i)
-        {
-          value.push_back(BytesMapping(message.GetReflection()->GetRepeatedStringReference(
-                                           message, field_descriptor, i, &empty),
-                                       field_descriptor));
-        }
-      }
-      else
-      {
-        for (int i = 0; i < field_size; ++i)
-        {
-          value.push_back(message.GetReflection()->GetRepeatedStringReference(
-              message, field_descriptor, i, &empty));
-        }
-      }
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE: {
-      for (int i = 0; i < field_size; ++i)
-      {
-        nlohmann::json sub_value;
-        ConvertGenericMessageToJson(
-            sub_value, message.GetReflection()->GetRepeatedMessage(message, field_descriptor, i));
-        value.push_back(std::move(sub_value));
-      }
-
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE: {
-      for (int i = 0; i < field_size; ++i)
-      {
-        value.push_back(message.GetReflection()->GetRepeatedDouble(message, field_descriptor, i));
-      }
-
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT: {
-      for (int i = 0; i < field_size; ++i)
-      {
-        value.push_back(message.GetReflection()->GetRepeatedFloat(message, field_descriptor, i));
-      }
-
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_BOOL: {
-      for (int i = 0; i < field_size; ++i)
-      {
-        value.push_back(message.GetReflection()->GetRepeatedBool(message, field_descriptor, i));
-      }
-
-      break;
-    }
-    case google::protobuf::FieldDescriptor::CPPTYPE_ENUM: {
-      for (int i = 0; i < field_size; ++i)
-      {
-        value.push_back(
-            message.GetReflection()->GetRepeatedEnumValue(message, field_descriptor, i));
-      }
-      break;
-    }
-    default: {
-      break;
-    }
-  }
-}
-
-// NOLINTEND(misc-no-recursion) suppressing for performance as if implemented with stack needs
-// Dynamic memory allocation
 
 class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileSystemBackend : public OtlpFileAppender
 {
@@ -1636,7 +1377,11 @@ private:
 
 OtlpFileClient::OtlpFileClient(OtlpFileClientOptions &&options,
                                OtlpFileClientRuntimeOptions &&runtime_options)
-    : options_{std::move(options)}, runtime_options_{std::move(runtime_options)}
+    : options_{std::move(options)},
+      runtime_options_{std::move(runtime_options)},
+      json_writer_factory_{runtime_options_.json_writer_factory
+                               ? runtime_options_.json_writer_factory
+                               : detail::GetDefaultJsonWriterFactory()}
 {
   if (nostd::holds_alternative<OtlpFileClientFileSystemOptions>(options_.backend_options))
   {
@@ -1674,12 +1419,14 @@ opentelemetry::sdk::common::ExportResult OtlpFileClient::Export(
     return ::opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
-  nlohmann::json json_request;
-  // Convert from proto into json object
-  ConvertGenericMessageToJson(json_request, message);
+  std::unique_ptr<JsonWriter> json_writer = json_writer_factory_->Create();
+  ConvertGenericMessageToJson(*json_writer, message, JsonConverterOptions{});
+  if (!json_writer->ok())
+  {
+    return ::opentelemetry::sdk::common::ExportResult::kFailure;
+  }
 
-  std::string post_body_json =
-      json_request.dump(-1, ' ', false, nlohmann::detail::error_handler_t::replace);
+  std::string post_body_json = json_writer->ToString();
   if (options_.console_debug)
   {
     OTEL_INTERNAL_LOG_DEBUG("[OTLP FILE Client] Write body(Json)" << post_body_json);

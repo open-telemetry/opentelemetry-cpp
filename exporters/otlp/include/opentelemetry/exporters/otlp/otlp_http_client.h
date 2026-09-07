@@ -16,6 +16,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/exporters/otlp/otlp_json_writer_factory.h"
 #include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -91,6 +92,8 @@ struct OtlpHttpClientOptions
 
   std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation =
       std::shared_ptr<sdk::common::ThreadInstrumentation>(nullptr);
+
+  std::shared_ptr<JsonWriterFactory> json_writer_factory;
 
   inline OtlpHttpClientOptions(
       nostd::string_view input_url,
@@ -294,6 +297,9 @@ private:
 
   // Object that stores the HTTP sessions that have been created
   std::shared_ptr<ext::http::client::HttpClient> http_client_;
+
+  // Resolved from options_.json_writer_factory, or the default backend.
+  std::shared_ptr<JsonWriterFactory> json_writer_factory_;
 
   // Cached parsed URI
   std::string http_uri_;

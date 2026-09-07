@@ -6,12 +6,14 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <map>
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter.h"
@@ -21,6 +23,7 @@
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
@@ -30,7 +33,10 @@
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/span_startoptions.h"
+#include "opentelemetry/trace/trace_flags.h"
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
@@ -206,6 +212,79 @@ TEST(OtlpFileExporterTest, Shutdown)
 TEST_F(OtlpFileExporterTestPeer, ExportJsonIntegrationTestSync)
 {
   ExportJsonIntegrationTest();
+}
+
+TEST(OtlpFileExporterTest, ExportJsonGoldenBody)
+{
+  static ProtobufGlobalSymbolGuard global_symbol_guard;
+
+  std::stringstream output;
+  OtlpFileExporterOptions opts;
+  opts.backend_options = std::ref(output);
+  auto exporter        = OtlpFileExporterFactory::Create(opts);
+
+  auto recordable = exporter->MakeRecordable();
+
+  const uint8_t trace_id_bytes[trace_api::TraceId::kSize] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
+                                                             0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
+                                                             0x0d, 0x0e, 0x0f, 0x10};
+  const uint8_t span_id_bytes[trace_api::SpanId::kSize]   = {0x11, 0x12, 0x13, 0x14,
+                                                             0x15, 0x16, 0x17, 0x18};
+  const uint8_t parent_span_id_bytes[trace_api::SpanId::kSize] = {0x21, 0x22, 0x23, 0x24,
+                                                                  0x25, 0x26, 0x27, 0x28};
+  const uint8_t link_trace_id_bytes[trace_api::TraceId::kSize] = {
+      0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
+      0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f, 0x40};
+  const uint8_t link_span_id_bytes[trace_api::SpanId::kSize] = {0x41, 0x42, 0x43, 0x44,
+                                                                0x45, 0x46, 0x47, 0x48};
+
+  trace_api::SpanContext span_context(
+      trace_api::TraceId(trace_id_bytes), trace_api::SpanId(span_id_bytes),
+      trace_api::TraceFlags(trace_api::TraceFlags::kIsSampled), false);
+  recordable->SetIdentity(span_context, trace_api::SpanId(parent_span_id_bytes));
+
+  recordable->SetName("golden span");
+  recordable->SetSpanKind(trace_api::SpanKind::kServer);
+  recordable->SetStartTime(
+      opentelemetry::common::SystemTimestamp(std::chrono::nanoseconds(1000000000)));
+  recordable->SetDuration(std::chrono::nanoseconds(500000000));
+  recordable->SetStatus(trace_api::StatusCode::kOk, "all good");
+  recordable->SetAttribute("bool_attr", true);
+  recordable->SetAttribute("int64_attr", static_cast<int64_t>(-42));
+  recordable->SetAttribute("uint64_attr", static_cast<uint64_t>(42));
+  recordable->SetAttribute("double_attr", static_cast<double>(3.5));
+  recordable->SetAttribute("string_attr", "golden value");
+
+  std::map<std::string, std::string> event_attribute_map = {{"event_key", "event_value"}};
+  recordable->AddEvent("golden event",
+                       opentelemetry::common::SystemTimestamp(std::chrono::nanoseconds(1000500000)),
+                       opentelemetry::common::MakeAttributes(event_attribute_map));
+
+  trace_api::SpanContext link_context(
+      trace_api::TraceId(link_trace_id_bytes), trace_api::SpanId(link_span_id_bytes),
+      trace_api::TraceFlags(trace_api::TraceFlags::kIsSampled), false);
+  std::map<std::string, std::string> link_attribute_map = {{"link_key", "link_value"}};
+  recordable->AddLink(link_context, opentelemetry::common::MakeAttributes(link_attribute_map));
+
+  auto instrumentation_scope =
+      opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+          "golden_scope", "golden_scope_version");
+  recordable->SetInstrumentationScope(*instrumentation_scope);
+
+  nostd::span<std::unique_ptr<opentelemetry::sdk::trace::Recordable>> batch(&recordable, 1);
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, exporter->Export(batch));
+
+  output.flush();
+  std::string captured_body = output.str();
+  if (!captured_body.empty() && captured_body.back() == '\n')
+  {
+    captured_body.pop_back();
+  }
+
+  static constexpr char kExpectedBody[] =
+      R"({"resourceSpans":[{"scopeSpans":[{"scope":{"name":"golden_scope","version":"golden_scope_version"},"spans":[{"attributes":[{"key":"bool_attr","value":{"boolValue":true}},{"key":"int64_attr","value":{"intValue":"-42"}},{"key":"uint64_attr","value":{"intValue":"42"}},{"key":"double_attr","value":{"doubleValue":3.5}},{"key":"string_attr","value":{"stringValue":"golden value"}}],"endTimeUnixNano":"1500000000","events":[{"attributes":[{"key":"event_key","value":{"stringValue":"event_value"}}],"name":"golden event","timeUnixNano":"1000500000"}],"kind":2,"links":[{"attributes":[{"key":"link_key","value":{"stringValue":"link_value"}}],"spanId":"4142434445464748","traceId":"3132333435363738393a3b3c3d3e3f40"}],"name":"golden span","parentSpanId":"2122232425262728","spanId":"1112131415161718","startTimeUnixNano":"1000000000","status":{"code":1},"traceId":"0102030405060708090a0b0c0d0e0f10"}]}]}]})";
+
+  ASSERT_EQ(std::string(kExpectedBody), captured_body);
 }
 
 }  // namespace otlp

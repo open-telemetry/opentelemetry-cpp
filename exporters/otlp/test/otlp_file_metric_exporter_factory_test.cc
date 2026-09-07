@@ -26,6 +26,8 @@
 #  error "protobuf should not be included"
 #endif
 
+#include "otlp_stub_json_writer.h"
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
 {
@@ -37,6 +39,17 @@ TEST(OtlpFileMetricExporterFactory, BuildTest)
   OtlpFileMetricExporterOptions opts;
   std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter =
       OtlpFileMetricExporterFactory::Create(opts);
+
+  EXPECT_TRUE(exporter != nullptr);
+}
+
+TEST(OtlpFileMetricExporterFactory, BuildWithJsonWriterFactoryTest)
+{
+  OtlpFileMetricExporterOptions opts;
+  OtlpFileMetricExporterRuntimeOptions runtime_opts;
+  runtime_opts.json_writer_factory = std::make_shared<StubJsonWriterFactory>();
+
+  auto exporter = OtlpFileMetricExporterFactory::Create(opts, runtime_opts);
 
   EXPECT_TRUE(exporter != nullptr);
 }

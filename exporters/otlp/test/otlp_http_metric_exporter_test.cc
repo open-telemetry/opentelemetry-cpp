@@ -38,6 +38,7 @@
 #include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 #include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 #include "opentelemetry/version.h"
+#include "otlp_http_request_body_capture.h"
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
@@ -1320,6 +1321,90 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportPartialSuccess)
   EXPECT_TRUE(contains("partial success"));
   EXPECT_TRUE(contains("21 data point(s) rejected"));
   EXPECT_TRUE(contains("too many data points!!"));
+}
+
+TEST_F(OtlpHttpMetricExporterTestPeer, ExportJsonGoldenBody)
+{
+  auto mock_otlp_client =
+      OtlpHttpMetricExporterTestPeer::GetMockOtlpHttpClient(HttpRequestContentType::kJson);
+  auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_client.first});
+
+  auto no_send_client =
+      std::static_pointer_cast<http_client::nosend::HttpClient>(mock_otlp_client.second);
+  auto mock_session =
+      std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+  sum_point_data.value_        = static_cast<int64_t>(7);
+  sum_point_data.is_monotonic_ = true;
+
+  opentelemetry::sdk::metrics::LastValuePointData last_value_point_data{};
+  last_value_point_data.value_              = 3.5;
+  last_value_point_data.is_lastvalue_valid_ = true;
+  last_value_point_data.sample_ts_ =
+      opentelemetry::common::SystemTimestamp(std::chrono::nanoseconds(2000000000));
+
+  opentelemetry::sdk::metrics::HistogramPointData histogram_point_data{};
+  histogram_point_data.boundaries_ = {1.0, 5.0};
+  histogram_point_data.count_      = 2;
+  histogram_point_data.counts_     = {1, 1};
+  histogram_point_data.sum_        = 6.0;
+  histogram_point_data.min_        = 2.0;
+  histogram_point_data.max_        = 4.0;
+
+  opentelemetry::sdk::metrics::MetricData sum_metric_data{
+      opentelemetry::sdk::metrics::InstrumentDescriptor{
+          "golden_counter", "golden counter description", "1",
+          opentelemetry::sdk::metrics::InstrumentType::kCounter,
+          opentelemetry::sdk::metrics::InstrumentValueType::kLong},
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      opentelemetry::common::SystemTimestamp(std::chrono::nanoseconds(1000000000)),
+      opentelemetry::common::SystemTimestamp(std::chrono::nanoseconds(2000000000)),
+      std::vector<opentelemetry::sdk::metrics::PointDataAttributes>{
+          {opentelemetry::sdk::metrics::PointAttributes{{"sum_key", "sum_value"}},
+           sum_point_data}}};
+
+  opentelemetry::sdk::metrics::MetricData gauge_metric_data{
+      opentelemetry::sdk::metrics::InstrumentDescriptor{
+          "golden_gauge", "golden gauge description", "1",
+          opentelemetry::sdk::metrics::InstrumentType::kObservableGauge,
+          opentelemetry::sdk::metrics::InstrumentValueType::kDouble},
+      opentelemetry::sdk::metrics::AggregationTemporality::kDelta,
+      opentelemetry::common::SystemTimestamp(std::chrono::nanoseconds(1000000000)),
+      opentelemetry::common::SystemTimestamp(std::chrono::nanoseconds(2000000000)),
+      std::vector<opentelemetry::sdk::metrics::PointDataAttributes>{
+          {opentelemetry::sdk::metrics::PointAttributes{{"gauge_key", "gauge_value"}},
+           last_value_point_data}}};
+
+  opentelemetry::sdk::metrics::MetricData histogram_metric_data{
+      opentelemetry::sdk::metrics::InstrumentDescriptor{
+          "golden_histogram", "golden histogram description", "1",
+          opentelemetry::sdk::metrics::InstrumentType::kHistogram,
+          opentelemetry::sdk::metrics::InstrumentValueType::kDouble},
+      opentelemetry::sdk::metrics::AggregationTemporality::kCumulative,
+      opentelemetry::common::SystemTimestamp(std::chrono::nanoseconds(1000000000)),
+      opentelemetry::common::SystemTimestamp(std::chrono::nanoseconds(2000000000)),
+      std::vector<opentelemetry::sdk::metrics::PointDataAttributes>{
+          {opentelemetry::sdk::metrics::PointAttributes{{"histogram_key", "histogram_value"}},
+           histogram_point_data}}};
+
+  opentelemetry::sdk::metrics::ResourceMetrics data;
+  data.resource_ = &opentelemetry::sdk::resource::Resource::GetEmpty();
+  auto scope     = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
+      "golden_scope", "golden_scope_version");
+  data.scope_metric_data_ = std::vector<opentelemetry::sdk::metrics::ScopeMetrics>{
+      {scope.get(), std::vector<opentelemetry::sdk::metrics::MetricData>{
+                        sum_metric_data, gauge_metric_data, histogram_metric_data}}};
+
+  std::string captured_body;
+  CaptureRequestBody(mock_session, captured_body);
+
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, exporter->Export(data));
+
+  static constexpr char kExpectedBody[] =
+      R"({"resourceMetrics":[{"resource":null,"scopeMetrics":[{"metrics":[{"description":"golden counter description","name":"golden_counter","sum":{"aggregationTemporality":2,"dataPoints":[{"asInt":"7","attributes":[{"key":"sum_key","value":{"stringValue":"sum_value"}}],"startTimeUnixNano":"1000000000","timeUnixNano":"2000000000"}],"isMonotonic":true},"unit":"1"},{"description":"golden gauge description","gauge":{"dataPoints":[{"asDouble":3.5,"attributes":[{"key":"gauge_key","value":{"stringValue":"gauge_value"}}],"startTimeUnixNano":"1000000000","timeUnixNano":"2000000000"}]},"name":"golden_gauge","unit":"1"},{"description":"golden histogram description","histogram":{"aggregationTemporality":2,"dataPoints":[{"attributes":[{"key":"histogram_key","value":{"stringValue":"histogram_value"}}],"bucketCounts":["1","1"],"count":"2","explicitBounds":[1.0,5.0],"max":4.0,"min":2.0,"startTimeUnixNano":"1000000000","sum":6.0,"timeUnixNano":"2000000000"}]},"name":"golden_histogram","unit":"1"}],"scope":{"name":"golden_scope","version":"golden_scope_version"}}]}]})";
+
+  ASSERT_EQ(std::string(kExpectedBody), captured_body);
 }
 
 // Exporter logs the rejection on partial_success when the response is JSON encoded.
