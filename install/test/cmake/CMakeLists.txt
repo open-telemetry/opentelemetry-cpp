@@ -134,9 +134,10 @@ if(PKG_CONFIG_FOUND)
            COMMAND ${CMAKE_COMMAND} --build
                    ${CMAKE_BINARY_DIR}/build-pkgconfig-test --parallel)
 
-  add_test(NAME pkgconfig-test-run-test
-           COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_BINARY_DIR}/build-pkgconfig-test
-                   ${CMAKE_CTEST_COMMAND} --output-on-failure)
+  add_test(
+    NAME pkgconfig-test-run-test
+    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_BINARY_DIR}/build-pkgconfig-test
+            ${CMAKE_CTEST_COMMAND} --output-on-failure)
 else()
   message(STATUS "PkgConfig not found; skipping pkg-config install tests")
 endif()
