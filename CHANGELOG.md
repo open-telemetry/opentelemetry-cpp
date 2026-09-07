@@ -21,6 +21,9 @@ Increment the:
   `Logger::EmitLogRecord(args...)` no longer silently loses an explicitly
   supplied context on its way to the processor.
   [#4421](https://github.com/open-telemetry/opentelemetry-cpp/pull/4421)
+
+* [DOC] Fix and clarify the `StartSpanOptions` documentation
+  [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
 * [EXPORTER] Fix the Elasticsearch log exporter aborting the process when a log
   record's body or attributes contain bytes that are not valid UTF-8. The
   exporter now substitutes the replacement character for the invalid bytes
