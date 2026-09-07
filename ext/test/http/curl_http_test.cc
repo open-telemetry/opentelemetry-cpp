@@ -1,11 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curl.h>
 #include <curl/curlver.h>
 #include "gtest/gtest.h"
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <curl/curl.h>
 #  include "gmock/gmock.h"
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
@@ -56,6 +56,35 @@ class HttpClientTestPeer
 {
 public:
   static void ResetMultiHandle(HttpClient &client) { client.resetMultiHandle(); }
+  // mock initializer
+  static nostd::shared_ptr<HttpCurlGlobalInitializer> CreateMockInitializer(CURLcode code,
+                                                                            bool is_valid)
+  {
+    return nostd::shared_ptr<HttpCurlGlobalInitializer>(
+        new HttpCurlGlobalInitializer(code, is_valid));
+  }
+  // injects the mock initializer into an HttpClient
+  static void SetInitializer(HttpClient &client,
+                             const nostd::shared_ptr<HttpCurlGlobalInitializer> &initializer)
+  {
+    client.curl_global_initializer_ = initializer;
+    if (!initializer || !initializer->IsValid())
+    {
+      std::lock_guard<std::mutex> lk(client.multi_handle_m_);
+      if (client.multi_handle_)
+      {
+        curl_multi_cleanup(client.multi_handle_);
+        client.multi_handle_ = nullptr;
+      }
+    }
+  }
+
+  // injects the mock initializer into an HttpClientSync
+  static void SetSyncInitializer(HttpClientSync &client,
+                                 const nostd::shared_ptr<HttpCurlGlobalInitializer> &initializer)
+  {
+    client.curl_global_initializer_ = initializer;
+  }
 };
 }  // namespace curl
 }  // namespace client
@@ -77,6 +106,10 @@ public:
   {
     switch (state)
     {
+      // CreateFailed occurs when initialization or request preparation fails before
+      // network dispatch (e.g., if curl_global_init failed or session setup failed).
+      // Marking is_called_ ensures tests expecting early failure notifications register it.
+      case http_client::SessionState::CreateFailed:
       case http_client::SessionState::ConnectFailed:
       case http_client::SessionState::SendFailed: {
         is_called_.store(true, std::memory_order_release);
@@ -1095,6 +1128,52 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
 }
+
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
+// 2 new tests
+TEST_F(BasicCurlHttpTests, GlobalInitFailureHttpClient)
+{
+  curl::HttpClient client;
+  auto mock_init =
+      http_client::curl::HttpClientTestPeer::CreateMockInitializer(CURLE_FAILED_INIT, false);
+  http_client::curl::HttpClientTestPeer::SetInitializer(client, mock_init);
+
+  EXPECT_FALSE(client.IsValid());
+
+  auto session = client.CreateSession("http://127.0.0.1:19000/get/");
+  auto request = session->CreateRequest();
+  request->SetMethod(http_client::Method::Get);
+  request->SetUri("get/");
+
+  auto handler = std::make_shared<CustomEventHandler>();
+  session->SendRequest(handler);
+
+  EXPECT_FALSE(session->IsSessionActive());
+  EXPECT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+
+  EXPECT_TRUE(client.CancelAllSessions());
+  EXPECT_TRUE(client.FinishAllSessions());
+}
+
+TEST_F(BasicCurlHttpTests, GlobalInitFailureHttpClientSync)
+{
+  curl::HttpClientSync sync_client;
+  auto mock_init =
+      http_client::curl::HttpClientTestPeer::CreateMockInitializer(CURLE_FAILED_INIT, false);
+  http_client::curl::HttpClientTestPeer::SetSyncInitializer(sync_client, mock_init);
+
+  http_client::HttpSslOptions ssl_opts;
+  auto get_result =
+      sync_client.Get("http://127.0.0.1:19000/get/", ssl_opts, {}, http_client::Compression::kNone);
+  EXPECT_FALSE(get_result);
+  EXPECT_EQ(get_result.GetSessionState(), http_client::SessionState::CreateFailed);
+
+  http_client::Body body;
+  auto post_result = sync_client.Post("http://127.0.0.1:19000/post/", ssl_opts, body, {},
+                                      http_client::Compression::kNone);
+  EXPECT_FALSE(post_result);
+  EXPECT_EQ(post_result.GetSessionState(), http_client::SessionState::CreateFailed);
+}
 
 }  // namespace

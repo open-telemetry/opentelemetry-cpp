@@ -48,13 +48,21 @@ namespace curl
 {
 
 HttpCurlGlobalInitializer::HttpCurlGlobalInitializer()
+    : init_code_(curl_global_init(CURL_GLOBAL_ALL)), is_initialized_(init_code_ == CURLE_OK)
 {
-  curl_global_init(CURL_GLOBAL_ALL);
+  if (!is_initialized_)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[HTTP Client Curl] curl_global_init failed with error code: "
+                            << static_cast<int>(init_code_));
+  }
 }
 
 HttpCurlGlobalInitializer::~HttpCurlGlobalInitializer()
 {
-  curl_global_cleanup();
+  if (is_initialized_)
+  {
+    curl_global_cleanup();
+  }
 }
 
 nostd::shared_ptr<HttpCurlGlobalInitializer> HttpCurlGlobalInitializer::GetInstance()
@@ -141,6 +149,18 @@ static int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint
 void Session::SendRequest(
     std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) noexcept
 {
+  // Returning early before MaybeSpawnBackgroundThread() ensures the background IO
+  // loop never starts with an uninitialized or null multi_handle_.
+  if (!http_client_.IsValid())
+  {
+    if (callback)
+    {
+      callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
+                        "curl initialization failed");
+    }
+    is_session_active_.store(false, std::memory_order_release);
+    return;
+  }
   is_session_active_.store(true, std::memory_order_release);
   const auto &url       = host_ + http_request_->uri_;
   auto callback_ptr     = callback.get();
@@ -271,24 +291,28 @@ void Session::FinishOperation()
 }
 
 HttpClient::HttpClient()
-    : multi_handle_(curl_multi_init()),
+    : curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()),
+      multi_handle_(curl_global_initializer_ && curl_global_initializer_->IsValid()
+                        ? curl_multi_init()
+                        : nullptr),
       next_session_id_{0},
       max_sessions_per_connection_{8},
       background_thread_instrumentation_(nullptr),
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
-      background_thread_wait_for_{std::chrono::minutes{1}},
-      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
+      background_thread_wait_for_{std::chrono::minutes{1}}
 {}
 
 HttpClient::HttpClient(
     const std::shared_ptr<sdk::common::ThreadInstrumentation> &thread_instrumentation)
-    : multi_handle_(curl_multi_init()),
+    : curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance()),
+      multi_handle_(curl_global_initializer_ && curl_global_initializer_->IsValid()
+                        ? curl_multi_init()
+                        : nullptr),
       next_session_id_{0},
       max_sessions_per_connection_{8},
       background_thread_instrumentation_(thread_instrumentation),
       scheduled_delay_milliseconds_{std::chrono::milliseconds(256)},
-      background_thread_wait_for_{std::chrono::minutes{1}},
-      curl_global_initializer_(HttpCurlGlobalInitializer::GetInstance())
+      background_thread_wait_for_{std::chrono::minutes{1}}
 {}
 
 HttpClient::~HttpClient()
@@ -317,7 +341,11 @@ HttpClient::~HttpClient()
   }
   {
     std::lock_guard<std::mutex> lock_guard{multi_handle_m_};
-    curl_multi_cleanup(multi_handle_);
+    if (multi_handle_)
+    {
+      curl_multi_cleanup(multi_handle_);
+      multi_handle_ = nullptr;
+    }
   }
 }
 
