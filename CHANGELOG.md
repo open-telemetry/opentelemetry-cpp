@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [DOC] Fix and clarify the `StartSpanOptions` documentation
+  [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
+
 * [EXPORTER] Fix the Elasticsearch log exporter aborting the process when a log
   record's body or attributes contain bytes that are not valid UTF-8. The
   exporter now substitutes the replacement character for the invalid bytes
