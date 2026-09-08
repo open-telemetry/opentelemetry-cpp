@@ -15,6 +15,16 @@ Increment the:
 
 ## [Unreleased]
 
+* [DOC] Fix and clarify the `StartSpanOptions` documentation
+  [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
+
+* [EXPORTER] Fix the Elasticsearch log exporter aborting the process when a log
+  record's body or attributes contain bytes that are not valid UTF-8. The
+  exporter now substitutes the replacement character for the invalid bytes
+  and continues, instead of `nlohmann::json::dump()` throwing out of a
+  `noexcept` function.
+  [#4439](https://github.com/open-telemetry/opentelemetry-cpp/issues/4439)
+
 * [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
   If a model-specific limit is set it is used, otherwise the matching general
   limit, otherwise the model-specific default. Limit fields on
@@ -279,6 +289,10 @@ Increment the:
 * [RESOURCE DETECTOR] Add required and recommended attributes (except htlhash)
   for process entity
   [#4437](https://github.com/open-telemetry/opentelemetry-cpp/pull/4437)
+
+* [BUG] Prevent lost condition-variable wakeups in OTLP file exporter and periodic
+  metric exporter
+  [#4365](https://github.com/open-telemetry/opentelemetry-cpp/pull/4365)
 
 Important changes:
 
