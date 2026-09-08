@@ -284,20 +284,42 @@ interface kept working through an adapter rather than replaced. One owner thread
 per `CURLM`. The two existing options treated as curl compatibility controls
 rather than as requirements of the replacement.
 
+Four more since, from @owent on #4448. A `Session` is single use: `SendRequest`
+was never meant to be called more than once, so the contract says so rather than
+leaving it implicit. A bounded governor needs both dimensions, a count and
+retained bytes, rather than either alone. For the curl backend the preferred
+default baseline is one shared `CURLM`, because a multi handle owns its
+connection, DNS and TLS caches and cannot be waited on together with another
+one. And the lifetime of everything a request needs should have a single owner,
+which is the direction that removes `HttpOperation` rather than guarding it.
+
+The last two are preferences with evidence, not settled architecture. The
+sharing scope of the `CURLM` is a benchmark decision, and a process wide one
+couples fault isolation and shutdown ownership across exporters, which is the
+cost side of it.
+
 **Open.** These are the questions a design cannot avoid, and they are listed
 rather than answered.
 
-- [ ] Is a `Session` single use, reusable after completion, or a legacy adapter?
 - [ ] Does submitting a request snapshot it or take ownership of it?
 - [ ] Is completion one terminal result, with progress separated out as optional
       diagnostics?
 - [ ] On what thread do callbacks run, and which calls may a callback make?
+      Not open in one direction: a handler that calls `SendRequest` on the
+      session that dispatched the callback destroys the operation whose member
+      function is running the dispatch. AddressSanitizer on `main` at
+      `58ed80d9`, single threaded and on the first attempt. Whatever the answer
+      is, it has to be enforceable where the call is made, because a `Session`
+      that owns its operation by `unique_ptr` and swaps it in place cannot
+      refuse.
 - [ ] Which layer owns retry, in-flight concurrency and `Retry-After`?
 - [ ] What should the default number of requests in flight be, given that the
       option says 64 today and the one reported workload needed about four?
-- [ ] Is the budget a count of requests, a number of bytes retained, or both?
-      64 requests at the 4 MB the reported workload was sending is 256 MB of
-      request payload before responses, retries or compression buffers.
+- [ ] What does the count count: export operations, HTTP attempts, attempts
+      the governor has admitted, or transfers currently running?
+- [ ] At what point is capacity taken, and which allocations are charged to the
+      byte budget: before serialization, after it, at submission, or when the
+      backend accepts the attempt?
 - [ ] Do an export operation and an HTTP attempt get separate identities, so
       that a retry is one operation and several attempts?
 - [ ] Is a new contract introduced alongside the current one with an adapter, or
@@ -308,6 +330,44 @@ interfaces and `http_client_factory_curl.h` but not the concrete curl headers,
 while Bazel's `//ext:headers` still globs everything under `ext/include`. The
 two surfaces disagree today, and whichever direction is chosen has to say what
 happens to a Bazel consumer that includes a concrete header.
+
+## What one shared `CURLM` implies
+
+Sharing the multi handle is what buys connection reuse across exporters and one
+polling thread instead of one per client. It also makes four things shared that
+are per client today, so the baseline has to name them.
+
+What is shared is a curl runtime, not the logical client. A process global
+`HttpClient` would share the session namespace, the cancellation scope,
+`FinishAllSessions()`, the shutdown state and the legacy compatibility settings,
+so one exporter's `Shutdown()` would reach into another's work. The shape that
+keeps both is a reference counted runtime, one owner thread and one `CURLM`,
+underneath separate logical clients that each keep their own operation
+namespace, admission lane, deadlines, cancellation and flush watermark. The
+runtime is torn down when the last logical client releases it, not when the
+first one shuts down.
+
+A shared budget then has to be hierarchical, because a per client limit alone
+stops bounding the process. Three exporters each allowed 64 attempts at 4 MB is
+768 MB of request payload before responses, retries or compression buffers.
+
+| level | bounds |
+| --- | --- |
+| per logical client | admitted operations, retained request bytes |
+| runtime wide | admitted attempts, retained bytes, pending operations, connections |
+| per origin | connections, streams per connection, negotiated protocol |
+
+And it has to say something about fairness, or a log client at the reported 10
+to 20K records per second can hold the whole budget while traces and metrics
+starve. Which discipline is a later decision; that one client must not be able
+to starve another indefinitely is a requirement now.
+
+Failure is shared too. libcurl documents that when `curl_multi_socket_action`
+returns an error the state of every transfer on that multi handle is undefined,
+so one multi level failure reaches every exporter at once. The baseline has to
+say how the owner thread stops admitting, settles or reschedules what was
+attached, rebuilds, and resumes, without one client's shutdown killing
+another's.
 
 ## What a replacement has to hold, whichever shape wins
 
@@ -377,6 +437,12 @@ the only evidence anyone has offered for what concurrency is worth:
 Reported per run: acknowledged batches per second, dropped batches, p50 and p99
 latency, resident memory, thread count, open descriptors, and whether
 `ForceFlush` and `Shutdown` returned the right answer within their deadlines.
+
+Throughput alone cannot choose the sharing scope, because what sharing costs is
+isolation rather than speed. So the run also has to cover: one logical client
+shutting down while two keep working; one client exhausting its byte budget; a
+log client saturating alongside trace and metric traffic; a multi level failure
+and the rebuild after it; and retries still pending when that failure lands.
 
 Rates have to name their unit. The reported workload is "roughly 10 to 20K QPS"
 of log volume, which is not the same number as HTTP requests per second, so the
