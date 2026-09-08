@@ -135,7 +135,7 @@ several streams on one connection subject to the server's own limits.
 
 Which is why one number cannot express it. A replacement has to separate
 
-- export operations admitted and in flight,
+- export operations accepted and in flight,
 - HTTP attempts, since one operation may make several,
 - physical connections,
 - streams per connection,
@@ -256,6 +256,58 @@ the sections above only make sense if they are named apart.
 The reported workload is a record rate. The "about four" is an attempt count.
 They are not the same number and a benchmark that reports one as the other
 cannot be compared with anything.
+
+## The two of them do not share a state machine
+
+The table above names an export operation and an attempt as different things.
+They also move through different states, and today they share one set of
+fields, which is where several of the reports come from.
+
+An export operation, from the caller's side:
+
+```text
+Created -> Accepted -> Attempting -> RetryWait -> Attempting -> Settling -> Settled
+```
+
+One HTTP attempt, from the backend's side:
+
+```text
+Prepared -> Admitted -> Queued -> Attached -> Running -> Detaching -> Completed -> Released
+```
+
+The second `Attempting` above is a second attempt, not a resumption of the
+first, and that is what makes two machines necessary rather than tidy. Each
+attempt has its own deadline, its own backend handle and its own result, so if
+those live on the operation then the second one overwrites the first. #4403 is
+that shape already: the retry time is recomputed on every read, with fresh
+jitter each time, so it is not a property of anything that can be waited on.
+
+Where `Admitted` falls relative to `Prepared` is one of the open decisions
+below rather than something this sequence settles. Charging the byte budget
+before serialization means guessing the size; charging it after means the bytes
+already exist by the time the governor is asked to allow them.
+
+Each boundary in the second sequence is a report:
+
+- `Queued` that never reaches `Attached` is a rejected `curl_multi_add_handle`.
+  The attempt never runs, and the operation still has to settle. Today the
+  rejection is logged and the caller keeps waiting, which is what #4395 fixes.
+- `Attached` has to pass through `Detaching` before `Released`, because libcurl
+  requires removal before cleanup. Freeing or resetting an easy handle that is
+  still attached is #4391.
+- `Completed` belongs to the attempt and `Settled` belongs to the operation.
+  Collapsing them fails in both directions. An operation settles twice when a
+  late callback arrives after another has already reported, which is #4360.
+  An operation never settles at all when a terminal backend state is delivered
+  as though it were progress, which is #4425. #4338 is both at once, and says
+  so in its title.
+- `CURLOPT_PRIVATE` should name an attempt. Today it names a `Session`, and the
+  background thread then asks that session for whichever operation it currently
+  holds, which is #4396.
+
+`ForceFlush` is stated against the first sequence and not the second: it
+answers for operations accepted before its watermark, whatever attempts those
+operations are making when it is called.
 
 ## Against the criteria in #4448
 
@@ -415,6 +467,41 @@ and retry are described as the exporter's responsibility. It is also the part I
 am least certain of, because a native backend that already has its own queue
 would then have two.
 
+## What this does not fix
+
+The reports that led here are transport reports, but three accepted issues
+above and below the transport produce symptoms of the same shape. None of the
+options here fixes any of them, and one of them decides whether the measurement
+below means anything.
+
+**Processor batching, #4449 for spans with #4466 open against it, and #4498 for
+logs.** The request geometry the transport sees is chosen upstream of it. #4498
+reports, at `max_queue_size = 8192`, `max_export_batch_size = 2048` and
+`schedule_delay_millis = 5000`, that 50,000 log records produced 2,332 export
+calls, of which one held 2,048 records or more and 2,331 held fewer than 100. A
+transport cannot change the size of the batches it is handed, so a benchmark run
+against that behaviour reports the processor and reads as a transport result.
+That makes this a dependency of the measurement section rather than a neighbour
+of it.
+
+**Bounded shutdown, #4532.** `BatchSpanProcessor::InternalShutdown` joins its
+worker thread unconditionally before it looks at its timeout. The report
+measures a 1 microsecond timeout returning after 9,702 ms, and attributes that
+figure to the exporter's own 10 second request timeout running its course. A
+deadline honoured by every transport attempt still does not produce a bounded
+`Shutdown` while an untimed join sits above it. The deadline has to hold at
+every layer or it holds at none.
+
+**Exceptions crossing a `noexcept` callback, #4534.** `OnResponse()` is
+declared `noexcept` and may copy a body, allocate, and parse JSON or protobuf.
+A throw from any of those is `std::terminate`. A contract that promises exactly
+one outcome per operation has to say what happens when delivering that outcome
+is itself what fails, and has to say it for builds compiled without exceptions,
+where `try` and `catch` are not available to say it with.
+
+These are listed as dependencies and non-goals, not as work this document
+proposes.
+
 ## What has to be measured before any of this is built
 
 The concurrency question should be answered with a number, and the repository
@@ -454,6 +541,11 @@ asked for: `CURLINFO_HTTP_VERSION` for the negotiated protocol and
 `CURLINFO_NUM_CONNECTS` for connections opened. Without those, a result at four
 in flight cannot be told apart from four connections, four streams on one
 connection, or four requests serialized behind each other.
+
+The run is also not worth starting until the batching behaviour above is
+settled. Records per request is an input to every row of the table, and at 21
+records per request rather than 2,048 the transport is being asked a different
+question than the reported workload asks.
 
 The `100 ms` in the report is not qualified as one way or round trip, so the
 benchmark should define it as `netem` round trip and say so rather than inherit
