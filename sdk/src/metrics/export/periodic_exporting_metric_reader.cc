@@ -221,7 +221,12 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
     if (force_flush_pending_sequence_.load(std::memory_order_acquire) >
         force_flush_notified_sequence_.load(std::memory_order_acquire))
     {
-      is_force_wakeup_background_worker_.store(true, std::memory_order_release);
+      {
+        // Acquiring cv_m_ guarantees that the worker thread either is not currently waiting on cv_,
+        // or the notify below will cause it to re-check the wait condition.
+        std::lock_guard<std::mutex> cv_guard{cv_m_};
+        is_force_wakeup_background_worker_.store(true, std::memory_order_release);
+      }
       cv_.notify_all();
     }
     return force_flush_notified_sequence_.load(std::memory_order_acquire) >= current_sequence;
@@ -283,6 +288,11 @@ bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout
 {
   if (worker_thread_.joinable())
   {
+    {
+      // Acquiring cv_m_ guarantees that the next time the worker thread checks the wait condition
+      // on cv_ (either from notify below or any other reason) it will see IsShutdown() return true.
+      std::lock_guard<std::mutex> cv_guard{cv_m_};
+    }
     cv_.notify_all();
     worker_thread_.join();
   }

@@ -515,6 +515,39 @@ TEST_F(MetricsBuildersTest, ViewSelectorWithAttributesProcessor)
   });
 }
 
+TEST_F(MetricsBuildersTest, ViewSelectorWithWildcardMatchingForInstrumentName)
+{
+  namespace metrics_sdk = opentelemetry::sdk::metrics;
+
+  auto model = MakeCardinalityOnlyViewConfig(config_sdk::InstrumentType::counter, 42);
+  model->selector->instrument_name = "my.counter*";
+
+  metrics_sdk::ViewRegistry view_registry;
+  AddView(&view_registry, model);
+
+  auto instrumentation_scope = scope_sdk::InstrumentationScope::Create("");
+
+  auto count_matches = [&](const std::string &name) {
+    metrics_sdk::InstrumentDescriptor instrument_descriptor{
+        name, "test description", "units", metrics_sdk::InstrumentType::kCounter,
+        metrics_sdk::InstrumentValueType::kLong};
+    int matched = 0;
+    view_registry.FindViews(instrument_descriptor, *instrumentation_scope,
+                            [&](const metrics_sdk::View &view) {
+                              auto *config = view.GetAggregationConfig();
+                              if (config != nullptr && config->cardinality_limit_ == 42u)
+                              {
+                                ++matched;
+                              }
+                              return true;
+                            });
+    return matched;
+  };
+
+  EXPECT_EQ(count_matches("my.counter_one"), 1);
+  EXPECT_EQ(count_matches("myXcounter_one"), 0);
+}
+
 TEST_F(MetricsBuildersTest, CreateBuiltInPeriodicMetricReader)
 {
   auto model      = std::make_unique<config_sdk::PeriodicMetricReaderConfiguration>();
