@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <chrono>
+#include <grpc/grpc.h>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -434,7 +435,16 @@ int main(int argc, char *argv[])
   internal_log::GlobalLogHandler::SetLogHandler(log_handler);
   internal_log::GlobalLogHandler::SetLogLevel(internal_log::LogLevel::Debug);
 
+  // Keep one explicit gRPC runtime reference for the lifetime of the functional test.
+  // Channel construction owns additional references internally, but their final release may
+  // start asynchronous global teardown just as this short-lived process is returning. The TLS
+  // failure cases exercise gRPC background work heavily enough that this has intermittently
+  // raced process exit in CI. Holding our own reference lets us destroy every OpenTelemetry/gRPC
+  // object first, then wait for the final gRPC teardown to complete before leaving main().
+  grpc_init();
   rc = run_test_case(opt_test_name);
+  grpc_shutdown_blocking();
+
   return rc;
 }
 
