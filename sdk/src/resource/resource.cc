@@ -198,12 +198,27 @@ Resource Resource::Merge(const Resource &other) const noexcept
 {
   if (entities_.empty() && other.entities_.empty())
   {
-    ResourceAttributes merged_resource_attributes(other.attributes_);
-    merged_resource_attributes.insert(attributes_.begin(), attributes_.end());
-    return Resource(merged_resource_attributes,
-                    other.schema_url_.empty() ? schema_url_ : other.schema_url_);
+    return MergeWithoutEntities(other);
   }
+  return MergeWithEntities(other);
+}
 
+// Legacy resource merge when neither resource contains entities.
+// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#merge-behavior-without-entities
+Resource Resource::MergeWithoutEntities(const Resource &other) const noexcept
+{
+  ResourceAttributes merged_resource_attributes(other.attributes_);
+  merged_resource_attributes.insert(attributes_.begin(), attributes_.end());
+  return Resource(merged_resource_attributes,
+                  other.schema_url_.empty() ? schema_url_ : other.schema_url_);
+}
+
+// Entity-aware resource merge when either resource contains entities.
+// Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#merge-behavior-with-entities
+// Resource data model:
+// https://opentelemetry.io/docs/specs/otel/resource/data-model/#merging-resources
+Resource Resource::MergeWithEntities(const Resource &other) const noexcept
+{
   const Resource &updating = other;
   auto rank                = BuildTypeRanks(*this, updating);
 
