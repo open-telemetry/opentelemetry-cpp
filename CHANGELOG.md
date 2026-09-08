@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Avoid throwing from `Resource::Create` when `process.executable.name`
+  has a non-string value and `service.name` is not set.
+  [#4535](https://github.com/open-telemetry/opentelemetry-cpp/issues/4535)
+
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
   [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
 
