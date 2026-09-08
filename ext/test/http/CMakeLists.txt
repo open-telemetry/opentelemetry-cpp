@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-if(WITH_HTTP_CLIENT_CURL)
+if(OTELCPP_WITH_HTTP_CLIENT_CURL)
   set(FILENAME curl_http_test)
   add_executable(${FILENAME} ${FILENAME}.cc)
   target_link_libraries(

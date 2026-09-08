@@ -21,6 +21,9 @@ target_link_libraries(
           opentelemetry-cpp::otlp_http_exporter
           opentelemetry-cpp::otlp_http_log_record_exporter
           opentelemetry-cpp::otlp_http_metric_exporter
+          opentelemetry-cpp::otlp_http_exporter_builder
+          opentelemetry-cpp::otlp_http_log_record_exporter_builder
+          opentelemetry-cpp::otlp_http_metric_exporter_builder
           GTest::gtest
           GTest::gtest_main)
 

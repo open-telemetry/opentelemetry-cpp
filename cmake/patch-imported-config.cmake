@@ -131,7 +131,7 @@ if(TARGET civetweb::civetweb)
     civetweb::civetweb civetweb::server civetweb::civetweb-cpp)
 endif()
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   project_build_tools_patch_default_imported_config(
     GTest::gtest
     GTest::gtest_main

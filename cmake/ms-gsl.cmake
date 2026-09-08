@@ -22,7 +22,7 @@ if(NOT Microsoft.GSL_FOUND)
   endif()
 
   set(GSL_TEST OFF CACHE BOOL "" FORCE)
-  set(GSL_INSTALL ${OPENTELEMETRY_INSTALL} CACHE BOOL "" FORCE)
+  set(GSL_INSTALL ${OTELCPP_INSTALL} CACHE BOOL "" FORCE)
 
   FetchContent_MakeAvailable(gsl)
 

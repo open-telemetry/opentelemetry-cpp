@@ -69,6 +69,21 @@ cc_test(
 )
 
 cc_test(
+    name = "multi_span_processor_test",
+    srcs = [
+        "multi_span_processor_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "batch_span_processor_test",
     srcs = [
         "batch_span_processor_test.cc",

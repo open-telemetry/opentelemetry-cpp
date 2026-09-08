@@ -48,7 +48,7 @@ otel_add_component(
   PATTERN
   "*.h")
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     exporter_in_memory "OpenTelemetry Exporter - In-Memory Span"
     "In-memory span exporter for testing and debugging." "opentelemetry_trace")
@@ -59,7 +59,7 @@ if(OPENTELEMETRY_INSTALL)
     "opentelemetry_metrics")
 endif()
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_executable(in_memory_span_data_test test/in_memory_span_data_test.cc)
   add_executable(in_memory_span_exporter_test
                  test/in_memory_span_exporter_test.cc)

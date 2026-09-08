@@ -51,6 +51,22 @@ set(INSTALL_TEST_SRC_DIR "${CMAKE_SOURCE_DIR}/../src")
 enable_testing()
 
 # -----------------------------------------------------------
+# Test find_package with components specified but including deprecated
+# components
+
+if(INSTALL_TEST_DEPRECATED_COMPONENTS)
+  add_test(
+    NAME cmake-deprecated-components-test
+    COMMAND
+      ${CMAKE_COMMAND} -Wdeprecated --log-level=DEBUG -S
+      ${CMAKE_SOURCE_DIR}/deprecated_components -B
+      build-cmake-usage-deprecated-components-test
+      "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS}
+      "-DINSTALL_TEST_DEPRECATED_COMPONENTS=${INSTALL_TEST_DEPRECATED_COMPONENTS}"
+  )
+endif()
+
+# -----------------------------------------------------------
 # Test the full package install using legacy cmake build instructions
 # find_package(opentelemetry-cpp CONFIG REQUIRED)
 

@@ -13,7 +13,7 @@ foreach(testname kv_properties_test string_util_test)
     TEST_LIST ${testname})
 endforeach()
 
-if(WITH_BENCHMARK)
+if(OTELCPP_WITH_BENCHMARK)
   add_executable(spinlock_benchmark spinlock_benchmark.cc)
   target_link_libraries(spinlock_benchmark benchmark::benchmark
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)

@@ -9,7 +9,9 @@ foreach(
   log_record_test
   log_record_limits_test
   simple_log_record_processor_test
+  multi_log_record_processor_test
   batch_log_record_processor_test
+  batch_log_record_processor_test_stress
   logger_config_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(

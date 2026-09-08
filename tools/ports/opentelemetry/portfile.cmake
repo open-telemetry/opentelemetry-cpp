@@ -47,7 +47,7 @@ if (UNIX)
 
   # Custom options could be passed to COMMAND, e.g.
   # vcpkg_execute_build_process(
-  #   COMMAND ${SOURCE_PATH}/tools/build.sh nostd-vcpkg -DBUILD_TESTING=OFF
+  #   COMMAND ${SOURCE_PATH}/tools/build.sh nostd-vcpkg -DOTELCPP_BUILD_TESTING=OFF
   #   ...
   # 
   vcpkg_execute_build_process(

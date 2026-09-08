@@ -3,11 +3,11 @@
 
 add_subdirectory(load)
 
-if(NOT OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS)
+if(NOT OTELCPP_SKIP_DYNAMIC_LOADING_TESTS)
   add_subdirectory(plugin)
 endif()
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/load/empty_config.txt" "")
   add_test(
     NAME examples.plugin

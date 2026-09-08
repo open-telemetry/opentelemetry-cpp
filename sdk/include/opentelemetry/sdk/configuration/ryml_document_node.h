@@ -10,6 +10,7 @@
 #include <string>
 
 #include "opentelemetry/sdk/configuration/document_node.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -40,6 +41,7 @@ public:
   std::size_t AsInteger() const override;
   double AsDouble() const override;
   std::string AsString() const override;
+  bool IsNull() const override;
 
   std::unique_ptr<DocumentNode> GetRequiredChildNode(const std::string &name) const override;
   std::unique_ptr<DocumentNode> GetChildNode(const std::string &name) const override;
@@ -49,6 +51,7 @@ public:
 
   std::size_t GetRequiredInteger(const std::string &name) const override;
   std::size_t GetInteger(const std::string &name, std::size_t default_value) const override;
+  OptionalValue<std::size_t> GetOptionalInteger(const std::string &name) const override;
 
   std::int64_t GetSignedInteger(const std::string &name, std::int64_t default_value) const override;
 

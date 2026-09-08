@@ -298,8 +298,8 @@ the given ABI is no longer available.
 
 The build files are the source of truth for which ABI version is currently
 experimental versus stable. In CMake, the experimental version is the
-`WITH_ABI_VERSION_*` option labeled `EXPERIMENTAL` in `CMakeLists.txt`, and it
-is off by default; any version without that label is stable.
+`OTELCPP_WITH_ABI_VERSION_*` option labeled `EXPERIMENTAL` in `CMakeLists.txt`,
+and it is off by default; any version without that label is stable.
 
 The following sections describe the migration path from one ABI (v1) to the
 next (v2).
@@ -322,8 +322,8 @@ In this state, two ABI versions are available.
 CMake offers the following options:
 
 ```cmake
-option(WITH_ABI_VERSION_1 "ABI version 1" ON)
-option(WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
+option(OTELCPP_WITH_ABI_VERSION_1 "ABI version 1" ON)
+option(OTELCPP_WITH_ABI_VERSION_2 "EXPERIMENTAL: ABI version 2 preview" OFF)
 ```
 
 Instrumented applications are built against ABI v1 by default,
@@ -347,9 +347,9 @@ An experimental ABI v3 is created.
 CMake offers the following options:
 
 ```cmake
-option(WITH_ABI_VERSION_1 "ABI version 1" ON)
-option(WITH_ABI_VERSION_2 "ABI version 2" OFF)
-option(WITH_ABI_VERSION_3 "EXPERIMENTAL: ABI version 3 preview" OFF)
+option(OTELCPP_WITH_ABI_VERSION_1 "ABI version 1" ON)
+option(OTELCPP_WITH_ABI_VERSION_2 "ABI version 2" OFF)
+option(OTELCPP_WITH_ABI_VERSION_3 "EXPERIMENTAL: ABI version 3 preview" OFF)
 ```
 
 Instrumented applications are built against stable ABI v1 by default,
@@ -369,9 +369,9 @@ the ABI offered by default is the newer ABI v2.
 CMake offers the following options:
 
 ```cmake
-option(WITH_ABI_VERSION_1 "DEPRECATED: ABI version 1" OFF)
-option(WITH_ABI_VERSION_2 "ABI version 2" ON)
-option(WITH_ABI_VERSION_3 "EXPERIMENTAL: ABI version 3 preview" OFF)
+option(OTELCPP_WITH_ABI_VERSION_1 "DEPRECATED: ABI version 1" OFF)
+option(OTELCPP_WITH_ABI_VERSION_2 "ABI version 2" ON)
+option(OTELCPP_WITH_ABI_VERSION_3 "EXPERIMENTAL: ABI version 3 preview" OFF)
 ```
 
 Instrumented applications are built against stable ABI v2 by default,
@@ -391,8 +391,8 @@ ABI v1 is no longer supported.
 CMake offers the following options:
 
 ```cmake
-option(WITH_ABI_VERSION_2 "ABI version 2" ON)
-option(WITH_ABI_VERSION_3 "EXPERIMENTAL: ABI version 3 preview" OFF)
+option(OTELCPP_WITH_ABI_VERSION_2 "ABI version 2" ON)
+option(OTELCPP_WITH_ABI_VERSION_3 "EXPERIMENTAL: ABI version 3 preview" OFF)
 ```
 
 Instrumented applications and the opentelemetry-cpp library are build using

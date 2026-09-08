@@ -4,15 +4,20 @@
 // clang-format off
 Create@OStreamSpanExporterFactory@trace@exporter@v1@opentelemetry
 Create@SimpleSpanProcessorFactory@trace@sdk@v1@opentelemetry
+Create@BatchSpanProcessorFactory@trace@sdk@v1@opentelemetry
+BatchSpanProcessorOptions@trace@sdk@v1@opentelemetry
 Create@TracerProviderFactory@trace@sdk@v1@opentelemetry
 Create@LoggerProviderFactory@logs@sdk@v1@opentelemetry
 Create@BatchLogRecordProcessorFactory@logs@sdk@v1@opentelemetry
+BatchLogRecordProcessorOptions@logs@sdk@v1@opentelemetry
 Create@SimpleLogRecordProcessorFactory@logs@sdk@v1@opentelemetry
 Create@MultiLogRecordProcessorFactory@logs@sdk@v1@opentelemetry
 TracerProvider@trace@sdk@v1@opentelemetry
 ForceFlush@TracerProvider@trace@sdk@v1@opentelemetry
+Shutdown@TracerProvider@trace@sdk@v1@opentelemetry
 LoggerProvider@logs@sdk@v1@opentelemetry
 ForceFlush@LoggerProvider@logs@sdk@v1@opentelemetry
+Shutdown@LoggerProvider@logs@sdk@v1@opentelemetry
 OStreamLogRecordExporter@logs@exporter@v1@opentelemetry
 Create@OStreamMetricExporterFactory@metrics@exporter@v1@opentelemetry
 Create@PeriodicExportingMetricReaderFactory@metrics@sdk@v1@opentelemetry
@@ -25,10 +30,13 @@ Create@InstrumentSelectorFactory@metrics@sdk@v1@opentelemetry
 AddMetricReader@MeterContext@metrics@sdk@v1@opentelemetry
 AddMetricReader@MeterProvider@metrics@sdk@v1@opentelemetry
 MeterProvider@metrics@sdk@v1@opentelemetry
+ForceFlush@MeterProvider@metrics@sdk@v1@opentelemetry
+Shutdown@MeterProvider@metrics@sdk@v1@opentelemetry
 AddView@MeterProvider@metrics@sdk@v1@opentelemetry
 SetTracerProvider@Provider@trace@sdk@v1@opentelemetry
 SetMeterProvider@Provider@metrics@sdk@v1@opentelemetry
 SetLoggerProvider@Provider@logs@sdk@v1@opentelemetry
+SetLogLevel@GlobalLogHandler@internal_log@common@sdk@v1@opentelemetry
 
 #if defined(WITH_OTLP_GRPC) || defined(WITH_OTLP_HTTP)
 GetOtlpDefaultTracesTimeout@otlp@exporter@v1@opentelemetry
@@ -46,6 +54,7 @@ GetOtlpDefaultLogsSslCertificateString@otlp@exporter@v1@opentelemetry
 #endif  // defined(WITH_OTLP_GRPC) || defined(WITH_OTLP_HTTP)
 
 #if defined(WITH_OTLP_GRPC)
+Create@OtlpGrpcClientFactory@otlp@exporter@v1@opentelemetry
 Create@OtlpGrpcExporterFactory@otlp@exporter@v1@opentelemetry
 Create@OtlpGrpcMetricExporterFactory@otlp@exporter@v1@opentelemetry
 Create@OtlpGrpcLogRecordExporterFactory@otlp@exporter@v1@opentelemetry
@@ -67,6 +76,9 @@ Create@OtlpHttpLogRecordExporterFactory@otlp@exporter@v1@opentelemetry
 OtlpHttpExporterOptions@otlp@exporter@v1@opentelemetry
 OtlpHttpMetricExporterOptions@otlp@exporter@v1@opentelemetry
 OtlpHttpLogRecordExporterOptions@otlp@exporter@v1@opentelemetry
+OtlpHttpExporterRuntimeOptions@otlp@exporter@v1@opentelemetry
+OtlpHttpMetricExporterRuntimeOptions@otlp@exporter@v1@opentelemetry
+OtlpHttpLogRecordExporterRuntimeOptions@otlp@exporter@v1@opentelemetry
 GetOtlpDefaultHttpTracesEndpoint@otlp@exporter@v1@opentelemetry
 GetOtlpDefaultHttpMetricsEndpoint@otlp@exporter@v1@opentelemetry
 GetOtlpDefaultHttpLogsEndpoint@otlp@exporter@v1@opentelemetry

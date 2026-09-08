@@ -657,6 +657,25 @@ TEST(RuleBasedPredicate, AttributePatterns)
   RuleBasedPredicate wide(std::move(precise));
   EXPECT_TRUE(Matches(wide, {{"value", 1234567.89}}));
   EXPECT_FALSE(Matches(wide, {{"value", 1234567.0}}));
+
+  // A double_precision of zero means one significant digit, not zero.
+  RuleBasedPredicateOptions coarse;
+  coarse.match_patterns   = true;
+  coarse.patterns_key     = "value";
+  coarse.included         = {"4e+02"};
+  coarse.double_precision = 0;
+  RuleBasedPredicate single_digit(std::move(coarse));
+  EXPECT_TRUE(Matches(single_digit, {{"value", 404.0}}));
+  EXPECT_TRUE(Matches(single_digit, {{"value", 444.0}}));
+
+  // Precision past the digits a double carries is capped at 17, not passed on to snprintf.
+  RuleBasedPredicateOptions unbounded;
+  unbounded.match_patterns   = true;
+  unbounded.patterns_key     = "value";
+  unbounded.included         = {"0.10000000000000001"};
+  unbounded.double_precision = std::numeric_limits<uint32_t>::max();
+  RuleBasedPredicate capped(std::move(unbounded));
+  EXPECT_TRUE(Matches(capped, {{"value", 0.1}}));
 }
 
 TEST(RuleBasedPredicate, ActiveGroupsAreAnded)
