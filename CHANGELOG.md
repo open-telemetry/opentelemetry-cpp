@@ -290,6 +290,10 @@ Increment the:
   for process entity
   [#4437](https://github.com/open-telemetry/opentelemetry-cpp/pull/4437)
 
+* [BUG] Prevent lost condition-variable wakeups in OTLP file exporter and periodic
+  metric exporter
+  [#4365](https://github.com/open-telemetry/opentelemetry-cpp/pull/4365)
+
 Important changes:
 
 * [API] Never set a null global provider or propagator
