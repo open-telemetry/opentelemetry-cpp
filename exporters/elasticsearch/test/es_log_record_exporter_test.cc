@@ -42,14 +42,15 @@ namespace http_client = opentelemetry::ext::http::client;
 // A response shaped like a successful Elasticsearch bulk reply: the exporter looks for
 // `"failed" : 0` in the body (see ElasticsearchLogRecordExporter::Export) in addition to the
 // status code before reporting success.
+constexpr const char *kDefaultAcceptedBody = R"({"errors": false, "failed" : 0})";
+
 class FakeResponse final : public http_client::Response
 {
 public:
-  FakeResponse()
-  {
-    static const std::string kSuccessBody = R"({"errors": false, "failed" : 0})";
-    body_.assign(kSuccessBody.begin(), kSuccessBody.end());
-  }
+  explicit FakeResponse(http_client::StatusCode status = 200,
+                        const std::string &body        = kDefaultAcceptedBody)
+      : status_(status), body_(body.begin(), body.end())
+  {}
 
   const http_client::Body &GetBody() const noexcept override { return body_; }
 
@@ -68,9 +69,10 @@ public:
     return true;
   }
 
-  http_client::StatusCode GetStatusCode() const noexcept override { return 200; }
+  http_client::StatusCode GetStatusCode() const noexcept override { return status_; }
 
 private:
+  http_client::StatusCode status_;
   http_client::Body body_;
 };
 
@@ -95,11 +97,26 @@ public:
   void SetRetryPolicy(const http_client::RetryPolicy &) noexcept override {}
 };
 
-// A session whose SendRequest() answers synchronously with a successful FakeResponse, so the
-// exporter's own wait for a response returns immediately without needing a real connection.
+// What the client does with a request, called from inside SendRequest() so the exporter's own
+// wait returns without needing a connection. The handler travels as a shared_ptr because a case
+// that checks an outcome is reported once has to keep it and send a second event to it. The
+// default answers once, successfully, which is what a case wants when the response is not the
+// thing under test.
+using EventScript = std::function<void(const std::shared_ptr<http_client::EventHandler> &)>;
+
+EventScript AnswerSuccessfully()
+{
+  return [](const std::shared_ptr<http_client::EventHandler> &handler) {
+    FakeResponse response;
+    handler->OnResponse(response);
+  };
+}
+
 class FakeSession final : public http_client::Session
 {
 public:
+  explicit FakeSession(EventScript script = AnswerSuccessfully()) : script_(std::move(script)) {}
+
   std::shared_ptr<http_client::Request> CreateRequest() noexcept override
   {
     return std::make_shared<FakeRequest>();
@@ -107,27 +124,54 @@ public:
 
   void SendRequest(std::shared_ptr<http_client::EventHandler> handler) noexcept override
   {
-    FakeResponse response;
-    handler->OnResponse(response);
+    script_(handler);
   }
 
   bool IsSessionActive() noexcept override { return true; }
   bool CancelSession() noexcept override { return true; }
   bool FinishSession() noexcept override { return true; }
+
+private:
+  EventScript script_;
 };
 
 class FakeHttpClient final : public http_client::HttpClient
 {
 public:
+  explicit FakeHttpClient(EventScript script = AnswerSuccessfully()) : script_(std::move(script)) {}
+
   std::shared_ptr<http_client::Session> CreateSession(
       opentelemetry::nostd::string_view) noexcept override
   {
-    return std::make_shared<FakeSession>();
+    if (on_create_session)
+    {
+      on_create_session();
+    }
+    return std::make_shared<FakeSession>(script_);
   }
 
-  bool CancelAllSessions() noexcept override { return true; }
+  // Runs inside Export(), after the records have been handed over and before the request exists.
+  std::function<void()> on_create_session;
+
+  // Runs inside Shutdown(). A real client answers its outstanding sessions here, so a case that
+  // needs a flush to be woken by the shutdown rather than by its own bound sets this; one that
+  // leaves it unset is a client that goes quiet instead, which is the case the bound exists for.
+  std::function<void()> on_cancel_all;
+
+  bool CancelAllSessions() noexcept override
+  {
+    if (on_cancel_all)
+    {
+      on_cancel_all();
+    }
+    return true;
+  }
+
   bool FinishAllSessions() noexcept override { return true; }
   void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
+
+private:
+  EventScript script_;
 };
 
 }  // namespace
@@ -287,104 +331,6 @@ namespace http_client = opentelemetry::ext::http::client;
 // same thing whichever success check is in place.
 constexpr const char *kAcceptedBody =
     R"({"took":30,"errors":false,"items":[{"index":{"status":201,"_shards":{"failed" : 0}}}]})";
-
-class FakeResponse : public http_client::Response
-{
-public:
-  FakeResponse(http_client::StatusCode status, const std::string &body)
-      : status_(status), body_(body.begin(), body.end())
-  {}
-  const http_client::Body &GetBody() const noexcept override { return body_; }
-  bool ForEachHeader(
-      nostd::function_ref<bool(nostd::string_view, nostd::string_view)>) const noexcept override
-  {
-    return true;
-  }
-  bool ForEachHeader(
-      const nostd::string_view &,
-      nostd::function_ref<bool(nostd::string_view, nostd::string_view)>) const noexcept override
-  {
-    return true;
-  }
-  http_client::StatusCode GetStatusCode() const noexcept override { return status_; }
-
-private:
-  http_client::StatusCode status_;
-  http_client::Body body_;
-};
-
-class FakeRequest : public http_client::Request
-{
-public:
-  void SetMethod(http_client::Method) noexcept override {}
-  void SetUri(nostd::string_view) noexcept override {}
-  void SetSslOptions(const http_client::HttpSslOptions &) noexcept override {}
-  void SetBody(http_client::Body &) noexcept override {}
-  void AddHeader(nostd::string_view, nostd::string_view) noexcept override {}
-  void ReplaceHeader(nostd::string_view, nostd::string_view) noexcept override {}
-  void SetTimeoutMs(std::chrono::milliseconds) noexcept override {}
-  void SetCompression(const http_client::Compression &) noexcept override {}
-  void EnableLogging(bool) noexcept override {}
-  void SetRetryPolicy(const http_client::RetryPolicy &) noexcept override {}
-};
-
-using EventScript = std::function<void(const std::shared_ptr<http_client::EventHandler> &)>;
-
-class FakeSession : public http_client::Session
-{
-public:
-  explicit FakeSession(EventScript script) : script_(std::move(script)) {}
-  std::shared_ptr<http_client::Request> CreateRequest() noexcept override
-  {
-    return std::make_shared<FakeRequest>();
-  }
-  void SendRequest(std::shared_ptr<http_client::EventHandler> handler) noexcept override
-  {
-    script_(handler);
-  }
-  bool IsSessionActive() noexcept override { return false; }
-  bool CancelSession() noexcept override { return true; }
-  bool FinishSession() noexcept override { return true; }
-
-private:
-  EventScript script_;
-};
-
-class FakeHttpClient : public http_client::HttpClient
-{
-public:
-  explicit FakeHttpClient(EventScript script) : script_(std::move(script)) {}
-  std::shared_ptr<http_client::Session> CreateSession(nostd::string_view) noexcept override
-  {
-    if (on_create_session)
-    {
-      on_create_session();
-    }
-    return std::make_shared<FakeSession>(script_);
-  }
-
-  // Runs inside Export(), after the records have been handed over and before the request exists.
-  std::function<void()> on_create_session;
-
-  // Runs inside Shutdown(). A real client answers its outstanding sessions here, so a case that
-  // needs a flush to be woken by the shutdown rather than by its own bound sets this; one that
-  // leaves it unset is a client that goes quiet instead, which is the case the bound exists for.
-  std::function<void()> on_cancel_all;
-
-  bool CancelAllSessions() noexcept override
-  {
-    if (on_cancel_all)
-    {
-      on_cancel_all();
-    }
-    return true;
-  }
-  bool FinishAllSessions() noexcept override { return true; }
-  void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
-
-private:
-  EventScript script_;
-};
 
 }  // namespace
 
