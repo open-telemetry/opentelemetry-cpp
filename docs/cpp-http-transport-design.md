@@ -34,9 +34,9 @@ Every in-tree consumer, read from `main`:
 | Elasticsearch, async preview | async curl client | returns with sessions outstanding |
 | A user supplied client | anything | callbacks may run inline or on another thread |
 
-`WITH_ASYNC_EXPORT_PREVIEW` is `OFF` by default.
+`OTELCPP_WITH_ASYNC_EXPORT_PREVIEW` is `OFF` by default.
 
-So in the configuration almost everyone builds, every exporter blocks until its
+So in the default configuration every exporter blocks until its
 request is done, and two of the three do it by handing the request to an
 asynchronous client and then waiting for it. Those callers pay for a background
 thread, a callback contract and a `CURLM` whether or not anything they can
@@ -287,7 +287,7 @@ below rather than something this sequence settles. Charging the byte budget
 before serialization means guessing the size; charging it after means the bytes
 already exist by the time the governor is asked to allow them.
 
-Each boundary in the second sequence is a report:
+Four of the open reports are about that second sequence:
 
 - `Queued` that never reaches `Attached` is a rejected `curl_multi_add_handle`.
   The attempt never runs, and the operation still has to settle. Today the
