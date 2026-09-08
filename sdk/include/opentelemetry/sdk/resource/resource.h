@@ -106,8 +106,40 @@ public:
   static Resource &GetDefault();
 
 private:
+  /**
+   * Normalizes entities supplied at construction time.
+   *
+   * Drops invalid entities, duplicate types, and entities whose identity or
+   * description keys conflict with an already-accepted entity (first wins).
+   * Stores survivors in `entities_`, removes their attribute keys from
+   * `unassociated_attributes_`, and updates `schema_url_` when any entity survives
+   * (common entity schema URL, or empty if they differ).
+   */
   void NormalizeEntities(const std::vector<Entity> &entities) noexcept;
+
+  /**
+   * Rebuilds the flattened `attributes_` cache from `entities_` (identity and
+   * description) followed by `unassociated_attributes_`.
+   */
   void RefreshFlattenedAttributes() noexcept;
+
+  /**
+   * Legacy resource merge when neither resource contains entities.
+   *
+   * Spec: Resource SDK, "Merge behavior without Entities" (since 1.60.0):
+   * https://opentelemetry.io/docs/specs/otel/resource/sdk/#merge-behavior-without-entities
+   */
+  Resource MergeWithoutEntities(const Resource &other) const noexcept;
+
+  /**
+   * Entity-aware resource merge when either resource contains entities.
+   *
+   * Spec: Resource SDK, "Merge behavior with entities" (Development, 1.60.0),
+   * which requires the resource data model merge algorithm:
+   * https://opentelemetry.io/docs/specs/otel/resource/sdk/#merge-behavior-with-entities
+   * https://opentelemetry.io/docs/specs/otel/resource/data-model/#merging-resources
+   */
+  Resource MergeWithEntities(const Resource &other) const noexcept;
 
   std::vector<Entity> entities_;
   ResourceAttributes unassociated_attributes_;
