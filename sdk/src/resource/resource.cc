@@ -73,6 +73,88 @@ std::unordered_map<std::string, std::size_t> BuildTypeRanks(const Resource &old_
   return rank;
 }
 
+std::vector<Entity> EvictInterEntityKeyConflicts(const std::vector<Entity> &entities)
+{
+  std::vector<Entity> accepted;
+  std::unordered_set<std::string> accepted_keys;
+  accepted.reserve(entities.size());
+
+  for (const auto &entity : entities)
+  {
+    bool key_conflict = false;
+    for (const auto &kv : entity.GetIdentity())
+    {
+      if (accepted_keys.find(kv.first) != accepted_keys.end())
+      {
+        key_conflict = true;
+        break;
+      }
+    }
+    if (!key_conflict)
+    {
+      for (const auto &kv : entity.GetDescription())
+      {
+        if (accepted_keys.find(kv.first) != accepted_keys.end())
+        {
+          key_conflict = true;
+          break;
+        }
+      }
+    }
+    if (key_conflict)
+    {
+      OTEL_INTERNAL_LOG_WARN("[Resource] Dropping Entity due to attribute key conflict.");
+      continue;
+    }
+
+    for (const auto &kv : entity.GetIdentity())
+    {
+      accepted_keys.insert(kv.first);
+    }
+    for (const auto &kv : entity.GetDescription())
+    {
+      accepted_keys.insert(kv.first);
+    }
+    accepted.push_back(entity);
+  }
+
+  return accepted;
+}
+
+std::string SchemaUrlFromEntities(const std::vector<Entity> &entities)
+{
+  if (entities.empty())
+  {
+    return std::string{};
+  }
+
+  const std::string &common_schema_url = entities.front().GetSchemaURL();
+  for (const auto &entity : entities)
+  {
+    if (entity.GetSchemaURL() != common_schema_url)
+    {
+      return std::string{};
+    }
+  }
+  return common_schema_url;
+}
+
+void RemoveEntityKeysFromUnassociated(ResourceAttributes &unassociated,
+                                      const std::vector<Entity> &entities)
+{
+  for (const auto &entity : entities)
+  {
+    for (const auto &kv : entity.GetIdentity())
+    {
+      unassociated.erase(kv.first);
+    }
+    for (const auto &kv : entity.GetDescription())
+    {
+      unassociated.erase(kv.first);
+    }
+  }
+}
+
 }  // namespace
 
 Resource::Resource() noexcept : entities_(), unassociated_attributes_(), schema_url_()
@@ -103,10 +185,9 @@ Resource::Resource(const ResourceAttributes &attributes,
 
 void Resource::NormalizeEntities(const std::vector<Entity> &entities) noexcept
 {
-  std::vector<Entity> accepted;
+  std::vector<Entity> filtered;
   std::unordered_set<std::string> accepted_types;
-  std::unordered_set<std::string> accepted_keys;
-  accepted.reserve(entities.size());
+  filtered.reserve(entities.size());
 
   for (const auto &entity : entities)
   {
@@ -122,64 +203,27 @@ void Resource::NormalizeEntities(const std::vector<Entity> &entities) noexcept
       continue;
     }
 
-    bool key_conflict = false;
-    for (const auto &kv : entity.GetIdentity())
-    {
-      if (accepted_keys.find(kv.first) != accepted_keys.end())
-      {
-        key_conflict = true;
-        break;
-      }
-    }
-    if (!key_conflict)
-    {
-      for (const auto &kv : entity.GetDescription())
-      {
-        if (accepted_keys.find(kv.first) != accepted_keys.end())
-        {
-          key_conflict = true;
-          break;
-        }
-      }
-    }
-    if (key_conflict)
-    {
-      OTEL_INTERNAL_LOG_WARN("[Resource] Dropping Entity due to attribute key conflict.");
-      continue;
-    }
-
     accepted_types.insert(entity.GetType());
+    filtered.push_back(entity);
+  }
+
+  entities_ = EvictInterEntityKeyConflicts(filtered);
+
+  for (const auto &entity : entities_)
+  {
     for (const auto &kv : entity.GetIdentity())
     {
-      accepted_keys.insert(kv.first);
+      unassociated_attributes_.erase(kv.first);
     }
     for (const auto &kv : entity.GetDescription())
     {
-      accepted_keys.insert(kv.first);
+      unassociated_attributes_.erase(kv.first);
     }
-    accepted.push_back(entity);
-  }
-
-  entities_ = std::move(accepted);
-
-  for (const auto &key : accepted_keys)
-  {
-    unassociated_attributes_.erase(key);
   }
 
   if (!entities_.empty())
   {
-    const std::string &common_schema_url = entities_.front().GetSchemaURL();
-    bool all_equal                       = true;
-    for (const auto &entity : entities_)
-    {
-      if (entity.GetSchemaURL() != common_schema_url)
-      {
-        all_equal = false;
-        break;
-      }
-    }
-    schema_url_ = all_equal ? common_schema_url : std::string{};
+    schema_url_ = SchemaUrlFromEntities(entities_);
   }
 }
 
@@ -286,7 +330,21 @@ Resource Resource::MergeWithEntities(const Resource &other) const noexcept
 
   const std::string classic_schema =
       updating.GetSchemaURL().empty() ? GetSchemaURL() : updating.GetSchemaURL();
-  return Resource(unassociated, classic_schema, after_eviction);
+  if (after_eviction.empty())
+  {
+    return Resource(unassociated, classic_schema);
+  }
+
+  const std::string merged_schema = SchemaUrlFromEntities(after_eviction);
+  RemoveEntityKeysFromUnassociated(unassociated, after_eviction);
+  std::vector<Entity> final_entities = EvictInterEntityKeyConflicts(after_eviction);
+
+  Resource result;
+  result.unassociated_attributes_ = std::move(unassociated);
+  result.schema_url_              = merged_schema;
+  result.entities_                = std::move(final_entities);
+  result.RefreshFlattenedAttributes();
+  return result;
 }
 
 Resource Resource::Create(const ResourceAttributes &attributes, const std::string &schema_url)

@@ -836,6 +836,38 @@ TEST(ResourceTest, MergeMixedEntitySchemaUrls)
   ASSERT_EQ(merged.GetEntities().size(), 2);
 }
 
+TEST(ResourceTest, MergeInterEntityConflictPreservesPreEvictionBlankSchema)
+{
+  const std::string schema_a = "https://opentelemetry.io/schemas/1.21.0";
+  const std::string schema_b = "https://opentelemetry.io/schemas/1.22.0";
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{{"env", "prod"}},
+              schema_a);
+  Entity service("service", ResourceAttributes{{"service.name", "app"}},
+                 ResourceAttributes{{"env", "dev"}}, schema_b);
+  Resource old_resource(ResourceAttributes{}, std::string{}, {host});
+  Resource updating(ResourceAttributes{}, std::string{}, {service});
+  auto merged = old_resource.Merge(updating);
+
+  ASSERT_EQ(merged.GetEntities().size(), 1);
+  EXPECT_EQ(merged.GetEntities()[0].GetType(), "service");
+  EXPECT_TRUE(merged.GetSchemaURL().empty());
+}
+
+TEST(ResourceTest, MergeInterEntityConflictPreservesPreEvictionCommonSchema)
+{
+  const std::string schema_url = "https://opentelemetry.io/schemas/1.21.0";
+  Entity host("host", ResourceAttributes{{"host.id", "H1"}}, ResourceAttributes{{"env", "prod"}},
+              schema_url);
+  Entity service("service", ResourceAttributes{{"service.name", "app"}},
+                 ResourceAttributes{{"env", "dev"}}, schema_url);
+  Resource old_resource(ResourceAttributes{}, std::string{}, {host});
+  Resource updating(ResourceAttributes{}, std::string{}, {service});
+  auto merged = old_resource.Merge(updating);
+
+  ASSERT_EQ(merged.GetEntities().size(), 1);
+  EXPECT_EQ(merged.GetSchemaURL(), schema_url);
+}
+
 TEST(ResourceTest, MergeUpdatingLooseBeatsOldLoose)
 {
   Resource old_resource(ResourceAttributes{{"foo", "old"}, {"keep", "old"}}, std::string{},
