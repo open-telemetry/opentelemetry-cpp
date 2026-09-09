@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Fix `MetricReader::Shutdown()` invoking `OnShutDown()` multiple times.
+  [#4536](https://github.com/open-telemetry/opentelemetry-cpp/issues/4536)
+
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
   [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
 

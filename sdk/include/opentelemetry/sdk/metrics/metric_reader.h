@@ -71,6 +71,11 @@ public:
 
   /**
    * Shutdown the metric reader.
+   *
+   * Idempotent. Only the first call performs the shutdown, later calls log a warning and
+   * return true.
+   *
+   * @return the result of OnShutDown() for the first call, true for any subsequent call.
    */
   bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 

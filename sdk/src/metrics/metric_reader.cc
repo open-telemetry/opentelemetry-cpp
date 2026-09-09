@@ -48,13 +48,13 @@ bool MetricReader::Collect(
 
 bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  bool status = true;
-  if (IsShutdown())
+  bool expected = false;
+  if (!shutdown_.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
   {
     OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown - Cannot invoke shutdown twice!");
+    return true;
   }
-
-  shutdown_.store(true, std::memory_order_release);
+  bool status = true;
 
   if (!OnShutDown(timeout))
   {

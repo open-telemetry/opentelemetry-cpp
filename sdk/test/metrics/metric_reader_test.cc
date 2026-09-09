@@ -2,9 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <chrono>
 #include <memory>
 #include <string>
+#include <thread>
 #include <utility>
+#include <vector>
 #include "common.h"
 
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -146,4 +149,65 @@ TEST(MetricReaderTest, CardinalityLimitsExplicitSdkDefaultIsHonoured)
   // histogram was not explicitly set — falls back to default_limit 1500
   EXPECT_EQ(metric_reader->GetCardinalityLimit(InstrumentType::kHistogram), 1500);
   EXPECT_EQ(metric_reader->GetCardinalityLimit(InstrumentType::kUpDownCounter), 1500);
+}
+
+namespace
+{
+
+class CountingMetricReader : public MetricReader
+{
+public:
+  AggregationTemporality GetAggregationTemporality(InstrumentType) const noexcept override
+  {
+    return AggregationTemporality::kCumulative;
+  }
+
+  int shutdown_count{0};
+  int force_flush_count{0};
+
+private:
+  bool OnForceFlush(std::chrono::microseconds) noexcept override
+  {
+    ++force_flush_count;
+    return true;
+  }
+
+  bool OnShutDown(std::chrono::microseconds) noexcept override
+  {
+    ++shutdown_count;
+    return true;
+  }
+};
+
+}  // namespace
+
+TEST(MetricReaderTest, ShutdownIsInvokedOnce)
+{
+  CountingMetricReader reader;
+
+  EXPECT_TRUE(reader.Shutdown());
+  EXPECT_TRUE(reader.IsShutdown());
+  EXPECT_EQ(reader.shutdown_count, 1);
+
+  EXPECT_TRUE(reader.Shutdown());
+  EXPECT_TRUE(reader.Shutdown());
+  EXPECT_EQ(reader.shutdown_count, 1);
+}
+
+TEST(MetricReaderTest, ConcurrentShutdownIsInvokedOnce)
+{
+  CountingMetricReader reader;
+
+  std::vector<std::thread> threads;
+  threads.reserve(8);
+  for (int i = 0; i < 8; i++)
+  {
+    threads.emplace_back([&reader]() { reader.Shutdown(); });
+  }
+  for (auto &thread : threads)
+  {
+    thread.join();
+  }
+
+  EXPECT_EQ(reader.shutdown_count, 1);
 }
