@@ -12,6 +12,8 @@ cc_test(
     deps = [
         "//api",
         "//sdk:headers",
+        "//sdk/src/common:env_variables",
+        "//sdk/src/instrumentationscope",
         "@com_google_googletest//:gtest_main",
     ],
 )
