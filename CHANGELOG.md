@@ -298,6 +298,10 @@ Increment the:
   metric exporter
   [#4365](https://github.com/open-telemetry/opentelemetry-cpp/pull/4365)
 
+* [SDK] Enforce span status transition rules defined in the OpenTelemetry
+  specification in `Span::SetStatus`.
+  [#4546](https://github.com/open-telemetry/opentelemetry-cpp/issues/4546)
+
 Important changes:
 
 * [API] Never set a null global provider or propagator

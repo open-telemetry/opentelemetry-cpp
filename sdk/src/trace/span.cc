@@ -8,6 +8,7 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/trace/span_status.h"
 #include "opentelemetry/trace/span_id.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/trace_flags.h"
@@ -201,7 +202,15 @@ void Span::SetStatus(opentelemetry::trace::StatusCode code, nostd::string_view d
   {
     return;
   }
-  recordable_->SetStatus(code, description);
+
+  const auto transition = ApplyStatusTransition(status_code_, code, description);
+  if (!transition.accepted)
+  {
+    return;
+  }
+
+  status_code_ = transition.code;
+  recordable_->SetStatus(transition.code, transition.description);
 }
 
 void Span::UpdateName(nostd::string_view name) noexcept
