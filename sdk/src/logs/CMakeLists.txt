@@ -27,8 +27,9 @@ add_library(
 
 set_target_properties(opentelemetry_logs PROPERTIES EXPORT_NAME logs)
 
-target_link_libraries(opentelemetry_logs PUBLIC opentelemetry_resources
-                                                opentelemetry_common)
+target_link_libraries(
+  opentelemetry_logs PUBLIC opentelemetry_resources opentelemetry_common
+                            opentelemetry_instrumentation_scope)
 set_target_version(opentelemetry_logs)
 
 target_include_directories(
@@ -39,5 +40,5 @@ if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     logs "OpenTelemetry SDK - Logs"
     "Components for exporting logs in the OpenTelemetry SDK."
-    "opentelemetry_resources")
+    "opentelemetry_resources" "opentelemetry_instrumentation_scope")
 endif()

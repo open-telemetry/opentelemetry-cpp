@@ -15,6 +15,16 @@ Increment the:
 
 ## [Unreleased]
 
+* [DOC] Fix and clarify the `StartSpanOptions` documentation
+  [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
+
+* [EXPORTER] Fix the Elasticsearch log exporter aborting the process when a log
+  record's body or attributes contain bytes that are not valid UTF-8. The
+  exporter now substitutes the replacement character for the invalid bytes
+  and continues, instead of `nlohmann::json::dump()` throwing out of a
+  `noexcept` function.
+  [#4439](https://github.com/open-telemetry/opentelemetry-cpp/issues/4439)
+
 * [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
   If a model-specific limit is set it is used, otherwise the matching general
   limit, otherwise the model-specific default. Limit fields on
@@ -26,6 +36,10 @@ Increment the:
 
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
+
+* [CONFIGURATION] Cleanup build targets and docs
+  [#4486](https://github.com/open-telemetry/opentelemetry-cpp/pull/4486)
+
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
   and merge the resource per the resource SDK specification.
@@ -47,12 +61,19 @@ Increment the:
 
 * [RESOURCE DETECTOR] Add the service resource detector and builder
   [#4414](https://github.com/open-telemetry/opentelemetry-cpp/issues/4414)
+
+* [BENCHMARK] Sync instrument recording benchmarks
+  [#4470](https://github.com/open-telemetry/opentelemetry-cpp/pull/4470)
+
 * [CONFIGURATION] deprecate config builder cmake components
   [#4428](https://github.com/open-telemetry/opentelemetry-cpp/pull/4428)
 
 * [CONFIGURATION] Add configuration builders for the container and process
   resource detectors
   [#4412](https://github.com/open-telemetry/opentelemetry-cpp/issues/4412)
+
+* [CONFIGURATION] Internal logging cleanup
+  [#4479](https://github.com/open-telemetry/opentelemetry-cpp/pull/4479)
 
 * [CONFIGURATION] Add support for composable sampler extensions.
   [#4409](https://github.com/open-telemetry/opentelemetry-cpp/issues/4409)
@@ -68,8 +89,14 @@ Increment the:
   (programmatic and from yaml)
   ([#4366](https://github.com/open-telemetry/opentelemetry-cpp/pull/4366))
 
+* [SDK] Replace SpinLockMutex with std::mutex in the metrics storage clases
+  [#4416](https://github.com/open-telemetry/opentelemetry-cpp/pull/4416)
+
 * [CONFIGURATION/BUILD] Add resource detector targets and README
   [#4430](https://github.com/open-telemetry/opentelemetry-cpp/pull/4430)
+
+* [CODE HEALTH] Resolve multiple clang tidy warnings
+  [#4492](https://github.com/open-telemetry/opentelemetry-cpp/pull/4492)
 
 * [SDK] `OTELResourceDetector` now percent-decodes values parsed from the
   `OTEL_RESOURCE_ATTRIBUTES` environment variable, per the W3C Baggage value
@@ -123,6 +150,9 @@ Increment the:
   `std::mutex` blocks the waiter instead. Only this one contended lock changes;
   the API `SpinLockMutex` and all other SDK locks are unchanged.
   [#4245](https://github.com/open-telemetry/opentelemetry-cpp/pull/4245)
+
+* [SDK] Create instrumentation scope library
+  [#4351](https://github.com/open-telemetry/opentelemetry-cpp/pull/4351)
 
 * [CONFIGURATION] Update ViewSelector to comply with schema v1.1.0
   [#4384](https://github.com/open-telemetry/opentelemetry-cpp/pull/4384)
@@ -247,6 +277,10 @@ Increment the:
   shutdown and force flush.
   [#4382](https://github.com/open-telemetry/opentelemetry-cpp/pull/4382)
 
+* [SDK] Fix lost-wakeups in BatchLogRecordProcessor to prevent stalls during
+  shutdown and force flush.
+  [#4400](https://github.com/open-telemetry/opentelemetry-cpp/issues/4400)
+
 * [METRICS SDK] Support `OTEL_METRICS_EXEMPLAR_FILTER` when metrics exemplars
   are enabled. The default exemplar filter changes from `always_off` to
   `trace_based` to match the specification.
@@ -263,6 +297,9 @@ Increment the:
 * [METRICS SDK] Avoid materializing owned exemplar attributes before
   fixed-size reservoir selection.
   [#4475](https://github.com/open-telemetry/opentelemetry-cpp/pull/4475)
+* [BUG] Prevent lost condition-variable wakeups in OTLP file exporter and periodic
+  metric exporter
+  [#4365](https://github.com/open-telemetry/opentelemetry-cpp/pull/4365)
 
 Important changes:
 

@@ -130,6 +130,12 @@ bool OtlpBuilderUtils::GrpcUseSsl(
 
   if (endpoint.substr(0, 5) == "http:")
   {
+    if (tls && !tls->insecure)
+    {
+      OTEL_INTERNAL_LOG_WARN(
+          "[Otlp Grpc Exporter] endpoint is http but tls.insecure is false: using insecure "
+          "connection");
+    }
     return false;
   }
 
@@ -138,6 +144,10 @@ bool OtlpBuilderUtils::GrpcUseSsl(
     return !tls->insecure;
   }
 
+  OTEL_INTERNAL_LOG_DEBUG(
+      "[Otlp Grpc Exporter] endpoint does not specify http or https and tls is not configured. "
+      "Using secure connection by default. To use an insecure connection, set tls.insecure to "
+      "true.");
   return true;
 }
 
