@@ -67,11 +67,14 @@ bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept
 /** Flush metric read by this reader **/
 bool MetricReader::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  bool status = true;
   if (IsShutdown())
   {
-    OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown Cannot invoke Force flush on shutdown reader!");
+    OTEL_INTERNAL_LOG_WARN(
+        "MetricReader::ForceFlush Cannot invoke Force flush on shutdown reader!");
+    return false;
   }
+
+  bool status = true;
   if (!OnForceFlush(timeout))
   {
     status = false;

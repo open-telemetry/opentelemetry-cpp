@@ -81,6 +81,9 @@ public:
 
   /**
    * Force flush the metric read by the reader.
+   *
+   * @return false without invoking OnForceFlush() if the reader is already shut down, otherwise
+   * the result of OnForceFlush().
    */
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 

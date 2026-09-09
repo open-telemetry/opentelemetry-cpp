@@ -211,3 +211,16 @@ TEST(MetricReaderTest, ConcurrentShutdownIsInvokedOnce)
 
   EXPECT_EQ(reader.shutdown_count, 1);
 }
+
+TEST(MetricReaderTest, ForceFlushAfterShutdownIsNoOp)
+{
+  CountingMetricReader reader;
+
+  EXPECT_TRUE(reader.ForceFlush());
+  EXPECT_EQ(reader.force_flush_count, 1);
+
+  EXPECT_TRUE(reader.Shutdown());
+
+  EXPECT_FALSE(reader.ForceFlush());
+  EXPECT_EQ(reader.force_flush_count, 1);
+}

@@ -18,6 +18,10 @@ Increment the:
 * [SDK] Fix `MetricReader::Shutdown()` invoking `OnShutDown()` multiple times.
   [#4536](https://github.com/open-telemetry/opentelemetry-cpp/issues/4536)
 
+* [SDK] Fix `MetricReader::ForceFlush()` invoking `OnForceFlush()` on a
+  shutdown reader.
+  [#4548](https://github.com/open-telemetry/opentelemetry-cpp/pull/4548)
+
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
   [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
 
