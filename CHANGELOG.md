@@ -15,7 +15,7 @@ Increment the:
 
 ## [Unreleased]
 
-* [CMAKE] Clean up pkg-config install methods and add CMake consumer tests
+* [CMAKE] Add pkg-config install consumer tests
   [#4503](https://github.com/open-telemetry/opentelemetry-cpp/issues/4503)
 
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
