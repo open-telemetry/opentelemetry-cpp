@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <atomic>
 #include <chrono>
 #include <memory>
 #include <string>
@@ -10,6 +11,8 @@
 #include <vector>
 #include "common.h"
 
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/cardinality_limits.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -162,8 +165,8 @@ public:
     return AggregationTemporality::kCumulative;
   }
 
-  int shutdown_count{0};
-  int force_flush_count{0};
+  std::atomic<int> shutdown_count{0};
+  std::atomic<int> force_flush_count{0};
 
 private:
   bool OnForceFlush(std::chrono::microseconds) noexcept override
@@ -187,16 +190,22 @@ TEST(MetricReaderTest, ShutdownIsInvokedOnce)
 
   EXPECT_TRUE(reader.Shutdown());
   EXPECT_TRUE(reader.IsShutdown());
-  EXPECT_EQ(reader.shutdown_count, 1);
+  EXPECT_EQ(reader.shutdown_count.load(), 1);
 
   EXPECT_TRUE(reader.Shutdown());
   EXPECT_TRUE(reader.Shutdown());
-  EXPECT_EQ(reader.shutdown_count, 1);
+  EXPECT_EQ(reader.shutdown_count.load(), 1);
 }
 
 TEST(MetricReaderTest, ConcurrentShutdownIsInvokedOnce)
 {
+  namespace internal_log = opentelemetry::sdk::common::internal_log;
   CountingMetricReader reader;
+
+  // default logger is not thread-safe
+  auto previous_handler = internal_log::GlobalLogHandler::GetLogHandler();
+  internal_log::GlobalLogHandler::SetLogHandler(
+      nostd::shared_ptr<internal_log::LogHandler>(new internal_log::NoopLogHandler()));
 
   std::vector<std::thread> threads;
   threads.reserve(8);
@@ -209,7 +218,9 @@ TEST(MetricReaderTest, ConcurrentShutdownIsInvokedOnce)
     thread.join();
   }
 
-  EXPECT_EQ(reader.shutdown_count, 1);
+  internal_log::GlobalLogHandler::SetLogHandler(previous_handler);
+
+  EXPECT_EQ(reader.shutdown_count.load(), 1);
 }
 
 TEST(MetricReaderTest, ForceFlushAfterShutdownIsNoOp)
@@ -217,10 +228,10 @@ TEST(MetricReaderTest, ForceFlushAfterShutdownIsNoOp)
   CountingMetricReader reader;
 
   EXPECT_TRUE(reader.ForceFlush());
-  EXPECT_EQ(reader.force_flush_count, 1);
+  EXPECT_EQ(reader.force_flush_count.load(), 1);
 
   EXPECT_TRUE(reader.Shutdown());
 
   EXPECT_FALSE(reader.ForceFlush());
-  EXPECT_EQ(reader.force_flush_count, 1);
+  EXPECT_EQ(reader.force_flush_count.load(), 1);
 }
