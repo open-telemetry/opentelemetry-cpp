@@ -29,7 +29,7 @@ Increment the:
   change.
   [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
 
-* [CMAKE] Clean up pkg-config install methods and add CMake consumer tests
+* [CMAKE] Add pkg-config install consumer tests for Ubuntu system packages
   [#4503](https://github.com/open-telemetry/opentelemetry-cpp/issues/4503)
 
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
