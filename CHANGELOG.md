@@ -65,6 +65,10 @@ Increment the:
 
 * [CONFIGURATION] SDK signal provider builder interface
   [#4426](https://github.com/open-telemetry/opentelemetry-cpp/pull/4426)
+
+* [CONFIGURATION] Break the configuration_core dependency on SDK logs
+  [#4553](https://github.com/open-telemetry/opentelemetry-cpp/pull/4553)
+
 * [CONFIGURATION] Support environment variable substitution for attributes
   [#4474](https://github.com/open-telemetry/opentelemetry-cpp/pull/4474)
 
