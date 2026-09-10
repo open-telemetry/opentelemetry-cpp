@@ -19,8 +19,6 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/configuration/aggregation_configuration.h"
-#include "opentelemetry/sdk/configuration/aggregation_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_builder.h"
@@ -29,14 +27,12 @@
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
-#include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_always_on_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/composable_always_on_sampler_configuration.h"
@@ -54,26 +50,18 @@
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/console_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/container_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/container_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/exemplar_filter.h"
-#include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_composable_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/extension_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_sampler_builder.h"
@@ -85,7 +73,6 @@
 #include "opentelemetry/sdk/configuration/host_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/host_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/include_exclude_configuration.h"
-#include "opentelemetry/sdk/configuration/instrument_type.h"
 #include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/integer_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_builder.h"
@@ -98,46 +85,28 @@
 #include "opentelemetry/sdk/configuration/logger_configurator_builder.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
-#include "opentelemetry/sdk/configuration/meter_configurator_builder.h"
-#include "opentelemetry/sdk/configuration/meter_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
-#include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
-#include "opentelemetry/sdk/configuration/metric_reader_configuration_visitor.h"
+#include "opentelemetry/sdk/configuration/meter_provider_builder.h"
+#include "opentelemetry/sdk/configuration/meter_provider_builder_context.h"
 #include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/periodic_metric_reader_builder.h"
-#include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/probability_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/process_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
-#include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_builder.h"
-#include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
-#include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration_visitor.h"
-#include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
-#include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/push_metric_exporter_configuration_visitor.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
@@ -168,9 +137,6 @@
 #include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/unsupported_exception.h"
-#include "opentelemetry/sdk/configuration/view_configuration.h"
-#include "opentelemetry/sdk/configuration/view_selector_configuration.h"
-#include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/log_record_limits.h"
@@ -178,24 +144,6 @@
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/logger_provider_factory.h"
 #include "opentelemetry/sdk/logs/processor.h"
-#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
-#include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
-#include "opentelemetry/sdk/metrics/cardinality_limits.h"
-#include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/meter_config.h"
-#include "opentelemetry/sdk/metrics/meter_context.h"
-#include "opentelemetry/sdk/metrics/meter_context_factory.h"
-#include "opentelemetry/sdk/metrics/meter_provider.h"
-#include "opentelemetry/sdk/metrics/meter_provider_factory.h"
-#include "opentelemetry/sdk/metrics/metric_reader.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
-#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
-#include "opentelemetry/sdk/metrics/view/instrument_selector.h"
-#include "opentelemetry/sdk/metrics/view/meter_selector.h"
-#include "opentelemetry/sdk/metrics/view/predicate_factory.h"
-#include "opentelemetry/sdk/metrics/view/view.h"
-#include "opentelemetry/sdk/metrics/view/view_registry.h"
-#include "opentelemetry/sdk/metrics/view/view_registry_factory.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/trace/exporter.h"
@@ -213,10 +161,6 @@
 
 #include "src/resource/detail/percent_decode.h"
 
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-#  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
-#endif
-
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
@@ -225,40 +169,6 @@ namespace configuration
 
 namespace
 {
-
-/// Convert a CardinalityLimitsConfiguration (where 0 means "unset, use
-/// default_limit") into a fully-resolved CardinalityLimits struct ready for
-/// MetricReader::SetCardinalityLimits().
-static opentelemetry::sdk::metrics::CardinalityLimits ToCardinalityLimits(
-    const opentelemetry::sdk::configuration::CardinalityLimitsConfiguration &cfg)
-{
-  opentelemetry::sdk::metrics::CardinalityLimits limits;
-  // If the caller supplied a non-zero default, use it; otherwise keep the
-  // SDK default (kDefaultCardinalityLimit = 2000) already in the struct.
-  const std::size_t d  = cfg.default_limit != CardinalityLimitsConfiguration::kInheritDefault
-                             ? cfg.default_limit
-                             : limits.default_limit;
-  limits.default_limit = d;
-  limits.counter = cfg.counter != CardinalityLimitsConfiguration::kInheritDefault ? cfg.counter : d;
-  limits.gauge   = cfg.gauge != CardinalityLimitsConfiguration::kInheritDefault ? cfg.gauge : d;
-  limits.histogram =
-      cfg.histogram != CardinalityLimitsConfiguration::kInheritDefault ? cfg.histogram : d;
-  limits.observable_counter =
-      cfg.observable_counter != CardinalityLimitsConfiguration::kInheritDefault
-          ? cfg.observable_counter
-          : d;
-  limits.observable_gauge = cfg.observable_gauge != CardinalityLimitsConfiguration::kInheritDefault
-                                ? cfg.observable_gauge
-                                : d;
-  limits.observable_up_down_counter =
-      cfg.observable_up_down_counter != CardinalityLimitsConfiguration::kInheritDefault
-          ? cfg.observable_up_down_counter
-          : d;
-  limits.up_down_counter = cfg.up_down_counter != CardinalityLimitsConfiguration::kInheritDefault
-                               ? cfg.up_down_counter
-                               : d;
-  return limits;
-}
 
 static std::uint32_t ToUint32Limit(std::size_t value)
 {
@@ -843,176 +753,6 @@ bool ResourceAttributeKeyMatches(
 
   return true;
 }
-
-class MetricReaderBuilder
-    : public opentelemetry::sdk::configuration::MetricReaderConfigurationVisitor
-{
-public:
-  MetricReaderBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
-  MetricReaderBuilder(MetricReaderBuilder &&)                      = delete;
-  MetricReaderBuilder(const MetricReaderBuilder &)                 = delete;
-  MetricReaderBuilder &operator=(MetricReaderBuilder &&)           = delete;
-  MetricReaderBuilder &operator=(const MetricReaderBuilder &other) = delete;
-  ~MetricReaderBuilder() override                                  = default;
-
-  void VisitPeriodic(
-      const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model) override
-  {
-    metric_reader = sdk_builder_->CreatePeriodicMetricReader(model);
-  }
-
-  void VisitPull(
-      const opentelemetry::sdk::configuration::PullMetricReaderConfiguration *model) override
-  {
-    metric_reader = sdk_builder_->CreatePullMetricReader(model);
-  }
-
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> metric_reader;
-
-private:
-  const SdkBuilder *sdk_builder_;
-};
-
-class PushMetricExporterBuilder
-    : public opentelemetry::sdk::configuration::PushMetricExporterConfigurationVisitor
-{
-public:
-  PushMetricExporterBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
-  PushMetricExporterBuilder(PushMetricExporterBuilder &&)                      = delete;
-  PushMetricExporterBuilder(const PushMetricExporterBuilder &)                 = delete;
-  PushMetricExporterBuilder &operator=(PushMetricExporterBuilder &&)           = delete;
-  PushMetricExporterBuilder &operator=(const PushMetricExporterBuilder &other) = delete;
-  ~PushMetricExporterBuilder() override                                        = default;
-
-  void VisitOtlpHttp(
-      const opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *model)
-      override
-  {
-    exporter = sdk_builder_->CreateOtlpHttpPushMetricExporter(model);
-  }
-
-  void VisitOtlpGrpc(
-      const opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *model)
-      override
-  {
-    exporter = sdk_builder_->CreateOtlpGrpcPushMetricExporter(model);
-  }
-
-  void VisitOtlpFile(
-      const opentelemetry::sdk::configuration::OtlpFilePushMetricExporterConfiguration *model)
-      override
-  {
-    exporter = sdk_builder_->CreateOtlpFilePushMetricExporter(model);
-  }
-
-  void VisitConsole(const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration
-                        *model) override
-  {
-    exporter = sdk_builder_->CreateConsolePushMetricExporter(model);
-  }
-
-  void VisitExtension(
-      const opentelemetry::sdk::configuration::ExtensionPushMetricExporterConfiguration *model)
-      override
-  {
-    exporter = sdk_builder_->CreateExtensionPushMetricExporter(model);
-  }
-
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter;
-
-private:
-  const SdkBuilder *sdk_builder_;
-};
-
-class PullMetricExporterBuilder
-    : public opentelemetry::sdk::configuration::PullMetricExporterConfigurationVisitor
-{
-public:
-  PullMetricExporterBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
-  PullMetricExporterBuilder(PullMetricExporterBuilder &&)                      = delete;
-  PullMetricExporterBuilder(const PullMetricExporterBuilder &)                 = delete;
-  PullMetricExporterBuilder &operator=(PullMetricExporterBuilder &&)           = delete;
-  PullMetricExporterBuilder &operator=(const PullMetricExporterBuilder &other) = delete;
-  ~PullMetricExporterBuilder() override                                        = default;
-
-  void VisitPrometheus(
-      const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *model)
-      override
-  {
-    exporter = sdk_builder_->CreatePrometheusPullMetricExporter(model);
-  }
-
-  void VisitExtension(
-      const opentelemetry::sdk::configuration::ExtensionPullMetricExporterConfiguration *model)
-      override
-  {
-    exporter = sdk_builder_->CreateExtensionPullMetricExporter(model);
-  }
-
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> exporter;
-
-private:
-  const SdkBuilder *sdk_builder_;
-};
-
-class AggregationConfigBuilder
-    : public opentelemetry::sdk::configuration::AggregationConfigurationVisitor
-{
-public:
-  AggregationConfigBuilder(const SdkBuilder *b) : sdk_builder_(b) {}
-  AggregationConfigBuilder(AggregationConfigBuilder &&)                      = delete;
-  AggregationConfigBuilder(const AggregationConfigBuilder &)                 = delete;
-  AggregationConfigBuilder &operator=(AggregationConfigBuilder &&)           = delete;
-  AggregationConfigBuilder &operator=(const AggregationConfigBuilder &other) = delete;
-  ~AggregationConfigBuilder() override                                       = default;
-
-  void VisitBase2ExponentialBucketHistogram(
-      const opentelemetry::sdk::configuration::
-          Base2ExponentialBucketHistogramAggregationConfiguration *model) override
-  {
-    aggregation_type   = opentelemetry::sdk::metrics::AggregationType::kBase2ExponentialHistogram;
-    aggregation_config = sdk_builder_->CreateBase2ExponentialBucketHistogramAggregation(model);
-  }
-
-  void VisitDefault(const opentelemetry::sdk::configuration::DefaultAggregationConfiguration
-                        * /* model */) override
-  {
-    aggregation_type = opentelemetry::sdk::metrics::AggregationType::kDefault;
-  }
-
-  void VisitDrop(
-      const opentelemetry::sdk::configuration::DropAggregationConfiguration * /* model */) override
-  {
-    aggregation_type = opentelemetry::sdk::metrics::AggregationType::kDrop;
-  }
-
-  void VisitExplicitBucketHistogram(
-      const opentelemetry::sdk::configuration::ExplicitBucketHistogramAggregationConfiguration
-          *model) override
-  {
-    aggregation_type   = opentelemetry::sdk::metrics::AggregationType::kHistogram;
-    aggregation_config = sdk_builder_->CreateExplicitBucketHistogramAggregation(model);
-  }
-
-  void VisitLastValue(const opentelemetry::sdk::configuration::LastValueAggregationConfiguration
-                          * /* model */) override
-  {
-    aggregation_type = opentelemetry::sdk::metrics::AggregationType::kLastValue;
-  }
-
-  void VisitSum(
-      const opentelemetry::sdk::configuration::SumAggregationConfiguration * /* model */) override
-  {
-    aggregation_type = opentelemetry::sdk::metrics::AggregationType::kSum;
-  }
-
-  opentelemetry::sdk::metrics::AggregationType aggregation_type{
-      opentelemetry::sdk::metrics::AggregationType::kDefault};
-  std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> aggregation_config;
-
-private:
-  const SdkBuilder *sdk_builder_;
-};
 
 class LogRecordProcessorBuilder
     : public opentelemetry::sdk::configuration::LogRecordProcessorConfigurationVisitor
@@ -1673,585 +1413,6 @@ SdkBuilder::CreatePropagator(
   return sdk;
 }
 
-static opentelemetry::sdk::metrics::InstrumentType ConvertInstrumentType(
-    enum opentelemetry::sdk::configuration::InstrumentType config)
-{
-  opentelemetry::sdk::metrics::InstrumentType sdk{
-      opentelemetry::sdk::metrics::InstrumentType::kCounter};
-
-  switch (config)
-  {
-    case opentelemetry::sdk::configuration::InstrumentType::counter:
-      sdk = opentelemetry::sdk::metrics::InstrumentType::kCounter;
-      break;
-    case opentelemetry::sdk::configuration::InstrumentType::gauge:
-      sdk = opentelemetry::sdk::metrics::InstrumentType::kGauge;
-      break;
-    case opentelemetry::sdk::configuration::InstrumentType::histogram:
-      sdk = opentelemetry::sdk::metrics::InstrumentType::kHistogram;
-      break;
-    case opentelemetry::sdk::configuration::InstrumentType::observable_counter:
-      sdk = opentelemetry::sdk::metrics::InstrumentType::kObservableCounter;
-      break;
-    case opentelemetry::sdk::configuration::InstrumentType::observable_gauge:
-      sdk = opentelemetry::sdk::metrics::InstrumentType::kObservableGauge;
-      break;
-    case opentelemetry::sdk::configuration::InstrumentType::observable_up_down_counter:
-      sdk = opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter;
-      break;
-    case opentelemetry::sdk::configuration::InstrumentType::up_down_counter:
-      sdk = opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter;
-      break;
-    case opentelemetry::sdk::configuration::InstrumentType::none:
-    default:
-      sdk = opentelemetry::sdk::metrics::InstrumentType::kCounter;
-      break;
-  }
-
-  return sdk;
-}
-
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-
-static opentelemetry::sdk::metrics::ExemplarFilterType ConvertExemplarFilter(
-    enum opentelemetry::sdk::configuration::ExemplarFilter config)
-{
-  opentelemetry::sdk::metrics::ExemplarFilterType sdk{
-      opentelemetry::sdk::metrics::ExemplarFilterType::kTraceBased};
-
-  switch (config)
-  {
-    case opentelemetry::sdk::configuration::ExemplarFilter::always_on:
-      sdk = opentelemetry::sdk::metrics::ExemplarFilterType::kAlwaysOn;
-      break;
-    case opentelemetry::sdk::configuration::ExemplarFilter::always_off:
-      sdk = opentelemetry::sdk::metrics::ExemplarFilterType::kAlwaysOff;
-      break;
-    case opentelemetry::sdk::configuration::ExemplarFilter::trace_based:
-      sdk = opentelemetry::sdk::metrics::ExemplarFilterType::kTraceBased;
-      break;
-    default:
-      break;
-  }
-
-  return sdk;
-}
-#endif /* ENABLE_METRICS_EXEMPLAR_PREVIEW */
-
-std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
-SdkBuilder::CreateOtlpHttpPushMetricExporter(
-    const opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *model) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
-  const OtlpHttpPushMetricExporterBuilder *builder =
-      registry_->GetOtlpHttpPushMetricExporterBuilder();
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG(
-        "[SDK Builder] CreateOtlpHttpPushMetricExporter() using registered http builder");
-    sdk = builder->Build(model);
-    return sdk;
-  }
-
-  static const std::string die("No http builder for OtlpPushMetricExporter");
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
-SdkBuilder::CreateOtlpGrpcPushMetricExporter(
-    const opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *model) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
-  const OtlpGrpcPushMetricExporterBuilder *builder =
-      registry_->GetOtlpGrpcPushMetricExporterBuilder();
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG(
-        "[SDK Builder] CreateOtlpGrpcPushMetricExporter() using registered grpc builder");
-    sdk = builder->Build(model);
-    return sdk;
-  }
-
-  static const std::string die("No grpc builder for OtlpPushMetricExporter");
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
-SdkBuilder::CreateOtlpFilePushMetricExporter(
-    const opentelemetry::sdk::configuration::OtlpFilePushMetricExporterConfiguration *model) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
-  const OtlpFilePushMetricExporterBuilder *builder =
-      registry_->GetOtlpFilePushMetricExporterBuilder();
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG(
-        "[SDK Builder] CreateOtlpFilePushMetricExporter() using registered file builder");
-    sdk = builder->Build(model);
-    return sdk;
-  }
-
-  static const std::string die("No file builder for OtlpPushMetricExporter");
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
-SdkBuilder::CreateConsolePushMetricExporter(
-    const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration *model) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
-
-  const ConsolePushMetricExporterBuilder *builder =
-      registry_->GetConsolePushMetricExporterBuilder();
-
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG(
-        "[SDK Builder] CreateConsolePushMetricExporter() using registered builder");
-    sdk = builder->Build(model);
-    return sdk;
-  }
-
-  static const std::string die("No builder for ConsolePushMetricExporter");
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
-SdkBuilder::CreateExtensionPushMetricExporter(
-    const opentelemetry::sdk::configuration::ExtensionPushMetricExporterConfiguration *model) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
-  std::string name = model->name;
-
-  const ExtensionPushMetricExporterBuilder *builder =
-      registry_->GetExtensionPushMetricExporterBuilder(name);
-
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG(
-        "[SDK Builder] CreateExtensionPushMetricExporter() using registered builder " << name);
-    sdk = builder->Build(model);
-    return sdk;
-  }
-
-  std::string die("No builder for ExtensionPushMetricExporter ");
-  die.append(name);
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::MetricReader>
-SdkBuilder::CreatePrometheusPullMetricExporter(
-    const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *model) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
-
-  const PrometheusPullMetricExporterBuilder *builder =
-      registry_->GetPrometheusPullMetricExporterBuilder();
-
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG(
-        "[SDK Builder] CreatePrometheusPullMetricExporter() using registered builder");
-    sdk = builder->Build(model);
-    return sdk;
-  }
-
-  static const std::string die("No builder for PrometheusMetricExporter");
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::MetricReader>
-SdkBuilder::CreateExtensionPullMetricExporter(
-    const opentelemetry::sdk::configuration::ExtensionPullMetricExporterConfiguration *model) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
-  std::string name = model->name;
-
-  const ExtensionPullMetricExporterBuilder *builder =
-      registry_->GetExtensionPullMetricExporterBuilder(name);
-
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG(
-        "[SDK Builder] CreateExtensionPullMetricExporter() using registered builder " << name);
-    sdk = builder->Build(model);
-    return sdk;
-  }
-
-  std::string die("No builder for ExtensionPullMetricExporter ");
-  die.append(name);
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
-SdkBuilder::CreatePushMetricExporter(
-    const std::unique_ptr<opentelemetry::sdk::configuration::PushMetricExporterConfiguration>
-        &model) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> sdk;
-
-  PushMetricExporterBuilder builder(this);
-  model->Accept(&builder);
-  sdk = std::move(builder.exporter);
-
-  return sdk;
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePullMetricExporter(
-    const std::unique_ptr<opentelemetry::sdk::configuration::PullMetricExporterConfiguration>
-        &model) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
-
-  PullMetricExporterBuilder builder(this);
-  model->Accept(&builder);
-  sdk = std::move(builder.exporter);
-
-  return sdk;
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePeriodicMetricReader(
-    const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
-
-  auto exporter_sdk = CreatePushMetricExporter(model->exporter);
-
-  if (model->producers.size() > 0)
-  {
-    OTEL_INTERNAL_LOG_WARN("[SDK Builder] metric producer is yet not supported, ignoring");
-  }
-
-  const PeriodicMetricReaderBuilder *builder = registry_->GetPeriodicMetricReaderBuilder();
-
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreatePeriodicMetricReader() using registered builder");
-    sdk = builder->Build(model, std::move(exporter_sdk));
-  }
-  else
-  {
-    static const std::string die("No builder for PeriodicMetricReader");
-    throw UnsupportedException(die);
-  }
-
-  if (model->cardinality_limits != nullptr)
-  {
-    sdk->SetCardinalityLimits(ToCardinalityLimits(*model->cardinality_limits));
-  }
-
-  return sdk;
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreatePullMetricReader(
-    const opentelemetry::sdk::configuration::PullMetricReaderConfiguration *model) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
-
-  sdk = CreatePullMetricExporter(model->exporter);
-
-  if (model->producers.size() > 0)
-  {
-    OTEL_INTERNAL_LOG_WARN("[SDK Builder] metric producer is yet not supported, ignoring");
-  }
-
-  if (model->cardinality_limits != nullptr)
-  {
-    sdk->SetCardinalityLimits(ToCardinalityLimits(*model->cardinality_limits));
-  }
-
-  return sdk;
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> SdkBuilder::CreateMetricReader(
-    const std::unique_ptr<opentelemetry::sdk::configuration::MetricReaderConfiguration> &model)
-    const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> sdk;
-
-  MetricReaderBuilder builder(this);
-  model->Accept(&builder);
-  sdk = std::move(builder.metric_reader);
-
-  return sdk;
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>
-SdkBuilder::CreateBase2ExponentialBucketHistogramAggregation(
-    const opentelemetry::sdk::configuration::Base2ExponentialBucketHistogramAggregationConfiguration
-        *model) const
-{
-  auto sdk =
-      std::make_unique<opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>();
-
-  sdk->max_size_       = model->max_size;
-  sdk->max_scale_      = model->max_scale;
-  sdk->record_min_max_ = model->record_min_max;
-
-  return sdk;
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig>
-SdkBuilder::CreateExplicitBucketHistogramAggregation(
-    const opentelemetry::sdk::configuration::ExplicitBucketHistogramAggregationConfiguration *model)
-    const
-{
-  auto sdk = std::make_unique<opentelemetry::sdk::metrics::HistogramAggregationConfig>();
-
-  sdk->boundaries_     = model->boundaries;
-  sdk->record_min_max_ = model->record_min_max;
-
-  return sdk;
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> SdkBuilder::CreateAggregationConfig(
-    const std::unique_ptr<opentelemetry::sdk::configuration::AggregationConfiguration> &model,
-    opentelemetry::sdk::metrics::AggregationType &aggregation_type) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> sdk;
-
-  AggregationConfigBuilder builder(this);
-  model->Accept(&builder);
-  aggregation_type = builder.aggregation_type;
-  sdk              = std::move(builder.aggregation_config);
-
-  return sdk;
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor>
-SdkBuilder::CreateAttributesProcessor(
-    const std::unique_ptr<opentelemetry::sdk::configuration::IncludeExcludeConfiguration> &model)
-    const
-{
-  using opentelemetry::sdk::metrics::DefaultAttributesProcessor;
-  using opentelemetry::sdk::metrics::IncludeExcludeAttributesProcessor;
-
-  if (model->included == nullptr && model->excluded == nullptr)
-  {
-    return std::make_unique<DefaultAttributesProcessor>();
-  }
-
-  std::vector<std::string> included_patterns;
-  if (model->included != nullptr)
-  {
-    included_patterns = model->included->string_array;
-  }
-
-  std::vector<std::string> excluded_patterns;
-  if (model->excluded != nullptr)
-  {
-    excluded_patterns = model->excluded->string_array;
-  }
-
-  return std::make_unique<IncludeExcludeAttributesProcessor>(
-      included_patterns.empty(), std::move(included_patterns), std::move(excluded_patterns));
-}
-
-void SdkBuilder::AddView(
-    opentelemetry::sdk::metrics::ViewRegistry *view_registry,
-    const std::unique_ptr<opentelemetry::sdk::configuration::ViewConfiguration> &model) const
-{
-  auto *selector = model->selector.get();
-
-  // Synchronous gauge instruments are not supported in ABIv1
-#if OPENTELEMETRY_ABI_VERSION_NO < 2
-  if (selector->instrument_type == opentelemetry::sdk::configuration::InstrumentType::gauge)
-  {
-    std::string die("Runtime does not support instrument_type: gauge with ABI version 1");
-    throw UnsupportedException(die);
-  }
-#endif
-
-  auto add_view = [&](opentelemetry::sdk::metrics::InstrumentType sdk_instrument_type) {
-    // If the instrument name is empty, use "*" to match all instruments of the given type.
-    const std::string instrument_name =
-        selector->instrument_name.empty() ? "*" : selector->instrument_name;
-
-    auto sdk_instrument_selector =
-        std::make_unique<opentelemetry::sdk::metrics::InstrumentSelector>(
-            sdk_instrument_type, instrument_name, selector->unit,
-            opentelemetry::sdk::metrics::PredicateType::kWildcard);
-
-    auto sdk_meter_selector = std::make_unique<opentelemetry::sdk::metrics::MeterSelector>(
-        selector->meter_name, selector->meter_version, selector->meter_schema_url);
-
-    auto *stream = model->stream.get();
-
-    opentelemetry::sdk::metrics::AggregationType sdk_aggregation_type =
-        opentelemetry::sdk::metrics::AggregationType::kDefault;
-
-    std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> sdk_aggregation_config;
-
-    if (stream->aggregation)
-    {
-      sdk_aggregation_config = CreateAggregationConfig(stream->aggregation, sdk_aggregation_type);
-    }
-
-    // Apply aggregation_cardinality_limit from the view stream configuration
-    if (stream->aggregation_cardinality_limit != 0)
-    {
-      if (sdk_aggregation_config)
-      {
-        sdk_aggregation_config->cardinality_limit_ = stream->aggregation_cardinality_limit;
-      }
-      else
-      {
-        // No explicit `aggregation` block was configured, so the view falls back to the
-        // instrument's default aggregation. ViewRegistry::AddView() rejects a view whose
-        // AggregationConfig type does not match the (possibly instrument-derived) aggregation
-        // type, so the config created here must match that same default rather than always
-        // being a plain AggregationConfig (which only satisfies kSum/kLastValue/kDrop).
-        auto effective_aggregation_type = sdk_aggregation_type;
-        if (effective_aggregation_type == opentelemetry::sdk::metrics::AggregationType::kDefault)
-        {
-          bool is_monotonic{false};
-          effective_aggregation_type =
-              opentelemetry::sdk::metrics::DefaultAggregation::GetDefaultAggregationType(
-                  sdk_instrument_type, is_monotonic);
-        }
-
-        switch (effective_aggregation_type)
-        {
-          case opentelemetry::sdk::metrics::AggregationType::kHistogram: {
-            auto histogram_config =
-                std::make_shared<opentelemetry::sdk::metrics::HistogramAggregationConfig>(
-                    stream->aggregation_cardinality_limit);
-            // A default-constructed HistogramAggregationConfig has empty boundaries_, which
-            // LongHistogramAggregation/DoubleHistogramAggregation interpret as "use these zero
-            // boundaries" rather than "no boundaries configured" (that distinction only exists
-            // when the config pointer itself is null). Since this config is synthesized here
-            // rather than coming from an explicit `aggregation` block, it must carry the SDK's
-            // default boundaries to preserve the instrument's default histogram shape.
-            histogram_config->boundaries_ =
-                opentelemetry::sdk::metrics::HistogramAggregationConfig::DefaultBoundaries();
-            sdk_aggregation_config = histogram_config;
-            break;
-          }
-
-          default:
-            sdk_aggregation_config =
-                std::make_shared<opentelemetry::sdk::metrics::AggregationConfig>(
-                    stream->aggregation_cardinality_limit);
-            break;
-        }
-      }
-    }
-
-    std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> sdk_attribute_processor;
-
-    if (stream->attribute_keys != nullptr)
-    {
-      sdk_attribute_processor = CreateAttributesProcessor(stream->attribute_keys);
-    }
-
-    auto sdk_view = std::make_unique<opentelemetry::sdk::metrics::View>(
-        stream->name, stream->description, sdk_aggregation_type, sdk_aggregation_config,
-        std::move(sdk_attribute_processor));
-
-    view_registry->AddView(std::move(sdk_instrument_selector), std::move(sdk_meter_selector),
-                           std::move(sdk_view));
-  };  // add_view
-
-  // If the instrument type is "none", add views to select all instrument types.
-  // FIXME-SDK: register a single view instead. InstrumentSelector must support an optional
-  // instrument type (a "match all types" value honored by ViewRegistry::MatchInstrument).
-  if (selector->instrument_type == opentelemetry::sdk::configuration::InstrumentType::none)
-  {
-    add_view(opentelemetry::sdk::metrics::InstrumentType::kCounter);
-    add_view(opentelemetry::sdk::metrics::InstrumentType::kHistogram);
-    add_view(opentelemetry::sdk::metrics::InstrumentType::kUpDownCounter);
-    add_view(opentelemetry::sdk::metrics::InstrumentType::kObservableCounter);
-    add_view(opentelemetry::sdk::metrics::InstrumentType::kObservableGauge);
-    add_view(opentelemetry::sdk::metrics::InstrumentType::kObservableUpDownCounter);
-#if OPENTELEMETRY_ABI_VERSION_NO >= 2
-    add_view(opentelemetry::sdk::metrics::InstrumentType::kGauge);
-#endif
-  }
-  else
-  {
-    add_view(ConvertInstrumentType(selector->instrument_type));
-  }
-}
-
-std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
-    opentelemetry::sdk::metrics::MeterConfig>>
-SdkBuilder::CreateMeterConfigurator(
-    const std::unique_ptr<MeterConfiguratorConfiguration> &model) const
-{
-  const MeterConfiguratorBuilder *builder = registry_->GetMeterConfiguratorBuilder();
-  if (builder != nullptr)
-  {
-    OTEL_INTERNAL_LOG_DEBUG("[SDK Builder] CreateMeterConfigurator() using registered builder");
-    return builder->Build(model.get());
-  }
-  static const std::string die("No builder for MeterConfigurator");
-  throw UnsupportedException(die);
-}
-
-std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> SdkBuilder::CreateMeterProvider(
-    const std::unique_ptr<opentelemetry::sdk::configuration::MeterProviderConfiguration> &model,
-    const opentelemetry::sdk::resource::Resource &resource) const
-{
-  std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> sdk;
-
-  auto view_registry = opentelemetry::sdk::metrics::ViewRegistryFactory::Create();
-
-  for (const auto &view_configuration : model->views)
-  {
-    AddView(view_registry.get(), view_configuration);
-  }
-
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-  auto sdk_exemplar_filter = ConvertExemplarFilter(model->exemplar_filter);
-#endif
-
-  std::unique_ptr<opentelemetry::sdk::metrics::MeterContext> meter_context;
-  if (model->meter_configurator)
-  {
-    auto meter_configurator = CreateMeterConfigurator(model->meter_configurator);
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    meter_context = opentelemetry::sdk::metrics::MeterContextFactory::Create(
-        std::move(view_registry), resource, std::move(meter_configurator), sdk_exemplar_filter);
-#else
-    meter_context = opentelemetry::sdk::metrics::MeterContextFactory::Create(
-        std::move(view_registry), resource, std::move(meter_configurator));
-#endif
-  }
-  else
-  {
-#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-    auto default_model      = std::make_unique<MeterConfiguratorConfiguration>();
-    auto meter_configurator = CreateMeterConfigurator(default_model);
-    meter_context           = opentelemetry::sdk::metrics::MeterContextFactory::Create(
-        std::move(view_registry), resource, std::move(meter_configurator), sdk_exemplar_filter);
-#else
-    auto default_model      = std::make_unique<MeterConfiguratorConfiguration>();
-    auto meter_configurator = CreateMeterConfigurator(default_model);
-    meter_context           = opentelemetry::sdk::metrics::MeterContextFactory::Create(
-        std::move(view_registry), resource, std::move(meter_configurator));
-#endif
-  }
-
-  for (const auto &reader_configuration : model->readers)
-  {
-    std::shared_ptr<opentelemetry::sdk::metrics::MetricReader> metric_reader;
-    metric_reader = CreateMetricReader(reader_configuration);
-    meter_context->AddMetricReader(metric_reader);
-  }
-
-#ifndef ENABLE_METRICS_EXEMPLAR_PREVIEW
-  /* Do not spam with warnings if disabled anyway. */
-  if (model->exemplar_filter != ExemplarFilter::always_off)
-  {
-    OTEL_INTERNAL_LOG_WARN("ENABLE_METRICS_EXEMPLAR_PREVIEW not set, ignoring exemplar filter");
-  }
-#endif /* ENABLE_METRICS_EXEMPLAR_PREVIEW */
-
-  sdk = opentelemetry::sdk::metrics::MeterProviderFactory::Create(std::move(meter_context));
-
-  return sdk;
-}
-
 std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter>
 SdkBuilder::CreateOtlpHttpLogRecordExporter(
     const opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration *model) const
@@ -2779,7 +1940,19 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
 
     if (model->meter_provider)
     {
-      sdk->meter_provider = CreateMeterProvider(model->meter_provider, sdk->resource);
+      const MeterProviderBuilder *mp_builder = registry_->GetMeterProviderBuilder();
+      if (mp_builder == nullptr)
+      {
+        static const std::string message("No builder for MeterProvider");
+        throw UnsupportedException(message);
+      }
+      MeterProviderBuilderContext mp_context{registry_.get(), &sdk->resource};
+      sdk->meter_provider = mp_builder->Build(mp_context, model->meter_provider.get());
+      if (sdk->meter_provider == nullptr)
+      {
+        static const std::string message("MeterProviderBuilder returned null provider");
+        throw UnsupportedException(message);
+      }
     }
 
     if (model->logger_provider)
