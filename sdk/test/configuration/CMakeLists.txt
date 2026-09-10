@@ -26,7 +26,7 @@ target_link_libraries(
   logs_builders_test
   PRIVATE ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
           opentelemetry_configuration_logs_builders
-          opentelemetry_configuration_core)
+          opentelemetry_configuration_core opentelemetry_test_common)
 gtest_add_tests(
   TARGET logs_builders_test
   TEST_PREFIX config.

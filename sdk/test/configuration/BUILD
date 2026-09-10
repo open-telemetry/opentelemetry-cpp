@@ -123,6 +123,7 @@ cc_test(
         "//sdk:headers",
         "//sdk/src/configuration:configuration_logs_builders",
         "//sdk/src/logs",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )

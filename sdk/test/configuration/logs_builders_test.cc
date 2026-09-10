@@ -14,12 +14,14 @@
 #include "opentelemetry/logs/provider.h"
 #include "opentelemetry/logs/severity.h"
 
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/event_to_span_event_bridge_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_builder.h"
@@ -50,6 +52,7 @@
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/logs/processor.h"
+#include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 
 #include "config_test_logs.h"
 
@@ -237,6 +240,28 @@ TEST_F(LogsBuildersTest, CreateSimpleLogRecordProcessor)
 
   auto result = MakeLogRecordProcessor(std::move(model));
   EXPECT_NE(result, nullptr);
+}
+
+// The event_to_span_event_bridge/development processor has no SDK implementation yet (see
+// https://github.com/open-telemetry/opentelemetry-cpp/issues/4454): SdkBuilder should log a
+// warning and skip it rather than build a processor, so a pipeline like
+// [event_to_span_event_bridge, batch] just runs batch instead of failing or crashing.
+TEST_F(LogsBuildersTest, CreateEventToSpanEventBridgeLogRecordProcessorWarnsAndSkips)
+{
+  opentelemetry::test_common::ScopedTestLogHandler log_handler{
+      opentelemetry::sdk::common::internal_log::LogLevel::Warning};
+
+  std::unique_ptr<config_sdk::LogRecordProcessorConfiguration> model =
+      std::make_unique<config_sdk::EventToSpanEventBridgeLogRecordProcessorConfiguration>();
+
+  auto result = MakeLogRecordProcessor(std::move(model));
+
+  EXPECT_EQ(result, nullptr);
+
+  auto entries = log_handler.Drain();
+  ASSERT_EQ(entries.size(), 1U);
+  EXPECT_EQ(entries[0].level, opentelemetry::sdk::common::internal_log::LogLevel::Warning);
+  EXPECT_NE(entries[0].msg.find("event_to_span_event_bridge"), std::string::npos);
 }
 
 TEST_F(LogsBuildersTest, UnregisteredLoggerConfigurator)

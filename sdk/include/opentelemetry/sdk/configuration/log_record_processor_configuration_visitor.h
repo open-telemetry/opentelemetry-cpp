@@ -13,6 +13,7 @@ namespace configuration
 
 class BatchLogRecordProcessorConfiguration;
 class SimpleLogRecordProcessorConfiguration;
+class EventToSpanEventBridgeLogRecordProcessorConfiguration;
 class ExtensionLogRecordProcessorConfiguration;
 
 class LogRecordProcessorConfigurationVisitor
@@ -27,8 +28,10 @@ public:
       const LogRecordProcessorConfigurationVisitor &other) = default;
   virtual ~LogRecordProcessorConfigurationVisitor()        = default;
 
-  virtual void VisitBatch(const BatchLogRecordProcessorConfiguration *model)         = 0;
-  virtual void VisitSimple(const SimpleLogRecordProcessorConfiguration *model)       = 0;
+  virtual void VisitBatch(const BatchLogRecordProcessorConfiguration *model)   = 0;
+  virtual void VisitSimple(const SimpleLogRecordProcessorConfiguration *model) = 0;
+  virtual void VisitEventToSpanEventBridge(
+      const EventToSpanEventBridgeLogRecordProcessorConfiguration *model)            = 0;
   virtual void VisitExtension(const ExtensionLogRecordProcessorConfiguration *model) = 0;
 };
 
