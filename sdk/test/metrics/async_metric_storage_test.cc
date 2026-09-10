@@ -487,4 +487,158 @@ TEST(AsyncMetricStorageRegressionTest, AttributeReappearanceAfterGapDeltaTempora
       << "After a gap, reappearing attribute must emit the increment since last seen";
 }
 
+// Regression test for the cumulative reappearance scenario.
+//
+// For async cumulative exports, stale attribute sets must be suppressed when absent,
+// but the internal cumulative baseline must still be preserved. If A=10, then absent,
+// then A=30, the reappearance must export 30 (full cumulative), not 20 (increment only).
+TEST(AsyncMetricStorageRegressionTest, AttributeReappearanceAfterGapCumulativeTemporality)
+{
+  InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kObservableCounter,
+                                     InstrumentValueType::kLong};
+
+  auto sdk_start_ts  = std::chrono::system_clock::now();
+  auto collection_ts = sdk_start_ts + std::chrono::seconds(5);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kCumulative));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors;
+  collectors.push_back(collector);
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
+      instr_desc, AggregationType::kSum,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+      nullptr);
+
+  // Collection 1: A=10 -> cumulative export should be 10.
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
+      {{{"attr", "A"}}, 10}};
+  storage.RecordLong(measurements1,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  int64_t cumulative_value = -1;
+  storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
+                  [&](const MetricData &metric_data) {
+                    for (const auto &data_attr : metric_data.point_data_attr_)
+                    {
+                      cumulative_value = opentelemetry::nostd::get<int64_t>(
+                          opentelemetry::nostd::get<SumPointData>(data_attr.point_data).value_);
+                    }
+                    return true;
+                  });
+  EXPECT_EQ(cumulative_value, 10);
+
+  // Collection 2: A absent -> no export for A.
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2;
+  storage.RecordLong(measurements2,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  int attr_count = 0;
+  storage.Collect(collector.get(), collectors, sdk_start_ts,
+                  collection_ts + std::chrono::seconds(5), [&](const MetricData &metric_data) {
+                    attr_count += static_cast<int>(metric_data.point_data_attr_.size());
+                    return true;
+                  });
+  EXPECT_EQ(attr_count, 0) << "No data points expected when attribute set is absent";
+
+  // Collection 3: A=30 -> cumulative export must be 30 (not 20).
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements3 = {
+      {{{"attr", "A"}}, 30}};
+  storage.RecordLong(measurements3,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  cumulative_value = -1;
+  storage.Collect(collector.get(), collectors, sdk_start_ts,
+                  collection_ts + std::chrono::seconds(10), [&](const MetricData &metric_data) {
+                    for (const auto &data_attr : metric_data.point_data_attr_)
+                    {
+                      cumulative_value = opentelemetry::nostd::get<int64_t>(
+                          opentelemetry::nostd::get<SumPointData>(data_attr.point_data).value_);
+                    }
+                    return true;
+                  });
+  EXPECT_EQ(cumulative_value, 30)
+      << "Cumulative reappearance must preserve baseline and export full cumulative value";
+}
+
+// Regression test for the multi-collector delta slow path.
+//
+// With more than one collector, delta temporality no longer short-circuits on the single-collector
+// fast path it goes through the slow path instead. This exercises
+// the delta branch that sets start_ts to the previous collection's timestamp, and verifies both
+// collectors independently receive the increment since their own last collection.
+TEST(AsyncMetricStorageRegressionTest, MultiCollectorDeltaTemporality)
+{
+  InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kObservableCounter,
+                                     InstrumentValueType::kLong};
+
+  auto sdk_start_ts   = std::chrono::system_clock::now();
+  auto collection_ts1 = sdk_start_ts + std::chrono::seconds(5);
+  auto collection_ts2 = sdk_start_ts + std::chrono::seconds(10);
+
+  std::shared_ptr<CollectorHandle> collector1(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::shared_ptr<CollectorHandle> collector2(
+      new MockCollectorHandle(AggregationTemporality::kDelta));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors;
+  collectors.push_back(collector1);
+  collectors.push_back(collector2);
+
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
+      instr_desc, AggregationType::kSum,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+      nullptr);
+
+  auto collect_value = [&](CollectorHandle *collector,
+                           opentelemetry::common::SystemTimestamp collection_ts, int64_t &value_out,
+                           opentelemetry::common::SystemTimestamp &start_ts_out) {
+    storage.Collect(collector, collectors, sdk_start_ts, collection_ts,
+                    [&](const MetricData &metric_data) {
+                      start_ts_out = metric_data.start_ts;
+                      for (const auto &data_attr : metric_data.point_data_attr_)
+                      {
+                        value_out = opentelemetry::nostd::get<int64_t>(
+                            opentelemetry::nostd::get<SumPointData>(data_attr.point_data).value_);
+                      }
+                      return true;
+                    });
+  };
+
+  // Cycle 1: A=10 observed once, both collectors drain the same delta -> each sees 10.
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
+      {{{"attr", "A"}}, 10}};
+  storage.RecordLong(measurements1,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  int64_t c1_value = -1;
+  int64_t c2_value = -1;
+  opentelemetry::common::SystemTimestamp c1_start;
+  opentelemetry::common::SystemTimestamp c2_start;
+  collect_value(collector1.get(), collection_ts1, c1_value, c1_start);
+  collect_value(collector2.get(), collection_ts1, c2_value, c2_start);
+  EXPECT_EQ(c1_value, 10);
+  EXPECT_EQ(c2_value, 10);
+
+  // Cycle 2: A=30 observed once -> delta since last seen is 20 for each collector.
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2 = {
+      {{{"attr", "A"}}, 30}};
+  storage.RecordLong(measurements2,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  c1_value = -1;
+  c2_value = -1;
+  collect_value(collector1.get(), collection_ts2, c1_value, c1_start);
+  collect_value(collector2.get(), collection_ts2, c2_value, c2_start);
+  EXPECT_EQ(c1_value, 20) << "Delta since previous collection must be 30 - 10 = 20";
+  EXPECT_EQ(c2_value, 20) << "Second collector must independently receive the same increment";
+  // The slow-path delta branch sets start_ts to the previous collection's timestamp.
+  EXPECT_EQ(c1_start, opentelemetry::common::SystemTimestamp(collection_ts1))
+      << "Delta start_ts must continue from the previous collection";
+  EXPECT_EQ(c2_start, opentelemetry::common::SystemTimestamp(collection_ts1))
+      << "Delta start_ts must continue from the previous collection";
+}
+
 }  // namespace
