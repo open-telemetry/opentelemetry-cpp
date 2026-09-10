@@ -3,51 +3,39 @@
 
 #pragma once
 
-#include <cstddef>
 #include <memory>
+#include <string>
 
-#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
-#include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
-#include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/container_resource_detector_configuration.h"
-#include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/host_resource_detector_configuration.h"
-#include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/integer_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
+#include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/service_resource_detector_configuration.h"
-#include "opentelemetry/sdk/configuration/string_array_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
+#include "opentelemetry/sdk/configuration/severity_number.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-
 namespace configuration
 {
 
 class SdkBuilder
 {
 public:
-  SdkBuilder(std::shared_ptr<Registry> registry) : registry_(std::move(registry)) {}
-  SdkBuilder(SdkBuilder &&)                      = default;
-  SdkBuilder(const SdkBuilder &)                 = default;
-  SdkBuilder &operator=(SdkBuilder &&)           = default;
-  SdkBuilder &operator=(const SdkBuilder &other) = default;
-  ~SdkBuilder()                                  = default;
+  explicit SdkBuilder(std::shared_ptr<Registry> registry);
 
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreateTextMapPropagator(
       const std::string &name) const;

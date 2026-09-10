@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include "opentelemetry/sdk/configuration/sdk_builder.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <map>
@@ -48,7 +50,6 @@
 #include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_detector_configuration_visitor.h"
-#include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/service_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/service_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
@@ -296,6 +297,8 @@ bool ResourceAttributeKeyMatches(
   return true;
 }
 }  // namespace
+
+SdkBuilder::SdkBuilder(std::shared_ptr<Registry> registry) : registry_(std::move(registry)) {}
 
 std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator>
 SdkBuilder::CreateTextMapPropagator(const std::string &name) const
