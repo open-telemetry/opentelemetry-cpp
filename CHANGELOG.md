@@ -40,6 +40,9 @@ Increment the:
 * [CONFIGURATION] Cleanup build targets and docs
   [#4486](https://github.com/open-telemetry/opentelemetry-cpp/pull/4486)
 
+* [CONFIGURATION] Break the configuration_core dependency on SDK metrics
+  [#4554](https://github.com/open-telemetry/opentelemetry-cpp/pull/4554)
+
 * [BUGFIX] Complete an OTLP HTTP request that its client ends with
   `Destroyed`, `ReadError` or `WriteError`, rather than logging the state
   and leaving the caller waiting
