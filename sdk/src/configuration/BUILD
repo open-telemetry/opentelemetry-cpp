@@ -23,7 +23,6 @@ cc_library(
         "//api",
         "//sdk:headers",
         "//sdk/src/common:wildcard_match",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
         "//sdk/src/trace",
     ],
@@ -58,7 +57,10 @@ cc_library(
 
 cc_library(
     name = "configuration_metrics_builders",
-    srcs = ["metrics_builders.cc"],
+    srcs = [
+        "metrics_builder_utils.cc",
+        "metrics_builders.cc",
+    ],
     include_prefix = "src/configuration",
     deps = [
         ":configuration_core",
