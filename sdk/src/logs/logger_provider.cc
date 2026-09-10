@@ -127,6 +127,15 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
     }
   }
 
+  // GetLogger is noexcept and does not surface an error, so callers cannot
+  // recover after a construction failure. Retrying would re-throw, catch, and
+  // log on later GetLogger calls. After the first failure, treat the provider
+  // as non-functional for new loggers.
+  if (construction_failed_)
+  {
+    return noop_logger_;
+  }
+
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
@@ -141,6 +150,7 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   }
   catch (const std::exception &ex)
   {
+    construction_failed_ = true;
     LogGetLoggerConstructionFailure(ex.what());
     return noop_logger_;
   }
@@ -148,6 +158,7 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   // std::exception. Catch everything so GetLogger stays noexcept.
   catch (...)
   {
+    construction_failed_ = true;
     LogGetLoggerConstructionFailure("unknown exception");
     return noop_logger_;
   }

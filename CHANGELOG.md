@@ -18,7 +18,9 @@ Increment the:
 * [SDK] Allow SDK provider and instrumentation constructors to throw during
   initialization. `GetTracer`, `GetLogger`, and `GetMeter` stay `noexcept` and
   return a pre-allocated noop object if constructing a new instrumentation
-  object fails, without caching the failure.
+  object fails. After the first failure, later uncached `Get*` calls return
+  the same noop immediately without retrying construction. Existing cached
+  objects continue to be returned.
   [#4361](https://github.com/open-telemetry/opentelemetry-cpp/issues/4361)
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)

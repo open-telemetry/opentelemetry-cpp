@@ -146,6 +146,9 @@ private:
   std::mutex lock_;
   // Allocated during provider construction so GetLogger can return it without allocating.
   nostd::shared_ptr<opentelemetry::logs::Logger> noop_logger_;
+  // Set on the first GetLogger construction failure. Later uncached GetLogger
+  // calls return the preallocated noop without retrying construction.
+  bool construction_failed_{false};
 };
 }  // namespace logs
 }  // namespace sdk

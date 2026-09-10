@@ -131,6 +131,15 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     }
   }
 
+  // GetMeter is noexcept and does not surface an error, so callers cannot
+  // recover after a construction failure. Retrying would re-throw, catch, and
+  // log on later GetMeter calls. After the first failure, treat the provider
+  // as non-functional for new meters.
+  if (construction_failed_)
+  {
+    return noop_meter_;
+  }
+
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
@@ -146,6 +155,7 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   }
   catch (const std::exception &ex)
   {
+    construction_failed_ = true;
     LogGetMeterConstructionFailure(ex.what());
     return noop_meter_;
   }
@@ -153,6 +163,7 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   // std::exception. Catch everything so GetMeter stays noexcept.
   catch (...)
   {
+    construction_failed_ = true;
     LogGetMeterConstructionFailure("unknown exception");
     return noop_meter_;
   }

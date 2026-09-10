@@ -682,10 +682,12 @@ TEST(LoggerProviderSDK, ConstructorsAreNotNoexcept)
 TEST(LoggerProviderSDK, GetLoggerReturnsNoopOnConstructionFailure)
 {
   auto should_throw          = std::make_shared<bool>(true);
+  auto construct_attempts    = std::make_shared<int>(0);
   auto throwing_configurator = std::make_unique<scope_sdk::ScopeConfigurator<LoggerConfig>>(
       scope_sdk::ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Default())
           .AddCondition(
-              [should_throw](const scope_sdk::InstrumentationScope &scope) {
+              [should_throw, construct_attempts](const scope_sdk::InstrumentationScope &scope) {
+                ++*construct_attempts;
                 if (scope.GetName() == "throwing-scope" && *should_throw)
                 {
                   throw std::runtime_error("injected logger construction failure");
@@ -705,7 +707,9 @@ TEST(LoggerProviderSDK, GetLoggerReturnsNoopOnConstructionFailure)
 #  ifdef OPENTELEMETRY_RTTI_ENABLED
   ASSERT_NE(dynamic_cast<Logger *>(cached.get()), nullptr);
 #  endif
+  EXPECT_EQ(*construct_attempts, 1);
   EXPECT_EQ(provider.GetLogger("cached-logger", "cached-scope"), cached);
+  EXPECT_EQ(*construct_attempts, 1);
 
   auto failed = provider.GetLogger("throwing-logger", "throwing-scope");
   ASSERT_NE(failed, nullptr);
@@ -713,33 +717,38 @@ TEST(LoggerProviderSDK, GetLoggerReturnsNoopOnConstructionFailure)
   EXPECT_EQ(dynamic_cast<Logger *>(failed.get()), nullptr);
 #  endif
   EXPECT_EQ(failed->GetName(), "noop logger");
+  EXPECT_EQ(*construct_attempts, 2);
   failed->Info("should-not-emit");
   provider.ForceFlush();
   EXPECT_EQ(counting_processor->emit_count(), 0u);
 
   auto failed_again = provider.GetLogger("throwing-logger", "throwing-scope");
   EXPECT_EQ(failed, failed_again);
+  EXPECT_EQ(*construct_attempts, 2);
 
-  *should_throw  = false;
-  auto recovered = provider.GetLogger("throwing-logger", "throwing-scope");
-  ASSERT_NE(recovered, nullptr);
-  EXPECT_NE(recovered, failed);
+  auto other = provider.GetLogger("other-logger", "other-scope");
+  EXPECT_EQ(other, failed);
 #  ifdef OPENTELEMETRY_RTTI_ENABLED
-  EXPECT_NE(dynamic_cast<Logger *>(recovered.get()), nullptr);
+  EXPECT_EQ(dynamic_cast<Logger *>(other.get()), nullptr);
 #  endif
-  recovered->Info("should-emit");
-  provider.ForceFlush();
-  EXPECT_EQ(counting_processor->emit_count(), 1u);
+  EXPECT_EQ(*construct_attempts, 2);
+
+  *should_throw     = false;
+  auto still_failed = provider.GetLogger("throwing-logger", "throwing-scope");
+  EXPECT_EQ(still_failed, failed);
+  EXPECT_EQ(*construct_attempts, 2);
 
   EXPECT_EQ(provider.GetLogger("cached-logger", "cached-scope"), cached);
 }
 
 TEST(LoggerProviderSDK, GetLoggerReturnsNoopOnNonStdConstructionFailure)
 {
+  auto construct_attempts    = std::make_shared<int>(0);
   auto throwing_configurator = std::make_unique<scope_sdk::ScopeConfigurator<LoggerConfig>>(
       scope_sdk::ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Default())
           .AddCondition(
-              [](const scope_sdk::InstrumentationScope &scope) {
+              [construct_attempts](const scope_sdk::InstrumentationScope &scope) {
+                ++*construct_attempts;
                 if (scope.GetName() == "throwing-scope")
                 {
                   throw 1;
@@ -760,8 +769,16 @@ TEST(LoggerProviderSDK, GetLoggerReturnsNoopOnNonStdConstructionFailure)
   EXPECT_EQ(dynamic_cast<Logger *>(failed.get()), nullptr);
 #  endif
   EXPECT_EQ(failed->GetName(), "noop logger");
+  EXPECT_EQ(*construct_attempts, 1);
   failed->Info("should-not-emit");
   provider.ForceFlush();
   EXPECT_EQ(counting_processor->emit_count(), 0u);
+
+  auto failed_again = provider.GetLogger("throwing-logger", "throwing-scope");
+  EXPECT_EQ(failed, failed_again);
+  EXPECT_EQ(*construct_attempts, 1);
+  auto other = provider.GetLogger("other-logger", "other-scope");
+  EXPECT_EQ(other, failed);
+  EXPECT_EQ(*construct_attempts, 1);
 }
 #endif  // OPENTELEMETRY_HAVE_EXCEPTIONS

@@ -154,6 +154,9 @@ private:
   std::mutex lock_;
   // Allocated during provider construction so GetMeter can return it without allocating.
   nostd::shared_ptr<opentelemetry::metrics::Meter> noop_meter_;
+  // Set on the first GetMeter construction failure. Later uncached GetMeter
+  // calls return the preallocated noop without retrying construction.
+  bool construction_failed_{false};
 
 #if defined(__cpp_lib_atomic_value_initialization) && \
     __cpp_lib_atomic_value_initialization >= 201911L

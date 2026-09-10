@@ -157,6 +157,9 @@ private:
   std::mutex lock_;
   // Allocated during provider construction so GetTracer can return it without allocating.
   nostd::shared_ptr<opentelemetry::trace::Tracer> noop_tracer_;
+  // Set on the first GetTracer construction failure. Later uncached GetTracer
+  // calls return the preallocated noop without retrying construction.
+  bool construction_failed_{false};
 };
 }  // namespace trace
 }  // namespace sdk

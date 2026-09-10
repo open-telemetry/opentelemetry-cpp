@@ -533,14 +533,16 @@ TEST(MeterProvider, ConstructorsAreNotNoexcept)
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
 TEST(MeterProvider, GetMeterReturnsNoopOnConstructionFailure)
 {
-  auto should_throw = std::make_shared<bool>(true);
+  auto should_throw       = std::make_shared<bool>(true);
+  auto construct_attempts = std::make_shared<int>(0);
   auto throwing_configurator =
       std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<MeterConfig>>(
           opentelemetry::sdk::instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(
               MeterConfig::Default())
               .AddCondition(
-                  [should_throw](
+                  [should_throw, construct_attempts](
                       const opentelemetry::sdk::instrumentationscope::InstrumentationScope &scope) {
+                    ++*construct_attempts;
                     if (scope.GetName() == "throwing-scope" && *should_throw)
                     {
                       throw std::runtime_error("injected meter construction failure");
@@ -559,42 +561,50 @@ TEST(MeterProvider, GetMeterReturnsNoopOnConstructionFailure)
 #  ifdef OPENTELEMETRY_RTTI_ENABLED
   ASSERT_NE(dynamic_cast<Meter *>(cached.get()), nullptr);
 #  endif
+  EXPECT_EQ(*construct_attempts, 1);
   EXPECT_EQ(provider.GetMeter("cached-scope"), cached);
+  EXPECT_EQ(*construct_attempts, 1);
 
   auto failed = provider.GetMeter("throwing-scope");
   ASSERT_NE(failed, nullptr);
 #  ifdef OPENTELEMETRY_RTTI_ENABLED
   EXPECT_EQ(dynamic_cast<Meter *>(failed.get()), nullptr);
 #  endif
+  EXPECT_EQ(*construct_attempts, 2);
   auto failed_counter = failed->CreateUInt64Counter("requests");
   ASSERT_NE(failed_counter, nullptr);
   failed_counter->Add(1);
 
   auto failed_again = provider.GetMeter("throwing-scope");
   EXPECT_EQ(failed, failed_again);
+  EXPECT_EQ(*construct_attempts, 2);
 
-  *should_throw  = false;
-  auto recovered = provider.GetMeter("throwing-scope");
-  ASSERT_NE(recovered, nullptr);
-  EXPECT_NE(recovered, failed);
+  auto other = provider.GetMeter("other-scope");
+  EXPECT_EQ(other, failed);
 #  ifdef OPENTELEMETRY_RTTI_ENABLED
-  EXPECT_NE(dynamic_cast<Meter *>(recovered.get()), nullptr);
+  EXPECT_EQ(dynamic_cast<Meter *>(other.get()), nullptr);
 #  endif
-  auto recovered_counter = recovered->CreateUInt64Counter("requests");
-  ASSERT_NE(recovered_counter, nullptr);
-  recovered_counter->Add(1);
+  EXPECT_EQ(*construct_attempts, 2);
+
+  *should_throw     = false;
+  auto still_failed = provider.GetMeter("throwing-scope");
+  EXPECT_EQ(still_failed, failed);
+  EXPECT_EQ(*construct_attempts, 2);
 
   EXPECT_EQ(provider.GetMeter("cached-scope"), cached);
 }
 
 TEST(MeterProvider, GetMeterReturnsNoopOnNonStdConstructionFailure)
 {
+  auto construct_attempts = std::make_shared<int>(0);
   auto throwing_configurator =
       std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<MeterConfig>>(
           opentelemetry::sdk::instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(
               MeterConfig::Default())
               .AddCondition(
-                  [](const opentelemetry::sdk::instrumentationscope::InstrumentationScope &scope) {
+                  [construct_attempts](
+                      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &scope) {
+                    ++*construct_attempts;
                     if (scope.GetName() == "throwing-scope")
                     {
                       throw 1;
@@ -613,8 +623,16 @@ TEST(MeterProvider, GetMeterReturnsNoopOnNonStdConstructionFailure)
 #  ifdef OPENTELEMETRY_RTTI_ENABLED
   EXPECT_EQ(dynamic_cast<Meter *>(failed.get()), nullptr);
 #  endif
+  EXPECT_EQ(*construct_attempts, 1);
   auto failed_counter = failed->CreateUInt64Counter("requests");
   ASSERT_NE(failed_counter, nullptr);
   failed_counter->Add(1);
+
+  auto failed_again = provider.GetMeter("throwing-scope");
+  EXPECT_EQ(failed, failed_again);
+  EXPECT_EQ(*construct_attempts, 1);
+  auto other = provider.GetMeter("other-scope");
+  EXPECT_EQ(other, failed);
+  EXPECT_EQ(*construct_attempts, 1);
 }
 #endif  // OPENTELEMETRY_HAVE_EXCEPTIONS

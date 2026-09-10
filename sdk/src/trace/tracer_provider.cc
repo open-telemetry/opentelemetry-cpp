@@ -153,6 +153,15 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
     }
   }
 
+  // GetTracer is noexcept and does not surface an error, so callers cannot
+  // recover after a construction failure. Retrying would re-throw, catch, and
+  // log on hot paths such as GetTracer(...)->StartSpan(...). After the first
+  // failure, treat the provider as non-functional for new tracers.
+  if (construction_failed_)
+  {
+    return noop_tracer_;
+  }
+
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
@@ -168,6 +177,7 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
   }
   catch (const std::exception &ex)
   {
+    construction_failed_ = true;
     LogGetTracerConstructionFailure(ex.what());
     return noop_tracer_;
   }
@@ -175,6 +185,7 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
   // std::exception. Catch everything so GetTracer stays noexcept.
   catch (...)
   {
+    construction_failed_ = true;
     LogGetTracerConstructionFailure("unknown exception");
     return noop_tracer_;
   }
