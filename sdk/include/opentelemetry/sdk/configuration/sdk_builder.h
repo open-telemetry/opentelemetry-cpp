@@ -58,9 +58,6 @@
 #include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
-#include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/logger_config.h"
-#include "opentelemetry/sdk/logs/logger_provider.h"
 #include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_provider.h"
@@ -247,49 +244,6 @@ public:
   std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> CreateMeterProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::MeterProviderConfiguration> &model,
       const opentelemetry::sdk::resource::Resource &resource) const;
-
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CreateOtlpHttpLogRecordExporter(
-      const opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CreateOtlpGrpcLogRecordExporter(
-      const opentelemetry::sdk::configuration::OtlpGrpcLogRecordExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CreateOtlpFileLogRecordExporter(
-      const opentelemetry::sdk::configuration::OtlpFileLogRecordExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CreateConsoleLogRecordExporter(
-      const opentelemetry::sdk::configuration::ConsoleLogRecordExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CreateExtensionLogRecordExporter(
-      const opentelemetry::sdk::configuration::ExtensionLogRecordExporterConfiguration *model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CreateLogRecordExporter(
-      const std::unique_ptr<opentelemetry::sdk::configuration::LogRecordExporterConfiguration>
-          &model) const;
-
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> CreateBatchLogRecordProcessor(
-      const opentelemetry::sdk::configuration::BatchLogRecordProcessorConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> CreateSimpleLogRecordProcessor(
-      const opentelemetry::sdk::configuration::SimpleLogRecordProcessorConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> CreateExtensionLogRecordProcessor(
-      const opentelemetry::sdk::configuration::ExtensionLogRecordProcessorConfiguration *model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor> CreateLogRecordProcessor(
-      const std::unique_ptr<opentelemetry::sdk::configuration::LogRecordProcessorConfiguration>
-          &model) const;
-
-  std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
-      opentelemetry::sdk::logs::LoggerConfig>>
-  CreateLoggerConfigurator(const std::unique_ptr<LoggerConfiguratorConfiguration> &model) const;
-
-  std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> CreateLoggerProvider(
-      const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
-      const opentelemetry::sdk::resource::Resource &resource,
-      const AttributeLimitsConfiguration *attribute_limits = nullptr) const;
 
   std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> CreateContainerResourceDetector(
       const opentelemetry::sdk::configuration::ContainerResourceDetectorConfiguration *model) const;
