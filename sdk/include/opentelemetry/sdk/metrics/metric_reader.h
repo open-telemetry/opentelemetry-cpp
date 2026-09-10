@@ -61,9 +61,8 @@ public:
   /**
    * Set per-instrument-type cardinality limits for this reader.
    *
-   * TODO: Reader-level limits are stored but not yet enforced as a per-collector
-   * fallback during the collection path. Enforcement will be added in a follow-up.
-   * View-level limits (via AggregationConfig) are enforced today.
+   * Enforced as a fallback during the collection path whenever the matching view has no
+   * explicit AggregationConfig cardinality limit of its own (View > Reader > SDK default).
    *
    * @param limits The cardinality limits to apply
    */
