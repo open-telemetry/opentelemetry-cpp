@@ -23,15 +23,14 @@ target_include_directories(
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>"
          "$<INSTALL_INTERFACE:include>")
 
-# TODO: Remove trace, metrics and logs library links from config core. See:
-# https://github.com/open-telemetry/opentelemetry-cpp/issues/4352
 target_link_libraries(
   opentelemetry_configuration_core
   PUBLIC opentelemetry_api opentelemetry_common opentelemetry_resources
-         opentelemetry_trace opentelemetry_metrics opentelemetry_logs)
+         opentelemetry_metrics opentelemetry_logs)
 
 # Trace SDK component builders
-add_library(opentelemetry_configuration_trace_builders trace_builders.cc)
+add_library(opentelemetry_configuration_trace_builders trace_builder_utils.cc
+                                                       trace_builders.cc)
 
 set_target_properties(opentelemetry_configuration_trace_builders
                       PROPERTIES EXPORT_NAME configuration_trace_builders)
@@ -93,9 +92,9 @@ target_include_directories(
 target_link_libraries(
   opentelemetry_configuration_registry_factory
   PUBLIC opentelemetry_configuration_core
-  PRIVATE opentelemetry_configuration_trace_builders
-          opentelemetry_configuration_metrics_builders
-          opentelemetry_configuration_logs_builders)
+         opentelemetry_configuration_trace_builders
+         opentelemetry_configuration_metrics_builders
+         opentelemetry_configuration_logs_builders)
 
 if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(

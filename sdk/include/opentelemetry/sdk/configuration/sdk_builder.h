@@ -66,26 +66,15 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/sampler.h"
-#include "opentelemetry/sdk/trace/tracer_config.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace trace
-{
-class ComposableSampler;
-}  // namespace trace
 
 namespace configuration
 {
-
-class ComposableSamplerConfiguration;
 
 class SdkBuilder
 {
@@ -96,74 +85,6 @@ public:
   SdkBuilder &operator=(SdkBuilder &&)           = default;
   SdkBuilder &operator=(const SdkBuilder &other) = default;
   ~SdkBuilder()                                  = default;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateAlwaysOffSampler(
-      const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateAlwaysOnSampler(
-      const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateJaegerRemoteSampler(
-      const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateParentBasedSampler(
-      const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateProbabilitySampler(
-      const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateTraceIdRatioBasedSampler(
-      const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateExtensionSampler(
-      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateSampler(
-      const std::unique_ptr<opentelemetry::sdk::configuration::SamplerConfiguration> &model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateCompositeSampler(
-      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpHttpSpanExporter(
-      const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpGrpcSpanExporter(
-      const opentelemetry::sdk::configuration::OtlpGrpcSpanExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpFileSpanExporter(
-      const opentelemetry::sdk::configuration::OtlpFileSpanExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateConsoleSpanExporter(
-      const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateExtensionSpanExporter(
-      const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateSpanExporter(
-      const std::unique_ptr<opentelemetry::sdk::configuration::SpanExporterConfiguration> &model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateBatchSpanProcessor(
-      const opentelemetry::sdk::configuration::BatchSpanProcessorConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateSimpleSpanProcessor(
-      const opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateExtensionSpanProcessor(
-      const opentelemetry::sdk::configuration::ExtensionSpanProcessorConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateSpanProcessor(
-      const std::unique_ptr<opentelemetry::sdk::configuration::SpanProcessorConfiguration> &model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
-      opentelemetry::sdk::trace::TracerConfig>>
-  CreateTracerConfigurator(const std::unique_ptr<TracerConfiguratorConfiguration> &model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> CreateTracerProvider(
-      const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
-      const opentelemetry::sdk::resource::Resource &resource,
-      const AttributeLimitsConfiguration *attribute_limits = nullptr) const;
 
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreateTextMapPropagator(
       const std::string &name) const;

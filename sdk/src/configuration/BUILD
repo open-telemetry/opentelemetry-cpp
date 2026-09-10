@@ -26,13 +26,15 @@ cc_library(
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/resource",
-        "//sdk/src/trace",
     ],
 )
 
 cc_library(
     name = "configuration_trace_builders",
-    srcs = ["trace_builders.cc"],
+    srcs = [
+        "trace_builder_utils.cc",
+        "trace_builders.cc",
+    ],
     include_prefix = "src/configuration",
     deps = [
         ":configuration_core",
