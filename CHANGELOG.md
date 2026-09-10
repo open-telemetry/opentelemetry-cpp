@@ -40,6 +40,11 @@ Increment the:
 * [CONFIGURATION] Cleanup build targets and docs
   [#4486](https://github.com/open-telemetry/opentelemetry-cpp/pull/4486)
 
+* [BUGFIX] Complete an OTLP HTTP request that its client ends with
+  `Destroyed`, `ReadError` or `WriteError`, rather than logging the state
+  and leaving the caller waiting
+  [#4425](https://github.com/open-telemetry/opentelemetry-cpp/issues/4425)
+
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
   and merge the resource per the resource SDK specification.
@@ -48,6 +53,10 @@ Increment the:
     longer injects a default `service.name`, since neither is part of the
     configuration model. Use the `service` detector or set the attributes in
     the configuration file instead.
+
+* [CONFIGURATION/BUILD] Break up OTLP builder utils into gRPC and HTTP utils
+  [#4533](https://github.com/open-telemetry/opentelemetry-cpp/pull/4533)
+
 * [CONFIGURATION] Add a resource detector extension example
   [#4419](https://github.com/open-telemetry/opentelemetry-cpp/issues/4419)
 
