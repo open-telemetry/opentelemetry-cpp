@@ -30,6 +30,30 @@ namespace exporter
 namespace otlp
 {
 
+static constexpr char kEnvOtlpEndpoint[]          = "OTEL_EXPORTER_OTLP_ENDPOINT";
+static constexpr char kEnvOtlpInsecure[]          = "OTEL_EXPORTER_OTLP_INSECURE";
+static constexpr char kEnvOtlpSslEnable[]         = "OTEL_EXPORTER_OTLP_SSL_ENABLE";
+static constexpr char kEnvOtlpCertificate[]       = "OTEL_EXPORTER_OTLP_CERTIFICATE";
+static constexpr char kEnvOtlpCertificateString[] = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING";
+static constexpr char kEnvOtlpClientKey[]         = "OTEL_EXPORTER_OTLP_CLIENT_KEY";
+static constexpr char kEnvOtlpClientKeyString[]   = "OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING";
+static constexpr char kEnvOtlpClientCertificate[] = "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE";
+static constexpr char kEnvOtlpClientCertificateString[] =
+    "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING";
+static constexpr char kEnvOtlpTimeout[]          = "OTEL_EXPORTER_OTLP_TIMEOUT";
+static constexpr char kEnvOtlpHeaders[]          = "OTEL_EXPORTER_OTLP_HEADERS";
+static constexpr char kEnvOtlpCompression[]      = "OTEL_EXPORTER_OTLP_COMPRESSION";
+static constexpr char kEnvOtlpRetryMaxAttempts[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS";
+static constexpr char kEnvOtlpRetryInitialBackoff[] =
+    "OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF";
+static constexpr char kEnvOtlpRetryMaxBackoff[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF";
+static constexpr char kEnvOtlpRetryBackoffMultiplier[] =
+    "OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER";
+static constexpr char kEnvOtlpMinTls[]      = "OTEL_CPP_EXPORTER_OTLP_MIN_TLS";
+static constexpr char kEnvOtlpMaxTls[]      = "OTEL_CPP_EXPORTER_OTLP_MAX_TLS";
+static constexpr char kEnvOtlpCipher[]      = "OTEL_CPP_EXPORTER_OTLP_CIPHER";
+static constexpr char kEnvOtlpCipherSuite[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER_SUITE";
+
 static bool GetBoolDualEnvVar(const char *signal_name, const char *generic_name, bool &value)
 {
   bool exists{};
@@ -113,14 +137,13 @@ static bool GetFloatDualEnvVar(const char *signal_name, const char *generic_name
 
 std::string GetOtlpDefaultGrpcTracesEndpoint()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_ENDPOINT";
-  constexpr char kDefault[]    = "http://localhost:4317";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT";
+  constexpr char kDefault[]   = "http://localhost:4317";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpEndpoint, value);
 
   if (exists)
   {
@@ -132,14 +155,13 @@ std::string GetOtlpDefaultGrpcTracesEndpoint()
 
 std::string GetOtlpDefaultGrpcMetricsEndpoint()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_ENDPOINT";
-  constexpr char kDefault[]    = "http://localhost:4317";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT";
+  constexpr char kDefault[]   = "http://localhost:4317";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpEndpoint, value);
 
   if (exists)
   {
@@ -151,14 +173,13 @@ std::string GetOtlpDefaultGrpcMetricsEndpoint()
 
 std::string GetOtlpDefaultGrpcLogsEndpoint()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_ENDPOINT";
-  constexpr char kDefault[]    = "http://localhost:4317";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT";
+  constexpr char kDefault[]   = "http://localhost:4317";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpEndpoint, value);
 
   if (exists)
   {
@@ -170,9 +191,8 @@ std::string GetOtlpDefaultGrpcLogsEndpoint()
 
 std::string GetOtlpDefaultHttpTracesEndpoint()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_ENDPOINT";
-  constexpr char kDefault[]    = "http://localhost:4318/v1/traces";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT";
+  constexpr char kDefault[]   = "http://localhost:4318/v1/traces";
 
   std::string value;
   bool exists{};
@@ -183,7 +203,7 @@ std::string GetOtlpDefaultHttpTracesEndpoint()
     return value;
   }
 
-  exists = sdk_common::GetStringEnvironmentVariable(kGenericEnv, value);
+  exists = sdk_common::GetStringEnvironmentVariable(kEnvOtlpEndpoint, value);
   if (exists)
   {
     value += "/v1/traces";
@@ -195,9 +215,8 @@ std::string GetOtlpDefaultHttpTracesEndpoint()
 
 std::string GetOtlpDefaultHttpMetricsEndpoint()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_ENDPOINT";
-  constexpr char kDefault[]    = "http://localhost:4318/v1/metrics";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT";
+  constexpr char kDefault[]   = "http://localhost:4318/v1/metrics";
 
   std::string value;
   bool exists{};
@@ -208,7 +227,7 @@ std::string GetOtlpDefaultHttpMetricsEndpoint()
     return value;
   }
 
-  exists = sdk_common::GetStringEnvironmentVariable(kGenericEnv, value);
+  exists = sdk_common::GetStringEnvironmentVariable(kEnvOtlpEndpoint, value);
   if (exists)
   {
     value += "/v1/metrics";
@@ -220,9 +239,8 @@ std::string GetOtlpDefaultHttpMetricsEndpoint()
 
 std::string GetOtlpDefaultHttpLogsEndpoint()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_ENDPOINT";
-  constexpr char kDefault[]    = "http://localhost:4318/v1/logs";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT";
+  constexpr char kDefault[]   = "http://localhost:4318/v1/logs";
 
   std::string value;
   bool exists{};
@@ -233,7 +251,7 @@ std::string GetOtlpDefaultHttpLogsEndpoint()
     return value;
   }
 
-  exists = sdk_common::GetStringEnvironmentVariable(kGenericEnv, value);
+  exists = sdk_common::GetStringEnvironmentVariable(kEnvOtlpEndpoint, value);
   if (exists)
   {
     value += "/v1/logs";
@@ -321,7 +339,7 @@ bool GetOtlpDefaultGrpcTracesIsInsecure()
 
   /* The trace endpoint, when providing a scheme, takes precedence. */
 
-  if (endpoint.substr(0, 6) == "https:")
+  if (opentelemetry::nostd::string_view(endpoint).substr(0, 6) == "https:")
   {
     return false;
   }
@@ -331,16 +349,14 @@ bool GetOtlpDefaultGrpcTracesIsInsecure()
     return true;
   }
 
-  constexpr char kSignalEnv[]     = "OTEL_EXPORTER_OTLP_TRACES_INSECURE";
-  constexpr char kGenericEnv[]    = "OTEL_EXPORTER_OTLP_INSECURE";
-  constexpr char kOldSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE";
-  constexpr char kOldGenericEnv[] = "OTEL_EXPORTER_OTLP_SSL_ENABLE";
+  constexpr char kSignalEnv[]    = "OTEL_EXPORTER_OTLP_TRACES_INSECURE";
+  constexpr char kOldSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE";
 
   bool insecure{};
   bool ssl_enabled{};
   bool exists{};
 
-  exists = GetBoolDualEnvVar(kSignalEnv, kGenericEnv, insecure);
+  exists = GetBoolDualEnvVar(kSignalEnv, kEnvOtlpInsecure, insecure);
   if (exists)
   {
     return insecure;
@@ -358,12 +374,12 @@ bool GetOtlpDefaultGrpcTracesIsInsecure()
     return insecure;
   }
 
-  exists = sdk_common::GetBoolEnvironmentVariable(kOldGenericEnv, ssl_enabled);
+  exists = sdk_common::GetBoolEnvironmentVariable(kEnvOtlpSslEnable, ssl_enabled);
   if (exists)
   {
 #ifdef WARN_DEPRECATED_ENV
-    OTEL_INTERNAL_LOG_WARN("Environment variable <" << kOldGenericEnv << "> is deprecated, use <"
-                                                    << kGenericEnv << "> instead.");
+    OTEL_INTERNAL_LOG_WARN("Environment variable <" << kEnvOtlpSslEnable << "> is deprecated, use <"
+                                                    << kEnvOtlpInsecure << "> instead.");
 #endif
 
     insecure = !ssl_enabled;
@@ -379,7 +395,7 @@ bool GetOtlpDefaultGrpcMetricsIsInsecure()
 
   /* The metrics endpoint, when providing a scheme, takes precedence. */
 
-  if (endpoint.substr(0, 6) == "https:")
+  if (opentelemetry::nostd::string_view(endpoint).substr(0, 6) == "https:")
   {
     return false;
   }
@@ -389,16 +405,14 @@ bool GetOtlpDefaultGrpcMetricsIsInsecure()
     return true;
   }
 
-  constexpr char kSignalEnv[]     = "OTEL_EXPORTER_OTLP_METRICS_INSECURE";
-  constexpr char kGenericEnv[]    = "OTEL_EXPORTER_OTLP_INSECURE";
-  constexpr char kOldSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_SSL_ENABLE";
-  constexpr char kOldGenericEnv[] = "OTEL_EXPORTER_OTLP_SSL_ENABLE";
+  constexpr char kSignalEnv[]    = "OTEL_EXPORTER_OTLP_METRICS_INSECURE";
+  constexpr char kOldSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_SSL_ENABLE";
 
   bool insecure{};
   bool ssl_enabled{};
   bool exists{};
 
-  exists = GetBoolDualEnvVar(kSignalEnv, kGenericEnv, insecure);
+  exists = GetBoolDualEnvVar(kSignalEnv, kEnvOtlpInsecure, insecure);
   if (exists)
   {
     return insecure;
@@ -416,12 +430,12 @@ bool GetOtlpDefaultGrpcMetricsIsInsecure()
     return insecure;
   }
 
-  exists = sdk_common::GetBoolEnvironmentVariable(kOldGenericEnv, ssl_enabled);
+  exists = sdk_common::GetBoolEnvironmentVariable(kEnvOtlpSslEnable, ssl_enabled);
   if (exists)
   {
 #ifdef WARN_DEPRECATED_ENV
-    OTEL_INTERNAL_LOG_WARN("Environment variable <" << kOldGenericEnv << "> is deprecated, use <"
-                                                    << kGenericEnv << "> instead.");
+    OTEL_INTERNAL_LOG_WARN("Environment variable <" << kEnvOtlpSslEnable << "> is deprecated, use <"
+                                                    << kEnvOtlpInsecure << "> instead.");
 #endif
 
     insecure = !ssl_enabled;
@@ -437,7 +451,7 @@ bool GetOtlpDefaultGrpcLogsIsInsecure()
 
   /* The logs endpoint, when providing a scheme, takes precedence. */
 
-  if (endpoint.substr(0, 6) == "https:")
+  if (opentelemetry::nostd::string_view(endpoint).substr(0, 6) == "https:")
   {
     return false;
   }
@@ -447,13 +461,12 @@ bool GetOtlpDefaultGrpcLogsIsInsecure()
     return true;
   }
 
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_INSECURE";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_INSECURE";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_INSECURE";
 
   bool insecure{};
   bool exists{};
 
-  exists = GetBoolDualEnvVar(kSignalEnv, kGenericEnv, insecure);
+  exists = GetBoolDualEnvVar(kSignalEnv, kEnvOtlpInsecure, insecure);
   if (exists)
   {
     return insecure;
@@ -464,13 +477,12 @@ bool GetOtlpDefaultGrpcLogsIsInsecure()
 
 std::string GetOtlpDefaultTracesSslCertificatePath()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CERTIFICATE";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCertificate, value);
   if (exists)
   {
     return value;
@@ -481,13 +493,12 @@ std::string GetOtlpDefaultTracesSslCertificatePath()
 
 std::string GetOtlpDefaultMetricsSslCertificatePath()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CERTIFICATE";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCertificate, value);
   if (exists)
   {
     return value;
@@ -498,13 +509,12 @@ std::string GetOtlpDefaultMetricsSslCertificatePath()
 
 std::string GetOtlpDefaultLogsSslCertificatePath()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CERTIFICATE";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCertificate, value);
   if (exists)
   {
     return value;
@@ -515,13 +525,12 @@ std::string GetOtlpDefaultLogsSslCertificatePath()
 
 std::string GetOtlpDefaultTracesSslCertificateString()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCertificateString, value);
   if (exists)
   {
     return value;
@@ -532,13 +541,12 @@ std::string GetOtlpDefaultTracesSslCertificateString()
 
 std::string GetOtlpDefaultMetricsSslCertificateString()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE_STRING";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_CERTIFICATE_STRING";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCertificateString, value);
   if (exists)
   {
     return value;
@@ -549,13 +557,12 @@ std::string GetOtlpDefaultMetricsSslCertificateString()
 
 std::string GetOtlpDefaultLogsSslCertificateString()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE_STRING";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CERTIFICATE_STRING";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE_STRING";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCertificateString, value);
   if (exists)
   {
     return value;
@@ -566,13 +573,12 @@ std::string GetOtlpDefaultLogsSslCertificateString()
 
 std::string GetOtlpDefaultTracesSslClientKeyPath()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CLIENT_KEY";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpClientKey, value);
   if (exists)
   {
     return value;
@@ -583,13 +589,12 @@ std::string GetOtlpDefaultTracesSslClientKeyPath()
 
 std::string GetOtlpDefaultMetricsSslClientKeyPath()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CLIENT_KEY";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpClientKey, value);
   if (exists)
   {
     return value;
@@ -600,13 +605,12 @@ std::string GetOtlpDefaultMetricsSslClientKeyPath()
 
 std::string GetOtlpDefaultLogsSslClientKeyPath()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CLIENT_KEY";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpClientKey, value);
   if (exists)
   {
     return value;
@@ -617,13 +621,12 @@ std::string GetOtlpDefaultLogsSslClientKeyPath()
 
 std::string GetOtlpDefaultTracesSslClientKeyString()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY_STRING";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY_STRING";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpClientKeyString, value);
   if (exists)
   {
     return value;
@@ -634,13 +637,12 @@ std::string GetOtlpDefaultTracesSslClientKeyString()
 
 std::string GetOtlpDefaultMetricsSslClientKeyString()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY_STRING";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_CLIENT_KEY_STRING";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpClientKeyString, value);
   if (exists)
   {
     return value;
@@ -651,13 +653,12 @@ std::string GetOtlpDefaultMetricsSslClientKeyString()
 
 std::string GetOtlpDefaultLogsSslClientKeyString()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY_STRING";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CLIENT_KEY_STRING";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY_STRING";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpClientKeyString, value);
   if (exists)
   {
     return value;
@@ -668,13 +669,12 @@ std::string GetOtlpDefaultLogsSslClientKeyString()
 
 std::string GetOtlpDefaultTracesSslClientCertificatePath()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpClientCertificate, value);
   if (exists)
   {
     return value;
@@ -685,13 +685,12 @@ std::string GetOtlpDefaultTracesSslClientCertificatePath()
 
 std::string GetOtlpDefaultMetricsSslClientCertificatePath()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpClientCertificate, value);
   if (exists)
   {
     return value;
@@ -702,13 +701,12 @@ std::string GetOtlpDefaultMetricsSslClientCertificatePath()
 
 std::string GetOtlpDefaultLogsSslClientCertificatePath()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpClientCertificate, value);
   if (exists)
   {
     return value;
@@ -719,13 +717,12 @@ std::string GetOtlpDefaultLogsSslClientCertificatePath()
 
 std::string GetOtlpDefaultTracesSslClientCertificateString()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE_STRING";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE_STRING";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpClientCertificateString, value);
   if (exists)
   {
     return value;
@@ -736,13 +733,12 @@ std::string GetOtlpDefaultTracesSslClientCertificateString()
 
 std::string GetOtlpDefaultMetricsSslClientCertificateString()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE_STRING";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE_STRING";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpClientCertificateString, value);
   if (exists)
   {
     return value;
@@ -753,13 +749,12 @@ std::string GetOtlpDefaultMetricsSslClientCertificateString()
 
 std::string GetOtlpDefaultLogsSslClientCertificateString()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE_STRING";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE_STRING";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE_STRING";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpClientCertificateString, value);
   if (exists)
   {
     return value;
@@ -776,13 +771,12 @@ std::string GetOtlpDefaultLogsSslClientCertificateString()
 
 std::string GetOtlpDefaultTracesSslTlsMinVersion()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_TRACES_MIN_TLS";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_MIN_TLS";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_TRACES_MIN_TLS";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpMinTls, value);
   if (exists)
   {
     return value;
@@ -793,13 +787,12 @@ std::string GetOtlpDefaultTracesSslTlsMinVersion()
 
 std::string GetOtlpDefaultMetricsSslTlsMinVersion()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_METRICS_MIN_TLS";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_MIN_TLS";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_METRICS_MIN_TLS";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpMinTls, value);
   if (exists)
   {
     return value;
@@ -810,13 +803,12 @@ std::string GetOtlpDefaultMetricsSslTlsMinVersion()
 
 std::string GetOtlpDefaultLogsSslTlsMinVersion()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_LOGS_MIN_TLS";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_MIN_TLS";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_LOGS_MIN_TLS";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpMinTls, value);
   if (exists)
   {
     return value;
@@ -827,13 +819,12 @@ std::string GetOtlpDefaultLogsSslTlsMinVersion()
 
 std::string GetOtlpDefaultTracesSslTlsMaxVersion()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_TRACES_MAX_TLS";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_MAX_TLS";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_TRACES_MAX_TLS";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpMaxTls, value);
   if (exists)
   {
     return value;
@@ -844,13 +835,12 @@ std::string GetOtlpDefaultTracesSslTlsMaxVersion()
 
 std::string GetOtlpDefaultMetricsSslTlsMaxVersion()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_METRICS_MAX_TLS";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_MAX_TLS";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_METRICS_MAX_TLS";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpMaxTls, value);
   if (exists)
   {
     return value;
@@ -861,13 +851,12 @@ std::string GetOtlpDefaultMetricsSslTlsMaxVersion()
 
 std::string GetOtlpDefaultLogsSslTlsMaxVersion()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_LOGS_MAX_TLS";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_MAX_TLS";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_LOGS_MAX_TLS";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpMaxTls, value);
   if (exists)
   {
     return value;
@@ -878,13 +867,12 @@ std::string GetOtlpDefaultLogsSslTlsMaxVersion()
 
 std::string GetOtlpDefaultTracesSslTlsCipher()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_TRACES_CIPHER";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_TRACES_CIPHER";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCipher, value);
   if (exists)
   {
     return value;
@@ -895,13 +883,12 @@ std::string GetOtlpDefaultTracesSslTlsCipher()
 
 std::string GetOtlpDefaultMetricsSslTlsCipher()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_METRICS_CIPHER";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_METRICS_CIPHER";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCipher, value);
   if (exists)
   {
     return value;
@@ -912,13 +899,12 @@ std::string GetOtlpDefaultMetricsSslTlsCipher()
 
 std::string GetOtlpDefaultLogsSslTlsCipher()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_LOGS_CIPHER";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_LOGS_CIPHER";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCipher, value);
   if (exists)
   {
     return value;
@@ -929,13 +915,12 @@ std::string GetOtlpDefaultLogsSslTlsCipher()
 
 std::string GetOtlpDefaultTracesSslTlsCipherSuite()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_TRACES_CIPHER_SUITE";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER_SUITE";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_TRACES_CIPHER_SUITE";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCipherSuite, value);
   if (exists)
   {
     return value;
@@ -946,13 +931,12 @@ std::string GetOtlpDefaultTracesSslTlsCipherSuite()
 
 std::string GetOtlpDefaultMetricsSslTlsCipherSuite()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_METRICS_CIPHER_SUITE";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER_SUITE";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_METRICS_CIPHER_SUITE";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCipherSuite, value);
   if (exists)
   {
     return value;
@@ -963,13 +947,12 @@ std::string GetOtlpDefaultMetricsSslTlsCipherSuite()
 
 std::string GetOtlpDefaultLogsSslTlsCipherSuite()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_LOGS_CIPHER_SUITE";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_CIPHER_SUITE";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_LOGS_CIPHER_SUITE";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCipherSuite, value);
   if (exists)
   {
     return value;
@@ -980,13 +963,12 @@ std::string GetOtlpDefaultLogsSslTlsCipherSuite()
 
 std::chrono::system_clock::duration GetOtlpDefaultTracesTimeout()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_TIMEOUT";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_TIMEOUT";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_TIMEOUT";
 
   std::chrono::system_clock::duration value;
   bool exists{};
 
-  exists = GetDurationDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetDurationDualEnvVar(kSignalEnv, kEnvOtlpTimeout, value);
   if (exists)
   {
     return value;
@@ -998,13 +980,12 @@ std::chrono::system_clock::duration GetOtlpDefaultTracesTimeout()
 
 std::chrono::system_clock::duration GetOtlpDefaultMetricsTimeout()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_TIMEOUT";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_TIMEOUT";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_TIMEOUT";
 
   std::chrono::system_clock::duration value;
   bool exists{};
 
-  exists = GetDurationDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetDurationDualEnvVar(kSignalEnv, kEnvOtlpTimeout, value);
   if (exists)
   {
     return value;
@@ -1016,13 +997,12 @@ std::chrono::system_clock::duration GetOtlpDefaultMetricsTimeout()
 
 std::chrono::system_clock::duration GetOtlpDefaultLogsTimeout()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_TIMEOUT";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_TIMEOUT";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_TIMEOUT";
 
   std::chrono::system_clock::duration value;
   bool exists{};
 
-  exists = GetDurationDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetDurationDualEnvVar(kSignalEnv, kEnvOtlpTimeout, value);
   if (exists)
   {
     return value;
@@ -1032,7 +1012,25 @@ std::chrono::system_clock::duration GetOtlpDefaultLogsTimeout()
   return value;
 }
 
-static void DumpOtlpHeaders(OtlpHeaders &output, const char *env_var_name)
+bool GetOtlpDefaultTracesTimeoutOverride(std::chrono::system_clock::duration &value)
+{
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_TIMEOUT";
+  return sdk_common::GetDurationEnvironmentVariable(kSignalEnv, value);
+}
+
+bool GetOtlpDefaultMetricsTimeoutOverride(std::chrono::system_clock::duration &value)
+{
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_TIMEOUT";
+  return sdk_common::GetDurationEnvironmentVariable(kSignalEnv, value);
+}
+
+bool GetOtlpDefaultLogsTimeoutOverride(std::chrono::system_clock::duration &value)
+{
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_TIMEOUT";
+  return sdk_common::GetDurationEnvironmentVariable(kSignalEnv, value);
+}
+
+void DumpOtlpHeaders(OtlpHeaders &output, const char *env_var_name)
 {
   std::string raw_value;
   bool exists{};
@@ -1083,37 +1081,33 @@ static OtlpHeaders GetHeaders(const char *signal_name, const char *generic_name)
 
 OtlpHeaders GetOtlpDefaultTracesHeaders()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_HEADERS";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_HEADERS";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_HEADERS";
 
-  return GetHeaders(kSignalEnv, kGenericEnv);
+  return GetHeaders(kSignalEnv, kEnvOtlpHeaders);
 }
 
 OtlpHeaders GetOtlpDefaultMetricsHeaders()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_HEADERS";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_HEADERS";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_HEADERS";
 
-  return GetHeaders(kSignalEnv, kGenericEnv);
+  return GetHeaders(kSignalEnv, kEnvOtlpHeaders);
 }
 
 OtlpHeaders GetOtlpDefaultLogsHeaders()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_HEADERS";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_HEADERS";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_HEADERS";
 
-  return GetHeaders(kSignalEnv, kGenericEnv);
+  return GetHeaders(kSignalEnv, kEnvOtlpHeaders);
 }
 
 std::string GetOtlpDefaultTracesCompression()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_TRACES_COMPRESSION";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_COMPRESSION";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_TRACES_COMPRESSION";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCompression, value);
   if (exists)
   {
     return value;
@@ -1124,13 +1118,12 @@ std::string GetOtlpDefaultTracesCompression()
 
 std::string GetOtlpDefaultMetricsCompression()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_METRICS_COMPRESSION";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_COMPRESSION";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_METRICS_COMPRESSION";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCompression, value);
   if (exists)
   {
     return value;
@@ -1141,13 +1134,12 @@ std::string GetOtlpDefaultMetricsCompression()
 
 std::string GetOtlpDefaultLogsCompression()
 {
-  constexpr char kSignalEnv[]  = "OTEL_EXPORTER_OTLP_LOGS_COMPRESSION";
-  constexpr char kGenericEnv[] = "OTEL_EXPORTER_OTLP_COMPRESSION";
+  constexpr char kSignalEnv[] = "OTEL_EXPORTER_OTLP_LOGS_COMPRESSION";
 
   std::string value;
   bool exists{};
 
-  exists = GetStringDualEnvVar(kSignalEnv, kGenericEnv, value);
+  exists = GetStringDualEnvVar(kSignalEnv, kEnvOtlpCompression, value);
   if (exists)
   {
     return value;
@@ -1158,11 +1150,10 @@ std::string GetOtlpDefaultLogsCompression()
 
 std::uint32_t GetOtlpDefaultTracesRetryMaxAttempts()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_ATTEMPTS";
   std::uint32_t value{};
 
-  if (GetUintDualEnvVar(kSignalEnv, kGenericEnv, value))
+  if (GetUintDualEnvVar(kSignalEnv, kEnvOtlpRetryMaxAttempts, value))
   {
     return value;
   }
@@ -1172,11 +1163,10 @@ std::uint32_t GetOtlpDefaultTracesRetryMaxAttempts()
 
 std::uint32_t GetOtlpDefaultMetricsRetryMaxAttempts()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_ATTEMPTS";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_ATTEMPTS";
   std::uint32_t value{};
 
-  if (GetUintDualEnvVar(kSignalEnv, kGenericEnv, value))
+  if (GetUintDualEnvVar(kSignalEnv, kEnvOtlpRetryMaxAttempts, value))
   {
     return value;
   }
@@ -1186,11 +1176,10 @@ std::uint32_t GetOtlpDefaultMetricsRetryMaxAttempts()
 
 std::uint32_t GetOtlpDefaultLogsRetryMaxAttempts()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_ATTEMPTS";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_ATTEMPTS";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_ATTEMPTS";
   std::uint32_t value{};
 
-  if (GetUintDualEnvVar(kSignalEnv, kGenericEnv, value))
+  if (GetUintDualEnvVar(kSignalEnv, kEnvOtlpRetryMaxAttempts, value))
   {
     return value;
   }
@@ -1200,11 +1189,10 @@ std::uint32_t GetOtlpDefaultLogsRetryMaxAttempts()
 
 std::chrono::duration<float> GetOtlpDefaultTracesRetryInitialBackoff()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_INITIAL_BACKOFF";
   float value{};
 
-  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  if (GetFloatDualEnvVar(kSignalEnv, kEnvOtlpRetryInitialBackoff, value))
   {
     return std::chrono::duration<float>{value};
   }
@@ -1214,11 +1202,10 @@ std::chrono::duration<float> GetOtlpDefaultTracesRetryInitialBackoff()
 
 std::chrono::duration<float> GetOtlpDefaultMetricsRetryInitialBackoff()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_INITIAL_BACKOFF";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_INITIAL_BACKOFF";
   float value{};
 
-  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  if (GetFloatDualEnvVar(kSignalEnv, kEnvOtlpRetryInitialBackoff, value))
   {
     return std::chrono::duration<float>{value};
   }
@@ -1228,11 +1215,10 @@ std::chrono::duration<float> GetOtlpDefaultMetricsRetryInitialBackoff()
 
 std::chrono::duration<float> GetOtlpDefaultLogsRetryInitialBackoff()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_INITIAL_BACKOFF";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_INITIAL_BACKOFF";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_INITIAL_BACKOFF";
   float value{};
 
-  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  if (GetFloatDualEnvVar(kSignalEnv, kEnvOtlpRetryInitialBackoff, value))
   {
     return std::chrono::duration<float>{value};
   }
@@ -1242,11 +1228,10 @@ std::chrono::duration<float> GetOtlpDefaultLogsRetryInitialBackoff()
 
 std::chrono::duration<float> GetOtlpDefaultTracesRetryMaxBackoff()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_MAX_BACKOFF";
   float value{};
 
-  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  if (GetFloatDualEnvVar(kSignalEnv, kEnvOtlpRetryMaxBackoff, value))
   {
     return std::chrono::duration<float>{value};
   }
@@ -1256,11 +1241,10 @@ std::chrono::duration<float> GetOtlpDefaultTracesRetryMaxBackoff()
 
 std::chrono::duration<float> GetOtlpDefaultMetricsRetryMaxBackoff()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_BACKOFF";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_MAX_BACKOFF";
   float value{};
 
-  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  if (GetFloatDualEnvVar(kSignalEnv, kEnvOtlpRetryMaxBackoff, value))
   {
     return std::chrono::duration<float>{value};
   }
@@ -1270,11 +1254,10 @@ std::chrono::duration<float> GetOtlpDefaultMetricsRetryMaxBackoff()
 
 std::chrono::duration<float> GetOtlpDefaultLogsRetryMaxBackoff()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_MAX_BACKOFF";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_MAX_BACKOFF";
   float value{};
 
-  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  if (GetFloatDualEnvVar(kSignalEnv, kEnvOtlpRetryMaxBackoff, value))
   {
     return std::chrono::duration<float>{value};
   }
@@ -1284,11 +1267,10 @@ std::chrono::duration<float> GetOtlpDefaultLogsRetryMaxBackoff()
 
 float GetOtlpDefaultTracesRetryBackoffMultiplier()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_TRACES_RETRY_BACKOFF_MULTIPLIER";
   float value{};
 
-  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  if (GetFloatDualEnvVar(kSignalEnv, kEnvOtlpRetryBackoffMultiplier, value))
   {
     return value;
   }
@@ -1298,11 +1280,10 @@ float GetOtlpDefaultTracesRetryBackoffMultiplier()
 
 float GetOtlpDefaultMetricsRetryBackoffMultiplier()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_BACKOFF_MULTIPLIER";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_METRICS_RETRY_BACKOFF_MULTIPLIER";
   float value{};
 
-  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  if (GetFloatDualEnvVar(kSignalEnv, kEnvOtlpRetryBackoffMultiplier, value))
   {
     return value;
   }
@@ -1312,11 +1293,175 @@ float GetOtlpDefaultMetricsRetryBackoffMultiplier()
 
 float GetOtlpDefaultLogsRetryBackoffMultiplier()
 {
-  constexpr char kSignalEnv[]  = "OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_BACKOFF_MULTIPLIER";
-  constexpr char kGenericEnv[] = "OTEL_CPP_EXPORTER_OTLP_RETRY_BACKOFF_MULTIPLIER";
+  constexpr char kSignalEnv[] = "OTEL_CPP_EXPORTER_OTLP_LOGS_RETRY_BACKOFF_MULTIPLIER";
   float value{};
 
-  if (GetFloatDualEnvVar(kSignalEnv, kGenericEnv, value))
+  if (GetFloatDualEnvVar(kSignalEnv, kEnvOtlpRetryBackoffMultiplier, value))
+  {
+    return value;
+  }
+
+  return 1.5f;
+}
+
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientEndpoint()
+{
+  constexpr char kDefault[] = "http://localhost:4317";
+
+  std::string value;
+
+  if (sdk_common::GetStringEnvironmentVariable(kEnvOtlpEndpoint, value))
+  {
+    return value;
+  }
+
+  return kDefault;
+}
+
+OPENTELEMETRY_EXPORT bool GetOtlpDefaultGrpcClientIsInsecure()
+{
+  std::string endpoint = GetOtlpDefaultGrpcClientEndpoint();
+
+  if (opentelemetry::nostd::string_view(endpoint).substr(0, 6) == "https:")
+  {
+    return false;
+  }
+
+  if (endpoint.substr(0, 5) == "http:")
+  {
+    return true;
+  }
+
+  bool insecure{};
+  bool ssl_enabled{};
+
+  if (sdk_common::GetBoolEnvironmentVariable(kEnvOtlpInsecure, insecure))
+  {
+    return insecure;
+  }
+
+  if (sdk_common::GetBoolEnvironmentVariable(kEnvOtlpSslEnable, ssl_enabled))
+  {
+    return !ssl_enabled;
+  }
+
+  return false;
+}
+
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslCertificatePath()
+{
+  std::string value;
+  sdk_common::GetStringEnvironmentVariable(kEnvOtlpCertificate, value);
+  return value;
+}
+
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslCertificateString()
+{
+  std::string value;
+  sdk_common::GetStringEnvironmentVariable(kEnvOtlpCertificateString, value);
+  return value;
+}
+
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslClientKeyPath()
+{
+  std::string value;
+  sdk_common::GetStringEnvironmentVariable(kEnvOtlpClientKey, value);
+  return value;
+}
+
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslClientKeyString()
+{
+  std::string value;
+  sdk_common::GetStringEnvironmentVariable(kEnvOtlpClientKeyString, value);
+  return value;
+}
+
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslClientCertificatePath()
+{
+  std::string value;
+  sdk_common::GetStringEnvironmentVariable(kEnvOtlpClientCertificate, value);
+  return value;
+}
+
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientSslClientCertificateString()
+{
+  std::string value;
+  sdk_common::GetStringEnvironmentVariable(kEnvOtlpClientCertificateString, value);
+  return value;
+}
+
+OPENTELEMETRY_EXPORT std::chrono::system_clock::duration GetOtlpDefaultGrpcClientTimeout()
+{
+  std::chrono::system_clock::duration value;
+
+  if (sdk_common::GetDurationEnvironmentVariable(kEnvOtlpTimeout, value))
+  {
+    return value;
+  }
+
+  return std::chrono::duration_cast<std::chrono::system_clock::duration>(std::chrono::seconds{10});
+}
+
+OPENTELEMETRY_EXPORT OtlpHeaders GetOtlpDefaultGrpcClientHeaders()
+{
+  OtlpHeaders result;
+  DumpOtlpHeaders(result, kEnvOtlpHeaders);
+  return result;
+}
+
+OPENTELEMETRY_EXPORT std::string GetOtlpDefaultGrpcClientCompression()
+{
+  std::string value;
+
+  if (sdk_common::GetStringEnvironmentVariable(kEnvOtlpCompression, value))
+  {
+    return value;
+  }
+
+  return std::string{"none"};
+}
+
+OPENTELEMETRY_EXPORT std::uint32_t GetOtlpDefaultGrpcClientRetryMaxAttempts()
+{
+  std::uint32_t value{};
+
+  if (sdk_common::GetUintEnvironmentVariable(kEnvOtlpRetryMaxAttempts, value))
+  {
+    return value;
+  }
+
+  return 5U;
+}
+
+OPENTELEMETRY_EXPORT std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryInitialBackoff()
+{
+  float value{};
+
+  if (sdk_common::GetFloatEnvironmentVariable(kEnvOtlpRetryInitialBackoff, value))
+  {
+    return std::chrono::duration<float>{value};
+  }
+
+  return std::chrono::duration<float>{1.0f};
+}
+
+OPENTELEMETRY_EXPORT std::chrono::duration<float> GetOtlpDefaultGrpcClientRetryMaxBackoff()
+{
+  float value{};
+
+  if (sdk_common::GetFloatEnvironmentVariable(kEnvOtlpRetryMaxBackoff, value))
+  {
+    return std::chrono::duration<float>{value};
+  }
+
+  return std::chrono::duration<float>{5.0f};
+}
+
+OPENTELEMETRY_EXPORT float GetOtlpDefaultGrpcClientRetryBackoffMultiplier()
+{
+  float value{};
+
+  if (sdk_common::GetFloatEnvironmentVariable(kEnvOtlpRetryBackoffMultiplier, value))
   {
     return value;
   }

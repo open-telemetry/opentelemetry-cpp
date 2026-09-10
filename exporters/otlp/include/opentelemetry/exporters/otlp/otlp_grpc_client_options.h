@@ -7,12 +7,19 @@
 #include "opentelemetry/version.h"
 
 #include <chrono>
-#include <memory>
+#include <cstddef>
+#include <cstdint>
 #include <string>
+
+#ifdef ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
+#  include <memory>
+#endif
 
 namespace grpc
 {
+#ifdef ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW
 class ChannelCredentials;
+#endif
 class ChannelArguments;
 }  // namespace grpc
 
@@ -22,10 +29,16 @@ namespace exporter
 namespace otlp
 {
 
-struct OtlpGrpcClientOptions
+struct OPENTELEMETRY_EXPORT OtlpGrpcClientOptions
 {
-  virtual ~OtlpGrpcClientOptions()                                = default;
-  OtlpGrpcClientOptions()                                         = default;
+  virtual ~OtlpGrpcClientOptions();
+
+  /** Lookup environment variables, and populate spec-compliant defaults. */
+  OtlpGrpcClientOptions();
+
+  /** No defaults. */
+  explicit OtlpGrpcClientOptions(void *);
+
   OtlpGrpcClientOptions(const OtlpGrpcClientOptions &)            = default;
   OtlpGrpcClientOptions(OtlpGrpcClientOptions &&)                 = default;
   OtlpGrpcClientOptions &operator=(const OtlpGrpcClientOptions &) = default;
@@ -35,7 +48,7 @@ struct OtlpGrpcClientOptions
   std::string endpoint;
 
   /** Use SSL. */
-  bool use_ssl_credentials{};
+  bool use_ssl_credentials{true};
 
   /** CA CERT, path to a file. */
   std::string ssl_credentials_cacert_path;
@@ -70,14 +83,14 @@ struct OtlpGrpcClientOptions
   std::string user_agent;
 
   /** max number of threads that can be allocated from this */
-  std::size_t max_threads{};
+  std::size_t max_threads{0};
 
   /** Compression type. */
   std::string compression;
 
 #ifdef ENABLE_ASYNC_EXPORT
   // Concurrent requests
-  std::size_t max_concurrent_requests{};
+  std::size_t max_concurrent_requests{64};
 #endif
 
   /** The maximum number of call attempts, including the original attempt. */
