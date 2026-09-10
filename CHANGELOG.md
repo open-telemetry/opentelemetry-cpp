@@ -53,6 +53,10 @@ Increment the:
     longer injects a default `service.name`, since neither is part of the
     configuration model. Use the `service` detector or set the attributes in
     the configuration file instead.
+
+* [CONFIGURATION/BUILD] Break up OTLP builder utils into gRPC and HTTP utils
+  [#4533](https://github.com/open-telemetry/opentelemetry-cpp/pull/4533)
+
 * [CONFIGURATION] Add a resource detector extension example
   [#4419](https://github.com/open-telemetry/opentelemetry-cpp/issues/4419)
 
