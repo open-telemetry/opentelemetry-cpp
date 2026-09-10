@@ -128,6 +128,19 @@ cc_test(
 )
 
 cc_test(
+    name = "batch_log_record_processor_test_stress",
+    srcs = glob(["*_test_stress.cc"]),
+    tags = [
+        "logs",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/logs",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "logger_config_test",
     srcs = [
         "logger_config_test.cc",

@@ -33,6 +33,7 @@ add_library(
   view/attributes_processor.cc
   view/instrument_selector_factory.cc
   view/meter_selector_factory.cc
+  view/predicate.cc
   view/view_factory.cc
   view/view_registry.cc
   view/view_registry_factory.cc
