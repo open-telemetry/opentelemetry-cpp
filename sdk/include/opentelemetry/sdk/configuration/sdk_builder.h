@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
@@ -161,7 +162,8 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> CreateTracerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
-      const opentelemetry::sdk::resource::Resource &resource) const;
+      const opentelemetry::sdk::resource::Resource &resource,
+      const AttributeLimitsConfiguration *attribute_limits = nullptr) const;
 
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreateTextMapPropagator(
       const std::string &name) const;
@@ -286,7 +288,8 @@ public:
 
   std::unique_ptr<opentelemetry::sdk::logs::LoggerProvider> CreateLoggerProvider(
       const std::unique_ptr<opentelemetry::sdk::configuration::LoggerProviderConfiguration> &model,
-      const opentelemetry::sdk::resource::Resource &resource) const;
+      const opentelemetry::sdk::resource::Resource &resource,
+      const AttributeLimitsConfiguration *attribute_limits = nullptr) const;
 
   std::unique_ptr<opentelemetry::sdk::resource::ResourceDetector> CreateContainerResourceDetector(
       const opentelemetry::sdk::configuration::ContainerResourceDetectorConfiguration *model) const;

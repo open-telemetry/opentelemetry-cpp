@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <limits>
 
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -23,8 +24,8 @@ public:
       (std::numeric_limits<std::size_t>::max)();
   static constexpr std::size_t kDefaultAttributeCountLimit = 128;
 
-  std::size_t attribute_value_length_limit{kDefaultAttributeValueLengthLimit};
-  std::size_t attribute_count_limit{kDefaultAttributeCountLimit};
+  OptionalValue<std::size_t> attribute_value_length_limit;
+  OptionalValue<std::size_t> attribute_count_limit;
 };
 
 }  // namespace configuration

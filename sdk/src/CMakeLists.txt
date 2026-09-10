@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_subdirectory(common)
+add_subdirectory(instrumentationscope)
 add_subdirectory(trace)
 add_subdirectory(metrics)
 add_subdirectory(logs)

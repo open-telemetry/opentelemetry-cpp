@@ -17,7 +17,7 @@ file_format: "1.1"
 disabled: false
 # Configure the log level of the internal logger used by the SDK.
 # If omitted, info is used.
-log_level: info
+log_level: debug
 # Configure general attribute limits. See also tracer_provider.limits, logger_provider.limits.
 attribute_limits:
   # Configure max attribute value size.
@@ -1006,6 +1006,8 @@ resource:
   attributes:
     - name: service.name
       value: unknown_service
+    - name: service.version
+      value: null
     - name: string_key
       value: value
       type: string
@@ -1074,6 +1076,18 @@ resource:
   # Configure resource schema URL.
   # If omitted or null, no schema URL is used.
   schema_url: https://opentelemetry.io/schemas/1.16.0
+
+# Configure distribution.
+# Defines configuration parameters specific to a particular OpenTelemetry distribution or vendor.
+# This section provides a standardized location for distribution-specific settings
+# that are not part of the OpenTelemetry configuration model.
+# It allows vendors to expose their own extensions and general configuration options.
+# If omitted, distribution defaults are used.
+distribution:
+  # Configure distribution-specific configuration options.
+  # Vendors may define their own configuration options here.
+  example:
+    property: "value"
 # Configure instrumentation.
 # This type is in development and subject to breaking changes in minor versions.
 instrumentation/development:

@@ -179,3 +179,19 @@ otel_cc_benchmark(
         "//sdk/src/resource",
     ],
 )
+
+otel_cc_benchmark(
+    name = "sync_instruments_benchmark",
+    srcs = [
+        "sync_instruments_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+    ],
+)
