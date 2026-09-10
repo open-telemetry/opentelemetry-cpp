@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] `PeriodicExportingMetricReader::Shutdown` now performs one final
+  collect-and-export cycle before shutting down the underlying exporter, so
+  metrics recorded since the last periodic tick are no longer silently
+  dropped on shutdown, per the metrics SDK spec.
+  [#2983](https://github.com/open-telemetry/opentelemetry-specification/issues/2983)
+
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
   [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
 

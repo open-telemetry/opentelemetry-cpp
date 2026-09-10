@@ -105,6 +105,35 @@ TEST(PeriodicExportingMetricReader, BasicTests)
             static_cast<MockMetricProducer *>(&producer)->GetDataCount());
 }
 
+TEST(PeriodicExportingMetricReader, ShutdownPerformsFinalCollectAndExport)
+{
+  // Shutdown() must perform one last collect-and-export cycle so that metrics recorded since
+  // the last periodic tick are not silently dropped. Use a long export interval so that no
+  // periodic tick (other than the initial one at thread start) fires on its own before we call
+  // Shutdown().
+  std::unique_ptr<PushMetricExporter> exporter(
+      new MockPushMetricExporter(std::chrono::milliseconds{0}));
+  PeriodicExportingMetricReaderOptions options;
+  options.export_timeout_millis  = std::chrono::milliseconds(200);
+  options.export_interval_millis = std::chrono::milliseconds(10000);
+  auto exporter_ptr              = exporter.get();
+  std::shared_ptr<PeriodicExportingMetricReader> reader =
+      std::make_shared<PeriodicExportingMetricReader>(std::move(exporter), options);
+  MockMetricProducer producer;
+  reader->SetMetricProducer(&producer);
+
+  // Let the initial (t=0) collect-and-export cycle complete and the worker settle into its
+  // long wait, well before the next periodic tick would ever fire on its own.
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  auto count_before_shutdown = producer.GetDataCount();
+
+  reader->Shutdown();
+
+  EXPECT_EQ(producer.GetDataCount(), count_before_shutdown + 1);
+  EXPECT_EQ(static_cast<MockPushMetricExporter *>(exporter_ptr)->GetDataCount(),
+            producer.GetDataCount());
+}
+
 TEST(PeriodicExportingMetricReader, Timeout)
 {
   std::unique_ptr<PushMetricExporter> exporter(

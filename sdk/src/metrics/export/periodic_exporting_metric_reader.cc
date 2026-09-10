@@ -150,6 +150,33 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
   } while (IsShutdown() != true);
 
+  // The loop above only exits once Shutdown() has been signalled, and the wait above may
+  // have woken up (or been woken up) without ever re-running CollectAndExportOnce(). Any
+  // metrics recorded since the last periodic tick would otherwise be silently dropped, so
+  // perform one last collect-and-export cycle here, before the exporter itself is shut
+  // down in OnShutDown().
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->BeforeLoad();
+  }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
+  auto final_status = CollectAndExportOnce();
+
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+  if (worker_thread_instrumentation_ != nullptr)
+  {
+    worker_thread_instrumentation_->AfterLoad();
+  }
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
+  if (!final_status)
+  {
+    OTEL_INTERNAL_LOG_ERROR(
+        "[Periodic Exporting Metric Reader]  Final Collect-Export Cycle Failure.")
+  }
+
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
   {
