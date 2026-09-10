@@ -15,6 +15,7 @@
 #include "opentelemetry/sdk/resource/entity.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/version/version.h"
+#include "opentelemetry/semconv/incubating/process_attributes.h"
 #include "opentelemetry/semconv/service_attributes.h"
 #include "opentelemetry/semconv/telemetry_attributes.h"
 
@@ -421,6 +422,17 @@ TEST(ResourceTest, CreateUnassociatedMatchesFlattened)
             "backend");
 }
 
+TEST(ResourceTest, CreateServiceNameFallbackUsesProcessExecutableName)
+{
+  ResourceAttributes attributes = {{semconv::process::kProcessExecutableName, "otel-test"}};
+  auto resource                 = Resource::Create(attributes);
+
+  EXPECT_TRUE(resource.GetEntities().empty());
+  EXPECT_EQ(resource.GetUnassociatedAttributes(), resource.GetAttributes());
+  EXPECT_EQ(nostd::get<std::string>(resource.GetAttributes().at(semconv::service::kServiceName)),
+            "unknown_service:otel-test");
+}
+
 TEST(ResourceTest, MergeUnassociatedMatchesFlattened)
 {
   TestResource resource1(ResourceAttributes({{"service", "backend"}}));
@@ -808,6 +820,8 @@ TEST(ResourceTest, MergeAllEntitiesDroppedUsesClassicSchema)
   EXPECT_TRUE(merged.GetEntities().empty());
   EXPECT_EQ(merged.GetSchemaURL(), updating_schema);
   EXPECT_EQ(nostd::get<std::string>(merged.GetUnassociatedAttributes().at("host.id")), "H2");
+  EXPECT_EQ(merged.GetAttributes(), merged.GetUnassociatedAttributes());
+  EXPECT_EQ(nostd::get<std::string>(merged.GetAttributes().at("host.id")), "H2");
 }
 
 TEST(ResourceTest, MergeSurvivingEntitiesSetResourceSchema)
