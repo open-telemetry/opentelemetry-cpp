@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <cstdlib>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <utility>
@@ -43,6 +45,7 @@ public:
     {
       std::this_thread::sleep_for(wait_);
     }
+    std::lock_guard<std::mutex> lk(m_);
     records_.push_back(record);
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
@@ -57,9 +60,17 @@ public:
 
   bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return true; }
 
-  size_t GetDataCount() { return records_.size(); }
+  // Guarded by a mutex (rather than left as a plain read) because tests may poll this
+  // from the main thread concurrently with the worker thread's Export() calls, with no
+  // other synchronization between the two accesses.
+  size_t GetDataCount()
+  {
+    std::lock_guard<std::mutex> lk(m_);
+    return records_.size();
+  }
 
 private:
+  std::mutex m_;
   std::vector<ResourceMetrics> records_;
   std::chrono::milliseconds wait_;
 };
@@ -74,16 +85,19 @@ public:
   MetricProducer::Result Produce() noexcept override
   {
     std::this_thread::sleep_for(sleep_ms_);
-    data_sent_size_++;
+    data_sent_size_.fetch_add(1, std::memory_order_acq_rel);
     ResourceMetrics data;
     return {data, MetricProducer::Status::kSuccess};
   }
 
-  size_t GetDataCount() { return data_sent_size_; }
+  // Atomic (rather than a plain size_t) because tests may poll this from the main thread
+  // concurrently with the worker thread's Produce() calls, with no other synchronization
+  // between the two accesses.
+  size_t GetDataCount() { return data_sent_size_.load(std::memory_order_acquire); }
 
 private:
   std::chrono::microseconds sleep_ms_;
-  size_t data_sent_size_{0};
+  std::atomic<size_t> data_sent_size_{0};
 };
 
 TEST(PeriodicExportingMetricReader, BasicTests)
