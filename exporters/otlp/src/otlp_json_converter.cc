@@ -319,8 +319,9 @@ void ConvertGenericMessageToJson(JsonWriter &writer,
   for (std::size_t i = 0; i < fields_with_data.size(); ++i)
   {
     const google::protobuf::FieldDescriptor *field_descriptor = fields_with_data[i];
-    writer.Key(options.use_json_name ? field_descriptor->json_name()
-                                     : field_descriptor->camelcase_name());
+    const auto &field_name =
+        options.use_json_name ? field_descriptor->json_name() : field_descriptor->camelcase_name();
+    writer.Key(nostd::string_view(field_name.data(), field_name.size()));
     if (field_descriptor->is_repeated())
     {
       ConvertListFieldToJson(writer, message, field_descriptor, options);
