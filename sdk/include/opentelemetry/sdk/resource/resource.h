@@ -118,8 +118,10 @@ private:
   void NormalizeEntities(const std::vector<Entity> &entities) noexcept;
 
   /**
-   * Rebuilds the flattened `attributes_` cache from `entities_` (identity and
-   * description) followed by `unassociated_attributes_`.
+   * Rebuilds the flattened `attributes_` cache for entity-aware Resources from
+   * `entities_` (identity and description) followed by
+   * `unassociated_attributes_`. Entity-free Resources leave the cache empty
+   * and return `unassociated_attributes_` directly from GetAttributes().
    */
   void RefreshFlattenedAttributes() noexcept;
 

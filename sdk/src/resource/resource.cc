@@ -230,6 +230,11 @@ void Resource::NormalizeEntities(const std::vector<Entity> &entities) noexcept
 void Resource::RefreshFlattenedAttributes() noexcept
 {
   attributes_.clear();
+  if (entities_.empty())
+  {
+    return;
+  }
+
   for (const auto &entity : entities_)
   {
     attributes_.insert(entity.GetIdentity().begin(), entity.GetIdentity().end());
@@ -251,8 +256,9 @@ Resource Resource::Merge(const Resource &other) const noexcept
 // Spec: https://opentelemetry.io/docs/specs/otel/resource/sdk/#merge-behavior-without-entities
 Resource Resource::MergeWithoutEntities(const Resource &other) const noexcept
 {
-  ResourceAttributes merged_resource_attributes(other.attributes_);
-  merged_resource_attributes.insert(attributes_.begin(), attributes_.end());
+  ResourceAttributes merged_resource_attributes(other.unassociated_attributes_);
+  merged_resource_attributes.insert(unassociated_attributes_.begin(),
+                                    unassociated_attributes_.end());
   return Resource(merged_resource_attributes,
                   other.schema_url_.empty() ? schema_url_ : other.schema_url_);
 }
@@ -360,17 +366,21 @@ Resource Resource::Create(const ResourceAttributes &attributes,
   auto resource =
       Resource::GetDefault().Merge(otel_resource).Merge(Resource{attributes, schema_url, entities});
 
-  if (resource.attributes_.find(semconv::service::kServiceName) == resource.attributes_.end())
+  const auto &resource_attributes = resource.GetAttributes();
+  if (resource_attributes.find(semconv::service::kServiceName) == resource_attributes.end())
   {
     std::string default_service_name = "unknown_service";
     auto it_process_executable_name =
-        resource.attributes_.find(semconv::process::kProcessExecutableName);
-    if (it_process_executable_name != resource.attributes_.end())
+        resource_attributes.find(semconv::process::kProcessExecutableName);
+    if (it_process_executable_name != resource_attributes.end())
     {
       default_service_name += ":" + nostd::get<std::string>(it_process_executable_name->second);
     }
     resource.unassociated_attributes_[semconv::service::kServiceName] = default_service_name;
-    resource.RefreshFlattenedAttributes();
+    if (!resource.entities_.empty())
+    {
+      resource.RefreshFlattenedAttributes();
+    }
   }
   return resource;
 }
@@ -393,7 +403,7 @@ Resource &Resource::GetDefault()
 
 const ResourceAttributes &Resource::GetAttributes() const noexcept
 {
-  return attributes_;
+  return entities_.empty() ? unassociated_attributes_ : attributes_;
 }
 
 const std::string &Resource::GetSchemaURL() const noexcept
