@@ -50,9 +50,12 @@
 #include "opentelemetry/sdk/configuration/last_value_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/meter_configurator_builder.h"
 #include "opentelemetry/sdk/configuration/meter_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/meter_provider_builder.h"
+#include "opentelemetry/sdk/configuration/meter_provider_builder_context.h"
 #include "opentelemetry/sdk/configuration/meter_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_producer_configuration.h"
 #include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/metrics_builder_utils.h"
 #include "opentelemetry/sdk/configuration/metrics_builders.h"
 #include "opentelemetry/sdk/configuration/open_census_metric_producer_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_builder.h"
@@ -69,7 +72,6 @@
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
-#include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/sdk/configuration/sum_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/unsupported_exception.h"
@@ -125,8 +127,7 @@ protected:
   std::unique_ptr<metrics_sdk::MetricReader> MakeMetricReader(
       std::unique_ptr<config_sdk::MetricReaderConfiguration> model)
   {
-    config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateMetricReader(model);
+    return config_sdk::MetricsBuilderUtils::CreateMetricReader(registry_.get(), model);
   }
 
   static std::unique_ptr<config_sdk::ViewConfiguration> MakeViewWithAggregation(
@@ -157,30 +158,29 @@ protected:
   std::unique_ptr<scope_sdk::ScopeConfigurator<metrics_sdk::MeterConfig>> MakeMeterConfigurator(
       std::unique_ptr<config_sdk::MeterConfiguratorConfiguration> model)
   {
-    config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateMeterConfigurator(model);
+    return config_sdk::MetricsBuilderUtils::CreateMeterConfigurator(registry_.get(), model);
   }
 
   void AddView(metrics_sdk::ViewRegistry *view_registry,
                const std::unique_ptr<config_sdk::ViewConfiguration> &model)
   {
-    config_sdk::SdkBuilder builder(registry_);
-    builder.AddView(view_registry, model);
+    config_sdk::MetricsBuilderUtils::AddView(view_registry, model);
   }
 
   std::unique_ptr<metrics_sdk::AttributesProcessor> CreateAttributesProcessor(
       const std::unique_ptr<config_sdk::IncludeExcludeConfiguration> &model)
   {
-    config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateAttributesProcessor(model);
+    return config_sdk::MetricsBuilderUtils::CreateAttributesProcessor(model);
   }
 
-  std::unique_ptr<metrics_sdk::MeterProvider> MakeMeterProvider(
+  std::shared_ptr<metrics_sdk::MeterProvider> MakeMeterProvider(
       std::unique_ptr<config_sdk::MeterProviderConfiguration> model,
       const opentelemetry::sdk::resource::Resource &resource)
   {
-    config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateMeterProvider(model, resource);
+
+    const auto *meter_provider_builder = registry_->GetMeterProviderBuilder();
+    config_sdk::MeterProviderBuilderContext context{registry_.get(), &resource};
+    return meter_provider_builder->Build(context, model.get());
   }
 
   void CheckInstrumentType(
