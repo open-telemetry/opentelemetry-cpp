@@ -61,10 +61,6 @@
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
-#include "opentelemetry/sdk/metrics/export/periodic_exporting_metric_reader.h"
-#include "opentelemetry/sdk/metrics/meter_config.h"
-#include "opentelemetry/sdk/metrics/meter_provider.h"
-#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -171,82 +167,6 @@ public:
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreatePropagator(
       const std::unique_ptr<opentelemetry::sdk::configuration::PropagatorConfiguration> &model)
       const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreateOtlpHttpPushMetricExporter(
-      const opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreateOtlpGrpcPushMetricExporter(
-      const opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreateOtlpFilePushMetricExporter(
-      const opentelemetry::sdk::configuration::OtlpFilePushMetricExporterConfiguration *model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreateConsolePushMetricExporter(
-      const opentelemetry::sdk::configuration::ConsolePushMetricExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter>
-  CreateExtensionPushMetricExporter(
-      const opentelemetry::sdk::configuration::ExtensionPushMetricExporterConfiguration *model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreatePrometheusPullMetricExporter(
-      const opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreateExtensionPullMetricExporter(
-      const opentelemetry::sdk::configuration::ExtensionPullMetricExporterConfiguration *model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> CreatePushMetricExporter(
-      const std::unique_ptr<opentelemetry::sdk::configuration::PushMetricExporterConfiguration>
-          &model) const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreatePullMetricExporter(
-      const std::unique_ptr<opentelemetry::sdk::configuration::PullMetricExporterConfiguration>
-          &model) const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreatePeriodicMetricReader(
-      const opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreatePullMetricReader(
-      const opentelemetry::sdk::configuration::PullMetricReaderConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> CreateMetricReader(
-      const std::unique_ptr<opentelemetry::sdk::configuration::MetricReaderConfiguration> &model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::Base2ExponentialHistogramAggregationConfig>
-  CreateBase2ExponentialBucketHistogramAggregation(
-      const opentelemetry::sdk::configuration::
-          Base2ExponentialBucketHistogramAggregationConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::HistogramAggregationConfig>
-  CreateExplicitBucketHistogramAggregation(
-      const opentelemetry::sdk::configuration::ExplicitBucketHistogramAggregationConfiguration
-          *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::AggregationConfig> CreateAggregationConfig(
-      const std::unique_ptr<opentelemetry::sdk::configuration::AggregationConfiguration> &model,
-      opentelemetry::sdk::metrics::AggregationType &aggregation_type) const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> CreateAttributesProcessor(
-      const std::unique_ptr<opentelemetry::sdk::configuration::IncludeExcludeConfiguration> &model)
-      const;
-
-  void AddView(
-      opentelemetry::sdk::metrics::ViewRegistry *view_registry,
-      const std::unique_ptr<opentelemetry::sdk::configuration::ViewConfiguration> &model) const;
-
-  std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
-      opentelemetry::sdk::metrics::MeterConfig>>
-  CreateMeterConfigurator(const std::unique_ptr<MeterConfiguratorConfiguration> &model) const;
-
-  std::unique_ptr<opentelemetry::sdk::metrics::MeterProvider> CreateMeterProvider(
-      const std::unique_ptr<opentelemetry::sdk::configuration::MeterProviderConfiguration> &model,
-      const opentelemetry::sdk::resource::Resource &resource) const;
 
   std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> CreateOtlpHttpLogRecordExporter(
       const opentelemetry::sdk::configuration::OtlpHttpLogRecordExporterConfiguration *model) const;
