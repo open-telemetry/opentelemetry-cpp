@@ -1,6 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 include("${PROJECT_SOURCE_DIR}/cmake/thirdparty-dependency-config.cmake")
+include("${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake")
 
 ########################################################################
 # INTERNAL FUNCTIONS - do not call directly. Use the otel_* "Main" functions
@@ -50,10 +51,11 @@ endfunction()
 #     OTEL_COMPONENT_FILES_MATCHING_<component>: Matching pattern for the files to be installed
 #     OTEL_COMPONENT_DEPENDS_<component>: List of components that this component depends on
 #     OTEL_COMPONENT_THIRDPARTY_DEPENDS_<component>: List of thirdparty dependencies that this component depends on
+#     OTEL_COMPONENT_DESCRIPTION_<component>: Optional human-readable component description
 #-----------------------------------------------------------------------
 function(_otel_set_component_properties)
     set(optionArgs )
-    set(oneValueArgs COMPONENT FILES_DIRECTORY FILES_DESTINATION)
+    set(oneValueArgs COMPONENT DESCRIPTION FILES_DIRECTORY FILES_DESTINATION)
     set(multiValueArgs TARGETS TARGETS_ALIAS FILES_MATCHING COMPONENT_DEPENDS THIRDPARTY_DEPENDS)
     cmake_parse_arguments(_PROPERTIES "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" "${ARGN}")
 
@@ -94,6 +96,10 @@ function(_otel_set_component_properties)
 
     if(_PROPERTIES_THIRDPARTY_DEPENDS)
       set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_THIRDPARTY_DEPENDS_${_PROPERTIES_COMPONENT} "${_PROPERTIES_THIRDPARTY_DEPENDS}")
+    endif()
+
+    if(_PROPERTIES_DESCRIPTION)
+      set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_DESCRIPTION_${_PROPERTIES_COMPONENT} "${_PROPERTIES_DESCRIPTION}")
     endif()
 endfunction()
 
@@ -283,6 +289,10 @@ function(_otel_install_component _COMPONENT)
       COMPONENT ${_COMPONENT}
       FILES_MATCHING ${_COMPONENT_FILES_MATCHING})
   endif()
+
+  foreach(_TARGET IN LISTS _COMPONENT_TARGETS)
+    _otel_install_target_pkgconfig("${_TARGET}" "${_COMPONENT}")
+  endforeach()
 endfunction()
 
 #-----------------------------------------------------------------------
@@ -357,6 +367,7 @@ endfunction()
 # Usage:
 #    otel_add_component(
 #      COMPONENT <component_name>
+#      [DESCRIPTION "<human-readable component summary>"]
 #      [DEPRECATED_NAMES <old_name1> <old_name2> ...]
 #      TARGETS <target1> <target2> ...
 #      [FILES_DIRECTORY <directory>
@@ -365,7 +376,7 @@ endfunction()
 #-----------------------------------------------------------------------
 function(otel_add_component)
   set(optionArgs DEPRECATED)
-  set(oneValueArgs COMPONENT FILES_DIRECTORY FILES_DESTINATION)
+  set(oneValueArgs COMPONENT DESCRIPTION FILES_DIRECTORY FILES_DESTINATION)
   set(multiValueArgs TARGETS FILES_MATCHING DEPRECATED_NAMES)
   cmake_parse_arguments(_OTEL_ADD_COMP "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" "${ARGN}")
 
@@ -404,9 +415,11 @@ function(otel_add_component)
   message(DEBUG "  FILES_DIRECTORY: ${_OTEL_ADD_COMP_FILES_DIRECTORY}")
   message(DEBUG "  FILES_DESTINATION: ${_OTEL_ADD_COMP_FILES_DESTINATION}")
   message(DEBUG "  FILES_MATCHING: ${_OTEL_ADD_COMP_FILES_MATCHING}")
+  message(DEBUG "  DESCRIPTION: ${_OTEL_ADD_COMP_DESCRIPTION}")
 
   _otel_set_component_properties(
     COMPONENT ${_OTEL_ADD_COMP_COMPONENT}
+    DESCRIPTION ${_OTEL_ADD_COMP_DESCRIPTION}
     TARGETS ${_OTEL_ADD_COMP_TARGETS}
     TARGETS_ALIAS ${_ALIAS_TARGETS}
     FILES_DIRECTORY ${_OTEL_ADD_COMP_FILES_DIRECTORY}
@@ -450,8 +463,12 @@ function(otel_install_components)
     get_property(_COMPONENT_FILES_DIRECTORY DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_DIRECTORY_${_COMPONENT})
     get_property(_COMPONENT_FILES_DESTINATION DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_DESTINATION_${_COMPONENT})
     get_property(_COMPONENT_FILES_MATCHING DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_FILES_MATCHING_${_COMPONENT})
+    get_property(_COMPONENT_DESCRIPTION DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENT_DESCRIPTION_${_COMPONENT})
 
     message(STATUS "Install COMPONENT ${_COMPONENT}")
+    if(_COMPONENT_DESCRIPTION)
+      message(STATUS "  DESCRIPTION: ${_COMPONENT_DESCRIPTION}")
+    endif()
     message(STATUS "  TARGETS: ${_COMPONENT_TARGETS}")
     message(STATUS "  TARGETS_ALIAS: ${_COMPONENT_TARGETS_ALIAS}")
     message(STATUS "  COMPONENT_DEPENDS: ${_COMPONENT_DEPENDS}")
