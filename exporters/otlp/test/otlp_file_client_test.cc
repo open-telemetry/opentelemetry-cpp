@@ -39,6 +39,7 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
+#include "otlp_marking_json_writer.h"
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
@@ -161,6 +162,38 @@ static std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable(
 
   // We should not depends NRVO of compilers, so do not return std::move(recordable) or recordable.
   return {std::move(recordable)};
+}
+
+TEST(OtlpFileClientTest, CustomJsonWriterFactoryIsUsed)
+{
+  auto resource              = MakeResource();
+  auto instrumentation_scope = MakeInstrumentationScope();
+
+  std::unique_ptr<opentelemetry::sdk::trace::Recordable> recordable[] = {
+      MakeRecordable(resource, *instrumentation_scope)};
+
+  opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request;
+  OtlpRecordableUtils::PopulateRequest(MakeSpan(recordable), &request);
+
+  std::stringstream output_stream;
+
+  opentelemetry::exporter::otlp::OtlpFileClientOptions opts;
+  opentelemetry::exporter::otlp::OtlpFileClientRuntimeOptions rt_opts;
+  opts.backend_options = std::ref(output_stream);
+
+  rt_opts.json_writer_factory = std::make_shared<test::MarkingJsonWriterFactory>();
+
+  auto client = std::make_unique<opentelemetry::exporter::otlp::OtlpFileClient>(std::move(opts),
+                                                                                std::move(rt_opts));
+  client->Export(request, 1);
+
+  EXPECT_EQ(output_stream.str().rfind("/*custom-writer*/", 0), 0u)
+      << "output was not produced by the injected JsonWriter: " << output_stream.str();
+
+  // The line still ends with the marked writer's underlying JSON, unchanged.
+  auto marker_size = std::string("/*custom-writer*/").size();
+  auto check_json  = nlohmann::json::parse(output_stream.str().substr(marker_size), nullptr, false);
+  EXPECT_FALSE(check_json.is_discarded());
 }
 
 TEST(OtlpFileClientTest, Shutdown)

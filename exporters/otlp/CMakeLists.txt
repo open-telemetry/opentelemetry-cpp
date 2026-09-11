@@ -96,6 +96,102 @@ if(OTELCPP_INSTALL)
     "Common utilities for OTLP exporter builders." "opentelemetry_otlp_common")
 endif()
 
+#
+# opentelemetry_exporter_otlp_json_writer
+#
+
+add_library(opentelemetry_exporter_otlp_json_writer INTERFACE)
+
+set_target_properties(opentelemetry_exporter_otlp_json_writer
+                      PROPERTIES EXPORT_NAME otlp_json_writer)
+
+target_include_directories(
+  opentelemetry_exporter_otlp_json_writer
+  INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+            "$<INSTALL_INTERFACE:include>")
+
+target_link_libraries(opentelemetry_exporter_otlp_json_writer
+                      INTERFACE opentelemetry_common)
+
+set(OPENTELEMETRY_OTLP_JSON_WRITER_TARGETS
+    opentelemetry_exporter_otlp_json_writer)
+
+if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+  add_library(
+    opentelemetry_exporter_otlp_json_writer_nlohmann
+    ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_json_writer_nlohmann.cc)
+
+  set_target_properties(opentelemetry_exporter_otlp_json_writer_nlohmann
+                        PROPERTIES EXPORT_NAME otlp_json_writer_nlohmann)
+  set_target_version(opentelemetry_exporter_otlp_json_writer_nlohmann)
+
+  target_include_directories(
+    opentelemetry_exporter_otlp_json_writer_nlohmann
+    PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+           "$<INSTALL_INTERFACE:include>")
+
+  target_link_libraries(
+    opentelemetry_exporter_otlp_json_writer_nlohmann
+    PUBLIC opentelemetry_common
+    PRIVATE opentelemetry_sdk "$<BUILD_INTERFACE:nlohmann_json::nlohmann_json>")
+
+  target_compile_definitions(opentelemetry_exporter_otlp_json_writer_nlohmann
+                             PUBLIC ENABLE_JSON_WRITER_NLOHMANN)
+
+  target_link_libraries(
+    opentelemetry_exporter_otlp_json_writer
+    INTERFACE opentelemetry_exporter_otlp_json_writer_nlohmann)
+
+  list(APPEND OPENTELEMETRY_OTLP_JSON_WRITER_TARGETS
+       opentelemetry_exporter_otlp_json_writer_nlohmann)
+endif()
+
+if(OTELCPP_INSTALL)
+  opentelemetry_add_pkgconfig(
+    exporter_otlp_json_writer "OpenTelemetry OTLP - JSON Writer"
+    "Token-stream JSON writer interface." "opentelemetry_common")
+
+  if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+    opentelemetry_add_pkgconfig(
+      exporter_otlp_json_writer_nlohmann
+      "OpenTelemetry OTLP - JSON Writer (nlohmann backend)"
+      "The nlohmann-json backed default implementation of the JsonWriter interface."
+      "opentelemetry_common")
+  endif()
+endif()
+
+#
+# opentelemetry_exporter_otlp_json_converter
+#
+
+add_library(opentelemetry_exporter_otlp_json_converter
+            ${OPENTELEMETRY_OTLP_TARGETS_LIB_TYPE} src/otlp_json_converter.cc)
+
+set_target_properties(opentelemetry_exporter_otlp_json_converter
+                      PROPERTIES EXPORT_NAME otlp_json_converter)
+set_target_version(opentelemetry_exporter_otlp_json_converter)
+
+target_include_directories(
+  opentelemetry_exporter_otlp_json_converter
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+
+target_link_libraries(
+  opentelemetry_exporter_otlp_json_converter
+  PUBLIC opentelemetry_sdk opentelemetry_common
+         opentelemetry_exporter_otlp_json_writer
+         "$<BUILD_INTERFACE:opentelemetry_proto>"
+  PRIVATE "$<INSTALL_INTERFACE:opentelemetry_proto>")
+
+if(OTELCPP_INSTALL)
+  opentelemetry_add_pkgconfig(
+    exporter_otlp_json_converter
+    "OpenTelemetry OTLP - JSON Converter"
+    "Shared reflection-based protobuf-to-JSON converter for OTLP/JSON exporters."
+    "opentelemetry_sdk opentelemetry_common opentelemetry_exporter_otlp_json_writer"
+  )
+endif()
+
 if(OTELCPP_WITH_OTLP_GRPC)
   if(NOT DEFINED grpc_lib_type)
     message(
@@ -359,13 +455,12 @@ if(OTELCPP_WITH_OTLP_HTTP)
   target_link_libraries(
     opentelemetry_exporter_otlp_http_client
     PUBLIC opentelemetry_ext "$<BUILD_INTERFACE:opentelemetry_proto>"
-    PRIVATE "$<INSTALL_INTERFACE:opentelemetry_proto>"
-            "$<BUILD_INTERFACE:nlohmann_json::nlohmann_json>")
+    PRIVATE "$<INSTALL_INTERFACE:opentelemetry_proto>")
 
   target_link_libraries(
     opentelemetry_exporter_otlp_http_client
     PUBLIC opentelemetry_http_client
-    PRIVATE opentelemetry_common)
+    PRIVATE opentelemetry_common opentelemetry_exporter_otlp_json_converter)
 
   target_include_directories(
     opentelemetry_exporter_otlp_http_client
@@ -586,7 +681,7 @@ if(OTELCPP_WITH_OTLP_FILE)
     PUBLIC opentelemetry_sdk opentelemetry_common
            "$<BUILD_INTERFACE:opentelemetry_proto>"
     PRIVATE "$<INSTALL_INTERFACE:opentelemetry_proto>"
-            "$<BUILD_INTERFACE:nlohmann_json::nlohmann_json>")
+            opentelemetry_exporter_otlp_json_converter)
 
   target_include_directories(
     opentelemetry_exporter_otlp_file_client
@@ -798,6 +893,8 @@ otel_add_component(
   opentelemetry_otlp_recordable
   opentelemetry_proto
   opentelemetry_exporter_otlp_builder_utils
+  opentelemetry_exporter_otlp_json_converter
+  ${OPENTELEMETRY_OTLP_JSON_WRITER_TARGETS}
   FILES_DIRECTORY
   "include/opentelemetry/exporters/otlp"
   FILES_DESTINATION
@@ -919,6 +1016,18 @@ if(OTELCPP_BUILD_TESTING)
     TEST_PREFIX exporter.otlp.
     TEST_LIST otlp_metrics_serialization_test)
 
+  if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+    add_executable(otlp_json_writer_nlohmann_test
+                   test/otlp_json_writer_nlohmann_test.cc)
+    target_link_libraries(
+      otlp_json_writer_nlohmann_test ${GTEST_BOTH_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_otlp_json_writer)
+    gtest_add_tests(
+      TARGET otlp_json_writer_nlohmann_test
+      TEST_PREFIX exporter.otlp.
+      TEST_LIST otlp_json_writer_nlohmann_test)
+  endif()
+
   if(OTELCPP_WITH_OTLP_GRPC)
     add_executable(otlp_grpc_exporter_test test/otlp_grpc_exporter_test.cc)
     target_link_libraries(
@@ -1004,24 +1113,26 @@ if(OTELCPP_BUILD_TESTING)
   endif()
 
   if(OTELCPP_WITH_OTLP_HTTP)
-    add_executable(otlp_http_exporter_test test/otlp_http_exporter_test.cc)
-    target_link_libraries(
-      otlp_http_exporter_test
-      ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT}
-      ${GMOCK_LIB}
-      opentelemetry_exporter_otlp_http
-      opentelemetry_http_client_nosend
-      nlohmann_json::nlohmann_json
-      protobuf::libprotobuf
-      opentelemetry_test_common)
-    if(WIN32)
-      target_link_libraries(otlp_http_exporter_test ws2_32)
+    if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+      add_executable(otlp_http_exporter_test test/otlp_http_exporter_test.cc)
+      target_link_libraries(
+        otlp_http_exporter_test
+        ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${GMOCK_LIB}
+        opentelemetry_exporter_otlp_http
+        opentelemetry_http_client_nosend
+        nlohmann_json::nlohmann_json
+        protobuf::libprotobuf
+        opentelemetry_test_common)
+      if(WIN32)
+        target_link_libraries(otlp_http_exporter_test ws2_32)
+      endif()
+      gtest_add_tests(
+        TARGET otlp_http_exporter_test
+        TEST_PREFIX exporter.otlp.
+        TEST_LIST otlp_http_exporter_test)
     endif()
-    gtest_add_tests(
-      TARGET otlp_http_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_http_exporter_test)
 
     add_executable(otlp_http_exporter_factory_test
                    test/otlp_http_exporter_factory_test.cc)
@@ -1033,25 +1144,27 @@ if(OTELCPP_BUILD_TESTING)
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_http_exporter_factory_test)
 
-    add_executable(otlp_http_log_record_exporter_test
-                   test/otlp_http_log_record_exporter_test.cc)
-    target_link_libraries(
-      otlp_http_log_record_exporter_test
-      ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT}
-      ${GMOCK_LIB}
-      opentelemetry_exporter_otlp_http_log
-      opentelemetry_logs
-      opentelemetry_http_client_nosend
-      nlohmann_json::nlohmann_json
-      opentelemetry_test_common)
-    if(WIN32)
-      target_link_libraries(otlp_http_log_record_exporter_test ws2_32)
+    if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+      add_executable(otlp_http_log_record_exporter_test
+                     test/otlp_http_log_record_exporter_test.cc)
+      target_link_libraries(
+        otlp_http_log_record_exporter_test
+        ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${GMOCK_LIB}
+        opentelemetry_exporter_otlp_http_log
+        opentelemetry_logs
+        opentelemetry_http_client_nosend
+        nlohmann_json::nlohmann_json
+        opentelemetry_test_common)
+      if(WIN32)
+        target_link_libraries(otlp_http_log_record_exporter_test ws2_32)
+      endif()
+      gtest_add_tests(
+        TARGET otlp_http_log_record_exporter_test
+        TEST_PREFIX exporter.otlp.
+        TEST_LIST otlp_http_log_record_exporter_test)
     endif()
-    gtest_add_tests(
-      TARGET otlp_http_log_record_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_http_log_record_exporter_test)
 
     add_executable(otlp_http_log_record_exporter_factory_test
                    test/otlp_http_log_record_exporter_factory_test.cc)
@@ -1064,23 +1177,25 @@ if(OTELCPP_BUILD_TESTING)
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_http_log_record_exporter_factory_test)
 
-    add_executable(otlp_http_metric_exporter_test
-                   test/otlp_http_metric_exporter_test.cc)
-    target_link_libraries(
-      otlp_http_metric_exporter_test
-      ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT}
-      ${GMOCK_LIB}
-      opentelemetry_exporter_otlp_http_metric
-      opentelemetry_metrics
-      opentelemetry_http_client_nosend
-      nlohmann_json::nlohmann_json
-      protobuf::libprotobuf
-      opentelemetry_test_common)
-    gtest_add_tests(
-      TARGET otlp_http_metric_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_http_metric_exporter_test)
+    if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+      add_executable(otlp_http_metric_exporter_test
+                     test/otlp_http_metric_exporter_test.cc)
+      target_link_libraries(
+        otlp_http_metric_exporter_test
+        ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${GMOCK_LIB}
+        opentelemetry_exporter_otlp_http_metric
+        opentelemetry_metrics
+        opentelemetry_http_client_nosend
+        nlohmann_json::nlohmann_json
+        protobuf::libprotobuf
+        opentelemetry_test_common)
+      gtest_add_tests(
+        TARGET otlp_http_metric_exporter_test
+        TEST_PREFIX exporter.otlp.
+        TEST_LIST otlp_http_metric_exporter_test)
+    endif()
 
     add_executable(otlp_http_metric_exporter_factory_test
                    test/otlp_http_metric_exporter_factory_test.cc)
@@ -1125,36 +1240,89 @@ if(OTELCPP_BUILD_TESTING)
       TARGET otlp_http_log_record_exporter_custom_client_test
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_http_log_record_exporter_custom_client_test)
+
+    if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+      add_executable(otlp_http_exporter_custom_json_writer_test
+                     test/otlp_http_exporter_custom_json_writer_test.cc)
+      target_link_libraries(
+        otlp_http_exporter_custom_json_writer_test
+        ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${GMOCK_LIB}
+        opentelemetry_exporter_otlp_http
+        opentelemetry_http_client_nosend
+        opentelemetry_exporter_otlp_json_writer)
+      gtest_add_tests(
+        TARGET otlp_http_exporter_custom_json_writer_test
+        TEST_PREFIX exporter.otlp.
+        TEST_LIST otlp_http_exporter_custom_json_writer_test)
+
+      add_executable(otlp_http_metric_exporter_custom_json_writer_test
+                     test/otlp_http_metric_exporter_custom_json_writer_test.cc)
+      target_link_libraries(
+        otlp_http_metric_exporter_custom_json_writer_test
+        ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
+        opentelemetry_exporter_otlp_http_metric
+        opentelemetry_metrics
+        opentelemetry_http_client_nosend
+        opentelemetry_exporter_otlp_json_writer)
+      gtest_add_tests(
+        TARGET otlp_http_metric_exporter_custom_json_writer_test
+        TEST_PREFIX exporter.otlp.
+        TEST_LIST otlp_http_metric_exporter_custom_json_writer_test)
+
+      add_executable(
+        otlp_http_log_record_exporter_custom_json_writer_test
+        test/otlp_http_log_record_exporter_custom_json_writer_test.cc)
+      target_link_libraries(
+        otlp_http_log_record_exporter_custom_json_writer_test
+        ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
+        opentelemetry_exporter_otlp_http_log
+        opentelemetry_logs
+        opentelemetry_http_client_nosend
+        opentelemetry_exporter_otlp_json_writer)
+      gtest_add_tests(
+        TARGET otlp_http_log_record_exporter_custom_json_writer_test
+        TEST_PREFIX exporter.otlp.
+        TEST_LIST otlp_http_log_record_exporter_custom_json_writer_test)
+    endif()
   endif()
 
   if(OTELCPP_WITH_OTLP_FILE)
-    add_executable(otlp_file_client_test test/otlp_file_client_test.cc)
-    target_link_libraries(
-      otlp_file_client_test
-      ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT}
-      ${GMOCK_LIB}
-      opentelemetry_exporter_otlp_file
-      opentelemetry_otlp_recordable
-      nlohmann_json::nlohmann_json)
-    gtest_add_tests(
-      TARGET otlp_file_client_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_file_client_test)
+    if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+      add_executable(otlp_file_client_test test/otlp_file_client_test.cc)
+      target_link_libraries(
+        otlp_file_client_test
+        ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${GMOCK_LIB}
+        opentelemetry_exporter_otlp_file
+        opentelemetry_otlp_recordable
+        opentelemetry_exporter_otlp_json_writer
+        nlohmann_json::nlohmann_json)
+      gtest_add_tests(
+        TARGET otlp_file_client_test
+        TEST_PREFIX exporter.otlp.
+        TEST_LIST otlp_file_client_test)
+    endif()
 
-    add_executable(otlp_file_exporter_test test/otlp_file_exporter_test.cc)
-    target_link_libraries(
-      otlp_file_exporter_test
-      ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT}
-      ${GMOCK_LIB}
-      opentelemetry_exporter_otlp_file
-      nlohmann_json::nlohmann_json
-      protobuf::libprotobuf)
-    gtest_add_tests(
-      TARGET otlp_file_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_file_exporter_test)
+    if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+      add_executable(otlp_file_exporter_test test/otlp_file_exporter_test.cc)
+      target_link_libraries(
+        otlp_file_exporter_test
+        ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${GMOCK_LIB}
+        opentelemetry_exporter_otlp_file
+        nlohmann_json::nlohmann_json
+        protobuf::libprotobuf)
+      gtest_add_tests(
+        TARGET otlp_file_exporter_test
+        TEST_PREFIX exporter.otlp.
+        TEST_LIST otlp_file_exporter_test)
+    endif()
 
     add_executable(otlp_file_exporter_factory_test
                    test/otlp_file_exporter_factory_test.cc)
@@ -1166,20 +1334,22 @@ if(OTELCPP_BUILD_TESTING)
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_file_exporter_factory_test)
 
-    add_executable(otlp_file_log_record_exporter_test
-                   test/otlp_file_log_record_exporter_test.cc)
-    target_link_libraries(
-      otlp_file_log_record_exporter_test
-      ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT}
-      ${GMOCK_LIB}
-      opentelemetry_exporter_otlp_file_log
-      opentelemetry_logs
-      nlohmann_json::nlohmann_json)
-    gtest_add_tests(
-      TARGET otlp_file_log_record_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_file_log_record_exporter_test)
+    if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+      add_executable(otlp_file_log_record_exporter_test
+                     test/otlp_file_log_record_exporter_test.cc)
+      target_link_libraries(
+        otlp_file_log_record_exporter_test
+        ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${GMOCK_LIB}
+        opentelemetry_exporter_otlp_file_log
+        opentelemetry_logs
+        nlohmann_json::nlohmann_json)
+      gtest_add_tests(
+        TARGET otlp_file_log_record_exporter_test
+        TEST_PREFIX exporter.otlp.
+        TEST_LIST otlp_file_log_record_exporter_test)
+    endif()
 
     add_executable(otlp_file_log_record_exporter_factory_test
                    test/otlp_file_log_record_exporter_factory_test.cc)
@@ -1192,21 +1362,23 @@ if(OTELCPP_BUILD_TESTING)
       TEST_PREFIX exporter.otlp.
       TEST_LIST otlp_file_log_record_exporter_factory_test)
 
-    add_executable(otlp_file_metric_exporter_test
-                   test/otlp_file_metric_exporter_test.cc)
-    target_link_libraries(
-      otlp_file_metric_exporter_test
-      ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT}
-      ${GMOCK_LIB}
-      opentelemetry_exporter_otlp_file_metric
-      opentelemetry_metrics
-      nlohmann_json::nlohmann_json
-      protobuf::libprotobuf)
-    gtest_add_tests(
-      TARGET otlp_file_metric_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_file_metric_exporter_test)
+    if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+      add_executable(otlp_file_metric_exporter_test
+                     test/otlp_file_metric_exporter_test.cc)
+      target_link_libraries(
+        otlp_file_metric_exporter_test
+        ${GTEST_BOTH_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${GMOCK_LIB}
+        opentelemetry_exporter_otlp_file_metric
+        opentelemetry_metrics
+        nlohmann_json::nlohmann_json
+        protobuf::libprotobuf)
+      gtest_add_tests(
+        TARGET otlp_file_metric_exporter_test
+        TEST_PREFIX exporter.otlp.
+        TEST_LIST otlp_file_metric_exporter_test)
+    endif()
 
     add_executable(otlp_file_metric_exporter_factory_test
                    test/otlp_file_metric_exporter_factory_test.cc)
