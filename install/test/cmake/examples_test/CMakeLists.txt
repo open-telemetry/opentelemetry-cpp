@@ -46,6 +46,10 @@ if("exporters_etw" IN_LIST OPENTELEMETRY_CPP_COMPONENTS_INSTALLED)
   set(OTELCPP_WITH_ETW ON)
 endif()
 
+if("resource_detectors" IN_LIST OPENTELEMETRY_CPP_COMPONENTS_INSTALLED)
+  set(OTELCPP_WITH_RESOURCE_DETECTORS ON)
+endif()
+
 # The http example uses the embedded server headers, which the package no longer
 # installs. The ext headers it does use are covered by
 # install/test/src/test_ext_*.cc.

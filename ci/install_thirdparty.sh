@@ -89,7 +89,7 @@ else
     CMAKE_BUILD_TYPE=Release
 fi
 
-THIRDPARTY_BUILD_DIR="/tmp/otel-cpp-third-party-build"
+THIRDPARTY_BUILD_DIR="/tmp/otel-third-party-build"
 CMAKE_OPTIONS=(
    "-DCMAKE_INSTALL_PREFIX=${THIRDPARTY_INSTALL_DIR}"
    "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"

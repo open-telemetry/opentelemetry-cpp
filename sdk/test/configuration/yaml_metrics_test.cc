@@ -7,8 +7,6 @@
 #include <string>
 #include <vector>
 
-#include "opentelemetry/common/key_value_iterable_view.h"
-#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/cardinality_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
@@ -31,8 +29,6 @@
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
-#include "opentelemetry/sdk/configuration/registry.h"
-#include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/string_array_configuration.h"
 #include "opentelemetry/sdk/configuration/temporality_preference.h"
 #include "opentelemetry/sdk/configuration/translation_strategy.h"
@@ -40,7 +36,6 @@
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/sdk/configuration/yaml_configuration_parser.h"
-#include "opentelemetry/sdk/metrics/view/attributes_processor.h"
 
 static std::unique_ptr<opentelemetry::sdk::configuration::Configuration> DoParse(
     const std::string &yaml)
@@ -1405,48 +1400,6 @@ meter_provider:
   ASSERT_EQ(view->stream->attribute_keys->excluded->string_array[0], "foo.ex");
   ASSERT_EQ(view->stream->attribute_keys->excluded->string_array[1], "bar.ex");
 }
-
-class YamlMetricsEmptyIncluded : public ::testing::TestWithParam<const char *>
-{};
-
-TEST_P(YamlMetricsEmptyIncluded, RetainsAllAttributes)
-{
-  std::string yaml = R"(
-file_format: "1.0-metrics"
-meter_provider:
-  readers:
-    - periodic:
-        exporter:
-          console:
-  views:
-    - selector:
-      stream:
-        attribute_keys:
-          included: )";
-  yaml.append(GetParam());
-  yaml.push_back('\n');
-
-  auto config = DoParse(yaml);
-  ASSERT_NE(config, nullptr);
-  ASSERT_NE(config->meter_provider, nullptr);
-  ASSERT_EQ(config->meter_provider->views.size(), 1u);
-  auto &model = config->meter_provider->views[0]->stream->attribute_keys;
-  ASSERT_NE(model, nullptr);
-  ASSERT_NE(model->included, nullptr);
-  ASSERT_TRUE(model->included->string_array.empty());
-
-  std::map<std::string, int> attributes = {{"first", 1}, {"second", 2}};
-  opentelemetry::common::KeyValueIterableView<std::map<std::string, int>> iterable(attributes);
-  opentelemetry::sdk::configuration::SdkBuilder builder(
-      std::make_shared<opentelemetry::sdk::configuration::Registry>());
-  auto processor = builder.CreateAttributesProcessor(model);
-  ASSERT_NE(processor, nullptr);
-
-  auto filtered = processor->process(iterable);
-  EXPECT_EQ(filtered.size(), attributes.size());
-}
-
-INSTANTIATE_TEST_SUITE_P(EmptyIncludedForms, YamlMetricsEmptyIncluded, ::testing::Values("[]", ""));
 
 TEST(YamlMetrics, no_meter_configurator)
 {

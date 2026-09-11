@@ -42,14 +42,15 @@ TEST(ServiceDetectorUtilsTest, GetServiceNameFallbackUsesUnknownServicePrefix)
 {
   unsetenv(kOtelServiceName);
 
-  const std::string service_name = detail::GetServiceName();
-  if (service_name.rfind("unknown_service:", 0) == 0)
+  const std::string service_name           = detail::GetServiceName();
+  const std::string unknown_service_prefix = "unknown_service:";
+  if (service_name.substr(0, unknown_service_prefix.size()) == unknown_service_prefix)
   {
-    EXPECT_GT(service_name.size(), std::string{"unknown_service:"}.size());
+    EXPECT_GT(service_name.size(), unknown_service_prefix.size());
   }
   else
   {
-    EXPECT_EQ(service_name, std::string{"unknown_service"});
+    EXPECT_EQ(service_name, "unknown_service");
   }
 }
 

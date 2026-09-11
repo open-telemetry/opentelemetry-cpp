@@ -262,7 +262,7 @@ TEST(GlobalPropagator, SetAndGet)
 
   std::vector<std::string> fields;
   propagator->Fields([&fields](nostd::string_view field) {
-    fields.push_back(field.data());
+    fields.emplace_back(field.data());
     return true;
   });
   EXPECT_EQ(fields.size(), 2);
