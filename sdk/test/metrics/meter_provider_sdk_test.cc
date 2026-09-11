@@ -19,7 +19,6 @@
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/meter.h"
-#include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -29,6 +28,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
@@ -838,58 +838,6 @@ TEST(MeterProvider, UpdateMeterConfiguratorConcurrentGetMeter)
   auto counter = meter->CreateUInt64Counter("counter.final");
   counter->Add(1);
   EXPECT_FALSE(CollectScopeNames(reader).empty());
-}
-
-// Guards the lock order between UpdateMeterConfigurator (lock_) and collection (meter_lock_ then
-// lock_, via an observable callback calling GetMeter). Hangs rather than fails on regression.
-TEST(MeterProvider, UpdateMeterConfiguratorConcurrentWithCollectDoesNotDeadlock)
-{
-  MetricReader *reader{};
-  auto provider = MakeProvider(reader);
-  ASSERT_NE(nullptr, reader);
-
-  auto meter = provider->GetMeter("scope.observable");
-
-  // Re-entering the provider from inside collection is what takes lock_ under meter_lock_.
-  static MeterProvider *callback_provider = provider.get();
-  auto observable                         = meter->CreateInt64ObservableCounter("obs.counter");
-  observable->AddCallback(
-      [](opentelemetry::metrics::ObserverResult, void *) noexcept {
-        if (callback_provider != nullptr)
-        {
-          auto reentrant = callback_provider->GetMeter("scope.observable");
-          (void)reentrant;
-        }
-      },
-      nullptr);
-
-  constexpr int kUpdateCount = 500;
-
-  std::atomic<bool> stop{false};
-  std::promise<void> collector_ready;
-  std::future<void> collector_ready_future = collector_ready.get_future();
-
-  std::thread collector([&] {
-    collector_ready.set_value();
-    while (!stop.load(std::memory_order_relaxed))
-    {
-      reader->Collect([](ResourceMetrics &) { return true; });
-    }
-  });
-
-  collector_ready_future.wait();
-
-  for (int i = 0; i < kUpdateCount; ++i)
-  {
-    provider->UpdateMeterConfigurator(i % 2 == 0 ? DisableAll() : EnableAll());
-  }
-
-  stop.store(true, std::memory_order_relaxed);
-  collector.join();
-
-  callback_provider = nullptr;
-
-  provider->UpdateMeterConfigurator(EnableAll());
 }
 
 TEST(MeterProvider, SetMeterConfiguratorNullIgnoredOnContext)

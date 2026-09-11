@@ -466,10 +466,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         auto storage_iter = storage_registry_.find(view_instr_desc);
         if (storage_iter != storage_registry_.end())
         {
-          if (IsEnabled())
-          {
-            WarnOnNameCaseConflict(GetInstrumentationScope(), storage_iter->first, view_instr_desc);
-          }
+          WarnOnNameCaseConflict(GetInstrumentationScope(), storage_iter->first, view_instr_desc);
           // static_pointer_cast is okay here. If storage_registry_.find is successful
           // InstrumentEqualNameCaseInsensitive ensures that the
           // instrument type and value type are the same for the existing and new instrument.
@@ -477,11 +474,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         }
         else
         {
-          if (IsEnabled())
-          {
-            WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_,
-                                      view_instr_desc);
-          }
+          WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_, view_instr_desc);
           sync_storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
               view_instr_desc, view.GetAggregationType(), view.GetAttributesProcessor(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -546,10 +539,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         auto storage_iter = storage_registry_.find(view_instr_desc);
         if (storage_iter != storage_registry_.end())
         {
-          if (IsEnabled())
-          {
-            WarnOnNameCaseConflict(GetInstrumentationScope(), storage_iter->first, view_instr_desc);
-          }
+          WarnOnNameCaseConflict(GetInstrumentationScope(), storage_iter->first, view_instr_desc);
           // static_pointer_cast is okay here. If storage_registry_.find is successful
           // InstrumentEqualNameCaseInsensitive ensures that the
           // instrument type and value type are the same for the existing and new instrument.
@@ -557,11 +547,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         }
         else
         {
-          if (IsEnabled())
-          {
-            WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_,
-                                      view_instr_desc);
-          }
+          WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_, view_instr_desc);
           async_storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
               view_instr_desc, view.GetAggregationType(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW

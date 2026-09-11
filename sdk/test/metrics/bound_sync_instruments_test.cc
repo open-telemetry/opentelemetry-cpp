@@ -79,7 +79,7 @@ public:
                                                    ExemplarFilterType::kAlwaysOff,
                                                    ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-                                                   cfg_);
+                                                   cfg_, meter_enabled_state_);
   }
 
   SyncMetricStorage &operator*() noexcept { return *storage_; }
@@ -87,6 +87,7 @@ public:
   std::shared_ptr<SyncMetricStorage> share() const noexcept { return storage_; }
 
 private:
+  std::shared_ptr<MeterEnabledState> meter_enabled_state_{std::make_shared<MeterEnabledState>()};
   std::unique_ptr<AggregationConfig> sum_cfg_;
   std::unique_ptr<HistogramAggregationConfig> hist_cfg_;
   const AggregationConfig *cfg_ = nullptr;
@@ -187,14 +188,15 @@ TEST(BoundSyncInstruments, BoundCounterBindInitializerList)
                             InstrumentValueType::kLong};
   std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
   AggregationConfig cfg;
+  auto meter_enabled_state = std::make_shared<MeterEnabledState>();
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kSum, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      &cfg));
+      &cfg, meter_enabled_state));
   SyncMetricStorage *storage_ptr = storage.get();
-  LongCounter counter(desc, std::move(storage), std::make_shared<MeterEnabledState>());
+  LongCounter counter(desc, std::move(storage), meter_enabled_state);
   opentelemetry::metrics::Counter<uint64_t> &api_counter = counter;
 
   auto bound = api_counter.Bind({{"key", "v"}});
@@ -239,14 +241,15 @@ TEST(BoundSyncInstruments, UnboundCounterDropsValueAboveInt64Max)
                             InstrumentValueType::kLong};
   std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
   AggregationConfig cfg;
+  auto meter_enabled_state = std::make_shared<MeterEnabledState>();
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kSum, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      &cfg));
+      &cfg, meter_enabled_state));
   SyncMetricStorage *storage_ptr = storage.get();
-  LongCounter counter(desc, std::move(storage), std::make_shared<MeterEnabledState>());
+  LongCounter counter(desc, std::move(storage), meter_enabled_state);
   M attrs = {{"key", "v"}};
   auto kv = KeyValueIterableView<M>(attrs);
 
@@ -262,14 +265,15 @@ TEST(BoundSyncInstruments, BoundCounterDropsValueAboveInt64Max)
                             InstrumentValueType::kLong};
   std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
   AggregationConfig cfg;
+  auto meter_enabled_state = std::make_shared<MeterEnabledState>();
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kSum, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      &cfg));
+      &cfg, meter_enabled_state));
   SyncMetricStorage *storage_ptr = storage.get();
-  LongCounter counter(desc, std::move(storage), std::make_shared<MeterEnabledState>());
+  LongCounter counter(desc, std::move(storage), meter_enabled_state);
   M attrs    = {{"key", "v"}};
   auto bound = counter.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(bound, nullptr);
@@ -316,14 +320,15 @@ TEST(BoundSyncInstruments, UnboundHistogramDropsValueAboveInt64Max)
                             InstrumentValueType::kLong};
   std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
   HistogramAggregationConfig cfg;
+  auto meter_enabled_state = std::make_shared<MeterEnabledState>();
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kHistogram, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      &cfg));
+      &cfg, meter_enabled_state));
   SyncMetricStorage *storage_ptr = storage.get();
-  LongHistogram histogram(desc, std::move(storage), std::make_shared<MeterEnabledState>());
+  LongHistogram histogram(desc, std::move(storage), meter_enabled_state);
   M attrs = {{"key", "v"}};
   auto kv = KeyValueIterableView<M>(attrs);
 
@@ -355,14 +360,15 @@ TEST(BoundSyncInstruments, BoundHistogramDropsValueAboveInt64Max)
                             InstrumentValueType::kLong};
   std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
   HistogramAggregationConfig cfg;
+  auto meter_enabled_state = std::make_shared<MeterEnabledState>();
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kHistogram, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      &cfg));
+      &cfg, meter_enabled_state));
   SyncMetricStorage *storage_ptr = storage.get();
-  LongHistogram histogram(desc, std::move(storage), std::make_shared<MeterEnabledState>());
+  LongHistogram histogram(desc, std::move(storage), meter_enabled_state);
   M attrs    = {{"key", "v"}};
   auto bound = histogram.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(bound, nullptr);
@@ -395,14 +401,15 @@ TEST(BoundSyncInstruments, BoundHistogramBindInitializerList)
                             InstrumentValueType::kLong};
   std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
   HistogramAggregationConfig cfg;
+  auto meter_enabled_state = std::make_shared<MeterEnabledState>();
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kHistogram, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      &cfg));
+      &cfg, meter_enabled_state));
   SyncMetricStorage *storage_ptr = storage.get();
-  LongHistogram histogram(desc, std::move(storage), std::make_shared<MeterEnabledState>());
+  LongHistogram histogram(desc, std::move(storage), meter_enabled_state);
   opentelemetry::metrics::Histogram<uint64_t> &api_histogram = histogram;
 
   auto bound = api_histogram.Bind({{"key", "v"}});
@@ -440,7 +447,7 @@ TEST(BoundSyncInstruments, BoundCounterRespectsDropAggregation)
                             ExemplarFilterType::kAlwaysOff,
                             ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-                            &cfg);
+                            &cfg, std::make_shared<MeterEnabledState>());
   M attrs    = {{"k", "v"}};
   auto bound = storage.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(bound, nullptr);
@@ -476,7 +483,7 @@ TEST(BoundSyncInstruments, BoundCounterRespectsLastValueAggregation)
                             ExemplarFilterType::kAlwaysOff,
                             ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-                            &cfg);
+                            &cfg, std::make_shared<MeterEnabledState>());
   M attrs    = {{"k", "v"}};
   auto bound = storage.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(bound, nullptr);
@@ -515,7 +522,7 @@ TEST(BoundSyncInstruments, BoundHistogramRespectsCustomBuckets)
                             ExemplarFilterType::kAlwaysOff,
                             ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-                            &cfg);
+                            &cfg, std::make_shared<MeterEnabledState>());
   M attrs    = {{"k", "v"}};
   auto bound = storage.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(bound, nullptr);
@@ -1134,15 +1141,16 @@ TEST(BoundSyncInstruments, BoundCounterObservesMeterEnabledState)
                             InstrumentValueType::kLong};
   std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
   AggregationConfig cfg;
+  // Production shares one state between the storage and the instrument.
+  auto meter_enabled_state = std::make_shared<MeterEnabledState>(false);
   std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
       desc, AggregationType::kSum, proc,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      &cfg));
+      &cfg, meter_enabled_state));
   SyncMetricStorage *storage_ptr = storage.get();
 
-  auto meter_enabled_state = std::make_shared<MeterEnabledState>(false);
   LongCounter counter(desc, std::move(storage), meter_enabled_state);
   opentelemetry::metrics::Counter<uint64_t> &api_counter = counter;
 

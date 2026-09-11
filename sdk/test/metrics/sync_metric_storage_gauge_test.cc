@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <memory>
 #include <string>
 
 #include "opentelemetry/common/attribute_value.h"  // IWYU pragma: keep
 #include "opentelemetry/nostd/utility.h"           // IWYU pragma: keep
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 #  include <chrono>
@@ -64,7 +66,7 @@ TEST_P(GaugeWritableMetricStorageTestFixture, LongGaugeLastValueAggregation)
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      nullptr);
+      nullptr, std::make_shared<MeterEnabledState>());
 
   int64_t bg_noise_level_1_roomA = 10;
   int64_t bg_noise_level_1_roomB = 20;
@@ -148,7 +150,7 @@ TEST_P(GaugeWritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      nullptr);
+      nullptr, std::make_shared<MeterEnabledState>());
 
   double bg_noise_level_1_roomA = 4.3;
   double bg_noise_level_1_roomB = 2.5;
@@ -242,7 +244,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      nullptr);
+      nullptr, std::make_shared<MeterEnabledState>());
   auto after_creation = std::chrono::system_clock::now();
 
   // Two collectors force the slow path (collectors.size() > 1).
@@ -423,7 +425,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      nullptr);
+      nullptr, std::make_shared<MeterEnabledState>());
   auto after_creation = std::chrono::system_clock::now();
 
   std::shared_ptr<CollectorHandle> collector_a(new MockCollectorHandle(GetParam()));

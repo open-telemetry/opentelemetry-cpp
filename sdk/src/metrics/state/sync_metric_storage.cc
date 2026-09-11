@@ -9,6 +9,7 @@
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/temporal_metric_storage.h"
@@ -185,9 +186,9 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
 std::shared_ptr<BoundSyncWritableMetricStorage> SyncMetricStorage::Bind(
     const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
-  // Bound entries are only GC'd during Collect(), which a disabled Meter skips, so binding here
-  // would leak cardinality slots permanently. nullptr is the documented "unsupported" contract.
-  if (meter_enabled_state_ && !meter_enabled_state_->IsEnabled())
+  // Bound entries are only GC'd during Collect(), which a disabled Meter skips, so binding
+  // here would leak a cardinality slot. Returning nullptr defers the bind.
+  if (!meter_enabled_state_->IsEnabled())
   {
     return nullptr;
   }

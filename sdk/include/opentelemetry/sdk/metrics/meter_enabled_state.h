@@ -22,6 +22,7 @@ class MeterEnabledState
 public:
   explicit MeterEnabledState(bool enabled = true) noexcept : enabled_(enabled) {}
 
+  ~MeterEnabledState()                                    = default;
   MeterEnabledState(const MeterEnabledState &)            = delete;
   MeterEnabledState(MeterEnabledState &&)                 = delete;
   MeterEnabledState &operator=(const MeterEnabledState &) = delete;

@@ -58,7 +58,7 @@ public:
                     nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
 #endif
                     const AggregationConfig *aggregation_config,
-                    std::shared_ptr<MeterEnabledState> meter_enabled_state = nullptr)
+                    std::shared_ptr<MeterEnabledState> meter_enabled_state)
       : instrument_descriptor_(instrument_descriptor),
         aggregation_config_(AggregationConfig::GetOrDefault(aggregation_config)),
         attributes_hashmap_(
@@ -288,7 +288,7 @@ private:
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;
 #endif
   TemporalMetricStorage temporal_metric_storage_;
-  // Owning Meter's enabled flag; null (tests/benchmarks) means enabled. Gates Bind().
+  // Owning Meter's enabled flag, shared so configurator updates reach this storage.
   std::shared_ptr<MeterEnabledState> meter_enabled_state_;
   std::mutex attribute_hashmap_lock_;
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW

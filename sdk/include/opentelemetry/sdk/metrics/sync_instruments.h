@@ -32,11 +32,8 @@ public:
         meter_enabled_state_(std::move(meter_enabled_state))
   {}
 
-  /** True while the Meter that created this instrument is enabled. Null state means enabled. */
-  bool IsEnabled() const noexcept
-  {
-    return !meter_enabled_state_ || meter_enabled_state_->IsEnabled();
-  }
+  /** True while the Meter that created this instrument is enabled. */
+  bool IsEnabled() const noexcept { return meter_enabled_state_->IsEnabled(); }
 
 protected:
   InstrumentDescriptor instrument_descriptor_;
