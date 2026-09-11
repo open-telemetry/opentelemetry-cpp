@@ -79,17 +79,19 @@
 #include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/span_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/span_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/trace_builder_utils.h"
 #include "opentelemetry/sdk/configuration/trace_builders.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_builder.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_provider_builder.h"
+#include "opentelemetry/sdk/configuration/tracer_provider_builder_context.h"
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/unsupported_exception.h"
 
@@ -208,37 +210,35 @@ protected:
       std::unique_ptr<config_sdk::TracerProviderConfiguration> model,
       const config_sdk::AttributeLimitsConfiguration *attribute_limits = nullptr)
   {
-    auto resource = opentelemetry::sdk::resource::Resource::Create({});
-    config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateTracerProvider(model, resource, attribute_limits);
+    auto resource                       = opentelemetry::sdk::resource::Resource::Create({});
+    const auto *tracer_provider_builder = registry_->GetTracerProviderBuilder();
+    config_sdk::TracerProviderBuilderContext tp_context{registry_.get(), &resource,
+                                                        attribute_limits};
+    return tracer_provider_builder->Build(tp_context, model.get());
   }
 
   std::unique_ptr<trace_sdk::SpanProcessor> MakeSpanProcessor(
       std::unique_ptr<config_sdk::SpanProcessorConfiguration> model)
   {
-    config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateSpanProcessor(model);
+    return config_sdk::TraceBuilderUtils::CreateSpanProcessor(registry_.get(), model);
   }
 
   std::unique_ptr<trace_sdk::SpanExporter> MakeSpanExporter(
       std::unique_ptr<config_sdk::SpanExporterConfiguration> model)
   {
-    config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateSpanExporter(model);
+    return config_sdk::TraceBuilderUtils::CreateSpanExporter(registry_.get(), model);
   }
 
   std::unique_ptr<trace_sdk::Sampler> MakeSampler(
       std::unique_ptr<config_sdk::SamplerConfiguration> model)
   {
-    config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateSampler(model);
+    return config_sdk::TraceBuilderUtils::CreateSampler(registry_.get(), model);
   }
 
   std::unique_ptr<scope_sdk::ScopeConfigurator<trace_sdk::TracerConfig>> MakeTracerConfigurator(
       std::unique_ptr<config_sdk::TracerConfiguratorConfiguration> model)
   {
-    config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateTracerConfigurator(model);
+    return config_sdk::TraceBuilderUtils::CreateTracerConfigurator(registry_.get(), model);
   }
 
   std::unique_ptr<trace_sdk::Sampler> MakeComposableSampler(

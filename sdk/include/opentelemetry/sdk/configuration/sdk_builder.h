@@ -3,160 +3,39 @@
 
 #pragma once
 
-#include <cstddef>
 #include <memory>
+#include <string>
 
-#include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
-#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
-#include "opentelemetry/sdk/configuration/base2_exponential_bucket_histogram_aggregation_configuration.h"
-#include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/boolean_array_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/boolean_attribute_value_configuration.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
-#include "opentelemetry/sdk/configuration/console_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/console_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/container_resource_detector_configuration.h"
-#include "opentelemetry/sdk/configuration/double_array_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/double_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
-#include "opentelemetry/sdk/configuration/extension_pull_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_resource_detector_configuration.h"
-#include "opentelemetry/sdk/configuration/extension_span_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/extension_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/host_resource_detector_configuration.h"
-#include "opentelemetry/sdk/configuration/integer_array_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/integer_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/meter_configurator_configuration.h"
-#include "opentelemetry/sdk/configuration/metric_reader_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_grpc_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
-#include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
-#include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/pull_metric_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/pull_metric_reader_configuration.h"
-#include "opentelemetry/sdk/configuration/push_metric_exporter_configuration.h"
+#include "opentelemetry/sdk/configuration/propagator_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/resource_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_detection_configuration.h"
 #include "opentelemetry/sdk/configuration/resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/service_resource_detector_configuration.h"
-#include "opentelemetry/sdk/configuration/simple_span_processor_configuration.h"
-#include "opentelemetry/sdk/configuration/span_exporter_configuration.h"
-#include "opentelemetry/sdk/configuration/string_array_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/string_attribute_value_configuration.h"
-#include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
-#include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/configuration/severity_number.h"
+#include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/sdk/trace/sampler.h"
-#include "opentelemetry/sdk/trace/tracer_config.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace sdk
 {
-namespace trace
-{
-class ComposableSampler;
-}  // namespace trace
-
 namespace configuration
 {
-
-class ComposableSamplerConfiguration;
 
 class SdkBuilder
 {
 public:
-  SdkBuilder(std::shared_ptr<Registry> registry) : registry_(std::move(registry)) {}
-  SdkBuilder(SdkBuilder &&)                      = default;
-  SdkBuilder(const SdkBuilder &)                 = default;
-  SdkBuilder &operator=(SdkBuilder &&)           = default;
-  SdkBuilder &operator=(const SdkBuilder &other) = default;
-  ~SdkBuilder()                                  = default;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateAlwaysOffSampler(
-      const opentelemetry::sdk::configuration::AlwaysOffSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateAlwaysOnSampler(
-      const opentelemetry::sdk::configuration::AlwaysOnSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateJaegerRemoteSampler(
-      const opentelemetry::sdk::configuration::JaegerRemoteSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateParentBasedSampler(
-      const opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateProbabilitySampler(
-      const opentelemetry::sdk::configuration::ProbabilitySamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateTraceIdRatioBasedSampler(
-      const opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateExtensionSampler(
-      const opentelemetry::sdk::configuration::ExtensionSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateSampler(
-      const std::unique_ptr<opentelemetry::sdk::configuration::SamplerConfiguration> &model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::Sampler> CreateCompositeSampler(
-      const opentelemetry::sdk::configuration::ComposableSamplerConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpHttpSpanExporter(
-      const opentelemetry::sdk::configuration::OtlpHttpSpanExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpGrpcSpanExporter(
-      const opentelemetry::sdk::configuration::OtlpGrpcSpanExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateOtlpFileSpanExporter(
-      const opentelemetry::sdk::configuration::OtlpFileSpanExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateConsoleSpanExporter(
-      const opentelemetry::sdk::configuration::ConsoleSpanExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateExtensionSpanExporter(
-      const opentelemetry::sdk::configuration::ExtensionSpanExporterConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> CreateSpanExporter(
-      const std::unique_ptr<opentelemetry::sdk::configuration::SpanExporterConfiguration> &model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateBatchSpanProcessor(
-      const opentelemetry::sdk::configuration::BatchSpanProcessorConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateSimpleSpanProcessor(
-      const opentelemetry::sdk::configuration::SimpleSpanProcessorConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateExtensionSpanProcessor(
-      const opentelemetry::sdk::configuration::ExtensionSpanProcessorConfiguration *model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor> CreateSpanProcessor(
-      const std::unique_ptr<opentelemetry::sdk::configuration::SpanProcessorConfiguration> &model)
-      const;
-
-  std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
-      opentelemetry::sdk::trace::TracerConfig>>
-  CreateTracerConfigurator(const std::unique_ptr<TracerConfiguratorConfiguration> &model) const;
-
-  std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> CreateTracerProvider(
-      const std::unique_ptr<opentelemetry::sdk::configuration::TracerProviderConfiguration> &model,
-      const opentelemetry::sdk::resource::Resource &resource,
-      const AttributeLimitsConfiguration *attribute_limits = nullptr) const;
+  explicit SdkBuilder(std::shared_ptr<Registry> registry);
 
   std::unique_ptr<opentelemetry::context::propagation::TextMapPropagator> CreateTextMapPropagator(
       const std::string &name) const;

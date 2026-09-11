@@ -48,6 +48,9 @@ Increment the:
   and leaving the caller waiting
   [#4425](https://github.com/open-telemetry/opentelemetry-cpp/issues/4425)
 
+* [CONFIGURATION] Break the configuration_core dependency on SDK trace
+  [#4555](https://github.com/open-telemetry/opentelemetry-cpp/pull/4555)
+
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
   and merge the resource per the resource SDK specification.
