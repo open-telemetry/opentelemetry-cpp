@@ -40,10 +40,16 @@ Increment the:
 * [CONFIGURATION] Cleanup build targets and docs
   [#4486](https://github.com/open-telemetry/opentelemetry-cpp/pull/4486)
 
+* [CONFIGURATION] Break the configuration_core dependency on SDK metrics
+  [#4554](https://github.com/open-telemetry/opentelemetry-cpp/pull/4554)
+
 * [BUGFIX] Complete an OTLP HTTP request that its client ends with
   `Destroyed`, `ReadError` or `WriteError`, rather than logging the state
   and leaving the caller waiting
   [#4425](https://github.com/open-telemetry/opentelemetry-cpp/issues/4425)
+
+* [CONFIGURATION] Break the configuration_core dependency on SDK trace
+  [#4555](https://github.com/open-telemetry/opentelemetry-cpp/pull/4555)
 
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
@@ -65,6 +71,10 @@ Increment the:
 
 * [CONFIGURATION] SDK signal provider builder interface
   [#4426](https://github.com/open-telemetry/opentelemetry-cpp/pull/4426)
+
+* [CONFIGURATION] Break the configuration_core dependency on SDK logs
+  [#4553](https://github.com/open-telemetry/opentelemetry-cpp/pull/4553)
+
 * [CONFIGURATION] Support environment variable substitution for attributes
   [#4474](https://github.com/open-telemetry/opentelemetry-cpp/pull/4474)
 
