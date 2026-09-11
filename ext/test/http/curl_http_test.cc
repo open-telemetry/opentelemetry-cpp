@@ -428,10 +428,9 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   session_manager->FinishAllSessions();
 }
 
-// The request body is uploaded through CURLOPT_READFUNCTION, and CURLOPT_SEEKFUNCTION is
-// registered alongside it so libcurl can rewind the body when it restarts an upload. Send a body
-// large enough to span several read callbacks and check it arrives whole, so a mistake in either
-// option shows up as a corrupted or short upload rather than silently.
+// Send a body large enough to span several read callbacks and check it arrives whole, so a mistake
+// in either CURLOPT_READFUNCTION or the seek callback registered beside it shows up as a corrupted
+// or short upload.
 TEST_F(BasicCurlHttpTests, SendPostRequestWithMultiChunkBody)
 {
   received_requests_.clear();
@@ -473,9 +472,7 @@ TEST_F(BasicCurlHttpTests, SendPostRequestWithMultiChunkBody)
   session_manager->FinishAllSessions();
 }
 
-// libcurl calls the seek callback when it has to restart an upload it already began. The body is a
-// fully buffered span, so an absolute seek inside it repositions the read cursor, and anything the
-// callback cannot honour is refused so libcurl fails rather than resuming from the wrong offset.
+// Cover both halves of the callback contract, the seeks it honours and the ones it refuses.
 TEST_F(BasicCurlHttpTests, SeekCallbackRepositionsTheRequestBody)
 {
   CustomEventHandler handler;
@@ -490,7 +487,6 @@ TEST_F(BasicCurlHttpTests, SeekCallbackRepositionsTheRequestBody)
 
   using Peer = curl::HttpOperationTestPeer;
 
-  // An absolute seek inside the body moves the cursor.
   Peer::SetReadCursor(operation, 10);
   EXPECT_EQ(CURL_SEEKFUNC_OK, Peer::Seek(operation, 4, SEEK_SET));
   EXPECT_EQ(4u, Peer::ReadCursor(operation));
