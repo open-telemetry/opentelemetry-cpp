@@ -13,6 +13,7 @@
 #  include <numeric>
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -400,6 +401,51 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
   session->FinishSession();
   ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
   ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+
+  session_manager->CancelAllSessions();
+  session_manager->FinishAllSessions();
+}
+
+// The request body is uploaded through CURLOPT_READFUNCTION, and CURLOPT_SEEKFUNCTION is
+// registered alongside it so libcurl can rewind the body when it restarts an upload. Send a body
+// large enough to span several read callbacks and check it arrives whole, so a mistake in either
+// option shows up as a corrupted or short upload rather than silently.
+TEST_F(BasicCurlHttpTests, SendPostRequestWithMultiChunkBody)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("post/");
+  request->SetMethod(http_client::Method::Post);
+
+  // Not a round number, so an off-by-one in the read cursor cannot land on a chunk boundary.
+  constexpr size_t kBodySize = 257u * 1024u + 7u;
+  http_client::Body body(kBodySize);
+  for (size_t i = 0; i < kBodySize; ++i)
+  {
+    body[i] = static_cast<http_client::Byte>('a' + (i % 26));
+  }
+  const http_client::Body expected = body;
+
+  request->SetBody(body);
+  request->AddHeader("Content-Type", "application/octet-stream");
+  auto handler = std::make_shared<PostEventHandler>();
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+  ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+
+  {
+    std::unique_lock<std::mutex> lk(mtx_requests);
+    ASSERT_EQ(received_requests_.size(), 1u);
+    const auto &received = received_requests_[0].content;
+    ASSERT_EQ(received.size(), expected.size());
+    EXPECT_TRUE(std::equal(expected.begin(), expected.end(), received.begin()));
+  }
 
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
