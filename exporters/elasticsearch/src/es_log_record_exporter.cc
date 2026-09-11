@@ -441,8 +441,20 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   request->SetBody(body_vec);
 
 #ifdef ENABLE_ASYNC_EXPORT
-  // Send the request
-  synchronization_data_->session_counter_.fetch_add(1, std::memory_order_release);
+  // Send the request. Registration has to happen under the same lock Shutdown() takes to
+  // flip is_shutdown_ and snapshot session_counter_ (see ForceFlush()) - otherwise a session
+  // that passes the isShutdown() check above can still register after Shutdown() has already
+  // taken its snapshot, and ForceFlush() would return without ever having waited for it.
+  {
+    std::lock_guard<std::recursive_mutex> lock_guard{synchronization_data_->force_flush_m};
+    if (isShutdown())
+    {
+      OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Exporting "
+                              << records.size() << " log(s) failed, exporter is shutdown");
+      return sdk::common::ExportResult::kFailure;
+    }
+    synchronization_data_->session_counter_.fetch_add(1, std::memory_order_release);
+  }
   std::size_t span_count    = records.size();
   auto synchronization_data = synchronization_data_;
   auto handler              = std::make_shared<AsyncResponseHandler>(
@@ -549,15 +561,29 @@ bool ElasticsearchLogRecordExporter::ForceFlush(std::chrono::microseconds timeou
 #endif
 }
 
-bool ElasticsearchLogRecordExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
+bool ElasticsearchLogRecordExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+#ifdef ENABLE_ASYNC_EXPORT
+  {
+    // Same lock Export() takes around its isShutdown() check and registration, so that by the
+    // time ForceFlush() below takes its session_counter_ snapshot, every session that is
+    // going to register for this shutdown already has.
+    std::lock_guard<std::recursive_mutex> lock_guard{synchronization_data_->force_flush_m};
+    is_shutdown_ = true;
+  }
+#else
   is_shutdown_ = true;
+#endif
+
+  // Flush with the caller's deadline before cancelling anything, so the wait below has
+  // something to wait for. Cancelling first would leave nothing pending to flush.
+  const bool flushed = ForceFlush(timeout);
 
   // Shutdown the session manager
   http_client_->CancelAllSessions();
   http_client_->FinishAllSessions();
 
-  return true;
+  return flushed;
 }
 
 bool ElasticsearchLogRecordExporter::isShutdown() const noexcept
