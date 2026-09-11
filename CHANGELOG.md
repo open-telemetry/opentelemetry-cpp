@@ -44,6 +44,17 @@ Increment the:
 * [CONFIGURATION] Cleanup build targets and docs
   [#4486](https://github.com/open-telemetry/opentelemetry-cpp/pull/4486)
 
+* [CONFIGURATION] Break the configuration_core dependency on SDK metrics
+  [#4554](https://github.com/open-telemetry/opentelemetry-cpp/pull/4554)
+
+* [BUGFIX] Complete an OTLP HTTP request that its client ends with
+  `Destroyed`, `ReadError` or `WriteError`, rather than logging the state
+  and leaving the caller waiting
+  [#4425](https://github.com/open-telemetry/opentelemetry-cpp/issues/4425)
+
+* [CONFIGURATION] Break the configuration_core dependency on SDK trace
+  [#4555](https://github.com/open-telemetry/opentelemetry-cpp/pull/4555)
+
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
   and merge the resource per the resource SDK specification.
@@ -52,6 +63,10 @@ Increment the:
     longer injects a default `service.name`, since neither is part of the
     configuration model. Use the `service` detector or set the attributes in
     the configuration file instead.
+
+* [CONFIGURATION/BUILD] Break up OTLP builder utils into gRPC and HTTP utils
+  [#4533](https://github.com/open-telemetry/opentelemetry-cpp/pull/4533)
+
 * [CONFIGURATION] Add a resource detector extension example
   [#4419](https://github.com/open-telemetry/opentelemetry-cpp/issues/4419)
 
@@ -60,6 +75,10 @@ Increment the:
 
 * [CONFIGURATION] SDK signal provider builder interface
   [#4426](https://github.com/open-telemetry/opentelemetry-cpp/pull/4426)
+
+* [CONFIGURATION] Break the configuration_core dependency on SDK logs
+  [#4553](https://github.com/open-telemetry/opentelemetry-cpp/pull/4553)
+
 * [CONFIGURATION] Support environment variable substitution for attributes
   [#4474](https://github.com/open-telemetry/opentelemetry-cpp/pull/4474)
 
@@ -281,6 +300,10 @@ Increment the:
   shutdown and force flush.
   [#4382](https://github.com/open-telemetry/opentelemetry-cpp/pull/4382)
 
+* [SDK] Fix lost-wakeups in BatchLogRecordProcessor to prevent stalls during
+  shutdown and force flush.
+  [#4400](https://github.com/open-telemetry/opentelemetry-cpp/issues/4400)
+
 * [METRICS SDK] Support `OTEL_METRICS_EXEMPLAR_FILTER` when metrics exemplars
   are enabled. The default exemplar filter changes from `always_off` to
   `trace_based` to match the specification.
@@ -293,6 +316,10 @@ Increment the:
 * [RESOURCE DETECTOR] Add required and recommended attributes (except htlhash)
   for process entity
   [#4437](https://github.com/open-telemetry/opentelemetry-cpp/pull/4437)
+
+* [BUG] Prevent lost condition-variable wakeups in OTLP file exporter and periodic
+  metric exporter
+  [#4365](https://github.com/open-telemetry/opentelemetry-cpp/pull/4365)
 
 Important changes:
 
