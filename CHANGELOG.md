@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Enforce a runtime minimum scale of `-11` for
+  `Base2ExponentialHistogramAggregation`, so a recording that spans the full
+  double range no longer downscales without end.
+  [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
   [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
 
