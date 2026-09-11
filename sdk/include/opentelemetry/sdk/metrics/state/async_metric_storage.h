@@ -134,12 +134,6 @@ public:
       delta_metrics = std::move(delta_hash_map_);
       delta_hash_map_ =
           std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_);
-      // cumulative_hash_map_ is intentionally NOT pruned here.
-      // It preserves the last-seen absolute value for every attribute set so that
-      // delta computation in Record() remains correct if an attribute set reappears
-      // after being absent for one or more collection cycles.
-      // Stale entries are suppressed at export time by the is_async_ guard in
-      // TemporalMetricStorage::buildMetrics() instead.
     }
 
     auto status =
