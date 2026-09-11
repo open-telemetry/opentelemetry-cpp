@@ -17,7 +17,7 @@ namespace exporter
 namespace otlp
 {
 
-namespace
+namespace test
 {
 
 // Captures the body of the one request the session is asked to send, and
@@ -36,7 +36,7 @@ inline void CaptureRequestBody(const std::shared_ptr<ext::http::client::nosend::
       });
 }
 
-}  // namespace
+}  // namespace test
 
 }  // namespace otlp
 }  // namespace exporter

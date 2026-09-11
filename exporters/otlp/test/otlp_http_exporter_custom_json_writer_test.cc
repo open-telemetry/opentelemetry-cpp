@@ -3,35 +3,27 @@
 
 #include <gtest/gtest.h>
 #include <chrono>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
 #include <string>
 #include <utility>
 #include "gmock/gmock.h"
 
-#include "opentelemetry/exporters/otlp/detail/default_json_writer_factory.h"
-#include "opentelemetry/exporters/otlp/otlp_http_client.h"
-#include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_runtime_options.h"
-#include "opentelemetry/exporters/otlp/otlp_json_writer.h"
-#include "opentelemetry/exporters/otlp/otlp_json_writer_factory.h"
 #include "opentelemetry/ext/http/client/http_client.h"
-#include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/sdk/common/exporter_utils.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
 #include "otlp_marking_json_writer.h"
 
 #include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
-#include "opentelemetry/test_common/ext/http/client/nosend/http_client_factory_nosend.h"
 #include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 
 using namespace testing;
@@ -44,14 +36,19 @@ namespace otlp
 
 namespace http_client = opentelemetry::ext::http::client;
 
+namespace
+{
+
 class OtlpHttpExporterCustomJsonWriterTestPeer : public ::testing::Test
 {};
+
+}  // namespace
 
 TEST_F(OtlpHttpExporterCustomJsonWriterTestPeer, RuntimeOptionsInjectionCreatesExporter)
 {
   OtlpHttpExporterOptions opts;
   OtlpHttpExporterRuntimeOptions runtime_opts;
-  runtime_opts.json_writer_factory = std::make_shared<MarkingJsonWriterFactory>();
+  runtime_opts.json_writer_factory = std::make_shared<test::MarkingJsonWriterFactory>();
   auto exporter                    = OtlpHttpExporterFactory::Create(opts, runtime_opts);
   ASSERT_NE(exporter, nullptr);
 }
@@ -60,7 +57,7 @@ TEST_F(OtlpHttpExporterCustomJsonWriterTestPeer, RuntimeOptionsWithHttpClientCre
 {
   OtlpHttpExporterOptions opts;
   OtlpHttpExporterRuntimeOptions runtime_opts;
-  runtime_opts.json_writer_factory = std::make_shared<MarkingJsonWriterFactory>();
+  runtime_opts.json_writer_factory = std::make_shared<test::MarkingJsonWriterFactory>();
   auto client                      = http_client::HttpClientTestFactory::Create();
   auto exporter = OtlpHttpExporterFactory::Create(opts, runtime_opts, std::move(client));
   ASSERT_NE(exporter, nullptr);
@@ -75,7 +72,7 @@ TEST_F(OtlpHttpExporterCustomJsonWriterTestPeer, ExportUsesTheInjectedJsonWriter
   OtlpHttpExporterOptions options;
   options.content_type = HttpRequestContentType::kJson;
   OtlpHttpExporterRuntimeOptions runtime_options;
-  runtime_options.json_writer_factory = std::make_shared<MarkingJsonWriterFactory>();
+  runtime_options.json_writer_factory = std::make_shared<test::MarkingJsonWriterFactory>();
   auto exporter = OtlpHttpExporterFactory::Create(options, runtime_options, std::move(client));
 
   std::string captured_body;

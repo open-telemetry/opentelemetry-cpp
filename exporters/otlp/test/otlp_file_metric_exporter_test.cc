@@ -4,6 +4,7 @@
 #include <google/protobuf/message_lite.h>  // IWYU pragma: keep
 #include <google/protobuf/stubs/common.h>  // IWYU pragma: keep
 #include <gtest/gtest.h>
+#include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <functional>

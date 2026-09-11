@@ -12,6 +12,7 @@
 
 #include "opentelemetry/exporters/otlp/detail/default_json_writer_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_json_writer_factory.h"
+#include "opentelemetry/version.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -35,6 +36,9 @@ TEST(NlohmannJsonWriter, FactoryReturnsAWorkingWriter)
   EXPECT_TRUE(writer->ok());
 }
 
+namespace
+{
+
 struct ScalarCase
 {
   const char *name;
@@ -49,6 +53,8 @@ void PrintTo(const ScalarCase &scalar_case, std::ostream *os)
 
 class NlohmannJsonWriterScalar : public ::testing::TestWithParam<ScalarCase>
 {};
+
+}  // namespace
 
 TEST_P(NlohmannJsonWriterScalar, WritesTopLevelScalar)
 {

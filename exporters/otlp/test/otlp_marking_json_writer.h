@@ -20,7 +20,7 @@ namespace exporter
 namespace otlp
 {
 
-namespace
+namespace test
 {
 
 // Wraps the default writer and marks its output, so a test can tell the
@@ -60,7 +60,7 @@ public:
   std::unique_ptr<JsonWriter> Create() override { return std::make_unique<MarkingJsonWriter>(); }
 };
 
-}  // namespace
+}  // namespace test
 
 }  // namespace otlp
 }  // namespace exporter

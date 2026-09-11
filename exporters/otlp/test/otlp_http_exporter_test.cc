@@ -25,6 +25,7 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -980,7 +981,7 @@ TEST_F(OtlpHttpExporterTestPeer, ExportJsonGoldenBody)
       std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
 
   std::string captured_body;
-  CaptureRequestBody(mock_session, captured_body);
+  test::CaptureRequestBody(mock_session, captured_body);
 
   auto recordable = exporter->MakeRecordable();
 

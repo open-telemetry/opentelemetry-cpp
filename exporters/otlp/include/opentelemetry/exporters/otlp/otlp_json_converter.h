@@ -7,11 +7,13 @@
 #include "opentelemetry/exporters/otlp/otlp_json_writer.h"
 #include "opentelemetry/version.h"
 
-// clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
-#include <google/protobuf/message.h>
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
-// clang-format on
+namespace google
+{
+namespace protobuf
+{
+class Message;
+}  // namespace protobuf
+}  // namespace google
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

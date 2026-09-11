@@ -14,6 +14,7 @@
 #include "nlohmann/json.hpp"
 
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
@@ -984,7 +985,7 @@ TEST_F(OtlpHttpLogRecordExporterTestPeer, ExportJsonGoldenBody)
       std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
 
   std::string captured_body;
-  CaptureRequestBody(mock_session, captured_body);
+  test::CaptureRequestBody(mock_session, captured_body);
 
   auto recordable = exporter->MakeRecordable();
 

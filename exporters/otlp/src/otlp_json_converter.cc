@@ -14,13 +14,14 @@
 #  include <cassert>
 #endif
 
-#include "opentelemetry/sdk/common/base64.h"
+#include "opentelemetry/nostd/string_view.h"
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 // clang-format on
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
+#include <string_view>
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
@@ -299,7 +300,6 @@ void ConvertListFieldToJson(JsonWriter &writer,
 }
 
 }  // namespace
-// NOLINTEND(misc-no-recursion)
 
 void ConvertGenericMessageToJson(JsonWriter &writer,
                                  const google::protobuf::Message &message,
@@ -333,6 +333,7 @@ void ConvertGenericMessageToJson(JsonWriter &writer,
   }
   writer.EndObject();
 }
+// NOLINTEND(misc-no-recursion)
 
 }  // namespace otlp
 }  // namespace exporter

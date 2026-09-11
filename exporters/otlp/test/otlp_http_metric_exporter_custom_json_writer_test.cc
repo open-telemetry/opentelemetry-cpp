@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include <string>
 #include <utility>
 
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
@@ -27,7 +28,7 @@ TEST(OtlpHttpMetricExporterCustomJsonWriterTest, RuntimeOptionsInjectionCreatesE
 {
   OtlpHttpMetricExporterOptions opts;
   OtlpHttpMetricExporterRuntimeOptions runtime_opts;
-  runtime_opts.json_writer_factory = std::make_shared<StubJsonWriterFactory>();
+  runtime_opts.json_writer_factory = std::make_shared<test::StubJsonWriterFactory>();
   auto exporter                    = OtlpHttpMetricExporterFactory::Create(opts, runtime_opts);
   ASSERT_NE(exporter, nullptr);
 }
@@ -36,7 +37,7 @@ TEST(OtlpHttpMetricExporterCustomJsonWriterTest, RuntimeOptionsWithHttpClientCre
 {
   OtlpHttpMetricExporterOptions opts;
   OtlpHttpMetricExporterRuntimeOptions runtime_opts;
-  runtime_opts.json_writer_factory = std::make_shared<StubJsonWriterFactory>();
+  runtime_opts.json_writer_factory = std::make_shared<test::StubJsonWriterFactory>();
   auto client                      = http_client::HttpClientTestFactory::Create();
   auto exporter = OtlpHttpMetricExporterFactory::Create(opts, runtime_opts, std::move(client));
   ASSERT_NE(exporter, nullptr);

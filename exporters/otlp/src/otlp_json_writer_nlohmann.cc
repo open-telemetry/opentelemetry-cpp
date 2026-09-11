@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -14,6 +15,13 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/base64.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/version.h"
+
+// Must be included after opentelemetry/version.h,
+// which exports opentelemetry/common/macros.h
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#  include <exception>
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -27,14 +35,11 @@ namespace
 class NlohmannJsonWriter final : public JsonWriter
 {
 public:
-  void BeginObject() noexcept override
-  {
-    OpenContainer(nlohmann::json::object(), Container::kObject);
-  }
+  void BeginObject() noexcept override { OpenContainer(Container::kObject); }
 
   void EndObject() noexcept override { CloseContainer(Container::kObject); }
 
-  void BeginArray() noexcept override { OpenContainer(nlohmann::json::array(), Container::kArray); }
+  void BeginArray() noexcept override { OpenContainer(Container::kArray); }
 
   void EndArray() noexcept override { CloseContainer(Container::kArray); }
 
@@ -93,11 +98,27 @@ public:
 
   std::string ToString() noexcept override
   {
-    return root_.dump(-1, ' ', false, nlohmann::detail::error_handler_t::replace);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+    {
+#endif
+      return root_.dump(-1, ' ', false, nlohmann::detail::error_handler_t::replace);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    }
+    catch (const std::exception &e)
+    {
+      Fail(e.what());
+    }
+    catch (...)
+    {
+      Fail("unknown exception");
+    }
+    return std::string();
+#endif
   }
 
 private:
-  enum class Container
+  enum class Container : std::uint8_t
   {
     kObject,
     kArray,
@@ -140,32 +161,61 @@ private:
     }
 
     Frame &frame = stack_.back();
-    if (frame.kind == Container::kArray)
-    {
-      frame.node->push_back(nlohmann::json());
-      return &frame.node->back();
-    }
-
-    // kObject
-    if (!has_pending_key_)
+    if (frame.kind == Container::kObject && !has_pending_key_)
     {
       Fail("a value was written without a preceding Key()");
       return nullptr;
     }
-    has_pending_key_     = false;
-    nlohmann::json &slot = (*frame.node)[pending_key_];
-    return &slot;
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+    {
+#endif
+      if (frame.kind == Container::kArray)
+      {
+        frame.node->push_back(nlohmann::json());
+        return &frame.node->back();
+      }
+      has_pending_key_ = false;
+      return &(*frame.node)[pending_key_];
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    }
+    catch (const std::exception &e)
+    {
+      Fail(e.what());
+    }
+    catch (...)
+    {
+      Fail("unknown exception");
+    }
+    return nullptr;
+#endif
   }
 
-  void OpenContainer(nlohmann::json &&empty_container, Container kind) noexcept
+  void OpenContainer(Container kind) noexcept
   {
     nlohmann::json *slot = ClaimSlot();
     if (!slot)
     {
       return;
     }
-    *slot = std::move(empty_container);
-    stack_.push_back(Frame{slot, kind});
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+    {
+#endif
+      *slot = kind == Container::kObject ? nlohmann::json::object() : nlohmann::json::array();
+      stack_.push_back(Frame{slot, kind});
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    }
+    catch (const std::exception &e)
+    {
+      Fail(e.what());
+    }
+    catch (...)
+    {
+      Fail("unknown exception");
+    }
+#endif
   }
 
   void CloseContainer(Container kind) noexcept

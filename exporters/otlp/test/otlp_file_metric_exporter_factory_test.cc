@@ -7,6 +7,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_runtime_options.h"
 #include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/version.h"
 
@@ -47,7 +48,7 @@ TEST(OtlpFileMetricExporterFactory, BuildWithJsonWriterFactoryTest)
 {
   OtlpFileMetricExporterOptions opts;
   OtlpFileMetricExporterRuntimeOptions runtime_opts;
-  runtime_opts.json_writer_factory = std::make_shared<StubJsonWriterFactory>();
+  runtime_opts.json_writer_factory = std::make_shared<test::StubJsonWriterFactory>();
 
   auto exporter = OtlpFileMetricExporterFactory::Create(opts, runtime_opts);
 

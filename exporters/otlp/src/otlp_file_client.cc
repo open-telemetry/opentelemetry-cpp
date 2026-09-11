@@ -11,7 +11,6 @@
 #include <ctime>
 #include <fstream>
 #include <functional>
-#include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -19,12 +18,6 @@
 #include <vector>
 
 // IWYU pragma: no_include <features.h>
-
-#if defined(HAVE_GSL)
-#  include <gsl/gsl>
-#else
-#  include <cassert>
-#endif
 
 #ifdef _MSC_VER
 #  define strcasecmp _stricmp
@@ -116,22 +109,23 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/version.h"
 
-// clang-format off
-#include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
-#include "google/protobuf/message.h"
-#include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
-// clang-format on
-
 // Must be included after opentelemetry/version.h,
 // which exports opentelemetry/common/macros.h
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
 #  include <exception>
-#  include <string_view>
 #endif
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
 #  include "opentelemetry/sdk/common/thread_instrumentation.h"
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
+namespace google
+{
+namespace protobuf
+{
+class Message;
+}  // namespace protobuf
+}  // namespace google
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter

@@ -932,7 +932,10 @@ cc_test(
 
 cc_test(
     name = "otlp_file_exporter_factory_test",
-    srcs = ["test/otlp_file_exporter_factory_test.cc"],
+    srcs = [
+        "test/otlp_file_exporter_factory_test.cc",
+        "test/otlp_stub_json_writer.h",
+    ],
     tags = [
         "otlp",
         "otlp_file",
@@ -1001,7 +1004,10 @@ cc_test(
 
 cc_test(
     name = "otlp_file_log_record_exporter_factory_test",
-    srcs = ["test/otlp_file_log_record_exporter_factory_test.cc"],
+    srcs = [
+        "test/otlp_file_log_record_exporter_factory_test.cc",
+        "test/otlp_stub_json_writer.h",
+    ],
     tags = [
         "otlp",
         "otlp_file_log",
@@ -1135,7 +1141,10 @@ cc_test(
 
 cc_test(
     name = "otlp_file_metric_exporter_factory_test",
-    srcs = ["test/otlp_file_metric_exporter_factory_test.cc"],
+    srcs = [
+        "test/otlp_file_metric_exporter_factory_test.cc",
+        "test/otlp_stub_json_writer.h",
+    ],
     tags = [
         "otlp",
         "otlp_file_metric",

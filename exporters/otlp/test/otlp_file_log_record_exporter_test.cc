@@ -12,6 +12,7 @@
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h"

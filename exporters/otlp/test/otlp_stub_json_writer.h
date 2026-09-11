@@ -19,7 +19,7 @@ namespace exporter
 namespace otlp
 {
 
-namespace
+namespace test
 {
 
 // A writer distinct from the nlohmann default, just enough to show that
@@ -51,7 +51,7 @@ public:
   std::unique_ptr<JsonWriter> Create() override { return std::make_unique<StubJsonWriter>(); }
 };
 
-}  // namespace
+}  // namespace test
 
 }  // namespace otlp
 }  // namespace exporter

@@ -7,6 +7,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_runtime_options.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 #include "opentelemetry/version.h"
 
@@ -47,7 +48,7 @@ TEST(OtlpFileLogRecordExporterFactoryTest, BuildWithJsonWriterFactoryTest)
 {
   OtlpFileLogRecordExporterOptions opts;
   OtlpFileLogRecordExporterRuntimeOptions runtime_opts;
-  runtime_opts.json_writer_factory = std::make_shared<StubJsonWriterFactory>();
+  runtime_opts.json_writer_factory = std::make_shared<test::StubJsonWriterFactory>();
 
   auto exporter = OtlpFileLogRecordExporterFactory::Create(opts, runtime_opts);
 

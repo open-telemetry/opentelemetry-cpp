@@ -1397,7 +1397,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportJsonGoldenBody)
                         sum_metric_data, gauge_metric_data, histogram_metric_data}}};
 
   std::string captured_body;
-  CaptureRequestBody(mock_session, captured_body);
+  test::CaptureRequestBody(mock_session, captured_body);
 
   EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kSuccess, exporter->Export(data));
 

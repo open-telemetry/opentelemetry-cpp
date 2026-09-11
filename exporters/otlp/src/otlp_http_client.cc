@@ -15,13 +15,6 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
-#include <vector>
-
-#if defined(HAVE_GSL)
-#  include <gsl/gsl>
-#else
-#  include <cassert>
-#endif
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/detail/default_json_writer_factory.h"
@@ -48,7 +41,6 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/stubs/port.h>
 #include <google/protobuf/util/json_util.h>
-#include <string_view>
 // IWYU pragma: no_include <google/protobuf/stubs/status.h>
 // IWYU pragma: no_include <google/protobuf/stubs/stringpiece.h>
 // IWYU pragma: no_include <google/protobuf/json/json.h>

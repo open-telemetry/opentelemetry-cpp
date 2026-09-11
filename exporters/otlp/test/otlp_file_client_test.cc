@@ -20,12 +20,9 @@
 // IWYU pragma: no_include <features.h>
 
 #include "opentelemetry/common/timestamp.h"
-#include "opentelemetry/exporters/otlp/detail/default_json_writer_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_runtime_options.h"
-#include "opentelemetry/exporters/otlp/otlp_json_writer.h"
-#include "opentelemetry/exporters/otlp/otlp_json_writer_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/nostd/span.h"
@@ -184,7 +181,7 @@ TEST(OtlpFileClientTest, CustomJsonWriterFactoryIsUsed)
   opentelemetry::exporter::otlp::OtlpFileClientRuntimeOptions rt_opts;
   opts.backend_options = std::ref(output_stream);
 
-  rt_opts.json_writer_factory = std::make_shared<MarkingJsonWriterFactory>();
+  rt_opts.json_writer_factory = std::make_shared<test::MarkingJsonWriterFactory>();
 
   auto client = std::make_unique<opentelemetry::exporter::otlp::OtlpFileClient>(std::move(opts),
                                                                                 std::move(rt_opts));
