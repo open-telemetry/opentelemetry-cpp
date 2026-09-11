@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include <mutex>
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/cardinality_limits.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -48,10 +49,11 @@ bool MetricReader::Collect(
 
 bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  bool expected = false;
-  if (!shutdown_.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
+  // Serialize so concurrent calls block until the first call's shutdown has completed.
+  std::lock_guard<std::mutex> shutdown_guard{shutdown_m_};
+  if (shutdown_.exchange(true, std::memory_order_release))
   {
-    OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown - Cannot invoke shutdown twice!");
+    OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown - Already shutdown!");
     return true;
   }
   bool status = true;

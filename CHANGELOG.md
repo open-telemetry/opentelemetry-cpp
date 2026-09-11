@@ -16,6 +16,7 @@ Increment the:
 ## [Unreleased]
 
 * [SDK] Fix `MetricReader::Shutdown()` invoking `OnShutDown()` multiple times.
+  Concurrent calls now block until the first call's shutdown has completed.
   [#4536](https://github.com/open-telemetry/opentelemetry-cpp/issues/4536)
 
 * [SDK] Fix `MetricReader::ForceFlush()` invoking `OnForceFlush()` on a

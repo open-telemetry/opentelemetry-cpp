@@ -6,6 +6,7 @@
 #include <atomic>
 #include <chrono>
 #include <cstddef>
+#include <mutex>
 
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/cardinality_limits.h"
@@ -72,8 +73,8 @@ public:
   /**
    * Shutdown the metric reader.
    *
-   * Idempotent. Only the first call performs the shutdown, later calls log a warning and
-   * return true.
+   * Idempotent and a completion barrier: only the first call runs OnShutDown(), and a
+   * concurrent call blocks until the first call has finished before returning.
    *
    * @return the result of OnShutDown() for the first call, true for any subsequent call.
    */
@@ -104,6 +105,7 @@ private:
 protected:
 private:
   MetricProducer *metric_producer_{nullptr};
+  std::mutex shutdown_m_;
   std::atomic<bool> shutdown_{false};
   CardinalityLimits cardinality_limits_;
 };
