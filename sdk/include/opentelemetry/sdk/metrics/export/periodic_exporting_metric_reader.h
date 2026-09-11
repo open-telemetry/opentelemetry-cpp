@@ -67,6 +67,18 @@ private:
   std::condition_variable cv_, force_flush_cv_;
   std::mutex cv_m_, force_flush_m_;
 
+  /**
+   * Set by OnShutDown() to tell the worker thread to stop. This is intentionally separate from
+   * the base class's IsShutdown(): MetricReader::Shutdown() only flips that *after* OnShutDown()
+   * has completed -- which itself performs one last OnForceFlush() drain, and joins the worker
+   * thread, before returning -- so that drain's own Collect() call isn't seen as happening
+   * "while Shutdown in progress", and so OnForceFlush()'s break_condition doesn't bail out
+   * immediately when that drain runs. The worker thread's loop and wait predicate, and
+   * OnForceFlush()'s break_condition, must therefore key off this flag instead of IsShutdown()
+   * to know when a shutdown is in progress.
+   */
+  std::atomic<bool> is_stop_requested_{false};
+
   /* The background worker thread */
   std::shared_ptr<sdk::common::ThreadInstrumentation> worker_thread_instrumentation_;
   std::thread worker_thread_;

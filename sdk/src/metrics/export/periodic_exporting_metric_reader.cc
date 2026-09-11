@@ -139,7 +139,7 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
         is_force_wakeup_background_worker_.store(false, std::memory_order_release);
         return true;
       }
-      return IsShutdown();
+      return is_stop_requested_.load(std::memory_order_acquire);
     });
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
@@ -148,34 +148,7 @@ void PeriodicExportingMetricReader::DoBackgroundWork()
       worker_thread_instrumentation_->AfterWait();
     }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
-  } while (IsShutdown() != true);
-
-  // The loop above only exits once Shutdown() has been signalled, and the wait above may
-  // have woken up (or been woken up) without ever re-running CollectAndExportOnce(). Any
-  // metrics recorded since the last periodic tick would otherwise be silently dropped, so
-  // perform one last collect-and-export cycle here, before the exporter itself is shut
-  // down in OnShutDown().
-#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
-  if (worker_thread_instrumentation_ != nullptr)
-  {
-    worker_thread_instrumentation_->BeforeLoad();
-  }
-#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
-
-  auto final_status = CollectAndExportOnce();
-
-#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
-  if (worker_thread_instrumentation_ != nullptr)
-  {
-    worker_thread_instrumentation_->AfterLoad();
-  }
-#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
-
-  if (!final_status)
-  {
-    OTEL_INTERNAL_LOG_ERROR(
-        "[Periodic Exporting Metric Reader]  Final Collect-Export Cycle Failure.")
-  }
+  } while (!is_stop_requested_.load(std::memory_order_acquire));
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
   if (worker_thread_instrumentation_ != nullptr)
@@ -239,7 +212,11 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
   std::uint64_t current_sequence =
       force_flush_pending_sequence_.fetch_add(1, std::memory_order_release) + 1;
   auto break_condition = [this, current_sequence]() {
-    if (IsShutdown())
+    // Give up rather than wait if a shutdown is already in progress -- checking
+    // is_stop_requested_ here (rather than IsShutdown()) matters because OnShutDown() runs
+    // its own internal OnForceFlush() drain, and only signals is_stop_requested_ afterwards,
+    // before MetricReader::Shutdown() marks the reader as shut down.
+    if (is_stop_requested_.load(std::memory_order_acquire))
     {
       return true;
     }
@@ -315,10 +292,20 @@ bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout
 {
   if (worker_thread_.joinable())
   {
+    // Reuses OnForceFlush()'s existing wake-the-worker-and-wait machinery (with its correct
+    // timeout accounting) to drain any metrics recorded since the last periodic tick, so they
+    // aren't silently dropped on shutdown. This must run while the worker thread is still alive
+    // and looping normally -- i.e. before is_stop_requested_ is set below, since
+    // OnForceFlush()'s break_condition treats that as "shutting down, nothing to do" and bails
+    // out immediately.
+    OnForceFlush(timeout);
+
     {
       // Acquiring cv_m_ guarantees that the next time the worker thread checks the wait condition
-      // on cv_ (either from notify below or any other reason) it will see IsShutdown() return true.
+      // on cv_ (either from notify below or any other reason) it will see is_stop_requested_
+      // return true.
       std::lock_guard<std::mutex> cv_guard{cv_m_};
+      is_stop_requested_.store(true, std::memory_order_release);
     }
     cv_.notify_all();
     worker_thread_.join();

@@ -16,9 +16,12 @@ Increment the:
 ## [Unreleased]
 
 * [METRICS] `PeriodicExportingMetricReader::Shutdown` now performs one final
-  collect-and-export cycle before shutting down the underlying exporter, so
-  metrics recorded since the last periodic tick are no longer silently
-  dropped on shutdown, per the metrics SDK spec.
+  flush (reusing the same timeout-bounded machinery as `ForceFlush`) before
+  shutting down the underlying exporter, so metrics recorded since the last
+  periodic tick are no longer silently dropped on shutdown, per the metrics
+  SDK spec. `MetricReader::Shutdown` now only marks the reader as shut down
+  after this final flush completes, so it no longer logs a spurious
+  "invoked while Shutdown in progress" warning on every clean shutdown.
   [#2983](https://github.com/open-telemetry/opentelemetry-specification/issues/2983)
 
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
