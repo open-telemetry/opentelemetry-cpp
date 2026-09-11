@@ -40,6 +40,9 @@ Increment the:
 * [CONFIGURATION] Cleanup build targets and docs
   [#4486](https://github.com/open-telemetry/opentelemetry-cpp/pull/4486)
 
+* [BUGFIX] Stop a curl request whose gzip step failed, instead of sending
+  a body the failed compression had already overwritten
+  [#4360](https://github.com/open-telemetry/opentelemetry-cpp/issues/4360)
 * [CONFIGURATION] Break the configuration_core dependency on SDK metrics
   [#4554](https://github.com/open-telemetry/opentelemetry-cpp/pull/4554)
 
