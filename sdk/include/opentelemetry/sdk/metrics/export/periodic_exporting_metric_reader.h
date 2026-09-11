@@ -69,13 +69,12 @@ private:
 
   /**
    * Set by OnShutDown() to tell the worker thread to stop. This is intentionally separate from
-   * the base class's IsShutdown(): MetricReader::Shutdown() only flips that *after* OnShutDown()
-   * has completed -- which itself performs one last OnForceFlush() drain, and joins the worker
-   * thread, before returning -- so that drain's own Collect() call isn't seen as happening
-   * "while Shutdown in progress", and so OnForceFlush()'s break_condition doesn't bail out
-   * immediately when that drain runs. The worker thread's loop and wait predicate, and
-   * OnForceFlush()'s break_condition, must therefore key off this flag instead of IsShutdown()
-   * to know when a shutdown is in progress.
+   * the base class's IsShutdown(), which is already true by the time OnShutDown() runs:
+   * OnShutDown() first performs one last OnForceFlush() drain, which needs the worker thread to
+   * still be alive and servicing wake-ups, and needs OnForceFlush()'s break_condition not to
+   * treat the in-progress shutdown as "nothing to do" and bail out before that drain happens.
+   * The worker thread's loop and wait predicate, and OnForceFlush()'s break_condition, must
+   * therefore key off this flag rather than IsShutdown() to know when to stop.
    */
   std::atomic<bool> is_stop_requested_{false};
 

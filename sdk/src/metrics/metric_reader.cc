@@ -54,18 +54,13 @@ bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept
     OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown - Cannot invoke shutdown twice!");
   }
 
-  // OnShutDown() may still need to perform work against this reader -- for example,
-  // PeriodicExportingMetricReader runs one final flush to drain metrics recorded since the
-  // last periodic tick. Run it first, and only mark the reader as shut down once OnShutDown()
-  // (and any such final work it does) has actually finished, so that work doesn't itself trip
-  // the "invoked while Shutdown in progress" warning in Collect() above.
+  shutdown_.store(true, std::memory_order_release);
+
   if (!OnShutDown(timeout))
   {
     status = false;
     OTEL_INTERNAL_LOG_WARN("MetricReader::OnShutDown Shutdown failed. Will not be tried again!");
   }
-
-  shutdown_.store(true, std::memory_order_release);
   return status;
 }
 

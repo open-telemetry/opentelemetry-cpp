@@ -290,6 +290,9 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
 
 bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout) noexcept
 {
+  const std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+  bool flush_status                                 = true;
+
   if (worker_thread_.joinable())
   {
     // Reuses OnForceFlush()'s existing wake-the-worker-and-wait machinery (with its correct
@@ -298,7 +301,7 @@ bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout
     // and looping normally -- i.e. before is_stop_requested_ is set below, since
     // OnForceFlush()'s break_condition treats that as "shutting down, nothing to do" and bails
     // out immediately.
-    OnForceFlush(timeout);
+    flush_status = OnForceFlush(timeout);
 
     {
       // Acquiring cv_m_ guarantees that the next time the worker thread checks the wait condition
@@ -310,7 +313,23 @@ bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout
     cv_.notify_all();
     worker_thread_.join();
   }
-  return exporter_->Shutdown(timeout);
+
+  // The exporter only gets what is left of the caller's budget after the flush and join above,
+  // rather than a second full one. `microseconds::max()`, and a non-positive timeout, both mean
+  // "no timeout" by the convention used throughout this class (see OnForceFlush above), and are
+  // passed on untouched. An exhausted budget is deliberately clamped to the smallest positive
+  // value rather than allowed to reach zero, since zero would otherwise be read as that same
+  // "wait indefinitely" signal.
+  std::chrono::microseconds exporter_timeout = timeout;
+  if (timeout != (std::chrono::microseconds::max)() && timeout > std::chrono::microseconds::zero())
+  {
+    const auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::steady_clock::now() - start);
+    exporter_timeout = (elapsed < timeout) ? (timeout - elapsed) : std::chrono::microseconds(1);
+  }
+
+  const bool exporter_status = exporter_->Shutdown(exporter_timeout);
+  return flush_status && exporter_status;
 }
 
 }  // namespace metrics

@@ -19,9 +19,9 @@ Increment the:
   flush (reusing the same timeout-bounded machinery as `ForceFlush`) before
   shutting down the underlying exporter, so metrics recorded since the last
   periodic tick are no longer silently dropped on shutdown, per the metrics
-  SDK spec. `MetricReader::Shutdown` now only marks the reader as shut down
-  after this final flush completes, so it no longer logs a spurious
-  "invoked while Shutdown in progress" warning on every clean shutdown.
+  SDK spec. `Shutdown` reports failure if either that final flush or the
+  exporter shutdown fails, and the exporter is given what remains of the
+  caller's timeout rather than a second full budget.
   [#2983](https://github.com/open-telemetry/opentelemetry-specification/issues/2983)
 
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
