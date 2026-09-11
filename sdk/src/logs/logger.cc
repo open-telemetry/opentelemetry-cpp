@@ -195,10 +195,52 @@ void Logger::EmitLogRecord(
   recordable->SetResource(context_->GetResource());
   recordable->SetInstrumentationScope(GetInstrumentationScope());
 
+  // No context was supplied to this specific call, so the ambient context (resolved inside
+  // EmitToProcessor) is the best available approximation. See the note on
+  // Logger::CreateLogRecord(context_or_span) for why this does not recover a context that was
+  // explicitly given to an earlier, separate CreateLogRecord(context_or_span) call.
+  EmitToProcessor(std::move(recordable), nullptr);
+}
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+void Logger::EmitLogRecordWithContext(
+    opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> &&log_record,
+    const nostd::variant<trace_api::SpanContext, context::Context> &resolved_context) noexcept
+{
+  if (!logger_enabled_.load(std::memory_order_relaxed))
+  {
+    return kNoopLogger.EmitLogRecordWithContext(std::move(log_record), resolved_context);
+  }
+
+  if (!log_record)
+  {
+    return;
+  }
+
+  std::unique_ptr<Recordable> recordable =
+      std::unique_ptr<Recordable>(static_cast<Recordable *>(log_record.release()));
+  recordable->SetResource(context_->GetResource());
+  recordable->SetInstrumentationScope(GetInstrumentationScope());
+
+  EmitToProcessor(std::move(recordable), &resolved_context);
+}
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+void Logger::EmitToProcessor(
+    std::unique_ptr<Recordable> &&recordable,
+    const nostd::variant<trace_api::SpanContext, context::Context> *resolved_context) noexcept
+{
   auto &processor = context_->GetProcessor();
 
-  // Send the log recordable to the processor
-  processor.OnEmit(std::move(recordable));
+  if (resolved_context != nullptr)
+  {
+    processor.OnEmitWithContext(std::move(recordable), *resolved_context);
+    return;
+  }
+
+  const nostd::variant<trace_api::SpanContext, context::Context> ambient_context{
+      context::RuntimeContext::GetCurrent()};
+  processor.OnEmitWithContext(std::move(recordable), ambient_context);
 }
 
 bool Logger::EnabledImplementation(opentelemetry::logs::Severity severity,
