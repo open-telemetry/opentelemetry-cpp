@@ -19,8 +19,12 @@ endif()
 find_package(PkgConfig REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 
-file(GLOB _pkgconfig_pc_files
-     "${CMAKE_PREFIX_PATH}/lib/pkgconfig/opentelemetry_*.pc")
+set(_pkgconfig_pc_files "")
+foreach(_prefix IN LISTS CMAKE_PREFIX_PATH)
+  file(GLOB _prefix_pkgconfig_pc_files
+       "${_prefix}/lib/pkgconfig/opentelemetry_*.pc")
+  list(APPEND _pkgconfig_pc_files ${_prefix_pkgconfig_pc_files})
+endforeach()
 if(NOT _pkgconfig_pc_files)
   message(
     FATAL_ERROR
