@@ -58,6 +58,27 @@ class HttpClientTestPeer
 public:
   static void ResetMultiHandle(HttpClient &client) { client.resetMultiHandle(); }
 };
+
+class HttpOperationTestPeer
+{
+public:
+  static int Seek(HttpOperation &operation, curl_off_t offset, int origin)
+  {
+    return HttpOperation::SeekCallback(&operation, offset, origin);
+  }
+
+  static int SeekNullUserData(curl_off_t offset, int origin)
+  {
+    return HttpOperation::SeekCallback(nullptr, offset, origin);
+  }
+
+  static size_t ReadCursor(const HttpOperation &operation) { return operation.request_nwrite_; }
+
+  static void SetReadCursor(HttpOperation &operation, size_t value)
+  {
+    operation.request_nwrite_ = value;
+  }
+};
 }  // namespace curl
 }  // namespace client
 }  // namespace http
@@ -449,6 +470,48 @@ TEST_F(BasicCurlHttpTests, SendPostRequestWithMultiChunkBody)
 
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
+}
+
+// libcurl calls the seek callback when it has to restart an upload it already began. The body is a
+// fully buffered span, so an absolute seek inside it repositions the read cursor, and anything the
+// callback cannot honour is refused so libcurl fails rather than resuming from the wrong offset.
+TEST_F(BasicCurlHttpTests, SeekCallbackRepositionsTheRequestBody)
+{
+  CustomEventHandler handler;
+  http_client::HttpSslOptions no_ssl;
+  http_client::Headers headers;
+  const char *payload    = "0123456789";
+  http_client::Body body = {payload, payload + std::strlen(payload)};
+
+  curl::HttpOperation operation(http_client::Method::Post, "http://127.0.0.1:19000/post/", no_ssl,
+                                &handler, headers, body, http_client::Compression::kNone, false,
+                                curl::kDefaultHttpConnTimeout);
+
+  using Peer = curl::HttpOperationTestPeer;
+
+  // An absolute seek inside the body moves the cursor.
+  Peer::SetReadCursor(operation, 10);
+  EXPECT_EQ(CURL_SEEKFUNC_OK, Peer::Seek(operation, 4, SEEK_SET));
+  EXPECT_EQ(4u, Peer::ReadCursor(operation));
+
+  // Rewinding to the start is the case libcurl actually asks for.
+  EXPECT_EQ(CURL_SEEKFUNC_OK, Peer::Seek(operation, 0, SEEK_SET));
+  EXPECT_EQ(0u, Peer::ReadCursor(operation));
+
+  // Seeking to exactly the end is in range and leaves nothing left to send.
+  EXPECT_EQ(CURL_SEEKFUNC_OK, Peer::Seek(operation, 10, SEEK_SET));
+  EXPECT_EQ(10u, Peer::ReadCursor(operation));
+
+  // Everything below is refused, and must leave the cursor where it was.
+  Peer::SetReadCursor(operation, 3);
+
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 11, SEEK_SET));
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, -1, SEEK_SET));
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 0, SEEK_CUR));
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 0, SEEK_END));
+  EXPECT_EQ(3u, Peer::ReadCursor(operation));
+
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::SeekNullUserData(0, SEEK_SET));
 }
 
 TEST_F(BasicCurlHttpTests, RequestTimeout)

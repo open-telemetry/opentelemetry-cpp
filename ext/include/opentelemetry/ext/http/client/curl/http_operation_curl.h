@@ -385,6 +385,7 @@ private:
     std::future<CURLcode> result_future;
   };
   friend class HttpOperationAccessor;
+  friend class HttpOperationTestPeer;
   std::unique_ptr<AsyncData> async_data_;
 };
 }  // namespace curl
