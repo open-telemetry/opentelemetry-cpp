@@ -483,7 +483,16 @@ public:
         parentContext = spanContext;
       }
     }
-    auto traceId = parentContext.IsValid() ? parentContext.trace_id() : traceId_;
+    // Generate a brand-new trace id from the IdGenerator on every root
+    // span. Do NOT fall back to the Tracer-scoped cached traceId_,
+    // because that collapses every root span produced by this Tracer
+    // into a single logical trace -- breaking per-request correlation
+    // in Geneva/Jarvis and disagreeing with the OTel spec and the
+    // sdk::trace::Tracer reference implementation, where each root
+    // span gets a fresh trace id.
+    // See https://github.com/open-telemetry/opentelemetry-cpp/issues/3846
+    auto traceId = parentContext.IsValid() ? parentContext.trace_id()
+                                           : GetIdGenerator(tracerProvider_).GenerateTraceId();
 
     // Sampling based on attributes is not supported for now, so passing empty below.
     std::map<std::string, int> emptyAttributes = {{}};
