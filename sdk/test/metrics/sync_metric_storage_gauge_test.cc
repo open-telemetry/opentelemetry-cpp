@@ -2,13 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <memory>
 #include <string>
 
 #include "opentelemetry/common/attribute_value.h"  // IWYU pragma: keep
 #include "opentelemetry/nostd/utility.h"           // IWYU pragma: keep
 #include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 #  include <chrono>

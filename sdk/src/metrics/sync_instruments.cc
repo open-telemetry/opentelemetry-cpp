@@ -3,17 +3,13 @@
 
 #include <cstdint>
 #include <limits>
-#include <map>
 #include <memory>
-#include <mutex>
+#include <mutex>  // IWYU pragma: keep
 #include <ostream>
 #include <string>
 #include <utility>
-#include <vector>
 
-#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
@@ -21,7 +17,6 @@
 #  include "opentelemetry/metrics/sync_instruments.h"
 #endif
 
-#include "opentelemetry/common/key_value_iterable_view.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
