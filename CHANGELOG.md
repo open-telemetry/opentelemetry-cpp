@@ -25,6 +25,9 @@ Increment the:
   `noexcept` function.
   [#4439](https://github.com/open-telemetry/opentelemetry-cpp/issues/4439)
 
+* [BUG] Elasticsearch: report an asynchronous export's outcome exactly once
+  [#4502](https://github.com/open-telemetry/opentelemetry-cpp/pull/4502)
+
 * [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
   If a model-specific limit is set it is used, otherwise the matching general
   limit, otherwise the model-specific default. Limit fields on
@@ -150,6 +153,9 @@ Increment the:
   deprecated C headers (`stdint.h`, `stddef.h`, `stdlib.h`, `string.h`,
   `stdio.h`, `ctype.h`, `limits.h`, `assert.h`) with their C++ equivalents
   ([#4349](https://github.com/open-telemetry/opentelemetry-cpp/pull/4349))
+* [BUG] Stop the Elasticsearch async ForceFlush reporting success without
+  waiting for the sessions it was asked about
+  [#4337](https://github.com/open-telemetry/opentelemetry-cpp/pull/4337)
 
 * [CONFIGURATION] Add SDK component builder interfaces to the registry
   [#4358](https://github.com/open-telemetry/opentelemetry-cpp/issues/4358)
