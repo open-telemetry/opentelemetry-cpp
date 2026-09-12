@@ -954,7 +954,7 @@ public:
                  nostd::string_view description) noexcept override
   {
     const auto transition =
-        opentelemetry::sdk::trace::detail::ApplyStatusTransition(status_code_, code, description);
+        sdk::trace::detail::ApplyStatusTransition(status_code_, code, description);
     if (!transition.accepted)
     {
       return;
