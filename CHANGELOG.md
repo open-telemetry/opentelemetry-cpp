@@ -15,15 +15,15 @@ Increment the:
 
 ## [Unreleased]
 
-* [SDK] Fix `MetricReader::ForceFlush()` invoking `OnForceFlush()` on a
-  shutdown reader.
-  [#4548](https://github.com/open-telemetry/opentelemetry-cpp/pull/4548)
-
 * [BUG] Install a curl seek callback so an OTLP/HTTP export body can be rewound
   when libcurl restarts an upload, instead of failing with
   `CURLE_SEND_FAIL_REWIND` and dropping the batch
   ([#4549](https://github.com/open-telemetry/opentelemetry-cpp/issues/4549))
-  
+
+* [SDK] Fix `MetricReader::ForceFlush()` invoking `OnForceFlush()` on a
+  shutdown reader.
+  [#4548](https://github.com/open-telemetry/opentelemetry-cpp/pull/4548)
+
 * [SDK] Fix `MetricReader::Shutdown()` invoking `OnShutDown()` multiple times.
   Concurrent calls now block until the first call's shutdown has completed.
   [#4536](https://github.com/open-telemetry/opentelemetry-cpp/issues/4536)
