@@ -159,19 +159,21 @@ There are two approaches to incoporate `opentelemetry-cpp` into
 1. Build and install `opentelemetry-cpp` then use `find_package`
  to import its targets
 
-   ```cmake
-   # Find all installed components and link all imported targets
-   find_package(opentelemetry-cpp CONFIG REQUIRED)
-   ...
-   target_include_directories(foo PRIVATE ${OPENTELEMETRY_CPP_INCLUDE_DIRS})
-   target_link_libraries(foo PRIVATE ${OPENTELEMETRY_CPP_LIBRARIES})
-   ```
+   Example instrumentation library (using only the OTel C++ API)
 
    ```cmake
-   # Find a specific component and link its imported target(s)
-   find_package(opentelemetry-cpp CONFIG REQUIRED COMPONENTS api)
+   find_package(opentelemetry-cpp CONFIG REQUIRED)
    ...
-   target_link_libraries(foo PRIVATE opentelemetry-cpp::api)
+   # Link just the API header only interface target
+   target_link_libraries(foo_lib PRIVATE opentelemetry-cpp::api)
+   ```
+
+   Example application (using the OTel C++ SDK and exporters)
+
+   ```cmake
+   find_package(opentelemetry-cpp CONFIG REQUIRED)
+   ...
+   target_link_libraries(foo_app PRIVATE opentelemetry-cpp::trace opentelemetry-cpp::ostream_span_exporter)
    ```
 
 2. Use CMake's [FetchContent](https://cmake.org/cmake/help/latest/module/FetchContent.html)
@@ -192,7 +194,7 @@ There are two approaches to incoporate `opentelemetry-cpp` into
    FetchContent_Declare(
    opentelemetry-cpp
    GIT_REPOSITORY https://github.com/open-telemetry/opentelemetry-cpp.git
-   GIT_TAG        v1.20.0)
+   GIT_TAG        <release tag or SHA>)
    FetchContent_MakeAvailable(opentelemetry-cpp)
    ...
    target_link_libraries(foo PRIVATE opentelemetry-cpp::api)
