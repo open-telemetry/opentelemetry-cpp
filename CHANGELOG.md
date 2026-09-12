@@ -20,6 +20,14 @@ Increment the:
   `CURLE_SEND_FAIL_REWIND` and dropping the batch
   ([#4549](https://github.com/open-telemetry/opentelemetry-cpp/issues/4549))
 
+* [SDK] Fix `MetricReader::ForceFlush()` invoking `OnForceFlush()` on a
+  shutdown reader.
+  [#4548](https://github.com/open-telemetry/opentelemetry-cpp/pull/4548)
+
+* [SDK] Fix `MetricReader::Shutdown()` invoking `OnShutDown()` multiple times.
+  Concurrent calls now block until the first call's shutdown has completed.
+  [#4536](https://github.com/open-telemetry/opentelemetry-cpp/issues/4536)
+
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
   [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
 

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include <mutex>
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/cardinality_limits.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -48,13 +49,14 @@ bool MetricReader::Collect(
 
 bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  bool status = true;
-  if (IsShutdown())
+  // Serialize so concurrent calls block until the first call's shutdown has completed.
+  std::lock_guard<std::mutex> shutdown_guard{shutdown_m_};
+  if (shutdown_.exchange(true, std::memory_order_release))
   {
-    OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown - Cannot invoke shutdown twice!");
+    OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown - Already shutdown!");
+    return true;
   }
-
-  shutdown_.store(true, std::memory_order_release);
+  bool status = true;
 
   if (!OnShutDown(timeout))
   {
@@ -67,11 +69,14 @@ bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept
 /** Flush metric read by this reader **/
 bool MetricReader::ForceFlush(std::chrono::microseconds timeout) noexcept
 {
-  bool status = true;
   if (IsShutdown())
   {
-    OTEL_INTERNAL_LOG_WARN("MetricReader::Shutdown Cannot invoke Force flush on shutdown reader!");
+    OTEL_INTERNAL_LOG_WARN(
+        "MetricReader::ForceFlush Cannot invoke Force flush on shutdown reader!");
+    return false;
   }
+
+  bool status = true;
   if (!OnForceFlush(timeout))
   {
     status = false;
