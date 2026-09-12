@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Add `MeterProvider::UpdateMeterConfigurator()` and example. Instruments
+  observe the enabled state of the Meter that created them, so a disabled Meter
+  behaves as a no-op Meter without instruments having to be recreated
+  [#4256](https://github.com/open-telemetry/opentelemetry-cpp/issues/4256)
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
   [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
 
