@@ -203,7 +203,7 @@ void Span::SetStatus(opentelemetry::trace::StatusCode code, nostd::string_view d
     return;
   }
 
-  const auto transition = ApplyStatusTransition(status_code_, code, description);
+  const auto transition = detail::ApplyStatusTransition(status_code_, code, description);
   if (!transition.accepted)
   {
     return;

@@ -10,7 +10,7 @@
 #include "opentelemetry/trace/span_metadata.h"
 
 using opentelemetry::nostd::string_view;
-using opentelemetry::sdk::trace::ApplyStatusTransition;
+using opentelemetry::sdk::trace::detail::ApplyStatusTransition;
 using opentelemetry::trace::StatusCode;
 
 namespace

@@ -12,6 +12,8 @@ namespace sdk
 {
 namespace trace
 {
+namespace detail
+{
 
 /**
  * Outcome of applying the span status transition rules to a SetStatus call.
@@ -54,6 +56,7 @@ inline StatusTransition ApplyStatusTransition(opentelemetry::trace::StatusCode c
   return StatusTransition{true, code, effective_description};
 }
 
+}  // namespace detail
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
