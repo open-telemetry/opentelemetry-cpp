@@ -291,9 +291,10 @@ bool PeriodicExportingMetricReader::OnForceFlush(std::chrono::microseconds timeo
 bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout) noexcept
 {
   const std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+  const bool has_worker_thread                      = worker_thread_.joinable();
   bool flush_status                                 = true;
 
-  if (worker_thread_.joinable())
+  if (has_worker_thread)
   {
     // Reuses OnForceFlush()'s existing wake-the-worker-and-wait machinery (with its correct
     // timeout accounting) to drain any metrics recorded since the last periodic tick, so they
@@ -302,15 +303,24 @@ bool PeriodicExportingMetricReader::OnShutDown(std::chrono::microseconds timeout
     // OnForceFlush()'s break_condition treats that as "shutting down, nothing to do" and bails
     // out immediately.
     flush_status = OnForceFlush(timeout);
+  }
 
-    {
-      // Acquiring cv_m_ guarantees that the next time the worker thread checks the wait condition
-      // on cv_ (either from notify below or any other reason) it will see is_stop_requested_
-      // return true.
-      std::lock_guard<std::mutex> cv_guard{cv_m_};
-      is_stop_requested_.store(true, std::memory_order_release);
-    }
-    cv_.notify_all();
+  {
+    // Set even when no worker thread was ever started -- OnInitialized() only runs once a
+    // producer is registered -- so that a later ForceFlush() sees the shutdown and gives up,
+    // instead of waiting to be serviced by a worker that will never run (indefinitely, with the
+    // default timeout).
+    //
+    // Acquiring cv_m_ guarantees that the next time the worker thread checks the wait condition
+    // on cv_ (either from notify below or any other reason) it will see is_stop_requested_
+    // return true.
+    std::lock_guard<std::mutex> cv_guard{cv_m_};
+    is_stop_requested_.store(true, std::memory_order_release);
+  }
+  cv_.notify_all();
+
+  if (has_worker_thread)
+  {
     worker_thread_.join();
   }
 

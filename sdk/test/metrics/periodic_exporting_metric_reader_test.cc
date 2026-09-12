@@ -226,6 +226,29 @@ TEST(PeriodicExportingMetricReader, ShutdownPassesRemainingTimeoutToExporter)
   EXPECT_LT(exporter_timeout, std::chrono::microseconds(requested_timeout));
 }
 
+TEST(PeriodicExportingMetricReader, ShutdownWithoutMetricProducer)
+{
+  // No producer is ever registered, so OnInitialized() never runs and no worker thread exists.
+  // Shutdown() must still record that the reader is stopping, otherwise a later ForceFlush()
+  // waits to be serviced by a worker that will never run -- which, with the default timeout,
+  // means waiting indefinitely.
+  std::unique_ptr<PushMetricExporter> exporter(
+      new MockPushMetricExporter(std::chrono::milliseconds{0}));
+  PeriodicExportingMetricReaderOptions options;
+  options.export_timeout_millis  = std::chrono::milliseconds(200);
+  options.export_interval_millis = std::chrono::milliseconds(500);
+  std::shared_ptr<PeriodicExportingMetricReader> reader =
+      std::make_shared<PeriodicExportingMetricReader>(std::move(exporter), options);
+
+  EXPECT_TRUE(reader->Shutdown());
+
+  const auto start = std::chrono::steady_clock::now();
+  reader->ForceFlush();
+  const auto elapsed = std::chrono::steady_clock::now() - start;
+
+  EXPECT_LT(elapsed, std::chrono::seconds(1));
+}
+
 TEST(PeriodicExportingMetricReader, Timeout)
 {
   std::unique_ptr<PushMetricExporter> exporter(
