@@ -316,6 +316,9 @@ Increment the:
   for process entity
   [#4437](https://github.com/open-telemetry/opentelemetry-cpp/pull/4437)
 
+* [METRICS SDK] Avoid materializing owned exemplar attributes before
+  fixed-size reservoir selection.
+  [#4475](https://github.com/open-telemetry/opentelemetry-cpp/pull/4475)
 * [BUG] Prevent lost condition-variable wakeups in OTLP file exporter and periodic
   metric exporter
   [#4365](https://github.com/open-telemetry/opentelemetry-cpp/pull/4365)
@@ -426,6 +429,13 @@ Breaking changes:
   [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
   * This is an incompatible API and ABI change for custom exemplar reservoirs.
     Implementations and callers must remove the timestamp parameter.
+
+* [METRICS SDK] Add non-owning `KeyValueIterable` overloads to the preview
+  `ExemplarReservoir` and `ReservoirCellSelector` interfaces. Custom reservoir
+  implementations inherit compatibility adapters but must be rebuilt because
+  the SDK vtable changes. Custom selector implementations must additionally
+  implement the new `int64_t` and `double` overloads.
+  [#4475](https://github.com/open-telemetry/opentelemetry-cpp/pull/4475)
 
 * [METRICS SDK] Breaking change to the preview metrics exemplar surface: the
   `SyncMetricStorage`/`AsyncMetricStorage` constructors now take an

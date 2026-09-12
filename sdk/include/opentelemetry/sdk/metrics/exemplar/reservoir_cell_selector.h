@@ -8,6 +8,7 @@
 #  include <cstddef>
 #  include <vector>
 
+#  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell.h"
 #  include "opentelemetry/version.h"
@@ -49,6 +50,18 @@ public:
 
   /** Called when {@link FixedSizeExemplarReservoir#CollectAndReset(Attributes)}. */
   virtual void reset() = 0;
+
+  /** Determine the index of the {@code cells} to record the measurement to. */
+  virtual int ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
+                                    int64_t value,
+                                    const opentelemetry::common::KeyValueIterable &attributes,
+                                    const opentelemetry::context::Context &context) = 0;
+
+  /** Determine the index of the {@code cells} to record the measurement to. */
+  virtual int ReservoirCellIndexFor(const std::vector<ReservoirCell> &cells,
+                                    double value,
+                                    const opentelemetry::common::KeyValueIterable &attributes,
+                                    const opentelemetry::context::Context &context) = 0;
 };
 
 }  // namespace metrics
