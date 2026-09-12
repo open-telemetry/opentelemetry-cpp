@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstddef>  // For std::size_t and std::max_align_t
 #include <cstdint>
 
 #include "opentelemetry/common/attribute_value.h"
@@ -14,6 +15,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "google/protobuf/arena.h"
 #include "opentelemetry/proto/logs/v1/logs.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
@@ -30,8 +32,21 @@ namespace otlp
 class OtlpLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
 public:
-  proto::logs::v1::LogRecord &log_record() noexcept { return proto_record_; }
-  const proto::logs::v1::LogRecord &log_record() const noexcept { return proto_record_; }
+  OtlpLogRecordable()
+      : arena_{arena_initial_block_, sizeof(arena_initial_block_)},
+        proto_record_{google::protobuf::Arena::Create<proto::logs::v1::LogRecord>(&arena_)}
+  {}
+
+  // The Arena member owns the memory the log record message points into, and an Arena is neither
+  // copyable nor movable, so neither is the recordable. Recordables are created and handed
+  // around by pointer, so nothing in the SDK or the exporters needs these.
+  OtlpLogRecordable(const OtlpLogRecordable &)            = delete;
+  OtlpLogRecordable &operator=(const OtlpLogRecordable &) = delete;
+  OtlpLogRecordable(OtlpLogRecordable &&)                 = delete;
+  OtlpLogRecordable &operator=(OtlpLogRecordable &&)      = delete;
+
+  proto::logs::v1::LogRecord &log_record() noexcept { return *proto_record_; }
+  const proto::logs::v1::LogRecord &log_record() const noexcept { return *proto_record_; }
 
   /** Returns the associated resource */
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
@@ -119,7 +134,23 @@ public:
                                    &instrumentation_scope) noexcept override;
 
 private:
-  proto::logs::v1::LogRecord proto_record_;
+  // Size of the block the Arena starts from. The block lives inside the recordable, so a log
+  // record whose recorded content fits in it never asks the heap for Arena memory at all. See
+  // the same constant in otlp_recordable.h, which explains how the size was chosen. 256, 512
+  // and 768 were measured here, and 512 was the best of the three: it is the smallest that
+  // keeps a minimal record's Arena entirely inside the recordable.
+  static constexpr std::size_t kArenaInitialBlockSize = 512;
+
+  // Declared before arena_ so the block is a live subobject before the Arena is pointed at it,
+  // and is still there when the Arena is destroyed. Deliberately left uninitialized, the Arena
+  // hands it out as it fills it. protobuf never frees a caller supplied initial block.
+  alignas(std::max_align_t) char arena_initial_block_[kArenaInitialBlockSize];
+  // Declared before proto_record_ so the Arena is constructed first and destroyed last. The log
+  // record message and everything recorded into it live on this Arena, so recording a field is an
+  // Arena bump instead of a heap allocation, and the whole record is released with the Arena.
+  google::protobuf::Arena arena_;
+  // Owned by arena_, never null, never deleted.
+  proto::logs::v1::LogRecord *proto_record_;
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
       nullptr;

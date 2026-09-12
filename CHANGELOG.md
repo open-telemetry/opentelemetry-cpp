@@ -433,6 +433,20 @@ Breaking changes:
   by value.
   [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
 
+* [EXPORTER] Allocate the OTLP trace and log recordable messages on a
+  `google::protobuf::Arena` owned by the recordable, so recording a field is an
+  Arena bump instead of a heap allocation. Recording a span with attributes
+  drops from about 5 heap allocations per attribute to about 1. The Arena
+  starts from a block that lives inside the recordable rather than from the
+  heap, so starting a span takes 5 heap allocations instead of 9.
+  `OtlpRecordable` and `OtlpLogRecordable` are no longer copyable or movable,
+  and they are larger, since each one now carries that block. The `span()` and
+  `log_record()` accessors keep their signatures, and
+  `OtlpRecordableUtils::PopulateRequest` still copies each recordable message
+  into the Arena allocated request.
+  [#4558](https://github.com/open-telemetry/opentelemetry-cpp/issues/4558)
+  [#TBD](https://github.com/open-telemetry/opentelemetry-cpp/pull/TBD)
+
 ## [1.28.0] 2026-07-16
 
 * [RELEASE] Bump main branch to 1.28.0-dev
