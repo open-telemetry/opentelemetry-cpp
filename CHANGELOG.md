@@ -23,7 +23,7 @@ Increment the:
   exporter shutdown fails, and the exporter is given what remains of the
   caller's timeout rather than a second full budget.
   [#2983](https://github.com/open-telemetry/opentelemetry-specification/issues/2983)
-  
+
 * [BUG] Install a curl seek callback so an OTLP/HTTP export body can be rewound
   when libcurl restarts an upload, instead of failing with
   `CURLE_SEND_FAIL_REWIND` and dropping the batch
