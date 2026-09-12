@@ -169,6 +169,10 @@ public:
   bool IsClosed() const noexcept { return isClosed_.load(); }
 
 private:
+  // Allow TracerProvider to force-construct the ETWProvider singleton ahead
+  // of itself; see TracerProvider's constructor for the rationale.
+  friend class TracerProvider;
+
   /**
    * @brief Parent provider of this Tracer
    */
@@ -1106,6 +1110,17 @@ public:
         id_generator_{std::move(id_generator)},
         tail_sampler_{std::move(tail_sampler)}
   {
+    // Force-initialize the process-wide ETWProvider singleton -- and its
+    // internal providers() map (lazily created on first ETWProvider method
+    // call) -- before this TracerProvider finishes constructing. Static
+    // destruction is reverse-of-construction order, so initializing both
+    // here guarantees that they outlive this provider's tracer cache:
+    // cached Tracer destructors call etwProvider().close(provHandle), and
+    // provHandle is a reference into that providers() map. Without this,
+    // either singleton could be destroyed first, leaving cached Tracer
+    // destructors with dangling state at process shutdown (#3849).
+    (void)Tracer::etwProvider().is_registered(std::string{});
+
     // By default we ensure that all events carry their with TraceId and SpanId
     GetOption(options, "enableTraceId", config_.enableTraceId, true);
     GetOption(options, "enableSpanId", config_.enableSpanId, true);
@@ -1143,6 +1158,17 @@ public:
         tail_sampler_{
             std::unique_ptr<opentelemetry::exporter::etw::TailSampler>(new AlwaysOnTailSampler())}
   {
+    // Force-initialize the process-wide ETWProvider singleton -- and its
+    // internal providers() map (lazily created on first ETWProvider method
+    // call) -- before this TracerProvider finishes constructing. Static
+    // destruction is reverse-of-construction order, so initializing both
+    // here guarantees that they outlive this provider's tracer cache:
+    // cached Tracer destructors call etwProvider().close(provHandle), and
+    // provHandle is a reference into that providers() map. Without this,
+    // either singleton could be destroyed first, leaving cached Tracer
+    // destructors with dangling state at process shutdown (#3849).
+    (void)Tracer::etwProvider().is_registered(std::string{});
+
     config_.enableTraceId           = true;
     config_.enableSpanId            = true;
     config_.enableActivityId        = false;
@@ -1151,6 +1177,31 @@ public:
     config_.enableAutoParent        = false;
     config_.encoding                = ETWProvider::EventFormat::ETW_MANIFEST;
   }
+
+  /**
+   * @brief Cache of Tracers handed out by GetTracer(), keyed by name.
+   *
+   * The ETW Span class stores its parent Tracer as a raw reference
+   * (Tracer &owner_); if the only strong refcount on the Tracer is the
+   * nostd::shared_ptr returned by GetTracer(), the Tracer is destroyed
+   * as soon as the caller drops it, leaving every Span derived from it
+   * with a dangling owner_ that crashes on End(). Cache here so the
+   * provider keeps the Tracer alive as long as it is alive itself,
+   * matching the lifetime contract used by sdk::trace::TracerProvider.
+   *
+   * Growth: this cache is unbounded by design and mirrors
+   * sdk::trace::TracerProvider's tracers_ vector. Eviction is unsafe
+   * because the ETW Span stores its parent Tracer by raw reference, so
+   * dropping a Tracer that still has outstanding Spans would
+   * re-introduce the use-after-free this cache exists to prevent.
+   *
+   * In practice the cache stays small because the ETW exporter is
+   * designed around "one Tracer per ETW provider name, reused for the
+   * process/component lifetime" -- and Windows itself caps the number
+   * of registered ETW providers per process well below any RAM concern.
+   */
+  std::map<std::string, std::shared_ptr<opentelemetry::trace::Tracer>> tracers_;
+  std::mutex tracers_lock_;
 
   /**
    * @brief Obtain ETW Tracer.
@@ -1177,9 +1228,19 @@ public:
     UNREFERENCED_PARAMETER(args);
     UNREFERENCED_PARAMETER(schema_url);
     ETWProvider::EventFormat evtFmt = config_.encoding;
-    std::shared_ptr<opentelemetry::trace::Tracer> tracer{new (std::nothrow)
-                                                             Tracer(*this, name, evtFmt)};
-    return nostd::shared_ptr<opentelemetry::trace::Tracer>{tracer};
+    // Cache Tracers by name. The exporter Span class holds a raw
+    // Tracer& as owner_, so the Tracer must live at least as long as
+    // the longest-lived Span derived from it. Without caching, each
+    // GetTracer() call mints a fresh heap Tracer that is destroyed the
+    // moment the caller drops the returned shared_ptr, orphaning any
+    // outstanding Spans (use-after-free in Span::End()).
+    std::lock_guard<std::mutex> lock(tracers_lock_);
+    auto &cached = tracers_[std::string{name.data(), name.size()}];
+    if (!cached)
+    {
+      cached.reset(new (std::nothrow) Tracer(*this, name, evtFmt));
+    }
+    return nostd::shared_ptr<opentelemetry::trace::Tracer>{cached};
   }
 };
 
