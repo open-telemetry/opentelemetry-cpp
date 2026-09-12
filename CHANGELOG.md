@@ -23,6 +23,11 @@ Increment the:
   exporter shutdown fails, and the exporter is given what remains of the
   caller's timeout rather than a second full budget.
   [#2983](https://github.com/open-telemetry/opentelemetry-specification/issues/2983)
+  
+* [BUG] Install a curl seek callback so an OTLP/HTTP export body can be rewound
+  when libcurl restarts an upload, instead of failing with
+  `CURLE_SEND_FAIL_REWIND` and dropping the batch
+  ([#4549](https://github.com/open-telemetry/opentelemetry-cpp/issues/4549))
 
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
   [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
@@ -49,10 +54,19 @@ Increment the:
 * [CONFIGURATION] Cleanup build targets and docs
   [#4486](https://github.com/open-telemetry/opentelemetry-cpp/pull/4486)
 
+* [BUGFIX] Stop a curl request whose gzip step failed, instead of sending
+  a body the failed compression had already overwritten
+  [#4360](https://github.com/open-telemetry/opentelemetry-cpp/issues/4360)
+* [CONFIGURATION] Break the configuration_core dependency on SDK metrics
+  [#4554](https://github.com/open-telemetry/opentelemetry-cpp/pull/4554)
+
 * [BUGFIX] Complete an OTLP HTTP request that its client ends with
   `Destroyed`, `ReadError` or `WriteError`, rather than logging the state
   and leaving the caller waiting
   [#4425](https://github.com/open-telemetry/opentelemetry-cpp/issues/4425)
+
+* [CONFIGURATION] Break the configuration_core dependency on SDK trace
+  [#4555](https://github.com/open-telemetry/opentelemetry-cpp/pull/4555)
 
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply
   the `detection.attributes` include/exclude filter to the detected attributes,
@@ -74,6 +88,10 @@ Increment the:
 
 * [CONFIGURATION] SDK signal provider builder interface
   [#4426](https://github.com/open-telemetry/opentelemetry-cpp/pull/4426)
+
+* [CONFIGURATION] Break the configuration_core dependency on SDK logs
+  [#4553](https://github.com/open-telemetry/opentelemetry-cpp/pull/4553)
+
 * [CONFIGURATION] Support environment variable substitution for attributes
   [#4474](https://github.com/open-telemetry/opentelemetry-cpp/pull/4474)
 
