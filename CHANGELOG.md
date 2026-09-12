@@ -18,6 +18,10 @@ Increment the:
 * [SDK] Avoid throwing from `Resource::Create` when `process.executable.name`
   has a non-string value and `service.name` is not set.
   [#4535](https://github.com/open-telemetry/opentelemetry-cpp/issues/4535)
+* [BUG] Install a curl seek callback so an OTLP/HTTP export body can be rewound
+  when libcurl restarts an upload, instead of failing with
+  `CURLE_SEND_FAIL_REWIND` and dropping the batch
+  ([#4549](https://github.com/open-telemetry/opentelemetry-cpp/issues/4549))
 
 * [DOC] Fix and clarify the `StartSpanOptions` documentation
   [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
