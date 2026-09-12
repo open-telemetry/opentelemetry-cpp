@@ -506,6 +506,9 @@ Increment the:
 * [BUG] Rewind the curl request body with a seek callback (#4557)
   [#4557](https://github.com/open-telemetry/opentelemetry-cpp/pull/4557)
 
+* [CMAKE] Fix missing version properties on configuration_core (#4559)
+  [#4559](https://github.com/open-telemetry/opentelemetry-cpp/pull/4559)
+
 Important changes:
 
 * [CONFIGURATION] Complete resource detection support in SdkBuilder (#4424)
