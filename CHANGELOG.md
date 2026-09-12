@@ -30,6 +30,10 @@ Increment the:
   `noexcept` function.
   [#4439](https://github.com/open-telemetry/opentelemetry-cpp/issues/4439)
 
+* [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
+  from conflicting streams, and warn if stream conflicts were configured
+  [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
+
 * [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
   If a model-specific limit is set it is used, otherwise the matching general
   limit, otherwise the model-specific default. Limit fields on
