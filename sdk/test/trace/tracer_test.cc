@@ -556,6 +556,79 @@ TEST(Tracer, TestAfterEnd)
   ASSERT_EQ(3.1, nostd::get<double>(cur_span_data->GetAttributes().at("abc")));
 }
 
+TEST(Tracer, SpanSetStatusOkIsFinal)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::unique_ptr<SpanExporter>{exporter});
+
+  auto span = tracer->StartSpan("span 1");
+  span->SetStatus(opentelemetry::trace::StatusCode::kOk, "");
+  span->SetStatus(opentelemetry::trace::StatusCode::kError, "later error");
+  span->SetStatus(opentelemetry::trace::StatusCode::kUnset, "");
+  span->End();
+
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+  auto &cur_span_data = spans.at(0);
+  ASSERT_EQ(cur_span_data->GetStatus(), opentelemetry::trace::StatusCode::kOk);
+  ASSERT_EQ(cur_span_data->GetDescription(), "");
+}
+
+TEST(Tracer, SpanSetStatusUnsetIsIgnored)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::unique_ptr<SpanExporter>{exporter});
+
+  auto span = tracer->StartSpan("span 1");
+  auto desc = "the real failure";
+  span->SetStatus(opentelemetry::trace::StatusCode::kError, desc);
+  span->SetStatus(opentelemetry::trace::StatusCode::kUnset, "");
+  span->End();
+
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+  auto &cur_span_data = spans.at(0);
+  ASSERT_EQ(cur_span_data->GetStatus(), opentelemetry::trace::StatusCode::kError);
+  ASSERT_EQ(cur_span_data->GetDescription(), desc);
+}
+
+TEST(Tracer, SpanSetStatusDescriptionIgnoredForOk)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::unique_ptr<SpanExporter>{exporter});
+
+  auto span = tracer->StartSpan("span 1");
+  span->SetStatus(opentelemetry::trace::StatusCode::kError, "transient");
+  span->SetStatus(opentelemetry::trace::StatusCode::kOk, "ignored description");
+  span->End();
+
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+  auto &cur_span_data = spans.at(0);
+  ASSERT_EQ(cur_span_data->GetStatus(), opentelemetry::trace::StatusCode::kOk);
+  ASSERT_EQ(cur_span_data->GetDescription(), "");
+}
+
+TEST(Tracer, SpanSetStatusErrorKeepsDescription)
+{
+  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
+  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
+  auto tracer                                 = initTracer(std::unique_ptr<SpanExporter>{exporter});
+
+  auto span = tracer->StartSpan("span 1");
+  span->SetStatus(opentelemetry::trace::StatusCode::kError, "boom");
+  span->End();
+
+  auto spans = span_data->GetSpans();
+  ASSERT_EQ(1, spans.size());
+  auto &cur_span_data = spans.at(0);
+  ASSERT_EQ(cur_span_data->GetStatus(), opentelemetry::trace::StatusCode::kError);
+  ASSERT_EQ(cur_span_data->GetDescription(), "boom");
+}
+
 TEST(Tracer, SpanSetEvents)
 {
   InMemorySpanExporter *exporter              = new InMemorySpanExporter();

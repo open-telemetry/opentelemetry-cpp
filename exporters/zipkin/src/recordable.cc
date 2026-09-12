@@ -215,6 +215,10 @@ void Recordable::SetStatus(trace::StatusCode code, nostd::string_view descriptio
     {
       span_["tags"]["error"] = description;
     }
+    else
+    {
+      span_["tags"].erase("error");
+    }
   }
 }
 
