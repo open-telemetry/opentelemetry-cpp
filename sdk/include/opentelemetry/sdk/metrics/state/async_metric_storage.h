@@ -53,7 +53,7 @@ public:
         exemplar_filter_type_(exemplar_filter_type),
         exemplar_reservoir_(std::move(exemplar_reservoir)),
 #endif
-        temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
+        temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config, true)
   {}
 
   template <class T>
