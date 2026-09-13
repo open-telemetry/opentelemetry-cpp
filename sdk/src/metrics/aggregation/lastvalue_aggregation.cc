@@ -9,6 +9,7 @@
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
@@ -20,6 +21,26 @@ namespace sdk
 {
 namespace metrics
 {
+namespace
+{
+
+// Returns whichever of `curr` and `other` has the newer sample, or `curr` if `other` is not a
+// LastValuePointData.
+const LastValuePointData &NewerPoint(const LastValuePointData &curr,
+                                     const PointType &other) noexcept
+{
+  const auto *other_data = nostd::get_if<LastValuePointData>(&other);
+  if (other_data == nullptr)
+  {
+    OTEL_INTERNAL_LOG_ERROR("LastValueAggregation - Loss of type");
+    return curr;
+  }
+  return curr.sample_ts_.time_since_epoch() > other_data->sample_ts_.time_since_epoch()
+             ? curr
+             : *other_data;
+}
+
+}  // namespace
 
 LongLastValueAggregation::LongLastValueAggregation()
 {
@@ -43,32 +64,18 @@ void LongLastValueAggregation::Aggregate(int64_t value,
 std::unique_ptr<Aggregation> LongLastValueAggregation::Merge(
     const Aggregation &delta) const noexcept
 {
-  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
-      nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch())
-  {
-    LastValuePointData merge_data = nostd::get<LastValuePointData>(ToPoint());
-    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(merge_data));
-  }
-  else
-  {
-    LastValuePointData merge_data = nostd::get<LastValuePointData>(delta.ToPoint());
-    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(merge_data));
-  }
+  const PointType delta_point = delta.ToPoint();
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return std::unique_ptr<Aggregation>(
+      new LongLastValueAggregation(NewerPoint(point_data_, delta_point)));
 }
 
 std::unique_ptr<Aggregation> LongLastValueAggregation::Diff(const Aggregation &next) const noexcept
 {
-  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
-      nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch())
-  {
-    LastValuePointData diff_data = nostd::get<LastValuePointData>(ToPoint());
-    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(diff_data));
-  }
-  else
-  {
-    LastValuePointData diff_data = nostd::get<LastValuePointData>(next.ToPoint());
-    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(diff_data));
-  }
+  const PointType next_point = next.ToPoint();
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return std::unique_ptr<Aggregation>(
+      new LongLastValueAggregation(NewerPoint(point_data_, next_point)));
 }
 
 PointType LongLastValueAggregation::ToPoint() const noexcept
@@ -99,33 +106,19 @@ void DoubleLastValueAggregation::Aggregate(double value,
 std::unique_ptr<Aggregation> DoubleLastValueAggregation::Merge(
     const Aggregation &delta) const noexcept
 {
-  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
-      nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch())
-  {
-    LastValuePointData merge_data = nostd::get<LastValuePointData>(ToPoint());
-    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(merge_data));
-  }
-  else
-  {
-    LastValuePointData merge_data = nostd::get<LastValuePointData>(delta.ToPoint());
-    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(merge_data));
-  }
+  const PointType delta_point = delta.ToPoint();
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return std::unique_ptr<Aggregation>(
+      new DoubleLastValueAggregation(NewerPoint(point_data_, delta_point)));
 }
 
 std::unique_ptr<Aggregation> DoubleLastValueAggregation::Diff(
     const Aggregation &next) const noexcept
 {
-  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
-      nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch())
-  {
-    LastValuePointData diff_data = nostd::get<LastValuePointData>(ToPoint());
-    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(diff_data));
-  }
-  else
-  {
-    LastValuePointData diff_data = nostd::get<LastValuePointData>(next.ToPoint());
-    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(diff_data));
-  }
+  const PointType next_point = next.ToPoint();
+  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  return std::unique_ptr<Aggregation>(
+      new DoubleLastValueAggregation(NewerPoint(point_data_, next_point)));
 }
 
 PointType DoubleLastValueAggregation::ToPoint() const noexcept

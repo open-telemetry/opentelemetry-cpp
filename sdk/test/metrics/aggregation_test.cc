@@ -189,6 +189,18 @@ TEST(Aggregation, DoubleLastValueAggregation)
   EXPECT_EQ(nostd::get<double>(lastvalue_data.value_), 1.0);
 }
 
+TEST(Aggregation, LastValueAggregationMergeDiffTypeMismatch)
+{
+  LongLastValueAggregation aggr;
+  aggr.Aggregate(static_cast<int64_t>(1), {});
+  LongSumAggregation sum_aggr(true);
+
+  auto merged = nostd::get<LastValuePointData>(aggr.Merge(sum_aggr)->ToPoint());
+  EXPECT_EQ(nostd::get<int64_t>(merged.value_), 1);
+  auto diffed = nostd::get<LastValuePointData>(aggr.Diff(sum_aggr)->ToPoint());
+  EXPECT_EQ(nostd::get<int64_t>(diffed.value_), 1);
+}
+
 TEST(Aggregation, LongHistogramAggregation)
 {
   LongHistogramAggregation aggr;
