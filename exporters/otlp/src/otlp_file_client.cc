@@ -1414,13 +1414,20 @@ opentelemetry::sdk::common::ExportResult OtlpFileClient::Export(
   }
 
   std::unique_ptr<JsonWriter> json_writer = json_writer_factory_->Create();
+  if (!json_writer)
+  {
+    OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] JsonWriterFactory::Create() returned nullptr");
+    return ::opentelemetry::sdk::common::ExportResult::kFailure;
+  }
+
   ConvertGenericMessageToJson(*json_writer, message, JsonConverterOptions{});
+
+  std::string post_body_json = json_writer->ok() ? json_writer->ToString() : std::string();
   if (!json_writer->ok())
   {
     return ::opentelemetry::sdk::common::ExportResult::kFailure;
   }
 
-  std::string post_body_json = json_writer->ToString();
   if (options_.console_debug)
   {
     OTEL_INTERNAL_LOG_DEBUG("[OTLP FILE Client] Write body(Json)" << post_body_json);

@@ -812,7 +812,7 @@ cc_test(
     name = "otlp_file_client_test",
     srcs = [
         "test/otlp_file_client_test.cc",
-        "test/otlp_marking_json_writer.h",
+        "test/otlp_stub_json_writer.h",
     ],
     tags = [
         "otlp",

@@ -21,7 +21,7 @@
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
-#include "otlp_marking_json_writer.h"
+#include "otlp_stub_json_writer.h"
 
 #include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
 #include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
@@ -48,7 +48,7 @@ TEST_F(OtlpHttpExporterCustomJsonWriterTestPeer, RuntimeOptionsInjectionCreatesE
 {
   OtlpHttpExporterOptions opts;
   OtlpHttpExporterRuntimeOptions runtime_opts;
-  runtime_opts.json_writer_factory = std::make_shared<test::MarkingJsonWriterFactory>();
+  runtime_opts.json_writer_factory = std::make_shared<test::StubJsonWriterFactory>();
   auto exporter                    = OtlpHttpExporterFactory::Create(opts, runtime_opts);
   ASSERT_NE(exporter, nullptr);
 }
@@ -57,7 +57,7 @@ TEST_F(OtlpHttpExporterCustomJsonWriterTestPeer, RuntimeOptionsWithHttpClientCre
 {
   OtlpHttpExporterOptions opts;
   OtlpHttpExporterRuntimeOptions runtime_opts;
-  runtime_opts.json_writer_factory = std::make_shared<test::MarkingJsonWriterFactory>();
+  runtime_opts.json_writer_factory = std::make_shared<test::StubJsonWriterFactory>();
   auto client                      = http_client::HttpClientTestFactory::Create();
   auto exporter = OtlpHttpExporterFactory::Create(opts, runtime_opts, std::move(client));
   ASSERT_NE(exporter, nullptr);
@@ -72,7 +72,11 @@ TEST_F(OtlpHttpExporterCustomJsonWriterTestPeer, ExportUsesTheInjectedJsonWriter
   OtlpHttpExporterOptions options;
   options.content_type = HttpRequestContentType::kJson;
   OtlpHttpExporterRuntimeOptions runtime_options;
-  runtime_options.json_writer_factory = std::make_shared<test::MarkingJsonWriterFactory>();
+  runtime_options.json_writer_factory = std::make_shared<test::StubJsonWriterFactory>([] {
+    auto writer          = std::make_unique<test::StubJsonWriter>();
+    writer->on_to_string = [] { return std::string("/*custom-writer*/"); };
+    return writer;
+  });
   auto exporter = OtlpHttpExporterFactory::Create(options, runtime_options, std::move(client));
 
   std::string captured_body;

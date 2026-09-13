@@ -716,10 +716,19 @@ OtlpHttpClient::createSession(
   else
   {
     std::unique_ptr<JsonWriter> json_writer = json_writer_factory_->Create();
+    if (!json_writer)
+    {
+      OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] JsonWriterFactory::Create() returned nullptr");
+      const auto result = opentelemetry::sdk::common::ExportResult::kFailure;
+      result_callback(result, response);
+      return result;
+    }
+
     ConvertGenericMessageToJson(
         *json_writer, message,
         JsonConverterOptions{options_.use_json_name, options_.json_bytes_mapping});
 
+    std::string post_body_json = json_writer->ok() ? json_writer->ToString() : std::string();
     if (!json_writer->ok())
     {
       const auto result = opentelemetry::sdk::common::ExportResult::kFailure;
@@ -727,7 +736,6 @@ OtlpHttpClient::createSession(
       return result;
     }
 
-    std::string post_body_json = json_writer->ToString();
     if (options_.console_debug)
     {
       OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Request body(Json)" << post_body_json);
