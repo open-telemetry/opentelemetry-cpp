@@ -1030,11 +1030,13 @@ if(OTELCPP_BUILD_TESTING)
     TEST_LIST otlp_metrics_serialization_test)
 
   if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
-    add_executable(otlp_json_writer_nlohmann_test
-                   test/otlp_json_writer_nlohmann_test.cc)
+    add_executable(
+      otlp_json_writer_nlohmann_test test/otlp_json_writer_nlohmann_test.cc
+                                     test/otlp_json_writer_contract_test.cc)
     target_link_libraries(
       otlp_json_writer_nlohmann_test ${GTEST_BOTH_LIBRARIES}
-      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_otlp_json_writer)
+      ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_otlp_json_writer
+      opentelemetry_test_common)
     gtest_add_tests(
       TARGET otlp_json_writer_nlohmann_test
       TEST_PREFIX exporter.otlp.

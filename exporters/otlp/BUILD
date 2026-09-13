@@ -748,13 +748,19 @@ cc_library(
 
 cc_test(
     name = "otlp_json_writer_nlohmann_test",
-    srcs = ["test/otlp_json_writer_nlohmann_test.cc"],
+    srcs = [
+        "test/otlp_json_writer_contract_test.cc",
+        "test/otlp_json_writer_contract_test.h",
+        "test/otlp_json_writer_nlohmann_test.cc",
+    ],
     tags = [
         "otlp",
         "test",
     ],
     deps = [
         ":otlp_json_writer",
+        "//sdk/src/common:global_log_handler",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
