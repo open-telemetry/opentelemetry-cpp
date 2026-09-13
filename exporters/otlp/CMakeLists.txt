@@ -147,9 +147,16 @@ if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
 endif()
 
 if(OTELCPP_INSTALL)
+  set(OPENTELEMETRY_OTLP_JSON_WRITER_PC_REQUIRES "opentelemetry_common")
+  if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+    string(APPEND OPENTELEMETRY_OTLP_JSON_WRITER_PC_REQUIRES
+           " opentelemetry_exporter_otlp_json_writer_nlohmann")
+  endif()
+
   opentelemetry_add_pkgconfig(
     exporter_otlp_json_writer "OpenTelemetry OTLP - JSON Writer"
-    "Token-stream JSON writer interface." "opentelemetry_common")
+    "Token-stream JSON writer interface."
+    "${OPENTELEMETRY_OTLP_JSON_WRITER_PC_REQUIRES}")
 
   if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
     opentelemetry_add_pkgconfig(
@@ -188,7 +195,7 @@ if(OTELCPP_INSTALL)
     exporter_otlp_json_converter
     "OpenTelemetry OTLP - JSON Converter"
     "Shared reflection-based protobuf-to-JSON converter for OTLP/JSON exporters."
-    "opentelemetry_sdk opentelemetry_common opentelemetry_exporter_otlp_json_writer"
+    "opentelemetry_common opentelemetry_exporter_otlp_json_writer opentelemetry_proto"
   )
 endif()
 
@@ -616,8 +623,11 @@ if(OTELCPP_WITH_OTLP_HTTP)
 
   if(OTELCPP_INSTALL)
     opentelemetry_add_pkgconfig(
-      exporter_otlp_http_client "OpenTelemetry OTLP - HTTP Client"
-      "HTTP client for OTLP protocol." "opentelemetry_api")
+      exporter_otlp_http_client
+      "OpenTelemetry OTLP - HTTP Client"
+      "HTTP client for OTLP protocol."
+      "opentelemetry_api opentelemetry_exporter_otlp_json_writer opentelemetry_exporter_otlp_json_converter"
+    )
 
     opentelemetry_add_pkgconfig(
       exporter_otlp_http
@@ -835,8 +845,11 @@ if(OTELCPP_WITH_OTLP_FILE)
 
   if(OTELCPP_INSTALL)
     opentelemetry_add_pkgconfig(
-      exporter_otlp_file_client "OpenTelemetry OTLP - File Client"
-      "File client for OTLP protocol." "opentelemetry_api opentelemetry_common")
+      exporter_otlp_file_client
+      "OpenTelemetry OTLP - File Client"
+      "File client for OTLP protocol."
+      "opentelemetry_api opentelemetry_common opentelemetry_exporter_otlp_json_writer opentelemetry_exporter_otlp_json_converter"
+    )
 
     opentelemetry_add_pkgconfig(
       exporter_otlp_file
