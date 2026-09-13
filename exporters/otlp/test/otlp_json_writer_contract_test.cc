@@ -89,8 +89,8 @@ TEST_P(JsonWriterContract, FactoryCreatesAWorkingWriter)
 
 TEST_P(JsonWriterContract, FactoryCreatesWritersConcurrently)
 {
-  constexpr int kThreads          = 8;
-  constexpr int kWritersPerThread = 200;
+  static constexpr int kThreads          = 8;
+  static constexpr int kWritersPerThread = 200;
   std::vector<std::string> failures(kThreads);
   std::vector<std::thread> threads;
   for (int t = 0; t < kThreads; ++t)
