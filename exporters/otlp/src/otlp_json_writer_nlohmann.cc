@@ -59,7 +59,24 @@ public:
       Fail("Key() called twice without an intervening value");
       return;
     }
-    pending_key_.assign(key.data(), key.size());
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+    {
+#endif
+      pending_slot_ = &(*stack_.back().node)[std::string(key.data(), key.size())];
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    }
+    catch (const std::exception &e)
+    {
+      Fail(e.what());
+      return;
+    }
+    catch (...)
+    {
+      Fail("unknown exception");
+      return;
+    }
+#endif
     has_pending_key_ = true;
   }
 
@@ -177,7 +194,7 @@ private:
         return &frame.node->back();
       }
       has_pending_key_ = false;
-      return &(*frame.node)[pending_key_];
+      return pending_slot_;
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
     }
     catch (const std::exception &e)
@@ -203,7 +220,9 @@ private:
     try
     {
 #endif
-      *slot = kind == Container::kObject ? nlohmann::json::object() : nlohmann::json::array();
+      // Constructing from value_t skips the initializer_list path of object()/array().
+      *slot = kind == Container::kObject ? nlohmann::json::value_t::object
+                                         : nlohmann::json::value_t::array;
       stack_.push_back(Frame{slot, kind});
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
     }
@@ -249,10 +268,10 @@ private:
 
   nlohmann::json root_;
   std::vector<Frame> stack_;
-  std::string pending_key_;
-  bool has_pending_key_ = false;
-  bool root_set_        = false;
-  bool ok_              = true;
+  nlohmann::json *pending_slot_ = nullptr;
+  bool has_pending_key_         = false;
+  bool root_set_                = false;
+  bool ok_                      = true;
 };
 
 }  // namespace
