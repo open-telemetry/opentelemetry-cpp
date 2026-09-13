@@ -1421,6 +1421,19 @@ if(OTELCPP_BUILD_TESTING
             ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
+if(OTELCPP_BUILD_TESTING
+   AND OTELCPP_WITH_BENCHMARK
+   AND OTELCPP_WITH_OTLP_FILE
+   AND OTELCPP_WITH_JSON_WRITER_NLOHMANN)
+  add_executable(otlp_file_client_json_benchmark
+                 benchmark/otlp_file_client_json_benchmark.cc)
+
+  target_link_libraries(
+    otlp_file_client_json_benchmark
+    PRIVATE opentelemetry_exporter_otlp_file_client benchmark::benchmark
+            ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
 if(OTELCPP_BUILD_TESTING AND OTELCPP_WITH_BENCHMARK)
   add_executable(otlp_recordable_benchmark test/otlp_recordable_benchmark.cc)
 

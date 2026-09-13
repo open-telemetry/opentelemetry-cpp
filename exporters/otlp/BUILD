@@ -1180,6 +1180,23 @@ otel_cc_benchmark(
 )
 
 otel_cc_benchmark(
+    name = "otlp_file_client_json_benchmark",
+    srcs = ["benchmark/otlp_file_client_json_benchmark.cc"],
+    tags = [
+        "benchmark",
+        "otlp",
+        "otlp_file",
+        "test",
+    ],
+    deps = [
+        ":otlp_file_client",
+        "//sdk/src/common:global_log_handler",
+        "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+    ],
+)
+
+otel_cc_benchmark(
     name = "otlp_recordable_benchmark",
     srcs = ["test/otlp_recordable_benchmark.cc"],
     tags = [
