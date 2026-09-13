@@ -23,33 +23,39 @@ cc_library(
         "//api",
         "//sdk:headers",
         "//sdk/src/common:wildcard_match",
-        "//sdk/src/logs",
         "//sdk/src/resource",
-        "//sdk/src/trace",
     ],
 )
 
 cc_library(
     name = "configuration_trace_builders",
-    srcs = ["trace_builders.cc"],
+    srcs = [
+        "trace_builder_utils.cc",
+        "trace_builders.cc",
+    ],
     include_prefix = "src/configuration",
     deps = [
         ":configuration_core",
         "//api",
         "//sdk:headers",
         "//sdk/src/common:wildcard_match",
+        "//sdk/src/trace",
     ],
 )
 
 cc_library(
     name = "configuration_logs_builders",
-    srcs = ["logs_builders.cc"],
+    srcs = [
+        "logs_builder_utils.cc",
+        "logs_builders.cc",
+    ],
     include_prefix = "src/configuration",
     deps = [
         ":configuration_core",
         "//api",
         "//sdk:headers",
         "//sdk/src/common:wildcard_match",
+        "//sdk/src/logs",
     ],
 )
 

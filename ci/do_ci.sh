@@ -825,6 +825,9 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
     -//sdk/src/configuration/...
     -//sdk/test/configuration/...
     -//resource_detectors/...
+    -//exporters/ostream:ostream_log_record_exporter_builder
+    -//exporters/ostream:ostream_metric_exporter_builder
+    -//exporters/ostream:ostream_span_exporter_builder
     -//exporters/otlp:otlp_builder_utils
     -//exporters/otlp:otlp_grpc_span_exporter_builder
     -//exporters/otlp:otlp_grpc_log_record_exporter_builder
