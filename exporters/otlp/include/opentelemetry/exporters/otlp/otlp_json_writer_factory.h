@@ -14,6 +14,19 @@ namespace exporter
 namespace otlp
 {
 
+/**
+ * Creates a JsonWriter for each OTLP/JSON export. Set it as
+ * json_writer_factory in the runtime options of an OTLP HTTP or file exporter
+ * to replace the default nlohmann-json backend.
+ *
+ * Create() is called once per export. One factory may be shared by several
+ * exporters, and an exporter may export from several threads, so Create() can
+ * be called concurrently and must be thread-safe.
+ *
+ * Create() must not throw: it is called from noexcept export paths, where an
+ * escaping exception terminates the program. To signal a failure it returns
+ * nullptr, and the export then fails.
+ */
 class OPENTELEMETRY_EXPORT JsonWriterFactory
 {
 public:
