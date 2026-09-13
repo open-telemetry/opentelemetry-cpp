@@ -325,6 +325,18 @@ Increment the:
   metric exporter
   [#4365](https://github.com/open-telemetry/opentelemetry-cpp/pull/4365)
 
+* [SDK] Enforce span status transition rules defined in the OpenTelemetry
+  specification in `Span::SetStatus`.
+  [#4546](https://github.com/open-telemetry/opentelemetry-cpp/issues/4546)
+  * Previously every `SetStatus` call overwrote the recorded status. It now
+    follows the specification, which changes behavior for users in three ways:
+    * A call with `StatusCode::kUnset` is ignored.
+    * Once the status is `kOk`, it is final. So a later call can no longer
+      change an explicit `kOk`.
+    * The description is kept only for `kError`; it is dropped for `kOk` and
+      `kUnset`.
+  * `ETWSpan::SetStatus` in the ETW exporter follows the same rules.
+
 Important changes:
 
 * [API] Never set a null global provider or propagator
