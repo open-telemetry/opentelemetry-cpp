@@ -23,7 +23,7 @@ const char *full_version   = "1.29.0";
  * For published releases: YYYY-MM-DD
  * For -dev releases: empty string
  */
-const char *build_date = "2026-09-12";
+const char *build_date = "2026-09-13";
 }  // namespace version
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
