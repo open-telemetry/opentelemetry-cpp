@@ -742,6 +742,23 @@ TEST(ResourceTest, MergeSameTypeSameIdentityOverlaysDescription)
   EXPECT_EQ(merged.GetEntities()[0].GetSchemaURL(), schema_url);
 }
 
+TEST(ResourceTest, MergeIntegerWidthIdentityOverlaysDescription)
+{
+  const std::string schema_url = "https://opentelemetry.io/schemas/1.21.0";
+  Entity old_process("process", ResourceAttributes{{"process.pid", std::int32_t{123}}},
+                     ResourceAttributes{{"process.command", "old"}}, schema_url);
+  Entity updating_process("process", ResourceAttributes{{"process.pid", std::int64_t{123}}},
+                          ResourceAttributes{{"process.command", "new"}}, schema_url);
+  auto merged = Resource(ResourceAttributes{}, std::string{}, {old_process})
+                    .Merge(Resource(ResourceAttributes{}, std::string{}, {updating_process}));
+
+  ASSERT_EQ(merged.GetEntities().size(), 1);
+  EXPECT_EQ(nostd::get<std::int64_t>(merged.GetEntities()[0].GetIdentity().at("process.pid")),
+            std::int64_t{123});
+  EXPECT_EQ(nostd::get<std::string>(merged.GetEntities()[0].GetDescription().at("process.command")),
+            "new");
+}
+
 TEST(ResourceTest, MergeSameTypeDifferentIdentityKeepsOld)
 {
   Entity old_host("host", ResourceAttributes{{"host.id", "H1"}});
