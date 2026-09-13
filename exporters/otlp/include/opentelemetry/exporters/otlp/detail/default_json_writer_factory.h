@@ -28,7 +28,7 @@ inline std::shared_ptr<JsonWriterFactory> GetDefaultJsonWriterFactory()
 #else
   OTEL_INTERNAL_LOG_ERROR(
       "No default JSON writer backend is compiled in. "
-      "Use the JsonWriterFactory constructor or factory overloads, "
+      "Set json_writer_factory in the exporter runtime options, "
       "or enable the nlohmann backend (OTELCPP_WITH_JSON_WRITER_NLOHMANN=ON).");
   std::terminate();
 #endif

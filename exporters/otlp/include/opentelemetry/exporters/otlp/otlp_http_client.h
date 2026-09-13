@@ -298,7 +298,8 @@ private:
   // Object that stores the HTTP sessions that have been created
   std::shared_ptr<ext::http::client::HttpClient> http_client_;
 
-  // Resolved from options_.json_writer_factory, or the default backend.
+  // Resolved from options_.json_writer_factory, or the default backend. Null when the content
+  // type is binary and no factory was supplied.
   std::shared_ptr<JsonWriterFactory> json_writer_factory_;
 
   // Cached parsed URI

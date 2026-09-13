@@ -427,6 +427,19 @@ bool SerializeToHttpBody(http_client::Body &output, const google::protobuf::Mess
   return true;
 }
 
+std::shared_ptr<JsonWriterFactory> ResolveJsonWriterFactory(const OtlpHttpClientOptions &options)
+{
+  if (options.json_writer_factory)
+  {
+    return options.json_writer_factory;
+  }
+  if (options.content_type == HttpRequestContentType::kJson)
+  {
+    return detail::GetDefaultJsonWriterFactory();
+  }
+  return nullptr;
+}
+
 }  // namespace
 
 OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options)
@@ -443,8 +456,7 @@ OtlpHttpClient::OtlpHttpClient(OtlpHttpClientOptions &&options,
     : is_shutdown_(false),
       options_(std::move(options)),
       http_client_(std::move(http_client)),
-      json_writer_factory_(options_.json_writer_factory ? options_.json_writer_factory
-                                                        : detail::GetDefaultJsonWriterFactory()),
+      json_writer_factory_(ResolveJsonWriterFactory(options_)),
       start_session_counter_(0),
       finished_session_counter_(0)
 {

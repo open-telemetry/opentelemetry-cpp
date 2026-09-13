@@ -354,6 +354,37 @@ TEST_F(OtlpHttpExporterCustomClientTestPeer, ALateTerminalEventDoesNotReportASec
   }
 }
 
+// Only catches a regression when built without a default JSON backend.
+TEST_F(OtlpHttpExporterCustomClientTestPeer, BinaryExportDoesNotNeedAJsonWriterFactory)
+{
+  auto client         = http_client::HttpClientTestFactory::Create();
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto session = std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> pending;
+  EXPECT_CALL(*session, SendRequest)
+      .WillOnce(
+          [&pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+            pending = std::move(callback);
+          });
+
+  auto options                = MakeOtlpHttpClientOptions(std::chrono::seconds{30});
+  options.content_type        = HttpRequestContentType::kBinary;
+  options.json_writer_factory = nullptr;
+  OtlpHttpClient otlp_client(std::move(options), client);
+
+  auto calls  = std::make_shared<std::atomic<int>>(0);
+  auto result = std::make_shared<sdk::common::ExportResult>(sdk::common::ExportResult::kFailure);
+  ExportOneRequest(otlp_client, calls, result);
+  ASSERT_NE(pending, nullptr);
+
+  http_client::nosend::Response sent;
+  sent.Finish(*pending);
+
+  EXPECT_EQ(1, calls->load(std::memory_order_acquire));
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, *result);
+}
+
 TEST_F(OtlpHttpExporterCustomClientTestPeer, JsonExportFailsWhenTheWriterFailsInToString)
 {
   auto client         = http_client::HttpClientTestFactory::Create();
