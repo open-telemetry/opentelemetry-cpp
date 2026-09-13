@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <chrono>
+#include <functional>
 #include <string>
 #include <utility>
 #include "gmock/gmock.h"

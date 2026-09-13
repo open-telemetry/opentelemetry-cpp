@@ -4,7 +4,9 @@
 #include "opentelemetry/exporters/otlp/otlp_json_converter.h"
 
 #include <gtest/gtest.h>
+#include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <limits>
 #include <ostream>
 #include <string>
@@ -42,8 +44,6 @@ std::vector<std::string> ConvertStrings(const google::protobuf::Message &message
   ConvertGenericMessageToJson(writer, message, JsonConverterOptions{false, bytes_mapping});
   return strings;
 }
-
-}  // namespace
 
 class OtlpJsonConverterSigned64BitInteger : public ::testing::TestWithParam<std::int64_t>
 {};
@@ -172,17 +172,17 @@ TEST_P(OtlpJsonConverterNesting, ContinuesOuterFieldsAfterANestedMessage)
   {
     auto *key_value = current->mutable_kvlist_value()->add_values();
     key_value->set_key("k" + std::to_string(level));
-    expected.push_back(key_value->key());
+    expected.emplace_back(key_value->key());
     current = key_value->mutable_value();
   }
   current->set_string_value("leaf");
-  expected.push_back("leaf");
+  expected.emplace_back("leaf");
 
   auto *after = root.mutable_kvlist_value()->add_values();
   after->set_key("after");
   after->mutable_value()->set_string_value("after-value");
-  expected.push_back("after");
-  expected.push_back("after-value");
+  expected.emplace_back("after");
+  expected.emplace_back("after-value");
 
   EXPECT_EQ(ConvertStrings(root, JsonBytesMappingKind::kHexId), expected);
 }
@@ -194,6 +194,7 @@ INSTANTIATE_TEST_SUITE_P(Levels,
                            return "Levels" + std::to_string(info.param);
                          });
 
+}  // namespace
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

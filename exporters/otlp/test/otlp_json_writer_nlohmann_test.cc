@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include <string>
 
 #include "opentelemetry/exporters/otlp/otlp_json_writer.h"
 #include "opentelemetry/exporters/otlp/otlp_json_writer_factory_nlohmann.h"

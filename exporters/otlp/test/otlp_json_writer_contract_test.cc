@@ -5,7 +5,6 @@
 
 #include <gtest/gtest.h>
 #include <algorithm>
-#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <limits>
@@ -93,6 +92,7 @@ TEST_P(JsonWriterContract, FactoryCreatesWritersConcurrently)
   static constexpr int kWritersPerThread = 200;
   std::vector<std::string> failures(kThreads);
   std::vector<std::thread> threads;
+  threads.reserve(kThreads);
   for (int t = 0; t < kThreads; ++t)
   {
     threads.emplace_back([this, t, &failures] {
@@ -108,11 +108,17 @@ TEST_P(JsonWriterContract, FactoryCreatesWritersConcurrently)
         writer->WriteInt32(t);
         writer->WriteInt32(i);
         writer->EndArray();
-        const std::string expected = "[" + std::to_string(t) + "," + std::to_string(i) + "]";
-        const std::string json     = writer->ToString();
+        std::string expected = "[";
+        expected += std::to_string(t);
+        expected += ",";
+        expected += std::to_string(i);
+        expected += "]";
+        const std::string json = writer->ToString();
         if (!writer->ok() || json != expected)
         {
-          failures[t] = "expected " + expected + ", got " + json;
+          failures[t] = "expected " + expected;
+          failures[t] += ", got ";
+          failures[t] += json;
         }
       }
     });
