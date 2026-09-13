@@ -59,7 +59,7 @@ public:
       Fail("Key() called twice without an intervening value");
       return;
     }
-    pending_key_     = std::string(key.data(), key.size());
+    pending_key_.assign(key.data(), key.size());
     has_pending_key_ = true;
   }
 
