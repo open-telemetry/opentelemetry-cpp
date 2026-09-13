@@ -2,9 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <array>
+#include <cstdint>
+#include <limits>
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/resource/entity.h"
@@ -125,4 +129,83 @@ TEST(EntityTest, Equality)
   Entity different_schema("service", identity, description,
                           "https://opentelemetry.io/schemas/1.1.0");
   EXPECT_FALSE(a == different_schema);
+}
+
+TEST(EntityTest, IdentityInt32EqualsInt64)
+{
+  Entity as_int32("process", ResourceAttributes{{"process.pid", std::int32_t{123}}});
+  Entity as_int64("process", ResourceAttributes{{"process.pid", std::int64_t{123}}});
+
+  EXPECT_TRUE(as_int32 == as_int64);
+  EXPECT_EQ(nostd::get<std::int64_t>(as_int32.GetIdentity().at("process.pid")), std::int64_t{123});
+  EXPECT_TRUE(nostd::holds_alternative<std::int64_t>(as_int32.GetIdentity().at("process.pid")));
+}
+
+TEST(EntityTest, IdentityUint32EqualsInt64)
+{
+  Entity as_uint32("process", ResourceAttributes{{"process.pid", std::uint32_t{123}}});
+  Entity as_int64("process", ResourceAttributes{{"process.pid", std::int64_t{123}}});
+
+  EXPECT_TRUE(as_uint32 == as_int64);
+  EXPECT_TRUE(nostd::holds_alternative<std::int64_t>(as_uint32.GetIdentity().at("process.pid")));
+}
+
+TEST(EntityTest, IdentityUint64InRangeEqualsInt64)
+{
+  const std::uint64_t in_range =
+      static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max());
+  Entity as_uint64("process", ResourceAttributes{{"process.pid", in_range}});
+  Entity as_int64("process",
+                  ResourceAttributes{{"process.pid", std::numeric_limits<std::int64_t>::max()}});
+
+  EXPECT_TRUE(as_uint64 == as_int64);
+  EXPECT_TRUE(nostd::holds_alternative<std::int64_t>(as_uint64.GetIdentity().at("process.pid")));
+}
+
+TEST(EntityTest, IdentityUint64OverflowRemainsDistinct)
+{
+  const std::uint64_t overflow = std::numeric_limits<std::uint64_t>::max();
+  Entity as_uint64("process", ResourceAttributes{{"process.pid", overflow}});
+  Entity as_int64("process",
+                  ResourceAttributes{{"process.pid", std::numeric_limits<std::int64_t>::max()}});
+  Entity as_negative("process", ResourceAttributes{{"process.pid", std::int64_t{-1}}});
+
+  EXPECT_TRUE(nostd::holds_alternative<std::uint64_t>(as_uint64.GetIdentity().at("process.pid")));
+  EXPECT_EQ(nostd::get<std::uint64_t>(as_uint64.GetIdentity().at("process.pid")), overflow);
+  EXPECT_FALSE(as_uint64 == as_int64);
+  EXPECT_FALSE(as_uint64 == as_negative);
+}
+
+TEST(EntityTest, IdentityIntegerArrayNormalization)
+{
+  const std::array<std::int32_t, 3> ids32    = {1, 2, 3};
+  const std::array<std::uint32_t, 3> ids_u32 = {1, 2, 3};
+  const std::array<std::int64_t, 3> ids64    = {1, 2, 3};
+  const std::array<std::uint64_t, 3> ids_u64 = {1, 2, 3};
+  Entity as_int32("host", ResourceAttributes{{"ids", nostd::span<const std::int32_t>{ids32}}});
+  Entity as_uint32("host", ResourceAttributes{{"ids", nostd::span<const std::uint32_t>{ids_u32}}});
+  Entity as_int64("host", ResourceAttributes{{"ids", nostd::span<const std::int64_t>{ids64}}});
+  Entity as_uint64_fit("host",
+                       ResourceAttributes{{"ids", nostd::span<const std::uint64_t>{ids_u64}}});
+
+  EXPECT_TRUE(as_int32 == as_int64);
+  EXPECT_TRUE(as_uint32 == as_int64);
+  EXPECT_TRUE(as_uint64_fit == as_int64);
+  EXPECT_TRUE(
+      nostd::holds_alternative<std::vector<std::int64_t>>(as_int32.GetIdentity().at("ids")));
+
+  const std::uint64_t overflow                    = std::numeric_limits<std::uint64_t>::max();
+  const std::array<std::uint64_t, 2> overflow_ids = {1, overflow};
+  Entity overflow_array(
+      "host", ResourceAttributes{{"ids", nostd::span<const std::uint64_t>{overflow_ids}}});
+  EXPECT_TRUE(
+      nostd::holds_alternative<std::vector<std::uint64_t>>(overflow_array.GetIdentity().at("ids")));
+  EXPECT_FALSE(overflow_array == as_int64);
+}
+
+TEST(EntityTest, DescriptionIntegersAreNotNormalized)
+{
+  Entity identity("service", ResourceAttributes{{"service.name", "app"}},
+                  ResourceAttributes{{"count", std::int32_t{7}}});
+  EXPECT_TRUE(nostd::holds_alternative<std::int32_t>(identity.GetDescription().at("count")));
 }

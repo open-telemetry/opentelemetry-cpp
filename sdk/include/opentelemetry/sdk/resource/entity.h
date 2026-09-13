@@ -19,6 +19,11 @@ using ResourceAttributes = opentelemetry::sdk::common::AttributeMap;
 class Entity
 {
 public:
+  /**
+   * Constructs an Entity. Integer identity values (and integer arrays) are
+   * canonicalized to int64_t when they fit, so C++ integer widths do not
+   * affect identity equality or merge. Description values are not rewritten.
+   */
   Entity(const std::string &type,
          const ResourceAttributes &identity,
          const ResourceAttributes &description = ResourceAttributes{},
