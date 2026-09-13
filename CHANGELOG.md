@@ -509,6 +509,15 @@ Increment the:
 * [CMAKE] Fix missing version properties on configuration_core (#4559)
   [#4559](https://github.com/open-telemetry/opentelemetry-cpp/pull/4559)
 
+* [SDK] Enforce Span Status transition rules (#4547)
+  [#4547](https://github.com/open-telemetry/opentelemetry-cpp/pull/4547)
+
+* [SDK] Fix MetricReader post shutdown handling (#4548)
+  [#4548](https://github.com/open-telemetry/opentelemetry-cpp/pull/4548)
+
+* [METRICS SDK] last collection of metrics before shutdown (#4550)
+  [#4550](https://github.com/open-telemetry/opentelemetry-cpp/pull/4550)
+
 Important changes:
 
 * [CONFIGURATION] Complete resource detection support in SdkBuilder (#4424)
@@ -532,6 +541,17 @@ Important changes:
     **Note**: this is a correctness fix to an inline API header; the observable
     behavior of these methods changes towards the already documented contract
     (see `docs/abi-policy.md`).
+
+* [SDK] Enforce Span Status transition rules (#4547)
+  [#4547](https://github.com/open-telemetry/opentelemetry-cpp/pull/4547)
+  * Previously every `SetStatus` call overwrote the recorded status. It now
+    follows the specification, which changes behavior for users in three ways:
+    * A call with `StatusCode::kUnset` is ignored.
+    * Once the status is `kOk`, it is final. So a later call can no longer
+      change an explicit `kOk`.
+    * The description is kept only for `kError`; it is dropped for `kOk` and
+      `kUnset`.
+  * `ETWSpan::SetStatus` in the ETW exporter follows the same rules.
 
 Breaking changes:
 
