@@ -18,8 +18,102 @@ and inspect the commit for the last upgrade.
 
 |      Dependency      |      Type     |
 | -------------------- | ------------- |
+|    nlohmann-json     | git submodule |
 | opentelemetry-proto  | git submodule |
 |    prometheus-cpp    | git submodule |
+
+## nlohmann-json
+
+### Comments (nlohmann-json)
+
+The `nlohmann-json` library provides JSON parsing and serialization support.
+opentelemetry-cpp can consume it from an installed package, from the
+`third_party/nlohmann-json` git submodule, or through CMake `FetchContent`.
+
+The dependency is also declared independently for Bazel and Conan builds,
+so a version upgrade needs to keep those package-manager declarations aligned
+with the CMake/submodule release where equivalent versions are available.
+
+### Origin (nlohmann-json)
+
+The repository for `nlohmann-json` is:
+
+* [repository](https://github.com/nlohmann/json)
+
+Check release notes at:
+
+* [release-notes](https://github.com/nlohmann/json/releases)
+
+### Upgrade (nlohmann-json)
+
+When upgrading `nlohmann-json` to a newer release, update each build-system
+reference that pins the dependency and verify that they resolve compatible
+releases.
+
+The current release line can be found by searching for `nlohmann-json` and
+`nlohmann_json` in the files below.
+
+#### directory third_party/nlohmann-json
+
+Update the `third_party/nlohmann-json` git submodule to the target release.
+See [Upgrade a git submodule](#upgrade-a-git-submodule) for the common
+submodule procedure.
+
+#### file third_party_release
+
+Update the CMake/FetchContent release tag. For example:
+
+```text
+nlohmann-json=v3.12.0
+```
+
+`cmake/nlohmann-json.cmake` reads this tag when an installed package or the
+submodule is not used, so there is normally no separate version literal to
+change in that CMake file.
+
+#### file install/cmake/third_party_latest
+
+Keep the latest CMake installation dependency set aligned with the release:
+
+```text
+nlohmann-json=v3.12.0
+```
+
+#### file MODULE.bazel
+
+Update the Bazel Central Registry version for `nlohmann_json`:
+
+```bzl
+bazel_dep(name = "nlohmann_json", version = "3.12.0.bcr.2", repo_name = "github_nlohmann_json")
+```
+
+The Bazel version can carry a BCR-specific suffix, so do not assume that the
+exact tag string from GitHub is the correct `MODULE.bazel` value. Verify the
+available release in the Bazel Central Registry before updating it.
+
+#### file install/conan/conanfile_latest.txt
+
+Update the Conan package reference used by the latest install configuration:
+
+```text
+nlohmann_json/3.12.0
+```
+
+### Validation (nlohmann-json)
+
+After changing the version, verify at least the build paths affected by the
+updated declarations:
+
+* initialize/update the `third_party/nlohmann-json` submodule and run the
+  relevant CMake build/tests;
+* verify the selected `nlohmann_json` version exists in the Bazel Central
+  Registry and run the Bazel build/test path;
+* verify the selected package exists in Conan Center before changing
+  `install/conan/conanfile_latest.txt`.
+
+If the new upstream release changes supported C++ standards, exported CMake
+targets, or package-manager metadata, keep those compatibility changes in the
+same dependency-upgrade PR and document any new minimum requirements.
 
 ## opentelemetry-proto
 
