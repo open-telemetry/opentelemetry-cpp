@@ -15,6 +15,15 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] `PeriodicExportingMetricReader::Shutdown` now performs one final
+  flush (reusing the same timeout-bounded machinery as `ForceFlush`) before
+  shutting down the underlying exporter, so metrics recorded since the last
+  periodic tick are no longer silently dropped on shutdown, per the metrics
+  SDK spec. `Shutdown` reports failure if either that final flush or the
+  exporter shutdown fails, and the exporter is given what remains of the
+  caller's timeout rather than a second full budget.
+  [#2983](https://github.com/open-telemetry/opentelemetry-specification/issues/2983)
+
 * [BUG] Install a curl seek callback so an OTLP/HTTP export body can be rewound
   when libcurl restarts an upload, instead of failing with
   `CURLE_SEND_FAIL_REWIND` and dropping the batch
