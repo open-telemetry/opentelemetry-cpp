@@ -90,7 +90,7 @@ public:
     if (nlohmann::json *slot = ClaimSlot())
     {
       *slot = opentelemetry::sdk::common::Base64Escape(
-          std::string(reinterpret_cast<const char *>(data), size));
+          nostd::string_view(reinterpret_cast<const char *>(data), size));
     }
   }
 
