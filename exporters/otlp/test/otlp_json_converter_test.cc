@@ -160,6 +160,40 @@ INSTANTIATE_TEST_SUITE_P(
       return "Bytes" + std::to_string(info.param);
     });
 
+class OtlpJsonConverterNesting : public ::testing::TestWithParam<int>
+{};
+
+TEST_P(OtlpJsonConverterNesting, ContinuesOuterFieldsAfterANestedMessage)
+{
+  proto::common::v1::AnyValue root;
+  proto::common::v1::AnyValue *current = &root;
+  std::vector<std::string> expected;
+  for (int level = 0; level < GetParam(); ++level)
+  {
+    auto *key_value = current->mutable_kvlist_value()->add_values();
+    key_value->set_key("k" + std::to_string(level));
+    expected.push_back(key_value->key());
+    current = key_value->mutable_value();
+  }
+  current->set_string_value("leaf");
+  expected.push_back("leaf");
+
+  auto *after = root.mutable_kvlist_value()->add_values();
+  after->set_key("after");
+  after->mutable_value()->set_string_value("after-value");
+  expected.push_back("after");
+  expected.push_back("after-value");
+
+  EXPECT_EQ(ConvertStrings(root, JsonBytesMappingKind::kHexId), expected);
+}
+
+INSTANTIATE_TEST_SUITE_P(Levels,
+                         OtlpJsonConverterNesting,
+                         ::testing::Values(1, 4, 12),
+                         [](const ::testing::TestParamInfo<int> &info) {
+                           return "Levels" + std::to_string(info.param);
+                         });
+
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE

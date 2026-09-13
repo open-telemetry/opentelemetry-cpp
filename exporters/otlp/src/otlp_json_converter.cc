@@ -160,67 +160,68 @@ void WriteBytesField(JsonWriter &writer,
 }
 
 // NOLINTBEGIN(misc-no-recursion)
+// The reflection is passed in because Message::GetReflection() is not free: every call goes
+// through the descriptor table's std::call_once.
 void ConvertGenericFieldToJson(JsonWriter &writer,
                                const google::protobuf::Message &message,
+                               const google::protobuf::Reflection &reflection,
                                const google::protobuf::FieldDescriptor *field_descriptor,
                                const JsonConverterOptions &options)
 {
   switch (field_descriptor->cpp_type())
   {
     case google::protobuf::FieldDescriptor::CPPTYPE_INT32: {
-      writer.WriteInt32(message.GetReflection()->GetInt32(message, field_descriptor));
+      writer.WriteInt32(reflection.GetInt32(message, field_descriptor));
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_INT64: {
       // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded as
       // decimal strings, and either numbers or strings are accepted when decoding.
-      WriteInt64String(writer, message.GetReflection()->GetInt64(message, field_descriptor));
+      WriteInt64String(writer, reflection.GetInt64(message, field_descriptor));
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_UINT32: {
-      writer.WriteUInt32(message.GetReflection()->GetUInt32(message, field_descriptor));
+      writer.WriteUInt32(reflection.GetUInt32(message, field_descriptor));
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_UINT64: {
       // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded as
       // decimal strings, and either numbers or strings are accepted when decoding.
-      WriteUInt64String(writer, message.GetReflection()->GetUInt64(message, field_descriptor));
+      WriteUInt64String(writer, reflection.GetUInt64(message, field_descriptor));
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
       std::string empty;
       if (field_descriptor->type() == google::protobuf::FieldDescriptor::TYPE_BYTES)
       {
-        WriteBytesField(
-            writer, message.GetReflection()->GetStringReference(message, field_descriptor, &empty),
-            field_descriptor, options.json_bytes_mapping);
+        WriteBytesField(writer, reflection.GetStringReference(message, field_descriptor, &empty),
+                        field_descriptor, options.json_bytes_mapping);
       }
       else
       {
-        writer.WriteString(
-            message.GetReflection()->GetStringReference(message, field_descriptor, &empty));
+        writer.WriteString(reflection.GetStringReference(message, field_descriptor, &empty));
       }
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE: {
-      ConvertGenericMessageToJson(
-          writer, message.GetReflection()->GetMessage(message, field_descriptor, nullptr), options);
+      ConvertGenericMessageToJson(writer, reflection.GetMessage(message, field_descriptor, nullptr),
+                                  options);
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE: {
-      writer.WriteDouble(message.GetReflection()->GetDouble(message, field_descriptor));
+      writer.WriteDouble(reflection.GetDouble(message, field_descriptor));
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT: {
-      writer.WriteDouble(message.GetReflection()->GetFloat(message, field_descriptor));
+      writer.WriteDouble(reflection.GetFloat(message, field_descriptor));
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_BOOL: {
-      writer.WriteBool(message.GetReflection()->GetBool(message, field_descriptor));
+      writer.WriteBool(reflection.GetBool(message, field_descriptor));
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_ENUM: {
-      writer.WriteInt32(message.GetReflection()->GetEnumValue(message, field_descriptor));
+      writer.WriteInt32(reflection.GetEnumValue(message, field_descriptor));
       break;
     }
     default: {
@@ -232,10 +233,11 @@ void ConvertGenericFieldToJson(JsonWriter &writer,
 
 void ConvertListFieldToJson(JsonWriter &writer,
                             const google::protobuf::Message &message,
+                            const google::protobuf::Reflection &reflection,
                             const google::protobuf::FieldDescriptor *field_descriptor,
                             const JsonConverterOptions &options)
 {
-  auto field_size = message.GetReflection()->FieldSize(message, field_descriptor);
+  auto field_size = reflection.FieldSize(message, field_descriptor);
 
   writer.BeginArray();
 
@@ -244,7 +246,7 @@ void ConvertListFieldToJson(JsonWriter &writer,
     case google::protobuf::FieldDescriptor::CPPTYPE_INT32: {
       for (int i = 0; i < field_size; ++i)
       {
-        writer.WriteInt32(message.GetReflection()->GetRepeatedInt32(message, field_descriptor, i));
+        writer.WriteInt32(reflection.GetRepeatedInt32(message, field_descriptor, i));
       }
 
       break;
@@ -254,8 +256,7 @@ void ConvertListFieldToJson(JsonWriter &writer,
       {
         // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded
         // as decimal strings, and either numbers or strings are accepted when decoding.
-        WriteInt64String(writer,
-                         message.GetReflection()->GetRepeatedInt64(message, field_descriptor, i));
+        WriteInt64String(writer, reflection.GetRepeatedInt64(message, field_descriptor, i));
       }
 
       break;
@@ -263,8 +264,7 @@ void ConvertListFieldToJson(JsonWriter &writer,
     case google::protobuf::FieldDescriptor::CPPTYPE_UINT32: {
       for (int i = 0; i < field_size; ++i)
       {
-        writer.WriteUInt32(
-            message.GetReflection()->GetRepeatedUInt32(message, field_descriptor, i));
+        writer.WriteUInt32(reflection.GetRepeatedUInt32(message, field_descriptor, i));
       }
 
       break;
@@ -274,8 +274,7 @@ void ConvertListFieldToJson(JsonWriter &writer,
       {
         // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded
         // as decimal strings, and either numbers or strings are accepted when decoding.
-        WriteUInt64String(writer,
-                          message.GetReflection()->GetRepeatedUInt64(message, field_descriptor, i));
+        WriteUInt64String(writer, reflection.GetRepeatedUInt64(message, field_descriptor, i));
       }
 
       break;
@@ -286,18 +285,17 @@ void ConvertListFieldToJson(JsonWriter &writer,
       {
         for (int i = 0; i < field_size; ++i)
         {
-          WriteBytesField(writer,
-                          message.GetReflection()->GetRepeatedStringReference(
-                              message, field_descriptor, i, &empty),
-                          field_descriptor, options.json_bytes_mapping);
+          WriteBytesField(
+              writer, reflection.GetRepeatedStringReference(message, field_descriptor, i, &empty),
+              field_descriptor, options.json_bytes_mapping);
         }
       }
       else
       {
         for (int i = 0; i < field_size; ++i)
         {
-          writer.WriteString(message.GetReflection()->GetRepeatedStringReference(
-              message, field_descriptor, i, &empty));
+          writer.WriteString(
+              reflection.GetRepeatedStringReference(message, field_descriptor, i, &empty));
         }
       }
       break;
@@ -306,8 +304,7 @@ void ConvertListFieldToJson(JsonWriter &writer,
       for (int i = 0; i < field_size; ++i)
       {
         ConvertGenericMessageToJson(
-            writer, message.GetReflection()->GetRepeatedMessage(message, field_descriptor, i),
-            options);
+            writer, reflection.GetRepeatedMessage(message, field_descriptor, i), options);
       }
 
       break;
@@ -315,8 +312,7 @@ void ConvertListFieldToJson(JsonWriter &writer,
     case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE: {
       for (int i = 0; i < field_size; ++i)
       {
-        writer.WriteDouble(
-            message.GetReflection()->GetRepeatedDouble(message, field_descriptor, i));
+        writer.WriteDouble(reflection.GetRepeatedDouble(message, field_descriptor, i));
       }
 
       break;
@@ -324,7 +320,7 @@ void ConvertListFieldToJson(JsonWriter &writer,
     case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT: {
       for (int i = 0; i < field_size; ++i)
       {
-        writer.WriteDouble(message.GetReflection()->GetRepeatedFloat(message, field_descriptor, i));
+        writer.WriteDouble(reflection.GetRepeatedFloat(message, field_descriptor, i));
       }
 
       break;
@@ -332,7 +328,7 @@ void ConvertListFieldToJson(JsonWriter &writer,
     case google::protobuf::FieldDescriptor::CPPTYPE_BOOL: {
       for (int i = 0; i < field_size; ++i)
       {
-        writer.WriteBool(message.GetReflection()->GetRepeatedBool(message, field_descriptor, i));
+        writer.WriteBool(reflection.GetRepeatedBool(message, field_descriptor, i));
       }
 
       break;
@@ -340,8 +336,7 @@ void ConvertListFieldToJson(JsonWriter &writer,
     case google::protobuf::FieldDescriptor::CPPTYPE_ENUM: {
       for (int i = 0; i < field_size; ++i)
       {
-        writer.WriteInt32(
-            message.GetReflection()->GetRepeatedEnumValue(message, field_descriptor, i));
+        writer.WriteInt32(reflection.GetRepeatedEnumValue(message, field_descriptor, i));
       }
       break;
     }
@@ -359,8 +354,9 @@ void ConvertGenericMessageToJson(JsonWriter &writer,
                                  const google::protobuf::Message &message,
                                  const JsonConverterOptions &options)
 {
+  const google::protobuf::Reflection &reflection = *message.GetReflection();
   std::vector<const google::protobuf::FieldDescriptor *> fields_with_data;
-  message.GetReflection()->ListFields(message, &fields_with_data);
+  reflection.ListFields(message, &fields_with_data);
 
   // A message with no set fields serializes as null, not as an empty object.
   if (fields_with_data.empty())
@@ -370,19 +366,18 @@ void ConvertGenericMessageToJson(JsonWriter &writer,
   }
 
   writer.BeginObject();
-  for (std::size_t i = 0; i < fields_with_data.size(); ++i)
+  for (const google::protobuf::FieldDescriptor *field_descriptor : fields_with_data)
   {
-    const google::protobuf::FieldDescriptor *field_descriptor = fields_with_data[i];
     const auto &field_name =
         options.use_json_name ? field_descriptor->json_name() : field_descriptor->camelcase_name();
     writer.Key(nostd::string_view(field_name.data(), field_name.size()));
     if (field_descriptor->is_repeated())
     {
-      ConvertListFieldToJson(writer, message, field_descriptor, options);
+      ConvertListFieldToJson(writer, message, reflection, field_descriptor, options);
     }
     else
     {
-      ConvertGenericFieldToJson(writer, message, field_descriptor, options);
+      ConvertGenericFieldToJson(writer, message, reflection, field_descriptor, options);
     }
   }
   writer.EndObject();
