@@ -747,6 +747,25 @@ cc_library(
 )
 
 cc_test(
+    name = "otlp_json_converter_test",
+    srcs = [
+        "test/otlp_json_converter_test.cc",
+        "test/otlp_stub_json_writer.h",
+    ],
+    tags = [
+        "otlp",
+        "test",
+    ],
+    deps = [
+        ":otlp_json_converter",
+        "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "otlp_json_writer_nlohmann_test",
     srcs = [
         "test/otlp_json_writer_contract_test.cc",

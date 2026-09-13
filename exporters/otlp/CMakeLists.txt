@@ -1029,6 +1029,15 @@ if(OTELCPP_BUILD_TESTING)
     TEST_PREFIX exporter.otlp.
     TEST_LIST otlp_metrics_serialization_test)
 
+  add_executable(otlp_json_converter_test test/otlp_json_converter_test.cc)
+  target_link_libraries(
+    otlp_json_converter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+    opentelemetry_exporter_otlp_json_converter protobuf::libprotobuf)
+  gtest_add_tests(
+    TARGET otlp_json_converter_test
+    TEST_PREFIX exporter.otlp.
+    TEST_LIST otlp_json_converter_test)
+
   if(OTELCPP_WITH_JSON_WRITER_NLOHMANN)
     add_executable(
       otlp_json_writer_nlohmann_test test/otlp_json_writer_nlohmann_test.cc

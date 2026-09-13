@@ -69,6 +69,62 @@ std::string HexEncode(const std::string &bytes)
   return ret;
 }
 
+// Hex-encodes into a stack buffer when the value fits, so trace and span IDs
+// do not allocate a temporary string before the writer copies them.
+void WriteHexString(JsonWriter &writer, const std::string &bytes)
+{
+  static constexpr std::size_t kStackBytes = 32;
+  if (bytes.size() > kStackBytes)
+  {
+    writer.WriteString(HexEncode(bytes));
+    return;
+  }
+  char buffer[kStackBytes * 2];
+  for (std::size_t i = 0; i < bytes.size(); ++i)
+  {
+    unsigned char byte = static_cast<unsigned char>(bytes[i]);
+    buffer[2 * i]      = HexEncode(static_cast<unsigned char>(byte >> 4));
+    buffer[2 * i + 1]  = HexEncode(static_cast<unsigned char>(byte & 0x0f));
+  }
+  writer.WriteString(nostd::string_view(buffer, bytes.size() * 2));
+}
+
+// Formats right-aligned into the end of buffer and returns the first digit.
+char *FormatDecimal(char *end, std::uint64_t value)
+{
+  do
+  {
+    *--end = static_cast<char>('0' + value % 10);
+    value /= 10;
+  } while (value != 0);
+  return end;
+}
+
+// 64-bit integers are JSON strings in OTLP/JSON; formatting into a stack
+// buffer avoids a temporary std::string that the writer would copy again.
+void WriteUInt64String(JsonWriter &writer, std::uint64_t value)
+{
+  char buffer[20];
+  char *end   = buffer + sizeof(buffer);
+  char *begin = FormatDecimal(end, value);
+  writer.WriteString(nostd::string_view(begin, static_cast<std::size_t>(end - begin)));
+}
+
+void WriteInt64String(JsonWriter &writer, std::int64_t value)
+{
+  char buffer[21];
+  char *end = buffer + sizeof(buffer);
+  // Negate as unsigned so INT64_MIN does not overflow.
+  std::uint64_t magnitude =
+      value < 0 ? 0 - static_cast<std::uint64_t>(value) : static_cast<std::uint64_t>(value);
+  char *begin = FormatDecimal(end, magnitude);
+  if (value < 0)
+  {
+    *--begin = '-';
+  }
+  writer.WriteString(nostd::string_view(begin, static_cast<std::size_t>(end - begin)));
+}
+
 void WriteBytesField(JsonWriter &writer,
                      const std::string &bytes,
                      const google::protobuf::FieldDescriptor *field_descriptor,
@@ -81,7 +137,7 @@ void WriteBytesField(JsonWriter &writer,
           field_descriptor->lowercase_name() == "span_id" ||
           field_descriptor->lowercase_name() == "parent_span_id")
       {
-        writer.WriteString(HexEncode(bytes));
+        WriteHexString(writer, bytes);
       }
       else
       {
@@ -95,7 +151,7 @@ void WriteBytesField(JsonWriter &writer,
       break;
     }
     case JsonBytesMappingKind::kHex:
-      writer.WriteString(HexEncode(bytes));
+      WriteHexString(writer, bytes);
       break;
     default:
       writer.WriteString(bytes);
@@ -118,8 +174,7 @@ void ConvertGenericFieldToJson(JsonWriter &writer,
     case google::protobuf::FieldDescriptor::CPPTYPE_INT64: {
       // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded as
       // decimal strings, and either numbers or strings are accepted when decoding.
-      writer.WriteString(
-          std::to_string(message.GetReflection()->GetInt64(message, field_descriptor)));
+      WriteInt64String(writer, message.GetReflection()->GetInt64(message, field_descriptor));
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_UINT32: {
@@ -129,8 +184,7 @@ void ConvertGenericFieldToJson(JsonWriter &writer,
     case google::protobuf::FieldDescriptor::CPPTYPE_UINT64: {
       // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded as
       // decimal strings, and either numbers or strings are accepted when decoding.
-      writer.WriteString(
-          std::to_string(message.GetReflection()->GetUInt64(message, field_descriptor)));
+      WriteUInt64String(writer, message.GetReflection()->GetUInt64(message, field_descriptor));
       break;
     }
     case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
@@ -200,8 +254,8 @@ void ConvertListFieldToJson(JsonWriter &writer,
       {
         // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded
         // as decimal strings, and either numbers or strings are accepted when decoding.
-        writer.WriteString(std::to_string(
-            message.GetReflection()->GetRepeatedInt64(message, field_descriptor, i)));
+        WriteInt64String(writer,
+                         message.GetReflection()->GetRepeatedInt64(message, field_descriptor, i));
       }
 
       break;
@@ -220,8 +274,8 @@ void ConvertListFieldToJson(JsonWriter &writer,
       {
         // According to Protobuf specs 64-bit integer numbers in JSON-encoded payloads are encoded
         // as decimal strings, and either numbers or strings are accepted when decoding.
-        writer.WriteString(std::to_string(
-            message.GetReflection()->GetRepeatedUInt64(message, field_descriptor, i)));
+        WriteUInt64String(writer,
+                          message.GetReflection()->GetRepeatedUInt64(message, field_descriptor, i));
       }
 
       break;
