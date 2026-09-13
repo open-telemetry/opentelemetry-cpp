@@ -10,6 +10,8 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/nostd/span.h"
+#include "opentelemetry/nostd/utility.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/resource/entity.h"
 
