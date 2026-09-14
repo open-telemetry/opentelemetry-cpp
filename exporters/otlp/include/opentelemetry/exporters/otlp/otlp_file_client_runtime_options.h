@@ -5,6 +5,7 @@
 
 #include <memory>
 
+#include "opentelemetry/exporters/otlp/otlp_json_writer_factory.h"
 #include "opentelemetry/sdk/common/thread_instrumentation.h"
 #include "opentelemetry/version.h"
 
@@ -28,6 +29,8 @@ struct OtlpFileClientRuntimeOptions
 
   std::shared_ptr<sdk::common::ThreadInstrumentation> thread_instrumentation =
       std::shared_ptr<sdk::common::ThreadInstrumentation>(nullptr);
+
+  std::shared_ptr<JsonWriterFactory> json_writer_factory;
 };
 
 }  // namespace otlp

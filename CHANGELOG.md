@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Add a `JsonWriter` interface for OTLP/JSON serialization, so a
+  consumer can supply their own JSON backend in place of the default
+  nlohmann-json one.
+  [#2541](https://github.com/open-telemetry/opentelemetry-cpp/issues/2541)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)

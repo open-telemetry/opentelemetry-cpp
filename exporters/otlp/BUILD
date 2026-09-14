@@ -72,6 +72,71 @@ cc_library(
 )
 
 cc_library(
+    name = "otlp_json_writer",
+    srcs = select({
+        ":json_writer_nlohmann_enabled": ["src/otlp_json_writer_nlohmann.cc"],
+        "//conditions:default": [],
+    }),
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/detail/default_json_writer_factory.h",
+        "include/opentelemetry/exporters/otlp/otlp_json_writer.h",
+        "include/opentelemetry/exporters/otlp/otlp_json_writer_factory.h",
+    ] + select({
+        ":json_writer_nlohmann_enabled": [
+            "include/opentelemetry/exporters/otlp/otlp_json_writer_factory_nlohmann.h",
+        ],
+        "//conditions:default": [],
+    }),
+    defines = select({
+        ":json_writer_nlohmann_enabled": ["ENABLE_JSON_WRITER_NLOHMANN"],
+        "//conditions:default": [],
+    }),
+    strip_include_prefix = "include",
+    tags = ["otlp"],
+    deps = [
+        "//api",
+        "//sdk/src/common:base64",
+        "//sdk/src/common:global_log_handler",
+    ] + select({
+        ":json_writer_nlohmann_enabled": ["@github_nlohmann_json//:json"],
+        "//conditions:default": [],
+    }),
+)
+
+config_setting(
+    name = "json_writer_nlohmann_enabled",
+    flag_values = {
+        ":with_json_writer_nlohmann": "true",
+    },
+)
+
+bool_flag(
+    name = "with_json_writer_nlohmann",
+    build_setting_default = True,
+)
+
+cc_library(
+    name = "otlp_json_converter",
+    srcs = [
+        "src/otlp_json_converter.cc",
+    ],
+    hdrs = [
+        "include/opentelemetry/exporters/otlp/otlp_http.h",
+        "include/opentelemetry/exporters/otlp/otlp_json_converter.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_prefix.h",
+        "include/opentelemetry/exporters/otlp/protobuf_include_suffix.h",
+    ],
+    strip_include_prefix = "include",
+    tags = ["otlp"],
+    deps = [
+        ":otlp_json_writer",
+        "//api",
+        "//sdk/src/common:base64",
+        "@com_google_protobuf//:protobuf",
+    ],
+)
+
+cc_library(
     name = "otlp_builder_utils",
     srcs = [
         "src/otlp_builder_utils.cc",
@@ -226,6 +291,8 @@ cc_library(
         "otlp_http_log",
     ],
     deps = [
+        ":otlp_json_converter",
+        ":otlp_json_writer",
         "//api",
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk:headers",
@@ -233,7 +300,6 @@ cc_library(
         "@com_github_opentelemetry_proto//:common_proto_cc",
         "@com_google_absl//absl/strings",
         "@com_google_protobuf//:protobuf",
-        "@github_nlohmann_json//:json",
     ],
 )
 
@@ -307,12 +373,13 @@ cc_library(
         "otlp_file",
     ],
     deps = [
+        ":otlp_json_converter",
+        ":otlp_json_writer",
         "//api",
         "//sdk:headers",
         "//sdk/src/common:base64",
         "@com_github_opentelemetry_proto//:common_proto_cc",
         "@com_google_absl//absl/strings",
-        "@github_nlohmann_json//:json",
     ],
 )
 
@@ -680,6 +747,44 @@ cc_library(
 )
 
 cc_test(
+    name = "otlp_json_converter_test",
+    srcs = [
+        "test/otlp_json_converter_test.cc",
+        "test/otlp_stub_json_writer.h",
+    ],
+    tags = [
+        "otlp",
+        "test",
+    ],
+    deps = [
+        ":otlp_json_converter",
+        "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@com_github_opentelemetry_proto//:metrics_service_proto_cc",
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_json_writer_nlohmann_test",
+    srcs = [
+        "test/otlp_json_writer_contract_test.cc",
+        "test/otlp_json_writer_contract_test.h",
+        "test/otlp_json_writer_nlohmann_test.cc",
+    ],
+    tags = [
+        "otlp",
+        "test",
+    ],
+    deps = [
+        ":otlp_json_writer",
+        "//sdk/src/common:global_log_handler",
+        "//test_common:headers",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "otlp_recordable_test",
     srcs = ["test/otlp_recordable_test.cc"],
     tags = [
@@ -730,7 +835,10 @@ cc_test(
 
 cc_test(
     name = "otlp_file_client_test",
-    srcs = ["test/otlp_file_client_test.cc"],
+    srcs = [
+        "test/otlp_file_client_test.cc",
+        "test/otlp_stub_json_writer.h",
+    ],
     tags = [
         "otlp",
         "otlp_file",
@@ -795,7 +903,10 @@ cc_test(
 
 cc_test(
     name = "otlp_http_exporter_test",
-    srcs = ["test/otlp_http_exporter_test.cc"],
+    srcs = [
+        "test/otlp_http_exporter_test.cc",
+        "test/otlp_http_request_body_capture.h",
+    ],
     defines = ["ENABLE_OTLP_RETRY_PREVIEW"],
     tags = [
         "otlp",
@@ -846,7 +957,10 @@ cc_test(
 
 cc_test(
     name = "otlp_file_exporter_factory_test",
-    srcs = ["test/otlp_file_exporter_factory_test.cc"],
+    srcs = [
+        "test/otlp_file_exporter_factory_test.cc",
+        "test/otlp_stub_json_writer.h",
+    ],
     tags = [
         "otlp",
         "otlp_file",
@@ -862,7 +976,10 @@ cc_test(
 
 cc_test(
     name = "otlp_http_log_record_exporter_test",
-    srcs = ["test/otlp_http_log_record_exporter_test.cc"],
+    srcs = [
+        "test/otlp_http_log_record_exporter_test.cc",
+        "test/otlp_http_request_body_capture.h",
+    ],
     tags = [
         "otlp",
         "otlp_http_log",
@@ -912,7 +1029,10 @@ cc_test(
 
 cc_test(
     name = "otlp_file_log_record_exporter_factory_test",
-    srcs = ["test/otlp_file_log_record_exporter_factory_test.cc"],
+    srcs = [
+        "test/otlp_file_log_record_exporter_factory_test.cc",
+        "test/otlp_stub_json_writer.h",
+    ],
     tags = [
         "otlp",
         "otlp_file_log",
@@ -996,7 +1116,10 @@ cc_test(
 
 cc_test(
     name = "otlp_http_metric_exporter_test",
-    srcs = ["test/otlp_http_metric_exporter_test.cc"],
+    srcs = [
+        "test/otlp_http_metric_exporter_test.cc",
+        "test/otlp_http_request_body_capture.h",
+    ],
     tags = [
         "otlp",
         "otlp_http_metric",
@@ -1043,7 +1166,10 @@ cc_test(
 
 cc_test(
     name = "otlp_file_metric_exporter_factory_test",
-    srcs = ["test/otlp_file_metric_exporter_factory_test.cc"],
+    srcs = [
+        "test/otlp_file_metric_exporter_factory_test.cc",
+        "test/otlp_stub_json_writer.h",
+    ],
     tags = [
         "otlp",
         "otlp_file_metric",
@@ -1069,6 +1195,23 @@ otel_cc_benchmark(
         ":otlp_grpc_exporter",
         "//examples/common/foo_library:common_foo_library",
         "//sdk/src/metrics",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "otlp_file_client_json_benchmark",
+    srcs = ["benchmark/otlp_file_client_json_benchmark.cc"],
+    tags = [
+        "benchmark",
+        "otlp",
+        "otlp_file",
+        "test",
+    ],
+    deps = [
+        ":otlp_file_client",
+        "//sdk/src/common:global_log_handler",
+        "@com_github_opentelemetry_proto//:common_proto_cc",
+        "@com_github_opentelemetry_proto//:trace_service_proto_cc",
     ],
 )
 
