@@ -137,8 +137,9 @@ private:
   // Size of the block the Arena starts from. The block lives inside the recordable, so a log
   // record whose recorded content fits in it never asks the heap for Arena memory at all. See
   // the same constant in otlp_recordable.h, which explains how the size was chosen. 256, 512
-  // and 768 were measured here, and 512 was the best of the three: it is the smallest that
-  // keeps a minimal record's Arena entirely inside the recordable.
+  // and 768 were measured here. 512 is the smallest of the three that keeps a minimal record's
+  // Arena entirely inside the recordable, and it led on allocation count and on the nominal
+  // shape. It is not ahead on every shape, for the same reason as in otlp_recordable.h.
   static constexpr std::size_t kArenaInitialBlockSize = 512;
 
   // Declared before arena_ so the block is a live subobject before the Arena is pointed at it,

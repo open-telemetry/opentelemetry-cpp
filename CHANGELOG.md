@@ -445,7 +445,7 @@ Breaking changes:
   `OtlpRecordableUtils::PopulateRequest` still copies each recordable message
   into the Arena allocated request.
   [#4558](https://github.com/open-telemetry/opentelemetry-cpp/issues/4558)
-  [#TBD](https://github.com/open-telemetry/opentelemetry-cpp/pull/TBD)
+  [#4580](https://github.com/open-telemetry/opentelemetry-cpp/pull/4580)
 
 ## [1.28.0] 2026-07-16
 

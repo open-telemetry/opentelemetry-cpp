@@ -134,9 +134,14 @@ private:
   // space, so 512 covers that plus a little, and a span that outgrows it keeps working, the
   // Arena simply grows onto the heap from there. 512, 768 and 1024 were all measured end to
   // end through a full BatchSpanProcessor queue. Larger blocks buy fewer allocations for spans
-  // with many long attributes and cost more everywhere else, in peak memory per queued
-  // recordable and, once the recordable passes about 1 kB, in the cost of starting a span while
-  // many are alive. 512 was the best of the three overall.
+  // with many long attributes, and for that shape a 768 byte block is actually ahead on both
+  // allocation count and record time, and on peak memory too, since which size wins there
+  // depends on where a span's overflow lands in protobuf's block doubling. What 512 buys is the
+  // other two columns: it is the smallest size that keeps a minimal span's identity fields off
+  // the heap, and it keeps the recordable small enough to avoid the regression seen at 768 and
+  // 1024 in the cost of starting a span while many are alive. That regression is a property of
+  // the allocator: on glibc malloc the boundary between the exact fit smallbins and the best
+  // fit largebins falls at a 1008 byte chunk, so it is worth re-measuring on a different one.
   static constexpr std::size_t kArenaInitialBlockSize = 512;
 
   // Declared before arena_ so the block is a live subobject before the Arena is pointed at it,
