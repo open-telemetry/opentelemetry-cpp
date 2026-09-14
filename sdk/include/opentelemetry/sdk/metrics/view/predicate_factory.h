@@ -4,6 +4,7 @@
 #pragma once
 
 #include <memory>
+#include <cstdint>
 
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/view/predicate.h"
