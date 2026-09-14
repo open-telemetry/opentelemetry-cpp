@@ -4,6 +4,7 @@
 #pragma once
 
 #include <vector>
+#include <cstdint>
 
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
