@@ -293,11 +293,15 @@ SpanContext MakeRemoteParentWithOt(nostd::string_view ot_value)
 constexpr const char *kOtValueMinRandomness = "rv:00000000000000;th:8";
 constexpr const char *kOtValueMaxRandomness = "rv:ffffffffffffff;th:8";
 
-const std::map<std::string, opentelemetry::common::AttributeValue> kRuleMatchAttributes = {
-    {"key_one", "value_one"},
-    {"key_two", static_cast<int64_t>(1)},
-    {"key_three", "value_target"},
-};
+const std::map<std::string, opentelemetry::common::AttributeValue> &GetAttributes()
+{
+  static const std::map<std::string, opentelemetry::common::AttributeValue> attributes = {
+      {"key_one", "value_one"},
+      {"key_two", static_cast<int64_t>(1)},
+      {"key_three", "value_target"},
+  };
+  return attributes;
+}
 
 // Sampler used as a baseline to compare with other samplers
 void BM_AlwaysOffSamplerShouldSample(benchmark::State &state)
@@ -413,8 +417,8 @@ void BM_CompositeRuleBasedSamplerShouldSampleMatchesValue(benchmark::State &stat
                    std::make_shared<ComposableAlwaysOnSampler>()});
   auto sampler = CompositeSamplerFactory::Create(
       std::make_shared<ComposableRuleBasedSampler>(std::move(rules)));
-  BenchmarkShouldSampler(*sampler, MakeRemoteParentWithOt(kOtValueMinRandomness),
-                         kRuleMatchAttributes, state);
+  BenchmarkShouldSampler(*sampler, MakeRemoteParentWithOt(kOtValueMinRandomness), GetAttributes(),
+                         state);
 }
 BENCHMARK(BM_CompositeRuleBasedSamplerShouldSampleMatchesValue);
 
@@ -429,8 +433,8 @@ void BM_CompositeRuleBasedSamplerShouldSampleMatchesPattern(benchmark::State &st
                    std::make_shared<ComposableAlwaysOnSampler>()});
   auto sampler = CompositeSamplerFactory::Create(
       std::make_shared<ComposableRuleBasedSampler>(std::move(rules)));
-  BenchmarkShouldSampler(*sampler, MakeRemoteParentWithOt(kOtValueMinRandomness),
-                         kRuleMatchAttributes, state);
+  BenchmarkShouldSampler(*sampler, MakeRemoteParentWithOt(kOtValueMinRandomness), GetAttributes(),
+                         state);
 }
 BENCHMARK(BM_CompositeRuleBasedSamplerShouldSampleMatchesPattern);
 
