@@ -4,7 +4,7 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
-def otel_cc_benchmark(name, srcs, deps, tags = [""]):
+def otel_cc_benchmark(name, srcs, deps, tags = [""], local_defines = []):
     """
     Creates targets for the benchmark and related targets.
 
@@ -21,6 +21,16 @@ def otel_cc_benchmark(name, srcs, deps, tags = [""]):
       :foo_benchmark           (the benchmark binary)
       :foo_benchmark_result    (results from running the benchmark)
       :foo_benchmark_smoketest (a fast test that runs a single iteration)
+
+    Args:
+      name: name of the benchmark binary.
+      srcs: sources of the benchmark.
+      deps: dependencies of the benchmark.
+      tags: extra tags for every generated target.
+      local_defines: preprocessor defines for the benchmark sources only. They
+        are not passed on to anything that depends on the generated targets,
+        which is what lets the same source be built twice under different
+        defines.
     """
 
     # This is the benchmark as a binary, it can be run manually, and is used
@@ -31,6 +41,7 @@ def otel_cc_benchmark(name, srcs, deps, tags = [""]):
         deps = deps + ["@com_github_google_benchmark//:benchmark"],
         tags = tags + ["manual"],
         defines = ["BAZEL_BUILD"],
+        local_defines = local_defines,
     )
 
     # The result of running the benchmark, captured into a text file.
@@ -52,4 +63,5 @@ def otel_cc_benchmark(name, srcs, deps, tags = [""]):
         args = ["--benchmark_min_time=1x"],
         tags = tags + ["benchmark"],
         defines = ["BAZEL_BUILD"],
+        local_defines = local_defines,
     )
