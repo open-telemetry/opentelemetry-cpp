@@ -133,8 +133,10 @@
 #include "opentelemetry/context/context_value.h"  // IWYU pragma: keep
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
@@ -146,6 +148,7 @@
 #include "opentelemetry/sdk/trace/samplers/composable_parent_threshold.h"
 #include "opentelemetry/sdk/trace/samplers/composable_probability.h"
 #include "opentelemetry/sdk/trace/samplers/composable_rule_based.h"
+#include "opentelemetry/sdk/trace/samplers/composable_sampler.h"
 #include "opentelemetry/sdk/trace/samplers/composite_sampler.h"
 #include "opentelemetry/sdk/trace/samplers/composite_sampler_factory.h"
 #include "opentelemetry/sdk/trace/samplers/parent.h"
