@@ -6,6 +6,7 @@
 #include <memory>
 #include <mutex>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -31,11 +32,13 @@ namespace metrics
 
 TemporalMetricStorage::TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
                                              AggregationType aggregation_type,
-                                             const AggregationConfig *aggregation_config)
+                                             const AggregationConfig *aggregation_config,
+                                             bool is_async)
     : instrument_descriptor_(std::move(instrument_descriptor)),
       aggregation_type_(aggregation_type),
       aggregation_config_(aggregation_config),
-      instrument_creation_ts_(std::chrono::system_clock::now())
+      instrument_creation_ts_(std::chrono::system_clock::now()),
+      is_async_(is_async)
 {}
 
 bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
@@ -135,6 +138,23 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
           return true;
         });
   }
+
+  // For async cumulative exports, capture the attribute sets actually observed for THIS collector
+  // during THIS cycle (the freshly merged deltas), before the cumulative baseline is merged in.
+  // delta_metrics only carries the deltas for whichever collector drains the shared map first, so
+  // it cannot be used as the "observed this cycle" signal in multi-collector setups.
+  const bool async_cumulative =
+      is_async_ && aggregation_temporarily == AggregationTemporality::kCumulative;
+  std::unordered_set<MetricAttributes, AttributeHashGenerator> observed_this_cycle;
+  if (async_cumulative)
+  {
+    merged_metrics->GetAllEntries(
+        [&observed_this_cycle](const MetricAttributes &attributes, Aggregation &) {
+          observed_this_cycle.insert(attributes);
+          return true;
+        });
+  }
+
   // Get the last reported metrics for the `collector` from `last reported metrics` stash
   //   - If the aggregation_temporarily for the collector is cumulative
   //       - Merge the last reported metrics with unreported metrics (which is in merged_metrics),
@@ -160,6 +180,9 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
             }
             else
             {
+              // Always carry forward cumulative state so the baseline survives gaps.
+              // For async instruments, stale suppression is applied only when building
+              // the exported MetricData below.
               auto def_agg = DefaultAggregation::CreateAggregation(
                   aggregation_type_, instrument_descriptor_, aggregation_config_);
               merged_metrics->Set(attributes, def_agg->Merge(aggregation));
@@ -193,13 +216,26 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   metric_data.start_ts                = last_collection_ts;
   metric_data.end_ts                  = collection_ts;
   result_to_export->GetAllEntries(
-      [&metric_data](const MetricAttributes &attributes, Aggregation &aggregation) {
+      [&metric_data, &observed_this_cycle, async_cumulative](const MetricAttributes &attributes,
+                                                             Aggregation &aggregation) {
+        if (async_cumulative && observed_this_cycle.find(attributes) == observed_this_cycle.end())
+        {
+          // Async cumulative exports must omit attribute sets that were not observed
+          // in the current callback cycle, while keeping the internal cumulative state.
+          return true;
+        }
+
         PointDataAttributes point_data_attr;
         point_data_attr.point_data = aggregation.ToPoint();
         point_data_attr.attributes = attributes;
         metric_data.point_data_attr_.emplace_back(std::move(point_data_attr));
         return true;
       });
+
+  if (metric_data.point_data_attr_.empty())
+  {
+    return true;
+  }
   return callback(metric_data);
 }
 
