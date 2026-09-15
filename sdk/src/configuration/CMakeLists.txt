@@ -179,7 +179,7 @@ if(OTELCPP_WITH_CONFIGURATION)
     opentelemetry_add_pkgconfig(
       configuration_yaml "OpenTelemetry SDK - Configuration YAML"
       "YAML configuration parser for the OpenTelemetry SDK."
-      "opentelemetry_configuration_core")
+      "opentelemetry_configuration_core" EXTRA_LIBS ryml)
 
     opentelemetry_add_pkgconfig(
       configuration
