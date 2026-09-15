@@ -15,7 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
-* [SDK] Fix span-limit environment variable handling compilation on 32-bit platforms (#4573)
+* [SDK] Fix span-limit environment variable handling compilation on 32-bit
+  platforms (#4573)
   [#4573](https://github.com/open-telemetry/opentelemetry-cpp/pull/4573)
 
 ## [1.29.0] 2026-09-13
