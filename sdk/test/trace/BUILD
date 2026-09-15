@@ -53,6 +53,21 @@ cc_test(
 )
 
 cc_test(
+    name = "span_status_test",
+    srcs = [
+        "span_status_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "simple_processor_test",
     srcs = [
         "simple_processor_test.cc",
