@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Fix span-limit environment variable handling compilation on 32-bit platforms.
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
