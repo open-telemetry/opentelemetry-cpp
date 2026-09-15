@@ -120,6 +120,59 @@ public:
   void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
 };
 
+// A session that accepts a handler and never calls back into it, at all: no OnResponse, no
+// OnEvent. Nothing in the HttpClient interface promises a terminal event, so a client built
+// this way (a dead thread, a reused socket, a swallowed error) is a legal implementation, not
+// a broken one. The exporter's own wait has to have a backstop independent of this.
+//
+// Only meaningful against the synchronous Export() path: under ENABLE_ASYNC_EXPORT, Export()
+// hands the request to the client and returns success without waiting on anything, by design,
+// so a silent client changes nothing observable there.
+#ifndef ENABLE_ASYNC_EXPORT
+class SilentSession final : public http_client::Session
+{
+public:
+  std::shared_ptr<http_client::Request> CreateRequest() noexcept override
+  {
+    return std::make_shared<FakeRequest>();
+  }
+
+  void SendRequest(std::shared_ptr<http_client::EventHandler>) noexcept override {}
+
+  bool IsSessionActive() noexcept override { return true; }
+  bool CancelSession() noexcept override
+  {
+    cancel_called_ = true;
+    return true;
+  }
+  bool FinishSession() noexcept override
+  {
+    finish_called_ = true;
+    return true;
+  }
+
+  bool cancel_called_ = false;
+  bool finish_called_ = false;
+};
+
+class SilentHttpClient final : public http_client::HttpClient
+{
+public:
+  std::shared_ptr<http_client::Session> CreateSession(
+      opentelemetry::nostd::string_view) noexcept override
+  {
+    session_ = std::make_shared<SilentSession>();
+    return session_;
+  }
+
+  bool CancelAllSessions() noexcept override { return true; }
+  bool FinishAllSessions() noexcept override { return true; }
+  void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
+
+  std::shared_ptr<SilentSession> session_;
+};
+#endif  // !ENABLE_ASYNC_EXPORT
+
 }  // namespace
 
 namespace sdklogs       = opentelemetry::sdk::logs;
@@ -156,6 +209,55 @@ TEST(ElasticsearchLogsExporterTests, CustomClientConstructionSucceeds)
       new logs_exporter::ElasticsearchLogRecordExporter(opts));
   ASSERT_NE(exporter, nullptr);
 }
+
+// Regression test: the synchronous export path used to wait on its response condition variable
+// with no deadline of its own, trusting the injected HttpClient to eventually deliver a terminal
+// event. SilentHttpClient never does, by design, so before the fix this test would hang forever.
+// The 1-second response_timeout_ keeps the test itself fast while still exercising the real
+// deadline path end to end, rather than a mocked-out clock.
+//
+// Synchronous-path-only: under ENABLE_ASYNC_EXPORT, Export() never waits at all (it hands the
+// request off and returns success unconditionally), so there is nothing here to regress against.
+#ifndef ENABLE_ASYNC_EXPORT
+TEST(ElasticsearchLogsExporterTests, ExportReturnsOnTimeoutWhenClientNeverResponds)
+{
+  logs_exporter::ElasticsearchExporterOptions options("localhost", 9200, "logs",
+                                                      /*response_timeout=*/1);
+  auto http_client = std::make_shared<SilentHttpClient>();
+  auto exporter    = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
+
+  auto record = exporter->MakeRecordable();
+  record->SetBody("this export should time out, not hang");
+
+  auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
+
+  EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
+}
+
+// Regression test: on a timed-out export, Export() used to call session->FinishSession()
+// regardless of the outcome. A real HTTP client (e.g. curl) blocks its FinishSession() on
+// the in-flight transfer completing, which is exactly the hang the deadline exists to avoid,
+// so the timeout path must cancel the session instead of finishing it.
+TEST(ElasticsearchLogsExporterTests, ExportCancelsSessionOnTimeoutInsteadOfFinishing)
+{
+  logs_exporter::ElasticsearchExporterOptions options("localhost", 9200, "logs",
+                                                      /*response_timeout=*/1);
+  auto http_client = std::make_shared<SilentHttpClient>();
+  auto exporter    = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
+
+  auto record = exporter->MakeRecordable();
+  record->SetBody("this export should cancel its session, not finish it");
+
+  auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
+
+  ASSERT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
+  ASSERT_NE(http_client->session_, nullptr);
+  EXPECT_TRUE(http_client->session_->cancel_called_);
+  EXPECT_FALSE(http_client->session_->finish_called_);
+}
+#endif  // !ENABLE_ASYNC_EXPORT
 
 // Attempt to write a log to an invalid host/port, test that the Export() returns failure
 TEST(DISABLED_ElasticsearchLogsExporterTests, InvalidEndpoint)
