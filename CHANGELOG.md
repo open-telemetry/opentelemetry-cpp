@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Fix span-limit environment variable handling compilation on 32-bit
+  platforms (#4573)
+  [#4573](https://github.com/open-telemetry/opentelemetry-cpp/pull/4573)
+* [API] Remove regex from trace_state.h
+  [#4570](https://github.com/open-telemetry/opentelemetry-cpp/pull/4570)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
