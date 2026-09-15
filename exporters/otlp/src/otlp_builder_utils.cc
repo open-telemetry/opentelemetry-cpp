@@ -8,13 +8,10 @@
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
-#include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_preferred_temporality.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
-#include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
-#include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
 #include "opentelemetry/sdk/configuration/temporality_preference.h"
 #include "opentelemetry/version.h"
 
@@ -23,24 +20,6 @@ namespace exporter
 {
 namespace otlp
 {
-
-HttpRequestContentType OtlpBuilderUtils::ConvertOtlpHttpEncoding(
-    opentelemetry::sdk::configuration::OtlpHttpEncoding model)
-{
-  auto result = exporter::otlp::HttpRequestContentType::kBinary;
-
-  switch (model)
-  {
-    case opentelemetry::sdk::configuration::OtlpHttpEncoding::protobuf:
-      result = exporter::otlp::HttpRequestContentType::kBinary;
-      break;
-    case opentelemetry::sdk::configuration::OtlpHttpEncoding::json:
-      result = exporter::otlp::HttpRequestContentType::kJson;
-      break;
-  }
-
-  return result;
-}
 
 OtlpHeaders OtlpBuilderUtils::ConvertHeadersConfigurationModel(
     const opentelemetry::sdk::configuration::HeadersConfiguration *model,
@@ -117,38 +96,6 @@ PreferredAggregationTemporality OtlpBuilderUtils::ConvertTemporalityPreference(
   }
 
   return result;
-}
-
-bool OtlpBuilderUtils::GrpcUseSsl(
-    const std::string &endpoint,
-    const opentelemetry::sdk::configuration::GrpcTlsConfiguration *tls)
-{
-  if (endpoint.substr(0, 6) == "https:")
-  {
-    return true;
-  }
-
-  if (endpoint.substr(0, 5) == "http:")
-  {
-    if (tls && !tls->insecure)
-    {
-      OTEL_INTERNAL_LOG_WARN(
-          "[Otlp Grpc Exporter] endpoint is http but tls.insecure is false: using insecure "
-          "connection");
-    }
-    return false;
-  }
-
-  if (tls != nullptr)
-  {
-    return !tls->insecure;
-  }
-
-  OTEL_INTERNAL_LOG_DEBUG(
-      "[Otlp Grpc Exporter] endpoint does not specify http or https and tls is not configured. "
-      "Using secure connection by default. To use an insecure connection, set tls.insecure to "
-      "true.");
-  return true;
 }
 
 }  // namespace otlp
