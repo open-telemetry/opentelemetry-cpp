@@ -51,10 +51,24 @@ private:
 
   HttpCurlGlobalInitializer();
 
+  friend class HttpClientTestPeer;
+
+  // Test constructor to simulate init failure without calling curl_global_init
+  HttpCurlGlobalInitializer(CURLcode code, bool is_initialized)
+      : init_code_{code}, is_initialized_{is_initialized}
+  {}
+
+  CURLcode init_code_{CURLE_OK};
+  bool is_initialized_{false};
+
 public:
   ~HttpCurlGlobalInitializer();
 
   static nostd::shared_ptr<HttpCurlGlobalInitializer> GetInstance();
+
+  // added accessors here
+  bool IsValid() const noexcept { return is_initialized_; }
+  CURLcode GetStatus() const noexcept { return init_code_; }
 };
 
 class Request : public opentelemetry::ext::http::client::Request
@@ -253,6 +267,11 @@ public:
       const opentelemetry::ext::http::client::Headers &headers,
       const opentelemetry::ext::http::client::Compression &compression) noexcept override
   {
+    if (!curl_global_initializer_ || !curl_global_initializer_->IsValid())
+    {
+      return opentelemetry::ext::http::client::Result(
+          nullptr, opentelemetry::ext::http::client::SessionState::CreateFailed);
+    }
     opentelemetry::ext::http::client::Body body;
 
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Get, url.data(),
@@ -283,6 +302,11 @@ public:
       const opentelemetry::ext::http::client::Headers &headers,
       const opentelemetry::ext::http::client::Compression &compression) noexcept override
   {
+    if (!curl_global_initializer_ || !curl_global_initializer_->IsValid())
+    {
+      return opentelemetry::ext::http::client::Result(
+          nullptr, opentelemetry::ext::http::client::SessionState::CreateFailed);
+    }
     HttpOperation curl_operation(opentelemetry::ext::http::client::Method::Post, url.data(),
                                  ssl_options, nullptr, headers, body, compression);
     curl_operation.SendSync();
@@ -308,6 +332,7 @@ public:
   ~HttpClientSync() override {}
 
 private:
+  friend class HttpClientTestPeer;
   nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };
 
@@ -324,6 +349,12 @@ public:
   HttpClient &operator=(HttpClient &&)      = delete;
 
   ~HttpClient() override;
+
+  inline bool IsValid() const noexcept
+  {
+    return curl_global_initializer_ && curl_global_initializer_->IsValid() &&
+           multi_handle_ != nullptr;
+  }
 
   std::shared_ptr<opentelemetry::ext::http::client::Session> CreateSession(
       nostd::string_view url) noexcept override;
@@ -366,6 +397,7 @@ private:
   bool doRetrySessions(bool report_all);
   void resetMultiHandle();
 
+  nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
   std::mutex multi_handle_m_;
   CURLM *multi_handle_;
   std::atomic<uint64_t> next_session_id_{0};
@@ -387,8 +419,6 @@ private:
 
   std::chrono::milliseconds background_thread_wait_for_;
   std::atomic<bool> is_shutdown_{false};
-
-  nostd::shared_ptr<HttpCurlGlobalInitializer> curl_global_initializer_;
 };
 
 }  // namespace curl
