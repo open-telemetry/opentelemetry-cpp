@@ -46,6 +46,21 @@ message(
 
 pkg_check_modules(OTEL_PKGCONFIG REQUIRED ${_pkgconfig_modules})
 
+# CMake 3.16 has no STATIC keyword on pkg_check_modules(), but it also
+# queries pkg-config --static and exposes the results as <prefix>_STATIC_*.
+# Install tests pass BUILD_SHARED_LIBS through INSTALL_TEST_CMAKE_OPTIONS.
+if(BUILD_SHARED_LIBS)
+  set(_otel_pkgconfig_include_dirs ${OTEL_PKGCONFIG_INCLUDE_DIRS})
+  set(_otel_pkgconfig_cflags_other ${OTEL_PKGCONFIG_CFLAGS_OTHER})
+  set(_otel_pkgconfig_libraries ${OTEL_PKGCONFIG_LIBRARIES})
+  set(_otel_pkgconfig_ldflags ${OTEL_PKGCONFIG_LDFLAGS})
+else()
+  set(_otel_pkgconfig_include_dirs ${OTEL_PKGCONFIG_STATIC_INCLUDE_DIRS})
+  set(_otel_pkgconfig_cflags_other ${OTEL_PKGCONFIG_STATIC_CFLAGS_OTHER})
+  set(_otel_pkgconfig_libraries ${OTEL_PKGCONFIG_STATIC_LIBRARIES})
+  set(_otel_pkgconfig_ldflags ${OTEL_PKGCONFIG_STATIC_LDFLAGS})
+endif()
+
 add_executable(full_pkgconfig_test)
 
 foreach(component IN LISTS INSTALL_TEST_COMPONENTS)
@@ -55,10 +70,10 @@ foreach(component IN LISTS INSTALL_TEST_COMPONENTS)
 endforeach()
 
 target_include_directories(full_pkgconfig_test
-                           PRIVATE ${OTEL_PKGCONFIG_INCLUDE_DIRS})
+                           PRIVATE ${_otel_pkgconfig_include_dirs})
 target_compile_options(full_pkgconfig_test
-                       PRIVATE ${OTEL_PKGCONFIG_CFLAGS_OTHER})
+                       PRIVATE ${_otel_pkgconfig_cflags_other})
 target_link_libraries(
   full_pkgconfig_test
-  PRIVATE ${OTEL_PKGCONFIG_LIBRARIES} ${OTEL_PKGCONFIG_LDFLAGS} GTest::gtest
+  PRIVATE ${_otel_pkgconfig_libraries} ${_otel_pkgconfig_ldflags} GTest::gtest
           GTest::gtest_main)
