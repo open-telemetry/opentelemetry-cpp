@@ -15,10 +15,7 @@ cc_test(
     deps = [
         "//sdk:headers",
         "//sdk/src/configuration:configuration_core",
-        "//sdk/src/logs",
-        "//sdk/src/metrics",
         "//sdk/src/resource",
-        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -34,11 +31,8 @@ cc_test(
     ],
     deps = [
         "//sdk:headers",
-        "//sdk/src/configuration:configuration_registry_factory",
-        "//sdk/src/logs",
-        "//sdk/src/metrics",
+        "//sdk/src/configuration:configuration_core",
         "//sdk/src/resource",
-        "//sdk/src/trace",
         "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
@@ -175,9 +169,6 @@ cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/configuration:configuration_yaml",
-        "//sdk/src/logs",
-        "//sdk/src/metrics",
-        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -195,9 +186,6 @@ cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/configuration:configuration_yaml",
-        "//sdk/src/logs",
-        "//sdk/src/metrics",
-        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -215,9 +203,6 @@ cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/configuration:configuration_yaml",
-        "//sdk/src/logs",
-        "//sdk/src/metrics",
-        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -235,9 +220,6 @@ cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/configuration:configuration_yaml",
-        "//sdk/src/logs",
-        "//sdk/src/metrics",
-        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -255,9 +237,6 @@ cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/configuration:configuration_yaml",
-        "//sdk/src/logs",
-        "//sdk/src/metrics",
-        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -275,9 +254,6 @@ cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/configuration:configuration_yaml",
-        "//sdk/src/logs",
-        "//sdk/src/metrics",
-        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -295,9 +271,6 @@ cc_test(
         "//api",
         "//sdk:headers",
         "//sdk/src/configuration:configuration_yaml",
-        "//sdk/src/logs",
-        "//sdk/src/metrics",
-        "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],
 )
