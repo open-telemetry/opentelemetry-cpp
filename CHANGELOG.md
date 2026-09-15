@@ -18,6 +18,18 @@ Increment the:
 * [API] Remove regex from trace_state.h
   [#4570](https://github.com/open-telemetry/opentelemetry-cpp/pull/4570)
 
+* [EXPORTER] Fix the Elasticsearch log exporter's `Shutdown()` ignoring its
+  timeout and always reporting success. It now flushes pending exports against
+  the caller's deadline before cancelling sessions, and returns whether that
+  flush actually completed in time. Also closes a race where a session could
+  register for export after `Shutdown()` had already taken its snapshot of
+  in-flight sessions, so `ForceFlush()` could return without ever waiting for
+  it.
+  [#4359](https://github.com/open-telemetry/opentelemetry-cpp/issues/4359)
+
+* [DOC] Fix and clarify the `StartSpanOptions` documentation
+  [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)

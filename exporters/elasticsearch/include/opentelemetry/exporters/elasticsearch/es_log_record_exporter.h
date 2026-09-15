@@ -129,8 +129,10 @@ public:
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
 
   /**
-   * Shutdown this exporter.
-   * @param timeout The maximum time to wait for the shutdown method to return
+   * Shutdown this exporter. Flushes any pending export within the given timeout before
+   * cancelling remaining sessions, then reports whether the flush completed in time.
+   * @param timeout The maximum time to wait for pending exports to flush before shutting down
+   * @return true if all pending exports flushed before the timeout, false otherwise
    */
   bool Shutdown(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
