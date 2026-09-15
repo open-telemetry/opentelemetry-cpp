@@ -491,8 +491,17 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   }
   bool write_successful = handler->waitForResponse(deadline);
 
-  // End the session
-  session->FinishSession();
+  // If the deadline expired, cancel rather than finish: FinishSession() waits for the
+  // in-flight transfer to complete, which is exactly the hang this deadline exists to bound
+  // for HTTP clients (e.g. curl) whose worker thread blocks on the transfer itself.
+  if (write_successful)
+  {
+    session->FinishSession();
+  }
+  else
+  {
+    session->CancelSession();
+  }
 
   // If an error occurred with the HTTP request
   if (!write_successful)
