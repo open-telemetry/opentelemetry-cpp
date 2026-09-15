@@ -31,6 +31,7 @@
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/metric_reader.h"
+#include "opentelemetry/sdk/metrics/push_metric_exporter.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/view/instrument_selector.h"
@@ -592,6 +593,269 @@ TEST_F(MetricCollectorTest, ViewCardinalityLimitEnforcedOnCollection)
   EXPECT_LE(total_points, kLimit + 1);
   // The overflow sentinel point must be present
   EXPECT_TRUE(overflow_present);
+}
+
+namespace
+{
+size_t CountRealPoints(const MetricProducer::Result &result, bool *overflow_present)
+{
+  size_t total_points = 0;
+  for (const ScopeMetrics &sm : result.points_.scope_metric_data_)
+  {
+    for (const MetricData &md : sm.metric_data_)
+    {
+      for (const PointDataAttributes &pda : md.point_data_attr_)
+      {
+        if (!pda.attributes.GetAttributes().empty() &&
+            pda.attributes.GetAttributes().begin()->first == kAttributesLimitOverflowKey)
+        {
+          if (overflow_present)
+          {
+            *overflow_present = true;
+          }
+          continue;
+        }
+        ++total_points;
+      }
+    }
+  }
+  return total_points;
+}
+
+// Sums the counter value across every point, including the overflow point. Used to prove no
+// data is silently dropped when several distinct attribute sets are funneled into overflow.
+int64_t SumCounterValue(const MetricProducer::Result &result)
+{
+  int64_t total = 0;
+  for (const ScopeMetrics &sm : result.points_.scope_metric_data_)
+  {
+    for (const MetricData &md : sm.metric_data_)
+    {
+      for (const PointDataAttributes &pda : md.point_data_attr_)
+      {
+        auto sum_point_data = nostd::get<SumPointData>(pda.point_data);
+        total += nostd::get<int64_t>(sum_point_data.value_);
+      }
+    }
+  }
+  return total;
+}
+}  // namespace
+
+// Regression test for the bug found during review of #4188: resolving a reader-level
+// cardinality limit fallback into shared storage broke per-reader semantics, since a
+// stricter reader would force every other reader sharing the same storage down to its limit.
+//
+// With no view-level limit configured, a stricter reader must only ever report up to its own
+// limit (extra series collapse into its own overflow point), while a laxer reader sharing the
+// same underlying storage must still see every recorded series with no data loss and no
+// spurious overflow.
+TEST_F(MetricCollectorTest, ReaderCardinalityLimitFallbackWithMultipleReaders)
+{
+  constexpr size_t kLowLimit            = 3;
+  constexpr size_t kHighLimit           = 50;
+  constexpr size_t kUniqueAttributeSets = 10;
+
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+  auto scope   = InstrumentationScope::Create("ReaderCardinalityLimitFallbackWithMultipleReaders");
+  auto meter   = std::shared_ptr<Meter>(new Meter(context, std::move(scope)));
+  context->AddMeter(meter);
+
+  auto low_reader = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits low_limits;
+  low_limits.counter = kLowLimit;
+  low_reader->SetCardinalityLimits(low_limits);
+  auto low_collector = AddMetricReaderToMeterContext(context, low_reader).lock();
+
+  auto high_reader = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits high_limits;
+  high_limits.counter = kHighLimit;
+  high_reader->SetCardinalityLimits(high_limits);
+  auto high_collector = AddMetricReaderToMeterContext(context, high_reader).lock();
+
+  // Both readers must already be attached before the instrument is first used: recording
+  // storage capacity is resolved (as the max limit across attached readers) at that point.
+  auto counter = meter->CreateUInt64Counter("shared_counter");
+
+  for (size_t i = 0; i < kUniqueAttributeSets; ++i)
+  {
+    std::map<std::string, std::string> attrs = {{"key", std::to_string(i)}};
+    counter->Add(
+        1, opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        opentelemetry::context::Context{});
+  }
+
+  auto low_produced  = low_collector->Produce();
+  auto high_produced = high_collector->Produce();
+
+  bool low_overflow  = false;
+  bool high_overflow = false;
+  size_t low_points  = CountRealPoints(low_produced, &low_overflow);
+  size_t high_points = CountRealPoints(high_produced, &high_overflow);
+
+  // The stricter reader must be capped at its own limit, with overflow absorbing the rest.
+  EXPECT_LE(low_points, kLowLimit);
+  EXPECT_TRUE(low_overflow);
+  // No data may be silently dropped: every one of the kUniqueAttributeSets Add(1, ...) calls
+  // must still be reflected somewhere, whether as its own point or merged into overflow.
+  EXPECT_EQ(SumCounterValue(low_produced), static_cast<int64_t>(kUniqueAttributeSets));
+
+  // The laxer reader, sharing the same underlying storage, must see every recorded series:
+  // it must not be capped down to the stricter reader's limit, and must not report overflow.
+  EXPECT_EQ(high_points, kUniqueAttributeSets);
+  EXPECT_FALSE(high_overflow);
+}
+
+// Regression test for a second bug found during review: the single-collector delta fast path
+// in TemporalMetricStorage::buildMetrics() reads straight from the raw recording storage,
+// bypassing the per-collector re-cap. With a single delta reader this is only safe if the
+// *recording* storage itself was already sized to that reader's own limit (rather than floored
+// at the SDK default), which is what ResolveRecordingCardinalityLimit() in meter.cc must do.
+TEST_F(MetricCollectorTest, ReaderCardinalityLimitFallbackSingleDeltaReader)
+{
+  constexpr size_t kLimit               = 3;
+  constexpr size_t kUniqueAttributeSets = 10;
+
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+  auto scope   = InstrumentationScope::Create("ReaderCardinalityLimitFallbackSingleDeltaReader");
+  auto meter   = std::shared_ptr<Meter>(new Meter(context, std::move(scope)));
+  context->AddMeter(meter);
+
+  // MockMetricReader's default exporter reports kCumulative, not kDelta (see
+  // MockMetricExporter's default member initializer), so an explicit kDelta exporter is
+  // required here to actually exercise TemporalMetricStorage::buildMetrics()'s
+  // single-collector-delta fast path with exactly one reader attached.
+  auto reader = std::shared_ptr<MetricReader>(new MockMetricReader(
+      std::unique_ptr<PushMetricExporter>(new MockMetricExporter(AggregationTemporality::kDelta))));
+  CardinalityLimits limits;
+  limits.counter = kLimit;
+  reader->SetCardinalityLimits(limits);
+  auto collector = AddMetricReaderToMeterContext(context, reader).lock();
+
+  auto counter = meter->CreateUInt64Counter("delta_counter");
+
+  for (size_t i = 0; i < kUniqueAttributeSets; ++i)
+  {
+    std::map<std::string, std::string> attrs = {{"key", std::to_string(i)}};
+    counter->Add(
+        1, opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        opentelemetry::context::Context{});
+  }
+
+  auto produced         = collector->Produce();
+  bool overflow_present = false;
+  size_t real_points    = CountRealPoints(produced, &overflow_present);
+
+  // The reader's own limit must be honored even via the single-collector delta fast path,
+  // not silently widened to the SDK default (2000).
+  EXPECT_LE(real_points, kLimit);
+  EXPECT_TRUE(overflow_present);
+  EXPECT_EQ(SumCounterValue(produced), static_cast<int64_t>(kUniqueAttributeSets));
+}
+
+// Regression test for a bug found during review of #4388: the single-collector delta fast path
+// in TemporalMetricStorage::buildMetrics() returned recorded data directly, without re-capping
+// to the collector's own limit. When recording capacity was resolved larger than this reader's
+// limit (because the reader was attached after the instrument already existed, so its stricter
+// limit was never part of the max-across-readers resolution at creation time), the fast path
+// could emit more attribute sets than the reader's own configured limit allows.
+TEST_F(MetricCollectorTest, ReaderCardinalityLimitFallbackSingleDeltaReaderAttachedLate)
+{
+  constexpr size_t kLimit               = 3;
+  constexpr size_t kUniqueAttributeSets = 10;
+
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+  auto scope =
+      InstrumentationScope::Create("ReaderCardinalityLimitFallbackSingleDeltaReaderAttachedLate");
+  auto meter = std::shared_ptr<Meter>(new Meter(context, std::move(scope)));
+  context->AddMeter(meter);
+
+  // No reader attached yet: recording capacity resolves to the SDK default (2000).
+  ASSERT_EQ(context->GetCollectors().size(), 0u);
+  auto counter = meter->CreateUInt64Counter("late_delta_counter");
+
+  // A single delta reader with a much stricter limit is attached only after the instrument
+  // already exists, exercising the single-collector-delta fast path with recording capacity
+  // (2000) larger than this reader's own limit (kLimit). An explicit kDelta exporter is
+  // required: MockMetricReader's default exporter reports kCumulative.
+  auto reader = std::shared_ptr<MetricReader>(new MockMetricReader(
+      std::unique_ptr<PushMetricExporter>(new MockMetricExporter(AggregationTemporality::kDelta))));
+  CardinalityLimits limits;
+  limits.counter = kLimit;
+  reader->SetCardinalityLimits(limits);
+  auto collector = AddMetricReaderToMeterContext(context, reader).lock();
+
+  for (size_t i = 0; i < kUniqueAttributeSets; ++i)
+  {
+    std::map<std::string, std::string> attrs = {{"key", std::to_string(i)}};
+    counter->Add(
+        1, opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        opentelemetry::context::Context{});
+  }
+
+  auto produced         = collector->Produce();
+  bool overflow_present = false;
+  size_t real_points    = CountRealPoints(produced, &overflow_present);
+
+  // Even though recording capacity was resolved without this reader in the picture, its own
+  // limit must still be honored on the single-collector delta fast path.
+  EXPECT_LE(real_points, kLimit);
+  EXPECT_TRUE(overflow_present);
+  EXPECT_EQ(SumCounterValue(produced), static_cast<int64_t>(kUniqueAttributeSets));
+}
+
+// Documents and pins a known limitation raised during review of #4188: recording capacity is
+// resolved once, as the highest limit across readers attached at instrument-creation time (see
+// ResolveRecordingCardinalityLimit() in meter.cc), and is not grown retroactively. A reader
+// added later with a higher limit cannot recover attribute sets that had already collapsed into
+// the overflow point before it was attached; see the Note on MeterContext::AddMetricReader().
+TEST_F(MetricCollectorTest, ReaderAddedAfterInstrumentCreationDoesNotGrowRecordingCapacity)
+{
+  constexpr size_t kLowLimit            = 3;
+  constexpr size_t kHighLimit           = 50;
+  constexpr size_t kUniqueAttributeSets = 10;
+
+  auto context = std::shared_ptr<MeterContext>(new MeterContext(ViewRegistryFactory::Create()));
+  auto scope   = InstrumentationScope::Create(
+      "ReaderAddedAfterInstrumentCreationDoesNotGrowRecordingCapacity");
+  auto meter = std::shared_ptr<Meter>(new Meter(context, std::move(scope)));
+  context->AddMeter(meter);
+
+  auto low_reader = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits low_limits;
+  low_limits.counter = kLowLimit;
+  low_reader->SetCardinalityLimits(low_limits);
+  AddMetricReaderToMeterContext(context, low_reader);
+
+  // The instrument is created (and its recording capacity resolved) with only the low-limit
+  // reader attached.
+  auto counter = meter->CreateUInt64Counter("late_reader_counter");
+
+  for (size_t i = 0; i < kUniqueAttributeSets; ++i)
+  {
+    std::map<std::string, std::string> attrs = {{"key", std::to_string(i)}};
+    counter->Add(
+        1, opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        opentelemetry::context::Context{});
+  }
+
+  // A higher-limit reader is attached only after the instrument already exists and has recorded
+  // more unique attribute sets than the low limit.
+  auto high_reader = std::shared_ptr<MetricReader>(new MockMetricReader());
+  CardinalityLimits high_limits;
+  high_limits.counter = kHighLimit;
+  high_reader->SetCardinalityLimits(high_limits);
+  auto high_collector = AddMetricReaderToMeterContext(context, high_reader).lock();
+
+  auto high_produced = high_collector->Produce();
+  bool high_overflow = false;
+  size_t high_points = CountRealPoints(high_produced, &high_overflow);
+
+  // Despite its own limit of kHighLimit, the late-attached reader is still capped by the
+  // recording capacity resolved when the instrument was created: attribute sets already
+  // collapsed into overflow before this reader existed cannot be recovered.
+  EXPECT_LE(high_points, kLowLimit);
+  EXPECT_TRUE(high_overflow);
 }
 
 #if defined(__GNUC__) || defined(__clang__) || defined(__apple_build_version__)
