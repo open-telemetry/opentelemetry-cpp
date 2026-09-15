@@ -4,7 +4,7 @@
 // clang-format off
 //
 //  ~/build/sdk/test/trace/sampler_benchmark --benchmark_repetitions=5 --benchmark_display_aggregates_only=true
-// 2026-09-14T15:37:10+00:00
+// 2026-09-14T19:42:38+00:00
 // Running /home/devuser/build/sdk/test/trace/sampler_benchmark
 // Run on (32 X 5700 MHz CPU s)
 // CPU Caches:
@@ -12,111 +12,111 @@
 //   L1 Instruction 32 KiB (x16)
 //   L2 Unified 2048 KiB (x16)
 //   L3 Unified 36864 KiB (x1)
-// Load Average: 1.35, 2.49, 2.33
+// Load Average: 4.67, 2.39, 1.00
 // ***WARNING*** ASLR is enabled, the results may have unreproducible noise in them.
 // ------------------------------------------------------------------------------------------------------------------------
 // Benchmark                                                                              Time             CPU   Iterations
 // ------------------------------------------------------------------------------------------------------------------------
-// BM_AlwaysOffSamplerConstruction_mean                                               0.341 ns        0.341 ns            5
-// BM_AlwaysOffSamplerConstruction_median                                             0.341 ns        0.341 ns            5
-// BM_AlwaysOffSamplerConstruction_stddev                                             0.003 ns        0.003 ns            5
-// BM_AlwaysOffSamplerConstruction_cv                                                  0.85 %          0.85 %             5
+// BM_AlwaysOffSamplerConstruction_mean                                               0.338 ns        0.338 ns            5
+// BM_AlwaysOffSamplerConstruction_median                                             0.339 ns        0.339 ns            5
+// BM_AlwaysOffSamplerConstruction_stddev                                             0.002 ns        0.002 ns            5
+// BM_AlwaysOffSamplerConstruction_cv                                                  0.52 %          0.51 %             5
 // BM_AlwaysOnSamplerConstruction_mean                                                0.349 ns        0.349 ns            5
-// BM_AlwaysOnSamplerConstruction_median                                              0.350 ns        0.350 ns            5
-// BM_AlwaysOnSamplerConstruction_stddev                                              0.004 ns        0.004 ns            5
-// BM_AlwaysOnSamplerConstruction_cv                                                   1.07 %          1.07 %             5
-// BM_AlwaysOffSamplerShouldSample_mean                                                3.04 ns         3.04 ns            5
-// BM_AlwaysOffSamplerShouldSample_median                                              3.02 ns         3.02 ns            5
-// BM_AlwaysOffSamplerShouldSample_stddev                                             0.031 ns        0.031 ns            5
-// BM_AlwaysOffSamplerShouldSample_cv                                                  1.02 %          1.02 %             5
-// BM_AlwaysOnSamplerShouldSample_mean                                                 3.10 ns         3.10 ns            5
+// BM_AlwaysOnSamplerConstruction_median                                              0.352 ns        0.352 ns            5
+// BM_AlwaysOnSamplerConstruction_stddev                                              0.005 ns        0.005 ns            5
+// BM_AlwaysOnSamplerConstruction_cv                                                   1.33 %          1.33 %             5
+// BM_AlwaysOffSamplerShouldSample_mean                                                3.11 ns         3.11 ns            5
+// BM_AlwaysOffSamplerShouldSample_median                                              3.12 ns         3.12 ns            5
+// BM_AlwaysOffSamplerShouldSample_stddev                                             0.011 ns        0.011 ns            5
+// BM_AlwaysOffSamplerShouldSample_cv                                                  0.34 %          0.34 %             5
+// BM_AlwaysOnSamplerShouldSample_mean                                                 3.11 ns         3.11 ns            5
 // BM_AlwaysOnSamplerShouldSample_median                                               3.11 ns         3.11 ns            5
-// BM_AlwaysOnSamplerShouldSample_stddev                                              0.016 ns        0.017 ns            5
-// BM_AlwaysOnSamplerShouldSample_cv                                                   0.53 %          0.53 %             5
-// BM_ParentBasedSamplerShouldSample_mean                                              6.15 ns         6.15 ns            5
-// BM_ParentBasedSamplerShouldSample_median                                            6.12 ns         6.12 ns            5
-// BM_ParentBasedSamplerShouldSample_stddev                                           0.104 ns        0.104 ns            5
-// BM_ParentBasedSamplerShouldSample_cv                                                1.69 %          1.69 %             5
-// BM_TraceIdRatioBasedSamplerShouldSample_mean                                        2.72 ns         2.72 ns            5
-// BM_TraceIdRatioBasedSamplerShouldSample_median                                      2.69 ns         2.69 ns            5
-// BM_TraceIdRatioBasedSamplerShouldSample_stddev                                     0.042 ns        0.042 ns            5
-// BM_TraceIdRatioBasedSamplerShouldSample_cv                                          1.55 %          1.55 %             5
-// BM_ProbabilitySamplerShouldSampleDrops_mean                                         1072 ns         1072 ns            5
-// BM_ProbabilitySamplerShouldSampleDrops_median                                       1029 ns         1029 ns            5
-// BM_ProbabilitySamplerShouldSampleDrops_stddev                                       86.1 ns         86.0 ns            5
-// BM_ProbabilitySamplerShouldSampleDrops_cv                                           8.03 %          8.03 %             5
-// BM_ProbabilitySamplerShouldSampleSamples_mean                                       1270 ns         1270 ns            5
-// BM_ProbabilitySamplerShouldSampleSamples_median                                     1264 ns         1264 ns            5
-// BM_ProbabilitySamplerShouldSampleSamples_stddev                                      118 ns          118 ns            5
-// BM_ProbabilitySamplerShouldSampleSamples_cv                                         9.26 %          9.26 %             5
-// BM_CompositeProbabilitySamplerShouldSampleDrops_mean                                 871 ns          871 ns            5
-// BM_CompositeProbabilitySamplerShouldSampleDrops_median                               861 ns          861 ns            5
-// BM_CompositeProbabilitySamplerShouldSampleDrops_stddev                              29.8 ns         29.8 ns            5
-// BM_CompositeProbabilitySamplerShouldSampleDrops_cv                                  3.42 %          3.42 %             5
-// BM_CompositeProbabilitySamplerShouldSampleSamples_mean                              1021 ns         1021 ns            5
-// BM_CompositeProbabilitySamplerShouldSampleSamples_median                             952 ns          952 ns            5
-// BM_CompositeProbabilitySamplerShouldSampleSamples_stddev                             155 ns          155 ns            5
-// BM_CompositeProbabilitySamplerShouldSampleSamples_cv                               15.23 %         15.23 %             5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesKind_mean                            1172 ns         1171 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesKind_median                          1177 ns         1177 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesKind_stddev                          10.7 ns         10.7 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesKind_cv                              0.92 %          0.91 %             5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesParent_mean                          1139 ns         1139 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesParent_median                        1133 ns         1133 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesParent_stddev                        23.2 ns         23.2 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesParent_cv                            2.04 %          2.04 %             5
-// BM_CompositeRuleBasedSamplerShouldSampleNoMatch_mean                                1025 ns         1024 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleNoMatch_median                              1027 ns         1027 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleNoMatch_stddev                              21.8 ns         21.9 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleNoMatch_cv                                  2.13 %          2.13 %             5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesValue_mean                           1146 ns         1146 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesValue_median                         1146 ns         1146 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesValue_stddev                         4.88 ns         4.91 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesValue_cv                             0.43 %          0.43 %             5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesPattern_mean                         1168 ns         1168 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesPattern_median                       1168 ns         1168 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesPattern_stddev                       10.6 ns         10.6 ns            5
-// BM_CompositeRuleBasedSamplerShouldSampleMatchesPattern_cv                           0.90 %          0.90 %             5
-// BM_CompositeParentThresholdSamplerShouldSampleParentHasThreshold_mean               1228 ns         1228 ns            5
-// BM_CompositeParentThresholdSamplerShouldSampleParentHasThreshold_median             1244 ns         1244 ns            5
-// BM_CompositeParentThresholdSamplerShouldSampleParentHasThreshold_stddev             23.6 ns         23.7 ns            5
-// BM_CompositeParentThresholdSamplerShouldSampleParentHasThreshold_cv                 1.93 %          1.93 %             5
-// BM_CompositeParentThresholdSamplerShouldSampleNoParent_mean                          370 ns          370 ns            5
-// BM_CompositeParentThresholdSamplerShouldSampleNoParent_median                        370 ns          370 ns            5
-// BM_CompositeParentThresholdSamplerShouldSampleNoParent_stddev                       1.43 ns         1.43 ns            5
-// BM_CompositeParentThresholdSamplerShouldSampleNoParent_cv                           0.39 %          0.38 %             5
-// BM_CompositeParentThresholdSamplerShouldSampleParentSampledNoThreshold_mean          535 ns          535 ns            5
-// BM_CompositeParentThresholdSamplerShouldSampleParentSampledNoThreshold_median        535 ns          535 ns            5
-// BM_CompositeParentThresholdSamplerShouldSampleParentSampledNoThreshold_stddev       1.67 ns         1.62 ns            5
-// BM_CompositeParentThresholdSamplerShouldSampleParentSampledNoThreshold_cv           0.31 %          0.30 %             5
-// BM_CompositeAlwaysOnSamplerShouldSample_mean                                        1123 ns         1122 ns            5
-// BM_CompositeAlwaysOnSamplerShouldSample_median                                      1121 ns         1121 ns            5
-// BM_CompositeAlwaysOnSamplerShouldSample_stddev                                      7.52 ns         7.47 ns            5
-// BM_CompositeAlwaysOnSamplerShouldSample_cv                                          0.67 %          0.67 %             5
-// BM_CompositeAlwaysOffSamplerShouldSample_mean                                        810 ns          810 ns            5
-// BM_CompositeAlwaysOffSamplerShouldSample_median                                      810 ns          810 ns            5
-// BM_CompositeAlwaysOffSamplerShouldSample_stddev                                     4.77 ns         4.75 ns            5
-// BM_CompositeAlwaysOffSamplerShouldSample_cv                                         0.59 %          0.59 %             5
-// BM_SpanCreation_mean                                                                 222 ns          222 ns            5
-// BM_SpanCreation_median                                                               222 ns          222 ns            5
-// BM_SpanCreation_stddev                                                              1.88 ns         1.89 ns            5
-// BM_SpanCreation_cv                                                                  0.85 %          0.85 %             5
-// BM_NoopSpanCreation_mean                                                            31.1 ns         31.1 ns            5
-// BM_NoopSpanCreation_median                                                          31.0 ns         31.0 ns            5
-// BM_NoopSpanCreation_stddev                                                         0.180 ns        0.179 ns            5
-// BM_NoopSpanCreation_cv                                                              0.58 %          0.58 %             5
-// BM_SpanCreationWithSamplingResultAttributes/1_mean                                   268 ns          268 ns            5
-// BM_SpanCreationWithSamplingResultAttributes/1_median                                 268 ns          268 ns            5
-// BM_SpanCreationWithSamplingResultAttributes/1_stddev                               0.302 ns        0.305 ns            5
-// BM_SpanCreationWithSamplingResultAttributes/1_cv                                    0.11 %          0.11 %             5
-// BM_SpanCreationWithSamplingResultAttributes/10_mean                                  607 ns          607 ns            5
-// BM_SpanCreationWithSamplingResultAttributes/10_median                                607 ns          607 ns            5
-// BM_SpanCreationWithSamplingResultAttributes/10_stddev                               1.38 ns         1.35 ns            5
-// BM_SpanCreationWithSamplingResultAttributes/10_cv                                   0.23 %          0.22 %             5
-// BM_SpanCreationWithSamplingResultAttributes/128_mean                                8507 ns         8506 ns            5
-// BM_SpanCreationWithSamplingResultAttributes/128_median                              8609 ns         8608 ns            5
-// BM_SpanCreationWithSamplingResultAttributes/128_stddev                               322 ns          322 ns            5
-// BM_SpanCreationWithSamplingResultAttributes/128_cv                                  3.79 %          3.79 %             5
+// BM_AlwaysOnSamplerShouldSample_stddev                                              0.008 ns        0.008 ns            5
+// BM_AlwaysOnSamplerShouldSample_cv                                                   0.26 %          0.25 %             5
+// BM_ParentBasedSamplerShouldSample_mean                                              6.18 ns         6.18 ns            5
+// BM_ParentBasedSamplerShouldSample_median                                            6.15 ns         6.14 ns            5
+// BM_ParentBasedSamplerShouldSample_stddev                                           0.091 ns        0.091 ns            5
+// BM_ParentBasedSamplerShouldSample_cv                                                1.47 %          1.47 %             5
+// BM_TraceIdRatioBasedSamplerShouldSample_mean                                        2.83 ns         2.83 ns            5
+// BM_TraceIdRatioBasedSamplerShouldSample_median                                      2.80 ns         2.80 ns            5
+// BM_TraceIdRatioBasedSamplerShouldSample_stddev                                     0.062 ns        0.062 ns            5
+// BM_TraceIdRatioBasedSamplerShouldSample_cv                                          2.18 %          2.18 %             5
+// BM_ProbabilitySamplerShouldSampleDrops_mean                                          274 ns          274 ns            5
+// BM_ProbabilitySamplerShouldSampleDrops_median                                        274 ns          274 ns            5
+// BM_ProbabilitySamplerShouldSampleDrops_stddev                                       3.25 ns         3.26 ns            5
+// BM_ProbabilitySamplerShouldSampleDrops_cv                                           1.18 %          1.19 %             5
+// BM_ProbabilitySamplerShouldSampleSamples_mean                                        289 ns          289 ns            5
+// BM_ProbabilitySamplerShouldSampleSamples_median                                      289 ns          288 ns            5
+// BM_ProbabilitySamplerShouldSampleSamples_stddev                                     2.53 ns         2.52 ns            5
+// BM_ProbabilitySamplerShouldSampleSamples_cv                                         0.88 %          0.87 %             5
+// BM_CompositeProbabilitySamplerShouldSampleDrops_mean                                 221 ns          221 ns            5
+// BM_CompositeProbabilitySamplerShouldSampleDrops_median                               224 ns          223 ns            5
+// BM_CompositeProbabilitySamplerShouldSampleDrops_stddev                              4.53 ns         4.52 ns            5
+// BM_CompositeProbabilitySamplerShouldSampleDrops_cv                                  2.05 %          2.05 %             5
+// BM_CompositeProbabilitySamplerShouldSampleSamples_mean                               241 ns          241 ns            5
+// BM_CompositeProbabilitySamplerShouldSampleSamples_median                             240 ns          240 ns            5
+// BM_CompositeProbabilitySamplerShouldSampleSamples_stddev                            2.53 ns         2.54 ns            5
+// BM_CompositeProbabilitySamplerShouldSampleSamples_cv                                1.05 %          1.05 %             5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesKind_mean                             248 ns          248 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesKind_median                           248 ns          248 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesKind_stddev                          1.78 ns         1.80 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesKind_cv                              0.72 %          0.73 %             5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesParent_mean                           248 ns          248 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesParent_median                         248 ns          248 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesParent_stddev                        2.35 ns         2.36 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesParent_cv                            0.95 %          0.95 %             5
+// BM_CompositeRuleBasedSamplerShouldSampleNoMatch_mean                                 224 ns          224 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleNoMatch_median                               224 ns          223 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleNoMatch_stddev                              1.17 ns         1.18 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleNoMatch_cv                                  0.52 %          0.53 %             5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesValue_mean                            288 ns          288 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesValue_median                          288 ns          288 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesValue_stddev                         3.97 ns         3.97 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesValue_cv                             1.38 %          1.38 %             5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesPattern_mean                          276 ns          276 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesPattern_median                        277 ns          277 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesPattern_stddev                       1.27 ns         1.27 ns            5
+// BM_CompositeRuleBasedSamplerShouldSampleMatchesPattern_cv                           0.46 %          0.46 %             5
+// BM_CompositeParentThresholdSamplerShouldSampleParentHasThreshold_mean                290 ns          290 ns            5
+// BM_CompositeParentThresholdSamplerShouldSampleParentHasThreshold_median              290 ns          290 ns            5
+// BM_CompositeParentThresholdSamplerShouldSampleParentHasThreshold_stddev             1.07 ns         1.08 ns            5
+// BM_CompositeParentThresholdSamplerShouldSampleParentHasThreshold_cv                 0.37 %          0.37 %             5
+// BM_CompositeParentThresholdSamplerShouldSampleNoParent_mean                         49.8 ns         49.8 ns            5
+// BM_CompositeParentThresholdSamplerShouldSampleNoParent_median                       50.0 ns         49.9 ns            5
+// BM_CompositeParentThresholdSamplerShouldSampleNoParent_stddev                      0.213 ns        0.217 ns            5
+// BM_CompositeParentThresholdSamplerShouldSampleNoParent_cv                           0.43 %          0.43 %             5
+// BM_CompositeParentThresholdSamplerShouldSampleParentSampledNoThreshold_mean         55.7 ns         55.7 ns            5
+// BM_CompositeParentThresholdSamplerShouldSampleParentSampledNoThreshold_median       55.8 ns         55.8 ns            5
+// BM_CompositeParentThresholdSamplerShouldSampleParentSampledNoThreshold_stddev      0.407 ns        0.408 ns            5
+// BM_CompositeParentThresholdSamplerShouldSampleParentSampledNoThreshold_cv           0.73 %          0.73 %             5
+// BM_CompositeAlwaysOnSamplerShouldSample_mean                                         245 ns          245 ns            5
+// BM_CompositeAlwaysOnSamplerShouldSample_median                                       245 ns          245 ns            5
+// BM_CompositeAlwaysOnSamplerShouldSample_stddev                                      3.36 ns         3.37 ns            5
+// BM_CompositeAlwaysOnSamplerShouldSample_cv                                          1.37 %          1.38 %             5
+// BM_CompositeAlwaysOffSamplerShouldSample_mean                                        220 ns          220 ns            5
+// BM_CompositeAlwaysOffSamplerShouldSample_median                                      220 ns          220 ns            5
+// BM_CompositeAlwaysOffSamplerShouldSample_stddev                                     5.15 ns         5.15 ns            5
+// BM_CompositeAlwaysOffSamplerShouldSample_cv                                         2.34 %          2.34 %             5
+// BM_SpanCreation_mean                                                                 218 ns          218 ns            5
+// BM_SpanCreation_median                                                               218 ns          218 ns            5
+// BM_SpanCreation_stddev                                                              1.00 ns         1.02 ns            5
+// BM_SpanCreation_cv                                                                  0.46 %          0.47 %             5
+// BM_NoopSpanCreation_mean                                                            31.6 ns         31.6 ns            5
+// BM_NoopSpanCreation_median                                                          31.6 ns         31.6 ns            5
+// BM_NoopSpanCreation_stddev                                                         0.359 ns        0.359 ns            5
+// BM_NoopSpanCreation_cv                                                              1.14 %          1.13 %             5
+// BM_SpanCreationWithSamplingResultAttributes/1_mean                                   263 ns          263 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/1_median                                 263 ns          263 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/1_stddev                                1.77 ns         1.75 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/1_cv                                    0.67 %          0.67 %             5
+// BM_SpanCreationWithSamplingResultAttributes/10_mean                                  621 ns          621 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/10_median                                617 ns          617 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/10_stddev                               7.70 ns         7.71 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/10_cv                                   1.24 %          1.24 %             5
+// BM_SpanCreationWithSamplingResultAttributes/128_mean                                5476 ns         5475 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/128_median                              5506 ns         5505 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/128_stddev                              60.4 ns         60.4 ns            5
+// BM_SpanCreationWithSamplingResultAttributes/128_cv                                  1.10 %          1.10 %             5
 //
 // clang-format on
 
