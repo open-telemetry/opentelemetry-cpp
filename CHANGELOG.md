@@ -22,7 +22,7 @@ Increment the:
   uses `uint8_t` without including the header that declares it. This relied
   on a transitive include from elsewhere in the translation unit and failed
   to compile standalone on newer standard library implementations.
-  [#0000](https://github.com/open-telemetry/opentelemetry-cpp/pull/0000)
+  [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
 ## [1.29.0] 2026-09-13
 
