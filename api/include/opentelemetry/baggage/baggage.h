@@ -138,8 +138,8 @@ public:
       auto metadata_separator = value.find(kMetadataSeparator);
       if (metadata_separator != std::string::npos)
       {
-        metadata = value.substr(metadata_separator);
-        value    = value.substr(0, metadata_separator);
+        metadata = common::StringUtil::Substr(value, metadata_separator);
+        value    = common::StringUtil::Substr(value, 0, metadata_separator);
       }
 
       bool err       = false;
