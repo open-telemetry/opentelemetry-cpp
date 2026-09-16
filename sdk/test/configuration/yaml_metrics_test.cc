@@ -109,7 +109,8 @@ meter_provider:
   auto *periodic =
       reinterpret_cast<opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration *>(
           reader);
-  ASSERT_EQ(periodic->interval, 5000);
+  const auto defaults = opentelemetry::sdk::configuration::PeriodicMetricReaderConfiguration{};
+  ASSERT_EQ(periodic->interval, defaults.interval);
   ASSERT_EQ(periodic->timeout, 30000);
   ASSERT_NE(periodic->exporter, nullptr);
   auto *exporter = periodic->exporter.get();
@@ -594,7 +595,7 @@ meter_provider:
 #endif
 }
 
-TEST(YamlMetrics, default_prometheus)
+TEST(YamlMetrics, default_prometheus_1_0)
 {
   std::string yaml = R"(
 file_format: "1.0-metrics"
@@ -620,14 +621,47 @@ meter_provider:
       opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(prometheus->host, "localhost");
   ASSERT_EQ(prometheus->port, 9464);
-  ASSERT_EQ(prometheus->without_scope_info, false);
-  ASSERT_EQ(prometheus->without_target_info, false);
+  ASSERT_EQ(prometheus->scope_info_enabled, true);
+  ASSERT_EQ(prometheus->target_info_enabled, true);
   ASSERT_EQ(prometheus->translation_strategy,
             opentelemetry::sdk::configuration::TranslationStrategy::UnderscoreEscapingWithSuffixes);
-  ASSERT_EQ(prometheus->with_resource_constant_labels, nullptr);
+  ASSERT_EQ(prometheus->resource_constant_labels, nullptr);
 }
 
-TEST(YamlMetrics, prometheus)
+TEST(YamlMetrics, default_prometheus_1_1)
+{
+  std::string yaml = R"(
+file_format: "1.1-metrics"
+meter_provider:
+  readers:
+    - pull:
+        exporter:
+          prometheus/development:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->readers.size(), 1);
+  auto *reader = config->meter_provider->readers[0].get();
+  ASSERT_NE(reader, nullptr);
+  auto *pull =
+      reinterpret_cast<opentelemetry::sdk::configuration::PullMetricReaderConfiguration *>(reader);
+  ASSERT_NE(pull->exporter, nullptr);
+  auto *exporter = pull->exporter.get();
+  ASSERT_NE(exporter, nullptr);
+  auto *prometheus = reinterpret_cast<
+      opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *>(exporter);
+  ASSERT_EQ(prometheus->host, "localhost");
+  ASSERT_EQ(prometheus->port, 9464);
+  ASSERT_EQ(prometheus->scope_info_enabled, true);
+  ASSERT_EQ(prometheus->target_info_enabled, true);
+  ASSERT_EQ(prometheus->translation_strategy,
+            opentelemetry::sdk::configuration::TranslationStrategy::UnderscoreEscapingWithSuffixes);
+  ASSERT_EQ(prometheus->resource_constant_labels, nullptr);
+}
+
+TEST(YamlMetrics, prometheus_1_0)
 {
   std::string yaml = R"(
 file_format: "1.0-metrics"
@@ -640,7 +674,7 @@ meter_provider:
             port: 1234
             without_scope_info: true
             without_target_info: true
-            translation_strategy: NoUTF8EscapingWithSuffixes
+            translation_strategy: no_utf8_escaping_with_suffixes/development
             with_resource_constant_labels:
               included:
                 - "foo.in"
@@ -664,18 +698,69 @@ meter_provider:
       opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *>(exporter);
   ASSERT_EQ(prometheus->host, "prometheus");
   ASSERT_EQ(prometheus->port, 1234);
-  ASSERT_EQ(prometheus->without_scope_info, true);
-  ASSERT_EQ(prometheus->without_target_info, true);
+  ASSERT_EQ(prometheus->scope_info_enabled, false);
+  ASSERT_EQ(prometheus->target_info_enabled, false);
   ASSERT_EQ(prometheus->translation_strategy,
             opentelemetry::sdk::configuration::TranslationStrategy::NoUTF8EscapingWithSuffixes);
-  ASSERT_NE(prometheus->with_resource_constant_labels, nullptr);
-  ASSERT_NE(prometheus->with_resource_constant_labels->included, nullptr);
-  ASSERT_EQ(prometheus->with_resource_constant_labels->included->string_array.size(), 2);
-  ASSERT_EQ(prometheus->with_resource_constant_labels->included->string_array[0], "foo.in");
-  ASSERT_EQ(prometheus->with_resource_constant_labels->included->string_array[1], "bar.in");
-  ASSERT_NE(prometheus->with_resource_constant_labels->excluded, nullptr);
-  ASSERT_EQ(prometheus->with_resource_constant_labels->excluded->string_array.size(), 1);
-  ASSERT_EQ(prometheus->with_resource_constant_labels->excluded->string_array[0], "baz.ex");
+  ASSERT_NE(prometheus->resource_constant_labels, nullptr);
+  ASSERT_NE(prometheus->resource_constant_labels->included, nullptr);
+  ASSERT_EQ(prometheus->resource_constant_labels->included->string_array.size(), 2);
+  ASSERT_EQ(prometheus->resource_constant_labels->included->string_array[0], "foo.in");
+  ASSERT_EQ(prometheus->resource_constant_labels->included->string_array[1], "bar.in");
+  ASSERT_NE(prometheus->resource_constant_labels->excluded, nullptr);
+  ASSERT_EQ(prometheus->resource_constant_labels->excluded->string_array.size(), 1);
+  ASSERT_EQ(prometheus->resource_constant_labels->excluded->string_array[0], "baz.ex");
+}
+
+TEST(YamlMetrics, prometheus_1_1)
+{
+  std::string yaml = R"(
+file_format: "1.1-metrics"
+meter_provider:
+  readers:
+    - pull:
+        exporter:
+          prometheus/development:
+            host: "prometheus"
+            port: 1234
+            scope_info_enabled: false
+            target_info_enabled/development: false
+            translation_strategy: no_utf8_escaping_with_suffixes/development
+            resource_constant_labels:
+              included:
+                - "foo.in"
+                - "bar.in"
+              excluded:
+                - "baz.ex"
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->readers.size(), 1);
+  auto *reader = config->meter_provider->readers[0].get();
+  ASSERT_NE(reader, nullptr);
+  auto *pull =
+      reinterpret_cast<opentelemetry::sdk::configuration::PullMetricReaderConfiguration *>(reader);
+  ASSERT_NE(pull->exporter, nullptr);
+  auto *exporter = pull->exporter.get();
+  ASSERT_NE(exporter, nullptr);
+  auto *prometheus = reinterpret_cast<
+      opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration *>(exporter);
+  ASSERT_EQ(prometheus->host, "prometheus");
+  ASSERT_EQ(prometheus->port, 1234);
+  ASSERT_EQ(prometheus->scope_info_enabled, false);
+  ASSERT_EQ(prometheus->target_info_enabled, false);
+  ASSERT_EQ(prometheus->translation_strategy,
+            opentelemetry::sdk::configuration::TranslationStrategy::NoUTF8EscapingWithSuffixes);
+  ASSERT_NE(prometheus->resource_constant_labels, nullptr);
+  ASSERT_NE(prometheus->resource_constant_labels->included, nullptr);
+  ASSERT_EQ(prometheus->resource_constant_labels->included->string_array.size(), 2);
+  ASSERT_EQ(prometheus->resource_constant_labels->included->string_array[0], "foo.in");
+  ASSERT_EQ(prometheus->resource_constant_labels->included->string_array[1], "bar.in");
+  ASSERT_NE(prometheus->resource_constant_labels->excluded, nullptr);
+  ASSERT_EQ(prometheus->resource_constant_labels->excluded->string_array.size(), 1);
+  ASSERT_EQ(prometheus->resource_constant_labels->excluded->string_array[0], "baz.ex");
 }
 
 TEST(YamlMetrics, empty_views)
@@ -732,7 +817,7 @@ meter_provider:
   ASSERT_EQ(view->stream->attribute_keys, nullptr);
 }
 
-TEST(YamlMetrics, selector)
+TEST(YamlMetrics, selector_counter)
 {
   std::string yaml = R"(
 file_format: "1.0-metrics"
@@ -772,6 +857,181 @@ meter_provider:
   ASSERT_EQ(view->stream->aggregation_cardinality_limit, 0);
   ASSERT_EQ(view->stream->aggregation, nullptr);
   ASSERT_EQ(view->stream->attribute_keys, nullptr);
+}
+
+TEST(YamlMetrics, selector_gauge)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: gauge
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->selector, nullptr);
+  ASSERT_EQ(view->selector->instrument_type,
+            opentelemetry::sdk::configuration::InstrumentType::gauge);
+}
+
+TEST(YamlMetrics, selector_histogram)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: histogram
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->selector, nullptr);
+  ASSERT_EQ(view->selector->instrument_type,
+            opentelemetry::sdk::configuration::InstrumentType::histogram);
+}
+
+TEST(YamlMetrics, selector_observable_counter)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: observable_counter
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->selector, nullptr);
+  ASSERT_EQ(view->selector->instrument_type,
+            opentelemetry::sdk::configuration::InstrumentType::observable_counter);
+}
+
+TEST(YamlMetrics, selector_observable_gauge)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: observable_gauge
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->selector, nullptr);
+  ASSERT_EQ(view->selector->instrument_type,
+            opentelemetry::sdk::configuration::InstrumentType::observable_gauge);
+}
+
+TEST(YamlMetrics, selector_observable_up_down_counter)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: observable_up_down_counter
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->selector, nullptr);
+  ASSERT_EQ(view->selector->instrument_type,
+            opentelemetry::sdk::configuration::InstrumentType::observable_up_down_counter);
+}
+
+TEST(YamlMetrics, selector_up_down_counter)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: up_down_counter
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->meter_provider, nullptr);
+  ASSERT_EQ(config->meter_provider->views.size(), 1);
+  auto *view = config->meter_provider->views[0].get();
+  ASSERT_NE(view, nullptr);
+  ASSERT_NE(view->selector, nullptr);
+  ASSERT_EQ(view->selector->instrument_type,
+            opentelemetry::sdk::configuration::InstrumentType::up_down_counter);
+}
+
+TEST(YamlMetrics, selector_invalid_instrument_type)
+{
+  std::string yaml = R"(
+file_format: "1.1"
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  views:
+    - selector:
+        instrument_type: invalid
+      stream:
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_EQ(config, nullptr);
 }
 
 TEST(YamlMetrics, stream)

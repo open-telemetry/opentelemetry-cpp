@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <benchmark/benchmark.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <mutex>
@@ -48,7 +48,7 @@ void BM_AttributseHashMap(benchmark::State &state)
   {
     for (size_t i = 0; i < MAX_THREADS; i++)
     {
-      workers.push_back(std::thread(work, i));
+      workers.emplace_back(work, i);
     }
   }
 

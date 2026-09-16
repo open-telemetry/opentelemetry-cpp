@@ -53,3 +53,20 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "filter_predicate_test",
+    srcs = [
+        "filter_predicate_test.cc",
+    ],
+    tags = [
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

@@ -8,11 +8,12 @@
 #  include <array>
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
-#include <stdint.h>
 #include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <functional>
 #include <future>
@@ -25,7 +26,6 @@
 #include <vector>
 
 #ifdef _MSC_VER
-#  include <string.h>
 #  define strncasecmp _strnicmp
 #else
 #  include <strings.h>
@@ -330,9 +330,30 @@ size_t HttpOperation::ReadMemoryCallback(char *buffer, size_t size, size_t nitem
     nwrite = self->request_body_.size() - self->request_nwrite_;
   }
 
-  memcpy(buffer, &self->request_body_[self->request_nwrite_], nwrite);
+  std::memcpy(buffer, &self->request_body_[self->request_nwrite_], nwrite);
   self->request_nwrite_ += nwrite;
   return nwrite;
+}
+
+int HttpOperation::SeekCallback(void *userp, curl_off_t offset, int origin)
+{
+  HttpOperation *self = reinterpret_cast<HttpOperation *>(userp);
+  if (nullptr == self)
+  {
+    return CURL_SEEKFUNC_CANTSEEK;
+  }
+
+  // The body is a fully buffered span owned by the caller, so an absolute seek inside it is just a
+  // move of the read cursor. Anything else is refused rather than approximated, because reporting
+  // success without repositioning would resume the upload from the wrong offset and send a
+  // truncated or misaligned body.
+  if (origin != SEEK_SET || offset < 0 || static_cast<size_t>(offset) > self->request_body_.size())
+  {
+    return CURL_SEEKFUNC_CANTSEEK;
+  }
+
+  self->request_nwrite_ = static_cast<size_t>(offset);
+  return CURL_SEEKFUNC_OK;
 }
 
 #if LIBCURL_VERSION_NUM >= 0x075000
@@ -376,12 +397,9 @@ int HttpOperation::OnProgressCallback(void *clientp,
     return -1;
   }
 
-  // CURL_PROGRESSFUNC_CONTINUE is added in 7.68.0
-#  if defined(CURL_PROGRESSFUNC_CONTINUE)
-  return CURL_PROGRESSFUNC_CONTINUE;
-#  else
+  // Not CURL_PROGRESSFUNC_CONTINUE, which asks libcurl to also run its built-in progress
+  // meter, and that meter writes to stderr.
   return 0;
-#  endif
 }
 #else
 int HttpOperation::OnProgressCallback(void *clientp,
@@ -547,11 +565,9 @@ void HttpOperation::Cleanup()
   if (async_data_)
   {
     // Just reset and move easy_handle to owner if in async mode
-    if (async_data_->session != nullptr)
+    Session *session = async_data_->session.exchange(nullptr, std::memory_order_acq_rel);
+    if (session != nullptr)
     {
-      auto session         = async_data_->session;
-      async_data_->session = nullptr;
-
       if (curl_resource_.easy_handle != nullptr)
       {
         curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_PRIVATE, NULL);
@@ -619,9 +635,10 @@ std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
     return retry_after_time_point_;
   }
 
-  static std::random_device rd;
-  static std::mt19937 gen(rd());
-  static std::uniform_real_distribution<float> dis(0.8f, 1.2f);
+  // One engine per thread. Every HttpClient drives its own background thread, and drawing from
+  // the engine advances its state, so a shared one is written by all of them at once.
+  static thread_local std::mt19937 gen{std::random_device{}()};
+  std::uniform_real_distribution<float> dis(0.8f, 1.2f);
 
   // The initial retry attempt will occur after initialBackoff * random(0.8, 1.2)
   auto backoff = retry_policy_.initial_backoff;
@@ -726,7 +743,7 @@ const char *HttpOperation::GetCurlErrorMessage(CURLcode code)
   return message;
 }
 
-CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, void *value)
+CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, const void *value)
 {
   /*
     curl_easy_setopt() is a macro with variadic arguments, type unsafe.
@@ -917,6 +934,7 @@ CURLcode HttpOperation::Setup()
 
       struct curl_blob stblob
       {};
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       stblob.data  = const_cast<char *>(data);
       stblob.len   = data_len;
       stblob.flags = CURL_BLOB_COPY;
@@ -959,6 +977,7 @@ CURLcode HttpOperation::Setup()
 
       struct curl_blob stblob
       {};
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       stblob.data  = const_cast<char *>(data);
       stblob.len   = data_len;
       stblob.flags = CURL_BLOB_COPY;
@@ -1007,6 +1026,7 @@ CURLcode HttpOperation::Setup()
 
       struct curl_blob stblob
       {};
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       stblob.data  = const_cast<char *>(data);
       stblob.len   = data_len;
       stblob.flags = CURL_BLOB_COPY;
@@ -1338,6 +1358,19 @@ CURLcode HttpOperation::Setup()
     {
       return rc;
     }
+
+    rc = SetCurlPtrOption(CURLOPT_SEEKFUNCTION,
+                          reinterpret_cast<void *>(&HttpOperation::SeekCallback));
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlPtrOption(CURLOPT_SEEKDATA, this);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
   }
   else if (method_ == opentelemetry::ext::http::client::Method::Get)
   {
@@ -1438,7 +1471,7 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
 
   async_data_.reset(new AsyncData());
   async_data_->is_promise_running.store(false, std::memory_order_release);
-  async_data_->session = nullptr;
+  async_data_->session.store(nullptr, std::memory_order_release);
 
   ReleaseResponse();
 
@@ -1452,12 +1485,17 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   }
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_PRIVATE, session);
 
+  // Only a session can be cancelled, so only this path needs the progress callback live. Setting
+  // it here, on the thread that owns the handle and before the handle is scheduled, leaves
+  // Abort() with nothing to do but raise the flag.
+  curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_NOPROGRESS, 0L);
+
   DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
   is_finished_.store(false, std::memory_order_release);
   is_aborted_.store(false, std::memory_order_release);
   is_cleaned_.store(false, std::memory_order_release);
 
-  async_data_->session = session;
+  async_data_->session.store(session, std::memory_order_release);
   if (false == async_data_->is_promise_running.exchange(true, std::memory_order_acq_rel))
   {
     async_data_->result_promise = std::promise<CURLcode>();
@@ -1509,15 +1547,16 @@ void HttpOperation::ReleaseResponse()
 
 void HttpOperation::Abort()
 {
+  // The easy handle belongs to the thread inside curl_multi_perform, so nothing here reads or
+  // writes it. Raising the flag is enough: the progress callback polls it, and the scheduled
+  // abort removes the handle on that thread.
   is_aborted_.store(true, std::memory_order_release);
-  if (curl_resource_.easy_handle != nullptr)
+  if (async_data_)
   {
-    // Enable progress callback to abort from polling thread
-    curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_NOPROGRESS, 0L);
-    if (async_data_ && nullptr != async_data_->session)
+    Session *session = async_data_->session.load(std::memory_order_acquire);
+    if (nullptr != session)
     {
-      async_data_->session->GetHttpClient().ScheduleAbortSession(
-          async_data_->session->GetSessionId());
+      session->GetHttpClient().ScheduleAbortSession(session->GetSessionId());
     }
   }
 }

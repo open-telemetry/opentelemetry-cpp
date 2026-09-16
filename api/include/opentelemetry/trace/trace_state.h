@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <ctype.h>
+#include <cctype>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -14,10 +14,6 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/version.h"
-
-#if OPENTELEMETRY_HAVE_WORKING_REGEX
-#  include <regex>
-#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
@@ -209,14 +205,7 @@ public:
    * An at sign (@) is treated as a regular character (keychar) with no structural meaning.
    * Total key length must not exceed 256 characters.
    */
-  static bool IsValidKey(nostd::string_view key) noexcept
-  {
-#if OPENTELEMETRY_HAVE_WORKING_REGEX
-    return IsValidKeyRegEx(key);
-#else
-    return IsValidKeyNonRegEx(key);
-#endif
-  }
+  static bool IsValidKey(nostd::string_view key) noexcept { return IsValidKeyNonRegEx(key); }
 
   /** Returns whether value is a valid value. See https://www.w3.org/TR/trace-context/#value
    * The value is an opaque string containing up to 256 printable ASCII (RFC0020)
@@ -224,11 +213,7 @@ public:
    */
   static bool IsValidValue(nostd::string_view value) noexcept
   {
-#if OPENTELEMETRY_HAVE_WORKING_REGEX
-    return IsValidValueRegEx(value);
-#else
     return IsValidValueNonRegEx(value);
-#endif
   }
 
 private:
@@ -248,45 +233,6 @@ private:
     return str.substr(left, right - left + 1);
   }
 
-#if OPENTELEMETRY_HAVE_WORKING_REGEX
-  static bool IsValidKeyRegEx(nostd::string_view key) noexcept
-  {
-#  if OPENTELEMETRY_HAVE_EXCEPTIONS
-    try
-    {
-#  endif
-      static std::regex reg_key("^[a-z0-9][a-z0-9*_\\-/@]{0,255}$");
-      std::string key_s(key.data(), key.size());
-      return std::regex_match(key_s, reg_key);
-#  if OPENTELEMETRY_HAVE_EXCEPTIONS
-    }
-    catch (const std::regex_error &)
-    {
-      return false;
-    }
-#  endif
-  }
-
-  static bool IsValidValueRegEx(nostd::string_view value) noexcept
-  {
-#  if OPENTELEMETRY_HAVE_EXCEPTIONS
-    try
-    {
-#  endif
-      // Hex 0x20 to 0x2B, 0x2D to 0x3C, 0x3E to 0x7E
-      static std::regex reg_value(
-          "^[\\x20-\\x2B\\x2D-\\x3C\\x3E-\\x7E]{0,255}[\\x21-\\x2B\\x2D-\\x3C\\x3E-\\x7E]$");
-      // Need to benchmark without regex, as a string object is created here.
-      return std::regex_match(std::string(value.data(), value.size()), reg_value);
-#  if OPENTELEMETRY_HAVE_EXCEPTIONS
-    }
-    catch (const std::regex_error &)
-    {
-      return false;
-    }
-#  endif
-  }
-#else
   static bool IsValidKeyNonRegEx(nostd::string_view key) noexcept
   {
     if (key.empty() || key.size() > kKeyMaxSize || !IsLowerCaseAlphaOrDigit(key[0]))
@@ -320,9 +266,11 @@ private:
     }
     return true;
   }
-#endif
 
-  static bool IsLowerCaseAlphaOrDigit(char c) noexcept { return isdigit(c) || islower(c); }
+  static bool IsLowerCaseAlphaOrDigit(char c) noexcept
+  {
+    return std::isdigit(c) || std::islower(c);
+  }
 
 private:
   // Store entries in a C-style array to avoid using std::array or std::vector.

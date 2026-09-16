@@ -6,9 +6,9 @@
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
 
 #  include <gtest/gtest.h>
-#  include <stddef.h>
-#  include <stdint.h>
 #  include <chrono>
+#  include <cstddef>
+#  include <cstdint>
 #  include <limits>
 #  include <map>
 #  include <memory>

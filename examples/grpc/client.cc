@@ -8,7 +8,7 @@
 #include <grpcpp/security/credentials.h>
 #include <grpcpp/support/status.h>
 
-#include <stdint.h>
+#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <string>

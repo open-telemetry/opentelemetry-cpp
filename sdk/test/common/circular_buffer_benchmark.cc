@@ -1,8 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stddef.h>
 #include <atomic>
+#include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <functional>
@@ -55,7 +55,8 @@ static uint64_t ConsumeBufferNumbers(CircularBuffer<uint64_t> &buffer) noexcept
 template <class Buffer>
 static void GenerateNumbersForThread(Buffer &buffer, int n, std::atomic<uint64_t> &sum) noexcept
 {
-  static thread_local std::mt19937_64 random_number_generator{std::random_device{}()};
+  // NOLINTNEXTLINE(bugprone-random-generator-seed)
+  static thread_local std::mt19937_64 random_number_generator{1234};
   for (int i = 0; i < n; ++i)
   {
     auto x = random_number_generator();

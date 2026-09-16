@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 #include <prometheus/metric_family.h>
-#include <stddef.h>
 #include <chrono>
+#include <cstddef>
 #include <string>
 #include <thread>
 #include <vector>

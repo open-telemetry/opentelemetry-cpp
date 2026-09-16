@@ -60,11 +60,11 @@ void run_threads()
   {
     // This shows how one can effectively use Scope objects to correctly
     // parent spans across threads.
-    threads.push_back(std::thread([=] {
+    threads.emplace_back([=] {
       trace_api::Scope scope(thread_span);
       auto thread_span_2 =
           get_tracer()->StartSpan(std::string("thread ") + std::to_string(thread_num));
-    }));
+    });
   }
 
   std::for_each(threads.begin(), threads.end(), [](std::thread &th) { th.join(); });

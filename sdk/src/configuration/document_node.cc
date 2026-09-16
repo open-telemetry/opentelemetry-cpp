@@ -242,7 +242,7 @@ size_t DocumentNode::IntegerFromString(const std::string &value) const
   const char *ptr = value.c_str();
   char *end       = nullptr;
   size_t len      = value.length();
-  size_t val      = strtoll(ptr, &end, 10);
+  size_t val      = std::strtoll(ptr, &end, 10);
   if (ptr + len != end)
   {
     std::string message("Illegal integer value: ");
@@ -285,7 +285,7 @@ double DocumentNode::DoubleFromString(const std::string &value) const
   const char *ptr = value.c_str();
   char *end       = nullptr;
   size_t len      = value.length();
-  double val      = strtod(ptr, &end);
+  double val      = std::strtod(ptr, &end);
   if (ptr + len != end)
   {
     std::string message("Illegal double value: ");

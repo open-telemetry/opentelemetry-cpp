@@ -5,7 +5,7 @@
 #include <prometheus/client_metric.h>
 #include <prometheus/metric_family.h>
 #include <prometheus/metric_type.h>
-#include <stddef.h>
+#include <cstddef>
 #include <limits>
 #include <list>
 #include <string>

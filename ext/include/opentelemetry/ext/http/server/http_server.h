@@ -5,7 +5,10 @@
 
 #include <cerrno>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <functional>
 #include <list>
 #include <map>
@@ -15,7 +18,7 @@
 #ifdef HAVE_HTTP_DEBUG
 #  ifdef LOG_TRACE
 #    undef LOG_TRACE
-#    define LOG_TRACE(x, ...) printf(x "\n", __VA_ARGS__)
+#    define LOG_TRACE(x, ...) std::printf(x "\n", __VA_ARGS__)
 #  endif
 #endif
 
@@ -98,7 +101,7 @@ protected:
     SocketTools::Socket socket;
     std::string receiveBuffer;
     std::string sendBuffer;
-    enum : std::uint8_t
+    enum : std::uint8_t  // NOLINT(cppcoreguidelines-use-enum-class)
     {
       Idle,
       ReceivingHeaders,
@@ -170,7 +173,7 @@ public:
         m_maxRequestContentSize(2 * 1024 * 1024)
   {}
 
-  HttpServer(const std::string &serverHost, int port = 30000) : HttpServer()
+  HttpServer(const std::string &serverHost, uint16_t port = 30000) : HttpServer()
   {
     std::ostringstream os;
     os << serverHost << ":" << port;
@@ -199,7 +202,7 @@ public:
 
   void setServerName(std::string const &name) { m_serverHost = name; }
 
-  int addListeningPort(int port)
+  int addListeningPort(uint16_t port)
   {
     SocketTools::Socket socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     socket.setNonBlocking();
@@ -220,7 +223,7 @@ public:
   HttpRequestHandler &addHandler(const std::string &root, HttpRequestCallback &handler)
   {
     // No thread-safety here!
-    m_handlers.push_back({root, &handler});
+    m_handlers.emplace_back(root, &handler);
     LOG_INFO("HttpServer: Added handler for %s", root.c_str());
     return m_handlers.back();
   }
@@ -228,7 +231,7 @@ public:
   HttpRequestHandler &operator[](const std::string &root)
   {
     // No thread-safety here!
-    m_handlers.push_back({root, nullptr});
+    m_handlers.emplace_back(root, nullptr);
     LOG_INFO("HttpServer: Added handler for %s", root.c_str());
     return m_handlers.back();
   }
@@ -236,7 +239,7 @@ public:
   HttpServer &operator+=(std::pair<const std::string &, HttpRequestCallback &> other)
   {
     LOG_INFO("HttpServer: Added handler for %s", other.first.c_str());
-    m_handlers.push_back(HttpRequestHandler(other.first, &other.second));
+    m_handlers.emplace_back(other.first, &other.second);
     return (*this);
   }
 
@@ -775,7 +778,8 @@ protected:
       for (auto &handler : m_handlers)
       {
         if (conn.request.uri.length() >= handler.first.length() &&
-            strncmp(conn.request.uri.c_str(), handler.first.c_str(), handler.first.length()) == 0)
+            std::strncmp(conn.request.uri.c_str(), handler.first.c_str(), handler.first.length()) ==
+                0)
         {
           LOG_TRACE("HttpServer: [%s] using handler for %s", conn.request.client.c_str(),
                     handler.first.c_str());
@@ -804,22 +808,22 @@ protected:
 
     conn.response.headers["Host"]           = m_serverHost;
     conn.response.headers["Connection"]     = (conn.keepalive ? "keep-alive" : "close");
-    conn.response.headers["Date"]           = formatTimestamp(time(nullptr));
+    conn.response.headers["Date"]           = formatTimestamp(std::time(nullptr));
     conn.response.headers["Content-Length"] = std::to_string(conn.response.body.size());
 
     return RequestOutcome::SendResponse;
   }
 
-  static std::string formatTimestamp(time_t time)
+  static std::string formatTimestamp(std::time_t time)
   {
-    tm tm{};
+    std::tm tm{};
 #ifdef _WIN32
     gmtime_s(&tm, &time);
 #else
     gmtime_r(&time, &tm);
 #endif
     char buf[32];
-    strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", &tm);
+    std::strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", &tm);
     return buf;
   }
 

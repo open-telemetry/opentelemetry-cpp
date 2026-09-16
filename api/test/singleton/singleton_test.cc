@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>  // IWYU pragma: keep
+#include <cstdint>  // IWYU pragma: keep
 #include <string>
 
 #ifdef _WIN32

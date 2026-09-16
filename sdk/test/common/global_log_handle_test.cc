@@ -24,19 +24,19 @@ public:
   {
     if (level == opentelemetry::sdk::common::internal_log::LogLevel::Debug)
     {
-      EXPECT_EQ(0, strncmp(msg, "Debug message", 13));
+      EXPECT_EQ(0, std::strncmp(msg, "Debug message", 13));
     }
     else if (level == opentelemetry::sdk::common::internal_log::LogLevel::Error)
     {
-      EXPECT_EQ(0, strncmp(msg, "Error message", 13));
+      EXPECT_EQ(0, std::strncmp(msg, "Error message", 13));
     }
     else if (level == opentelemetry::sdk::common::internal_log::LogLevel::Info)
     {
-      EXPECT_EQ(0, strncmp(msg, "Info message", 12));
+      EXPECT_EQ(0, std::strncmp(msg, "Info message", 12));
     }
     else if (level == opentelemetry::sdk::common::internal_log::LogLevel::Warning)
     {
-      EXPECT_EQ(0, strncmp(msg, "Warning message", 15));
+      EXPECT_EQ(0, std::strncmp(msg, "Warning message", 15));
     }
     ++count;
   }

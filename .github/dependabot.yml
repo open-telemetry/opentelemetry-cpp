@@ -4,11 +4,15 @@ updates:
     directory: "/"
     schedule:
      interval: daily
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
      interval: daily
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -16,4 +20,6 @@ updates:
       interval: "daily"
     labels:
       - "GHA"
+    cooldown:
+      default-days: 7
 

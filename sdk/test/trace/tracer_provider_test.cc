@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdlib.h>
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <future>
 #include <limits>
 #include <string>
@@ -268,7 +268,7 @@ TEST(TracerProvider, GetTracerAbiv2)
     EXPECT_EQ(opentelemetry::nostd::get<int>(attr->second), 42);
   }
 
-  typedef std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue> KV;
+  using KV = std::pair<opentelemetry::nostd::string_view, opentelemetry::common::AttributeValue>;
 
   std::initializer_list<KV> attrs7 = {{"foo", 3.14}, {"bar", "2"}};
   auto t7                          = tp.GetTracer("name7", "version7", "url7", attrs7);
@@ -624,6 +624,38 @@ TEST(TracerProvider, SpanLimitsFromEnvReadsVariables)
   EXPECT_EQ(limits.link_count_limit, 2u);
   EXPECT_EQ(limits.event_attribute_count_limit, 4u);
   EXPECT_EQ(limits.link_attribute_count_limit, 6u);
+
+  UnsetSpanLimitsEnv();
+}
+
+TEST(TracerProvider, SpanLimitsFromEnvUnsignedBoundaries)
+{
+  UnsetSpanLimitsEnv();
+
+  const struct
+  {
+    const char *value;
+    std::uint32_t expected;
+  } test_cases[] = {{"0", 0}, {"4294967295", (std::numeric_limits<std::uint32_t>::max)()}};
+
+  for (const auto &test_case : test_cases)
+  {
+    SCOPED_TRACE(test_case.value);
+    setenv("OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT", test_case.value, 1);
+    setenv("OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT", test_case.value, 1);
+
+    const SpanLimits limits = span_limits_env::GetSpanLimitsFromEnv(SpanLimits{});
+    EXPECT_EQ(limits.attribute_value_length_limit, static_cast<std::size_t>(test_case.expected));
+    EXPECT_EQ(limits.attribute_count_limit, test_case.expected);
+  }
+
+  setenv("OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT", "4294967296", 1);
+  setenv("OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT", "4294967296", 1);
+
+  const SpanLimits defaults{};
+  const SpanLimits limits = span_limits_env::GetSpanLimitsFromEnv(defaults);
+  EXPECT_EQ(limits.attribute_value_length_limit, defaults.attribute_value_length_limit);
+  EXPECT_EQ(limits.attribute_count_limit, defaults.attribute_count_limit);
 
   UnsetSpanLimitsEnv();
 }

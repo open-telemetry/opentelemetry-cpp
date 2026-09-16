@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <utility>
@@ -191,7 +191,7 @@ TEST(JaegerPropagatorTest, InjectsContext)
 
   std::vector<std::string> fields;
   format.Fields([&fields](nostd::string_view field) {
-    fields.push_back(field.data());
+    fields.emplace_back(field.data());
     return true;
   });
   EXPECT_EQ(fields.size(), 1);

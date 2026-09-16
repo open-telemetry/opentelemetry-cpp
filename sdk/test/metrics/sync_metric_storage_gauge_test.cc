@@ -9,9 +9,9 @@
 #include "opentelemetry/sdk/metrics/instruments.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <stddef.h>
-#  include <stdint.h>
 #  include <chrono>
+#  include <cstddef>
+#  include <cstdint>
 #  include <map>
 #  include <memory>
 #  include <utility>

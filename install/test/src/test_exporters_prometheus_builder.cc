@@ -13,7 +13,7 @@ TEST(ExportersPrometheusBuilderInstall, PrometheusPullBuilder)
   opentelemetry::sdk::configuration::PrometheusPullMetricExporterConfiguration model;
   model.host               = "localhost";
   model.port               = 1234;
-  model.without_scope_info = false;
+  model.scope_info_enabled = true;
 
   auto exporter = builder->Build(&model);
   ASSERT_TRUE(exporter != nullptr);

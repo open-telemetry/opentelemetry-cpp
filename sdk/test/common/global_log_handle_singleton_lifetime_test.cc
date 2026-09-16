@@ -28,7 +28,7 @@ public:
     if (!custom_handler_destroyed || handle)
     {
       OTEL_INTERNAL_LOG_ERROR("GlobalLogHandler must be destroyed before the checker");
-      abort();
+      std::abort();
     }
     std::cout << "GlobalLogHandlerChecker destroyed and check pass.\n";
   }

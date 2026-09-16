@@ -23,11 +23,74 @@ cc_library(
         "//api",
         "//sdk:headers",
         "//sdk/src/common:wildcard_match",
+        "//sdk/src/resource",
     ],
 )
 
 cc_library(
-    name = "configuration",
+    name = "configuration_trace_builders",
+    srcs = [
+        "trace_builder_utils.cc",
+        "trace_builders.cc",
+    ],
+    include_prefix = "src/configuration",
+    deps = [
+        ":configuration_core",
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/common:wildcard_match",
+        "//sdk/src/trace",
+    ],
+)
+
+cc_library(
+    name = "configuration_logs_builders",
+    srcs = [
+        "logs_builder_utils.cc",
+        "logs_builders.cc",
+    ],
+    include_prefix = "src/configuration",
+    deps = [
+        ":configuration_core",
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/common:wildcard_match",
+        "//sdk/src/logs",
+    ],
+)
+
+cc_library(
+    name = "configuration_metrics_builders",
+    srcs = [
+        "metrics_builder_utils.cc",
+        "metrics_builders.cc",
+    ],
+    include_prefix = "src/configuration",
+    deps = [
+        ":configuration_core",
+        "//api",
+        "//sdk:headers",
+        "//sdk/src/common:wildcard_match",
+        "//sdk/src/metrics",
+    ],
+)
+
+cc_library(
+    name = "configuration_registry_factory",
+    srcs = ["registry_factory.cc"],
+    include_prefix = "src/configuration",
+    deps = [
+        ":configuration_core",
+        ":configuration_logs_builders",
+        ":configuration_metrics_builders",
+        ":configuration_trace_builders",
+        "//api",
+        "//sdk:headers",
+    ],
+)
+
+cc_library(
+    name = "configuration_yaml",
     srcs = [
         "configuration_parser.cc",
         "ryml_document.cc",
@@ -40,5 +103,17 @@ cc_library(
         "//api",
         "//sdk:headers",
         "@rapidyaml",
+    ],
+)
+
+cc_library(
+    name = "configuration",
+    deps = [
+        ":configuration_core",
+        ":configuration_logs_builders",
+        ":configuration_metrics_builders",
+        ":configuration_registry_factory",
+        ":configuration_trace_builders",
+        ":configuration_yaml",
     ],
 )

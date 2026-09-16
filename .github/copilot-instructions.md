@@ -212,13 +212,13 @@ code.coverage                   # Build with coverage analysis
 Key options you can pass to `cmake ..`:
 
 ```bash
--DWITH_EXAMPLES=ON           # Build examples (default ON)
--DWITH_PROMETHEUS=ON         # Enable Prometheus exporter
--DWITH_ZIPKIN=ON            # Enable Zipkin exporter
--DWITH_OTLP_GRPC=ON         # Enable OTLP gRPC exporter
--DWITH_OTLP_HTTP=ON         # Enable OTLP HTTP exporter
--DBUILD_TESTING=ON          # Build tests (default ON)
--DCMAKE_BUILD_TYPE=Debug    # Debug build
+-DOTELCPP_WITH_EXAMPLES=ON       # Build examples (default ON)
+-DOTELCPP_WITH_PROMETHEUS=ON     # Enable Prometheus exporter
+-DOTELCPP_WITH_ZIPKIN=ON         # Enable Zipkin exporter
+-DOTELCPP_WITH_OTLP_GRPC=ON      # Enable OTLP gRPC exporter
+-DOTELCPP_WITH_OTLP_HTTP=ON      # Enable OTLP HTTP exporter
+-DOTELCPP_BUILD_TESTING=ON       # Build tests (default ON)
+-DCMAKE_BUILD_TYPE=Debug         # Debug build
 ```
 
 ## Timing Expectations

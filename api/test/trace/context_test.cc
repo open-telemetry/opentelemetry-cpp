@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 #include "opentelemetry/context/context.h"

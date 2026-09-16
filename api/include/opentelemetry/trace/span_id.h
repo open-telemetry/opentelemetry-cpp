@@ -23,7 +23,10 @@ public:
   SpanId() noexcept = default;
 
   // Creates a SpanId with the given ID.
-  explicit SpanId(nostd::span<const uint8_t, kSize> id) noexcept { memcpy(rep_, id.data(), kSize); }
+  explicit SpanId(nostd::span<const uint8_t, kSize> id) noexcept
+  {
+    std::memcpy(rep_, id.data(), kSize);
+  }
 
   // Populates the buffer with the lowercase base16 representation of the ID.
   void ToLowerBase16(nostd::span<char, 2 * kSize> buffer) const noexcept
@@ -42,7 +45,10 @@ public:
     return nostd::span<const uint8_t, kSize>(rep_);
   }
 
-  bool operator==(const SpanId &that) const noexcept { return memcmp(rep_, that.rep_, kSize) == 0; }
+  bool operator==(const SpanId &that) const noexcept
+  {
+    return std::memcmp(rep_, that.rep_, kSize) == 0;
+  }
 
   bool operator!=(const SpanId &that) const noexcept { return !(*this == that); }
 
@@ -50,13 +56,13 @@ public:
   bool IsValid() const noexcept
   {
     static constexpr uint8_t kEmptyRep[kSize] = {0};
-    return memcmp(rep_, kEmptyRep, kSize) != 0;
+    return std::memcmp(rep_, kEmptyRep, kSize) != 0;
   }
 
   // Copies the opaque SpanId data to dest.
   void CopyBytesTo(nostd::span<uint8_t, kSize> dest) const noexcept
   {
-    memcpy(dest.data(), rep_, kSize);
+    std::memcpy(dest.data(), rep_, kSize);
   }
 
 private:

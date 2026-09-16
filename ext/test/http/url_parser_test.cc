@@ -8,9 +8,13 @@
 #include <tuple>
 #include <variant>
 
+#include "opentelemetry/ext/http/client/http_client.h"
 #include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/nostd/string_view.h"
 
 namespace http_common = opentelemetry::ext::http::common;
+namespace http_client = opentelemetry::ext::http::client;
+namespace nostd       = opentelemetry::nostd;
 
 namespace
 {
@@ -140,6 +144,26 @@ TEST_P(UrlDecoderTests, BasicTests)
   const auto actual    = http_common::UrlDecoder::Decode(encoded);
 
   EXPECT_EQ(actual, expected);
+}
+
+http_client::HttpSslOptions SslOptionsFor(nostd::string_view url)
+{
+  return http_client::HttpSslOptions{url, false, "", "", "", "", "", "", "", "", "", ""};
+}
+
+// HttpSslOptions decides use_ssl from the scheme the caller passed, and the url is a string_view,
+// so it can be a window onto a longer buffer. Reading one byte past it changes the answer: a view
+// holding "https" over a buffer that continues with a colon reads as a secure scheme.
+TEST(HttpSslOptionsTests, UsesOnlyTheGivenUrlToDecideTheScheme)
+{
+  const char buffer[] = "https://example.com";
+
+  EXPECT_TRUE(SslOptionsFor(nostd::string_view{buffer}).use_ssl);
+  EXPECT_FALSE(SslOptionsFor(nostd::string_view{"http://example.com"}).use_ssl);
+
+  // The same buffer, but the caller offers only the five characters before the colon.
+  EXPECT_FALSE(SslOptionsFor(nostd::string_view{buffer, 5}).use_ssl)
+      << "read past the end of the url view";
 }
 
 }  // namespace

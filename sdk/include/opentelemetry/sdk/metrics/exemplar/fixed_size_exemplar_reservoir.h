@@ -36,11 +36,9 @@ public:
 
   using ExemplarReservoir::OfferMeasurement;
 
-  void OfferMeasurement(
-      int64_t value,
-      const MetricAttributes &attributes,
-      const opentelemetry::context::Context &context,
-      const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
+  void OfferMeasurement(int64_t value,
+                        const MetricAttributes &attributes,
+                        const opentelemetry::context::Context &context) noexcept override
   {
     if (!reservoir_cell_selector_)
     {
@@ -54,11 +52,9 @@ public:
     }
   }
 
-  void OfferMeasurement(
-      double value,
-      const MetricAttributes &attributes,
-      const opentelemetry::context::Context &context,
-      const opentelemetry::common::SystemTimestamp & /* timestamp */) noexcept override
+  void OfferMeasurement(double value,
+                        const MetricAttributes &attributes,
+                        const opentelemetry::context::Context &context) noexcept override
   {
     if (!reservoir_cell_selector_)
     {

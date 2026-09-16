@@ -4,6 +4,17 @@
 # Configured from opentelemetry-cpp/cmake/component-definitions.cmake.in
 
 # ----------------------------------------------------------------------
+# Deprecated components
+# ----------------------------------------------------------------------
+set(OTEL_DEPRECATED_COMPONENTS_LIST @OTEL_DEPRECATED_COMPONENTS_LIST@)
+
+# ----------------------------------------------------------------------
+# Deprecated component replacements (deprecated_name -> replacement_name)
+# ----------------------------------------------------------------------
+
+@OTEL_COMPONENTS_REPLACEMENTS_BLOCK@
+
+# ----------------------------------------------------------------------
 # opentelmetry-cpp Built COMPONENT list
 # ----------------------------------------------------------------------
 set(OTEL_BUILT_COMPONENTS_LIST @OTEL_BUILT_COMPONENTS_LIST@)

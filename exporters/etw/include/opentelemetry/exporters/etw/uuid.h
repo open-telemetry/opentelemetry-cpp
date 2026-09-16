@@ -199,7 +199,7 @@ struct UUID
     this->Data1 = uuid.Data1;
     this->Data2 = uuid.Data2;
     this->Data3 = uuid.Data3;
-    memcpy(&(this->Data4[0]), &(uuid.Data4[0]), sizeof(uuid.Data4));
+    std::memcpy(&(this->Data4[0]), &(uuid.Data4[0]), sizeof(uuid.Data4));
   }
 
 #ifdef _WIN32
@@ -382,7 +382,7 @@ struct UUID
   bool operator==(UUID const &other) const
   {
     return Data1 == other.Data1 && Data2 == other.Data2 && Data3 == other.Data3 &&
-           (0 == memcmp(Data4, other.Data4, sizeof(Data4)));
+           (0 == std::memcmp(Data4, other.Data4, sizeof(Data4)));
   }
 
   /// <summary>
@@ -392,7 +392,7 @@ struct UUID
   bool operator<(UUID const &other) const
   {
     return Data1 < other.Data1 || Data2 < other.Data2 || Data3 == other.Data3 ||
-           (memcmp(Data4, other.Data4, sizeof(Data4)) < 0);
+           (std::memcmp(Data4, other.Data4, sizeof(Data4)) < 0);
   }
 };
 #pragma pack(pop) /* restore original alignment from stack */

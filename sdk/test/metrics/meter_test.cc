@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>
-#include <stdint.h>
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <initializer_list>  // IWYU pragma: keep
 #include <iostream>
 #include <string>
@@ -109,7 +109,7 @@ public:
     if (LogLevel::Warning == level)
     {
       std::cout << msg << "\n";
-      warnings.push_back(msg);
+      warnings.emplace_back(msg);
     }
   }
 

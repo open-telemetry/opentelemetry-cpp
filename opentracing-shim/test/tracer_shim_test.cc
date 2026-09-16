@@ -4,7 +4,7 @@
  */
 
 #include <gtest/gtest.h>
-#include <stdint.h>
+#include <cstdint>
 #include <iostream>
 #include <string>
 #include <system_error>

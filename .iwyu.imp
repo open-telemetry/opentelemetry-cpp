@@ -8,8 +8,8 @@
   { "include": ["<bits/chrono.h>", "private", "<chrono>", "public"] },
   { "include": ["<bits/std_abs.h>", "private", "<cstdlib>", "public"] },
   { "include": ["<ext/alloc_traits.h>", "private", "<memory>", "public"] },
-  { "include": ["<bits/types/struct_tm.h>", "private", "<time.h>", "public"] },
-  { "include": ["<bits/types/struct_FILE.h>", "private", "<stdio.h>", "public"] },
+  { "include": ["<bits/types/struct_tm.h>", "private", "<ctime>", "public"] },
+  { "include": ["<bits/types/struct_FILE.h>", "private", "<cstdio>", "public"] },
 
   # Work around for ryml
   { "include": ["<c4/std/string.hpp>", "private", "<ryml_std.hpp>", "public"] },

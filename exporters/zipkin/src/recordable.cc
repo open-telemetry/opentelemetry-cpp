@@ -1,8 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <stdint.h>
 #include <chrono>
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 
@@ -214,6 +214,10 @@ void Recordable::SetStatus(trace::StatusCode code, nostd::string_view descriptio
     if (code == trace::StatusCode::kError)
     {
       span_["tags"]["error"] = description;
+    }
+    else
+    {
+      span_["tags"].erase("error");
     }
   }
 }

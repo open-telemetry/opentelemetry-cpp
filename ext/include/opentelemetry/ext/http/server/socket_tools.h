@@ -8,6 +8,7 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -59,11 +60,11 @@
 // Log to console if there's no standard log facility defined
 #  include <cstdio>
 #  ifndef LOG_DEBUG
-#    define LOG_DEBUG(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_TRACE(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_INFO(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_WARN(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_ERROR(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_DEBUG(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_TRACE(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_INFO(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_WARN(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_ERROR(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
 #  endif
 #endif
 
@@ -174,11 +175,11 @@ struct SocketAddr
   /// <returns>SocketAddr</returns>
   SocketAddr() {}
 
-  SocketAddr(u_long addr, int port)
+  SocketAddr(u_long addr, uint16_t port)
   {
     sockaddr_in &inet4    = reinterpret_cast<sockaddr_in &>(m_data);
     inet4.sin_family      = AF_INET;
-    inet4.sin_port        = htons(static_cast<uint16_t>(port));
+    inet4.sin_port        = htons(port);
     inet4.sin_addr.s_addr = htonl(addr);
   }
 
@@ -202,8 +203,8 @@ struct SocketAddr
     sockaddr_in parsed{};
     parsed.sin_family = AF_INET;
 
-    char const *colon          = strchr(addr, ':');
-    char const *hostEnd        = colon ? colon : addr + strlen(addr);
+    char const *colon          = std::strchr(addr, ':');
+    char const *hostEnd        = colon ? colon : addr + std::strlen(addr);
     ptrdiff_t const hostLength = hostEnd - addr;
 
     // Reject a host that would not fit rather than truncating it into a different valid address
@@ -213,7 +214,7 @@ struct SocketAddr
     if (ok)
     {
       char host[16];
-      memcpy(host, addr, static_cast<size_t>(hostLength));
+      std::memcpy(host, addr, static_cast<size_t>(hostLength));
       host[hostLength] = '\0';
       ok               = (::inet_pton(AF_INET, host, &parsed.sin_addr) == 1);
     }
@@ -222,8 +223,8 @@ struct SocketAddr
     // accept a leading sign or whitespace and depend on the locale.
     if (ok && colon)
     {
-      char const *p     = colon + 1;
-      unsigned int port = 0;
+      char const *p = colon + 1;
+      uint16_t port = 0;
       if (*p == '\0')
       {
         ok = false;  // empty port, e.g. "127.0.0.1:"
@@ -235,7 +236,7 @@ struct SocketAddr
           ok = false;
           break;
         }
-        unsigned int const digit = static_cast<unsigned int>(*p - '0');
+        const uint16_t digit = static_cast<uint16_t>(*p - '0');
         if (port > (65535u - digit) / 10u)
         {
           ok = false;  // would exceed 65535
@@ -246,13 +247,13 @@ struct SocketAddr
       }
       if (ok)
       {
-        parsed.sin_port = htons(static_cast<uint16_t>(port));
+        parsed.sin_port = htons(port);
       }
     }
 
     if (ok)
     {
-      memcpy(&m_data, &parsed, sizeof(parsed));
+      std::memcpy(&m_data, &parsed, sizeof(parsed));
     }
     else
     {
@@ -275,7 +276,7 @@ struct SocketAddr
         // Copy out rather than binding a sockaddr_in glvalue to sockaddr storage, which is an
         // alignment/type-access issue (see the constructor and #4307).
         sockaddr_in inet4{};
-        memcpy(&inet4, &m_data, sizeof(inet4));
+        std::memcpy(&inet4, &m_data, sizeof(inet4));
         return ntohs(inet4.sin_port);
       }
 
@@ -292,7 +293,7 @@ struct SocketAddr
     {
       case AF_INET: {
         sockaddr_in inet4{};
-        memcpy(&inet4, &m_data, sizeof(inet4));
+        std::memcpy(&inet4, &m_data, sizeof(inet4));
         u_long addr = ntohl(inet4.sin_addr.s_addr);
         os << (addr >> 24) << '.' << ((addr >> 16) & 255) << '.' << ((addr >> 8) & 255) << '.'
            << (addr & 255);
@@ -325,10 +326,10 @@ static_assert(sizeof(SocketAddr) == sizeof(sockaddr),
 struct Socket
 {
 #ifdef _WIN32
-  typedef SOCKET Type;
+  using Type                = SOCKET;
   static Type const Invalid = INVALID_SOCKET;
 #else
-  typedef int Type;
+  using Type                = int;
   static Type const Invalid = -1;
 #endif
 
@@ -464,7 +465,7 @@ struct Socket
 #endif
   }
 
-  enum  // NOLINT(performance-enum-size)
+  enum  // NOLINT(performance-enum-size,cppcoreguidelines-use-enum-class)
   {
 #ifdef _WIN32
     ErrorWouldBlock = WSAEWOULDBLOCK
@@ -473,7 +474,7 @@ struct Socket
 #endif
   };
 
-  enum  // NOLINT(performance-enum-size)
+  enum  // NOLINT(performance-enum-size,cppcoreguidelines-use-enum-class)
   {
 #ifdef _WIN32
     ShutdownReceive = SD_RECEIVE,
@@ -526,7 +527,7 @@ struct Reactor : protected common::Thread
   /// <summary>
   /// Socket State
   /// </summary>
-  enum State : std::uint8_t
+  enum State : std::uint8_t  // NOLINT(cppcoreguidelines-use-enum-class)
   {
     Readable   = 1,
     Writable   = 2,
@@ -625,7 +626,7 @@ public:
         EV_SET(&event, event.ident, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
         kevent(kq, &event, 1, NULL, 0, NULL);
 #endif
-        m_sockets.push_back(SocketData());
+        m_sockets.emplace_back();
         m_sockets.back().socket = socket;
         m_sockets.back().flags  = 0;
         it                      = m_sockets.end() - 1;

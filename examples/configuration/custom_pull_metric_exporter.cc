@@ -10,23 +10,23 @@ opentelemetry::sdk::metrics::AggregationTemporality
 CustomPullMetricExporter::GetAggregationTemporality(
     opentelemetry::sdk::metrics::InstrumentType /* instrument_type */) const noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomPullMetricExporter::GetAggregationTemporality(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_INFO("CustomPullMetricExporter::GetAggregationTemporality(): YOUR CODE HERE");
   return opentelemetry::sdk::metrics::AggregationTemporality::kCumulative;
 }
 
 bool CustomPullMetricExporter::OnForceFlush(std::chrono::microseconds /* timeout */) noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomPullMetricExporter::OnForceFlush(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_INFO("CustomPullMetricExporter::OnForceFlush(): YOUR CODE HERE");
   return true;
 }
 
 bool CustomPullMetricExporter::OnShutDown(std::chrono::microseconds /* timeout */) noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomPullMetricExporter::OnShutDown(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_INFO("CustomPullMetricExporter::OnShutDown(): YOUR CODE HERE");
   return true;
 }
 
 void CustomPullMetricExporter::OnInitialized() noexcept
 {
-  OTEL_INTERNAL_LOG_ERROR("CustomPullMetricExporter::OnInitialized(): YOUR CODE HERE");
+  OTEL_INTERNAL_LOG_INFO("CustomPullMetricExporter::OnInitialized(): YOUR CODE HERE");
 }

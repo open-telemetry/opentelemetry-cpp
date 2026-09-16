@@ -20,7 +20,7 @@
 #include "opentelemetry/trace/tracer.h"
 #include "tracer_common.h"
 
-#include <stdint.h>
+#include <cstdint>
 #include <cstdlib>
 #include <map>
 #include <string>
@@ -71,7 +71,7 @@ void sendRequest(const std::string &url)
     span->SetAttribute(semconv::http::kHttpResponseStatusCode, status_code);
     result.GetResponse().ForEachHeader(
         [&span](nostd::string_view header_name, nostd::string_view header_value) {
-          span->SetAttribute("http.header." + std::string(header_name.data()), header_value);
+          span->SetAttribute("http.header." + std::string(header_name), header_value);
           return true;
         });
 
