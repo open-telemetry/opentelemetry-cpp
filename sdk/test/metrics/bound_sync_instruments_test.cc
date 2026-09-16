@@ -6,6 +6,7 @@
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
 
 #  include <gtest/gtest.h>
+#  include <atomic>
 #  include <chrono>
 #  include <cstddef>
 #  include <cstdint>
@@ -13,6 +14,7 @@
 #  include <map>
 #  include <memory>
 #  include <string>
+#  include <thread>
 #  include <utility>
 #  include <vector>
 
@@ -1119,7 +1121,7 @@ TEST(BoundSyncInstruments, RetainedBoundEntriesCountAfterDeltaCollect)
   b1->RecordLong(1);
   b2->RecordLong(1);
 
-  // Delta collect resets attributes_hashmap_ but retains bound_entries_.
+  // Delta collect releases unbound entries but retains user-held bound entries.
   EXPECT_EQ(CollectAndCountPoints(*holder, AggregationTemporality::kDelta), 2u);
 
   // New unbound key now must overflow because bound entries still count.
@@ -1313,9 +1315,9 @@ TEST(BoundSyncInstruments, DirtyDroppedBoundEntriesReleaseCardinality)
   EXPECT_FALSE(HasOverflowPoint(*holder, AggregationTemporality::kDelta));
 }
 
-// Regression for M2: ResolveCardinality must mirror
+// Cardinality resolution must mirror
 // AttributesHashMap::IsOverflowAttributes() exactly. When the overflow slot
-// is already counted in active_keys_ but room remains under the limit, a
+// already exists but room remains under the non-overflow limit, a
 // fresh real key must still be admitted, not routed to overflow.
 TEST(BoundSyncInstruments, OverflowParityAllowsFillingRemainingSlot)
 {
@@ -1336,7 +1338,7 @@ TEST(BoundSyncInstruments, OverflowParityAllowsFillingRemainingSlot)
   bov->RecordLong(100);
 
   // Drop k1 only. After Collect(), the M1 cleanup releases its slot, leaving
-  // active_keys_ = { k2, k3, overflow }. With limit=3, the existing
+  // Retained keys = { k2, k3, overflow }. With limit=3, the existing
   // AttributesHashMap semantics admit one more real key.
   b1.reset();
   EXPECT_EQ(CollectAndCountPoints(*holder, AggregationTemporality::kDelta), 4u);
@@ -1373,6 +1375,185 @@ TEST(BoundSyncInstruments, OverflowParityAllowsFillingRemainingSlot)
   EXPECT_TRUE(a5_seen);
   EXPECT_EQ(a5_value, 42);
   EXPECT_FALSE(overflow_seen);
+}
+
+namespace
+{
+template <class Gauge, class T>
+void CheckMixedGaugeOrder(InstrumentValueType value_type,
+                          const M &bound_attributes,
+                          const M &ordinary_attributes,
+                          std::shared_ptr<const AttributesProcessor> processor,
+                          bool overflow = false)
+{
+  InstrumentDescriptor desc{"gauge", "", "", InstrumentType::kGauge, value_type};
+  AggregationConfig cfg(overflow ? 1 : 2000);
+  auto storage = std::unique_ptr<SyncMetricStorage>(new SyncMetricStorage(
+      desc, AggregationType::kLastValue, std::move(processor),
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  auto *storage_ptr = storage.get();
+  Gauge gauge(desc, std::move(storage));
+  auto keeper = overflow ? gauge.Bind({{"reserved", "slot"}}) : nullptr;
+  const KeyValueIterableView<M> view(ordinary_attributes);
+  // Binding must reuse data recorded before the first bound handle existed.
+  gauge.Record(T(10), view);
+  auto bound     = gauge.Bind(bound_attributes);
+  auto collector = std::make_shared<MockCollectorHandle>(AggregationTemporality::kDelta);
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+  auto collect = [&] {
+    std::vector<T> values;
+    storage_ptr->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
+                         std::chrono::system_clock::now(), [&](const MetricData &md) {
+                           for (const auto &point : md.point_data_attr_)
+                           {
+                             const auto &last =
+                                 opentelemetry::nostd::get<LastValuePointData>(point.point_data);
+                             EXPECT_TRUE(last.is_lastvalue_valid_);
+                             values.push_back(opentelemetry::nostd::get<T>(last.value_));
+                             if (overflow)
+                             {
+                               EXPECT_EQ(point.attributes, GetOverflowAttributes());
+                             }
+                           }
+                           return true;
+                         });
+    return values;
+  };
+  EXPECT_EQ(collect(), std::vector<T>{T(10)});
+  for (int i = 0; i < 1000; ++i)
+  {
+    // Prewarm the ordinary path, then exercise both sequential recording orders.
+    // Rapid writes also exercise equal clock ticks on platforms with coarse clocks.
+    gauge.Record(T(0), view);
+    bound->Record(T(1));
+    gauge.Record(T(2), view);
+    ASSERT_EQ(collect(), std::vector<T>{T(2)}) << "iteration " << i;
+    gauge.Record(T(3), view);
+    bound->Record(T(4));
+    ASSERT_EQ(collect(), std::vector<T>{T(4)}) << "iteration " << i;
+  }
+  EXPECT_TRUE(collect().empty());
+  bound.reset();
+  gauge.Record(T(5), view);
+  EXPECT_EQ(collect(), std::vector<T>{T(5)});
+}
+}  // namespace
+
+TEST(BoundSyncInstruments, MixedLongGaugeRecordingOrder)
+{
+  auto processor = std::make_shared<DefaultAttributesProcessor>();
+  CheckMixedGaugeOrder<LongGauge, int64_t>(InstrumentValueType::kLong, {}, {}, processor);
+  const M attrs{{"key", "value"}};
+  CheckMixedGaugeOrder<LongGauge, int64_t>(InstrumentValueType::kLong, attrs, attrs, processor);
+}
+
+TEST(BoundSyncInstruments, MixedDoubleGaugeRecordingOrder)
+{
+  auto processor = std::make_shared<DefaultAttributesProcessor>();
+  CheckMixedGaugeOrder<DoubleGauge, double>(InstrumentValueType::kDouble, {}, {}, processor);
+  const M attrs{{"key", "value"}};
+  CheckMixedGaugeOrder<DoubleGauge, double>(InstrumentValueType::kDouble, attrs, attrs, processor);
+}
+
+TEST(BoundSyncInstruments, MixedGaugeRecordingOrderAfterFiltering)
+{
+  auto processor =
+      std::make_shared<FilteringAttributesProcessor>(FilterAttributeMap{{"keep", true}});
+  CheckMixedGaugeOrder<LongGauge, int64_t>(InstrumentValueType::kLong,
+                                           {{"keep", "same"}, {"drop", "bound"}},
+                                           {{"keep", "same"}, {"drop", "ordinary"}}, processor);
+}
+
+TEST(BoundSyncInstruments, MixedGaugeRecordingOrderAtOverflow)
+{
+  CheckMixedGaugeOrder<LongGauge, int64_t>(InstrumentValueType::kLong, {{"key", "bound"}},
+                                           {{"key", "ordinary"}},
+                                           std::make_shared<DefaultAttributesProcessor>(), true);
+}
+
+TEST(BoundSyncInstruments, ConcurrentMixedWritesAndCollectionDoNotLoseMeasurements)
+{
+  StorageHolder holder(InstrumentType::kCounter, InstrumentValueType::kLong);
+  const M attrs{{"key", "value"}};
+  const KeyValueIterableView<M> view(attrs);
+  auto bound = holder->Bind(view);
+  std::atomic<bool> start{false};
+  std::atomic<int> finished{0};
+  std::thread bound_writer([&] {
+    while (!start.load(std::memory_order_acquire))
+    {
+      std::this_thread::yield();
+    }
+    for (int i = 0; i < 10000; ++i)
+    {
+      bound->RecordLong(1);
+    }
+    finished.fetch_add(1, std::memory_order_release);
+  });
+  std::thread ordinary_writer([&] {
+    while (!start.load(std::memory_order_acquire))
+    {
+      std::this_thread::yield();
+    }
+    for (int i = 0; i < 10000; ++i)
+    {
+      holder->RecordLong(1, view, {});
+    }
+    finished.fetch_add(1, std::memory_order_release);
+  });
+  start.store(true, std::memory_order_release);
+  int64_t total = 0;
+  while (finished.load(std::memory_order_acquire) != 2)
+  {
+    total += SumLongFor(*holder, AggregationTemporality::kDelta, attrs);
+  }
+  bound_writer.join();
+  ordinary_writer.join();
+  total += SumLongFor(*holder, AggregationTemporality::kDelta, attrs);
+  EXPECT_EQ(total, 20000);
+}
+
+TEST(BoundSyncInstruments, MixedCounterLastValueRecordingOrder)
+{
+  InstrumentDescriptor desc{"counter", "", "", InstrumentType::kCounter,
+                            InstrumentValueType::kLong};
+  auto processor = std::make_shared<DefaultAttributesProcessor>();
+  AggregationConfig cfg;
+  auto storage = std::unique_ptr<SyncMetricStorage>(new SyncMetricStorage(
+      desc, AggregationType::kLastValue, processor,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  auto *storage_ptr = storage.get();
+  LongCounter counter(desc, std::move(storage));
+  auto bound     = counter.Bind({});
+  auto collector = std::make_shared<MockCollectorHandle>(AggregationTemporality::kDelta);
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+  for (int i = 0; i < 1000; ++i)
+  {
+    counter.Add(0);
+    bound->Add(1);
+    counter.Add(2);
+    bool seen = false;
+    storage_ptr->Collect(collector.get(), collectors, std::chrono::system_clock::now(),
+                         std::chrono::system_clock::now(), [&](const MetricData &md) {
+                           EXPECT_EQ(md.point_data_attr_.size(), 1u);
+                           if (md.point_data_attr_.size() != 1u)
+                           {
+                             return false;
+                           }
+                           const auto &last = opentelemetry::nostd::get<LastValuePointData>(
+                               md.point_data_attr_[0].point_data);
+                           EXPECT_EQ(opentelemetry::nostd::get<int64_t>(last.value_), 2);
+                           seen = true;
+                           return true;
+                         });
+    ASSERT_TRUE(seen);
+  }
 }
 
 #endif  // OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW

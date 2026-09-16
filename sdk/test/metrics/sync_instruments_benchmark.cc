@@ -204,12 +204,14 @@
 // clang-format on
 
 #include <benchmark/benchmark.h>
-
+#include <atomic>
 #include <chrono>
 #include <cstdlib>
 #include <map>
+#include <memory>
 #include <random>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -334,6 +336,7 @@ static std::vector<AttributeMap> MakeAttributeSets(std::size_t cardinality)
 struct BenchmarkProvider
 {
   std::shared_ptr<metrics_sdk::MeterProvider> sdk_meter_provider;
+  std::shared_ptr<MockMetricExporter> exporter;
   opentelemetry::nostd::shared_ptr<opentelemetry::metrics::Meter> meter;
 
   BenchmarkProvider(bool meter_enabled = true)
@@ -351,7 +354,8 @@ struct BenchmarkProvider
 
     sdk_meter_provider = std::make_shared<metrics_sdk::MeterProvider>(
         std::move(view_registry), resource, std::move(meter_configurator));
-    sdk_meter_provider->AddMetricReader(std::make_shared<MockMetricExporter>());
+    exporter = std::make_shared<MockMetricExporter>();
+    sdk_meter_provider->AddMetricReader(exporter);
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     sdk_meter_provider->SetExemplarFilter(metrics_sdk::ExemplarFilterType::kAlwaysOff);
 #endif
@@ -1067,6 +1071,162 @@ void BM_Record_BoundHistogram_Base2Expo_ByThreads(benchmark::State &state)
 }
 BENCHMARK(BM_Record_BoundHistogram_Base2Expo_ByThreads)
     ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
+
+// One instance per benchmark invocation, shared only by that invocation's threads.
+// All attributes and handles are prepared before the timing loop starts.
+class GaugeRecordingBenchmark
+{
+public:
+  GaugeRecordingBenchmark(int mode, std::size_t series_count, bool collect)
+      : gauge(provider.meter->CreateDoubleGauge("shared_entry_gauge")),
+        attributes(MakeAttributeSets(series_count)),
+        views(attributes.begin(), attributes.end())
+  {
+    for (const auto &view : views)
+    {
+      if (mode != 0)
+      {
+        bounds.push_back(gauge->Bind(view));
+      }
+      gauge->Record(0.0, view);
+    }
+    if (collect)
+    {
+      collector = std::thread([this] {
+        while (!stop.load(std::memory_order_relaxed))
+        {
+          provider.exporter->Collect([](metrics_sdk::ResourceMetrics &) { return true; });
+          // Fixed idle time between collections, not a fixed collection frequency.
+          std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+      });
+    }
+  }
+
+  ~GaugeRecordingBenchmark()
+  {
+    stop.store(true, std::memory_order_relaxed);
+    if (collector.joinable())
+    {
+      collector.join();
+    }
+  }
+
+  BenchmarkProvider provider;
+  opentelemetry::nostd::unique_ptr<opentelemetry::metrics::Gauge<double>> gauge;
+  std::vector<AttributeMap> attributes;
+  std::vector<AttributesView> views;
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundGauge<double>>> bounds;
+
+private:
+  std::atomic<bool> stop{false};
+  std::thread collector;
+};
+
+// Mode 0: unbound only, 1: bound only, 2: alternating bound/unbound.
+// Args: distinct series per thread, concurrent collection, series per writer.
+template <int Mode>
+void BM_Record_Gauge_SharedEntry(benchmark::State &state)
+{
+  static std::unique_ptr<GaugeRecordingBenchmark> fixture;
+  const auto series_per_writer = static_cast<std::size_t>(state.range(2));
+  const auto offset            = state.range(0) ? state.thread_index() * series_per_writer : 0;
+  if (state.thread_index() == 0)
+  {
+    const auto total_series = series_per_writer * (state.range(0) ? state.threads() : 1);
+    fixture = std::make_unique<GaugeRecordingBenchmark>(Mode, total_series, state.range(1) != 0);
+  }
+  std::size_t index = 0;
+  // Google Benchmark synchronizes all threads at loop entry and exit. No other
+  // thread accesses fixture before entry or after exit, so thread 0 can safely
+  // construct/reset it without keeping state across arguments or repetitions.
+  for (auto _ : state)
+  {
+    const auto current = offset + index;
+    if (++index == series_per_writer)
+    {
+      index = 0;
+    }
+    if (Mode != 0)
+    {
+      fixture->bounds[current]->Record(1.0);
+    }
+    if (Mode != 1)
+    {
+      fixture->gauge->Record(2.0, fixture->views[current]);
+    }
+  }
+  if (state.thread_index() == 0)
+  {
+    fixture.reset();
+  }
+  state.SetItemsProcessed(state.iterations() * (Mode == 2 ? 2 : 1));
+}
+BENCHMARK_TEMPLATE(BM_Record_Gauge_SharedEntry, 0)
+    ->Args({0, 0, 1})
+    ->Args({1, 0, 1})
+    ->Args({0, 1, 1})
+    ->Args({0, 0, 1000})
+    ->Args({0, 1, 1000})
+    ->Threads(1)
+    ->Threads(4)
+    ->UseRealTime();
+BENCHMARK_TEMPLATE(BM_Record_Gauge_SharedEntry, 1)
+    ->Args({0, 0, 1})
+    ->Args({1, 0, 1})
+    ->Args({0, 1, 1})
+    ->Args({0, 0, 1000})
+    ->Args({0, 1, 1000})
+    ->Threads(1)
+    ->Threads(4)
+    ->UseRealTime();
+BENCHMARK_TEMPLATE(BM_Record_Gauge_SharedEntry, 2)
+    ->Args({0, 0, 1})
+    ->Args({1, 0, 1})
+    ->Args({0, 1, 1})
+    ->Args({0, 0, 1000})
+    ->Args({0, 1, 1000})
+    ->Threads(1)
+    ->Threads(4)
+    ->UseRealTime();
+
+// Complete record-and-collect cycles, including aggregation allocation and export.
+template <int Mode>
+void BM_Collect_Gauge_SharedEntry(benchmark::State &state)
+{
+  BenchmarkProvider provider;
+  auto gauge            = provider.meter->CreateDoubleGauge("collect_shared_entry_gauge");
+  const auto attributes = MakeAttributeSets(state.range(0));
+  std::vector<opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundGauge<double>>> bounds;
+  if (Mode != 0)
+  {
+    for (const auto &attrs : attributes)
+    {
+      bounds.push_back(gauge->Bind(AttributesView(attrs)));
+    }
+  }
+  for (auto _ : state)
+  {
+    for (std::size_t i = 0; i < attributes.size(); ++i)
+    {
+      if (Mode != 0)
+      {
+        bounds[i]->Record(1.0);
+      }
+      if (Mode != 1)
+      {
+        gauge->Record(2.0, AttributesView(attributes[i]));
+      }
+    }
+    provider.exporter->Collect([](metrics_sdk::ResourceMetrics &data) {
+      benchmark::DoNotOptimize(data);
+      return true;
+    });
+  }
+}
+BENCHMARK_TEMPLATE(BM_Collect_Gauge_SharedEntry, 0)->Arg(1)->Arg(1000)->UseRealTime();
+BENCHMARK_TEMPLATE(BM_Collect_Gauge_SharedEntry, 1)->Arg(1)->Arg(1000)->UseRealTime();
+BENCHMARK_TEMPLATE(BM_Collect_Gauge_SharedEntry, 2)->Arg(1)->Arg(1000)->UseRealTime();
 
 #endif  // OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
 
