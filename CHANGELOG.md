@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXAMPLES] Fix random attribute selection in metrics foo example to include
+  all key-value pairs
+  [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
 * [SDK] Fix span-limit environment variable handling compilation on 32-bit
   platforms (#4573)
   [#4573](https://github.com/open-telemetry/opentelemetry-cpp/pull/4573)
