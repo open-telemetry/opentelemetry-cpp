@@ -32,7 +32,7 @@ Refer to the [ABI Policy](./docs/abi-policy.md) for more details. To summarise:
   required by the specification would be released. All these components are
   always versioned and released together. For example, any changes in one of the
   exporter would result in version update of the entire source package even
-  though there is no changes in API, SDK and other exporters.
+  though there are no changes in API, SDK and other exporters.
 * Experimental releases: New (unstable) telemetry signals and features will be
   introduced behind feature flag protected by a preprocessor macro.
 
