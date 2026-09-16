@@ -21,6 +21,18 @@ Increment the:
 * [API] Remove regex from trace_state.h
   [#4570](https://github.com/open-telemetry/opentelemetry-cpp/pull/4570)
 
+* [EXPORTER] Fix the Elasticsearch log exporter's synchronous export path
+  waiting with no deadline of its own, trusting an injected `HttpClient` to
+  always eventually deliver a terminal event. A client that accepts a
+  request and never calls back (a dead thread, a reused socket, a swallowed
+  error) left `Export()` blocked for the life of the process. The wait now
+  has its own deadline derived from the configured response timeout, so a
+  non-responding client fails the export instead of hanging it.
+  [#4362](https://github.com/open-telemetry/opentelemetry-cpp/issues/4362)
+
+* [DOC] Fix and clarify the `StartSpanOptions` documentation
+  [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
