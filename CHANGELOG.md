@@ -21,6 +21,12 @@ Increment the:
 * [API] Remove regex from trace_state.h
   [#4570](https://github.com/open-telemetry/opentelemetry-cpp/pull/4570)
 
+* [SDK] Add a missing `<cstdint>` include to `predicate_factory.h`, which
+  uses `uint8_t` without including the header that declares it. This relied
+  on a transitive include from elsewhere in the translation unit and failed
+  to compile standalone on newer standard library implementations.
+  [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
