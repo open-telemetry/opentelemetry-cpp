@@ -21,6 +21,16 @@ Increment the:
 * [API] Remove regex from trace_state.h
   [#4570](https://github.com/open-telemetry/opentelemetry-cpp/pull/4570)
 
+* [LOGS] `LogRecordProcessor::OnEmit()` is now always called with the log
+  record's resolved context (explicit if the caller supplied one, otherwise
+  ambient), via a new `OnEmitWithContext()` method processors can override.
+  `Logger::EmitLogRecord(args...)` no longer silently loses an explicitly
+  supplied context on its way to the processor.
+  [#4421](https://github.com/open-telemetry/opentelemetry-cpp/pull/4421)
+
+* [DOC] Fix and clarify the `StartSpanOptions` documentation
+  [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
@@ -561,6 +571,16 @@ Important changes:
 
 Breaking changes:
 
+* [LOGS] `logs::Logger` and `sdk::logs::LogRecordProcessor` each gained a new
+  virtual method (`EmitLogRecordWithContext()` and `OnEmitWithContext()`
+  respectively).
+  [#4421](https://github.com/open-telemetry/opentelemetry-cpp/pull/4421)
+  * Source compatible: both have default implementations that forward to the
+    existing `EmitLogRecord()`/`OnEmit()`, so existing subclasses continue to
+    compile and behave as before.
+  * Not ABI compatible: the added virtuals change the vtable layout of both
+    classes, so code that subclasses either must be recompiled against this
+    version of the SDK.
 * [CONFIGURATION] Align declarative configuration schema defaults with
   OpenTelemetry Configuration Schema v1.1.0
   [#4432](https://github.com/open-telemetry/opentelemetry-cpp/issues/4432)
