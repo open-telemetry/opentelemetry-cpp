@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] Extend preview bound instruments to UpDownCounter and Gauge
+  [#4321](https://github.com/open-telemetry/opentelemetry-cpp/pull/4321)
+
 * [SDK] Fix span-limit environment variable handling compilation on 32-bit
   platforms (#4573)
   [#4573](https://github.com/open-telemetry/opentelemetry-cpp/pull/4573)
