@@ -91,6 +91,33 @@ add_test(NAME full-package-run-test
 # -----------------------------------------------------------
 
 # -----------------------------------------------------------
+# Pkg-config consumer test (compile/link/run against installed .pc files)
+find_package(PkgConfig QUIET)
+if(PKG_CONFIG_FOUND)
+  add_test(
+    NAME pkgconfig-test-config-test
+    COMMAND
+      ${CMAKE_COMMAND} --log-level=DEBUG -S ${CMAKE_SOURCE_DIR}/pkgconfig_test
+      -B build-pkgconfig-test "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+      ${INSTALL_TEST_CMAKE_OPTIONS}
+      "-DINSTALL_TEST_COMPONENTS=${INSTALL_TEST_COMPONENTS}"
+      "-DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR}")
+
+  set_tests_properties(
+    pkgconfig-test-config-test
+    PROPERTIES ENVIRONMENT "PKG_CONFIG_PATH=${CMAKE_PREFIX_PATH}/lib/pkgconfig")
+
+  add_test(NAME pkgconfig-test-build-test
+           COMMAND ${CMAKE_COMMAND} --build
+                   ${CMAKE_BINARY_DIR}/build-pkgconfig-test --parallel)
+
+  add_test(NAME pkgconfig-test-run-test
+           COMMAND ${CMAKE_BINARY_DIR}/build-pkgconfig-test/full_pkgconfig_test)
+else()
+  message(STATUS "PkgConfig not found; skipping pkg-config install tests")
+endif()
+
+# -----------------------------------------------------------
 # Loop over all the components to test
 foreach(component ${INSTALL_TEST_COMPONENTS})
   # Test cmake configuration
