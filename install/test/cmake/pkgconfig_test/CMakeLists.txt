@@ -46,9 +46,9 @@ message(
 
 pkg_check_modules(OTEL_PKGCONFIG REQUIRED ${_pkgconfig_modules})
 
-+# CMake 3.16 has no STATIC keyword on pkg_check_modules(), but it also queries
-+# pkg-config --static and exposes the results as <prefix>_STATIC_*. Install
-+# tests pass BUILD_SHARED_LIBS through INSTALL_TEST_CMAKE_OPTIONS.
+# CMake 3.16 has no STATIC keyword on pkg_check_modules(), but it also queries
+# pkg-config --static and exposes the results as <prefix>_STATIC_*. Install
+# tests pass BUILD_SHARED_LIBS through INSTALL_TEST_CMAKE_OPTIONS.
 if(BUILD_SHARED_LIBS)
   set(_otel_pkgconfig_include_dirs ${OTEL_PKGCONFIG_INCLUDE_DIRS})
   set(_otel_pkgconfig_cflags_other ${OTEL_PKGCONFIG_CFLAGS_OTHER})
