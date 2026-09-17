@@ -10,6 +10,15 @@ gtest_add_tests(
   TEST_PREFIX config.
   TEST_LIST registry_test)
 
+add_executable(sdk_builder_test sdk_builder_test.cc)
+target_link_libraries(
+  sdk_builder_test PRIVATE ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
+                           opentelemetry_configuration_core)
+gtest_add_tests(
+  TARGET sdk_builder_test
+  TEST_PREFIX config.
+  TEST_LIST sdk_builder_test)
+
 add_executable(trace_builders_test trace_builders_test.cc)
 target_link_libraries(
   trace_builders_test
@@ -53,8 +62,7 @@ gtest_add_tests(
   TEST_PREFIX config.
   TEST_LIST propagator_builders_test)
 
-foreach(testname sdk_builder_test configured_sdk_test
-                 programmatic_configuration_test)
+foreach(testname configured_sdk_test programmatic_configuration_test)
   add_executable(${testname} "${testname}.cc")
   target_link_libraries(
     ${testname} PRIVATE ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
@@ -64,8 +72,6 @@ foreach(testname sdk_builder_test configured_sdk_test
     TEST_PREFIX config.
     TEST_LIST ${testname})
 endforeach()
-
-target_link_libraries(sdk_builder_test PRIVATE opentelemetry_test_common)
 
 if(WITH_CONFIGURATION)
   foreach(

@@ -31,6 +31,7 @@
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/logs_builder_utils.h"
 #include "opentelemetry/sdk/configuration/logs_builders.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h"
@@ -39,7 +40,6 @@
 #include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_http_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
-#include "opentelemetry/sdk/configuration/sdk_builder.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_configuration.h"
@@ -80,21 +80,18 @@ protected:
   std::unique_ptr<logs_sdk::LogRecordProcessor> MakeLogRecordProcessor(
       std::unique_ptr<config_sdk::LogRecordProcessorConfiguration> model)
   {
-    config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateLogRecordProcessor(model);
+    return config_sdk::LogsBuilderUtils::CreateLogRecordProcessor(registry_.get(), model);
   }
 
   std::unique_ptr<logs_sdk::LogRecordExporter> MakeLogRecordExporter(
       std::unique_ptr<config_sdk::LogRecordExporterConfiguration> model)
   {
-    config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateLogRecordExporter(model);
+    return config_sdk::LogsBuilderUtils::CreateLogRecordExporter(registry_.get(), model);
   }
 
   auto MakeLoggerConfigurator(std::unique_ptr<config_sdk::LoggerConfiguratorConfiguration> model)
   {
-    config_sdk::SdkBuilder builder(registry_);
-    return builder.CreateLoggerConfigurator(model);
+    return config_sdk::LogsBuilderUtils::CreateLoggerConfigurator(registry_.get(), model);
   }
 
   std::shared_ptr<config_sdk::Registry> registry_;
