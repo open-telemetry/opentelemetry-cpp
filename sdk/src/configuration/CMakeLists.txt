@@ -176,10 +176,20 @@ if(OTELCPP_WITH_CONFIGURATION)
               opentelemetry_configuration_logs_builders)
 
   if(OPENTELEMETRY_INSTALL)
-    opentelemetry_add_pkgconfig(
-      configuration_yaml "OpenTelemetry SDK - Configuration YAML"
-      "YAML configuration parser for the OpenTelemetry SDK."
-      "opentelemetry_configuration_core" EXTRA_LIBS ryml)
+    # find_package: use the third-party module (Conan PkgConfigDeps names
+    # rapidyaml/0.9.0 "rapidyaml", not "ryml"). fetch_repository: RYML_INSTALL
+    # puts libryml (c4core embedded) in the OTel prefix, so -lryml is enough.
+    if(ryml_PROVIDER STREQUAL "find_package")
+      opentelemetry_add_pkgconfig(
+        configuration_yaml "OpenTelemetry SDK - Configuration YAML"
+        "YAML configuration parser for the OpenTelemetry SDK."
+        "opentelemetry_configuration_core rapidyaml")
+    else()
+      opentelemetry_add_pkgconfig(
+        configuration_yaml "OpenTelemetry SDK - Configuration YAML"
+        "YAML configuration parser for the OpenTelemetry SDK."
+        "opentelemetry_configuration_core" EXTRA_LIBS ryml)
+    endif()
 
     opentelemetry_add_pkgconfig(
       configuration
