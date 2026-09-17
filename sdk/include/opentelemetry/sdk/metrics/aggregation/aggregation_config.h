@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <vector>
 #include <cstdint>
+#include <vector>
 
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
