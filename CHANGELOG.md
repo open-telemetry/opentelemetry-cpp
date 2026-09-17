@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXAMPLES] Fix random attribute selection in metrics foo example to include
+  all key-value pairs
+  [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
 * [SDK] Fix span-limit environment variable handling compilation on 32-bit
   platforms (#4573)
   [#4573](https://github.com/open-telemetry/opentelemetry-cpp/pull/4573)
@@ -24,6 +27,11 @@ Increment the:
 * [SDK] Avoid throwing from `Resource::Create` when `process.executable.name`
   has a non-string value and `service.name` is not set.
   [#4535](https://github.com/open-telemetry/opentelemetry-cpp/issues/4535)
+* [SDK] Add a missing `<cstdint>` include to `predicate_factory.h`, which
+  uses `uint8_t` without including the header that declares it. This relied
+  on a transitive include from elsewhere in the translation unit and failed
+  to compile standalone on newer standard library implementations.
+  [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
 ## [1.29.0] 2026-09-13
 
