@@ -1,0 +1,80 @@
+name: Publish Doxygen Docs
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake doxygen graphviz
+
+      - name: Configure documentation version
+        shell: bash
+        run: |
+          VERSION=$(grep -E '^[[:space:]]*set\(OPENTELEMETRY_VERSION_NUMBER' CMakeLists.txt | sed -E 's/.*"([^"]+)".*/\1/')
+          SUFFIX=$(grep -E '^[[:space:]]*set\(OPENTELEMETRY_VERSION_SUFFIX' CMakeLists.txt | sed -E 's/.*"([^"]+)".*/\1/')
+          FULL_VERSION="${VERSION}${SUFFIX}"
+
+          if [ -z "$VERSION" ]; then
+            echo "Failed to determine OpenTelemetry version."
+            exit 1
+          fi
+
+          echo "Documentation version: ${FULL_VERSION}"
+
+          sed -i \
+            "s/^PROJECT_BRIEF.*/PROJECT_BRIEF = \"Version ${FULL_VERSION}\"/" \
+            docs/public/Doxyfile
+
+      - name: Generate Doxygen documentation
+        working-directory: docs/public
+        run: doxygen Doxyfile
+
+      - name: Verify generated documentation
+        run: |
+          test -f docs/public/html/index.html
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/public/html
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
