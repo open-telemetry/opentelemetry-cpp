@@ -32,13 +32,11 @@ namespace metrics
 
 TemporalMetricStorage::TemporalMetricStorage(InstrumentDescriptor instrument_descriptor,
                                              AggregationType aggregation_type,
-                                             const AggregationConfig *aggregation_config,
-                                             bool is_async)
+                                             const AggregationConfig *aggregation_config)
     : instrument_descriptor_(std::move(instrument_descriptor)),
       aggregation_type_(aggregation_type),
       aggregation_config_(aggregation_config),
-      instrument_creation_ts_(std::chrono::system_clock::now()),
-      is_async_(is_async)
+      instrument_creation_ts_(std::chrono::system_clock::now())
 {}
 
 bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
@@ -144,7 +142,8 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   // delta_metrics only carries the deltas for whichever collector drains the shared map first, so
   // it cannot be used as the "observed this cycle" signal in multi-collector setups.
   const bool async_cumulative =
-      is_async_ && aggregation_temporarily == AggregationTemporality::kCumulative;
+      InstrumentDescriptorUtil::IsInstrumentTypeAsync(instrument_descriptor_.type_) &&
+      aggregation_temporarily == AggregationTemporality::kCumulative;
   std::unordered_set<MetricAttributes, AttributeHashGenerator> observed_this_cycle;
   if (async_cumulative)
   {
