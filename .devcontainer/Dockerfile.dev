@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-FROM otel/cpp_format_tools
+FROM otel/cpp_format_tools@sha256:45d4342c753759bb6cfafe256d4352dd3d4dd1671537a5bb04d4152b38eb6db0
 
 ARG USER_UID=1000
 ARG USER_GID=1000
