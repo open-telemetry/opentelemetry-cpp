@@ -139,11 +139,11 @@ public:
       // max size reached or invalid key/value. Returning empty TraceState
       return TraceState::GetDefault();
     }
-    auto curr_size   = kv_properties_->Size();
-    bool at_capacity = curr_size >= kMaxKeyValuePairs;
+    const size_t curr_size = kv_properties_->Size();
+    const bool at_capacity = curr_size >= kMaxKeyValuePairs;
 
-    bool replacing_at_capacity = at_capacity && kv_properties_->HasKey(key);
-    auto allocate_size         = curr_size;
+    const bool replacing_at_capacity = at_capacity && kv_properties_->HasKey(key);
+    size_t allocate_size             = curr_size;
 
     if (!at_capacity)
     {
@@ -187,20 +187,22 @@ public:
     {
       return TraceState::GetDefault();
     }
-    auto curr_size = kv_properties_->Size();
-    nostd::shared_ptr<TraceState> ts(new TraceState(curr_size));
+    const size_t curr_size     = kv_properties_->Size();
+    const bool has_key         = kv_properties_->HasKey(key);
+    const size_t allocate_size = has_key ? curr_size - 1 : curr_size;
+    nostd::shared_ptr<TraceState> ts(new TraceState(allocate_size));
     // Keys are unique, so at most one existing entry can match `key`. Once we've found it,
     // skip comparing the rest.
-    bool key_found = false;
+    bool skip_key_check = !has_key;
     kv_properties_->GetAllEntries(
-        [&ts, &key, &key_found](nostd::string_view e_key, nostd::string_view e_value) {
-          if (key_found || key != e_key)
+        [&ts, &key, &skip_key_check](nostd::string_view e_key, nostd::string_view e_value) {
+          if (skip_key_check || key != e_key)
           {
             ts->kv_properties_->AddEntry(e_key, e_value);
           }
           else
           {
-            key_found = true;
+            skip_key_check = true;
           }
           return true;
         });
