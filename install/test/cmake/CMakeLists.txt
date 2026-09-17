@@ -103,9 +103,20 @@ if(PKG_CONFIG_FOUND)
       "-DINSTALL_TEST_COMPONENTS=${INSTALL_TEST_COMPONENTS}"
       "-DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR}")
 
+  # OTel's installed .pc files stay first. When a Conan toolchain is in use,
+  # PkgConfigDeps writes third-party .pc files next to conan_toolchain.cmake.
+  set(_pkgconfig_path "${CMAKE_PREFIX_PATH}/lib/pkgconfig")
+  if(CMAKE_TOOLCHAIN_FILE)
+    get_filename_component(_conan_generators_dir "${CMAKE_TOOLCHAIN_FILE}"
+                           DIRECTORY)
+    string(APPEND _pkgconfig_path ":${_conan_generators_dir}")
+    if(DEFINED ENV{PKG_CONFIG_PATH} AND NOT "$ENV{PKG_CONFIG_PATH}" STREQUAL "")
+      string(APPEND _pkgconfig_path ":$ENV{PKG_CONFIG_PATH}")
+    endif()
+  endif()
   set_tests_properties(
-    pkgconfig-test-config-test
-    PROPERTIES ENVIRONMENT "PKG_CONFIG_PATH=${CMAKE_PREFIX_PATH}/lib/pkgconfig")
+    pkgconfig-test-config-test PROPERTIES ENVIRONMENT
+                                          "PKG_CONFIG_PATH=${_pkgconfig_path}")
 
   add_test(NAME pkgconfig-test-build-test
            COMMAND ${CMAKE_COMMAND} --build
