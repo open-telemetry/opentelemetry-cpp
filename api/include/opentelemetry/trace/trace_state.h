@@ -75,13 +75,13 @@ public:
         return GetDefault();
       }
 
-      if (ts->kv_properties_->HasKey(key))
+      // W3C trace-context tests require tracestate to be populated when it contains
+      // duplicate keys. Discard duplicate entries.
+      // https://github.com/w3c/trace-context/blob/acab820be9db7b3433668baa5cdd43f57f4c4be0/test/test.py#L565
+      if (!ts->kv_properties_->HasKey(key))
       {
-        // duplicate keys are not legal in the header. Discard entire TraceState
-        return GetDefault();
+        ts->kv_properties_->AddEntry(key, value);
       }
-
-      ts->kv_properties_->AddEntry(key, value);
     }
 
     return ts;

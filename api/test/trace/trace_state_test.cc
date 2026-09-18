@@ -60,6 +60,8 @@ TEST(TraceStateTest, ValidateHeaderParsing)
                    {"k1=v1,InvalidKey=v2", ""},
                    {"k1=v1,k2=v2,,", "k1=v1,k2=v2"},
                    {"k1=v1,k2=v2,invalidmember", ""},
+                   {"k1=v1,k2=v2,k1=duplicate_v1", "k1=v1,k2=v2"},
+                   {"k1=v1,k2=v2,k2=duplicate_v2,k2=duplicate_v2", "k1=v1,k2=v2"},
                    {"1a-2f@foo=bar1,a*/foo-_/bar=bar4", "1a-2f@foo=bar1,a*/foo-_/bar=bar4"},
                    {"1a-2f@foo=bar1,*/foo-_/bar=bar4", ""},
                    {"foo@@bar=1,baz=2", "foo@@bar=1,baz=2"},
@@ -87,15 +89,6 @@ TEST(TraceStateTest, ExceedsMaxKeyValuePairs)
   std::string header = header_with_max_members();
   header += ",overflow=value";
 
-  auto ts = TraceState::FromHeader(header);
-  EXPECT_EQ(ts->ToHeader(), "");
-}
-
-TEST(TraceStateTest, DuplicateKeyDiscardsEntireHeader)
-{
-  // Per https://www.w3.org/TR/trace-context/#list-members, only one entry per key
-  // is allowed. A header with a duplicate key is malformed and must be discarded.
-  std::string header("k1=v1,k2=v2,k1=v3");
   auto ts = TraceState::FromHeader(header);
   EXPECT_EQ(ts->ToHeader(), "");
 }
