@@ -64,12 +64,12 @@ else()
 endif()
 
 # FindPkgConfig splits "-framework Foo" into two list entries. Passing the raw
-# *_LDFLAGS list to target_link_libraries() turns the name into -lFoo
-# (ld: library 'Cocoa' not found). Fold each pair into a single
-# "-framework <name>" item, the same representation FindPkgConfig uses in
-# *_LIBRARIES. Do not also pass *_LDFLAGS: it duplicates -l/-L and re-splits
-# frameworks. *_LDFLAGS_OTHER is used instead of *_LDFLAGS so remaining
-# non-library flags (e.g. -pthread) are kept without duplicating libraries.
+# *_LDFLAGS list to target_link_libraries() turns the name into -lFoo (ld:
+# library 'Cocoa' not found). Fold each pair into a single "-framework <name>"
+# item, the same representation FindPkgConfig uses in *_LIBRARIES. Do not also
+# pass *_LDFLAGS: it duplicates -l/-L and re-splits frameworks. *_LDFLAGS_OTHER
+# is used instead of *_LDFLAGS so remaining non-library flags (e.g. -pthread)
+# are kept without duplicating libraries.
 set(_otel_pkgconfig_link_flags "")
 set(_otel_next_is_framework FALSE)
 foreach(_flag IN LISTS _otel_pkgconfig_ldflags_other)
@@ -190,8 +190,8 @@ target_include_directories(full_pkgconfig_test
 target_compile_options(full_pkgconfig_test
                        PRIVATE ${_otel_pkgconfig_cflags_other})
 if(_otel_pkgconfig_library_dirs)
-  target_link_directories(full_pkgconfig_test
-                          PRIVATE ${_otel_pkgconfig_library_dirs})
+  target_link_directories(full_pkgconfig_test PRIVATE
+                          ${_otel_pkgconfig_library_dirs})
 endif()
 target_link_libraries(
   full_pkgconfig_test
