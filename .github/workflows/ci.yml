@@ -105,7 +105,7 @@ jobs:
 
   cmake_msvc_legacy_options_test:
     name: CMake msvc legacy option names compatibility test
-    runs-on: windows-latest
+    runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -433,7 +433,7 @@ jobs:
 
   cmake_msvc_maintainer_test:
     name: CMake msvc (maintainer mode)
-    runs-on: windows-latest
+    runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -452,7 +452,7 @@ jobs:
 
   cmake_msvc_maintainer_test_stl_cxx20:
     name: CMake msvc (maintainer mode) with C++20
-    runs-on: windows-latest
+    runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -473,7 +473,7 @@ jobs:
 
   cmake_msvc_maintainer_abiv2_test:
     name: CMake msvc (maintainer mode, abiv2)
-    runs-on: windows-latest
+    runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -494,7 +494,7 @@ jobs:
 
   cmake_with_async_export_test:
     name: CMake test (without otlp-exporter and with async export)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -521,7 +521,7 @@ jobs:
 
   cmake_opentracing_shim_test:
     name: CMake test (with opentracing-shim)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -653,7 +653,7 @@ jobs:
 
   cmake_test_cxx23_gcc:
     name: CMake C++23 test(GCC)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -742,7 +742,7 @@ jobs:
 
   cmake_modern_protobuf_grpc_with_abseil_test:
     name: CMake test (with modern protobuf,grpc and abseil)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       CXX_STANDARD: '14'
     steps:
@@ -812,7 +812,7 @@ jobs:
 
   plugin_test:
     name: Plugin -> CMake
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Deprecated, pending removal
     if: false
     steps:
@@ -839,7 +839,7 @@ jobs:
 
   bazel_test:
     name: Bazel
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -866,7 +866,7 @@ jobs:
 
   bazel_test_async:
     name: Bazel with async export
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -893,7 +893,7 @@ jobs:
 
   bazel_valgrind:
     name: Bazel valgrind
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -920,7 +920,7 @@ jobs:
 
   bazel_noexcept:
     name: Bazel noexcept
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -947,7 +947,7 @@ jobs:
 
   bazel_nortti:
     name: Bazel nortti
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -974,7 +974,7 @@ jobs:
 
   bazel_asan:
     name: Bazel asan config
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1001,7 +1001,7 @@ jobs:
 
   bazel_ubsan:
     name: Bazel ubsan config
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1028,7 +1028,7 @@ jobs:
 
   bazel_tsan:
     name: Bazel tsan config
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1083,7 +1083,7 @@ jobs:
 
   benchmark:
     name: Benchmark
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1300,7 +1300,7 @@ jobs:
         files: /home/runner/build/coverage.info
 
   markdown-lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Harden the runner (Audit all outbound calls)
@@ -1320,7 +1320,7 @@ jobs:
       run: markdownlint .
 
   shellcheck:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1337,7 +1337,7 @@ jobs:
       run: find . -name \*.sh | xargs shellcheck --severity=error
 
   misspell:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1357,7 +1357,7 @@ jobs:
 
   docfx_check:
     name: DocFX check
-    runs-on: windows-latest
+    runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1375,7 +1375,7 @@ jobs:
 
   w3c_trace_context_compliance_v1:
     name: W3C Distributed Tracing Validation V1
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1421,7 +1421,7 @@ jobs:
 
   w3c_trace_context_compliance_v2:
     name: W3C Distributed Tracing Validation V2
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
