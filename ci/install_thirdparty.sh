@@ -11,14 +11,16 @@ usage() {
     echo "  --tags-file <file>            File containing tags for third-party packages (optional)"
     echo "  --packages \"<pkg1>;<pkg2>;...\"  Semicolon-separated list of packages to build (optional). Default installs all third-party packages."
     echo "  --build-type <type>           Build type for third-party packages (optional). Valid: Debug|Release|RelWithDebInfo|MinSizeRel. Default: Release"
+    echo "  --build-shared-libs <ON|OFF>  Build shared libraries (optional)"
     echo "  -h, --help                    Show this help message"
 }
 
 THIRDPARTY_TAGS_FILE=""
 THIRDPARTY_PACKAGES=""
-SRC_DIR="$(pwd)"
+SRC_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 THIRDPARTY_INSTALL_DIR=""
 BUILD_TYPE=""
+CMAKE_BUILD_SHARED_LIBS=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -56,6 +58,15 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             BUILD_TYPE="$2"
+            shift 2
+            ;;
+        --build-shared-libs)
+            if [ -z "$2" ] || [[ "$2" == --* ]]; then
+                echo "Error: --build-shared-libs requires a value" >&2
+                usage
+                exit 1
+            fi
+            CMAKE_BUILD_SHARED_LIBS="$2"
             shift 2
             ;;
         -h|--help)
@@ -114,6 +125,15 @@ if [ -d "${THIRDPARTY_BUILD_DIR}" ]; then
     rm -rf "${THIRDPARTY_BUILD_DIR}"
 fi
 
+if [ -n "${CMAKE_BUILD_TYPE}" ]; then
+    CMAKE_OPTIONS+=("-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+    CMAKE_BUILD_ARGS+=("--config" "${CMAKE_BUILD_TYPE}")
+fi
+
+if [ -n "${CMAKE_BUILD_SHARED_LIBS}" ]; then
+    CMAKE_OPTIONS+=("-DBUILD_SHARED_LIBS=${CMAKE_BUILD_SHARED_LIBS}")
+fi
+
 cmake -S "${SRC_DIR}/install/cmake" -B "${THIRDPARTY_BUILD_DIR}" \
     "${CMAKE_OPTIONS[@]}"
 
@@ -129,3 +149,6 @@ echo "-- THIRDPARTY_TAGS_FILE: ${THIRDPARTY_TAGS_FILE}"
 echo "-- THIRDPARTY_PACKAGES: ${THIRDPARTY_PACKAGES:-all}"
 echo "-- CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}"
 echo "-- CXX_STANDARD: ${CXX_STANDARD}"
+if [ -n "${CMAKE_BUILD_TYPE}" ]; then
+    echo "-- CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}"
+fi
