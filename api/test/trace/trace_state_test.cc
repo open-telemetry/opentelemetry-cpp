@@ -91,6 +91,15 @@ TEST(TraceStateTest, ExceedsMaxKeyValuePairs)
   EXPECT_EQ(ts->ToHeader(), "");
 }
 
+TEST(TraceStateTest, DuplicateKeyDiscardsEntireHeader)
+{
+  // Per https://www.w3.org/TR/trace-context/#list-members, only one entry per key
+  // is allowed. A header with a duplicate key is malformed and must be discarded.
+  std::string header("k1=v1,k2=v2,k1=v3");
+  auto ts = TraceState::FromHeader(header);
+  EXPECT_EQ(ts->ToHeader(), "");
+}
+
 TEST(TraceStateTest, TraceStateGet)
 {
 

@@ -72,8 +72,13 @@ public:
       if (!IsValidKey(key) || !IsValidValue(value))
       {
         // invalid header. return empty TraceState
-        ts->kv_properties_.reset(new common::KeyValueProperties());
-        break;
+        return GetDefault();
+      }
+
+      if (ts->kv_properties_->HasKey(key))
+      {
+        // duplicate keys are not legal in the header. Discard entire TraceState
+        return GetDefault();
       }
 
       ts->kv_properties_->AddEntry(key, value);
