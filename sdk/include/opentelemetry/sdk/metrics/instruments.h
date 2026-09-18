@@ -155,6 +155,29 @@ struct InstrumentDescriptorUtil
         return "Unknown";
     }
   }
+
+  static bool IsInstrumentTypeAsync(InstrumentType type) noexcept
+  {
+    switch (type)
+    {
+      case InstrumentType::kCounter:
+        return false;
+      case InstrumentType::kUpDownCounter:
+        return false;
+      case InstrumentType::kHistogram:
+        return false;
+      case InstrumentType::kObservableCounter:
+        return true;
+      case InstrumentType::kObservableUpDownCounter:
+        return true;
+      case InstrumentType::kObservableGauge:
+        return true;
+      case InstrumentType::kGauge:
+        return false;
+      default:
+        return false;
+    }
+  }
 };
 
 struct InstrumentEqualNameCaseInsensitive
