@@ -61,10 +61,12 @@ using NosendHttpClientFactory =
     opentelemetry::test_common::ext::http::client::nosend::HttpClientFactoryNosend;
 
 static OtlpHttpClientOptions MakeOtlpHttpClientOptions(
-    std::chrono::system_clock::duration timeout = std::chrono::system_clock::duration::zero())
+    std::chrono::system_clock::duration timeout = std::chrono::system_clock::duration::zero(),
+    HttpRequestContentType content_type         = HttpRequestContentType::kJson)
 {
   std::shared_ptr<opentelemetry::sdk::common::ThreadInstrumentation> not_instrumented;
   OtlpHttpExporterOptions options;
+  options.content_type                    = content_type;
   options.console_debug                   = true;
   options.timeout                         = timeout;
   options.retry_policy_max_attempts       = 0U;
@@ -351,6 +353,111 @@ TEST_F(OtlpHttpExporterCustomClientTestPeer, ALateTerminalEventDoesNotReportASec
     EXPECT_EQ(1, calls->load(std::memory_order_acquire))
         << "a state arriving after the response reported the request a second time";
   }
+}
+
+// A response body that fails to parse on the protobuf path is reported as a failed
+// export, exactly once, through the result callback, so the caller is unblocked. The
+// body copy and both parse branches run inside the noexcept OnResponse() handler,
+// where nothing is allowed to escape.
+TEST_F(OtlpHttpExporterCustomClientTestPeer, ABinaryBodyThatFailsToParseReportsFailure)
+{
+  auto client         = http_client::HttpClientTestFactory::Create();
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto session = std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> pending;
+  EXPECT_CALL(*session, SendRequest)
+      .WillRepeatedly(
+          [&pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+            pending = std::move(callback);
+          });
+
+  OtlpHttpClient otlp_client(
+      MakeOtlpHttpClientOptions(std::chrono::seconds{30}, HttpRequestContentType::kBinary), client);
+
+  auto arena = std::make_unique<google::protobuf::Arena>();
+  auto *request =
+      google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
+          arena.get());
+  auto *response =
+      google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceResponse>(
+          arena.get());
+
+  auto calls  = std::make_shared<std::atomic<int>>(0);
+  auto result = std::make_shared<sdk::common::ExportResult>(sdk::common::ExportResult::kSuccess);
+
+  otlp_client.Export(
+      *request, std::move(arena), response,
+      [calls, result](opentelemetry::sdk::common::ExportResult outcome,
+                      google::protobuf::Message *) {
+        calls->fetch_add(1, std::memory_order_release);
+        *result = outcome;
+        return true;
+      },
+      1);
+  ASSERT_NE(pending, nullptr);
+
+  http_client::nosend::Response sent;
+  // 0xff is not a valid protobuf wire type, so parsing this body always fails.
+  const std::string body = "\xff\xff\xff\xff";
+  sent.body_.assign(body.begin(), body.end());
+  sent.Finish(*pending);
+
+  EXPECT_EQ(1, calls->load(std::memory_order_acquire))
+      << "the result callback did not run exactly once for the failed export";
+  EXPECT_EQ(sdk::common::ExportResult::kFailure, *result);
+
+  // The deadline is short on purpose. Without the response being reported above this waits it out.
+  EXPECT_TRUE(otlp_client.ForceFlush(std::chrono::milliseconds{50}));
+}
+
+// The same contract on the JSON path: a body that fails to parse into the typed response
+// is reported as a failed export, and the response still unblocks the caller.
+TEST_F(OtlpHttpExporterCustomClientTestPeer, AJsonBodyThatFailsToParseReportsFailure)
+{
+  auto client         = http_client::HttpClientTestFactory::Create();
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto session = std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> pending;
+  EXPECT_CALL(*session, SendRequest)
+      .WillRepeatedly(
+          [&pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+            pending = std::move(callback);
+          });
+
+  OtlpHttpClient otlp_client(MakeOtlpHttpClientOptions(std::chrono::seconds{30}), client);
+
+  auto arena = std::make_unique<google::protobuf::Arena>();
+  auto *request =
+      google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
+          arena.get());
+  auto *response =
+      google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceResponse>(
+          arena.get());
+
+  auto calls  = std::make_shared<std::atomic<int>>(0);
+  auto result = std::make_shared<sdk::common::ExportResult>(sdk::common::ExportResult::kSuccess);
+
+  otlp_client.Export(
+      *request, std::move(arena), response,
+      [calls, result](opentelemetry::sdk::common::ExportResult outcome,
+                      google::protobuf::Message *) {
+        calls->fetch_add(1, std::memory_order_release);
+        *result = outcome;
+        return true;
+      },
+      1);
+  ASSERT_NE(pending, nullptr);
+
+  http_client::nosend::Response sent;
+  const std::string body = "{some bad JSON";
+  sent.body_.assign(body.begin(), body.end());
+  sent.Finish(*pending);
+
+  EXPECT_EQ(1, calls->load(std::memory_order_acquire));
+  EXPECT_EQ(sdk::common::ExportResult::kFailure, *result);
+  EXPECT_TRUE(otlp_client.ForceFlush(std::chrono::milliseconds{50}));
 }
 
 }  // namespace otlp
