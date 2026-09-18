@@ -35,6 +35,31 @@ Increment the:
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
   [#4259](https://github.com/open-telemetry/opentelemetry-cpp/pull/4259)
 
+* [EXPORTER] Fix the Elasticsearch log exporter aborting the process when a log
+  record's body or attributes contain bytes that are not valid UTF-8. The
+  exporter now substitutes the replacement character for the invalid bytes
+  and continues, instead of `nlohmann::json::dump()` throwing out of a
+  `noexcept` function.
+  [#4439](https://github.com/open-telemetry/opentelemetry-cpp/issues/4439)
+
+* [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
+  from conflicting streams, and warn if stream conflicts were configured
+  [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
+
+* [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
+  If a model-specific limit is set it is used, otherwise the matching general
+  limit, otherwise the model-specific default. Limit fields on
+  `AttributeLimitsConfiguration`, `SpanLimitsConfiguration`, and
+  `LogRecordLimitsConfiguration` are now optional so omitted keys and YAML
+  `null` are distinct from explicit values. This is a breaking change to the
+  experimental configuration model.
+  [#4467](https://github.com/open-telemetry/opentelemetry-cpp/issues/4467)
+
+* [CONFIGURATION] Add a configuration builder for the host resource detector
+  [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
+
+* [CONFIGURATION] Cleanup build targets and docs
+  [#4486](https://github.com/open-telemetry/opentelemetry-cpp/pull/4486)
 * docs: update supported development platforms (#4260)
   [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
 
