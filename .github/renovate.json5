@@ -7,13 +7,8 @@
   ],
   packageRules: [
     {
-      dependencyDashboardApproval: true,
-      matchCategories: ["!ci", "!docker"],
-    },
-    {
       description: "Bundles all patches into 1 easy to review pr",
       groupName: "all [patches]",
-      matchCategories: ["ci", "docker"],
       matchUpdateTypes: ["patch", "digest"],
       schedule: ["before 6am every weekday"],
     },
@@ -25,10 +20,14 @@
       schedule: ["before 8am on Monday"],
     },
     {
-      description: "Allow major ci updates to be raised each Monday without approval",
-      matchCategories: ["ci", "docker"],
-      matchUpdateTypes: ["major"],
+      description: "Allow major/minor updates to be raised each Monday without approval",
+      matchUpdateTypes: ["major", "minor"],
       schedule: ["before 8am on Monday"],
+    },
+    {
+      dependencyDashboardApproval: true,
+      matchCategories: ["bazel"],
+      matchUpdateTypes: ["major"],
     },
   ],
 }
