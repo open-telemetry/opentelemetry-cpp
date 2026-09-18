@@ -9,7 +9,7 @@ permissions:
 jobs:
   docker_image:
     name: Docker Image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 300
     steps:
     - name: Harden the runner (Audit all outbound calls)
