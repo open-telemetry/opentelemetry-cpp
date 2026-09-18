@@ -53,13 +53,35 @@ if(BUILD_SHARED_LIBS)
   set(_otel_pkgconfig_include_dirs ${OTEL_PKGCONFIG_INCLUDE_DIRS})
   set(_otel_pkgconfig_cflags_other ${OTEL_PKGCONFIG_CFLAGS_OTHER})
   set(_otel_pkgconfig_libraries ${OTEL_PKGCONFIG_LIBRARIES})
-  set(_otel_pkgconfig_ldflags ${OTEL_PKGCONFIG_LDFLAGS})
+  set(_otel_pkgconfig_library_dirs ${OTEL_PKGCONFIG_LIBRARY_DIRS})
+  set(_otel_pkgconfig_ldflags_other ${OTEL_PKGCONFIG_LDFLAGS_OTHER})
 else()
   set(_otel_pkgconfig_include_dirs ${OTEL_PKGCONFIG_STATIC_INCLUDE_DIRS})
   set(_otel_pkgconfig_cflags_other ${OTEL_PKGCONFIG_STATIC_CFLAGS_OTHER})
   set(_otel_pkgconfig_libraries ${OTEL_PKGCONFIG_STATIC_LIBRARIES})
-  set(_otel_pkgconfig_ldflags ${OTEL_PKGCONFIG_STATIC_LDFLAGS})
+  set(_otel_pkgconfig_library_dirs ${OTEL_PKGCONFIG_STATIC_LIBRARY_DIRS})
+  set(_otel_pkgconfig_ldflags_other ${OTEL_PKGCONFIG_STATIC_LDFLAGS_OTHER})
 endif()
+
+# FindPkgConfig splits "-framework Foo" into two list entries. Passing the raw
+# *_LDFLAGS list to target_link_libraries() turns the name into -lFoo
+# (ld: library 'Cocoa' not found). Fold each pair into a single
+# "-framework <name>" item, the same representation FindPkgConfig uses in
+# *_LIBRARIES. Do not also pass *_LDFLAGS: it duplicates -l/-L and re-splits
+# frameworks. *_LDFLAGS_OTHER is used instead of *_LDFLAGS so remaining
+# non-library flags (e.g. -pthread) are kept without duplicating libraries.
+set(_otel_pkgconfig_link_flags "")
+set(_otel_next_is_framework FALSE)
+foreach(_flag IN LISTS _otel_pkgconfig_ldflags_other)
+  if(_otel_next_is_framework)
+    list(APPEND _otel_pkgconfig_libraries "-framework ${_flag}")
+    set(_otel_next_is_framework FALSE)
+  elseif(_flag STREQUAL "-framework")
+    set(_otel_next_is_framework TRUE)
+  else()
+    list(APPEND _otel_pkgconfig_link_flags "${_flag}")
+  endif()
+endforeach()
 
 # INSTALL_TEST_COMPONENTS is the CMake component set, not the set of components
 # represented by installed .pc files. Compile a test source only when this
@@ -167,7 +189,11 @@ target_include_directories(full_pkgconfig_test
                            PRIVATE ${_otel_pkgconfig_include_dirs})
 target_compile_options(full_pkgconfig_test
                        PRIVATE ${_otel_pkgconfig_cflags_other})
+if(_otel_pkgconfig_library_dirs)
+  target_link_directories(full_pkgconfig_test
+                          PRIVATE ${_otel_pkgconfig_library_dirs})
+endif()
 target_link_libraries(
   full_pkgconfig_test
-  PRIVATE ${_otel_pkgconfig_libraries} ${_otel_pkgconfig_ldflags} GTest::gtest
-          GTest::gtest_main)
+  PRIVATE ${_otel_pkgconfig_libraries} ${_otel_pkgconfig_link_flags}
+          GTest::gtest GTest::gtest_main)

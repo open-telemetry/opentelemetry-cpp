@@ -83,7 +83,11 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo -E apt-get update
-        sudo -E apt-get install -y libabsl-dev libcurl4-openssl-dev zlib1g-dev nlohmann-json3-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc
+        # libcurl.pc --static emits unversioned private libs (nghttp2, idn2, rtmp,
+        # ssh, psl, gssapi_krb5, lber/ldap, brotlidec). libcurl4-openssl-dev pulls
+        # only the runtime SONAMEs; the matching -dev packages provide the linker
+        # names. Do not encode these in OTel .pc files.
+        sudo -E apt-get install -y libabsl-dev libcurl4-openssl-dev zlib1g-dev nlohmann-json3-dev libprotobuf-dev libgrpc++-dev protobuf-compiler protobuf-compiler-grpc libnghttp2-dev libidn2-dev librtmp-dev libssh-dev libpsl-dev libkrb5-dev libldap2-dev libbrotli-dev
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "googletest;benchmark"
     - name: Run Install Functions Tests
       run: ./ci/do_ci.sh cmake.install_functions.test
