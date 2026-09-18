@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <algorithm>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -10,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
@@ -187,6 +189,44 @@ TEST(Aggregation, DoubleLastValueAggregation)
   aggr.Aggregate(1.0, {});
   lastvalue_data = nostd::get<LastValuePointData>(aggr.ToPoint());
   EXPECT_EQ(nostd::get<double>(lastvalue_data.value_), 1.0);
+}
+
+TEST(Aggregation, LastValueAggregationMergeDiffSelectNewerSample)
+{
+  LastValuePointData older_data;
+  older_data.value_              = static_cast<int64_t>(1);
+  older_data.is_lastvalue_valid_ = true;
+  older_data.sample_ts_          = opentelemetry::common::SystemTimestamp(std::chrono::seconds(1));
+  LastValuePointData newer_data  = older_data;
+  newer_data.value_              = static_cast<int64_t>(2);
+  newer_data.sample_ts_          = opentelemetry::common::SystemTimestamp(std::chrono::seconds(2));
+
+  LongLastValueAggregation older(older_data);
+  LongLastValueAggregation newer(newer_data);
+  auto merged = nostd::get<LastValuePointData>(older.Merge(newer)->ToPoint());
+  EXPECT_EQ(nostd::get<int64_t>(merged.value_), 2);
+  auto diffed = nostd::get<LastValuePointData>(newer.Diff(older)->ToPoint());
+  EXPECT_EQ(nostd::get<int64_t>(diffed.value_), 2);
+}
+
+TEST(Aggregation, LastValueAggregationMergeDiffTypeMismatch)
+{
+  LongLastValueAggregation long_aggr;
+  long_aggr.Aggregate(static_cast<int64_t>(1), {});
+  DoubleLastValueAggregation double_aggr;
+  double_aggr.Aggregate(1.0, {});
+  LongSumAggregation sum_aggr(true);
+
+  std::unique_ptr<Aggregation> results[] = {long_aggr.Merge(sum_aggr), long_aggr.Diff(sum_aggr),
+                                            double_aggr.Merge(sum_aggr),
+                                            double_aggr.Diff(sum_aggr)};
+  for (const auto &result : results)
+  {
+    ASSERT_NE(result, nullptr);
+    auto data = result->ToPoint();
+    ASSERT_TRUE(nostd::holds_alternative<LastValuePointData>(data));
+    EXPECT_FALSE(nostd::get<LastValuePointData>(data).is_lastvalue_valid_);
+  }
 }
 
 TEST(Aggregation, LongHistogramAggregation)
