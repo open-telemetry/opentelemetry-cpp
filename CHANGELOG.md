@@ -30,6 +30,13 @@ Increment the:
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+* [METRICS SDK] Fix preview exemplar reservoirs to serialize concurrent
+  measurement offers and collection, reset stored cells and sampling state
+  between collection intervals, remain usable after collection, and omit empty
+  cells from collected results. Correct the simple fixed-size reservoir's
+  sampling bounds so the current measurement can be discarded.
+  [#4429](https://github.com/open-telemetry/opentelemetry-cpp/pull/4429)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)

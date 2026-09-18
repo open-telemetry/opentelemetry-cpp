@@ -6,6 +6,8 @@
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 #  include <memory>
+#  include <mutex>
+#  include <utility>
 #  include <vector>
 
 #  include "opentelemetry/context/context.h"
@@ -44,6 +46,9 @@ public:
     {
       return;
     }
+
+    std::lock_guard<std::mutex> lock{mutex_};
+
     auto idx =
         reservoir_cell_selector_->ReservoirCellIndexFor(storage_, value, attributes, context);
     if (idx != -1)
@@ -60,6 +65,9 @@ public:
     {
       return;
     }
+
+    std::lock_guard<std::mutex> lock{mutex_};
+
     auto idx =
         reservoir_cell_selector_->ReservoirCellIndexFor(storage_, value, attributes, context);
     if (idx != -1)
@@ -76,17 +84,26 @@ public:
     {
       return results;
     }
+
+    std::lock_guard<std::mutex> lock{mutex_};
+
     if (!map_and_reset_cell_)
     {
-      reservoir_cell_selector_.reset();
+      reservoir_cell_selector_->reset();
       return results;
     }
-    for (auto reservoirCell : storage_)
+
+    results.reserve(storage_.size());
+    for (auto &reservoirCell : storage_)
     {
       auto result = (reservoirCell.*(map_and_reset_cell_))(pointAttributes);
-      results.push_back(result);
+      if (result)
+      {
+        results.emplace_back(std::move(result));
+      }
     }
-    reservoir_cell_selector_.reset();
+
+    reservoir_cell_selector_->reset();
     return results;
   }
 
@@ -95,6 +112,7 @@ private:
   std::vector<ReservoirCell> storage_;
   std::shared_ptr<ReservoirCellSelector> reservoir_cell_selector_;
   MapAndResetCellType map_and_reset_cell_{nullptr};
+  std::mutex mutex_;
 };
 
 }  // namespace metrics
