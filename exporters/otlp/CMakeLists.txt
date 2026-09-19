@@ -1246,4 +1246,36 @@ if(OTELCPP_BUILD_TESTING AND OTELCPP_WITH_BENCHMARK)
             benchmark::benchmark
             opentelemetry_test_common
             ${CMAKE_THREAD_LIBS_INIT})
+
+  add_executable(otlp_recordable_phase_benchmark
+                 test/otlp_recordable_phase_benchmark.cc)
+
+  target_link_libraries(
+    otlp_recordable_phase_benchmark
+    PRIVATE opentelemetry_otlp_recordable
+            opentelemetry_trace
+            opentelemetry_metrics
+            opentelemetry_resources
+            benchmark::benchmark
+            opentelemetry_test_common
+            ${CMAKE_THREAD_LIBS_INIT})
+
+  # Counting the heap allocations of each phase replaces the global operator new, which perturbs
+  # the very allocations it measures. Build the same source a second time for the counts and keep
+  # the timing binary uninstrumented.
+  add_executable(otlp_recordable_phase_alloc_benchmark
+                 test/otlp_recordable_phase_benchmark.cc)
+
+  target_compile_definitions(otlp_recordable_phase_alloc_benchmark
+                             PRIVATE OTELCPP_BENCHMARK_COUNT_ALLOCATIONS)
+
+  target_link_libraries(
+    otlp_recordable_phase_alloc_benchmark
+    PRIVATE opentelemetry_otlp_recordable
+            opentelemetry_trace
+            opentelemetry_metrics
+            opentelemetry_resources
+            benchmark::benchmark
+            opentelemetry_test_common
+            ${CMAKE_THREAD_LIBS_INIT})
 endif()
