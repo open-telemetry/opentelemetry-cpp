@@ -110,8 +110,8 @@ public:
 
   /**
    * A method the user calls to block their thread until the request has either produced a
-   * response or failed. The longest duration is the timeout of the request, set by
-   * SetTimeoutMs(), which arrives here as a TimedOut session event.
+   * response or failed. It has no deadline of its own and relies on the HTTP client
+   * reporting one of the terminal session states.
    */
   bool waitForResponse()
   {
@@ -183,11 +183,15 @@ public:
         OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error");
         recordCompletion(CompletionState::Failure);
         break;
+      // Both of these end the session, so each has to release the waiter. Without that a
+      // synchronous export whose transfer fails this way blocks until the process ends.
       case http_client::SessionState::ReadError:
         OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Read error");
+        recordCompletion(CompletionState::Failure);
         break;
       case http_client::SessionState::WriteError:
         OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Write error");
+        recordCompletion(CompletionState::Failure);
         break;
       case http_client::SessionState::Cancelled:
         OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] (manually) cancelled");
