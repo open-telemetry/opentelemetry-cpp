@@ -134,7 +134,10 @@ public:
    * If the provided key-value pair is invalid, or results in transtate that violates the
    * tracecontext specification, empty TraceState instance will be returned.
    *
-   * If the existing object has maximum list members, it's copy is returned.
+   * If the existing object has maximum list members and the key is not already present, then the
+   * new key-value pair is ignored and a copy of the existing TraceState is returned. If an entry
+   * with the same key is present then the existing entry will be replaced with the updated
+   * key-value pair at the beginning of the list.
    */
   nostd::shared_ptr<TraceState> Set(const nostd::string_view &key,
                                     const nostd::string_view &value) noexcept
