@@ -663,16 +663,15 @@ void HttpClient::ScheduleAddSession(uint64_t session_id)
 void HttpClient::ScheduleAbortSession(uint64_t session_id)
 {
   {
+    std::lock_guard<std::recursive_mutex> session_ids_lock{session_ids_m_};
     std::lock_guard<std::mutex> sessions_lock{sessions_m_};
     auto session = sessions_.find(session_id);
     if (session == sessions_.end())
     {
-      std::lock_guard<std::recursive_mutex> session_ids_lock{session_ids_m_};
       pending_to_add_session_ids_.erase(session_id);
     }
     else
     {
-      std::lock_guard<std::recursive_mutex> session_ids_lock{session_ids_m_};
       pending_to_abort_sessions_[session_id] = std::move(session->second);
       pending_to_add_session_ids_.erase(session_id);
 
@@ -899,8 +898,8 @@ void HttpClient::resetMultiHandle()
     // sessions_m_ again, and it is not recursive, so holding it across them stops the IO
     // thread here for good. Cleanup also runs the caller's handler, which this lock was
     // never meant to cover.
-    std::lock_guard<std::mutex> session_lock_guard{sessions_m_};
     std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
+    std::lock_guard<std::mutex> session_lock_guard{sessions_m_};
     for (auto &session : sessions_)
     {
       if (pending_to_add_session_ids_.end() == pending_to_add_session_ids_.find(session.first))
