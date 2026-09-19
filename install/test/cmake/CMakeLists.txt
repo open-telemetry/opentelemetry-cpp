@@ -91,6 +91,44 @@ add_test(NAME full-package-run-test
 # -----------------------------------------------------------
 
 # -----------------------------------------------------------
+# Pkg-config consumer test (compile/link/run against installed .pc files)
+find_package(PkgConfig QUIET)
+if(PKG_CONFIG_FOUND)
+  add_test(
+    NAME pkgconfig-test-config-test
+    COMMAND
+      ${CMAKE_COMMAND} --log-level=DEBUG -S ${CMAKE_SOURCE_DIR}/pkgconfig_test
+      -B build-pkgconfig-test "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+      ${INSTALL_TEST_CMAKE_OPTIONS}
+      "-DINSTALL_TEST_COMPONENTS=${INSTALL_TEST_COMPONENTS}"
+      "-DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR}")
+
+  # OTel's installed .pc files stay first. When a Conan toolchain is in use,
+  # PkgConfigDeps writes third-party .pc files next to conan_toolchain.cmake.
+  set(_pkgconfig_path "${CMAKE_PREFIX_PATH}/lib/pkgconfig")
+  if(CMAKE_TOOLCHAIN_FILE)
+    get_filename_component(_conan_generators_dir "${CMAKE_TOOLCHAIN_FILE}"
+                           DIRECTORY)
+    string(APPEND _pkgconfig_path ":${_conan_generators_dir}")
+    if(DEFINED ENV{PKG_CONFIG_PATH} AND NOT "$ENV{PKG_CONFIG_PATH}" STREQUAL "")
+      string(APPEND _pkgconfig_path ":$ENV{PKG_CONFIG_PATH}")
+    endif()
+  endif()
+  set_tests_properties(
+    pkgconfig-test-config-test PROPERTIES ENVIRONMENT
+                                          "PKG_CONFIG_PATH=${_pkgconfig_path}")
+
+  add_test(NAME pkgconfig-test-build-test
+           COMMAND ${CMAKE_COMMAND} --build
+                   ${CMAKE_BINARY_DIR}/build-pkgconfig-test --parallel)
+
+  add_test(NAME pkgconfig-test-run-test
+           COMMAND ${CMAKE_BINARY_DIR}/build-pkgconfig-test/full_pkgconfig_test)
+else()
+  message(STATUS "PkgConfig not found; skipping pkg-config install tests")
+endif()
+
+# -----------------------------------------------------------
 # Loop over all the components to test
 foreach(component ${INSTALL_TEST_COMPONENTS})
   # Test cmake configuration

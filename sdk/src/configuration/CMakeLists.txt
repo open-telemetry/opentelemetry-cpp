@@ -176,10 +176,35 @@ if(OTELCPP_WITH_CONFIGURATION)
               opentelemetry_configuration_logs_builders)
 
   if(OPENTELEMETRY_INSTALL)
-    opentelemetry_add_pkgconfig(
-      configuration_yaml "OpenTelemetry SDK - Configuration YAML"
-      "YAML configuration parser for the OpenTelemetry SDK."
-      "opentelemetry_configuration_core")
+    # find_package: Requires rapidyaml only when pkg-config can resolve it
+    # (Conan PkgConfigDeps names the module rapidyaml, not ryml).
+    # fetch_repository: RYML_INSTALL puts libryml (c4core embedded) in the OTel
+    # prefix, so a bare -lryml is enough.
+    unset(_otel_rapidyaml_FOUND)
+    if(ryml_PROVIDER STREQUAL "find_package")
+      find_package(PkgConfig QUIET)
+      if(PKG_CONFIG_FOUND)
+        set(_otel_saved_pkg_config_path "$ENV{PKG_CONFIG_PATH}")
+        if(CMAKE_TOOLCHAIN_FILE)
+          get_filename_component(_otel_pc_extra "${CMAKE_TOOLCHAIN_FILE}"
+                                 DIRECTORY)
+          set(ENV{PKG_CONFIG_PATH} "${_otel_pc_extra}:$ENV{PKG_CONFIG_PATH}")
+        endif()
+        pkg_check_modules(_otel_rapidyaml QUIET rapidyaml)
+        set(ENV{PKG_CONFIG_PATH} "${_otel_saved_pkg_config_path}")
+      endif()
+    endif()
+    if(_otel_rapidyaml_FOUND)
+      opentelemetry_add_pkgconfig(
+        configuration_yaml "OpenTelemetry SDK - Configuration YAML"
+        "YAML configuration parser for the OpenTelemetry SDK."
+        "opentelemetry_configuration_core rapidyaml")
+    else()
+      opentelemetry_add_pkgconfig(
+        configuration_yaml "OpenTelemetry SDK - Configuration YAML"
+        "YAML configuration parser for the OpenTelemetry SDK."
+        "opentelemetry_configuration_core" EXTRA_LIBS ryml)
+    endif()
 
     opentelemetry_add_pkgconfig(
       configuration

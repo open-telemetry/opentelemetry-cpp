@@ -66,7 +66,8 @@ otel_add_component(
 if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     exporter_prometheus "OpenTelemetry Exporter - Prometheus"
-    "Exports metrics in Prometheus format." "opentelemetry_metrics")
+    "Exports metrics in Prometheus format."
+    "opentelemetry_metrics prometheus-cpp-pull")
 
   opentelemetry_add_pkgconfig(
     exporter_prometheus_builder "OpenTelemetry Exporter - Prometheus Builder"

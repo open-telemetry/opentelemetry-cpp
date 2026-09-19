@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CMAKE] Add pkg-config install consumer tests
+  [#4503](https://github.com/open-telemetry/opentelemetry-cpp/issues/4503)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
