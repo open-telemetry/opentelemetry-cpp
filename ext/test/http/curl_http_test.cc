@@ -1,11 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curl.h>
 #include <curl/curlver.h>
 #include "gtest/gtest.h"
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <curl/curl.h>
 #  include "gmock/gmock.h"
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
@@ -13,9 +13,11 @@
 #  include <numeric>
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdio>
 #include <cstring>
 #include <map>
 #include <memory>
@@ -56,6 +58,27 @@ class HttpClientTestPeer
 {
 public:
   static void ResetMultiHandle(HttpClient &client) { client.resetMultiHandle(); }
+};
+
+class HttpOperationTestPeer
+{
+public:
+  static int Seek(HttpOperation &operation, curl_off_t offset, int origin)
+  {
+    return HttpOperation::SeekCallback(&operation, offset, origin);
+  }
+
+  static int SeekNullUserData(curl_off_t offset, int origin)
+  {
+    return HttpOperation::SeekCallback(nullptr, offset, origin);
+  }
+
+  static size_t ReadCursor(const HttpOperation &operation) { return operation.request_nwrite_; }
+
+  static void SetReadCursor(HttpOperation &operation, size_t value)
+  {
+    operation.request_nwrite_ = value;
+  }
 };
 }  // namespace curl
 }  // namespace client
@@ -403,6 +426,89 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
 
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
+}
+
+// Send a body large enough to span several read callbacks and check it arrives whole, so a mistake
+// in either CURLOPT_READFUNCTION or the seek callback registered beside it shows up as a corrupted
+// or short upload.
+TEST_F(BasicCurlHttpTests, SendPostRequestWithMultiChunkBody)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("post/");
+  request->SetMethod(http_client::Method::Post);
+
+  // Not a round number, so an off-by-one in the read cursor cannot land on a chunk boundary.
+  constexpr size_t kBodySize = 257u * 1024u + 7u;
+  http_client::Body body(kBodySize);
+  for (size_t i = 0; i < kBodySize; ++i)
+  {
+    body[i] = static_cast<http_client::Byte>('a' + (i % 26));
+  }
+  const http_client::Body expected = body;
+
+  request->SetBody(body);
+  request->AddHeader("Content-Type", "application/octet-stream");
+  auto handler = std::make_shared<PostEventHandler>();
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+  ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+
+  {
+    std::unique_lock<std::mutex> lk(mtx_requests);
+    ASSERT_EQ(received_requests_.size(), 1u);
+    const auto &received = received_requests_[0].content;
+    ASSERT_EQ(received.size(), expected.size());
+    EXPECT_TRUE(std::equal(expected.begin(), expected.end(), received.begin()));
+  }
+
+  session_manager->CancelAllSessions();
+  session_manager->FinishAllSessions();
+}
+
+// Cover both halves of the callback contract, the seeks it honours and the ones it refuses.
+TEST_F(BasicCurlHttpTests, SeekCallbackRepositionsTheRequestBody)
+{
+  CustomEventHandler handler;
+  http_client::HttpSslOptions no_ssl;
+  http_client::Headers headers;
+  const char *payload    = "0123456789";
+  http_client::Body body = {payload, payload + std::strlen(payload)};
+
+  curl::HttpOperation operation(http_client::Method::Post, "http://127.0.0.1:19000/post/", no_ssl,
+                                &handler, headers, body, http_client::Compression::kNone, false,
+                                curl::kDefaultHttpConnTimeout);
+
+  using Peer = curl::HttpOperationTestPeer;
+
+  Peer::SetReadCursor(operation, 10);
+  EXPECT_EQ(CURL_SEEKFUNC_OK, Peer::Seek(operation, 4, SEEK_SET));
+  EXPECT_EQ(4u, Peer::ReadCursor(operation));
+
+  // Rewinding to the start is the case libcurl actually asks for.
+  EXPECT_EQ(CURL_SEEKFUNC_OK, Peer::Seek(operation, 0, SEEK_SET));
+  EXPECT_EQ(0u, Peer::ReadCursor(operation));
+
+  // Seeking to exactly the end is in range and leaves nothing left to send.
+  EXPECT_EQ(CURL_SEEKFUNC_OK, Peer::Seek(operation, 10, SEEK_SET));
+  EXPECT_EQ(10u, Peer::ReadCursor(operation));
+
+  // Everything below is refused, and must leave the cursor where it was.
+  Peer::SetReadCursor(operation, 3);
+
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 11, SEEK_SET));
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, -1, SEEK_SET));
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 0, SEEK_CUR));
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 0, SEEK_END));
+  EXPECT_EQ(3u, Peer::ReadCursor(operation));
+
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::SeekNullUserData(0, SEEK_SET));
 }
 
 TEST_F(BasicCurlHttpTests, RequestTimeout)
