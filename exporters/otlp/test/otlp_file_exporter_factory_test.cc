@@ -35,15 +35,6 @@ namespace exporter
 namespace otlp
 {
 
-TEST(OtlpFileExporterFactoryTest, BuildTest)
-{
-  OtlpFileExporterOptions opts;
-  std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> exporter =
-      OtlpFileExporterFactory::Create(opts);
-
-  EXPECT_TRUE(exporter != nullptr);
-}
-
 TEST(OtlpFileExporterFactoryTest, BuildWithJsonWriterFactoryTest)
 {
   OtlpFileExporterOptions opts;

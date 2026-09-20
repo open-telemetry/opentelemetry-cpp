@@ -35,15 +35,6 @@ namespace exporter
 namespace otlp
 {
 
-TEST(OtlpFileMetricExporterFactory, BuildTest)
-{
-  OtlpFileMetricExporterOptions opts;
-  std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> exporter =
-      OtlpFileMetricExporterFactory::Create(opts);
-
-  EXPECT_TRUE(exporter != nullptr);
-}
-
 TEST(OtlpFileMetricExporterFactory, BuildWithJsonWriterFactoryTest)
 {
   OtlpFileMetricExporterOptions opts;

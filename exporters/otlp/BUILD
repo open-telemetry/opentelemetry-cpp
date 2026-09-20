@@ -1182,6 +1182,54 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "otlp_file_exporter_default_json_writer_test",
+    srcs = ["test/otlp_file_exporter_default_json_writer_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_file",
+        "test",
+    ],
+    deps = [
+        ":otlp_file_exporter",
+        "//api",
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_file_log_record_exporter_default_json_writer_test",
+    srcs = ["test/otlp_file_log_record_exporter_default_json_writer_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_file",
+        "test",
+    ],
+    deps = [
+        ":otlp_file_log_record_exporter",
+        "//api",
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "otlp_file_metric_exporter_default_json_writer_test",
+    srcs = ["test/otlp_file_metric_exporter_default_json_writer_test.cc"],
+    tags = [
+        "otlp",
+        "otlp_file",
+        "test",
+    ],
+    deps = [
+        ":otlp_file_metric_exporter",
+        "//api",
+        "//sdk/src/metrics",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 otel_cc_benchmark(
     name = "otlp_grpc_exporter_benchmark",
     srcs = ["test/otlp_grpc_exporter_benchmark.cc"],
