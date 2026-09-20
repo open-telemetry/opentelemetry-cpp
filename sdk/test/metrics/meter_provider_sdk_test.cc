@@ -50,14 +50,6 @@
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/meter_context_factory.h"
 
-#  ifndef NO_GETENV
-#    include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
-#    include "opentelemetry/sdk/metrics/meter_config.h"
-#    include "opentelemetry/sdk/metrics/meter_context.h"
-#    include "opentelemetry/sdk/metrics/view/view_registry.h"
-#    include "opentelemetry/sdk/resource/resource.h"
-#  endif
-
 #  if defined(_MSC_VER) && !defined(NO_GETENV)
 #    include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
@@ -66,8 +58,6 @@ using opentelemetry::sdk::common::unsetenv;
 #endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <cstdint>
-#  include <initializer_list>
 #  include <map>
 #  include <unordered_map>
 

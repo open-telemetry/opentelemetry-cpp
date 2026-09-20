@@ -3,24 +3,28 @@
 
 #include <cstdint>
 #include <limits>
-#include <memory>
-#include <mutex>  // IWYU pragma: keep
+#include <memory>  // IWYU pragma: keep
+#include <mutex>   // IWYU pragma: keep
 #include <ostream>
 #include <string>
 #include <utility>
 
 #include "opentelemetry/context/context.h"
-#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/version.h"
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+#  include <cstddef>
+#  include <vector>
+#  include "opentelemetry/common/attribute_value.h"
+#  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/metrics/sync_instruments.h"
+#  include "opentelemetry/nostd/function_ref.h"
+#  include "opentelemetry/nostd/span.h"
+#  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/nostd/unique_ptr.h"
+#  include "opentelemetry/nostd/variant.h"
+#  include "opentelemetry/sdk/common/attribute_utils.h"
 #endif
-
-#include "opentelemetry/nostd/span.h"
-#include "opentelemetry/nostd/unique_ptr.h"
-#include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_enabled_state.h"

@@ -28,6 +28,7 @@
 #  include "opentelemetry/sdk/metrics/data/point_data.h"
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#  include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
