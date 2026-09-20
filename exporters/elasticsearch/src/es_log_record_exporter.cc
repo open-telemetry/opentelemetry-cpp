@@ -537,7 +537,10 @@ bool ElasticsearchLogRecordExporter::ForceFlush(std::chrono::microseconds timeou
   }
 
   std::unique_lock<std::mutex> lk_cv(synchronization_data_->force_flush_cv_m);
-  // Wait for all the sessions to finish
+  // Wait for all the sessions to finish. The condition variable's return value is not trusted
+  // on its own: the standard permits wait_for() to report cv_status::no_timeout on a spurious
+  // wakeup, indistinguishable from a real notification, so completion is always verified
+  // against finished_session_counter_ directly instead of inferred from the wait's return.
   while (timeout_steady > std::chrono::steady_clock::duration::zero())
   {
     if (synchronization_data_->finished_session_counter_.load(std::memory_order_acquire) >=
@@ -546,16 +549,22 @@ bool ElasticsearchLogRecordExporter::ForceFlush(std::chrono::microseconds timeou
       break;
     }
 
+    // Clamp the wait to whatever is left of the caller's deadline: waiting the full
+    // response_timeout_ regardless of timeout_steady would let Shutdown(timeout) block far
+    // longer than the timeout it was given whenever nothing ever notifies this condition
+    // variable (e.g. an export that never completes).
+    const std::chrono::steady_clock::duration wait_interval = (std::min)(
+        std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+            std::chrono::seconds{options_.response_timeout_}),
+        timeout_steady);
+
     std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
-    if (std::cv_status::no_timeout != synchronization_data_->force_flush_cv.wait_for(
-                                          lk_cv, std::chrono::seconds{options_.response_timeout_}))
-    {
-      break;
-    }
+    synchronization_data_->force_flush_cv.wait_for(lk_cv, wait_interval);
     timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
   }
 
-  return timeout_steady > std::chrono::steady_clock::duration::zero();
+  return synchronization_data_->finished_session_counter_.load(std::memory_order_acquire) >=
+         running_counter;
 #else
   return true;
 #endif

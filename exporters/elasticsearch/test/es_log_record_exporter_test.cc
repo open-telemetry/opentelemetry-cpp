@@ -120,6 +120,49 @@ public:
   void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
 };
 
+// A session that accepts a handler and keeps it forever, never calling back into it. Used to
+// keep an async export outstanding by the time Shutdown()/ForceFlush() runs, so their wait
+// loop actually has something to wait for instead of finding nothing pending.
+//
+// Only meaningful under ENABLE_ASYNC_EXPORT: that is the only build where ForceFlush() waits on
+// anything at all (see ElasticsearchLogRecordExporter::ForceFlush).
+#ifdef ENABLE_ASYNC_EXPORT
+class HoldingSession final : public http_client::Session
+{
+public:
+  std::shared_ptr<http_client::Request> CreateRequest() noexcept override
+  {
+    return std::make_shared<FakeRequest>();
+  }
+
+  void SendRequest(std::shared_ptr<http_client::EventHandler> handler) noexcept override
+  {
+    held_ = std::move(handler);
+  }
+
+  bool IsSessionActive() noexcept override { return true; }
+  bool CancelSession() noexcept override { return true; }
+  bool FinishSession() noexcept override { return true; }
+
+private:
+  std::shared_ptr<http_client::EventHandler> held_;
+};
+
+class HoldingHttpClient final : public http_client::HttpClient
+{
+public:
+  std::shared_ptr<http_client::Session> CreateSession(
+      opentelemetry::nostd::string_view) noexcept override
+  {
+    return std::make_shared<HoldingSession>();
+  }
+
+  bool CancelAllSessions() noexcept override { return true; }
+  bool FinishAllSessions() noexcept override { return true; }
+  void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
+};
+#endif  // ENABLE_ASYNC_EXPORT
+
 }  // namespace
 
 namespace sdklogs       = opentelemetry::sdk::logs;
@@ -176,6 +219,35 @@ TEST(ElasticsearchLogsExporterTests, ShutdownReportsFlushCompletion)
 
   EXPECT_TRUE(exporter->Shutdown(std::chrono::seconds(1)));
 }
+
+// Regression test: ForceFlush()'s wait loop always waited the full response_timeout_ on its
+// condition variable, regardless of how much of the caller's own timeout was left. With an
+// export still outstanding and nothing to notify the condition variable, Shutdown(1us) waited
+// the full response_timeout_ (30s by default) instead of returning after about 1us. The wait
+// is now clamped to whatever remains of the caller's deadline, matching the pattern already
+// used by the OTLP HTTP client's ForceFlush().
+#ifdef ENABLE_ASYNC_EXPORT
+TEST(ElasticsearchLogsExporterTests, ShutdownClampsWaitToCallerTimeoutWhenExportIsOutstanding)
+{
+  logs_exporter::ElasticsearchExporterOptions options;
+  auto http_client = std::make_shared<HoldingHttpClient>();
+  auto exporter    = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
+
+  auto record = exporter->MakeRecordable();
+  record->SetBody("this export never completes");
+  auto export_result =
+      exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
+  ASSERT_EQ(export_result, opentelemetry::sdk::common::ExportResult::kSuccess);
+
+  auto start  = std::chrono::steady_clock::now();
+  bool result = exporter->Shutdown(std::chrono::microseconds(1));
+  auto elapsed = std::chrono::steady_clock::now() - start;
+
+  EXPECT_FALSE(result);
+  EXPECT_LT(elapsed, std::chrono::seconds(1));
+}
+#endif  // ENABLE_ASYNC_EXPORT
 
 // Regression test: once Shutdown() has been called, any later Export() must fail rather than
 // silently trying to register a session against an exporter that is already tearing down.
