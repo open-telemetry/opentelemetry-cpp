@@ -51,7 +51,17 @@ Resource Resource::Create(const ResourceAttributes &attributes, const std::strin
         resource.attributes_.find(semconv::process::kProcessExecutableName);
     if (it_process_executable_name != resource.attributes_.end())
     {
-      default_service_name += ":" + nostd::get<std::string>(it_process_executable_name->second);
+      // process.executable.name is not guaranteed to hold a std::string here: it may come from
+      // a custom ResourceDetector or from caller-supplied attributes, neither of which are
+      // constrained by the ResourceAttributes type to a particular AttributeValue alternative.
+      // Fall back to the plain "unknown_service" suffix rather than throwing bad_variant_access
+      // when it holds something else.
+      const auto *process_executable_name =
+          nostd::get_if<std::string>(&it_process_executable_name->second);
+      if (process_executable_name != nullptr)
+      {
+        default_service_name += ":" + *process_executable_name;
+      }
     }
     resource.attributes_[semconv::service::kServiceName] = default_service_name;
   }

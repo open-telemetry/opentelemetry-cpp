@@ -15,6 +15,13 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Fix `Resource::Create()` throwing `bad_variant_access` when
+  `process.executable.name` is present but does not hold a `std::string`
+  (e.g. set by a custom `ResourceDetector` or passed in directly with a
+  different `AttributeValue` alternative). It now falls back to the plain
+  `unknown_service` default instead of crashing provider construction.
+  [#4535](https://github.com/open-telemetry/opentelemetry-cpp/issues/4535)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)

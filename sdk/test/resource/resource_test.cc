@@ -14,6 +14,7 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/version/version.h"
+#include "opentelemetry/semconv/incubating/process_attributes.h"
 #include "opentelemetry/semconv/service_attributes.h"
 #include "opentelemetry/semconv/telemetry_attributes.h"
 
@@ -82,6 +83,24 @@ TEST(ResourceTest, create_without_servicename)
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
+}
+
+// Regression test: process.executable.name is not guaranteed to hold a std::string, since
+// neither a custom ResourceDetector nor caller-supplied attributes are constrained by the
+// ResourceAttributes type to a particular AttributeValue alternative. Create() used to build
+// the default service.name by calling nostd::get<std::string> on it unconditionally, which
+// throws bad_variant_access when it holds something else, crashing provider construction.
+TEST(ResourceTest, CreateFallsBackToPlainUnknownServiceWhenProcessExecutableNameIsNotAString)
+{
+  ResourceAttributes attributes = {
+      {semconv::process::kProcessExecutableName, static_cast<uint32_t>(1234)}};
+
+  auto resource = Resource::Create(attributes);
+
+  auto received_attributes = resource.GetAttributes();
+  auto it                  = received_attributes.find(semconv::service::kServiceName);
+  ASSERT_NE(it, received_attributes.end());
+  EXPECT_EQ(nostd::get<std::string>(it->second), "unknown_service");
 }
 
 TEST(ResourceTest, create_with_servicename)
