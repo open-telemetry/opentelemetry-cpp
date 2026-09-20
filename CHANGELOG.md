@@ -20,7 +20,7 @@ Increment the:
   (e.g. set by a custom `ResourceDetector` or passed in directly with a
   different `AttributeValue` alternative). It now falls back to the plain
   `unknown_service` default instead of crashing provider construction.
-  [#4535](https://github.com/open-telemetry/opentelemetry-cpp/issues/4535)
+  [#4609](https://github.com/open-telemetry/opentelemetry-cpp/pull/4609)
 
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
