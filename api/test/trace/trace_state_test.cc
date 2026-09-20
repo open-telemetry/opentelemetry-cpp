@@ -126,6 +126,38 @@ TEST(TraceStateTest, TraceStateSet)
   EXPECT_EQ(ts3_new->ToHeader(), "");
 }
 
+// Regression test: Set() used to always append a new entry, even when the key already existed,
+// instead of overwriting it in place as the W3C trace-context spec requires ("only one entry
+// per key is allowed"). Repeated Set() calls with the same key duplicated the entry every time,
+// eventually filling kMaxKeyValuePairs with stale copies of one key and silently dropping any
+// later, genuinely new key.
+TEST(TraceStateTest, TraceStateSetOverwritesExistingKey)
+{
+  std::string trace_state_header = "k1=v1,k2=v2";
+  auto ts1                       = TraceState::FromHeader(trace_state_header);
+
+  auto ts1_updated = ts1->Set("k1", "new_v1");
+  EXPECT_EQ(ts1_updated->ToHeader(), "k1=new_v1,k2=v2");
+
+  std::string value;
+  EXPECT_TRUE(ts1_updated->Get("k1", value));
+  EXPECT_EQ(value, "new_v1");
+
+  // Repeated overwrites of the same key must never grow the list past its original size, all
+  // the way up to kMaxKeyValuePairs, otherwise a later distinct key gets silently dropped.
+  auto ts_repeated = ts1;
+  for (int i = 0; i < TraceState::kMaxKeyValuePairs * 2; ++i)
+  {
+    ts_repeated = ts_repeated->Set("k1", "v" + std::to_string(i));
+  }
+  EXPECT_EQ(ts_repeated->ToHeader(), "k1=v" + std::to_string(TraceState::kMaxKeyValuePairs * 2 - 1) +
+                                         ",k2=v2");
+
+  auto ts_still_has_room = ts_repeated->Set("k3", "v3");
+  EXPECT_EQ(ts_still_has_room->ToHeader(),
+           "k3=v3,k1=v" + std::to_string(TraceState::kMaxKeyValuePairs * 2 - 1) + ",k2=v2");
+}
+
 TEST(TraceStateTest, TraceStateDelete)
 {
   std::string trace_state_header = "k1=v1,k2=v2,k3=v3";

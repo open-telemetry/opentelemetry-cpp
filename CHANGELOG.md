@@ -15,6 +15,13 @@ Increment the:
 
 ## [Unreleased]
 
+* [API] Fix `TraceState::Set()` appending a duplicate entry instead of
+  overwriting an existing key, in violation of the W3C trace-context
+  requirement that only one entry per key is allowed. Repeated `Set()`
+  calls on the same key filled the list with stale copies of it, up to
+  `kMaxKeyValuePairs`, silently dropping any later, genuinely new key.
+  [#4583](https://github.com/open-telemetry/opentelemetry-cpp/issues/4583)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)

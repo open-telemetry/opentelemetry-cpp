@@ -140,22 +140,33 @@ public:
       // max size reached or invalid key/value. Returning empty TraceState
       return TraceState::GetDefault();
     }
+
+    // Per the W3C trace-context spec, only one entry per key is allowed: updating an existing
+    // key must overwrite it in place rather than append a second entry, so the count only grows
+    // for a genuinely new key.
+    std::string existing_value;
+    bool key_exists = kv_properties_->GetValue(key, existing_value);
+
     auto allocate_size = curr_size;
-    if (curr_size < kMaxKeyValuePairs)
+    if (!key_exists && curr_size < kMaxKeyValuePairs)
     {
       allocate_size += 1;
     }
     nostd::shared_ptr<TraceState> ts(new TraceState(allocate_size));
-    if (curr_size < kMaxKeyValuePairs)
+    if (key_exists || curr_size < kMaxKeyValuePairs)
     {
-      // add new field first
+      // add new/updated field first
       ts->kv_properties_->AddEntry(key, value);
     }
-    // add rest of the fields.
-    kv_properties_->GetAllEntries([&ts](nostd::string_view key, nostd::string_view value) {
-      ts->kv_properties_->AddEntry(key, value);
-      return true;
-    });
+    // add rest of the fields, skipping the old entry for this key so it isn't duplicated.
+    kv_properties_->GetAllEntries(
+        [&ts, &key](nostd::string_view entry_key, nostd::string_view entry_value) {
+          if (entry_key != key)
+          {
+            ts->kv_properties_->AddEntry(entry_key, entry_value);
+          }
+          return true;
+        });
     return ts;
   }
 
