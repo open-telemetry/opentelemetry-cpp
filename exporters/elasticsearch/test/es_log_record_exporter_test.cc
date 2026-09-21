@@ -40,9 +40,7 @@ namespace
 {
 namespace http_client = opentelemetry::ext::http::client;
 
-// A response shaped like a successful Elasticsearch bulk reply: the exporter looks for
-// `"failed" : 0` in the body (see ElasticsearchLogRecordExporter::Export) in addition to the
-// status code before reporting success.
+// A bulk reply the exporter accepts: it looks for `"failed" : 0` as well as the status code.
 constexpr const char *kDefaultAcceptedBody = R"({"errors": false, "failed" : 0})";
 
 class FakeResponse final : public http_client::Response
@@ -98,11 +96,8 @@ public:
   void SetRetryPolicy(const http_client::RetryPolicy &) noexcept override {}
 };
 
-// What the client does with a request, called from inside SendRequest() so the exporter's own
-// wait returns without needing a connection. The handler travels as a shared_ptr because a case
-// that checks an outcome is reported once has to keep it and send a second event to it. The
-// default answers once, successfully, which is what a case wants when the response is not the
-// thing under test.
+// What the client does with a request, run from inside SendRequest() so no connection is
+// needed. The handler is shared so a case can keep it and deliver a second event.
 using EventScript = std::function<void(const std::shared_ptr<http_client::EventHandler> &)>;
 
 EventScript AnswerSuccessfully()
@@ -154,9 +149,7 @@ public:
   // Runs inside Export(), after the records have been handed over and before the request exists.
   std::function<void()> on_create_session;
 
-  // Runs inside Shutdown(). A real client answers its outstanding sessions here, so a case that
-  // needs a flush to be woken by the shutdown rather than by its own bound sets this; one that
-  // leaves it unset is a client that goes quiet instead, which is the case the bound exists for.
+  // Runs inside Shutdown(): set for a client that answers there, unset for one that stays quiet.
   std::function<void()> on_cancel_all;
 
   bool CancelAllSessions() noexcept override
@@ -327,9 +320,8 @@ namespace
 {
 namespace http_client = opentelemetry::ext::http::client;
 
-// Accepted by the substring check, by a top level "errors": false parse, and by one
-// acknowledged operation result carrying a 2xx status, so these cases keep meaning the
-// same thing whichever success check is in place.
+// Accepted by the substring check, by an "errors": false parse and by a 2xx operation result,
+// so these cases mean the same thing whichever success check is in place.
 constexpr const char *kAcceptedBody =
     R"({"took":30,"errors":false,"items":[{"index":{"status":201,"_shards":{"failed" : 0}}}]})";
 
@@ -343,8 +335,7 @@ namespace
 // A response timeout short enough that a wait bounded by it instead of by the caller's deadline
 // is visible in the elapsed time.
 constexpr int kShortResponseTimeoutSeconds = 2;
-// A flush that waits for its own export blocks until that timeout, so half of it separates
-// the two outcomes with a wide margin either way.
+// A flush that waits for its own export burns that timeout, so half of it separates the two.
 constexpr std::int64_t kFlushDidNotWaitUs = kShortResponseTimeoutSeconds * 500000;
 
 struct FlushFixture
@@ -362,6 +353,16 @@ FlushFixture MakeExporter(EventScript script)
   fixture.exporter          = std::unique_ptr<logs_exporter::ElasticsearchLogRecordExporter>(
       new logs_exporter::ElasticsearchLogRecordExporter(options, fixture.client));
   return fixture;
+}
+
+// Microseconds a flush took, for the cases that hold it did not wait for anything.
+std::int64_t FlushUs(logs_exporter::ElasticsearchLogRecordExporter &exporter)
+{
+  const auto started = std::chrono::steady_clock::now();
+  exporter.ForceFlush(std::chrono::milliseconds{20});
+  return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() -
+                                                               started)
+      .count();
 }
 
 void ExportOnce(logs_exporter::ElasticsearchLogRecordExporter &exporter)
@@ -413,8 +414,7 @@ public:
   int failures() const noexcept { return failures_.load(std::memory_order_relaxed); }
   int completions() const noexcept { return successes() + failures(); }
 
-  // Everything the handler was given, not only the completions. What a session says on its way to
-  // an outcome is as much a part of the contract as what it says at the end of one.
+  // Everything the handler was given, not only the completions.
   int lines() const noexcept { return lines_.load(std::memory_order_relaxed); }
 
 private:
@@ -678,15 +678,9 @@ public:
     {
       return;
     }
-    // ForceFlush() reports success when it gives up on its own condition variable, so the return
-    // value cannot tell a flush that had nothing to wait for from one that waited the whole
-    // response timeout. The duration can.
-    const auto started = std::chrono::steady_clock::now();
-    exporter_->ForceFlush(std::chrono::milliseconds{20});
-    flush_us_.store(std::chrono::duration_cast<std::chrono::microseconds>(
-                        std::chrono::steady_clock::now() - started)
-                        .count(),
-                    std::memory_order_relaxed);
+    // ForceFlush() also returns true when it gives up, so only the duration tells a flush with
+    // nothing to wait for from one that waited out the response timeout.
+    flush_us_.store(FlushUs(*exporter_), std::memory_order_relaxed);
   }
 
   bool reentered() const noexcept { return reentered_.load(std::memory_order_relaxed); }
@@ -803,5 +797,8 @@ TEST_F(ElasticsearchAsyncCompletionTests, AHandlerDestroyedWithoutAnOutcomeStill
 {
   auto fixture = MakeExporter([](const std::shared_ptr<http_client::EventHandler> &) {});
   ExportOnce(*fixture.exporter);
-  EXPECT_TRUE(fixture.exporter->ForceFlush(std::chrono::milliseconds{20}));
+
+  const std::int64_t waited = FlushUs(*fixture.exporter);
+  EXPECT_LT(waited, kFlushDidNotWaitUs)
+      << "the flush waited " << waited << "us for a session that reported nothing";
 }

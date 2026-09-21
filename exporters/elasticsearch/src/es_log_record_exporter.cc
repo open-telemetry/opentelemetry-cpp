@@ -269,16 +269,14 @@ public:
    */
   ~AsyncResponseHandler() override
   {
-    // An outcome is owed even here, or a waiter is left on a session that cannot finish.
-    // Reported before FinishSession(), which can block.
+    // Report before FinishSession(), which can block: an outcome is owed even here.
     CompleteOnce(sdk::common::ExportResult::kFailure);
     session_->FinishSession();
   }
 
   /**
-   * Report the outcome of this export, at most once. The HTTP client can deliver both a response
-   * and a terminal session event for one request, and the exporter counts one finished session
-   * per export, so only the first outcome is reported.
+   * Report this export's outcome, at most once: one request can deliver both a response and a
+   * terminal event, and the exporter counts one finished session per export.
    * @return whether this call is the one that reported.
    */
   bool CompleteOnce(sdk::common::ExportResult result) noexcept
@@ -301,11 +299,8 @@ public:
     const std::string body(response.GetBody().begin(), response.GetBody().end());
     const bool written = body.find("\"failed\" : 0") != std::string::npos;
 
-    // Reported before anything is logged. CompleteOnce() retires the session and wakes
-    // ForceFlush() before it returns, and the log handler is replaceable, so one that calls
-    // ForceFlush() would otherwise wait for the session this call has not let go of. A response
-    // that loses the exchange says nothing either, since the outcome it would describe is not the
-    // one the caller was given.
+    // Report before logging: CompleteOnce() retires the session, and a replaceable handler that
+    // flushes would wait on it. A loser stays silent; its outcome went to nobody.
     if (!CompleteOnce(written ? sdk::common::ExportResult::kSuccess
                               : sdk::common::ExportResult::kFailure))
     {
@@ -328,14 +323,12 @@ public:
   // Callback method when an http event occurs
   void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
   {
-    // No default label, so -Wswitch reports a state added upstream rather than leaving it
-    // uncounted.
+    // No default label: -Wswitch then reports a state added upstream instead of dropping it.
     const char *failure = nullptr;
     switch (state)
     {
-      // On the way to an outcome, so nothing to report and, in particular, nothing to log: the
-      // session is still registered, and a replaceable log handler that flushed from here would
-      // wait on the export whose call stack it is standing in.
+      // Progress only. The session is still registered, so a handler that flushed from a log
+      // line here would wait on the export it is standing in.
       case http_client::SessionState::Created:
       case http_client::SessionState::Connecting:
       case http_client::SessionState::Connected:
@@ -375,8 +368,7 @@ public:
         break;
     }
 
-    // Logged only when this event is the outcome. These can arrive after a response, and an
-    // error line there would describe a failure the caller was never told about.
+    // Only the event that decided the outcome speaks; a later one names a failure nobody got.
     if (failure != nullptr && CompleteOnce(sdk::common::ExportResult::kFailure))
     {
       OTEL_INTERNAL_LOG_ERROR(failure);
@@ -493,9 +485,8 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   auto handler              = std::make_shared<AsyncResponseHandler>(
       session,
       [span_count, synchronization_data](opentelemetry::sdk::common::ExportResult result) {
-        // Counted and woken before anything replaceable runs, for the same reason OnResponse()
-        // reports before it logs: a handler that calls ForceFlush() from the line below would
-        // otherwise wait for the session reporting to it.
+        // Count and wake before logging: a handler that flushes from the line below would
+        // wait for the session reporting to it.
         synchronization_data->finished_session_counter_.fetch_add(1, std::memory_order_release);
         synchronization_data->force_flush_cv.notify_all();
 
