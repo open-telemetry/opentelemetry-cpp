@@ -26,9 +26,7 @@ Increment the:
 * [SDK] Add `MeterProvider::UpdateMeterConfigurator()` and example. Instruments
   observe the enabled state of the Meter that created them, so a disabled Meter
   behaves as a no-op Meter without instruments having to be recreated
-  [#4256](https://github.com/open-telemetry/opentelemetry-cpp/issues/4256)
-* [DOC] Fix and clarify the `StartSpanOptions` documentation
-  [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
+  [#4313](https://github.com/open-telemetry/opentelemetry-cpp/pull/4313)
 
 * [SDK] Add a missing `<cstdint>` include to `predicate_factory.h`, which
   uses `uint8_t` without including the header that declares it. This relied
