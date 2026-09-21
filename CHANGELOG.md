@@ -18,11 +18,24 @@ Increment the:
 * [METRICS] Extend preview bound instruments to UpDownCounter and Gauge
   [#4321](https://github.com/open-telemetry/opentelemetry-cpp/pull/4321)
 
+* [EXAMPLES] Fix random attribute selection in metrics foo example to include
+  all key-value pairs
+  [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
 * [SDK] Fix span-limit environment variable handling compilation on 32-bit
   platforms (#4573)
   [#4573](https://github.com/open-telemetry/opentelemetry-cpp/pull/4573)
 * [API] Remove regex from trace_state.h
   [#4570](https://github.com/open-telemetry/opentelemetry-cpp/pull/4570)
+
+* [API] `TraceState::Set` now overwrites an entry with the same key, and
+ `TraceState::FromHeader` discards duplicate keys.
+  [#4586](https://github.com/open-telemetry/opentelemetry-cpp/pull/4586)
+
+* [SDK] Add a missing `<cstdint>` include to `predicate_factory.h`, which
+  uses `uint8_t` without including the header that declares it. This relied
+  on a transitive include from elsewhere in the translation unit and failed
+  to compile standalone on newer standard library implementations.
+  [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
 ## [1.29.0] 2026-09-13
 
