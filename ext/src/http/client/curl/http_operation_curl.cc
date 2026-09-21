@@ -507,8 +507,8 @@ HttpOperation::~HttpOperation()
       {
         if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
         {
-          async_data_->result_future.wait();
-          last_curl_result_ = async_data_->result_future.get();
+          // The IO thread stored this into the member before setting the promise.
+          static_cast<void>(async_data_->result_future.get());
         }
       }
       break;
@@ -532,8 +532,8 @@ void HttpOperation::Finish()
     // We should not wait in callback from Cleanup()
     if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
     {
-      async_data_->result_future.wait();
-      last_curl_result_ = async_data_->result_future.get();
+      // The IO thread stored this into the member before setting the promise.
+      static_cast<void>(async_data_->result_future.get());
     }
   }
 }
