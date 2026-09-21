@@ -724,6 +724,28 @@ TEST_F(ElasticsearchAsyncCompletionTests, AFlushFromInsideTheLogHandlerDoesNotWa
   raw->Watch(nullptr);
 }
 
+// The callback CompleteOnce() invokes writes its own diagnostic, and it is replaceable too, so
+// the session has to be counted and woken before that line rather than after it.
+TEST_F(ElasticsearchAsyncCompletionTests, AFlushFromTheCompletionErrorDoesNotWaitForItsOwnSession)
+{
+  auto fixture = MakeExporter([](const std::shared_ptr<http_client::EventHandler> &handler) {
+    FakeResponse response(200, R"({"took":1,"errors":true,"items":[]})");
+    handler->OnResponse(response);
+  });
+
+  auto watcher = nostd::shared_ptr<internal_log::LogHandler>(new FlushingLogHandler());
+  auto *raw    = static_cast<FlushingLogHandler *>(watcher.get());
+  raw->Watch(fixture.exporter.get(), "ERROR: Export");
+  internal_log::GlobalLogHandler::SetLogHandler(watcher);
+
+  ExportOnce(*fixture.exporter);
+
+  ASSERT_TRUE(raw->reentered()) << "the failure never reached the log handler";
+  EXPECT_LT(raw->flush_us(), kFlushDidNotWaitUs)
+      << "the flush waited " << raw->flush_us() << "us for the session that was reporting itself";
+  raw->Watch(nullptr);
+}
+
 // The same property on the path that refuses the batch: a handler that flushes from inside the
 // refusal must not wait for the Export() calling it. The shutdown check returns before
 // session_counter_ is incremented, so nothing is ever registered for a refused export.

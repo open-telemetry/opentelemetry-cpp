@@ -493,6 +493,12 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   auto handler              = std::make_shared<AsyncResponseHandler>(
       session,
       [span_count, synchronization_data](opentelemetry::sdk::common::ExportResult result) {
+        // Counted and woken before anything replaceable runs, for the same reason OnResponse()
+        // reports before it logs: a handler that calls ForceFlush() from the line below would
+        // otherwise wait for the session reporting to it.
+        synchronization_data->finished_session_counter_.fetch_add(1, std::memory_order_release);
+        synchronization_data->force_flush_cv.notify_all();
+
         if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
         {
           OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] ERROR: Export "
@@ -504,9 +510,6 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
           OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Export " << span_count
                                                                            << " log record(s) success");
         }
-
-        synchronization_data->finished_session_counter_.fetch_add(1, std::memory_order_release);
-        synchronization_data->force_flush_cv.notify_all();
         return true;
       },
       options_.console_debug_);
