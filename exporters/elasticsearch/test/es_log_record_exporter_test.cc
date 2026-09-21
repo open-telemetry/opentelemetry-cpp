@@ -120,9 +120,11 @@ public:
   void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
 };
 
-// A session that accepts a handler and keeps it forever, never calling back into it. Used to
-// keep an async export outstanding by the time Shutdown()/ForceFlush() runs, so their wait
-// loop actually has something to wait for instead of finding nothing pending.
+// A session that drops the handler it is given without ever calling back into it. Nothing on
+// the AsyncResponseHandler destruction path touches finished_session_counter_, so an export
+// through this session stays counted as outstanding for as long as the exporter lives, whether
+// or not the handler itself is retained; not retaining it avoids a Session/AsyncResponseHandler
+// reference cycle (they hold shared_ptrs to each other) that a leak sanitizer would flag.
 //
 // Only meaningful under ENABLE_ASYNC_EXPORT: that is the only build where ForceFlush() waits on
 // anything at all (see ElasticsearchLogRecordExporter::ForceFlush).
@@ -135,17 +137,11 @@ public:
     return std::make_shared<FakeRequest>();
   }
 
-  void SendRequest(std::shared_ptr<http_client::EventHandler> handler) noexcept override
-  {
-    held_ = std::move(handler);
-  }
+  void SendRequest(std::shared_ptr<http_client::EventHandler>) noexcept override {}
 
   bool IsSessionActive() noexcept override { return true; }
   bool CancelSession() noexcept override { return true; }
   bool FinishSession() noexcept override { return true; }
-
-private:
-  std::shared_ptr<http_client::EventHandler> held_;
 };
 
 class HoldingHttpClient final : public http_client::HttpClient
@@ -240,8 +236,8 @@ TEST(ElasticsearchLogsExporterTests, ShutdownClampsWaitToCallerTimeoutWhenExport
       exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
   ASSERT_EQ(export_result, opentelemetry::sdk::common::ExportResult::kSuccess);
 
-  auto start  = std::chrono::steady_clock::now();
-  bool result = exporter->Shutdown(std::chrono::microseconds(1));
+  auto start   = std::chrono::steady_clock::now();
+  bool result  = exporter->Shutdown(std::chrono::microseconds(1));
   auto elapsed = std::chrono::steady_clock::now() - start;
 
   EXPECT_FALSE(result);
