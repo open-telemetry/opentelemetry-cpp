@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include <string>
 
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_log_record_exporter_options.h"
