@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 #include <array>
 #include <atomic>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -342,6 +343,9 @@ namespace
 // A response timeout short enough that a wait bounded by it instead of by the caller's deadline
 // is visible in the elapsed time.
 constexpr int kShortResponseTimeoutSeconds = 2;
+// A flush that waits for its own export blocks until that timeout, so half of it separates
+// the two outcomes with a wide margin either way.
+constexpr std::int64_t kFlushDidNotWaitUs = kShortResponseTimeoutSeconds * 500000;
 
 struct FlushFixture
 {
@@ -674,18 +678,26 @@ public:
     {
       return;
     }
-    flushed_.store(exporter_->ForceFlush(std::chrono::milliseconds{20}), std::memory_order_relaxed);
+    // ForceFlush() reports success when it gives up on its own condition variable, so the return
+    // value cannot tell a flush that had nothing to wait for from one that waited the whole
+    // response timeout. The duration can.
+    const auto started = std::chrono::steady_clock::now();
+    exporter_->ForceFlush(std::chrono::milliseconds{20});
+    flush_us_.store(std::chrono::duration_cast<std::chrono::microseconds>(
+                        std::chrono::steady_clock::now() - started)
+                        .count(),
+                    std::memory_order_relaxed);
   }
 
   bool reentered() const noexcept { return reentered_.load(std::memory_order_relaxed); }
-  bool flushed() const noexcept { return flushed_.load(std::memory_order_relaxed); }
+  std::int64_t flush_us() const noexcept { return flush_us_.load(std::memory_order_relaxed); }
   int lines() const noexcept { return lines_.load(std::memory_order_relaxed); }
 
 private:
   logs_exporter::ElasticsearchLogRecordExporter *exporter_{nullptr};
   const char *needle_{"Logs were not written"};
   std::atomic<bool> reentered_{false};
-  std::atomic<bool> flushed_{false};
+  std::atomic<std::int64_t> flush_us_{0};
   std::atomic<int> lines_{0};
 };
 }  // namespace
@@ -707,13 +719,14 @@ TEST_F(ElasticsearchAsyncCompletionTests, AFlushFromInsideTheLogHandlerDoesNotWa
   ExportOnce(*fixture.exporter);
 
   ASSERT_TRUE(raw->reentered()) << "the failure never reached the log handler";
-  EXPECT_TRUE(raw->flushed()) << "the flush waited for the session that was reporting itself";
+  EXPECT_LT(raw->flush_us(), kFlushDidNotWaitUs)
+      << "the flush waited " << raw->flush_us() << "us for the session that was reporting itself";
   raw->Watch(nullptr);
 }
 
-// The same rule on the path that refuses the batch. The export is registered before the shutdown
-// check, so reporting the refusal before retiring it makes a flushing handler wait for the
-// Export() that is calling it, and the refusal is described twice.
+// The same property on the path that refuses the batch: a handler that flushes from inside the
+// refusal must not wait for the Export() calling it. The shutdown check returns before
+// session_counter_ is incremented, so nothing is ever registered for a refused export.
 TEST_F(ElasticsearchAsyncCompletionTests, AFlushFromTheShutdownErrorDoesNotWaitForItsOwnExport)
 {
   auto fixture = MakeExporter([](const std::shared_ptr<http_client::EventHandler> &) {});
@@ -727,7 +740,8 @@ TEST_F(ElasticsearchAsyncCompletionTests, AFlushFromTheShutdownErrorDoesNotWaitF
   ExportOnce(*fixture.exporter);
 
   ASSERT_TRUE(raw->reentered()) << "the shutdown refusal never reached the log handler";
-  EXPECT_TRUE(raw->flushed()) << "the flush waited for the export that was refusing itself";
+  EXPECT_LT(raw->flush_us(), kFlushDidNotWaitUs)
+      << "the flush waited " << raw->flush_us() << "us for the export that was refusing itself";
   EXPECT_EQ(1, raw->lines()) << "one refusal was described " << raw->lines() << " times";
   raw->Watch(nullptr);
 }
