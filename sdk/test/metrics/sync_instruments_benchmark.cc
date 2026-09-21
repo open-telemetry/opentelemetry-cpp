@@ -1078,6 +1078,43 @@ void BM_Record_BoundHistogram_Base2Expo_ByThreads(benchmark::State &state)
 BENCHMARK(BM_Record_BoundHistogram_Base2Expo_ByThreads)
     ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
 
+// PR #4321 results, 2026-09-21, source b3e71a6b.
+// Apple M4 Pro (12 cores), macOS 26.6.2 arm64, Apple Clang 21.0.0.
+// Release (-O3 -DNDEBUG), C++17, Google Benchmark 1.9.5.
+// CMake: OTELCPP_WITH_ABI_VERSION_1=OFF, OTELCPP_WITH_ABI_VERSION_2=ON,
+// OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW=ON,
+// OTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=OFF, OTELCPP_WITH_STL=OFF,
+// OTELCPP_BUILD_TESTING=ON, OTELCPP_WITH_BENCHMARK=ON.
+// Five repetitions, --benchmark_min_time=0.25s --benchmark_repetitions=5.
+// Machine-specific measurements. Threads were not pinned.
+// Run sync_instruments_benchmark with:
+// --benchmark_filter='BM_(Record|Collect)_Gauge_SharedEntry'
+// Median reported real time, ns/iteration. Mixed records twice per iteration.
+// Threaded timings are normalized across writers, not individual call latency.
+// Run-to-run real-time CV reached 25.1% in a contended case.
+//
+// BM_Record_Gauge_SharedEntry: args = distinct/collect/series per writer.
+// distinct=1 gives each writer separate series. collect=1 starts a collector
+// with 1 ms idle time between collections. Columns correspond to modes 0/1/2.
+// clang-format off
+// Args        Writers       Unbound         Bound         Mixed
+// 0/0/1             1         302.0          34.6         383.0
+// 0/0/1             4        2083.6         387.5        2588.7
+// 1/0/1             1         307.0          34.5         380.2
+// 1/0/1             4        1738.3         162.4        1510.6
+// 0/1/1             1         312.2          53.2         385.6
+// 0/1/1             4        2014.7         389.7        2618.7
+// 0/0/1000          1         327.3          34.9         354.7
+// 0/0/1000          4        2283.9          45.0        2112.8
+// 0/1/1000          1         387.1          35.6         389.3
+// 0/1/1000          4        4331.8          88.9        2549.5
+//
+// BM_Collect_Gauge_SharedEntry: full record-and-collect cycle, one writer.
+// Series                    Unbound         Bound         Mixed
+// 1                          1956.3        1535.6        1884.6
+// 1000                    1589240.5     1108428.8     1434183.6
+// clang-format on
+
 // One instance per benchmark invocation, shared only by that invocation's threads.
 // All attributes and handles are prepared before the timing loop starts.
 class GaugeRecordingBenchmark
