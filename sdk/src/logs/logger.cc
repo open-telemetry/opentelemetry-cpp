@@ -17,6 +17,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/logger.h"
@@ -187,6 +188,18 @@ void Logger::EmitLogRecord(
 
   if (!log_record)
   {
+    return;
+  }
+
+  // MakeRecordable() is a public, overridable entry point, so a caller (or another SDK/wrapper
+  // built on the API) can hand this a LogRecord implementation that is not actually a
+  // Recordable. static_cast between unrelated polymorphic types performs no runtime check, so
+  // the guard below has to come first: it is a virtual capability query rather than a
+  // dynamic_cast because this project supports building with RTTI disabled.
+  if (!log_record->IsRecordable())
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Logger::EmitLogRecord] Dropping log record: not a Recordable implementation.");
     return;
   }
 

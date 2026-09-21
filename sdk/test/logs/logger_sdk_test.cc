@@ -407,6 +407,51 @@ TEST(LoggerSDK, LogToAProcessor)
       now);
 }
 
+namespace
+{
+// A LogRecord implementation that is not an opentelemetry::sdk::logs::Recordable, simulating a
+// caller or bridge that hands EmitLogRecord() a foreign LogRecord. IsRecordable() correctly
+// defaults to false since this class does not override it.
+class ForeignLogRecord final : public logs_api::LogRecord
+{
+public:
+  void SetTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
+  void SetObservedTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
+  void SetSeverity(logs_api::Severity) noexcept override {}
+  void SetBody(const opentelemetry::common::AttributeValue &) noexcept override {}
+  void SetAttribute(nostd::string_view, const opentelemetry::common::AttributeValue &) noexcept override
+  {}
+  void SetEventId(int64_t, nostd::string_view) noexcept override {}
+  void SetTraceId(const opentelemetry::trace::TraceId &) noexcept override {}
+  void SetSpanId(const opentelemetry::trace::SpanId &) noexcept override {}
+  void SetTraceFlags(const opentelemetry::trace::TraceFlags &) noexcept override {}
+};
+}  // namespace
+
+// Regression test: EmitLogRecord() used to static_cast any LogRecord straight to Recordable
+// with no runtime check, so a LogRecord implementation that is not actually a Recordable (a
+// bridge, or a caller-supplied MakeRecordable() override) hit undefined behavior the moment the
+// mismatched vtable/layout was used. IsRecordable() now gates the cast; a foreign LogRecord
+// must be dropped rather than forwarded to the processor.
+TEST(LoggerSDK, EmitLogRecordDropsNonRecordableLogRecord)
+{
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
+  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library");
+  auto lp     = static_cast<LoggerProvider *>(api_lp.get());
+
+  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+  lp->AddProcessor(std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>(
+      new MockProcessor(shared_recordable)));
+
+  logger->EmitLogRecord(
+      nostd::unique_ptr<logs_api::LogRecord>(new ForeignLogRecord()));
+
+  // The processor's MockProcessor::OnEmit() would have run through a mismatched vtable/layout
+  // had the cast not been guarded; instead, shared_recordable must be untouched.
+  EXPECT_EQ(shared_recordable->GetSeverity(), logs_api::Severity::kInvalid);
+  EXPECT_EQ(shared_recordable->GetBody(), "");
+}
+
 TEST(LoggerSDK, LoggerWithDisabledConfig)
 {
   ScopeConfigurator<LoggerConfig> disabled_all_scopes =

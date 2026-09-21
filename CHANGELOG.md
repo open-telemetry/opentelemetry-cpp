@@ -15,6 +15,20 @@ Increment the:
 
 ## [Unreleased]
 
+* [LOGS] Fix `Logger::EmitLogRecord()` unconditionally `static_cast`-ing a
+  caller-supplied `LogRecord` to the SDK's internal `Recordable`, which is
+  undefined behavior when the `LogRecord` (e.g. from a bridge, or a custom
+  `MakeRecordable()` override) is not actually a `Recordable`. Added
+  `LogRecord::IsRecordable()`, a virtual capability check (not `dynamic_cast`,
+  since this project supports building with RTTI disabled), that
+  `EmitLogRecord()` now consults before casting; a `LogRecord` that is not a
+  `Recordable` is dropped with a warning instead of being forwarded.
+  [#4537](https://github.com/open-telemetry/opentelemetry-cpp/issues/4537)
+  * This adds a new virtual method to the public `opentelemetry::logs::LogRecord`
+    class, changing its vtable layout. It has a default implementation, so no
+    source changes are needed for existing `LogRecord` implementations, but
+    they must be rebuilt against this version.
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)

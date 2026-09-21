@@ -55,6 +55,8 @@ public:
    * supplied object alive.
    */
   virtual void SetLogRecordLimits(const LogRecordLimits & /* limits */) noexcept {}
+
+  bool IsRecordable() const noexcept final { return true; }
 };
 
 }  // namespace logs
