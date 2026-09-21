@@ -419,7 +419,8 @@ public:
   void SetObservedTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
   void SetSeverity(logs_api::Severity) noexcept override {}
   void SetBody(const opentelemetry::common::AttributeValue &) noexcept override {}
-  void SetAttribute(nostd::string_view, const opentelemetry::common::AttributeValue &) noexcept override
+  void SetAttribute(nostd::string_view,
+                    const opentelemetry::common::AttributeValue &) noexcept override
   {}
   void SetEventId(int64_t, nostd::string_view) noexcept override {}
   void SetTraceId(const opentelemetry::trace::TraceId &) noexcept override {}
@@ -443,8 +444,7 @@ TEST(LoggerSDK, EmitLogRecordDropsNonRecordableLogRecord)
   lp->AddProcessor(std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>(
       new MockProcessor(shared_recordable)));
 
-  logger->EmitLogRecord(
-      nostd::unique_ptr<logs_api::LogRecord>(new ForeignLogRecord()));
+  logger->EmitLogRecord(nostd::unique_ptr<logs_api::LogRecord>(new ForeignLogRecord()));
 
   // The processor's MockProcessor::OnEmit() would have run through a mismatched vtable/layout
   // had the cast not been guarded; instead, shared_recordable must be untouched.
