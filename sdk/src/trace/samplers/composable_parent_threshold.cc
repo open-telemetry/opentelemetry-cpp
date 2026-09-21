@@ -10,7 +10,6 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/trace_id.h"
-#include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
 
 #include "ot_trace_state.h"
@@ -42,13 +41,9 @@ SamplingIntent ComposableParentThresholdSampler::GetSamplingIntent(
                                             links);
   }
 
-  std::string ot_value;
   const auto &parent_trace_state = parent_context.trace_state();
-  if (parent_trace_state)
-  {
-    parent_trace_state->Get(kOtTraceStateKey, ot_value);
-  }
-  OtelTraceState ot_state = OtelTraceState::Parse(ot_value);
+  nostd::string_view ot_value    = GetOtValue(parent_trace_state);
+  OtelTraceState ot_state        = OtelTraceState::Parse(ot_value);
 
   SamplingIntent intent;
   if (ot_state.has_threshold)

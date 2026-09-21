@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <utility>
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -43,71 +44,52 @@ SamplingResult ProbabilitySampler::ShouldSample(
     const trace_api::SpanContextKeyValueIterable & /*links*/) noexcept
 {
   const auto &parent_trace_state = parent_context.trace_state();
-  const bool has_parent_entries  = parent_trace_state && !parent_trace_state->Empty();
 
-  OtelTraceState ot_state;
-  if (has_parent_entries)
-  {
-    std::string ot_value;
-    if (parent_trace_state->Get(kOtTraceStateKey, ot_value))
-    {
-      ot_state = OtelTraceState::Parse(ot_value);
-    }
-  }
+  nostd::string_view ot_value        = GetOtValue(parent_trace_state);
+  OtelTraceState ot_state            = OtelTraceState::Parse(ot_value);
+  const bool had_threshold           = ot_state.has_threshold;
+  const uint64_t had_threshold_value = ot_state.threshold;
 
-  bool drop = threshold_ == kMaxThreshold;
-  if (!drop)
+  // A threshold of 0 keeps every span regardless of randomness (e.g. a 100%
+  // sampling ratio), so skip computing it entirely.
+  bool is_sampled = threshold_ != kMaxThreshold;
+  if (is_sampled && threshold_ != 0)
   {
-    uint64_t randomness = 0;
-    if (ot_state.has_random_value)
+    if (!ot_state.has_random_value && parent_context.IsValid() &&
+        !parent_context.trace_flags().IsRandom())
     {
-      // An explicit "rv" from an upstream Level 2 participant wins over the
-      // trace id, keeping the sampling decision consistent across the trace.
-      randomness = ot_state.random_value;
-    }
-    else
-    {
-      if (parent_context.IsValid() && !parent_context.trace_flags().IsRandom())
+      static std::atomic<bool> warned{false};
+      if (!warned.exchange(true))
       {
-        static std::atomic<bool> warned{false};
-        if (!warned.exchange(true))
-        {
-          OTEL_INTERNAL_LOG_WARN(
-              "ProbabilitySampler presumes TraceID randomness, but the W3C random trace flag is "
-              "not set. Upgrade the caller to W3C Trace Context Level 2.");
-        }
+        OTEL_INTERNAL_LOG_WARN(
+            "ProbabilitySampler presumes TraceID randomness, but the W3C random trace flag is "
+            "not set. Upgrade the caller to W3C Trace Context Level 2.");
       }
-      randomness = GetRandomnessFromTraceId(trace_id);
     }
-    drop = randomness < threshold_;
+    is_sampled = GetSamplingRandomness(ot_state, trace_id) >= threshold_;
   }
+
+  Decision decision = is_sampled ? Decision::RECORD_AND_SAMPLE : Decision::DROP;
 
   // Record the effective threshold when sampling; a dropped span carries no
   // probability, so its inherited (now stale) "th" must be erased. The "rv"
   // sub-key and any other "ot" sub-keys are preserved by OtelTraceState.
-  if (drop)
-  {
-    ot_state.has_threshold = false;
-  }
-  else
+  if (is_sampled)
   {
     ot_state.has_threshold = true;
     ot_state.threshold     = threshold_;
   }
-
-  std::string new_ot_value = ot_state.Serialize();
-  auto trace_state =
-      has_parent_entries ? parent_trace_state->Delete(kOtTraceStateKey) : parent_trace_state;
-  if (!new_ot_value.empty())
+  else
   {
-    if (!trace_state)
-    {
-      trace_state = trace_api::TraceState::GetDefault();
-    }
-    trace_state = trace_state->Set(kOtTraceStateKey, new_ot_value);
+    ot_state.has_threshold = false;
   }
 
-  return {drop ? Decision::DROP : Decision::RECORD_AND_SAMPLE, nullptr, trace_state};
+  nostd::shared_ptr<trace_api::TraceState> trace_state =
+      parent_trace_state ? parent_trace_state : trace_api::TraceState::GetDefault();
+
+  return {decision, nullptr,
+          GetTraceStateForOtValue(ot_state, had_threshold, had_threshold_value, ot_value,
+                                  std::move(trace_state))};
 }
 
 nostd::string_view ProbabilitySampler::GetDescription() const noexcept
