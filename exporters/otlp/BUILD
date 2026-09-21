@@ -1190,6 +1190,10 @@ cc_test(
         "otlp_file",
         "test",
     ],
+    target_compatible_with = select({
+        ":json_writer_nlohmann_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         ":otlp_file_exporter",
         "//api",
@@ -1206,6 +1210,10 @@ cc_test(
         "otlp_file",
         "test",
     ],
+    target_compatible_with = select({
+        ":json_writer_nlohmann_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         ":otlp_file_log_record_exporter",
         "//api",
@@ -1222,6 +1230,10 @@ cc_test(
         "otlp_file",
         "test",
     ],
+    target_compatible_with = select({
+        ":json_writer_nlohmann_enabled": [],
+        "//conditions:default": ["@platforms//:incompatible"],
+    }),
     deps = [
         ":otlp_file_metric_exporter",
         "//api",
