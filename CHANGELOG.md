@@ -23,7 +23,7 @@ Increment the:
   since this project supports building with RTTI disabled), that
   `EmitLogRecord()` now consults before casting; a `LogRecord` that is not a
   `Recordable` is dropped with a warning instead of being forwarded.
-  [#4537](https://github.com/open-telemetry/opentelemetry-cpp/issues/4537)
+  [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
   * This adds a new virtual method to the public `opentelemetry::logs::LogRecord`
     class, changing its vtable layout. It has a default implementation, so no
     source changes are needed for existing `LogRecord` implementations, but
