@@ -10,6 +10,7 @@
 #  include <chrono>
 #  include <cstddef>
 #  include <cstdint>
+#  include <initializer_list>
 #  include <limits>
 #  include <map>
 #  include <memory>

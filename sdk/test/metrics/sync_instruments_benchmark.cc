@@ -204,14 +204,12 @@
 // clang-format on
 
 #include <benchmark/benchmark.h>
-#include <atomic>
 #include <chrono>
 #include <cstdlib>
 #include <map>
-#include <memory>
+#include <memory>  // IWYU pragma: keep
 #include <random>
 #include <string>
-#include <thread>
 #include <utility>
 #include <vector>
 
@@ -235,6 +233,14 @@
 #include "opentelemetry/sdk/resource/resource.h"
 
 #include "opentelemetry/version.h"  // IWYU pragma: keep
+
+#ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+#  include <atomic>
+#  include <thread>
+#  include "opentelemetry/nostd/function_ref.h"
+#  include "opentelemetry/nostd/unique_ptr.h"
+#  include "opentelemetry/sdk/metrics/export/metric_producer.h"
+#endif
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 #  include <cstdint>

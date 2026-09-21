@@ -16,10 +16,14 @@
 #include "opentelemetry/version.h"
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
+#  include <stddef.h>
 #  include <cstdint>
+#  include <functional>
+#  include <unordered_map>
 
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
+#  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
 #endif
 
