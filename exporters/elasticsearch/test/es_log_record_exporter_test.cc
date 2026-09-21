@@ -335,8 +335,10 @@ namespace
 // A response timeout short enough that a wait bounded by it instead of by the caller's deadline
 // is visible in the elapsed time.
 constexpr int kShortResponseTimeoutSeconds = 2;
-// A flush that waits for its own export burns that timeout, so half of it separates the two.
-constexpr std::int64_t kFlushDidNotWaitUs = kShortResponseTimeoutSeconds * 500000;
+// A flush with nothing outstanding returns at once and one that waits burns at least its own
+// timeout, so this sits between the two whether or not the caller deadline is honoured (#4336).
+constexpr auto kFlushTimeout              = std::chrono::milliseconds{200};
+constexpr std::int64_t kFlushDidNotWaitUs = 100000;
 
 struct FlushFixture
 {
@@ -359,7 +361,7 @@ FlushFixture MakeExporter(EventScript script)
 std::int64_t FlushUs(logs_exporter::ElasticsearchLogRecordExporter &exporter)
 {
   const auto started = std::chrono::steady_clock::now();
-  exporter.ForceFlush(std::chrono::milliseconds{20});
+  exporter.ForceFlush(kFlushTimeout);
   return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() -
                                                                started)
       .count();
