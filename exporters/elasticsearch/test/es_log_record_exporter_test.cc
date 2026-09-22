@@ -120,11 +120,12 @@ public:
   void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
 };
 
-// A session that drops the handler it is given without ever calling back into it. Nothing on
-// the AsyncResponseHandler destruction path touches finished_session_counter_, so an export
-// through this session stays counted as outstanding for as long as the exporter lives, whether
-// or not the handler itself is retained; not retaining it avoids a Session/AsyncResponseHandler
-// reference cycle (they hold shared_ptrs to each other) that a leak sanitizer would flag.
+// A session that parks the handler it is given, in the test case rather than in the session
+// itself, without ever calling back into it. The handler stays alive (so the export it
+// represents keeps counting as outstanding) without creating a Session/AsyncResponseHandler
+// reference cycle: AsyncResponseHandler holds a shared_ptr to its session, so a session that
+// held the handler back would keep both alive for the exporter's own lifetime, which a leak
+// sanitizer would flag.
 //
 // Only meaningful under ENABLE_ASYNC_EXPORT: that is the only build where ForceFlush() waits on
 // anything at all (see ElasticsearchLogRecordExporter::ForceFlush).
@@ -132,30 +133,46 @@ public:
 class HoldingSession final : public http_client::Session
 {
 public:
+  explicit HoldingSession(std::shared_ptr<http_client::EventHandler> *parked) : parked_(parked) {}
+
   std::shared_ptr<http_client::Request> CreateRequest() noexcept override
   {
     return std::make_shared<FakeRequest>();
   }
 
-  void SendRequest(std::shared_ptr<http_client::EventHandler>) noexcept override {}
+  // Parked where the case can see it, not in this session: the handler owns its session, so a
+  // session that owned the handler back would keep the pair alive.
+  void SendRequest(std::shared_ptr<http_client::EventHandler> handler) noexcept override
+  {
+    *parked_ = std::move(handler);
+  }
 
   bool IsSessionActive() noexcept override { return true; }
   bool CancelSession() noexcept override { return true; }
   bool FinishSession() noexcept override { return true; }
+
+private:
+  std::shared_ptr<http_client::EventHandler> *parked_;
 };
 
 class HoldingHttpClient final : public http_client::HttpClient
 {
 public:
+  explicit HoldingHttpClient(std::shared_ptr<http_client::EventHandler> *parked) : parked_(parked)
+  {}
+
   std::shared_ptr<http_client::Session> CreateSession(
       opentelemetry::nostd::string_view) noexcept override
   {
-    return std::make_shared<HoldingSession>();
+    return std::make_shared<HoldingSession>(parked_);
   }
 
   bool CancelAllSessions() noexcept override { return true; }
   bool FinishAllSessions() noexcept override { return true; }
   void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
+
+private:
+  std::shared_ptr<http_client::EventHandler> *parked_;
 };
 #endif  // ENABLE_ASYNC_EXPORT
 
@@ -225,8 +242,10 @@ TEST(ElasticsearchLogsExporterTests, ShutdownReportsFlushCompletion)
 #ifdef ENABLE_ASYNC_EXPORT
 TEST(ElasticsearchLogsExporterTests, ShutdownClampsWaitToCallerTimeoutWhenExportIsOutstanding)
 {
+  // Declared first so it outlives the client and the session that point at it.
+  std::shared_ptr<http_client::EventHandler> parked;
   logs_exporter::ElasticsearchExporterOptions options;
-  auto http_client = std::make_shared<HoldingHttpClient>();
+  auto http_client = std::make_shared<HoldingHttpClient>(&parked);
   auto exporter    = std::unique_ptr<sdklogs::LogRecordExporter>(
       new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
 
@@ -242,6 +261,9 @@ TEST(ElasticsearchLogsExporterTests, ShutdownClampsWaitToCallerTimeoutWhenExport
 
   EXPECT_FALSE(result);
   EXPECT_LT(elapsed, std::chrono::seconds(1));
+
+  // Let the export finish now that the assertions are done.
+  parked.reset();
 }
 #endif  // ENABLE_ASYNC_EXPORT
 
