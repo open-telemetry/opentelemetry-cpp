@@ -210,11 +210,13 @@ rather than conventional. Exactly one outcome is what the handle settles to.
 A request the caller cannot change after submission closes the mutation half of
 the lifetime problem. The other half is separate: a const view of freed storage
 is still dangling, so the operation has to own the bytes until the backend is
-done with them. #4433 is that second half, a member reference bound to a
-constructor temporary. The submission has an identity that does not move when a
-session is reused. Progress reporting is
-separable from settlement, so there is no progress callback that can be mistaken
-for one.
+done with them. #4433 has a case for each. Its body is the lifetime half, a
+member reference bound to a constructor temporary. A comment on it reports the
+mutation half, ThreadSanitizer on the write in `Request::SetBody` against the
+read of the same vector in the read callback, measured rather than reasoned but
+without a published reproduction. The submission has an identity that does not
+move when a session is reused. Progress reporting is separable from settlement,
+so there is no progress callback that can be mistaken for one.
 
 The cost is real and should not be glossed. It is a second interface next to the
 installed one, so it needs an adapter and a migration story rather than a
