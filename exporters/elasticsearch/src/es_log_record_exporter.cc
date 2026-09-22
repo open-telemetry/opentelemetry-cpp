@@ -1,7 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <algorithm>
+#include <algorithm>  // IWYU pragma: keep
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
