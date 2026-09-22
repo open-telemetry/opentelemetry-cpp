@@ -210,8 +210,9 @@ rather than conventional. Exactly one outcome is what the handle settles to.
 A request the caller cannot change after submission closes the mutation half of
 the lifetime problem. The other half is separate: a const view of freed storage
 is still dangling, so the operation has to own the bytes until the backend is
-done with them. #4433 has a case for each. The submission has an
-identity that does not move when a session is reused. Progress reporting is
+done with them. #4433 is that second half, a member reference bound to a
+constructor temporary. The submission has an identity that does not move when a
+session is reused. Progress reporting is
 separable from settlement, so there is no progress callback that can be mistaken
 for one.
 
@@ -350,12 +351,13 @@ leaving it implicit. A bounded governor needs both dimensions, a count and
 retained bytes, rather than either alone. For the curl backend the preferred
 default baseline is one shared `CURLM`, because a multi handle owns its
 connection, DNS and TLS caches, and two of them cannot be waited on together
-through `curl_multi_poll`. That is a property of the polling interface rather
-than of libcurl: `curl_multi_socket_action` hands sockets and timers back to the
-caller, so one event loop could drive several. Whether that is worth doing is a
-benchmark question, not one this rules out. And the lifetime of everything a
-request needs should have a single owner, which is the direction that removes
-`HttpOperation` rather than guarding it.
+through `curl_multi_poll`. That is a property of the polling interface.
+`curl_multi_socket_action` reports readiness through `CURLMOPT_SOCKETFUNCTION`
+and `CURLMOPT_TIMERFUNCTION` instead, leaving the waiting to the caller. The
+documentation does not say whether one loop can drive several multi handles, so
+treat that as an inference to test rather than a fact to cite. And the lifetime
+of everything a request needs should have a single owner, which is the direction
+that removes `HttpOperation` rather than guarding it.
 
 The last two are preferences with evidence, not settled architecture. The
 sharing scope of the `CURLM` is a benchmark decision, and a process wide one
