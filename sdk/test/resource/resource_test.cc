@@ -433,6 +433,15 @@ TEST(ResourceTest, CreateServiceNameFallbackUsesProcessExecutableName)
             "unknown_service:otel-test");
 }
 
+TEST(ResourceTest, CreateNonStringProcessExecutableNameFallsBackToUnknownService)
+{
+  ResourceAttributes attributes = {{semconv::process::kProcessExecutableName, true}};
+  auto resource                 = Resource::Create(attributes);
+
+  EXPECT_EQ(nostd::get<std::string>(resource.GetAttributes().at(semconv::service::kServiceName)),
+            "unknown_service");
+}
+
 TEST(ResourceTest, MergeUnassociatedMatchesFlattened)
 {
   TestResource resource1(ResourceAttributes({{"service", "backend"}}));
