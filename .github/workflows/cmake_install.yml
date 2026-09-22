@@ -285,7 +285,7 @@ jobs:
 
   macos_14_conan_stable:
     name: macOS 14 conan stable versions cxx17 (static libs)
-    runs-on: macos-14
+    runs-on: macos-26
     env:
       INSTALL_TEST_DIR: '/Users/runner/install_test'
       CXX_STANDARD: '17'
@@ -322,7 +322,7 @@ jobs:
 
   macos_14_brew_packages:
     name: macOS 14 brew latest versions cxx17 (static libs)
-    runs-on: macos-14
+    runs-on: macos-26
     env:
       INSTALL_TEST_DIR: '/Users/runner/install_test'
       CXX_STANDARD: '17'
