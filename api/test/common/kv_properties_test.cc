@@ -225,6 +225,15 @@ TEST(KeyValueProperties, GetValue)
   EXPECT_FALSE(present);
 }
 
+TEST(KeyValueProperties, HasKey)
+{
+  auto kv_properties = KeyValueProperties(1);
+  kv_properties.AddEntry("k1", "v1");
+
+  EXPECT_TRUE(kv_properties.HasKey("k1"));
+  EXPECT_FALSE(kv_properties.HasKey("k3"));
+}
+
 TEST(KeyValueProperties, GetAllEntries)
 {
   std::vector<std::pair<std::string, std::string>> kv_pairs = {

@@ -365,7 +365,7 @@ TEST(Aggregation, Base2ExponentialHistogramAggregation)
   ASSERT_TRUE(histo_point.positive_buckets_->Empty());
   ASSERT_TRUE(histo_point.negative_buckets_->Empty());
 
-  // Create a new aggreagte based in point data
+  // Create a new aggregate based on point data
   {
     const auto &point_data = histo_point;
     Base2ExponentialHistogramAggregation scale0_aggr2(point_data);

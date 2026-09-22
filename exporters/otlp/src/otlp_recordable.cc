@@ -213,6 +213,10 @@ void OtlpRecordable::SetStatus(trace::StatusCode code, nostd::string_view descri
   {
     span_.mutable_status()->set_message(description.data(), description.size());
   }
+  else
+  {
+    span_.mutable_status()->clear_message();
+  }
 }
 
 void OtlpRecordable::SetName(nostd::string_view name) noexcept
