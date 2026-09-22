@@ -25,6 +25,7 @@
 #include "opentelemetry/sdk/configuration/headers_configuration.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_encoding.h"
@@ -605,12 +606,12 @@ tracer_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
   ASSERT_NE(config->tracer_provider->limits, nullptr);
-  ASSERT_EQ(config->tracer_provider->limits->attribute_value_length_limit, 4096);
-  ASSERT_EQ(config->tracer_provider->limits->attribute_count_limit, 128);
-  ASSERT_EQ(config->tracer_provider->limits->event_count_limit, 128);
-  ASSERT_EQ(config->tracer_provider->limits->link_count_limit, 128);
-  ASSERT_EQ(config->tracer_provider->limits->event_attribute_count_limit, 128);
-  ASSERT_EQ(config->tracer_provider->limits->link_attribute_count_limit, 128);
+  ASSERT_FALSE(config->tracer_provider->limits->attribute_value_length_limit.HasValue());
+  ASSERT_FALSE(config->tracer_provider->limits->attribute_count_limit.HasValue());
+  ASSERT_FALSE(config->tracer_provider->limits->event_count_limit.HasValue());
+  ASSERT_FALSE(config->tracer_provider->limits->link_count_limit.HasValue());
+  ASSERT_FALSE(config->tracer_provider->limits->event_attribute_count_limit.HasValue());
+  ASSERT_FALSE(config->tracer_provider->limits->link_attribute_count_limit.HasValue());
 }
 
 TEST(YamlTrace, limits)
@@ -635,12 +636,43 @@ tracer_provider:
   ASSERT_NE(config, nullptr);
   ASSERT_NE(config->tracer_provider, nullptr);
   ASSERT_NE(config->tracer_provider->limits, nullptr);
-  ASSERT_EQ(config->tracer_provider->limits->attribute_value_length_limit, 1111);
-  ASSERT_EQ(config->tracer_provider->limits->attribute_count_limit, 2222);
-  ASSERT_EQ(config->tracer_provider->limits->event_count_limit, 3333);
-  ASSERT_EQ(config->tracer_provider->limits->link_count_limit, 4444);
-  ASSERT_EQ(config->tracer_provider->limits->event_attribute_count_limit, 5555);
-  ASSERT_EQ(config->tracer_provider->limits->link_attribute_count_limit, 6666);
+  ASSERT_TRUE(config->tracer_provider->limits->attribute_value_length_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->attribute_value_length_limit.Value(), 1111);
+  ASSERT_TRUE(config->tracer_provider->limits->attribute_count_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->attribute_count_limit.Value(), 2222);
+  ASSERT_TRUE(config->tracer_provider->limits->event_count_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->event_count_limit.Value(), 3333);
+  ASSERT_TRUE(config->tracer_provider->limits->link_count_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->link_count_limit.Value(), 4444);
+  ASSERT_TRUE(config->tracer_provider->limits->event_attribute_count_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->event_attribute_count_limit.Value(), 5555);
+  ASSERT_TRUE(config->tracer_provider->limits->link_attribute_count_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->link_attribute_count_limit.Value(), 6666);
+}
+
+TEST(YamlTrace, limits_null_fields)
+{
+  std::string yaml = R"(
+file_format: "1.0-trace"
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  limits:
+    attribute_value_length_limit: null
+    attribute_count_limit: null
+    event_count_limit: 64
+)";
+
+  auto config = DoParse(yaml);
+  ASSERT_NE(config, nullptr);
+  ASSERT_NE(config->tracer_provider, nullptr);
+  ASSERT_NE(config->tracer_provider->limits, nullptr);
+  ASSERT_FALSE(config->tracer_provider->limits->attribute_value_length_limit.HasValue());
+  ASSERT_FALSE(config->tracer_provider->limits->attribute_count_limit.HasValue());
+  ASSERT_TRUE(config->tracer_provider->limits->event_count_limit.HasValue());
+  ASSERT_EQ(config->tracer_provider->limits->event_count_limit.Value(), 64);
 }
 
 TEST(YamlTrace, limits_with_invalid_values)
@@ -949,7 +981,8 @@ tracer_provider:
   auto *ratio =
       reinterpret_cast<opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration *>(
           sampler);
-  ASSERT_EQ(ratio->ratio, 0.0);
+  const auto defaults = opentelemetry::sdk::configuration::TraceIdRatioBasedSamplerConfiguration{};
+  ASSERT_EQ(ratio->ratio, defaults.ratio);
 }
 
 TEST(YamlTrace, trace_id_ratio_based_sampler)

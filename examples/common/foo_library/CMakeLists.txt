@@ -3,7 +3,7 @@
 
 add_library(common_foo_library foo_library.h foo_library.cc)
 
-if(DEFINED OPENTELEMETRY_BUILD_DLL)
+if(OTELCPP_BUILD_DLL)
   target_compile_definitions(common_foo_library
                              PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
 endif()

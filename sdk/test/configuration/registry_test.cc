@@ -34,7 +34,9 @@
 #include "opentelemetry/sdk/configuration/host_resource_detector_builder.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_builder.h"
+#include "opentelemetry/sdk/configuration/logger_provider_builder.h"
 #include "opentelemetry/sdk/configuration/meter_configurator_builder.h"
+#include "opentelemetry/sdk/configuration/meter_provider_builder.h"
 #include "opentelemetry/sdk/configuration/open_census_metric_producer_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_log_record_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_builder.h"
@@ -58,6 +60,7 @@
 #include "opentelemetry/sdk/configuration/text_map_propagator_builder.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_builder.h"
+#include "opentelemetry/sdk/configuration/tracer_provider_builder.h"
 
 #include "opentelemetry/context/propagation/text_map_propagator.h"      // IWYU pragma: keep
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"  // IWYU pragma: keep
@@ -628,6 +631,39 @@ public:
   }
 };
 
+class TestTracerProviderBuilder : public configuration::TracerProviderBuilder
+{
+public:
+  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> Build(
+      const configuration::TracerProviderBuilderContext & /* context */,
+      const configuration::TracerProviderConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestLoggerProviderBuilder : public configuration::LoggerProviderBuilder
+{
+public:
+  std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> Build(
+      const configuration::LoggerProviderBuilderContext & /* context */,
+      const configuration::LoggerProviderConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
+class TestMeterProviderBuilder : public configuration::MeterProviderBuilder
+{
+public:
+  std::shared_ptr<opentelemetry::sdk::metrics::MeterProvider> Build(
+      const configuration::MeterProviderBuilderContext & /* context */,
+      const configuration::MeterProviderConfiguration * /* model */) const override
+  {
+    return nullptr;
+  }
+};
+
 }  // namespace
 
 // ----------------------------------------------------------------------------------
@@ -1027,4 +1063,22 @@ TEST(Registry, ExtensionLogRecordProcessorBuilder)
   TestNamedSlot<TestExtensionLogRecordProcessorBuilder>(
       &configuration::Registry::GetExtensionLogRecordProcessorBuilder,
       &configuration::Registry::SetExtensionLogRecordProcessorBuilder, "my_processor");
+}
+
+TEST(Registry, TracerProviderBuilder)
+{
+  TestTypedSlot<TestTracerProviderBuilder>(&configuration::Registry::GetTracerProviderBuilder,
+                                           &configuration::Registry::SetTracerProviderBuilder);
+}
+
+TEST(Registry, LoggerProviderBuilder)
+{
+  TestTypedSlot<TestLoggerProviderBuilder>(&configuration::Registry::GetLoggerProviderBuilder,
+                                           &configuration::Registry::SetLoggerProviderBuilder);
+}
+
+TEST(Registry, MeterProviderBuilder)
+{
+  TestTypedSlot<TestMeterProviderBuilder>(&configuration::Registry::GetMeterProviderBuilder,
+                                          &configuration::Registry::SetMeterProviderBuilder);
 }

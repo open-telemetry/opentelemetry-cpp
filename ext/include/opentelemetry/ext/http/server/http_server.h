@@ -101,7 +101,7 @@ protected:
     SocketTools::Socket socket;
     std::string receiveBuffer;
     std::string sendBuffer;
-    enum : std::uint8_t
+    enum : std::uint8_t  // NOLINT(cppcoreguidelines-use-enum-class)
     {
       Idle,
       ReceivingHeaders,
@@ -173,7 +173,7 @@ public:
         m_maxRequestContentSize(2 * 1024 * 1024)
   {}
 
-  HttpServer(const std::string &serverHost, int port = 30000) : HttpServer()
+  HttpServer(const std::string &serverHost, uint16_t port = 30000) : HttpServer()
   {
     std::ostringstream os;
     os << serverHost << ":" << port;
@@ -202,7 +202,7 @@ public:
 
   void setServerName(std::string const &name) { m_serverHost = name; }
 
-  int addListeningPort(int port)
+  int addListeningPort(uint16_t port)
   {
     SocketTools::Socket socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     socket.setNonBlocking();
@@ -223,7 +223,7 @@ public:
   HttpRequestHandler &addHandler(const std::string &root, HttpRequestCallback &handler)
   {
     // No thread-safety here!
-    m_handlers.push_back({root, &handler});
+    m_handlers.emplace_back(root, &handler);
     LOG_INFO("HttpServer: Added handler for %s", root.c_str());
     return m_handlers.back();
   }
@@ -231,7 +231,7 @@ public:
   HttpRequestHandler &operator[](const std::string &root)
   {
     // No thread-safety here!
-    m_handlers.push_back({root, nullptr});
+    m_handlers.emplace_back(root, nullptr);
     LOG_INFO("HttpServer: Added handler for %s", root.c_str());
     return m_handlers.back();
   }
@@ -239,7 +239,7 @@ public:
   HttpServer &operator+=(std::pair<const std::string &, HttpRequestCallback &> other)
   {
     LOG_INFO("HttpServer: Added handler for %s", other.first.c_str());
-    m_handlers.push_back(HttpRequestHandler(other.first, &other.second));
+    m_handlers.emplace_back(other.first, &other.second);
     return (*this);
   }
 

@@ -175,11 +175,11 @@ struct SocketAddr
   /// <returns>SocketAddr</returns>
   SocketAddr() {}
 
-  SocketAddr(u_long addr, int port)
+  SocketAddr(u_long addr, uint16_t port)
   {
     sockaddr_in &inet4    = reinterpret_cast<sockaddr_in &>(m_data);
     inet4.sin_family      = AF_INET;
-    inet4.sin_port        = htons(static_cast<uint16_t>(port));
+    inet4.sin_port        = htons(port);
     inet4.sin_addr.s_addr = htonl(addr);
   }
 
@@ -223,8 +223,8 @@ struct SocketAddr
     // accept a leading sign or whitespace and depend on the locale.
     if (ok && colon)
     {
-      char const *p     = colon + 1;
-      unsigned int port = 0;
+      char const *p = colon + 1;
+      uint16_t port = 0;
       if (*p == '\0')
       {
         ok = false;  // empty port, e.g. "127.0.0.1:"
@@ -236,7 +236,7 @@ struct SocketAddr
           ok = false;
           break;
         }
-        unsigned int const digit = static_cast<unsigned int>(*p - '0');
+        const uint16_t digit = static_cast<uint16_t>(*p - '0');
         if (port > (65535u - digit) / 10u)
         {
           ok = false;  // would exceed 65535
@@ -247,7 +247,7 @@ struct SocketAddr
       }
       if (ok)
       {
-        parsed.sin_port = htons(static_cast<uint16_t>(port));
+        parsed.sin_port = htons(port);
       }
     }
 
@@ -326,10 +326,10 @@ static_assert(sizeof(SocketAddr) == sizeof(sockaddr),
 struct Socket
 {
 #ifdef _WIN32
-  typedef SOCKET Type;
+  using Type                = SOCKET;
   static Type const Invalid = INVALID_SOCKET;
 #else
-  typedef int Type;
+  using Type                = int;
   static Type const Invalid = -1;
 #endif
 
@@ -465,7 +465,7 @@ struct Socket
 #endif
   }
 
-  enum  // NOLINT(performance-enum-size)
+  enum  // NOLINT(performance-enum-size,cppcoreguidelines-use-enum-class)
   {
 #ifdef _WIN32
     ErrorWouldBlock = WSAEWOULDBLOCK
@@ -474,7 +474,7 @@ struct Socket
 #endif
   };
 
-  enum  // NOLINT(performance-enum-size)
+  enum  // NOLINT(performance-enum-size,cppcoreguidelines-use-enum-class)
   {
 #ifdef _WIN32
     ShutdownReceive = SD_RECEIVE,
@@ -527,7 +527,7 @@ struct Reactor : protected common::Thread
   /// <summary>
   /// Socket State
   /// </summary>
-  enum State : std::uint8_t
+  enum State : std::uint8_t  // NOLINT(cppcoreguidelines-use-enum-class)
   {
     Readable   = 1,
     Writable   = 2,
@@ -626,7 +626,7 @@ public:
         EV_SET(&event, event.ident, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
         kevent(kq, &event, 1, NULL, 0, NULL);
 #endif
-        m_sockets.push_back(SocketData());
+        m_sockets.emplace_back();
         m_sockets.back().socket = socket;
         m_sockets.back().flags  = 0;
         it                      = m_sockets.end() - 1;

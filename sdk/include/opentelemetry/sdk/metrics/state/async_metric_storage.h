@@ -63,7 +63,7 @@ public:
     // Async counter always record monotonically increasing values, and the
     // exporter/reader can request either for delta or cumulative value.
     // So we convert the async counter value to delta before passing it to temporal storage.
-    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
+    std::lock_guard<std::mutex> guard(hashmap_lock_);
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     const bool offer_exemplars =
         ExemplarFilterEnabled(exemplar_filter_type_, opentelemetry::context::Context{});
@@ -130,7 +130,7 @@ public:
 
     std::shared_ptr<AttributesHashMap> delta_metrics = nullptr;
     {
-      std::lock_guard<opentelemetry::common::SpinLockMutex> guard(hashmap_lock_);
+      std::lock_guard<std::mutex> guard(hashmap_lock_);
       delta_metrics = std::move(delta_hash_map_);
       delta_hash_map_ =
           std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_);
@@ -148,7 +148,7 @@ private:
   const AggregationConfig *aggregation_config_;
   std::unique_ptr<AttributesHashMap> cumulative_hash_map_;
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
-  opentelemetry::common::SpinLockMutex hashmap_lock_;
+  std::mutex hashmap_lock_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
   ExemplarFilterType exemplar_filter_type_;
   nostd::shared_ptr<ExemplarReservoir> exemplar_reservoir_;

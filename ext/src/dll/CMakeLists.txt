@@ -27,7 +27,7 @@ target_include_directories(
     $<TARGET_PROPERTY:opentelemetry_exporter_ostream_span,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   target_compile_definitions(opentelemetry_cpp PRIVATE WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_grpc)
@@ -38,7 +38,7 @@ if(WITH_OTLP_GRPC)
   )
 endif()
 
-if(WITH_OTLP_HTTP)
+if(OTELCPP_WITH_OTLP_HTTP)
   target_compile_definitions(opentelemetry_cpp PRIVATE WITH_OTLP_HTTP)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_http)
@@ -49,7 +49,7 @@ if(WITH_OTLP_HTTP)
   )
 endif()
 
-if(WITH_OTLP_FILE)
+if(OTELCPP_WITH_OTLP_FILE)
   target_compile_definitions(opentelemetry_cpp PRIVATE WITH_OTLP_FILE)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_file)
@@ -70,7 +70,7 @@ target_include_directories(
     $<TARGET_PROPERTY:opentelemetry_exporter_ostream_metrics,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_grpc_metrics)
   target_include_directories(
@@ -80,7 +80,7 @@ if(WITH_OTLP_GRPC)
   )
 endif()
 
-if(WITH_OTLP_HTTP)
+if(OTELCPP_WITH_OTLP_HTTP)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_http_metric)
   target_include_directories(
@@ -90,7 +90,7 @@ if(WITH_OTLP_HTTP)
   )
 endif()
 
-if(WITH_OTLP_FILE)
+if(OTELCPP_WITH_OTLP_FILE)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_file_metric)
   target_include_directories(
@@ -110,7 +110,7 @@ target_include_directories(
     $<TARGET_PROPERTY:opentelemetry_exporter_ostream_logs,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_grpc_log)
   target_include_directories(
@@ -120,7 +120,7 @@ if(WITH_OTLP_GRPC)
   )
 endif()
 
-if(WITH_OTLP_HTTP)
+if(OTELCPP_WITH_OTLP_HTTP)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_http_log)
   target_include_directories(
@@ -130,7 +130,7 @@ if(WITH_OTLP_HTTP)
   )
 endif()
 
-if(WITH_OTLP_FILE)
+if(OTELCPP_WITH_OTLP_FILE)
   target_link_libraries(opentelemetry_cpp
                         PRIVATE opentelemetry_exporter_otlp_file_log)
   target_include_directories(

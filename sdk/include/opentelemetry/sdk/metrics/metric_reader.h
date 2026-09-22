@@ -6,6 +6,7 @@
 #include <atomic>
 #include <chrono>
 #include <cstddef>
+#include <mutex>
 
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/sdk/metrics/cardinality_limits.h"
@@ -71,11 +72,19 @@ public:
 
   /**
    * Shutdown the metric reader.
+   *
+   * Idempotent and a completion barrier: only the first call runs OnShutDown(), and a
+   * concurrent call blocks until the first call has finished before returning.
+   *
+   * @return the result of OnShutDown() for the first call, true for any subsequent call.
    */
   bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
   /**
    * Force flush the metric read by the reader.
+   *
+   * @return false without invoking OnForceFlush() if the reader is already shut down, otherwise
+   * the result of OnForceFlush().
    */
   bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
 
@@ -96,6 +105,7 @@ private:
 protected:
 private:
   MetricProducer *metric_producer_{nullptr};
+  std::mutex shutdown_m_;
   std::atomic<bool> shutdown_{false};
   CardinalityLimits cardinality_limits_;
 };

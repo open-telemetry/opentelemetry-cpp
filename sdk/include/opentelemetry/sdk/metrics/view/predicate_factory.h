@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
 
 #include "opentelemetry/nostd/string_view.h"
@@ -18,7 +19,8 @@ namespace metrics
 enum class PredicateType : uint8_t
 {
   kPattern,
-  kExact
+  kExact,
+  kWildcard
 };
 
 class PredicateFactory
@@ -27,7 +29,7 @@ public:
   static std::unique_ptr<Predicate> GetPredicate(opentelemetry::nostd::string_view pattern,
                                                  PredicateType type)
   {
-    if ((type == PredicateType::kPattern && pattern == "*") ||
+    if (((type == PredicateType::kPattern || type == PredicateType::kWildcard) && pattern == "*") ||
         (type == PredicateType::kExact && pattern == ""))
     {
       return std::unique_ptr<Predicate>(new MatchEverythingPattern());
@@ -39,6 +41,10 @@ public:
     if (type == PredicateType::kExact)
     {
       return std::unique_ptr<Predicate>(new ExactPredicate(pattern));
+    }
+    if (type == PredicateType::kWildcard)
+    {
+      return std::unique_ptr<Predicate>(new WildcardPredicate(pattern));
     }
     return std::unique_ptr<Predicate>(new MatchNothingPattern());
   }

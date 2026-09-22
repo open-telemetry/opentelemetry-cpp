@@ -8,10 +8,17 @@
 #include <opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h>
 
+#include <opentelemetry/exporters/otlp/otlp_grpc_builder_utils.h>
+#include <opentelemetry/sdk/configuration/grpc_tls_configuration.h>
+
 #include <opentelemetry/exporters/otlp/otlp_grpc_client_factory.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h>
 #include <opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h>
+
+#include <opentelemetry/exporters/otlp/otlp_grpc_log_record_builder.h>
+#include <opentelemetry/exporters/otlp/otlp_grpc_push_metric_builder.h>
+#include <opentelemetry/exporters/otlp/otlp_grpc_span_builder.h>
 
 TEST(ExportersOtlpGrpcInstall, OtlpGrpcClient)
 {
@@ -39,4 +46,68 @@ TEST(ExportersOtlpGrpcInstall, OtlpGrpcMetricExporter)
   auto options  = opentelemetry::exporter::otlp::OtlpGrpcMetricExporterOptions();
   auto exporter = opentelemetry::exporter::otlp::OtlpGrpcMetricExporterFactory::Create(options);
   ASSERT_TRUE(exporter != nullptr);
+}
+
+TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcSpanBuilder)
+{
+  auto builder = std::make_unique<opentelemetry::exporter::otlp::OtlpGrpcSpanBuilder>();
+  ASSERT_TRUE(builder != nullptr);
+
+  opentelemetry::sdk::configuration::OtlpGrpcSpanExporterConfiguration model;
+  model.tls = std::make_unique<opentelemetry::sdk::configuration::GrpcTlsConfiguration>();
+
+  model.endpoint      = "http://localhost:4317";
+  model.tls->insecure = false;
+  model.timeout       = 12;
+  model.compression   = "none";
+
+  auto exporter = builder->Build(&model);
+  ASSERT_TRUE(exporter != nullptr);
+}
+
+TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcPushMetricBuilder)
+{
+  auto builder = std::make_unique<opentelemetry::exporter::otlp::OtlpGrpcPushMetricBuilder>();
+  ASSERT_TRUE(builder != nullptr);
+
+  opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration model;
+  model.tls = std::make_unique<opentelemetry::sdk::configuration::GrpcTlsConfiguration>();
+
+  model.endpoint      = "http://localhost:4317";
+  model.tls->insecure = false;
+  model.timeout       = 12;
+  model.compression   = "none";
+  model.temporality_preference =
+      opentelemetry::sdk::configuration::TemporalityPreference::cumulative;
+
+  auto exporter = builder->Build(&model);
+  ASSERT_TRUE(exporter != nullptr);
+}
+
+TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcLogRecordBuilder)
+{
+  auto builder = std::make_unique<opentelemetry::exporter::otlp::OtlpGrpcLogRecordBuilder>();
+  ASSERT_TRUE(builder != nullptr);
+
+  opentelemetry::sdk::configuration::OtlpGrpcLogRecordExporterConfiguration model;
+  model.tls = std::make_unique<opentelemetry::sdk::configuration::GrpcTlsConfiguration>();
+
+  model.endpoint      = "http://localhost:4317";
+  model.tls->insecure = false;
+  model.timeout       = 12;
+  model.compression   = "none";
+
+  auto exporter = builder->Build(&model);
+  ASSERT_TRUE(exporter != nullptr);
+}
+
+TEST(ExportersOtlpGrpcBuilderInstall, OtlpGrpcBuilderUtilsGrpcUseSsl)
+{
+  opentelemetry::sdk::configuration::GrpcTlsConfiguration tls;
+  tls.insecure = true;
+
+  EXPECT_FALSE(opentelemetry::exporter::otlp::OtlpGrpcBuilderUtils::GrpcUseSsl(
+      "http://localhost:4317", &tls));
+  EXPECT_TRUE(opentelemetry::exporter::otlp::OtlpGrpcBuilderUtils::GrpcUseSsl(
+      "https://localhost:4317", &tls));
 }

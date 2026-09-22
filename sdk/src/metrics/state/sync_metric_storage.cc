@@ -22,7 +22,6 @@
 #  include <unordered_set>
 #  include <vector>
 
-#  include "opentelemetry/common/spin_lock_mutex.h"
 #  include "opentelemetry/sdk/common/global_log_handler.h"
 #  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
@@ -47,7 +46,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
   std::shared_ptr<AttributesHashMap> delta_metrics = nullptr;
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
   // Snapshot of bound entries (under map lock) that we will rotate without
-  // holding the map lock. Each entry has its own spinlock for the swap.
+  // holding the map lock. Each entry has its own mutex for the swap.
   std::vector<std::shared_ptr<BoundEntry>> entry_snapshot;
 #endif
   {
@@ -66,7 +65,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
       bool can_erase = false;
       if (it->second.use_count() == 1)
       {
-        std::lock_guard<opentelemetry::common::SpinLockMutex> g(it->second->lock_);
+        std::lock_guard<std::mutex> g(it->second->lock_);
         can_erase = !it->second->dirty_;
       }
       if (can_erase)
@@ -95,7 +94,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
   }
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
-  // Rotate dirty bound entries: under each entry's own spinlock, swap out the
+  // Rotate dirty bound entries: under each entry's own mutex, swap out the
   // current aggregation and merge it into delta_metrics so bound + unbound
   // writes for the same post-filter attribute set produce one datapoint.
   for (auto &entry : entry_snapshot)
@@ -103,7 +102,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
     std::unique_ptr<Aggregation> rotated;
     MetricAttributes attrs_copy;
     {
-      std::lock_guard<opentelemetry::common::SpinLockMutex> g(entry->lock_);
+      std::lock_guard<std::mutex> g(entry->lock_);
       if (!entry->dirty_)
       {
         continue;
@@ -160,7 +159,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
       // satisfy the documented invariant on dirty_.
       bool entry_dirty = false;
       {
-        std::lock_guard<opentelemetry::common::SpinLockMutex> g(it->second->lock_);
+        std::lock_guard<std::mutex> g(it->second->lock_);
         entry_dirty = it->second->dirty_;
       }
       if (entry_dirty)
@@ -228,7 +227,7 @@ void SyncMetricStorage::BoundEntry::RecordLong(int64_t value) noexcept
         "is not long");
     return;
   }
-  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
+  std::lock_guard<std::mutex> guard(lock_);
   current_->Aggregate(value);
   dirty_ = true;
 }
@@ -242,7 +241,7 @@ void SyncMetricStorage::BoundEntry::RecordDouble(double value) noexcept
         "is not double");
     return;
   }
-  std::lock_guard<opentelemetry::common::SpinLockMutex> guard(lock_);
+  std::lock_guard<std::mutex> guard(lock_);
   current_->Aggregate(value);
   dirty_ = true;
 }

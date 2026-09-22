@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <memory>
+#include <string>
 #include <utility>
 
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_span_builder.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/configuration/otlp_file_span_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/version.h"
@@ -25,11 +28,15 @@ void OtlpFileSpanBuilder::Register(opentelemetry::sdk::configuration::Registry *
 }
 
 std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpFileSpanBuilder::Build(
-    const opentelemetry::sdk::configuration::OtlpFileSpanExporterConfiguration * /* model */) const
+    const opentelemetry::sdk::configuration::OtlpFileSpanExporterConfiguration *model) const
 {
   OtlpFileExporterOptions options;
 
   // FIXME: unclear how to map model->output_stream to a OtlpFileClientBackendOptions
+  if (!model->output_stream.empty())
+  {
+    OTEL_INTERNAL_LOG_WARN("[Otlp File Exporter] output_stream is not yet supported, ignoring");
+  }
 
   return OtlpFileExporterFactory::Create(options);
 }

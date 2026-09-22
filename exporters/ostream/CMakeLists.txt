@@ -16,14 +16,15 @@ set_target_version(opentelemetry_exporter_ostream_span)
 
 target_include_directories(
   opentelemetry_exporter_ostream_span
-  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
 
 target_link_libraries(opentelemetry_exporter_ostream_span
                       PUBLIC opentelemetry_trace)
 
 list(APPEND OPENTELEMETRY_OSTREAM_TARGETS opentelemetry_exporter_ostream_span)
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_executable(ostream_span_test test/ostream_span_test.cc)
   target_link_libraries(ostream_span_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_ostream_span)
@@ -31,7 +32,7 @@ if(BUILD_TESTING)
     TARGET ostream_span_test
     TEST_PREFIX exporter.
     TEST_LIST ostream_span_test)
-endif() # BUILD_TESTING
+endif() # OTELCPP_BUILD_TESTING
 
 #
 # opentelemetry_exporter_ostream_span_builder
@@ -51,8 +52,8 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_exporter_ostream_span_builder
-  PUBLIC opentelemetry_exporter_ostream_span
-  PRIVATE opentelemetry_configuration_core)
+  PUBLIC opentelemetry_configuration_core opentelemetry_trace
+  PRIVATE opentelemetry_exporter_ostream_span)
 
 list(APPEND OPENTELEMETRY_OSTREAM_BUILDER_TARGETS
      opentelemetry_exporter_ostream_span_builder)
@@ -69,14 +70,16 @@ set_target_version(opentelemetry_exporter_ostream_metrics)
 
 target_include_directories(
   opentelemetry_exporter_ostream_metrics
-  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
+
 target_link_libraries(opentelemetry_exporter_ostream_metrics
                       PUBLIC opentelemetry_metrics)
 
 list(APPEND OPENTELEMETRY_OSTREAM_TARGETS
      opentelemetry_exporter_ostream_metrics)
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_executable(ostream_metric_test test/ostream_metric_test.cc)
   target_link_libraries(
     ostream_metric_test ${GTEST_BOTH_LIBRARIES}
@@ -103,8 +106,8 @@ target_include_directories(
          "$<INSTALL_INTERFACE:include>")
 target_link_libraries(
   opentelemetry_exporter_ostream_metrics_builder
-  PUBLIC opentelemetry_exporter_ostream_metrics
-  PRIVATE opentelemetry_configuration_core)
+  PUBLIC opentelemetry_configuration_core opentelemetry_metrics
+  PRIVATE opentelemetry_exporter_ostream_metrics)
 
 list(APPEND OPENTELEMETRY_OSTREAM_BUILDER_TARGETS
      opentelemetry_exporter_ostream_metrics_builder)
@@ -121,12 +124,13 @@ set_target_version(opentelemetry_exporter_ostream_logs)
 
 target_include_directories(
   opentelemetry_exporter_ostream_logs
-  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
+  PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+         "$<INSTALL_INTERFACE:include>")
 target_link_libraries(opentelemetry_exporter_ostream_logs
                       PUBLIC opentelemetry_logs)
 list(APPEND OPENTELEMETRY_OSTREAM_TARGETS opentelemetry_exporter_ostream_logs)
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_executable(ostream_log_test test/ostream_log_test.cc)
   target_link_libraries(ostream_log_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_ostream_logs)
@@ -153,37 +157,18 @@ target_include_directories(
          "$<INSTALL_INTERFACE:include>")
 target_link_libraries(
   opentelemetry_exporter_ostream_logs_builder
-  PUBLIC opentelemetry_exporter_ostream_logs
-  PRIVATE opentelemetry_configuration_core)
+  PUBLIC opentelemetry_configuration_core opentelemetry_logs
+  PRIVATE opentelemetry_exporter_ostream_logs)
 list(APPEND OPENTELEMETRY_OSTREAM_BUILDER_TARGETS
      opentelemetry_exporter_ostream_logs_builder)
 
 otel_add_component(
   COMPONENT
   exporters_ostream
-  TARGETS
-  ${OPENTELEMETRY_OSTREAM_TARGETS}
-  FILES_DIRECTORY
-  "include/opentelemetry/exporters/ostream"
-  FILES_DESTINATION
-  "include/opentelemetry/exporters"
-  FILES_MATCHING
-  PATTERN
-  "*.h"
-  PATTERN
-  "console_log_record_builder.h"
-  EXCLUDE
-  PATTERN
-  "console_push_metric_builder.h"
-  EXCLUDE
-  PATTERN
-  "console_span_builder.h"
-  EXCLUDE)
-
-otel_add_component(
-  COMPONENT
+  DEPRECATED_NAMES
   exporters_ostream_builder
   TARGETS
+  ${OPENTELEMETRY_OSTREAM_TARGETS}
   ${OPENTELEMETRY_OSTREAM_BUILDER_TARGETS}
   FILES_DIRECTORY
   "include/opentelemetry/exporters/ostream"
@@ -191,13 +176,9 @@ otel_add_component(
   "include/opentelemetry/exporters"
   FILES_MATCHING
   PATTERN
-  "console_log_record_builder.h"
-  PATTERN
-  "console_push_metric_builder.h"
-  PATTERN
-  "console_span_builder.h")
+  "*.h")
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     exporter_ostream_span "OpenTelemetry Exporter - OStream Span"
     "Exports trace spans to output stream." "opentelemetry_trace")
@@ -205,7 +186,8 @@ if(OPENTELEMETRY_INSTALL)
   opentelemetry_add_pkgconfig(
     exporter_ostream_span_builder
     "OpenTelemetry Exporter - OStream Span Builder"
-    "Builder for OStream span exporter." "opentelemetry_exporter_ostream_span")
+    "Builder for OStream span exporter."
+    "opentelemetry_exporter_ostream_span opentelemetry_configuration_core")
 
   opentelemetry_add_pkgconfig(
     exporter_ostream_metrics "OpenTelemetry Exporter - OStream Metrics"
@@ -215,7 +197,7 @@ if(OPENTELEMETRY_INSTALL)
     exporter_ostream_metrics_builder
     "OpenTelemetry Exporter - OStream Metrics Builder"
     "Builder for OStream metrics exporter."
-    "opentelemetry_exporter_ostream_metrics")
+    "opentelemetry_exporter_ostream_metrics opentelemetry_configuration_core")
 
   opentelemetry_add_pkgconfig(
     exporter_ostream_logs "OpenTelemetry Exporter - OStream Logs"
@@ -225,5 +207,5 @@ if(OPENTELEMETRY_INSTALL)
     exporter_ostream_logs_builder
     "OpenTelemetry Exporter - OStream Logs Builder"
     "Builder for OStream log record exporter."
-    "opentelemetry_exporter_ostream_logs")
+    "opentelemetry_exporter_ostream_logs opentelemetry_configuration_core")
 endif()

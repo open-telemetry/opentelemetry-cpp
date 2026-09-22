@@ -24,11 +24,10 @@ namespace metrics
 
 using MetricAttributes = opentelemetry::sdk::metrics::FilteredOrderedAttributeMap;
 
-typedef std::unordered_map<std::string,
-                           bool,
-                           opentelemetry::sdk::common::StringViewHash,
-                           opentelemetry::sdk::common::StringViewEqual>
-    FilterAttributeMap;
+using FilterAttributeMap = std::unordered_map<std::string,
+                                              bool,
+                                              opentelemetry::sdk::common::StringViewHash,
+                                              opentelemetry::sdk::common::StringViewEqual>;
 
 /**
  * The AttributesProcessor is responsible for customizing which

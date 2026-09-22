@@ -17,6 +17,8 @@
 #include "opentelemetry/semconv/service_attributes.h"
 #include "opentelemetry/semconv/telemetry_attributes.h"
 
+#include "src/resource/detail/percent_decode.h"
+
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
 using opentelemetry::sdk::common::setenv;
@@ -236,6 +238,21 @@ TEST(ResourceTest, OtelResourceDetector)
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());
 
   unsetenv("OTEL_RESOURCE_ATTRIBUTES");
+}
+
+TEST(ResourceTest, PercentDecode)
+{
+  using opentelemetry::sdk::resource::detail::PercentDecode;
+
+  EXPECT_EQ(PercentDecode("hello%20world"), "hello world");
+  EXPECT_EQ(PercentDecode("a%2Cb"), "a,b");
+  EXPECT_EQ(PercentDecode("100%25"), "100%");
+  EXPECT_EQ(PercentDecode("%41%42%43"), "ABC");
+
+  EXPECT_EQ(PercentDecode("100%"), "100%");
+  EXPECT_EQ(PercentDecode("50%z"), "50%z");
+  EXPECT_EQ(PercentDecode("%GG"), "%GG");
+  EXPECT_EQ(PercentDecode("plain"), "plain");
 }
 
 TEST(ResourceTest, OtelResourceDetectorPercentDecodesValues)

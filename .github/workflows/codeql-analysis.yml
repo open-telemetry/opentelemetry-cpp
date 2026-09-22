@@ -16,20 +16,21 @@ jobs:
       actions: read  # for github/codeql-action/init to get workflow details
       contents: read  # for actions/checkout to fetch code
       security-events: write  # for github/codeql-action/autobuild to send a status report
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       CC: /usr/bin/gcc-14
       CXX: /usr/bin/g++-14
       CXX_STANDARD: '17'
     steps:
     - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+      uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
       with:
         egress-policy: audit
 
     - name: Checkout repository
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
+         persist-credentials: false
          submodules: 'recursive'
     - name: Install dependencies
       run: |
@@ -56,7 +57,7 @@ jobs:
       run: |
         sudo -E ./ci/install_thirdparty.sh --install-dir /usr/local --tags-file third_party_release --packages "ryml"
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
+      uses: github/codeql-action/init@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
       with:
         languages: cpp
         config: |
@@ -67,8 +68,8 @@ jobs:
         mkdir -p $HOME/build && cd $HOME/build
         cmake -G Ninja \
               -C ${GITHUB_WORKSPACE}/test_common/cmake/all-options-abiv2-preview.cmake \
-              -DWITH_OPENTRACING=OFF \
+              -DOTELCPP_WITH_OPENTRACING=OFF \
               "${GITHUB_WORKSPACE}"
         cmake --build . --parallel
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
+      uses: github/codeql-action/analyze@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1

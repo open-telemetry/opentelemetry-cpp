@@ -22,6 +22,7 @@ otel_add_component(
   opentelemetry_common
   opentelemetry_resources
   opentelemetry_version
+  opentelemetry_instrumentation_scope
   opentelemetry_logs
   opentelemetry_trace
   opentelemetry_metrics
@@ -50,11 +51,12 @@ otel_add_component(
   "sdk/configuration/ryml_document_node.h"
   EXCLUDE)
 
-if(WITH_CONFIGURATION)
+if(OTELCPP_WITH_CONFIGURATION)
   otel_add_component(
     COMPONENT
     configuration
     TARGETS
+    opentelemetry_configuration_yaml
     opentelemetry_configuration
     FILES_DIRECTORY
     "include/opentelemetry/"
@@ -71,6 +73,6 @@ if(WITH_CONFIGURATION)
     "sdk/configuration/ryml_document_node.h")
 endif()
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_subdirectory(test)
 endif()

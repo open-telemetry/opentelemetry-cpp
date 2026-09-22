@@ -20,7 +20,6 @@
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/exporter.h"
-#include "opentelemetry/sdk/logs/multi_log_record_processor.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor.h"
@@ -352,51 +351,6 @@ TEST(SimpleLogRecordProcessorTest, EnabledForwardsArgumentsToImplementation)
   EXPECT_EQ(call_state->severity, logs_api::Severity::kWarn);
   EXPECT_EQ(call_state->event_name, "test-event-name");
   EXPECT_EQ(call_state->call_count, 1U);
-}
-
-TEST(SimpleLogRecordProcessorTest, MultiLogRecordProcessorEnabledWhenAnyChildEnabled)
-{
-  auto first_state  = std::make_shared<EnabledCallState>();
-  auto second_state = std::make_shared<EnabledCallState>();
-
-  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
-  processors.emplace_back(new EnabledProcessor(false, first_state));
-  processors.emplace_back(new EnabledProcessor(true, second_state));
-  MultiLogRecordProcessor processor(std::move(processors));
-
-  context::Context test_context{"test-key", true};
-  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
-
-  EXPECT_TRUE(
-      processor.Enabled(test_context, *scope, logs_api::Severity::kError, "test-event-name"));
-  EXPECT_EQ(first_state->call_count, 1U);
-  EXPECT_EQ(second_state->call_count, 1U);
-  EXPECT_EQ(second_state->event_name, "test-event-name");
-}
-
-TEST(SimpleLogRecordProcessorTest, MultiLogRecordProcessorDisabledWhenAllChildrenDisabled)
-{
-  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
-  processors.emplace_back(new EnabledProcessor(false));
-  processors.emplace_back(new EnabledProcessor(false));
-  MultiLogRecordProcessor processor(std::move(processors));
-
-  context::Context test_context{"test-key", true};
-  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
-
-  EXPECT_FALSE(
-      processor.Enabled(test_context, *scope, logs_api::Severity::kError, "test-event-name"));
-}
-
-TEST(SimpleLogRecordProcessorTest, EmptyMultiLogRecordProcessorIsDisabled)
-{
-  MultiLogRecordProcessor processor(std::vector<std::unique_ptr<LogRecordProcessor>>{});
-
-  context::Context test_context{"test-key", true};
-  auto scope = instrumentation_scope::InstrumentationScope::Create("test-scope");
-
-  EXPECT_FALSE(
-      processor.Enabled(test_context, *scope, logs_api::Severity::kDebug, "test-event-name"));
 }
 
 }  // namespace

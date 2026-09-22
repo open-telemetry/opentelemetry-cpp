@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_span_builder.h"
@@ -16,6 +17,10 @@
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/version.h"
+
+#ifndef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
+#  include "opentelemetry/sdk/common/global_log_handler.h"
+#endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace exporter
@@ -38,7 +43,7 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcSpanBuilder::Bu
 
   options.endpoint = model->endpoint;
 
-  options.use_ssl_credentials = OtlpBuilderUtils::GrpcUseSsl(options.endpoint, tls);
+  options.use_ssl_credentials = OtlpGrpcBuilderUtils::GrpcUseSsl(options.endpoint, tls);
 
   if (tls != nullptr)
   {
@@ -46,6 +51,13 @@ std::unique_ptr<opentelemetry::sdk::trace::SpanExporter> OtlpGrpcSpanBuilder::Bu
 #ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
     options.ssl_client_key_path  = tls->key_file;
     options.ssl_client_cert_path = tls->cert_file;
+#else
+    if (!tls->key_file.empty() || !tls->cert_file.empty())
+    {
+      OTEL_INTERNAL_LOG_WARN(
+          "[Otlp Grpc Exporter] mTLS client key/cert configured but the SDK was built without "
+          "ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW: tls.cert_file and tls.key_file will be ignored");
+    }
 #endif
   }
 
