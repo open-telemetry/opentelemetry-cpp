@@ -17,8 +17,10 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <limits>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -506,6 +508,12 @@ TEST_F(BasicCurlHttpTests, SeekCallbackRepositionsTheRequestBody)
   EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, -1, SEEK_SET));
   EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 0, SEEK_CUR));
   EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 0, SEEK_END));
+
+  // An offset past the range of size_t must stay out of range. Narrowing it to size_t first
+  // wrapped it back into the body on a build where size_t is 32 bits.
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK,
+            Peer::Seek(operation, static_cast<curl_off_t>(std::numeric_limits<uint32_t>::max()) + 4,
+                       SEEK_SET));
   EXPECT_EQ(3u, Peer::ReadCursor(operation));
 
   EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::SeekNullUserData(0, SEEK_SET));
