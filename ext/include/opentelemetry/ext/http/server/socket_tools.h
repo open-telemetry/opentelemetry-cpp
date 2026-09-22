@@ -177,10 +177,13 @@ struct SocketAddr
 
   SocketAddr(u_long addr, uint16_t port)
   {
-    sockaddr_in &inet4    = reinterpret_cast<sockaddr_in &>(m_data);
+    struct sockaddr_in inet4;
+    std::memset(&inet4, 0, sizeof(inet4));
     inet4.sin_family      = AF_INET;
     inet4.sin_port        = htons(port);
     inet4.sin_addr.s_addr = htonl(addr);
+
+    std::memcpy(&m_data, &inet4, sizeof(inet4));
   }
 
   /// Parses an IPv4 address in "host" or "host:port" form. Host parsing follows the platform's
