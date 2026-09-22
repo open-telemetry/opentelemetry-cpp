@@ -8,6 +8,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/exporters/otlp/otlp_http_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_http_push_metric_builder.h"
@@ -49,7 +50,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpHttpPushMet
   const auto *tls = model->tls.get();
 
   options.url                = model->endpoint;
-  options.content_type       = OtlpBuilderUtils::ConvertOtlpHttpEncoding(model->encoding);
+  options.content_type       = OtlpHttpBuilderUtils::ConvertOtlpHttpEncoding(model->encoding);
   options.json_bytes_mapping = JsonBytesMappingKind::kHexId;
   options.use_json_name      = false;
   options.console_debug      = false;
