@@ -24,7 +24,7 @@
 #include <cstdint>
 #include <mutex>
 #include <string>
-#include <thread>
+#include <thread>  // IWYU pragma: keep
 #include <utility>
 #include <vector>
 #include "nlohmann/json.hpp"
