@@ -24,7 +24,6 @@ add_executable(
 target_link_libraries(
   example_yaml
   PRIVATE ${CMAKE_THREAD_LIBS_INIT}
-          opentelemetry-cpp::configuration_registry_factory
           opentelemetry-cpp::configuration
           common_metrics_foo_library
           common_logs_foo_library

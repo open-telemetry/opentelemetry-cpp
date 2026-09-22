@@ -13,6 +13,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <functional>
 #include <future>
@@ -309,6 +310,27 @@ size_t HttpOperation::ReadMemoryCallback(char *buffer, size_t size, size_t nitem
   std::memcpy(buffer, &self->request_body_[self->request_nwrite_], nwrite);
   self->request_nwrite_ += nwrite;
   return nwrite;
+}
+
+int HttpOperation::SeekCallback(void *userp, curl_off_t offset, int origin)
+{
+  HttpOperation *self = reinterpret_cast<HttpOperation *>(userp);
+  if (nullptr == self)
+  {
+    return CURL_SEEKFUNC_CANTSEEK;
+  }
+
+  // The body is a fully buffered span owned by the caller, so an absolute seek inside it is just a
+  // move of the read cursor. Anything else is refused rather than approximated, because reporting
+  // success without repositioning would resume the upload from the wrong offset and send a
+  // truncated or misaligned body.
+  if (origin != SEEK_SET || offset < 0 || static_cast<size_t>(offset) > self->request_body_.size())
+  {
+    return CURL_SEEKFUNC_CANTSEEK;
+  }
+
+  self->request_nwrite_ = static_cast<size_t>(offset);
+  return CURL_SEEKFUNC_OK;
 }
 
 #if LIBCURL_VERSION_NUM >= 0x075000
@@ -765,7 +787,7 @@ const char *HttpOperation::GetCurlErrorMessage(CURLcode code)
   return message;
 }
 
-CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, void *value)
+CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, const void *value)
 {
   /*
     curl_easy_setopt() is a macro with variadic arguments, type unsafe.
@@ -956,6 +978,7 @@ CURLcode HttpOperation::Setup()
 
       struct curl_blob stblob
       {};
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       stblob.data  = const_cast<char *>(data);
       stblob.len   = data_len;
       stblob.flags = CURL_BLOB_COPY;
@@ -998,6 +1021,7 @@ CURLcode HttpOperation::Setup()
 
       struct curl_blob stblob
       {};
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       stblob.data  = const_cast<char *>(data);
       stblob.len   = data_len;
       stblob.flags = CURL_BLOB_COPY;
@@ -1046,6 +1070,7 @@ CURLcode HttpOperation::Setup()
 
       struct curl_blob stblob
       {};
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       stblob.data  = const_cast<char *>(data);
       stblob.len   = data_len;
       stblob.flags = CURL_BLOB_COPY;
@@ -1373,6 +1398,19 @@ CURLcode HttpOperation::Setup()
     }
 
     rc = SetCurlPtrOption(CURLOPT_READDATA, this);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlPtrOption(CURLOPT_SEEKFUNCTION,
+                          reinterpret_cast<void *>(&HttpOperation::SeekCallback));
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlPtrOption(CURLOPT_SEEKDATA, this);
     if (rc != CURLE_OK)
     {
       return rc;

@@ -40,5 +40,5 @@ if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     logs "OpenTelemetry SDK - Logs"
     "Components for exporting logs in the OpenTelemetry SDK."
-    "opentelemetry_resources")
+    "opentelemetry_resources" "opentelemetry_instrumentation_scope")
 endif()

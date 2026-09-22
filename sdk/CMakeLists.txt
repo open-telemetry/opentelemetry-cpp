@@ -56,6 +56,7 @@ if(OTELCPP_WITH_CONFIGURATION)
     COMPONENT
     configuration
     TARGETS
+    opentelemetry_configuration_yaml
     opentelemetry_configuration
     FILES_DIRECTORY
     "include/opentelemetry/"

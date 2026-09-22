@@ -115,6 +115,20 @@ private:
 
   static size_t ReadMemoryCallback(char *buffer, size_t size, size_t nitems, void *userp);
 
+  /**
+   * Reposition the request body for libcurl.
+   *
+   * libcurl calls this when it has to restart an upload it already began, for example after a
+   * connection it had reused was closed before the response arrived. Without it libcurl has no way
+   * to rewind the body and fails the transfer with CURLE_SEND_FAIL_REWIND.
+   *
+   * @param userp The HttpOperation, set through CURLOPT_SEEKDATA
+   * @param offset Byte offset to seek to, interpreted relative to origin
+   * @param origin One of SEEK_SET, SEEK_CUR or SEEK_END
+   * @return CURL_SEEKFUNC_OK on success, CURL_SEEKFUNC_CANTSEEK to tell libcurl to find another way
+   */
+  static int SeekCallback(void *userp, curl_off_t offset, int origin);
+
   static int CurlLoggerCallback(const CURL * /* handle */,
                                 curl_infotype type,
                                 const char *data,
@@ -306,12 +320,11 @@ private:
    */
   void FinishUnscheduled(const char *reason);
 
-  CURLcode SetCurlPtrOption(CURLoption option, void *value);
+  CURLcode SetCurlPtrOption(CURLoption option, const void *value);
 
   CURLcode SetCurlStrOption(CURLoption option, const char *str)
   {
-    void *ptr = const_cast<char *>(str);
-    return SetCurlPtrOption(option, ptr);
+    return SetCurlPtrOption(option, str);
   }
 
   CURLcode SetCurlBlobOption(CURLoption option, struct curl_blob *blob)
@@ -387,6 +400,8 @@ private:
     std::promise<CURLcode> result_promise;
     std::future<CURLcode> result_future;
   };
+  friend class HttpOperationAccessor;
+  friend class HttpOperationTestPeer;
   std::unique_ptr<AsyncData> async_data_;
 };
 }  // namespace curl
