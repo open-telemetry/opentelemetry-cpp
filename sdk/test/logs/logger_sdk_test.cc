@@ -22,7 +22,6 @@
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
@@ -424,10 +423,9 @@ TEST(LoggerSDK, EmitLogRecordSafeWhenEnabledBetweenCreateAndEmit)
   auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
   auto log_processor = std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable));
 
-  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
-  auto scope_configurator =
-      std::make_unique<ScopeConfigurator<LoggerConfig>>(disabled_all_scopes);
-  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(
+  const auto resource     = opentelemetry::sdk::resource::Resource::Create({});
+  auto scope_configurator = std::make_unique<ScopeConfigurator<LoggerConfig>>(disabled_all_scopes);
+  auto api_lp             = std::shared_ptr<logs_api::LoggerProvider>(
       new LoggerProvider(std::move(log_processor), resource, std::move(scope_configurator)));
   auto logger = api_lp->GetLogger("logger", "opentelelemtry_library");
   auto sdk_lp = static_cast<LoggerProvider *>(api_lp.get());
