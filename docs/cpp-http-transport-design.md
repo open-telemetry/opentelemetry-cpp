@@ -198,9 +198,14 @@ submission. Exactly one of a response, an invalid request, a transport error, a
 deadline or a cancellation eventually settles it.
 
 The earlier draft of this section described the same contract as a blocking
-call. That was the mistake @owent's evidence exposes: a blocking interface
-cannot serve the workload above without a second model beside it, and two models
-is how the current code got here. Asynchronous submission is the general shape,
+call. @owent's evidence rules that out as the shape to build on, though not as
+impossible: a blocking one attempt contract behind a bounded worker pool, under
+the same governor, also puts several requests in flight without a second request
+and result model beside it. What that costs is a thread for every request in
+flight and a harder cancellation story, so the case for submitting
+asynchronously is that price, not an inability to reach the workload. Two models
+beside each other is how the current code got here, and either shape can avoid
+it. Asynchronous submission is the general shape,
 and blocking is the special case of submitting one operation and waiting for
 that operation's own result until its own deadline. Not `ForceFlush`, which
 waits for everyone else's work as well, and which has its own open defects.
@@ -257,7 +262,7 @@ the sections above only make sense if they are named apart.
 | running transfer | attempts libcurl is currently working on |
 | connection | one TCP or QUIC connection to an origin |
 | stream | one exchange on a connection; one at a time on HTTP/1.1 |
-| retained bytes | serialized request bytes an operation holds until it settles, including while it waits to retry |
+| retained bytes | serialized request bytes held from submission until the backend releases them, which is not the moment the operation settles |
 
 The reported workload is a record rate. The "about four" is an attempt count.
 They are not the same number and a benchmark that reports one as the other
@@ -447,6 +452,12 @@ decisions below makes any of them optional.
   attempt running and still holds its serialized body. A count of requests does
   not bound it either: 64 in flight at the 4 MB the reported workload sent is
   256 MB of bodies alone, not of the exporter.
+- Settling an operation is not releasing its storage, and the bound follows the
+  storage. An operation that reaches its deadline reports an outcome while the
+  backend may still hold the body, so a quota returned at settlement can be
+  spent on the next operation while the last one's bytes are still allocated,
+  and again after that. Either the quota is returned when the bytes are, or
+  whatever is waiting to be reclaimed carries a bound of its own.
 - Compression working memory counts against that bound. Today the gzip step
   works in the caller's own buffer, so it is invisible to any request count.
 - A retry does not silently multiply retained payload. One export operation
