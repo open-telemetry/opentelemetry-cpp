@@ -207,7 +207,10 @@ waits for everyone else's work as well, and which has its own open defects.
 
 What this buys is that the properties that keep breaking become structural
 rather than conventional. Exactly one outcome is what the handle settles to.
-Immutability removes the borrowed request lifetime. The submission has an
+A request the caller cannot change after submission closes the mutation half of
+the lifetime problem. The other half is separate: a const view of freed storage
+is still dangling, so the operation has to own the bytes until the backend is
+done with them. #4433 has a case for each. The submission has an
 identity that does not move when a session is reused. Progress reporting is
 separable from settlement, so there is no progress callback that can be mistaken
 for one.
@@ -251,7 +254,7 @@ the sections above only make sense if they are named apart.
 | running transfer | attempts libcurl is currently working on |
 | connection | one TCP or QUIC connection to an origin |
 | stream | one exchange on a connection; one at a time on HTTP/1.1 |
-| retained bytes | serialized request bytes held for attempts that have not settled |
+| retained bytes | serialized request bytes an operation holds until it settles, including while it waits to retry |
 
 The reported workload is a record rate. The "about four" is an attempt count.
 They are not the same number and a benchmark that reports one as the other
@@ -315,12 +318,16 @@ operations are making when it is called.
 | --- | --- | --- | --- |
 | Throughput, connection reuse | keeps both | reuse yes, in-flight count owned above it | keeps both |
 | Cancellation | flag plus races | explicit, at a defined point | explicit, owner thread applies it |
-| Shutdown | four reports open | bounded by construction | bounded, one thread to drain |
+| Shutdown | four reports open | one deadline per operation | one owner to drain |
 | Admission and retry owner | inside the transport | above the transport | above the transport |
 | Connection and stream scheduling | implicit, libcurl decides | backend policy | backend policy, one owner thread |
 | Installed interfaces | unchanged | new interface plus an adapter | unchanged, backend only |
 | Custom clients | must be re-entrant, undocumented | one method to implement | unaffected |
 | Native backends | awkward | natural | not applicable |
+
+Neither B nor C bounds shutdown on its own. An owner thread can still be inside
+a resolver or a callback that has no deadline of its own, so each wait has to
+state its bound rather than inherit one from the shape.
 
 ## What this needs decided
 
@@ -328,10 +335,11 @@ Two lists rather than one. The first is what the discussion on #4448 has already
 settled, written down so a reviewer can disagree with a specific line instead of
 re-reading the thread. The second is what is genuinely still open.
 
-**Settled, unless someone objects to a line here.** A backend neutral contract
-rather than a curl shaped one. Asynchronous submission of one attempt over a
-request that does not change after it is submitted. Exactly one settlement per
-export operation. Bounded resources, in bytes as well as in count. The existing
+**What I read the thread as having settled, which is not the same as agreed.**
+A backend neutral contract rather than a curl shaped one. Asynchronous
+submission of one attempt over a request that does not change after it is
+submitted. Exactly one settlement per export operation. Bounded resources, in
+bytes as well as in count. The existing
 interface kept working through an adapter rather than replaced. One owner thread
 per `CURLM`. The two existing options treated as curl compatibility controls
 rather than as requirements of the replacement.
@@ -341,9 +349,13 @@ was never meant to be called more than once, so the contract says so rather than
 leaving it implicit. A bounded governor needs both dimensions, a count and
 retained bytes, rather than either alone. For the curl backend the preferred
 default baseline is one shared `CURLM`, because a multi handle owns its
-connection, DNS and TLS caches and cannot be waited on together with another
-one. And the lifetime of everything a request needs should have a single owner,
-which is the direction that removes `HttpOperation` rather than guarding it.
+connection, DNS and TLS caches, and two of them cannot be waited on together
+through `curl_multi_poll`. That is a property of the polling interface rather
+than of libcurl: `curl_multi_socket_action` hands sockets and timers back to the
+caller, so one event loop could drive several. Whether that is worth doing is a
+benchmark question, not one this rules out. And the lifetime of everything a
+request needs should have a single owner, which is the direction that removes
+`HttpOperation` rather than guarding it.
 
 The last two are preferences with evidence, not settled architecture. The
 sharing scope of the `CURLM` is a benchmark decision, and a process wide one
@@ -426,9 +438,11 @@ another's.
 These are requirements rather than questions, because no answer to the open
 decisions below makes any of them optional.
 
-- Total bytes retained for attempts that have not settled is bounded. A count of
-  requests does not bound it: 64 in flight at the 4 MB the reported workload was
-  sending is 256 MB of request payload.
+- Total bytes retained by operations that have not settled is bounded, charged
+  to the operation rather than the attempt: an operation in `RetryWait` has no
+  attempt running and still holds its serialized body. A count of requests does
+  not bound it either: 64 in flight at the 4 MB the reported workload sent is
+  256 MB of bodies alone, not of the exporter.
 - Compression working memory counts against that bound. Today the gzip step
   works in the caller's own buffer, so it is invisible to any request count.
 - A retry does not silently multiply retained payload. One export operation
@@ -437,7 +451,8 @@ decisions below makes any of them optional.
   answers for operations accepted before its watermark, not for whichever
   attempts happen to be running.
 - Exactly one outcome is delivered per export operation, and it is the
-  operation's, not the last attempt's.
+  operation's, not the last attempt's. A reported failure is an outcome, so
+  settling once is not the same as the backend having accepted the data.
 
 ## A recommendation
 
@@ -542,10 +557,11 @@ asked for: `CURLINFO_HTTP_VERSION` for the negotiated protocol and
 in flight cannot be told apart from four connections, four streams on one
 connection, or four requests serialized behind each other.
 
-The run is also not worth starting until the batching behaviour above is
-settled. Records per request is an input to every row of the table, and at 21
-records per request rather than 2,048 the transport is being asked a different
-question than the reported workload asks.
+The end to end half of that is not worth starting until the batching behaviour
+above is settled. Records per request is an input to every row of the table, and
+at 21 records per request rather than 2,048 the transport is being asked a
+different question than the reported workload asks. A transport level run with a
+fixed payload and arrival rate does not depend on batching and can go first.
 
 The `100 ms` in the report is not qualified as one way or round trip, so the
 benchmark should define it as `netem` round trip and say so rather than inherit
