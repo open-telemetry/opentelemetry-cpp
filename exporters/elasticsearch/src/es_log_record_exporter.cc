@@ -442,19 +442,28 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   request->SetBody(body_vec);
 
 #ifdef ENABLE_ASYNC_EXPORT
+  bool rejected = false;
   // Send the request. Registration has to happen under the same lock Shutdown() takes to
   // flip is_shutdown_ and snapshot session_counter_ (see ForceFlush()) - otherwise a session
   // that passes the isShutdown() check above can still register after Shutdown() has already
   // taken its snapshot, and ForceFlush() would return without ever having waited for it.
   {
     std::lock_guard<std::recursive_mutex> lock_guard{synchronization_data_->force_flush_m};
-    if (isShutdown())
+    rejected = isShutdown();
+    if (!rejected)
     {
-      OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Exporting "
-                              << records.size() << " log(s) failed, exporter is shutdown");
-      return sdk::common::ExportResult::kFailure;
+      synchronization_data_->session_counter_.fetch_add(1, std::memory_order_release);
     }
-    synchronization_data_->session_counter_.fetch_add(1, std::memory_order_release);
+  }
+
+  // Outside the lock: the client owns the session until somebody hands it back, and this is the
+  // only path that can, since the handler that would do it later is never built.
+  if (rejected)
+  {
+    session->FinishSession();
+    OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Exporting "
+                            << records.size() << " log(s) failed, exporter is shutdown");
+    return sdk::common::ExportResult::kFailure;
   }
   std::size_t span_count    = records.size();
   auto synchronization_data = synchronization_data_;
