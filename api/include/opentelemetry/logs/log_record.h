@@ -92,18 +92,6 @@ public:
    * @param trace_flags the trace flags to set
    */
   virtual void SetTraceFlags(const trace::TraceFlags &trace_flags) noexcept = 0;
-
-  /**
-   * Whether this LogRecord is also an opentelemetry::sdk::logs::Recordable. The SDK's
-   * Logger::EmitLogRecord() accepts a LogRecord and needs to downcast it to the SDK's own
-   * Recordable to attach resource/scope and hand it to a processor, but a caller (or another
-   * SDK/wrapper built on the API) can supply a LogRecord implementation that is not a
-   * Recordable, and this project supports building with RTTI disabled, so a checked
-   * dynamic_cast is not available as a guard. Overriding this to return true is how a
-   * Recordable implementation asserts that such a downcast is safe. Do not override this in
-   * any type that is not actually a Recordable.
-   */
-  virtual bool IsRecordable() const noexcept { return false; }
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE

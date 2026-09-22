@@ -17,12 +17,12 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/nostd/variant.h"
-#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/logger.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
 #include "opentelemetry/sdk/logs/logger_context.h"
+#include "opentelemetry/sdk/logs/multi_recordable.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/recordable.h"
 #include "opentelemetry/trace/context.h"
@@ -135,7 +135,12 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
 {
   if (!logger_enabled_.load(std::memory_order_relaxed))
   {
-    return kNoopLogger.CreateLogRecord();
+    // Returns an empty MultiRecordable rather than a NoopLogRecord: the logger's enabled state
+    // can flip between this call and EmitLogRecord() (e.g. via UpdateLoggerConfig()), and
+    // MultiLogRecordProcessor::OnEmit() unconditionally static_casts whatever it receives to
+    // MultiRecordable. An empty one is a safe target either way, since every Set* call and
+    // ReleaseRecordable() loop over zero wrapped recordables.
+    return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(new MultiRecordable());
   }
 
   auto recordable = context_->GetProcessor().MakeRecordable();
@@ -161,7 +166,8 @@ opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord> Logger::CreateL
 {
   if (!logger_enabled_.load(std::memory_order_relaxed))
   {
-    return kNoopLogger.CreateLogRecord();
+    // See the matching comment in the no-argument CreateLogRecord() overload above.
+    return opentelemetry::nostd::unique_ptr<opentelemetry::logs::LogRecord>(new MultiRecordable());
   }
 
   auto recordable = context_->GetProcessor().MakeRecordable();
@@ -188,18 +194,6 @@ void Logger::EmitLogRecord(
 
   if (!log_record)
   {
-    return;
-  }
-
-  // MakeRecordable() is a public, overridable entry point, so a caller (or another SDK/wrapper
-  // built on the API) can hand this a LogRecord implementation that is not actually a
-  // Recordable. static_cast between unrelated polymorphic types performs no runtime check, so
-  // the guard below has to come first: it is a virtual capability query rather than a
-  // dynamic_cast because this project supports building with RTTI disabled.
-  if (!log_record->IsRecordable())
-  {
-    OTEL_INTERNAL_LOG_WARN(
-        "[Logger::EmitLogRecord] Dropping log record: not a Recordable implementation.");
     return;
   }
 

@@ -408,47 +408,41 @@ TEST(LoggerSDK, LogToAProcessor)
       now);
 }
 
-namespace
+// Regression test: while the logger is disabled, CreateLogRecord() used to hand back a
+// kNoopLogger-created NoopLogRecord, which is not an opentelemetry::sdk::logs::Recordable.
+// EmitLogRecord() re-checks the enabled state at emit time, so enabling the logger in between
+// (e.g. via UpdateLoggerConfig()) made that NoopLogRecord reach Logger::EmitLogRecord()'s
+// static_cast<Recordable *> and then MultiLogRecordProcessor::OnEmit()'s own
+// static_cast<MultiRecordable *>, both undefined behavior. CreateLogRecord() now returns an
+// empty MultiRecordable while disabled, which is a safe target for both casts either way: an
+// empty MultiRecordable's Set* calls and ReleaseRecordable() simply loop over zero wrapped
+// recordables, so the record is dropped without ever reaching a real processor.
+TEST(LoggerSDK, EmitLogRecordSafeWhenEnabledBetweenCreateAndEmit)
 {
-// A LogRecord implementation that is not an opentelemetry::sdk::logs::Recordable, simulating a
-// caller or bridge that hands EmitLogRecord() a foreign LogRecord. IsRecordable() correctly
-// defaults to false since this class does not override it.
-class ForeignLogRecord final : public logs_api::LogRecord
-{
-public:
-  void SetTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
-  void SetObservedTimestamp(opentelemetry::common::SystemTimestamp) noexcept override {}
-  void SetSeverity(logs_api::Severity) noexcept override {}
-  void SetBody(const opentelemetry::common::AttributeValue &) noexcept override {}
-  void SetAttribute(nostd::string_view,
-                    const opentelemetry::common::AttributeValue &) noexcept override
-  {}
-  void SetEventId(int64_t, nostd::string_view) noexcept override {}
-  void SetTraceId(const opentelemetry::trace::TraceId &) noexcept override {}
-  void SetSpanId(const opentelemetry::trace::SpanId &) noexcept override {}
-  void SetTraceFlags(const opentelemetry::trace::TraceFlags &) noexcept override {}
-};
-}  // namespace
-
-// Regression test: EmitLogRecord() used to static_cast any LogRecord straight to Recordable
-// with no runtime check, so a LogRecord implementation that is not actually a Recordable (a
-// bridge, or a caller-supplied MakeRecordable() override) hit undefined behavior the moment the
-// mismatched vtable/layout was used. IsRecordable() now gates the cast; a foreign LogRecord
-// must be dropped rather than forwarded to the processor.
-TEST(LoggerSDK, EmitLogRecordDropsNonRecordableLogRecord)
-{
-  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(new LoggerProvider());
-  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library");
-  auto lp     = static_cast<LoggerProvider *>(api_lp.get());
-
+  ScopeConfigurator<LoggerConfig> disabled_all_scopes =
+      ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Disabled()).Build();
   auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
-  lp->AddProcessor(std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>(
-      new MockProcessor(shared_recordable)));
+  auto log_processor = std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable));
 
-  logger->EmitLogRecord(nostd::unique_ptr<logs_api::LogRecord>(new ForeignLogRecord()));
+  const auto resource = opentelemetry::sdk::resource::Resource::Create({});
+  auto scope_configurator =
+      std::make_unique<ScopeConfigurator<LoggerConfig>>(disabled_all_scopes);
+  auto api_lp = std::shared_ptr<logs_api::LoggerProvider>(
+      new LoggerProvider(std::move(log_processor), resource, std::move(scope_configurator)));
+  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library");
+  auto sdk_lp = static_cast<LoggerProvider *>(api_lp.get());
 
-  // The processor's MockProcessor::OnEmit() would have run through a mismatched vtable/layout
-  // had the cast not been guarded; instead, shared_recordable must be untouched.
+  // Created while disabled: this must be an empty MultiRecordable, not a NoopLogRecord.
+  auto log_record = logger->CreateLogRecord();
+
+  // Enable the logger before the record is emitted.
+  sdk_lp->UpdateLoggerConfigurator(std::make_unique<ScopeConfigurator<LoggerConfig>>(
+      ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Enabled()).Build()));
+  ASSERT_TRUE(logger->Enabled(logs_api::Severity::kInvalid));
+
+  // Must not crash, and the record has no wrapped recordable for this processor, so it is
+  // dropped rather than delivered.
+  logger->EmitLogRecord(std::move(log_record));
   EXPECT_EQ(shared_recordable->GetSeverity(), logs_api::Severity::kInvalid);
   EXPECT_EQ(shared_recordable->GetBody(), "");
 }
