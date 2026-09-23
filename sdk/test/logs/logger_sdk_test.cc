@@ -436,8 +436,8 @@ TEST(LoggerSDK, EmitLogRecordSafeWhenEnabledBetweenCreateAndEmit)
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   // The v2 overload takes the same fix; nothing exercises it otherwise, since the no-argument
   // overload above is the only one a disabled logger reaches by default.
-  auto log_record_v2 = logger->CreateLogRecord(
-      nostd::variant<opentelemetry::trace::SpanContext, context::Context>{
+  auto log_record_v2 =
+      logger->CreateLogRecord(nostd::variant<opentelemetry::trace::SpanContext, context::Context>{
           opentelemetry::trace::SpanContext::GetInvalid()});
 #endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
 
