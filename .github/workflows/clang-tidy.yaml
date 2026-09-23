@@ -17,15 +17,15 @@ jobs:
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 113
+            warning_limit: 73
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 124
+            warning_limit: 76
     env:
       CC: /usr/bin/clang-22
       CXX: /usr/bin/clang++-22
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
 
@@ -88,13 +88,13 @@ jobs:
           cat $REPORT_PATH >> $GITHUB_STEP_SUMMARY
 
       - name: Upload build log
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: Logs-clang-tidy-${{ matrix.cmake_options }}
           path: ${{ steps.build.outputs.build_log }}
 
       - name: Upload warning report
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: Report-clang-tidy-${{ matrix.cmake_options }}
           path: ${{ steps.analyze.outputs.report_path }}

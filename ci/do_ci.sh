@@ -55,9 +55,6 @@ mkdir -p "${INSTALL_TEST_DIR}"
 
 export BAZEL_CXXOPTS="-std=c++17"
 
-# Work around for https://github.com/actions/runner-images/issues/13564
-export USE_BAZEL_VERSION="8.5.0"
-
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW --//exporters/otlp:with_otlp_grpc_credential_preview=true"
 BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT"
 
@@ -825,6 +822,9 @@ elif [[ "$1" == "bazel.noexcept" ]]; then
     -//sdk/src/configuration/...
     -//sdk/test/configuration/...
     -//resource_detectors/...
+    -//exporters/ostream:ostream_log_record_exporter_builder
+    -//exporters/ostream:ostream_metric_exporter_builder
+    -//exporters/ostream:ostream_span_exporter_builder
     -//exporters/otlp:otlp_builder_utils
     -//exporters/otlp:otlp_grpc_span_exporter_builder
     -//exporters/otlp:otlp_grpc_log_record_exporter_builder
