@@ -86,9 +86,8 @@ public:
         exemplar_reservoir_->OfferMeasurement(measurement.second, measurement.first, {});
       }
 #endif
-      MetricAttributes attributes = FilterAttributes(measurement.first);
       observations
-          .GetOrSetDefault(std::move(attributes),
+          .GetOrSetDefault(FilterAttributes(measurement.first),
                            [this]() {
                              return DefaultAggregation::CreateAggregation(aggregation_type_,
                                                                           instrument_descriptor_);
