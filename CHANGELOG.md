@@ -34,6 +34,11 @@ Increment the:
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+* [EXPORTER] Avoid `std::terminate` in the OTLP HTTP exporter when copying or
+  parsing the response body throws, which would otherwise escape the `noexcept`
+  response handler. The export is reported as a failure instead.
+  [#4534](https://github.com/open-telemetry/opentelemetry-cpp/issues/4534)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)

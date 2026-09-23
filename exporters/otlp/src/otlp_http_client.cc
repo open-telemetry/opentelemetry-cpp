@@ -6,6 +6,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
+#include <exception>
 #include <functional>
 #include <iostream>
 #include <list>
@@ -116,50 +117,70 @@ public:
   {
     sdk::common::ExportResult result = sdk::common::ExportResult::kSuccess;
     std::string log_message;
-    // Lock the private members so they can't be read while being modified
+    // Copying the response body and parsing it can throw (e.g. std::bad_alloc while
+    // growing the body, or an exception raised inside the protobuf parsers). This
+    // method is noexcept, so an exception escaping here would call std::terminate
+    // and take down the whole process. Convert any exception into a failed export
+    // instead, and keep the termination logic below outside of the try block so a
+    // caught exception can't leave callers waiting for a response that never comes.
+    try
     {
-      std::unique_lock<std::mutex> lk(mutex_);
-
-      // Store the body of the request
-      body_ = std::string(response.GetBody().begin(), response.GetBody().end());
-
-      if (!(response.GetStatusCode() >= 200 && response.GetStatusCode() <= 299))
+      // Lock the private members so they can't be read while being modified
       {
-        log_message = BuildResponseLogMessage(response, body_);
+        std::unique_lock<std::mutex> lk(mutex_);
 
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Export failed, " << log_message);
-        result = sdk::common::ExportResult::kFailure;
-      }
-      else if (console_debug_)
-      {
-        if (log_message.empty())
+        // Store the body of the request
+        body_ = std::string(response.GetBody().begin(), response.GetBody().end());
+
+        if (!(response.GetStatusCode() >= 200 && response.GetStatusCode() <= 299))
         {
           log_message = BuildResponseLogMessage(response, body_);
+
+          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Export failed, " << log_message);
+          result = sdk::common::ExportResult::kFailure;
+        }
+        else if (console_debug_)
+        {
+          if (log_message.empty())
+          {
+            log_message = BuildResponseLogMessage(response, body_);
+          }
         }
       }
-    }
 
-    // On 2xx with a non-empty body, parse it into the caller-provided typed response
-    if (response_ != nullptr && result == sdk::common::ExportResult::kSuccess && !body_.empty())
-    {
-      if (content_type_ == HttpRequestContentType::kJson)
+      // On 2xx with a non-empty body, parse it into the caller-provided typed response
+      if (response_ != nullptr && result == sdk::common::ExportResult::kSuccess && !body_.empty())
       {
-        if (!google::protobuf::util::JsonStringToMessage(body_, response_).ok())
+        if (content_type_ == HttpRequestContentType::kJson)
         {
-          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Failed to parse JSON response body");
+          if (!google::protobuf::util::JsonStringToMessage(body_, response_).ok())
+          {
+            OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Failed to parse JSON response body");
+            result = sdk::common::ExportResult::kFailure;
+          }
+        }
+        else if (!response_->ParseFromString(body_))
+        {
+          OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Failed to parse response body");
           result = sdk::common::ExportResult::kFailure;
         }
       }
-      else if (!response_->ParseFromString(body_))
+
+      if (console_debug_ && result == sdk::common::ExportResult::kSuccess)
       {
-        OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Failed to parse response body");
-        result = sdk::common::ExportResult::kFailure;
+        OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export success, " << log_message);
       }
     }
-
-    if (console_debug_ && result == sdk::common::ExportResult::kSuccess)
+    catch (const std::exception &ex)
     {
-      OTEL_INTERNAL_LOG_DEBUG("[OTLP HTTP Client] Export success, " << log_message);
+      OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Exception while processing the response, "
+                              << ex.what());
+      result = sdk::common::ExportResult::kFailure;
+    }
+    catch (...)
+    {
+      OTEL_INTERNAL_LOG_ERROR("[OTLP HTTP Client] Unknown exception while processing the response");
+      result = sdk::common::ExportResult::kFailure;
     }
 
     {
