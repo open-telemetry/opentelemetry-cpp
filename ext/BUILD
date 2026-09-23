@@ -40,3 +40,27 @@ cc_library(
         ":headers",
     ],
 )
+
+# Internal: Embedded HTTP server headers (test and example use only)
+# TODO: Move to test_common per issue #4332
+# These are test infrastructure, not part of the public API
+cc_library(
+    name = "server_headers",
+    hdrs = [
+        "include/opentelemetry/ext/http/server/http_server.h",
+        "include/opentelemetry/ext/http/server/socket_tools.h",
+    ],
+    strip_include_prefix = "include",
+    visibility = [
+        "//ext/test/http:__pkg__",
+        "//ext/test/w3c_tracecontext_http_test_server:__pkg__",
+        "//examples/http:__pkg__",
+    ],
+    linkopts = select({
+        "//bazel:windows": ["-DEFAULTLIB:Ws2_32.lib"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        "//api",
+    ],
+)
