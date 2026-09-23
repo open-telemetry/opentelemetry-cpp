@@ -117,8 +117,14 @@ public:
    * error) would otherwise leave this wait blocked for the life of the process. The deadline is
    * this exporter's own backstop, independent of whether the client honors its side of the
    * contract.
+   *
+   * @param timed_out if not null, set to whether the deadline passed with nothing having
+   * reaped the transfer yet (completion_ still Pending), as opposed to a terminal event (a
+   * response, or a failure like ConnectFailed/SendFailed) having already arrived. The caller
+   * needs this distinction: only a still-outstanding transfer needs CancelSession() rather than
+   * FinishSession(), since a terminal event means the transfer is already over.
    */
-  bool waitForResponse(std::chrono::steady_clock::time_point deadline)
+  bool waitForResponse(std::chrono::steady_clock::time_point deadline, bool *timed_out = nullptr)
   {
     std::unique_lock<std::mutex> lk(mutex_);
     // Waiting on a predicate rather than bare: the completion may already have been recorded
@@ -126,6 +132,10 @@ public:
     // A deadline that passes without a terminal event leaves completion_ at Pending, which
     // reads as failure below, the same outcome a terminal error event would have produced.
     cv_.wait_until(lk, deadline, [this] { return completion_ != CompletionState::Pending; });
+    if (timed_out != nullptr)
+    {
+      *timed_out = (completion_ == CompletionState::Pending);
+    }
     return completion_ == CompletionState::Success;
   }
 
@@ -489,10 +499,23 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
     OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] waiting for response from Elasticsearch (timeout = "
                             << options_.response_timeout_ << " seconds)");
   }
-  bool write_successful = handler->waitForResponse(deadline);
+  bool timed_out        = false;
+  bool write_successful = handler->waitForResponse(deadline, &timed_out);
 
-  // End the session
-  session->FinishSession();
+  // Cancel only when the deadline genuinely expired with the transfer still outstanding:
+  // FinishSession() waits for an in-flight transfer to complete, which is exactly the hang
+  // this deadline exists to bound for HTTP clients (e.g. curl) whose worker thread blocks on
+  // the transfer itself. A terminal failure (ConnectFailed, SendFailed, CreateFailed, a
+  // response, ...) means the transfer is already over by the time waitForResponse returns, so
+  // FinishSession() is the correct call there, and for curl the two are not interchangeable.
+  if (timed_out)
+  {
+    session->CancelSession();
+  }
+  else
+  {
+    session->FinishSession();
+  }
 
   // If an error occurred with the HTTP request
   if (!write_successful)
