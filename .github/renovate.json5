@@ -5,6 +5,7 @@
     "helpers:pinGitHubActionDigestsToSemver",
     ":separateMultipleMajorReleases",
   ],
+  ignorePaths: [],
   packageRules: [
     {
       description: "Bundles all patches into 1 easy to review pr",
@@ -26,7 +27,7 @@
     },
     {
       dependencyDashboardApproval: true,
-      matchCategories: ["bazel"],
+      matchCategories: ["bazel", "docker"],
       matchUpdateTypes: ["major"],
     },
   ],
