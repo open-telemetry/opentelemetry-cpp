@@ -68,7 +68,7 @@ TEST_P(AsyncWritableMetricStorageTestFixture, TestAggregation)
   collectors.push_back(collector);
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kSum,
+      instr_desc, AggregationType::kSum, std::make_shared<DefaultAttributesProcessor>(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
@@ -163,7 +163,7 @@ TEST_P(WritableMetricStorageTestUpDownFixture, TestAggregation)
   collectors.push_back(collector);
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kDefault,
+      instr_desc, AggregationType::kDefault, std::make_shared<DefaultAttributesProcessor>(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
@@ -259,7 +259,7 @@ TEST_P(WritableMetricStorageTestObservableGaugeFixture, TestAggregation)
   collectors.push_back(collector);
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kLastValue,
+      instr_desc, AggregationType::kLastValue, std::make_shared<DefaultAttributesProcessor>(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
@@ -321,5 +321,176 @@ INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestObservableGaugeFixtureLong,
                          WritableMetricStorageTestObservableGaugeFixture,
                          ::testing::Values(AggregationTemporality::kCumulative,
                                            AggregationTemporality::kDelta));
+
+class WritableMetricStorageTestFilteredAttributesFixture
+    : public ::testing::TestWithParam<AggregationTemporality>
+{};
+
+// Several observations can collapse to the same attribute set once the view drops
+// some of the spatial dimensions. For additive instruments they have to be summed up,
+// instead of the last observation overwriting the previous ones.
+TEST_P(WritableMetricStorageTestFilteredAttributesFixture, TestAggregation)
+{
+  AggregationTemporality temporality = GetParam();
+
+  InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kObservableCounter,
+                                     InstrumentValueType::kLong};
+
+  auto sdk_start_ts  = std::chrono::system_clock::now();
+  auto collection_ts = std::chrono::system_clock::now() + std::chrono::seconds(5);
+
+  std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporality));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors;
+  collectors.push_back(collector);
+
+  // The view only keeps "RequestType", so the "version" dimension is dropped.
+  FilterAttributeMap allowed_attributes;
+  allowed_attributes["RequestType"] = true;
+  std::shared_ptr<const AttributesProcessor> attributes_processor{
+      new FilteringAttributesProcessor(allowed_attributes)};
+
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
+      instr_desc, AggregationType::kSum, attributes_processor,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+      nullptr);
+
+  int64_t get_count_v1 = 20;
+  int64_t get_count_v2 = 10;
+  int64_t put_count_v1 = 5;
+
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
+      {{{"RequestType", "GET"}, {"version", "1"}}, get_count_v1},
+      {{{"RequestType", "GET"}, {"version", "2"}}, get_count_v2},
+      {{{"RequestType", "PUT"}, {"version", "1"}}, put_count_v1}};
+  storage.RecordLong(measurements1,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  size_t collected_points = 0;
+  storage.Collect(
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
+        {
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          // "version" must have been dropped by the view.
+          EXPECT_EQ(data_attr.attributes.end(), data_attr.attributes.find("version"));
+          ++collected_points;
+          if (opentelemetry::nostd::get<std::string>(
+                  data_attr.attributes.find("RequestType")->second) == "GET")
+          {
+            // Both GET observations collapse onto the same attribute set, and are summed up.
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), get_count_v1 + get_count_v2);
+          }
+          else
+          {
+            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count_v1);
+          }
+        }
+        return true;
+      });
+  EXPECT_EQ(collected_points, 2);
+
+  // Subsequent (monotonically increasing) observations should be re-aggregated the same way,
+  // and reported as delta/cumulative as requested by the reader.
+  int64_t get_count_v1_2 = 50;
+  int64_t get_count_v2_2 = 30;
+  int64_t put_count_v1_2 = 8;
+
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2 = {
+      {{{"RequestType", "GET"}, {"version", "1"}}, get_count_v1_2},
+      {{{"RequestType", "GET"}, {"version", "2"}}, get_count_v2_2},
+      {{{"RequestType", "PUT"}, {"version", "1"}}, put_count_v1_2}};
+  storage.RecordLong(measurements2,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  storage.Collect(
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
+        {
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          EXPECT_EQ(data_attr.attributes.end(), data_attr.attributes.find("version"));
+          if (opentelemetry::nostd::get<std::string>(
+                  data_attr.attributes.find("RequestType")->second) == "GET")
+          {
+            if (temporality == AggregationTemporality::kCumulative)
+            {
+              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_),
+                        get_count_v1_2 + get_count_v2_2);
+            }
+            else
+            {
+              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_),
+                        (get_count_v1_2 + get_count_v2_2) - (get_count_v1 + get_count_v2));
+            }
+          }
+          else
+          {
+            if (temporality == AggregationTemporality::kCumulative)
+            {
+              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), put_count_v1_2);
+            }
+            else
+            {
+              EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_),
+                        put_count_v1_2 - put_count_v1);
+            }
+          }
+        }
+        return true;
+      });
+}
+
+INSTANTIATE_TEST_SUITE_P(WritableMetricStorageTestFilteredAttributesLong,
+                         WritableMetricStorageTestFilteredAttributesFixture,
+                         ::testing::Values(AggregationTemporality::kCumulative,
+                                           AggregationTemporality::kDelta));
+
+// All the dimensions of an async up-down counter can be dropped, collapsing every
+// observation onto the empty attribute set.
+TEST(WritableMetricStorageTestFilteredAttributes, TestUpDownCounterAllAttributesDropped)
+{
+  InstrumentDescriptor instr_desc = {"name", "desc", "1unit",
+                                     InstrumentType::kObservableUpDownCounter,
+                                     InstrumentValueType::kDouble};
+
+  auto sdk_start_ts  = std::chrono::system_clock::now();
+  auto collection_ts = std::chrono::system_clock::now() + std::chrono::seconds(5);
+
+  std::shared_ptr<CollectorHandle> collector(
+      new MockCollectorHandle(AggregationTemporality::kCumulative));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors;
+  collectors.push_back(collector);
+
+  // Empty allow list - every attribute is dropped.
+  std::shared_ptr<const AttributesProcessor> attributes_processor{
+      new FilteringAttributesProcessor(FilterAttributeMap{})};
+
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
+      instr_desc, AggregationType::kSum, attributes_processor,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+      nullptr);
+
+  std::unordered_map<MetricAttributes, double, AttributeHashGenerator> measurements = {
+      {{{"version", "1"}}, 1.0}, {{{"version", "2"}}, 2.0}, {{{"version", "3"}}, -4.0}};
+  storage.RecordDouble(measurements,
+                       opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  size_t collected_points = 0;
+  storage.Collect(
+      collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
+        for (const auto &data_attr : metric_data.point_data_attr_)
+        {
+          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          ++collected_points;
+          EXPECT_EQ(0, data_attr.attributes.size());
+          EXPECT_DOUBLE_EQ(opentelemetry::nostd::get<double>(data.value_), -1.0);
+        }
+        return true;
+      });
+  EXPECT_EQ(collected_points, 1);
+}
 
 }  // namespace

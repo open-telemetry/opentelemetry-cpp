@@ -15,6 +15,15 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Fix spatial re-aggregation for asynchronous instruments. A view which
+  drops attributes is now applied to asynchronous instruments as well, and the
+  observations which collapse onto the same attribute set are re-aggregated
+  (summed up for the additive instruments) instead of the last observation
+  overwriting the previous ones.
+  Note that `AsyncMetricStorage`'s constructor now takes the view's
+  `AttributesProcessor`, matching `SyncMetricStorage`.
+  [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)

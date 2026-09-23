@@ -13,7 +13,9 @@
 
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/metrics/async_instruments.h"
 #include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -409,6 +411,78 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
       return true;
     });
   }
+}
+
+namespace
+{
+// Observes two different "version" dimensions for the same "attr1" value.
+void ObservableCounterCallback(opentelemetry::metrics::ObserverResult observer, void * /* state */)
+{
+  auto observer_double = opentelemetry::nostd::get<
+      opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<double>>>(observer);
+  observer_double->Observe(1.0,
+                           std::map<std::string, std::string>{{"attr1", "val1"}, {"version", "1"}});
+  observer_double->Observe(2.0,
+                           std::map<std::string, std::string>{{"attr1", "val1"}, {"version", "2"}});
+}
+}  // namespace
+
+// A view which drops the "version" dimension collapses both observations onto the same
+// attribute set. Being an additive instrument, they must be summed up (1 + 2), and not
+// reported as the last observed value.
+TEST(AsyncCounterToSumFilterAttributes, Double)
+{
+  MeterProvider mp;
+  auto m                      = mp.GetMeter("meter1", "version1", "schema1");
+  std::string instrument_unit = "ms";
+  std::string instrument_name = "observable_counter1";
+  std::string instrument_desc = "observable counter metrics";
+
+  opentelemetry::sdk::metrics::FilterAttributeMap allowedattr;
+  allowedattr["attr1"] = true;
+  std::unique_ptr<opentelemetry::sdk::metrics::AttributesProcessor> attrproc{
+      new opentelemetry::sdk::metrics::FilteringAttributesProcessor(allowedattr)};
+
+  std::shared_ptr<opentelemetry::sdk::metrics::AggregationConfig> dummy_aggregation_config{
+      new opentelemetry::sdk::metrics::AggregationConfig};
+  std::unique_ptr<MockMetricExporter> exporter(new MockMetricExporter());
+  std::shared_ptr<MetricReader> reader{new MockMetricReader(std::move(exporter))};
+  mp.AddMetricReader(reader);
+
+  std::unique_ptr<View> view{new View("view1", "view1_description", AggregationType::kSum,
+                                      dummy_aggregation_config, std::move(attrproc))};
+  std::unique_ptr<InstrumentSelector> instrument_selector{
+      new InstrumentSelector(InstrumentType::kObservableCounter, instrument_name, instrument_unit)};
+  std::unique_ptr<MeterSelector> meter_selector{new MeterSelector("meter1", "version1", "schema1")};
+  mp.AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
+
+  auto c = m->CreateDoubleObservableCounter(instrument_name, instrument_desc, instrument_unit);
+  c->AddCallback(ObservableCounterCallback, nullptr);
+
+  size_t collected_points = 0;
+  reader->Collect([&](ResourceMetrics &rm) {
+    for (const ScopeMetrics &smd : rm.scope_metric_data_)
+    {
+      for (const MetricData &md : smd.metric_data_)
+      {
+        EXPECT_EQ(1, md.point_data_attr_.size());
+        for (const PointDataAttributes &dp : md.point_data_attr_)
+        {
+          ++collected_points;
+          EXPECT_EQ(3.0, opentelemetry::nostd::get<double>(
+                             opentelemetry::nostd::get<SumPointData>(dp.point_data).value_));
+          // Only the attribute allowed by the view is reported.
+          EXPECT_EQ(1, dp.attributes.size());
+          EXPECT_NE(dp.attributes.end(), dp.attributes.find("attr1"));
+          EXPECT_EQ(dp.attributes.end(), dp.attributes.find("version"));
+        }
+      }
+    }
+    return true;
+  });
+  EXPECT_EQ(1, collected_points);
+
+  c->RemoveCallback(ObservableCounterCallback, nullptr);
 }
 
 namespace

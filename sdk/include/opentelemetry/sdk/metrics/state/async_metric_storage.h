@@ -6,9 +6,11 @@
 #include <memory>
 #include <mutex>
 #include <unordered_map>
+#include <utility>
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 
@@ -37,6 +39,7 @@ class AsyncMetricStorage : public MetricStorage, public AsyncWritableMetricStora
 public:
   AsyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
                      const AggregationType aggregation_type,
+                     std::shared_ptr<const AttributesProcessor> attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
                      ExemplarFilterType exemplar_filter_type,
                      nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
@@ -45,6 +48,7 @@ public:
       : instrument_descriptor_(instrument_descriptor),
         aggregation_type_{aggregation_type},
         aggregation_config_{AggregationConfig::GetOrDefault(aggregation_config)},
+        attributes_processor_{std::move(attributes_processor)},
         cumulative_hash_map_(
             std::make_unique<AttributesHashMap>(aggregation_config_->cardinality_limit_)),
         delta_hash_map_(
@@ -68,6 +72,12 @@ public:
     const bool offer_exemplars =
         ExemplarFilterEnabled(exemplar_filter_type_, opentelemetry::context::Context{});
 #endif
+
+    // The view may drop attributes (spatial dimensions), so several of the observed
+    // measurements can collapse onto the same attribute set. Those have to be re-aggregated
+    // (summed up for the additive instruments) instead of the last observation overwriting
+    // the previous ones.
+    AttributesHashMap observations{aggregation_config_->cardinality_limit_};
     for (auto &measurement : measurements)
     {
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -76,27 +86,39 @@ public:
         exemplar_reservoir_->OfferMeasurement(measurement.second, measurement.first, {});
       }
 #endif
+      MetricAttributes attributes = FilterAttributes(measurement.first);
+      observations
+          .GetOrSetDefault(std::move(attributes),
+                           [this]() {
+                             return DefaultAggregation::CreateAggregation(aggregation_type_,
+                                                                          instrument_descriptor_);
+                           })
+          ->Aggregate(measurement.second);
+    }
 
-      auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
-      aggr->Aggregate(measurement.second);
-      auto prev = cumulative_hash_map_->Get(measurement.first);
+    observations.GetAllEntries([this](const MetricAttributes &attributes,
+                                      Aggregation &aggregation) {
+      auto aggr = DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_,
+                                                       aggregation);
+      auto prev = cumulative_hash_map_->Get(attributes);
       if (prev)
       {
         auto delta = prev->Diff(*aggr);
         // store received value in cumulative map, and the diff in delta map (to pass it to temporal
         // storage)
-        cumulative_hash_map_->Set(measurement.first, std::move(aggr));
-        delta_hash_map_->Set(measurement.first, std::move(delta));
+        cumulative_hash_map_->Set(attributes, std::move(aggr));
+        delta_hash_map_->Set(attributes, std::move(delta));
       }
       else
       {
         // store received value in cumulative and delta map.
         cumulative_hash_map_->Set(
-            measurement.first,
+            attributes,
             DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_, *aggr));
-        delta_hash_map_->Set(measurement.first, std::move(aggr));
+        delta_hash_map_->Set(attributes, std::move(aggr));
       }
-    }
+      return true;
+    });
   }
 
   void RecordLong(
@@ -143,9 +165,42 @@ public:
   }
 
 private:
+  /**
+   * Returns a copy of the observed attributes with the attributes dropped by the view removed.
+   */
+  MetricAttributes FilterAttributes(const MetricAttributes &attributes) const noexcept
+  {
+    MetricAttributes filtered(attributes);
+    if (!attributes_processor_)
+    {
+      return filtered;
+    }
+
+    bool dropped = false;
+    for (auto iter = filtered.begin(); iter != filtered.end();)
+    {
+      if (attributes_processor_->isPresent(iter->first))
+      {
+        ++iter;
+      }
+      else
+      {
+        iter    = filtered.erase(iter);
+        dropped = true;
+      }
+    }
+
+    if (dropped)
+    {
+      filtered.UpdateHash();
+    }
+    return filtered;
+  }
+
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
   const AggregationConfig *aggregation_config_;
+  std::shared_ptr<const AttributesProcessor> attributes_processor_;
   std::unique_ptr<AttributesHashMap> cumulative_hash_map_;
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
   std::mutex hashmap_lock_;
