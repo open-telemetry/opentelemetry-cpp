@@ -8,6 +8,7 @@
 #  include <memory>
 #  include <vector>
 
+#  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir_cell_selector.h"
 #  include "opentelemetry/version.h"
 
@@ -67,6 +68,16 @@ public:
    */
   virtual std::vector<std::shared_ptr<ExemplarData>> CollectAndReset(
       const MetricAttributes &pointAttributes) noexcept = 0;
+
+  /** Offers a long measurement to be sampled. */
+  virtual void OfferMeasurement(int64_t value,
+                                const opentelemetry::common::KeyValueIterable &attributes,
+                                const opentelemetry::context::Context &context) noexcept = 0;
+
+  /** Offers a long measurement to be sampled. */
+  virtual void OfferMeasurement(double value,
+                                const opentelemetry::common::KeyValueIterable &attributes,
+                                const opentelemetry::context::Context &context) noexcept = 0;
 
   static nostd::shared_ptr<ExemplarReservoir> GetSimpleFixedSizeExemplarReservoir(
       size_t size,

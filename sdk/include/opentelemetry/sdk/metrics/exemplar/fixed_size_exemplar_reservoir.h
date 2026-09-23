@@ -8,6 +8,7 @@
 #  include <memory>
 #  include <vector>
 
+#  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/context/context.h"
 #  include "opentelemetry/nostd/function_ref.h"
 #  include "opentelemetry/nostd/shared_ptr.h"
@@ -65,6 +66,40 @@ public:
     if (idx != -1)
     {
       storage_[idx].RecordDoubleMeasurement(value, attributes, context);
+    }
+  }
+
+  void OfferMeasurement(int64_t value,
+                        const opentelemetry::common::KeyValueIterable &attributes,
+                        const opentelemetry::context::Context &context) noexcept override
+  {
+    if (!reservoir_cell_selector_)
+    {
+      return;
+    }
+    auto idx =
+        reservoir_cell_selector_->ReservoirCellIndexFor(storage_, value, attributes, context);
+    if (idx != -1)
+    {
+      MetricAttributes owned_attributes{attributes};
+      storage_[idx].RecordLongMeasurement(value, owned_attributes, context);
+    }
+  }
+
+  void OfferMeasurement(double value,
+                        const opentelemetry::common::KeyValueIterable &attributes,
+                        const opentelemetry::context::Context &context) noexcept override
+  {
+    if (!reservoir_cell_selector_)
+    {
+      return;
+    }
+    auto idx =
+        reservoir_cell_selector_->ReservoirCellIndexFor(storage_, value, attributes, context);
+    if (idx != -1)
+    {
+      MetricAttributes owned_attributes{attributes};
+      storage_[idx].RecordDoubleMeasurement(value, owned_attributes, context);
     }
   }
 
