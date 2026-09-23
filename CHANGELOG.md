@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Compare the curl seek offset in `curl_off_t` before narrowing it to
+  `size_t`, so an offset past the `size_t` range cannot wrap back inside the
+  request body on a 32-bit build
+  [#4630](https://github.com/open-telemetry/opentelemetry-cpp/pull/4630)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
