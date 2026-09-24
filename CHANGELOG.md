@@ -48,6 +48,18 @@ Increment the:
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+Breaking changes:
+
+* [SDK] Remove `noexcept` from the public SDK `TracerProvider`,
+  `LoggerProvider`, `MeterProvider`, `Tracer`, `Logger`, and `Meter`
+  constructors so initialization failures can propagate to callers.
+  `GetTracer`, `GetLogger`, and `GetMeter` remain `noexcept` and return a
+  pre-allocated noop object if constructing a new instrumentation object
+  fails. After the first failure, later uncached `Get*` calls return the same
+  noop immediately without retrying construction. Existing cached objects
+  continue to be returned.
+  [#4361](https://github.com/open-telemetry/opentelemetry-cpp/issues/4361)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
