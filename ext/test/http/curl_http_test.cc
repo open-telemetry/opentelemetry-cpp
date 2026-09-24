@@ -698,6 +698,39 @@ TEST_F(BasicCurlHttpTests, RetryAfterBeyondMaxBackoffIsNotQueued)
   EXPECT_EQ(1, hits("/retry-after/"));
   EXPECT_EQ(2, hits("/retry/"));
 }
+
+// The shutdown half of #4631: the closed session used to hold the join until the server's time.
+TEST_F(BasicCurlHttpTests, RetryAfterBeyondMaxBackoffDoesNotDelayShutdown)
+{
+  received_requests_.clear();
+  curl::HttpClient http_client;
+  const http_client::RetryPolicy retry_policy = {2, std::chrono::duration<float>{0.1f},
+                                                 std::chrono::duration<float>{1.0f}, 1.0f};
+
+  auto session = http_client.CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetMethod(http_client::Method::Post);
+  request->SetUri("retry-after/");
+  request->SetRetryPolicy(retry_policy);
+  auto handler = std::make_shared<RetryEventHandler>();
+  session->SendRequest(handler);
+  session->FinishSession();
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+
+  const auto started_at = std::chrono::steady_clock::now();
+  http_client.WaitBackgroundThreadExit();
+  const auto joined_in = std::chrono::steady_clock::now() - started_at;
+
+  // The server asks for 30 s.
+  EXPECT_TRUE(joined_in < std::chrono::seconds{10})
+      << "join ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(joined_in).count();
+
+  std::unique_lock<std::mutex> lock_requests(mtx_requests);
+  EXPECT_EQ(1, std::count_if(received_requests_.begin(), received_requests_.end(),
+                             [](const HTTP_SERVER_NS::HttpRequest &received) {
+                               return received.uri == "/retry-after/";
+                             }));
+}
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 // A cancel that arrives once the server has answered used to deliver Cancelled and the response,
