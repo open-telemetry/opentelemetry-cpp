@@ -79,6 +79,10 @@ Increment the:
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+* [BUG] Send one request per curl session, rather than replacing the operation
+  a running request still belongs to
+  [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
