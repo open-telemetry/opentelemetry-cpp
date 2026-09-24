@@ -324,7 +324,8 @@ int HttpOperation::SeekCallback(void *userp, curl_off_t offset, int origin)
   // move of the read cursor. Anything else is refused rather than approximated, because reporting
   // success without repositioning would resume the upload from the wrong offset and send a
   // truncated or misaligned body.
-  if (origin != SEEK_SET || offset < 0 || static_cast<size_t>(offset) > self->request_body_.size())
+  if (origin != SEEK_SET || offset < 0 ||
+      offset > static_cast<curl_off_t>(self->request_body_.size()))
   {
     return CURL_SEEKFUNC_CANTSEEK;
   }
