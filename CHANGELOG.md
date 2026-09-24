@@ -46,6 +46,20 @@ Increment the:
 
 ## [Unreleased]
 
+* [LOGS] Fix undefined behavior in `Logger::EmitLogRecord()` when a logger is
+  enabled (e.g. via `LoggerProvider::UpdateLoggerConfigurator()`) after
+  `CreateLogRecord()` was called while it was still disabled. The disabled
+  path previously returned a `NoopLogRecord`, which is not the SDK's internal
+  `Recordable`; `EmitLogRecord()` re-checks the enabled state at emit time, so
+  such a record could reach its unconditional `static_cast<Recordable *>` and
+  then `MultiLogRecordProcessor::OnEmit()`'s own `static_cast`, both undefined
+  behavior. `CreateLogRecord()` now returns an empty `MultiRecordable` while
+  disabled instead, which is a safe target either way: every `Set*` call and
+  `ReleaseRecordable()` on it simply loop over zero wrapped recordables, so
+  the record is dropped without reaching a real processor. No API or ABI
+  change.
+  [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
