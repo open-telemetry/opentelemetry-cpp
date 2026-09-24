@@ -83,6 +83,11 @@ Increment the:
   a running request still belongs to
   [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
 
+* [BUG] Compare the curl seek offset in `curl_off_t` before narrowing it to
+  `size_t`, so an offset past the `size_t` range cannot wrap back inside the
+  request body on a 32-bit build
+  [#4630](https://github.com/open-telemetry/opentelemetry-cpp/pull/4630)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
