@@ -52,6 +52,10 @@ Increment the:
   a running request still belongs to
   [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
 
+* [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
+  from conflicting streams, and warn if stream conflicts were configured
+  [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
+
 * [BUG] Compare the curl seek offset in `curl_off_t` before narrowing it to
   `size_t`, so an offset past the `size_t` range cannot wrap back inside the
   request body on a 32-bit build
@@ -68,10 +72,6 @@ Increment the:
   and continues, instead of `nlohmann::json::dump()` throwing out of a
   `noexcept` function.
   [#4439](https://github.com/open-telemetry/opentelemetry-cpp/issues/4439)
-
-* [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
-  from conflicting streams, and warn if stream conflicts were configured
-  [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
 
 * [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
   If a model-specific limit is set it is used, otherwise the matching general

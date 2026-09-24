@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
@@ -83,10 +84,6 @@ public:
 private:
   bool HasStorage(const std::shared_ptr<SyncWritableMetricStorage> &storage) const
   {
-    if (!storage || storages_.empty())
-    {
-      return false;
-    }
     return std::find(storages_.begin(), storages_.end(), storage) != storages_.end();
   }
 
@@ -129,10 +126,6 @@ public:
 private:
   bool HasStorage(const std::shared_ptr<AsyncWritableMetricStorage> &storage) const
   {
-    if (!storage || storages_.empty())
-    {
-      return false;
-    }
     return std::find(storages_.begin(), storages_.end(), storage) != storages_.end();
   }
 
