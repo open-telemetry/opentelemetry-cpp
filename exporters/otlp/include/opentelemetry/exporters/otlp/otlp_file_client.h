@@ -8,6 +8,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_runtime_options.h"
+#include "opentelemetry/exporters/otlp/otlp_json_writer_factory.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/version.h"
@@ -88,6 +89,9 @@ private:
   OtlpFileClientOptions options_;
   // The runtime options associated with this file client.
   OtlpFileClientRuntimeOptions runtime_options_;
+
+  // Resolved from runtime_options_.json_writer_factory, or the default backend.
+  std::shared_ptr<JsonWriterFactory> json_writer_factory_;
 
   opentelemetry::nostd::shared_ptr<OtlpFileAppender> backend_;
 };

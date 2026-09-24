@@ -27,6 +27,9 @@ done
 # OTLP exporters
 validate_package "opentelemetry_otlp_recordable"
 validate_package "opentelemetry_exporter_otlp_builder_utils"
+for variant in json_writer json_writer_nlohmann json_converter; do
+  validate_package "opentelemetry_exporter_otlp_${variant}"
+done
 
 # OTLP gRPC exporter
 validate_package "opentelemetry_exporter_otlp_grpc"
