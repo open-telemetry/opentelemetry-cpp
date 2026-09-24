@@ -80,9 +80,9 @@ if(_OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW_REQUESTED
 endif()
 unset(_OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW_REQUESTED)
 
-# Experimental: bound synchronous metric instruments (Counter, Histogram).
-# Requires OTELCPP_WITH_ABI_VERSION_2. Context-bearing bound operations,
-# exemplar parity, Gauge, and UpDownCounter bound support are follow-ups.
+# Experimental: bound synchronous metric instruments (Counter, UpDownCounter,
+# Histogram, Gauge). Requires OTELCPP_WITH_ABI_VERSION_2. Context-bearing bound
+# operations and exemplar parity are follow-ups.
 otelcpp_dependent_option(
   OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW
   "EXPERIMENTAL: bound synchronous metric instruments preview" OFF

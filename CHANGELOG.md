@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] Extend preview bound instruments to UpDownCounter and Gauge
+  [#4321](https://github.com/open-telemetry/opentelemetry-cpp/pull/4321)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
