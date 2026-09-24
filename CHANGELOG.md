@@ -15,6 +15,20 @@ Increment the:
 
 ## [Unreleased]
 
+* [LOGS] Fix undefined behavior in `Logger::EmitLogRecord()` when a logger is
+  enabled (e.g. via `LoggerProvider::UpdateLoggerConfigurator()`) after
+  `CreateLogRecord()` was called while it was still disabled. The disabled
+  path previously returned a `NoopLogRecord`, which is not the SDK's internal
+  `Recordable`; `EmitLogRecord()` re-checks the enabled state at emit time, so
+  such a record could reach its unconditional `static_cast<Recordable *>` and
+  then `MultiLogRecordProcessor::OnEmit()`'s own `static_cast`, both undefined
+  behavior. `CreateLogRecord()` now returns an empty `MultiRecordable` while
+  disabled instead, which is a safe target either way: every `Set*` call and
+  `ReleaseRecordable()` on it simply loop over zero wrapped recordables, so
+  the record is dropped without reaching a real processor. No API or ABI
+  change.
+  [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
@@ -33,6 +47,15 @@ Increment the:
   on a transitive include from elsewhere in the translation unit and failed
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
+
+* [BUG] Send one request per curl session, rather than replacing the operation
+  a running request still belongs to
+  [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
+
+* [BUG] Compare the curl seek offset in `curl_off_t` before narrowing it to
+  `size_t`, so an offset past the `size_t` range cannot wrap back inside the
+  request body on a 32-bit build
+  [#4630](https://github.com/open-telemetry/opentelemetry-cpp/pull/4630)
 
 ## [1.29.0] 2026-09-13
 
