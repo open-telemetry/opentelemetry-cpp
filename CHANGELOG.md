@@ -15,6 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] `BatchSpanProcessor` now waits for a full batch
+  (`max_export_batch_size`) before exporting, instead of draining the buffer
+  whenever it is non-empty. This reduces gRPC request count and CPU usage
+  under steady load while preserving `ForceFlush`/`Shutdown` drain semantics.
+  Force-flush exports also respect `max_export_batch_size`, splitting buffered
+  spans into multiple batches when needed.
+  [#4466](https://github.com/open-telemetry/opentelemetry-cpp/pull/4466)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
