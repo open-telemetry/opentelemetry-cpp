@@ -15,11 +15,32 @@ Increment the:
 
 ## [Unreleased]
 
+* [LOGS] Fix undefined behavior in `Logger::EmitLogRecord()` when a logger is
+  enabled (e.g. via `LoggerProvider::UpdateLoggerConfigurator()`) after
+  `CreateLogRecord()` was called while it was still disabled. The disabled
+  path previously returned a `NoopLogRecord`, which is not the SDK's internal
+  `Recordable`; `EmitLogRecord()` re-checks the enabled state at emit time, so
+  such a record could reach its unconditional `static_cast<Recordable *>` and
+  then `MultiLogRecordProcessor::OnEmit()`'s own `static_cast`, both undefined
+  behavior. `CreateLogRecord()` now returns an empty `MultiRecordable` while
+  disabled instead, which is a safe target either way: every `Set*` call and
+  `ReleaseRecordable()` on it simply loop over zero wrapped recordables, so
+  the record is dropped without reaching a real processor. No API or ABI
+  change.
+  [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
+
+* [EXAMPLES] Fix random attribute selection in metrics foo example to include
+  all key-value pairs
+  [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
 * [SDK] Fix span-limit environment variable handling compilation on 32-bit
   platforms (#4573)
   [#4573](https://github.com/open-telemetry/opentelemetry-cpp/pull/4573)
 * [API] Remove regex from trace_state.h
   [#4570](https://github.com/open-telemetry/opentelemetry-cpp/pull/4570)
+
+* [API] `TraceState::Set` now overwrites an entry with the same key, and
+ `TraceState::FromHeader` discards duplicate keys.
+  [#4586](https://github.com/open-telemetry/opentelemetry-cpp/pull/4586)
 
 * [SDK] Add a missing `<cstdint>` include to `predicate_factory.h`, which
   uses `uint8_t` without including the header that declares it. This relied
@@ -33,8 +54,9 @@ Increment the:
   warning and skips it when configured.
   [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
 
-* [DOC] Fix and clarify the `StartSpanOptions` documentation
-  [#4526](https://github.com/open-telemetry/opentelemetry-cpp/pull/4526)
+* [BUG] Send one request per curl session, rather than replacing the operation
+  a running request still belongs to
+  [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
 
 ## [1.29.0] 2026-09-13
 
