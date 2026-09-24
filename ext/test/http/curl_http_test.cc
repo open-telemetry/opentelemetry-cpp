@@ -7,6 +7,11 @@
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
 #  include "gmock/gmock.h"
+#  ifdef _WIN32
+#    include <windows.h>
+#  else
+#    include <ctime>
+#  endif
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
@@ -768,6 +773,61 @@ TEST_F(BasicCurlHttpTests, RetryAfterBeyondMaxBackoffDoesNotDelayShutdown)
   EXPECT_EQ(1, std::count_if(received_requests_.begin(), received_requests_.end(),
                              [](const HTTP_SERVER_NS::HttpRequest &received) {
                                return received.uri == "/retry-after/";
+                             }));
+}
+
+// CPU time of the whole process. std::clock() measures wall time on Windows.
+std::chrono::microseconds ProcessCpuTime()
+{
+#  ifdef _WIN32
+  FILETIME created{}, exited{}, kernel{}, user{};
+  GetProcessTimes(GetCurrentProcess(), &created, &exited, &kernel, &user);
+  // FILETIME counts 100 ns ticks.
+  const auto ticks = [](const FILETIME &time) {
+    return (static_cast<std::uint64_t>(time.dwHighDateTime) << 32) | time.dwLowDateTime;
+  };
+  return std::chrono::microseconds{static_cast<std::int64_t>((ticks(kernel) + ticks(user)) / 10)};
+#  else
+  return std::chrono::microseconds{
+      static_cast<std::int64_t>(static_cast<double>(std::clock()) * 1000000 / CLOCKS_PER_SEC)};
+#  endif
+}
+
+// During shutdown the IO loop used to skip its poll while a retry waited out its backoff.
+TEST_F(BasicCurlHttpTests, ShutdownDoesNotSpinWhileARetryIsQueued)
+{
+  received_requests_.clear();
+  curl::HttpClient http_client;
+  // Three waits: the first can still sleep on a poll the loop asked for before the join.
+  const http_client::RetryPolicy retry_policy = {4, std::chrono::duration<float>{0.25f},
+                                                 std::chrono::duration<float>{5.0f}, 2.0f};
+
+  auto session = http_client.CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetMethod(http_client::Method::Post);
+  request->SetUri("retry/");
+  request->SetRetryPolicy(retry_policy);
+  auto handler = std::make_shared<RetryEventHandler>();
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+
+  const auto cpu_before = ProcessCpuTime();
+  const auto started_at = std::chrono::steady_clock::now();
+  http_client.WaitBackgroundThreadExit();
+  const auto joined_in = std::chrono::steady_clock::now() - started_at;
+  const auto cpu_used  = ProcessCpuTime() - cpu_before;
+
+  session->FinishSession();
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+
+  EXPECT_TRUE(cpu_used * 2 < joined_in)
+      << "join ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(joined_in).count()
+      << ", CPU ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cpu_used).count();
+
+  std::unique_lock<std::mutex> lock_requests(mtx_requests);
+  EXPECT_EQ(4, std::count_if(received_requests_.begin(), received_requests_.end(),
+                             [](const HTTP_SERVER_NS::HttpRequest &received) {
+                               return received.uri == "/retry/";
                              }));
 }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
