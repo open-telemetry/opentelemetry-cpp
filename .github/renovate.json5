@@ -5,6 +5,7 @@
     "helpers:pinGitHubActionDigestsToSemver",
     ":separateMultipleMajorReleases",
   ],
+  ignorePaths: [],
   packageRules: [
     {
       description: "Bundles all patches into 1 easy to review pr",
