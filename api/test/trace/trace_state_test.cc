@@ -60,6 +60,8 @@ TEST(TraceStateTest, ValidateHeaderParsing)
                    {"k1=v1,InvalidKey=v2", ""},
                    {"k1=v1,k2=v2,,", "k1=v1,k2=v2"},
                    {"k1=v1,k2=v2,invalidmember", ""},
+                   {"k1=v1,k2=v2,k1=duplicate_v1", "k1=v1,k2=v2"},
+                   {"k1=v1,k2=v2,k2=duplicate_v2,k2=duplicate_v2", "k1=v1,k2=v2"},
                    {"1a-2f@foo=bar1,a*/foo-_/bar=bar4", "1a-2f@foo=bar1,a*/foo-_/bar=bar4"},
                    {"1a-2f@foo=bar1,*/foo-_/bar=bar4", ""},
                    {"foo@@bar=1,baz=2", "foo@@bar=1,baz=2"},
@@ -126,6 +128,47 @@ TEST(TraceStateTest, TraceStateSet)
   EXPECT_EQ(ts3_new->ToHeader(), "");
 }
 
+TEST(TraceStateTest, TraceStateSetExistingKey)
+{
+  // Updating an existing key must not duplicate it, and the updated entry must move
+  // to the front of the list.
+  std::string trace_state_header = "k1=v1,k2=v2,k3=v3";
+  auto ts1                       = TraceState::FromHeader(trace_state_header);
+  auto ts1_new                   = ts1->Set("k2", "new_v2");
+  EXPECT_EQ(ts1_new->ToHeader(), "k2=new_v2,k1=v1,k3=v3");
+
+  // Updating the first key is a no-op reposition, but must still not duplicate.
+  auto ts2_new = ts1->Set("k1", "new_v1");
+  EXPECT_EQ(ts2_new->ToHeader(), "k1=new_v1,k2=v2,k3=v3");
+}
+
+TEST(TraceStateTest, TraceStateSetExistingKeyAtCapacity)
+{
+  // Replacing an existing key while already at kMaxKeyValuePairs must update it in
+  // place (moved to front), not drop it.
+  std::string trace_state_header = header_with_max_members();
+  auto ts                        = TraceState::FromHeader(trace_state_header);
+  auto ts_new                    = ts->Set("key15", "updated_value15");
+
+  std::string value;
+  EXPECT_TRUE(ts_new->Get("key15", value));
+  EXPECT_EQ(value, "updated_value15");
+
+  size_t count   = 0;
+  bool duplicate = false;
+  ts_new->GetAllEntries([&count, &duplicate](nostd::string_view key, nostd::string_view) {
+    if (key == "key15" && count != 0)
+    {
+      duplicate = true;
+    }
+    count++;
+    return true;
+  });
+  EXPECT_EQ(count, static_cast<size_t>(TraceState::kMaxKeyValuePairs));
+  EXPECT_FALSE(duplicate);
+  EXPECT_EQ(ts_new->ToHeader().find("key15"), size_t(0));  // moved to front
+}
+
 TEST(TraceStateTest, TraceStateDelete)
 {
   std::string trace_state_header = "k1=v1,k2=v2,k3=v3";
@@ -142,6 +185,36 @@ TEST(TraceStateTest, TraceStateDelete)
   auto ts3           = TraceState::FromHeader(trace_state_header);
   auto ts3_new       = ts3->Delete(std::string("InvalidKey"));
   EXPECT_EQ(ts3_new->ToHeader(), "");
+}
+
+TEST(TraceStateTest, TraceStateDeleteMiddleAndAbsentKey)
+{
+  // Deleting an entry that isn't first must still find and exclude it.
+  std::string trace_state_header = "k1=v1,k2=v2,k3=v3";
+  auto ts1                       = TraceState::FromHeader(trace_state_header);
+  EXPECT_EQ(ts1->Delete("k2")->ToHeader(), "k1=v1,k3=v3");
+  EXPECT_EQ(ts1->Delete("k3")->ToHeader(), "k1=v1,k2=v2");
+
+  // Deleting a valid but absent key must leave the list unchanged.
+  EXPECT_EQ(ts1->Delete("k9")->ToHeader(), "k1=v1,k2=v2,k3=v3");
+}
+
+TEST(TraceStateTest, TraceStateDeleteAtCapacity)
+{
+  // Deleting from a full kMaxKeyValuePairs list must remove exactly the one entry.
+  std::string trace_state_header = header_with_max_members();
+  auto ts                        = TraceState::FromHeader(trace_state_header);
+  auto ts_new                    = ts->Delete("key15");
+
+  std::string value;
+  EXPECT_FALSE(ts_new->Get("key15", value));
+
+  size_t count = 0;
+  ts_new->GetAllEntries([&count](nostd::string_view, nostd::string_view) {
+    count++;
+    return true;
+  });
+  EXPECT_EQ(count, static_cast<size_t>(TraceState::kMaxKeyValuePairs) - 1);
 }
 
 TEST(TraceStateTest, Empty)
