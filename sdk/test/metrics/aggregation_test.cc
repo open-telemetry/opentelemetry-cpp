@@ -1012,6 +1012,38 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationDiffUsesReportedBucketBudg
   EXPECT_EQ(diffed_point.negative_buckets_->MaxSize(), diffed_point.max_buckets_);
 }
 
+TEST(Aggregation, Base2ExponentialHistogramAggregationDiffOneSideEmptyFitsReportedBudget)
+{
+  // left has no buckets on the populated sign, so only next's own span shows that the narrow result
+  // budget needs a reduction.
+  const auto narrow_config = MakeAggregationConfig(-1, kMaxSizeMin);
+  const auto wide_config   = MakeAggregationConfig(0, 8);
+
+  for (double sign : {1.0, -1.0})
+  {
+    SCOPED_TRACE(sign);
+    Base2ExponentialHistogramAggregation left(&narrow_config);
+    Base2ExponentialHistogramAggregation next(&wide_config);
+    next.Aggregate(sign * 1.0, {});   // index -1
+    next.Aggregate(sign * 16.0, {});  // index 3
+
+    const auto diffed_point = MakePointData(*left.Diff(next));
+    ExpectCountInvariant(2u, diffed_point, "DiffOneSideEmpty");
+    EXPECT_EQ(diffed_point.positive_buckets_->MaxSize(), diffed_point.max_buckets_);
+    EXPECT_EQ(diffed_point.negative_buckets_->MaxSize(), diffed_point.max_buckets_);
+  }
+
+  // The negative union fits, so only the empty positive side can demand the reduction.
+  Base2ExponentialHistogramAggregation left(&narrow_config);
+  left.Aggregate(-1.0, {});
+  Base2ExponentialHistogramAggregation next(&wide_config);
+  next.Aggregate(-1.0, {});
+  next.Aggregate(1.0, {});
+  next.Aggregate(16.0, {});
+
+  ExpectCountInvariant(2u, MakePointData(*left.Diff(next)), "DiffOneSignEmpty");
+}
+
 TEST(Aggregation, Base2ExponentialHistogramAggregationDefaultConfigMerge)
 {
   Base2ExponentialHistogramAggregationConfig config;
@@ -1197,6 +1229,39 @@ Base2ExponentialHistogramPointData MakeMismatchedBucketPointData()
 
   point.positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(kMaxSizeMin);
   EXPECT_TRUE(point.positive_buckets_->Increment(100, 1));
+  return point;
+}
+
+// A one-slot counter at INT32_MAX is narrower than any budget, so it reaches the widening copy loop
+// unless the index check runs first. Only the move constructor can receive a null counter.
+Base2ExponentialHistogramPointData MakeMaxIndexPointData(bool null_negative_buckets)
+{
+  Base2ExponentialHistogramPointData point;
+  point.max_buckets_ = kMaxSizeMin;
+  point.count_       = 1;
+
+  point.positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(1);
+  EXPECT_TRUE(point.positive_buckets_->Increment((std::numeric_limits<int32_t>::max)(), 1));
+  if (null_negative_buckets)
+  {
+    point.negative_buckets_.reset();
+  }
+  return point;
+}
+
+// Scale 21 is the lowest scale whose index bounds for the full double range overflow int32_t.
+Base2ExponentialHistogramPointData MakeTooFineScalePointData(bool with_bucket)
+{
+  Base2ExponentialHistogramPointData point;
+  point.max_buckets_ = kMaxSizeMin;
+  point.scale_       = kMaxScaleMax + 1;
+  if (with_bucket)
+  {
+    point.count_            = 1;
+    point.positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(kMaxSizeMin);
+    EXPECT_TRUE(point.positive_buckets_->Increment(
+        Base2ExponentialHistogramIndexer(point.scale_).ComputeIndex(1.5), 1));
+  }
   return point;
 }
 
@@ -1460,4 +1525,59 @@ TEST(Aggregation, Base2ExponentialHistogramAggregationRejectsMismatchedBuckets)
   ExpectCountInvariant(1u, MakePointData(*diffed), "MismatchedDiff");
 
   EXPECT_EQ(log_handler.Drain().size(), 3u);
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationRejectsMaxIndexBeforeWidening)
+{
+  opentelemetry::test_common::ScopedTestLogHandler log_handler{
+      opentelemetry::sdk::common::internal_log::LogLevel::Error};
+
+  const auto copied_source = MakeMaxIndexPointData(false);
+  Base2ExponentialHistogramAggregation copied(copied_source);
+  Base2ExponentialHistogramAggregation moved(MakeMaxIndexPointData(false));
+  Base2ExponentialHistogramAggregation moved_null_negative(MakeMaxIndexPointData(true));
+
+  for (auto *aggr : {&copied, &moved, &moved_null_negative})
+  {
+    const auto point = MakePointData(*aggr);
+    EXPECT_EQ(point.count_, 0u);
+    ASSERT_TRUE(point.positive_buckets_ != nullptr);
+    ASSERT_TRUE(point.negative_buckets_ != nullptr);
+    EXPECT_TRUE(point.positive_buckets_->Empty());
+    EXPECT_GE(point.negative_buckets_->MaxSize(), kMaxSizeMin);
+
+    aggr->Aggregate(1.0, {});
+    ExpectCountInvariant(1u, MakePointData(*aggr), "RecordAfterRejectedMaxIndex");
+  }
+
+  EXPECT_EQ(log_handler.Drain().size(), 3u);
+}
+
+TEST(Aggregation, Base2ExponentialHistogramAggregationFoldsScaleAboveMaximum)
+{
+  const int32_t bucket_index = Base2ExponentialHistogramIndexer(kMaxScaleMax + 1).ComputeIndex(1.5);
+
+  for (bool with_bucket : {false, true})
+  {
+    SCOPED_TRACE(with_bucket);
+    const uint64_t supplied_count = with_bucket ? 1 : 0;
+    const auto copied_source      = MakeTooFineScalePointData(with_bucket);
+    Base2ExponentialHistogramAggregation copied(copied_source);
+    Base2ExponentialHistogramAggregation moved(MakeTooFineScalePointData(with_bucket));
+
+    for (auto *aggr : {&copied, &moved})
+    {
+      const auto folded = MakePointData(*aggr);
+      EXPECT_EQ(folded.scale_, kMaxScaleMax);
+      ExpectCountInvariant(supplied_count, folded, "FoldedScale");
+
+      // The same value lands in the folded bucket only if the indexer follows the new scale.
+      aggr->Aggregate(1.5, {});
+      EXPECT_EQ(MakePointData(*aggr).positive_buckets_->Get(bucket_index >> 1), supplied_count + 1);
+
+      aggr->Aggregate(kTiny, {});
+      aggr->Aggregate(kHuge, {});
+      ExpectCountInvariant(supplied_count + 3, MakePointData(*aggr), "RecordAfterFold");
+    }
+  }
 }

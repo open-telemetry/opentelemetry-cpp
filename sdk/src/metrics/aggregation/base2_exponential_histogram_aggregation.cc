@@ -51,9 +51,15 @@ uint32_t GetScaleReductionForUnion(const AdaptingCircularBufferCounter &low,
                                    const AdaptingCircularBufferCounter &high,
                                    size_t max_buckets) noexcept
 {
-  if (low.Empty() || high.Empty())
+  if (low.Empty() && high.Empty())
   {
     return 0;
+  }
+  // The populated side alone can exceed a result sized for the narrower operand's budget.
+  if (low.Empty() || high.Empty())
+  {
+    const AdaptingCircularBufferCounter &populated = low.Empty() ? high : low;
+    return GetScaleReduction(populated.StartIndex(), populated.EndIndex(), max_buckets);
   }
   return GetScaleReduction((std::min)(low.StartIndex(), high.StartIndex()),
                            (std::max)(low.EndIndex(), high.EndIndex()), max_buckets);
@@ -97,6 +103,32 @@ void DownscaleBuckets(std::unique_ptr<AdaptingCircularBufferCounter> &buckets, u
   buckets->Downscale(by);
 }
 
+// Folds `high_res` onto `target_scale`. The bucket shift has to match the scale delta exactly, so
+// the runtime floor is deliberately not applied here: it bounds the reductions the SDK chooses,
+// not the alignment of an operand that already sits lower.
+void AlignToScale(Base2ExponentialHistogramPointData &high_res, int32_t target_scale) noexcept
+{
+  if (high_res.scale_ <= target_scale)
+  {
+    return;
+  }
+
+  // AdaptingCircularBufferCounter::Downscale() saturates at 31, which is idempotent for int32_t
+  // indices, so a larger delta needs no special handling.
+  const int64_t delta = static_cast<int64_t>(high_res.scale_) - target_scale;
+  const uint32_t by   = delta > 31 ? 31u : static_cast<uint32_t>(delta);
+
+  if (high_res.positive_buckets_)
+  {
+    DownscaleBuckets(high_res.positive_buckets_, by);
+  }
+  if (high_res.negative_buckets_)
+  {
+    DownscaleBuckets(high_res.negative_buckets_, by);
+  }
+  high_res.scale_ = target_scale;
+}
+
 // Guards point data that arrives through the public constructors with a smaller budget than the
 // configuration validator would ever produce. A configured max_size is at least kMaxSizeMin, so
 // this never allocates more buckets than the user asked for.
@@ -124,10 +156,10 @@ void EnsureBucketCapacity(std::unique_ptr<AdaptingCircularBufferCounter> &bucket
   auto widened = std::make_unique<AdaptingCircularBufferCounter>(capacity);
   if (!buckets->Empty())
   {
-    for (int32_t index = buckets->StartIndex(); index <= buckets->EndIndex(); ++index)
+    for (int64_t index = buckets->StartIndex(); index <= buckets->EndIndex(); ++index)
     {
-      const uint64_t count = buckets->Get(index);
-      if (count > 0 && !widened->Increment(index, count))
+      const uint64_t count = buckets->Get(static_cast<int32_t>(index));
+      if (count > 0 && !widened->Increment(static_cast<int32_t>(index), count))
       {
         OTEL_INTERNAL_LOG_ERROR(
             "[Base2ExponentialHistogramAggregation::EnsureBucketCapacity] bucket index "
@@ -139,25 +171,28 @@ void EnsureBucketCapacity(std::unique_ptr<AdaptingCircularBufferCounter> &bucket
   buckets = std::move(widened);
 }
 
-bool BucketIndicesMatchScale(const AdaptingCircularBufferCounter &buckets,
+bool BucketIndicesMatchScale(const AdaptingCircularBufferCounter *buckets,
                              int32_t min_index,
                              int32_t max_index) noexcept
 {
-  return buckets.Empty() || (buckets.StartIndex() >= min_index && buckets.EndIndex() <= max_index);
+  return buckets == nullptr || buckets->Empty() ||
+         (buckets->StartIndex() >= min_index && buckets->EndIndex() <= max_index);
 }
 
 void NormalizeSuppliedPointData(Base2ExponentialHistogramPointData &point_data) noexcept
 {
-  const size_t capacity = BucketCapacity(point_data.max_buckets_);
-  EnsureBucketCapacity(point_data.positive_buckets_, capacity);
-  EnsureBucketCapacity(point_data.negative_buckets_, capacity);
+  // Index bounds above kMaxScaleMax overflow int32_t; folding keeps every supplied count.
+  AlignToScale(point_data, kMaxScaleMax);
 
+  const size_t capacity = BucketCapacity(point_data.max_buckets_);
   const Base2ExponentialHistogramIndexer indexer(point_data.scale_);
   const int32_t min_index = indexer.ComputeIndex((std::numeric_limits<double>::denorm_min)());
   const int32_t max_index = indexer.ComputeIndex((std::numeric_limits<double>::max)());
-  if (BucketIndicesMatchScale(*point_data.positive_buckets_, min_index, max_index) &&
-      BucketIndicesMatchScale(*point_data.negative_buckets_, min_index, max_index))
+  if (BucketIndicesMatchScale(point_data.positive_buckets_.get(), min_index, max_index) &&
+      BucketIndicesMatchScale(point_data.negative_buckets_.get(), min_index, max_index))
   {
+    EnsureBucketCapacity(point_data.positive_buckets_, capacity);
+    EnsureBucketCapacity(point_data.negative_buckets_, capacity);
     return;
   }
 
@@ -169,8 +204,9 @@ void NormalizeSuppliedPointData(Base2ExponentialHistogramPointData &point_data) 
   point_data.max_        = (std::numeric_limits<double>::min)();
   point_data.count_      = 0;
   point_data.zero_count_ = 0;
-  point_data.positive_buckets_->Clear();
-  point_data.negative_buckets_->Clear();
+  // Fresh counters rather than Clear(): a moved-in counter may be null.
+  point_data.positive_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(capacity);
+  point_data.negative_buckets_ = std::make_unique<AdaptingCircularBufferCounter>(capacity);
 }
 
 // Truncates `requested` to the reduction that can be applied without pushing `current_scale` below
@@ -205,32 +241,6 @@ uint32_t ApplyDownscale(Base2ExponentialHistogramPointData &point_data, uint32_t
   }
   point_data.scale_ -= static_cast<int32_t>(applied);
   return applied;
-}
-
-// Folds `high_res` onto `target_scale`. The bucket shift has to match the scale delta exactly, so
-// the runtime floor is deliberately not applied here: it bounds the reductions the SDK chooses,
-// not the alignment of an operand that already sits lower.
-void AlignToScale(Base2ExponentialHistogramPointData &high_res, int32_t target_scale) noexcept
-{
-  if (high_res.scale_ <= target_scale)
-  {
-    return;
-  }
-
-  // AdaptingCircularBufferCounter::Downscale() saturates at 31, which is idempotent for int32_t
-  // indices, so a larger delta needs no special handling.
-  const int64_t delta = static_cast<int64_t>(high_res.scale_) - target_scale;
-  const uint32_t by   = delta > 31 ? 31u : static_cast<uint32_t>(delta);
-
-  if (high_res.positive_buckets_)
-  {
-    DownscaleBuckets(high_res.positive_buckets_, by);
-  }
-  if (high_res.negative_buckets_)
-  {
-    DownscaleBuckets(high_res.negative_buckets_, by);
-  }
-  high_res.scale_ = target_scale;
 }
 
 }  // namespace
@@ -305,6 +315,8 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
   }
 
   NormalizeSuppliedPointData(point_data_);
+  // Normalization may have folded the supplied scale.
+  indexer_ = Base2ExponentialHistogramIndexer(point_data_.scale_);
 }
 
 Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
@@ -314,6 +326,8 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
       record_min_max_{point_data_.record_min_max_}
 {
   NormalizeSuppliedPointData(point_data_);
+  // Normalization may have folded the supplied scale.
+  indexer_ = Base2ExponentialHistogramIndexer(point_data_.scale_);
 }
 
 void Base2ExponentialHistogramAggregation::Aggregate(
