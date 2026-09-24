@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <vector>
 
 #include "opentelemetry/sdk/metrics/instruments.h"
