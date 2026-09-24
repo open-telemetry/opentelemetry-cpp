@@ -9,14 +9,36 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "headers",
     hdrs = [
+        "include/opentelemetry/ext/http/client/curl/http_client_factory_curl.h",
         "include/opentelemetry/ext/http/client/http_client.h",
         "include/opentelemetry/ext/http/client/http_client_factory.h",
-        "include/opentelemetry/ext/http/client/curl/http_client_factory_curl.h",
         "include/opentelemetry/ext/http/common/url_parser.h",
     ],
     strip_include_prefix = "include",
     deps = [
         "//api",
+    ],
+)
+
+# Internal: curl implementation headers
+# Used by: the curl client itself, its tests, and the w3c test server
+# These are implementation details and are not installed by CMake
+cc_library(
+    name = "curl_implementation_headers",
+    hdrs = [
+        "include/opentelemetry/ext/http/client/curl/http_client_curl.h",
+        "include/opentelemetry/ext/http/client/curl/http_operation_curl.h",
+        "include/opentelemetry/ext/http/client/curl/http_time_util.h",
+    ],
+    strip_include_prefix = "include",
+    visibility = [
+        "//ext/src/http/client/curl:__pkg__",
+        "//ext/test/http:__pkg__",
+        "//ext/test/w3c_tracecontext_http_test_server:__pkg__",
+    ],
+    deps = [
+        ":headers",
+        "@curl",
     ],
 )
 
@@ -30,11 +52,10 @@ cc_library(
     ],
     strip_include_prefix = "include",
     visibility = [
-        "//ext/src/http/client/curl:__pkg__",
         "//exporters/elasticsearch:__pkg__",
-        "//exporters/jaeger:__pkg__",
         "//exporters/otlp:__pkg__",
         "//exporters/zipkin:__pkg__",
+        "//ext/src/http/client/curl:__pkg__",
     ],
     deps = [
         ":headers",
@@ -50,16 +71,17 @@ cc_library(
         "include/opentelemetry/ext/http/server/http_server.h",
         "include/opentelemetry/ext/http/server/socket_tools.h",
     ],
-    strip_include_prefix = "include",
-    visibility = [
-        "//ext/test/http:__pkg__",
-        "//ext/test/w3c_tracecontext_http_test_server:__pkg__",
-        "//examples/http:__pkg__",
-    ],
     linkopts = select({
         "//bazel:windows": ["-DEFAULTLIB:Ws2_32.lib"],
         "//conditions:default": [],
     }),
+    strip_include_prefix = "include",
+    visibility = [
+        "//examples/http:__pkg__",
+        "//exporters/otlp:__pkg__",
+        "//ext/test/http:__pkg__",
+        "//ext/test/w3c_tracecontext_http_test_server:__pkg__",
+    ],
     deps = [
         "//api",
     ],
