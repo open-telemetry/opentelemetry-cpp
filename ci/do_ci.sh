@@ -55,9 +55,6 @@ mkdir -p "${INSTALL_TEST_DIR}"
 
 export BAZEL_CXXOPTS="-std=c++17"
 
-# Work around for https://github.com/actions/runner-images/issues/13564
-export USE_BAZEL_VERSION="8.5.0"
-
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW --//exporters/otlp:with_otlp_grpc_credential_preview=true"
 BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT"
 
@@ -814,13 +811,35 @@ elif [[ "$1" == "bazel.legacy.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/otlp/... -//exporters/prometheus/...
   exit 0
 elif [[ "$1" == "bazel.noexcept" ]]; then
-  # there are some exceptions and error handling code from the Prometheus Client
-  # as well as Opentracing shim (due to some third party code in its Opentracing dependency)
-  # that make this test always fail. Ignore these packages in the noexcept test here.
-  # Set the api:with_cxx_stdlib=none because C++17 std::variant::get<> throws
+  # The following directories and targets use exceptions and are excluded.
+  # TODO: create an exception handling policy that defines which components allow excecptions.
 
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/... -//resource_detectors/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/... -//resource_detectors/...
+  NOEXCEPT_EXCLUDES=(
+    -//exporters/prometheus/...
+    -//examples/prometheus/...
+    -//opentracing-shim/...
+    -//examples/configuration/...
+    -//sdk/src/configuration/...
+    -//sdk/test/configuration/...
+    -//resource_detectors/...
+    -//exporters/ostream:ostream_log_record_exporter_builder
+    -//exporters/ostream:ostream_metric_exporter_builder
+    -//exporters/ostream:ostream_span_exporter_builder
+    -//exporters/otlp:otlp_builder_utils
+    -//exporters/otlp:otlp_grpc_span_exporter_builder
+    -//exporters/otlp:otlp_grpc_log_record_exporter_builder
+    -//exporters/otlp:otlp_grpc_metric_exporter_builder
+    -//exporters/otlp:otlp_http_span_exporter_builder
+    -//exporters/otlp:otlp_http_log_record_exporter_builder
+    -//exporters/otlp:otlp_http_metric_exporter_builder
+    -//exporters/otlp:otlp_file_span_exporter_builder
+    -//exporters/otlp:otlp_file_log_record_exporter_builder
+    -//exporters/otlp:otlp_file_metric_exporter_builder
+  )
+
+  # Set the api:with_cxx_stdlib=none because C++17 std::variant::get<> throws
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... "${NOEXCEPT_EXCLUDES[@]}"
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... "${NOEXCEPT_EXCLUDES[@]}"
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client

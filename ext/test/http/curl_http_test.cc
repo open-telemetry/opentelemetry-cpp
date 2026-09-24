@@ -1,11 +1,11 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <curl/curl.h>
 #include <curl/curlver.h>
 #include "gtest/gtest.h"
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <curl/curl.h>
 #  include "gmock/gmock.h"
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
@@ -13,9 +13,11 @@
 #  include <numeric>
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdio>
 #include <cstring>
 #include <map>
 #include <memory>
@@ -56,6 +58,27 @@ class HttpClientTestPeer
 {
 public:
   static void ResetMultiHandle(HttpClient &client) { client.resetMultiHandle(); }
+};
+
+class HttpOperationTestPeer
+{
+public:
+  static int Seek(HttpOperation &operation, curl_off_t offset, int origin)
+  {
+    return HttpOperation::SeekCallback(&operation, offset, origin);
+  }
+
+  static int SeekNullUserData(curl_off_t offset, int origin)
+  {
+    return HttpOperation::SeekCallback(nullptr, offset, origin);
+  }
+
+  static size_t ReadCursor(const HttpOperation &operation) { return operation.request_nwrite_; }
+
+  static void SetReadCursor(HttpOperation &operation, size_t value)
+  {
+    operation.request_nwrite_ = value;
+  }
 };
 }  // namespace curl
 }  // namespace client
@@ -118,7 +141,14 @@ public:
         cancelled_from_callback_.fetch_add(1, std::memory_order_release);
       }
     }
-    else if (state == cancel_at_ && cancel_target_ != nullptr)
+
+    if (state == http_client::SessionState::ConnectFailed ||
+        state == http_client::SessionState::SendFailed)
+    {
+      terminal_count_.fetch_add(1, std::memory_order_release);
+    }
+
+    if (state == cancel_at_ && cancel_target_ != nullptr)
     {
       auto *session   = cancel_target_;
       cancel_target_  = nullptr;
@@ -396,6 +426,89 @@ TEST_F(BasicCurlHttpTests, SendPostRequest)
 
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
+}
+
+// Send a body large enough to span several read callbacks and check it arrives whole, so a mistake
+// in either CURLOPT_READFUNCTION or the seek callback registered beside it shows up as a corrupted
+// or short upload.
+TEST_F(BasicCurlHttpTests, SendPostRequestWithMultiChunkBody)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  EXPECT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("post/");
+  request->SetMethod(http_client::Method::Post);
+
+  // Not a round number, so an off-by-one in the read cursor cannot land on a chunk boundary.
+  constexpr size_t kBodySize = 257u * 1024u + 7u;
+  http_client::Body body(kBodySize);
+  for (size_t i = 0; i < kBodySize; ++i)
+  {
+    body[i] = static_cast<http_client::Byte>('a' + (i % 26));
+  }
+  const http_client::Body expected = body;
+
+  request->SetBody(body);
+  request->AddHeader("Content-Type", "application/octet-stream");
+  auto handler = std::make_shared<PostEventHandler>();
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+  ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+
+  {
+    std::unique_lock<std::mutex> lk(mtx_requests);
+    ASSERT_EQ(received_requests_.size(), 1u);
+    const auto &received = received_requests_[0].content;
+    ASSERT_EQ(received.size(), expected.size());
+    EXPECT_TRUE(std::equal(expected.begin(), expected.end(), received.begin()));
+  }
+
+  session_manager->CancelAllSessions();
+  session_manager->FinishAllSessions();
+}
+
+// Cover both halves of the callback contract, the seeks it honours and the ones it refuses.
+TEST_F(BasicCurlHttpTests, SeekCallbackRepositionsTheRequestBody)
+{
+  CustomEventHandler handler;
+  http_client::HttpSslOptions no_ssl;
+  http_client::Headers headers;
+  const char *payload    = "0123456789";
+  http_client::Body body = {payload, payload + std::strlen(payload)};
+
+  curl::HttpOperation operation(http_client::Method::Post, "http://127.0.0.1:19000/post/", no_ssl,
+                                &handler, headers, body, http_client::Compression::kNone, false,
+                                curl::kDefaultHttpConnTimeout);
+
+  using Peer = curl::HttpOperationTestPeer;
+
+  Peer::SetReadCursor(operation, 10);
+  EXPECT_EQ(CURL_SEEKFUNC_OK, Peer::Seek(operation, 4, SEEK_SET));
+  EXPECT_EQ(4u, Peer::ReadCursor(operation));
+
+  // Rewinding to the start is the case libcurl actually asks for.
+  EXPECT_EQ(CURL_SEEKFUNC_OK, Peer::Seek(operation, 0, SEEK_SET));
+  EXPECT_EQ(0u, Peer::ReadCursor(operation));
+
+  // Seeking to exactly the end is in range and leaves nothing left to send.
+  EXPECT_EQ(CURL_SEEKFUNC_OK, Peer::Seek(operation, 10, SEEK_SET));
+  EXPECT_EQ(10u, Peer::ReadCursor(operation));
+
+  // Everything below is refused, and must leave the cursor where it was.
+  Peer::SetReadCursor(operation, 3);
+
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 11, SEEK_SET));
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, -1, SEEK_SET));
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 0, SEEK_CUR));
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 0, SEEK_END));
+  EXPECT_EQ(3u, Peer::ReadCursor(operation));
+
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::SeekNullUserData(0, SEEK_SET));
 }
 
 TEST_F(BasicCurlHttpTests, RequestTimeout)
@@ -919,8 +1032,12 @@ TEST_F(BasicCurlHttpTests, FinishInAsyncCallback)
   }
 }
 
+// Destroying the client wakes the polling background thread instead of letting it sleep out
+// scheduled_delay_milliseconds_. A missed wakeup is slow rather than wrong, so the bound is the
+// assertion: measured, the quit is under a millisecond and a slept out poll is 256 ms.
 TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
 {
+  received_requests_.clear();
   auto http_client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
   std::static_pointer_cast<curl::HttpClient>(http_client)->MaybeSpawnBackgroundThread();
   // start background first, then test it could wakeup
@@ -929,19 +1046,22 @@ TEST_F(BasicCurlHttpTests, ElegantQuitQuick)
   request->SetUri("get/");
   auto handler = std::make_shared<GetEventHandler>();
   session->SendRequest(handler);
-  std::this_thread::sleep_for(std::chrono::milliseconds{10});  // let it enter poll state
+
+  // Sending is not what is timed, so a slow request must not read as a slow quit.
+  ASSERT_TRUE(waitForRequests(30, 1));
+  session->FinishSession();
+  ASSERT_TRUE(handler->is_called_.load(std::memory_order_acquire));
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+
   auto beg = std::chrono::system_clock::now();
   http_client->FinishAllSessions();
   http_client.reset();
-  // when background_thread_wait_for_ is used, it should have no side effect on elegant quit
-  // wait should be less than scheduled_delay_milliseconds_
-  // Due to load on CI hosts (some take 10ms), we assert it is less than 20ms
   auto cost = std::chrono::system_clock::now() - beg;
-  ASSERT_TRUE(cost < std::chrono::milliseconds{20})
+
+  // background_thread_wait_for_ keeps the thread alive here and must not delay the quit.
+  ASSERT_TRUE(cost < std::chrono::milliseconds{100})
       << "cost ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cost).count()
       << " libcurl version: 0x" << std::hex << LIBCURL_VERSION_NUM;
-  ASSERT_TRUE(handler->is_called_);
-  ASSERT_TRUE(handler->got_response_);
 }
 
 TEST_F(BasicCurlHttpTests, BackgroundThreadWaitMore)
@@ -983,6 +1103,46 @@ struct GzipEventHandler : public CustomEventHandler
   http_client::SessionState state_ = static_cast<http_client::SessionState>(-1);
   std::string reason_;
 };
+
+// A request whose compression step fails reports CreateFailed and is not sent.
+//
+// The failure is arranged, not injected: deflateInPlace() gets the body's own size as its output
+// budget, and one byte cannot hold a gzip header, so it returns Z_BUF_ERROR.
+TEST_F(BasicCurlHttpTests, AFailedCompressionStopsTheRequest)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("post/");
+  request->SetMethod(http_client::Method::Post);
+
+  http_client::Body body(1);
+  request->SetBody(body);
+  request->AddHeader("Content-Type", "text/plain");
+  request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
+
+  auto handler = std::make_shared<GzipEventHandler>();
+  session->SendRequest(handler);
+
+  // Asserted rather than assumed: a change that made this body compressible would otherwise leave
+  // the case passing while testing nothing.
+  ASSERT_TRUE(handler->is_called_) << "the compression did not fail, so nothing was tested";
+  ASSERT_EQ(handler->state_, http_client::SessionState::CreateFailed);
+
+  session->FinishSession();
+  session_manager->FinishAllSessions();
+
+  // Long enough that a request which was going to be sent has been. The server records every
+  // request it receives, including one whose body is unreadable.
+  std::this_thread::sleep_for(std::chrono::milliseconds{500});
+
+  std::unique_lock<std::mutex> lk1(mtx_requests);
+  EXPECT_TRUE(received_requests_.empty())
+      << "a request the caller was told had failed was sent anyway";
+}
 
 TEST_F(BasicCurlHttpTests, GzipCompressibleData)
 {
@@ -1067,26 +1227,26 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
       63,  35,  21,  121, 152, 22,  242, 199, 106, 217, 199, 211, 206, 165, 88,  77,  112, 108, 193,
       122, 8,   193, 74,  91,  50,  6,   156, 185, 165, 15,  92,  116, 3,   18,  244, 165, 191, 2,
       183, 9,   164, 116, 75,  127};
-  const auto original_size = body.size();
 
   request->SetBody(body);
   request->AddHeader("Content-Type", "text/plain");
   request->SetCompression(opentelemetry::ext::http::client::Compression::kGzip);
   auto handler = std::make_shared<GzipEventHandler>();
   session->SendRequest(handler);
-  ASSERT_TRUE(waitForRequests(30, 1));
-  session->FinishSession();
+
+  // deflateInPlace() overwrites part of the caller's buffer before reporting that the result will
+  // not fit, so no payload survives to send uncompressed. Whether to keep one is #4360.
   ASSERT_TRUE(handler->is_called_);
-  ASSERT_EQ(handler->state_, http_client::SessionState::Response);
-  ASSERT_TRUE(handler->reason_.empty());
+  ASSERT_EQ(handler->state_, http_client::SessionState::CreateFailed);
 
-  auto http_request =
-      dynamic_cast<opentelemetry::ext::http::client::curl::Request *>(request.get());
-  ASSERT_TRUE(http_request != nullptr);
-  ASSERT_EQ(http_request->body_.size(), original_size);
-
+  session->FinishSession();
   session_manager->CancelAllSessions();
   session_manager->FinishAllSessions();
+
+  std::this_thread::sleep_for(std::chrono::milliseconds{500});
+  std::unique_lock<std::mutex> lk1(mtx_requests);
+  EXPECT_TRUE(received_requests_.empty())
+      << "a body the compression step had already overwritten was sent anyway";
 }
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 

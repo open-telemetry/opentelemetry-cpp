@@ -267,6 +267,19 @@ public:
     return false;
   }
 
+  // Returns whether an entry for `key` exists
+  bool HasKey(nostd::string_view key) const noexcept
+  {
+    for (size_t i = 0; i < num_entries_; i++)
+    {
+      if ((entries_.get())[i].GetKey() == key)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   size_t Size() const noexcept { return num_entries_; }
 };
 }  // namespace common
