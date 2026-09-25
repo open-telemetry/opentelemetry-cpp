@@ -56,13 +56,17 @@ cc_library(
     }),
     linkstatic = True,
     deps = [
-        ":implementation_headers",
         "//api",
         "//ext:headers",
-        "//ext:http_client_detail",
         "//sdk:headers",
         "//sdk/src/common:random",
         "@curl",
         "@zlib",
+    ],
+    # Implementation headers are not exposed in the public API, so they are
+    # declared as implementation_deps to prevent transitive dependents from
+    # accessing curl internals. Only the .cc files (via srcs) see these headers.
+    implementation_deps = [
+        ":implementation_headers",
     ],
 )

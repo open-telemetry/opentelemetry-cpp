@@ -41,6 +41,7 @@ cc_library(
     tags = ["zipkin"],
     deps = [
         ":zipkin_recordable",
+        "//ext:http_client_detail",
         "//ext/src/http/client/curl:http_client_curl",
     ],
 )
