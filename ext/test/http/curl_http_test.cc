@@ -6,6 +6,7 @@
 #include "gtest/gtest.h"
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
+#  include <ratio>
 #  include "gmock/gmock.h"
 #  ifdef _WIN32
 #    include <windows.h>
