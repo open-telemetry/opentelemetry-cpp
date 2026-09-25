@@ -821,15 +821,18 @@ TEST_F(BasicCurlHttpTests, ShutdownDoesNotSpinWhileARetryIsQueued)
   session->FinishSession();
   ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
 
-  EXPECT_TRUE(cpu_used * 2 < joined_in)
-      << "join ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(joined_in).count()
-      << ", CPU ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cpu_used).count();
-
   std::unique_lock<std::mutex> lock_requests(mtx_requests);
   EXPECT_EQ(4, std::count_if(received_requests_.begin(), received_requests_.end(),
                              [](const HTTP_SERVER_NS::HttpRequest &received) {
                                return received.uri == "/retry/";
                              }));
+
+#  ifdef __APPLE__
+  GTEST_SKIP() << "The test server's kqueue reactor spins while a connection is open";
+#  endif
+  EXPECT_TRUE(cpu_used * 2 < joined_in)
+      << "join ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(joined_in).count()
+      << ", CPU ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cpu_used).count();
 }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
