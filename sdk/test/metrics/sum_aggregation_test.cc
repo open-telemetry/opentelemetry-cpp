@@ -427,9 +427,8 @@ void ObservableCounterCallback(opentelemetry::metrics::ObserverResult observer, 
 }
 }  // namespace
 
-// A view which drops the "version" dimension collapses both observations onto the same
-// attribute set. Being an additive instrument, they must be summed up (1 + 2), and not
-// reported as the last observed value.
+// A view dropping "version" collapses both observations onto one point: additive, so 1 + 2,
+// not the last observed value.
 TEST(AsyncCounterToSumFilterAttributes, Double)
 {
   MeterProvider mp;
@@ -471,7 +470,6 @@ TEST(AsyncCounterToSumFilterAttributes, Double)
           ++collected_points;
           EXPECT_EQ(3.0, opentelemetry::nostd::get<double>(
                              opentelemetry::nostd::get<SumPointData>(dp.point_data).value_));
-          // Only the attribute allowed by the view is reported.
           EXPECT_EQ(1, dp.attributes.size());
           EXPECT_NE(dp.attributes.end(), dp.attributes.find("attr1"));
           EXPECT_EQ(dp.attributes.end(), dp.attributes.find("version"));
