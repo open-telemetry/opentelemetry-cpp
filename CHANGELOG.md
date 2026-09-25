@@ -30,9 +30,11 @@ Increment the:
     * `opentelemetry/ext/http/server/socket_tools.h`
   * Code that included any of these headers must migrate to new internal
     targets:
-    * Curl implementation details: depend on `//ext/src/http/client/curl:implementation_headers`
-    * Factory helper: depend on `//ext:http_client_detail`
-    * Server headers: depend on `//ext:server_headers`
+    * Curl implementation details: use `//ext:curl_implementation_headers` in
+      `implementation_deps` (implementation only; not public API)
+    * Factory helper: use `//ext:http_client_detail` in `implementation_deps`
+      when calling `GetDefaultHttpClientFactory()`
+    * Server headers: depend on `//ext:server_headers` (for tests and examples)
   * The public API (4 stable headers) remains unchanged:
     * `opentelemetry/ext/http/client/http_client.h`
     * `opentelemetry/ext/http/client/http_client_factory.h`
