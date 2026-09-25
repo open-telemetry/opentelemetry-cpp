@@ -24,10 +24,10 @@ cc_test(
     defines = ["ENABLE_OTLP_RETRY_PREVIEW"],
     tags = ["test"],
     deps = [
+        "//ext:curl_implementation_headers",
         "//ext:headers",
         "//ext:server_headers",
         "//ext/src/http/client/curl:http_client_curl",
-        "//ext/src/http/client/curl:implementation_headers",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
         "@curl",

@@ -5,33 +5,6 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
-# Internal implementation headers for curl HTTP client
-# Used by: curl client implementation, internal tests, w3c test server
-# These are implementation details that should not be depended on by external code
-cc_library(
-    name = "implementation_headers",
-    hdrs = [
-        "http_client_curl.h",
-        "http_operation_curl.h",
-        "http_time_util.h",
-    ],
-    strip_include_prefix = ".",
-    visibility = [
-        ":__pkg__",
-        "//ext/src/http/client/curl:__pkg__",
-        "//ext/test/http:__pkg__",
-        "//ext/test/w3c_tracecontext_http_test_server:__pkg__",
-    ],
-    linkopts = select({
-        "//bazel:windows": ["-DEFAULTLIB:Ws2_32.lib"],
-        "//conditions:default": [],
-    }),
-    deps = [
-        "//ext:headers",
-        "@curl//:curl",
-    ],
-)
-
 cc_library(
     name = "http_client_curl",
     srcs = [
@@ -57,6 +30,7 @@ cc_library(
     linkstatic = True,
     deps = [
         "//api",
+        "//ext:curl_implementation_headers",
         "//ext:headers",
         "//sdk:headers",
         "//sdk/src/common:random",
