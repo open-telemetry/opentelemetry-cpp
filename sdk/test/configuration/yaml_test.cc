@@ -95,6 +95,17 @@ file_format: "1.2"
   ASSERT_EQ(config, nullptr);
 }
 
+TEST(Yaml, unsupported_instrumentation_development)
+{
+  std::string yaml = R"(
+file_format: "1.0"
+instrumentation/development:
+  enabled: true
+)";
+
+  EXPECT_THROW(DoParse(yaml), opentelemetry::sdk::configuration::UnsupportedException);
+}
+
 TEST(Yaml, just_format_1_0)
 {
   std::string yaml = R"(

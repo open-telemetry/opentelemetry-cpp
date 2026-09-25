@@ -22,7 +22,9 @@
 #include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/configuration.h"
 #include "opentelemetry/sdk/configuration/configured_sdk.h"
+#include "opentelemetry/sdk/configuration/distribution_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_builder.h"
+#include "opentelemetry/sdk/configuration/unsupported_exception.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/extension_push_metric_exporter_configuration.h"
@@ -181,6 +183,15 @@ protected:
 // ConfiguredSdk class.
 //                      For integration testing to determine if the SDK is configured correctly, see
 //                      the programmatic_configuration_test.cc file
+
+TEST_F(ConfiguredSdkTest, ConfiguredSdkRejectsUnsupportedDistribution)
+{
+  auto model          = std::make_unique<config_sdk::Configuration>();
+  model->resource     = std::make_unique<config_sdk::ResourceConfiguration>();
+  model->distribution = std::make_unique<config_sdk::DistributionConfiguration>();
+
+  EXPECT_EQ(config_sdk::ConfiguredSdk::Create(registry_, model), nullptr);
+}
 
 TEST_F(ConfiguredSdkTest, ConfiguredSdkDefaultLogLevel)
 {

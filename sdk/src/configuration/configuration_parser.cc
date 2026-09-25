@@ -2953,9 +2953,9 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
   child = node->GetChildNode("instrumentation/development");
   if (child)
   {
-    // FIXME-CONFIG: implement the instrumentation/development model
-    OTEL_INTERNAL_LOG_WARN(
-        "[Config Parser] instrumentation/development is not yet supported, ignoring");
+    // This configuration node is intentionally unsupported. Reject it explicitly rather than
+    // silently accepting it and producing a partially configured SDK.
+    throw UnsupportedException("instrumentation/development is not yet supported");
   }
 
   child = node->GetChildNode("distribution");
