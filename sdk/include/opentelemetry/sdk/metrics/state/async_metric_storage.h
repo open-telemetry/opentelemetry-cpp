@@ -157,7 +157,7 @@ private:
    * being reported into a spurious decrease.
    */
   template <class T>
-  void RecordMonotonicSum(const MetricAttributes &attributes, T value) noexcept
+  void RecordMonotonicSum(const MetricAttributes &attributes, T value)
   {
     auto observed = create_default_aggregation_();
     observed->Aggregate(value);
@@ -184,7 +184,7 @@ private:
    * Over-the-limit attribute sets resolve to the same otel.metric.overflow entry, which merges
    * too.
    */
-  void AccumulateDelta(const MetricAttributes &attributes, const Aggregation &delta) noexcept
+  void AccumulateDelta(const MetricAttributes &attributes, const Aggregation &delta)
   {
     auto merged =
         delta_hash_map_->GetOrSetDefault(attributes, create_default_aggregation_)->Merge(delta);
@@ -222,7 +222,7 @@ private:
   /**
    * Returns a copy of the observed attributes with the attributes dropped by the view removed.
    */
-  MetricAttributes FilterAttributes(const MetricAttributes &attributes) const noexcept
+  MetricAttributes FilterAttributes(const MetricAttributes &attributes) const
   {
     MetricAttributes filtered(attributes);
     if (!attributes_processor_)
