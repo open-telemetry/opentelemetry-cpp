@@ -17,14 +17,14 @@ namespace
 // corrupted while port() happens to still return -1.
 void ExpectInvalid(const SocketTools::SocketAddr &addr)
 {
-  EXPECT_EQ(addr.m_data.sa_family, AF_UNSPEC);
+  EXPECT_EQ(addr.m_data.ss_family, AF_UNSPEC);
   EXPECT_EQ(addr.port(), -1);
 }
 
 TEST(SocketAddrTest, ParsesHostAndPort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:8800");
-  EXPECT_EQ(addr.m_data.sa_family, AF_INET);
+  EXPECT_EQ(addr.m_data.ss_family, AF_INET);
   EXPECT_EQ(addr.port(), 8800);
   EXPECT_EQ(addr.toString(), "127.0.0.1:8800");
 }
@@ -57,7 +57,7 @@ TEST(SocketAddrTest, ParsesHostWithoutPort)
 TEST(SocketAddrTest, ParsesLegitimateZeroPort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:0");
-  EXPECT_EQ(addr.m_data.sa_family, AF_INET);
+  EXPECT_EQ(addr.m_data.ss_family, AF_INET);
   EXPECT_EQ(addr.port(), 0);
   EXPECT_EQ(addr.toString(), "127.0.0.1:0");
 }
@@ -67,7 +67,7 @@ TEST(SocketAddrTest, ParsesLegitimateZeroPort)
 TEST(SocketAddrTest, AcceptsLeadingZeroPort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:080");
-  EXPECT_EQ(addr.m_data.sa_family, AF_INET);
+  EXPECT_EQ(addr.m_data.ss_family, AF_INET);
   EXPECT_EQ(addr.port(), 80);
 }
 
