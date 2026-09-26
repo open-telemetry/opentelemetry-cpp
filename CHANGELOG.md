@@ -57,6 +57,8 @@ Increment the:
   request body on a 32-bit build
   [#4630](https://github.com/open-telemetry/opentelemetry-cpp/pull/4630)
 
+* [BUG] Do not queue a curl session closed by the Retry-After cap
+  [#4632](https://github.com/open-telemetry/opentelemetry-cpp/pull/4632)
 * [BUG] End the Elasticsearch exporter's wait on a read or write error
   [#4331](https://github.com/open-telemetry/opentelemetry-cpp/pull/4331)
 
