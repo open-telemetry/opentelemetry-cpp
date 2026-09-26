@@ -126,7 +126,7 @@ TEST(SocketAddrTest, RejectEmptyHostOrPort)
 
 // The port grammar is decimal digits only: a sign or whitespace that strtol would have accepted
 // must be rejected so both platforms agree.
-TEST(SocketAddrTest, RejectSignAndWhitespaceInPort)
+TEST(SocketAddrTest, RejectsSignAndWhitespaceInPort)
 {
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:+80"));
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:-0"));
