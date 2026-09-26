@@ -85,7 +85,7 @@ TEST(SocketAddrTest, RejectsOverlongHostInsteadOfTruncating)
   ExpectInvalid(addr);
 }
 
-TEST(SocketAddrTest, RejectTrailingGarbageInPort)
+TEST(SocketAddrTest, RejectsTrailingGarbageInPort)
 {
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:80junk"));
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:80:90"));
