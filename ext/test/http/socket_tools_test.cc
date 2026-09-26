@@ -133,7 +133,7 @@ TEST(SocketAddrTest, RejectSignAndWhitespaceInPort)
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1: 80"));
 }
 
-TEST(SocketAddrTest, RejectPortOverflow)
+TEST(SocketAddrTest, RejectsPortOverflow)
 {
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:65536"));
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:4294967377"));
