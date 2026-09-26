@@ -17,12 +17,6 @@ cc_library(
         "ENABLE_HTTP_CLIENT_CURL",
         "ENABLE_OTLP_RETRY_PREVIEW",
     ],
-    # Implementation headers are not exposed in the public API, so they are
-    # declared as implementation_deps to prevent transitive dependents from
-    # accessing curl internals. Only the .cc files (via srcs) see these headers.
-    implementation_deps = [
-        "//ext:curl_implementation_headers",
-    ],
     include_prefix = "src/http/client/curl",
     linkopts = select({
         "//bazel:windows": [
@@ -36,17 +30,13 @@ cc_library(
     linkstatic = True,
     deps = [
         "//api",
-        "//ext:curl_implementation_headers",
         "//ext:headers",
         "//sdk:headers",
         "//sdk/src/common:random",
         "@curl",
         "@zlib",
     ],
-    # Implementation headers are not exposed in the public API, so they are
-    # declared as implementation_deps to prevent transitive dependents from
-    # accessing curl internals. Only the .cc files (via srcs) see these headers.
     implementation_deps = [
-        ":implementation_headers",
+        "//ext:curl_implementation_headers",
     ],
 )
