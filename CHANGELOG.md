@@ -29,6 +29,13 @@ Increment the:
   change.
   [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
 
+* [LOGS] `LogRecordProcessor::OnEmit()` is now always called with the log
+  record's resolved context (explicit if the caller supplied one, otherwise
+  ambient), via a new `OnEmitWithContext()` method processors can override.
+  `Logger::EmitLogRecord(args...)` no longer silently loses an explicitly
+  supplied context on its way to the processor.
+  [#4421](https://github.com/open-telemetry/opentelemetry-cpp/pull/4421)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
@@ -615,6 +622,17 @@ Breaking changes:
       (less frequent metric exports when the field is omitted).
     * `trace_id_ratio_based` sampler `ratio` defaults to 1.0 instead of 0.0
       (sample all traces instead of dropping all when the field is omitted).
+
+* [LOGS] `logs::Logger` and `sdk::logs::LogRecordProcessor` each gained a new
+  virtual method (`EmitLogRecordWithContext()` and `OnEmitWithContext()`
+  respectively).
+  [#4421](https://github.com/open-telemetry/opentelemetry-cpp/pull/4421)
+  * Source compatible: both have default implementations that forward to the
+    existing `EmitLogRecord()`/`OnEmit()`, so existing subclasses continue to
+    compile and behave as before.
+  * Not ABI compatible: the added virtuals change the vtable layout of both
+    classes, so code that subclasses either must be recompiled against this
+    version of the SDK.
 
 * [CONFIGURATION] SDK default component builder libraries and example
   [#4367](https://github.com/open-telemetry/opentelemetry-cpp/pull/4367)
