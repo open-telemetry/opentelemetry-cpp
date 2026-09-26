@@ -110,15 +110,32 @@ public:
 
   /**
    * A method the user calls to block their thread until the request has either produced a
-   * response or failed. The longest duration is the timeout of the request, set by
-   * SetTimeoutMs(), which arrives here as a TimedOut session event.
+   * response or failed, or until the given deadline passes. Ordinarily the request's own
+   * timeout (set by SetTimeoutMs()) arrives here first, as a TimedOut session event. But that
+   * guarantee belongs to the injected HttpClient, not to this exporter: a client that accepts
+   * a handler and never delivers a terminal event (a dead thread, a reused socket, a swallowed
+   * error) would otherwise leave this wait blocked for the life of the process. The deadline is
+   * this exporter's own backstop, independent of whether the client honors its side of the
+   * contract.
+   *
+   * @param timed_out if not null, set to whether the deadline passed with nothing having
+   * reaped the transfer yet (completion_ still Pending), as opposed to a terminal event (a
+   * response, or a failure like ConnectFailed/SendFailed) having already arrived. The caller
+   * needs this distinction: only a still-outstanding transfer needs CancelSession() rather than
+   * FinishSession(), since a terminal event means the transfer is already over.
    */
-  bool waitForResponse()
+  bool waitForResponse(std::chrono::steady_clock::time_point deadline, bool *timed_out = nullptr)
   {
     std::unique_lock<std::mutex> lk(mutex_);
     // Waiting on a predicate rather than bare: the completion may already have been recorded
     // before this thread got here, in which case there is no notification left to receive.
-    cv_.wait(lk, [this] { return completion_ != CompletionState::Pending; });
+    // A deadline that passes without a terminal event leaves completion_ at Pending, which
+    // reads as failure below, the same outcome a terminal error event would have produced.
+    cv_.wait_until(lk, deadline, [this] { return completion_ != CompletionState::Pending; });
+    if (timed_out != nullptr)
+    {
+      *timed_out = (completion_ == CompletionState::Pending);
+    }
     return completion_ == CompletionState::Success;
   }
 
@@ -470,6 +487,10 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
 #else
   // Send the request
   auto handler = std::make_shared<ResponseHandler>(options_.console_debug_);
+  // Captured before SendRequest() so the deadline reflects this exporter's own timeout budget,
+  // not whatever the injected HttpClient decides to do with it (see waitForResponse()).
+  auto deadline =
+      std::chrono::steady_clock::now() + std::chrono::seconds(options_.response_timeout_);
   session->SendRequest(handler);
 
   // Wait for the response to be received
@@ -478,10 +499,23 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
     OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] waiting for response from Elasticsearch (timeout = "
                             << options_.response_timeout_ << " seconds)");
   }
-  bool write_successful = handler->waitForResponse();
+  bool timed_out        = false;
+  bool write_successful = handler->waitForResponse(deadline, &timed_out);
 
-  // End the session
-  session->FinishSession();
+  // Cancel only when the deadline genuinely expired with the transfer still outstanding:
+  // FinishSession() waits for an in-flight transfer to complete, which is exactly the hang
+  // this deadline exists to bound for HTTP clients (e.g. curl) whose worker thread blocks on
+  // the transfer itself. A terminal failure (ConnectFailed, SendFailed, CreateFailed, a
+  // response, ...) means the transfer is already over by the time waitForResponse returns, so
+  // FinishSession() is the correct call there, and for curl the two are not interchangeable.
+  if (timed_out)
+  {
+    session->CancelSession();
+  }
+  else
+  {
+    session->FinishSession();
+  }
 
   // If an error occurred with the HTTP request
   if (!write_successful)
