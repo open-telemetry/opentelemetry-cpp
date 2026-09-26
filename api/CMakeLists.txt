@@ -33,7 +33,7 @@ if(WIN32)
   )
   target_link_options(opentelemetry_api_symbol_bridge INTERFACE
     $<$<CXX_COMPILER_ID:MSVC>:/INCLUDE:OpenTelemetryAbiBridgeHook>
-    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wl,-u,:OpenTelemetryAbiBridgeHook>
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wl,-u,OpenTelemetryAbiBridgeHook>
   )
   
   list(APPEND EXPORTED_OTELCPP_TARGETS opentelemetry_api_symbol_bridge)
