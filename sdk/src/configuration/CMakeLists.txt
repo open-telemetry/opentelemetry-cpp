@@ -176,10 +176,13 @@ if(OTELCPP_WITH_CONFIGURATION)
               opentelemetry_configuration_logs_builders)
 
   if(OPENTELEMETRY_INSTALL)
+    # FetchContent/RYML_INSTALL puts libryml (c4core embedded) in the OTel
+    # prefix. There is no system rapidyaml.pc on the Ubuntu apt job, so emit
+    # -lryml instead of Requires: rapidyaml.
     opentelemetry_add_pkgconfig(
       configuration_yaml "OpenTelemetry SDK - Configuration YAML"
       "YAML configuration parser for the OpenTelemetry SDK."
-      "opentelemetry_configuration_core")
+      "opentelemetry_configuration_core" EXTRA_LIBS ryml)
 
     opentelemetry_add_pkgconfig(
       configuration
