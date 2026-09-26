@@ -11,6 +11,10 @@
 #include "opentelemetry/trace/tracer_provider.h"
 #include "opentelemetry/version.h"
 
+#ifdef _WIN32
+# include "opentelemetry/common/detail/symbol_bridge_windows.h"
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace trace
 {
@@ -55,12 +59,20 @@ public:
 private:
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<TracerProvider> &GetProvider() noexcept
   {
+#ifdef _WIN32
+    if (const auto address = common::detail::LoadSymbolBridgeSymbol<nostd::shared_ptr<TracerProvider>& (*)()>("OpenTelemetryTraceProviderGetProvider"))
+      return address();
+#endif
     static nostd::shared_ptr<TracerProvider> provider(new NoopTracerProvider);
     return provider;
   }
 
   OPENTELEMETRY_API_SINGLETON static common::SpinLockMutex &GetLock() noexcept
   {
+#ifdef _WIN32
+    if (const auto address = common::detail::LoadSymbolBridgeSymbol<common::SpinLockMutex& (*)(), TracerProvider>("OpenTelemetryTraceProviderGetLock"))
+      return address();
+#endif
     static common::SpinLockMutex lock;
     return lock;
   }

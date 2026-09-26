@@ -11,6 +11,10 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/version.h"
 
+#ifdef _WIN32
+# include "opentelemetry/common/detail/symbol_bridge_windows.h"
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace logs
 {
@@ -97,6 +101,10 @@ public:
 private:
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<LoggerProvider> &GetProvider() noexcept
   {
+#ifdef _WIN32
+    if (const auto address = common::detail::LoadSymbolBridgeSymbol<nostd::shared_ptr<LoggerProvider>& (*)()>("OpenTelemetryLogsProviderGetProvider"))
+      return address();
+#endif
     static nostd::shared_ptr<LoggerProvider> provider(new NoopLoggerProvider);
     return provider;
   }
@@ -105,6 +113,10 @@ private:
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<EventLoggerProvider> &
   GetEventProvider() noexcept
   {
+#ifdef _WIN32
+    if (const auto address = common::detail::LoadSymbolBridgeSymbol<nostd::shared_ptr<EventLoggerProvider>& (*)()>("OpenTelemetryLogsProviderGetEventProvider"))
+      return address();
+#endif
     static nostd::shared_ptr<EventLoggerProvider> provider(new NoopEventLoggerProvider);
     return provider;
   }
@@ -112,6 +124,10 @@ private:
 
   OPENTELEMETRY_API_SINGLETON static common::SpinLockMutex &GetLock() noexcept
   {
+#ifdef _WIN32
+    if (const auto address = common::detail::LoadSymbolBridgeSymbol<common::SpinLockMutex& (*)(), LoggerProvider>("OpenTelemetryLogsProviderGetLock"))
+      return address();
+#endif
     static common::SpinLockMutex lock;
     return lock;
   }
