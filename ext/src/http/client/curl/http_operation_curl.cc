@@ -1562,7 +1562,7 @@ void HttpOperation::Abort()
   }
 }
 
-void HttpOperation::PerformCurlMessage(CURLcode code)
+bool HttpOperation::PerformCurlMessage(CURLcode code)
 {
   ++retry_attempts_;
   last_attempt_time_      = std::chrono::system_clock::now();
@@ -1668,7 +1668,10 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
   {
     // Cleanup and unbind easy handle from multi handle, and finish callback
     Cleanup();
+    return false;
   }
+
+  return true;
 }
 
 }  // namespace curl
