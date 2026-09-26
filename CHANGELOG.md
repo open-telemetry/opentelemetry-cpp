@@ -59,6 +59,10 @@ Increment the:
 
 * [BUG] Do not queue a curl session closed by the Retry-After cap
   [#4632](https://github.com/open-telemetry/opentelemetry-cpp/pull/4632)
+* [BUG] Remove a curl easy handle from the multi handle before freeing that
+  handle and the header list it points at, and keep both when libcurl will not
+  take the handle back
+  [#4391](https://github.com/open-telemetry/opentelemetry-cpp/issues/4391)
 
 ## [1.29.0] 2026-09-13
 
