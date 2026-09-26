@@ -35,7 +35,7 @@ constexpr int SPINLOCK_SLEEP_MS        = 1;
  * 2. A loop where the current thread yields control after checking the lock.
  * 3. Issuing a thread-sleep call before starting back in phase 1.
  *
- * This is meant to give a good balance of perofrmance and CPU consumption in
+ * This is meant to give a good balance of performance and CPU consumption in
  * practice.
  *
  * This class implements the `BasicLockable` specification:
