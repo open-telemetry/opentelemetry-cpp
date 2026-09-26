@@ -57,6 +57,8 @@ Increment the:
   request body on a 32-bit build
   [#4630](https://github.com/open-telemetry/opentelemetry-cpp/pull/4630)
 
+* [BUG] Do not queue a curl session closed by the Retry-After cap
+  [#4632](https://github.com/open-telemetry/opentelemetry-cpp/pull/4632)
 * [BUG] Finish a curl operation that never gets scheduled, instead of leaving
   FinishSession blocked forever
   ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
