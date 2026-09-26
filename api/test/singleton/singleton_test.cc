@@ -352,14 +352,6 @@ static void cleanup_otel()
   trace_api::Provider::SetTracerProvider(provider);
 }
 
-// TODO: Remove once windows api singletons are supported.
-// See https://github.com/open-telemetry/opentelemetry-cpp/issues/2534
-#ifdef _WIN32
-#  define RUN_FAILING_WINDOWS_TEST 1
-#else
-#  define RUN_FAILING_WINDOWS_TEST 1
-#endif
-
 TEST(SingletonTest, Uniqueness)
 {
   do_something();
@@ -402,30 +394,26 @@ TEST(SingletonTest, Uniqueness)
   EXPECT_EQ(span_b_f1_count, 2);
   EXPECT_EQ(span_b_f2_count, 1);
 
-#if RUN_FAILING_WINDOWS_TEST
-  EXPECT_EQ(span_c_lib_count, 1);  // Fails with shared libraries on Windows
-  EXPECT_EQ(span_c_f1_count, 2);   // Fails with shared libraries on Windows
-  EXPECT_EQ(span_c_f2_count, 1);   // Fails with shared libraries on Windows
-  EXPECT_EQ(span_d_lib_count, 1);  // Fails with shared libraries on Windows
-  EXPECT_EQ(span_d_f1_count, 2);   // Fails with shared libraries on Windows
-  EXPECT_EQ(span_d_f2_count, 1);   // Fails with shared libraries on Windows
-  EXPECT_EQ(span_e_lib_count, 1);  // Fails with shared libraries on Windows
-  EXPECT_EQ(span_e_f1_count, 2);   // Fails with shared libraries on Windows
-  EXPECT_EQ(span_e_f2_count, 1);   // Fails with shared libraries on Windows
-  EXPECT_EQ(span_f_lib_count, 1);  // Fails with shared libraries on Windows
-  EXPECT_EQ(span_f_f1_count, 2);   // Fails with shared libraries on Windows
-  EXPECT_EQ(span_f_f2_count, 1);   // Fails with shared libraries on Windows
-#endif
+  EXPECT_EQ(span_c_lib_count, 1);
+  EXPECT_EQ(span_c_f1_count, 2);
+  EXPECT_EQ(span_c_f2_count, 1);
+  EXPECT_EQ(span_d_lib_count, 1);
+  EXPECT_EQ(span_d_f1_count, 2);
+  EXPECT_EQ(span_d_f2_count, 1);
+  EXPECT_EQ(span_e_lib_count, 1);
+  EXPECT_EQ(span_e_f1_count, 2);
+  EXPECT_EQ(span_e_f2_count, 1);
+  EXPECT_EQ(span_f_lib_count, 1);
+  EXPECT_EQ(span_f_f1_count, 2);
+  EXPECT_EQ(span_f_f2_count, 1);
 
 #ifndef BAZEL_BUILD
-#  if RUN_FAILING_WINDOWS_TEST
-  EXPECT_EQ(span_g_lib_count, 1);  // Fails with shared libraries on Windows
-  EXPECT_EQ(span_g_f1_count, 2);   // Fails with shared libraries on Windows
-  EXPECT_EQ(span_g_f2_count, 1);   // Fails with shared libraries on Windows
-  EXPECT_EQ(span_h_lib_count, 1);  // Fails with shared libraries on Windows
-  EXPECT_EQ(span_h_f1_count, 2);   // Fails with shared libraries on Windows
-  EXPECT_EQ(span_h_f2_count, 1);   // Fails with shared libraries on Windows
-#  endif
+  EXPECT_EQ(span_g_lib_count, 1);
+  EXPECT_EQ(span_g_f1_count, 2);
+  EXPECT_EQ(span_g_f2_count, 1);
+  EXPECT_EQ(span_h_lib_count, 1);
+  EXPECT_EQ(span_h_f1_count, 2);
+  EXPECT_EQ(span_h_f2_count, 1);
 #endif
 
   EXPECT_EQ(unknown_span_count, 0);
