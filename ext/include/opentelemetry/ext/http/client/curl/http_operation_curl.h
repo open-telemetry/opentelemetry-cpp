@@ -298,8 +298,9 @@ public:
    * be called when got a CURLMSG_DONE.
    *
    * @param code CURLcode
+   * @return true if the request was re-armed for a retry, false if the operation was cleaned up
    */
-  void PerformCurlMessage(CURLcode code);
+  bool PerformCurlMessage(CURLcode code);
 
   inline CURL *GetCurlEasyHandle() noexcept { return curl_resource_.easy_handle; }
 
