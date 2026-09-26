@@ -17,7 +17,7 @@ namespace
 // corrupted while port() happens to still return -1.
 void ExpectInvalid(const SocketTools::SocketAddr &addr)
 {
-  EXPECT_EQ(reinterpret_cast<const sockaddr*>(&addr.m_data)->sa_family, AF_UNSPEC);
+ EXPECT_EQ(addr.sockaddr()->sa_family, AF_UNSPEC);
   EXPECT_EQ(addr.port(), -1);
 }
 
@@ -79,7 +79,7 @@ TEST(SocketAddrTest, RejectsOutOfRangePort)
 
 // A host longer than the buffer must be rejected, not truncated into a different valid address:
 // "255.255.255.2559" must not become "255.255.255.255".
-TEST(SocketAddrTest, RejectOverlongHostInsteadOfTruncating)
+TEST(SocketAddrTest, RejectsOverlongHostInsteadOfTruncating)
 {
   SocketTools::SocketAddr addr("255.255.255.2559:80");
   ExpectInvalid(addr);
@@ -140,7 +140,7 @@ TEST(SocketAddrTest, RejectPortOverflow)
 }
 
 // inet_pton() requires four decimal components, so it rejects the shorthand form ("127.1") that the
-// legacy inet_aton()/inet_aton() resolvers accepted. This holds on every platform (verified on
+// legacy inet_aton()/inet_atdd() resolvers accepted. This holds on every platform (verified on
 // glibc and macOS). Leading-zero components ("01.02.03.004") are deliberately not asserted: glibc
 // rejects them but macOS inet_pton accepts them, so that outcome is platform-dependent.
 TEST(SocketAddrTest, RejectShorthandHost)
