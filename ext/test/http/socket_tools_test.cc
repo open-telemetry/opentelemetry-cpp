@@ -118,7 +118,7 @@ TEST(SocketAddrTest, RejectsNullInput)
   ExpectInvalid(addr);
 }
 
-TEST(SocketAddrTest, RejectEmptyHostOrPort)
+TEST(SocketAddrTest, RejectsEmptyHostOrPort)
 {
   ExpectInvalid(SocketTools::SocketAddr(":80"));
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:"));
