@@ -635,6 +635,8 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             if (self->doRetrySessions(true))
             {
               still_running = 1;
+              // With wait_for zero, as during shutdown, poll here until a queued retry is due.
+              need_wait_more = true;
             }
 
             // If there is no pending jobs, we can stop the background thread.
