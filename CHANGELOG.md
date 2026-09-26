@@ -59,6 +59,10 @@ Increment the:
 
 * [BUG] Do not queue a curl session closed by the Retry-After cap
   [#4632](https://github.com/open-telemetry/opentelemetry-cpp/pull/4632)
+* [BUG] Decide Elasticsearch bulk export success from the HTTP status, the
+  errors flag, and one acknowledgement per record that names its target index
+  and says the operation applied
+  [#4297](https://github.com/open-telemetry/opentelemetry-cpp/pull/4297)
 
 ## [1.29.0] 2026-09-13
 
