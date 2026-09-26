@@ -99,7 +99,7 @@ TEST(SocketAddrTest, RejectsInvalidHost)
 
 // A host far longer than the 15-character dotted-quad maximum must be rejected by the length
 // bound before it can drive an out-of-bounds access on the fixed host buffer.
-TEST(SocketAddrTest, RejectExtremelyOverlongHost)
+TEST(SocketAddrTest, RejectsExtremelyOverlongHost)
 {
   const std::string overlong(512, '9');
   SocketTools::SocketAddr addr(overlong.c_str());
