@@ -16,8 +16,9 @@
 
 #ifdef ENABLE_ASYNC_EXPORT
 #  include <condition_variable>
-#  include <cstddef>
+#  include <cstdint>
 #  include <mutex>
+#  include <set>
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -122,8 +123,16 @@ public:
 
   /**
    * Force flush the exporter.
+   *
+   * Waits for the asynchronous sessions already started when the call was made, bounded by the
+   * caller's timeout rather than by the exporter's response timeout.
+   *
    * @param timeout an option timeout, default to max.
-   * @return return true when all data are exported, and false when timeout
+   * @return true when each of those exports has reported a terminal outcome, false on timeout.
+   *         The outcome is published before the session is torn down, so a true return does not
+   *         mean FinishSession() has run. Nor does it mean the batch reached Elasticsearch: a
+   *         failed export reports too, through the internal log. Surfacing that here is
+   *         [#3075](https://github.com/open-telemetry/opentelemetry-cpp/issues/3075).
    */
   bool ForceFlush(
       std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept override;
@@ -149,13 +158,21 @@ private:
 #ifdef ENABLE_ASYNC_EXPORT
   struct SynchronizationData
   {
-    std::atomic<std::size_t> session_counter_{0};
-    std::atomic<std::size_t> finished_session_counter_{0};
+    // next_session_id and running_sessions are guarded by force_flush_cv_m, so a start or a
+    // finish cannot interleave with a waiter's snapshot. The wait compares ids by order, so they
+    // must keep increasing: uint64_t rather than size_t.
+    std::uint64_t next_session_id{0};
+    std::set<std::uint64_t> running_sessions;
     std::condition_variable force_flush_cv;
     std::mutex force_flush_cv_m;
-    std::recursive_mutex force_flush_m;
+
+    // Test synchronization. Raised under force_flush_cv_m once per ForceFlush(), immediately
+    // after that call takes its watermark. No exporter behaviour reads it.
+    std::uint64_t watermarks_taken{0};
   };
   nostd::shared_ptr<SynchronizationData> synchronization_data_;
+
+  friend class ElasticsearchExporterTestPeer;
 #endif
 };
 }  // namespace logs

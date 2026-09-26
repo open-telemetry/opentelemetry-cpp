@@ -62,6 +62,12 @@ Increment the:
 * [BUG] Fix a data race on the curl operation's last result code
   [#4618](https://github.com/open-telemetry/opentelemetry-cpp/pull/4618)
 
+* [BUG] Elasticsearch: report an asynchronous export's outcome exactly once
+  [#4502](https://github.com/open-telemetry/opentelemetry-cpp/pull/4502)
+* [BUG] Stop the Elasticsearch async ForceFlush reporting success without
+  waiting for the sessions it was asked about
+  [#4337](https://github.com/open-telemetry/opentelemetry-cpp/pull/4337)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
