@@ -253,6 +253,7 @@ struct SocketAddr
     {
       // Reset on failure
       std::memset(&m_data, 0, sizeof(m_data));
+      m_data.ss_family = AF_UNSPEC;
       LOG_WARN("SocketAddr: cannot parse address");
     }
   }
