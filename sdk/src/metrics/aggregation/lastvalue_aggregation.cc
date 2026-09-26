@@ -9,6 +9,7 @@
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/nostd/variant.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
@@ -43,31 +44,47 @@ void LongLastValueAggregation::Aggregate(int64_t value,
 std::unique_ptr<Aggregation> LongLastValueAggregation::Merge(
     const Aggregation &delta) const noexcept
 {
-  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
-      nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch())
+  auto curr_point  = ToPoint();
+  auto delta_point = delta.ToPoint();
+
+  const auto *curr_data  = nostd::get_if<LastValuePointData>(&curr_point);
+  const auto *delta_data = nostd::get_if<LastValuePointData>(&delta_point);
+  if (curr_data == nullptr || delta_data == nullptr)
   {
-    LastValuePointData merge_data = nostd::get<LastValuePointData>(ToPoint());
-    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(merge_data));
+    OTEL_INTERNAL_LOG_ERROR("LongLastValueAggregation::Merge - Loss of type");
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation());
+  }
+
+  if (curr_data->sample_ts_.time_since_epoch() > delta_data->sample_ts_.time_since_epoch())
+  {
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(*curr_data));
   }
   else
   {
-    LastValuePointData merge_data = nostd::get<LastValuePointData>(delta.ToPoint());
-    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(merge_data));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(*delta_data));
   }
 }
 
 std::unique_ptr<Aggregation> LongLastValueAggregation::Diff(const Aggregation &next) const noexcept
 {
-  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
-      nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch())
+  auto curr_point = ToPoint();
+  auto next_point = next.ToPoint();
+
+  const auto *curr_data = nostd::get_if<LastValuePointData>(&curr_point);
+  const auto *next_data = nostd::get_if<LastValuePointData>(&next_point);
+  if (curr_data == nullptr || next_data == nullptr)
   {
-    LastValuePointData diff_data = nostd::get<LastValuePointData>(ToPoint());
-    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(diff_data));
+    OTEL_INTERNAL_LOG_ERROR("LongLastValueAggregation::Diff - Loss of type");
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation());
+  }
+
+  if (curr_data->sample_ts_.time_since_epoch() > next_data->sample_ts_.time_since_epoch())
+  {
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(*curr_data));
   }
   else
   {
-    LastValuePointData diff_data = nostd::get<LastValuePointData>(next.ToPoint());
-    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(diff_data));
+    return std::unique_ptr<Aggregation>(new LongLastValueAggregation(*next_data));
   }
 }
 
@@ -99,32 +116,48 @@ void DoubleLastValueAggregation::Aggregate(double value,
 std::unique_ptr<Aggregation> DoubleLastValueAggregation::Merge(
     const Aggregation &delta) const noexcept
 {
-  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
-      nostd::get<LastValuePointData>(delta.ToPoint()).sample_ts_.time_since_epoch())
+  auto curr_point  = ToPoint();
+  auto delta_point = delta.ToPoint();
+
+  const auto *curr_data  = nostd::get_if<LastValuePointData>(&curr_point);
+  const auto *delta_data = nostd::get_if<LastValuePointData>(&delta_point);
+  if (curr_data == nullptr || delta_data == nullptr)
   {
-    LastValuePointData merge_data = nostd::get<LastValuePointData>(ToPoint());
-    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(merge_data));
+    OTEL_INTERNAL_LOG_ERROR("DoubleLastValueAggregation::Merge - Loss of type");
+    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation());
+  }
+
+  if (curr_data->sample_ts_.time_since_epoch() > delta_data->sample_ts_.time_since_epoch())
+  {
+    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(*curr_data));
   }
   else
   {
-    LastValuePointData merge_data = nostd::get<LastValuePointData>(delta.ToPoint());
-    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(merge_data));
+    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(*delta_data));
   }
 }
 
 std::unique_ptr<Aggregation> DoubleLastValueAggregation::Diff(
     const Aggregation &next) const noexcept
 {
-  if (nostd::get<LastValuePointData>(ToPoint()).sample_ts_.time_since_epoch() >
-      nostd::get<LastValuePointData>(next.ToPoint()).sample_ts_.time_since_epoch())
+  auto curr_point = ToPoint();
+  auto next_point = next.ToPoint();
+
+  const auto *curr_data = nostd::get_if<LastValuePointData>(&curr_point);
+  const auto *next_data = nostd::get_if<LastValuePointData>(&next_point);
+  if (curr_data == nullptr || next_data == nullptr)
   {
-    LastValuePointData diff_data = nostd::get<LastValuePointData>(ToPoint());
-    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(diff_data));
+    OTEL_INTERNAL_LOG_ERROR("DoubleLastValueAggregation::Diff - Loss of type");
+    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation());
+  }
+
+  if (curr_data->sample_ts_.time_since_epoch() > next_data->sample_ts_.time_since_epoch())
+  {
+    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(*curr_data));
   }
   else
   {
-    LastValuePointData diff_data = nostd::get<LastValuePointData>(next.ToPoint());
-    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(diff_data));
+    return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation(*next_data));
   }
 }
 
