@@ -167,7 +167,7 @@ struct SocketAddr
 {
   static u_long const Loopback = 0x7F000001;
 
-  sockaddr m_data{};
+  sockaddr_storage m_data{};
 
   /// <summary>
   /// SocketAddr constructor
@@ -189,19 +189,13 @@ struct SocketAddr
   /// input leaves the address at AF_UNSPEC, for which port() returns -1.
   SocketAddr(char const *addr)
   {
-    // One parser for every platform: inet_pton (Winsock provides it since Vista) plus a strict
-    // decimal port. This avoids WSAStringToAddress, whose grammar and default-component filling
-    // differ from the POSIX path. Parse into a local sockaddr_in and commit with memcpy only on
-    // success, which keeps m_data at AF_UNSPEC on failure and avoids accessing the sockaddr
-    // storage through a sockaddr_in glvalue (an alignment/type-access issue tracked in #4307).
     if (addr == nullptr)
     {
       LOG_WARN("SocketAddr: cannot parse a null address");
       return;  // m_data is already AF_UNSPEC, so port() reports -1.
     }
 
-    sockaddr_in parsed{};
-    parsed.sin_family = AF_INET;
+    sockaddr_in &parsed = reinterpret_cast<sockaddr_in &>(m_data);
 
     char const *colon          = std::strchr(addr, ':');
     char const *hostEnd        = colon ? colon : addr + std::strlen(addr);
@@ -253,30 +247,28 @@ struct SocketAddr
 
     if (ok)
     {
-      std::memcpy(&m_data, &parsed, sizeof(parsed));
+      parsed.sin_family = AF_INET;
     }
     else
     {
-      // Leave m_data at AF_UNSPEC; port() returns -1 so callers can tell a parse failure from a
-      // real endpoint, including the legitimate ":0". Do not echo the raw input, which may be
-      // arbitrarily long.
+      // Reset on failure
+      std::memset(&m_data, 0, sizeof(m_data));
+      m_data.ss_family = AF_UNSPEC;
       LOG_WARN("SocketAddr: cannot parse address");
     }
   }
 
-  operator sockaddr *() { return &m_data; }
+  operator sockaddr *() { return reinterpret_cast<sockaddr *>(&m_data); }
 
-  operator const sockaddr *() const { return &m_data; }
+  operator const sockaddr *() const { return reinterpret_cast<const sockaddr *>(&m_data); }
 
   int port() const
   {
-    switch (m_data.sa_family)
+    const sockaddr &sa = reinterpret_cast<const sockaddr &>(m_data);
+    switch (sa.sa_family)
     {
       case AF_INET: {
-        // Copy out rather than binding a sockaddr_in glvalue to sockaddr storage, which is an
-        // alignment/type-access issue (see the constructor and #4307).
-        sockaddr_in inet4{};
-        std::memcpy(&inet4, &m_data, sizeof(inet4));
+        const sockaddr_in &inet4 = reinterpret_cast<const sockaddr_in &>(m_data);
         return ntohs(inet4.sin_port);
       }
 
@@ -288,12 +280,12 @@ struct SocketAddr
   std::string toString() const
   {
     std::ostringstream os;
+    const sockaddr &sa = reinterpret_cast<const sockaddr &>(m_data);
 
-    switch (m_data.sa_family)
+    switch (sa.sa_family)
     {
       case AF_INET: {
-        sockaddr_in inet4{};
-        std::memcpy(&inet4, &m_data, sizeof(inet4));
+        const sockaddr_in &inet4 = reinterpret_cast<const sockaddr_in &>(m_data);
         u_long addr = ntohl(inet4.sin_addr.s_addr);
         os << (addr >> 24) << '.' << ((addr >> 16) & 255) << '.' << ((addr >> 8) & 255) << '.'
            << (addr & 255);
@@ -302,7 +294,7 @@ struct SocketAddr
       }
 
       default:
-        os << "[?AF?" << m_data.sa_family << ']';
+        os << "[?AF?" << sa.sa_family << ']';
     }
     return os.str();
   }
@@ -313,13 +305,12 @@ struct SocketAddr
 // the exact same size rather than trusting every ABI: passing an address length that is too large
 // for the family is a documented EINVAL for connect()/bind(). Exact equality also keeps the memcpy
 // safe. Together with the assertion below, sizeof(SocketAddr) == sizeof(sockaddr_in).
-static_assert(sizeof(sockaddr) == sizeof(sockaddr_in),
-              "SocketAddr is IPv4-only: sockaddr and sockaddr_in must have identical size");
-static_assert(offsetof(sockaddr, sa_family) == offsetof(sockaddr_in, sin_family),
-              "sockaddr and sockaddr_in must place the address family at the same offset");
-static_assert(sizeof(SocketAddr) == sizeof(sockaddr),
-              "SocketAddr must add no storage beyond its sockaddr, since syscalls use its size");
-
+static_assert(sizeof(sockaddr_storage) >= sizeof(sockaddr_in),
+              "sockaddr_storage must be large enough to hold sockaddr_in");
+static_assert(offsetof(sockaddr_storage, ss_family) == offsetof(sockaddr_in, sin_family),
+              "sockaddr_storage and sockaddr_in must place the address family at the same offset");
+static_assert(sizeof(SocketAddr) == sizeof(sockaddr_storage),
+              "SocketAddr must add no storage beyond its sockaddr_storage");
 /// <summary>
 /// Encapsulation of a socket (non-exclusive ownership)
 /// </summary>
