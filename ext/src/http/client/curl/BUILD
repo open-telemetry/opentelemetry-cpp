@@ -36,4 +36,7 @@ cc_library(
         "@curl",
         "@zlib",
     ],
+    implementation_deps = [
+        "//ext:curl_implementation_headers",
+    ],
 )

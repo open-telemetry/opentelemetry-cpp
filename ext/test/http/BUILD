@@ -8,11 +8,10 @@ cc_test(
     srcs = [
         "socket_tools_test.cc",
     ],
-    # ws2_32 is an interface linkopt of //ext:headers, so it is inherited here rather than
-    # relinked, which also lets the test verify the public target's usage requirements.
     tags = ["test"],
     deps = [
         "//ext:headers",
+        "//ext:server_headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -25,7 +24,9 @@ cc_test(
     defines = ["ENABLE_OTLP_RETRY_PREVIEW"],
     tags = ["test"],
     deps = [
+        "//ext:curl_implementation_headers",
         "//ext:headers",
+        "//ext:server_headers",
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",

@@ -41,6 +41,7 @@ cc_library(
     tags = ["zipkin"],
     deps = [
         ":zipkin_recordable",
+        "//ext:http_client_detail",
         "//ext/src/http/client/curl:http_client_curl",
     ],
 )
@@ -68,6 +69,7 @@ cc_test(
     deps = [
         ":zipkin_exporter",
         ":zipkin_recordable",
+        "//ext:curl_implementation_headers",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],

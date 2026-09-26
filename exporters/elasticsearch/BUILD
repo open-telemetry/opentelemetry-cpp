@@ -28,6 +28,7 @@ cc_library(
     tags = ["es"],
     deps = [
         "//ext:headers",
+        "//ext:http_client_detail",
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk/src/logs",
         "@curl",

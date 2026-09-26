@@ -13,6 +13,39 @@ Increment the:
 * MINOR version when you add functionality in a backwards compatible manner, and
 * PATCH version when you make backwards compatible bug fixes.
 
+## [2.0.0] TBD
+
+### Breaking Changes
+
+* [BUILD] Narrow ext:headers Bazel target to match CMake install manifest
+  [#4625](https://github.com/open-telemetry/opentelemetry-cpp/pull/4625)
+  * The `ext` Bazel target now exposes only 4 public headers, matching
+    CMakeLists.txt behavior (unchanged for 2+ years). These 6 headers are
+    no longer part of the public API:
+    * `opentelemetry/ext/http/client/curl/http_client_curl.h`
+    * `opentelemetry/ext/http/client/curl/http_operation_curl.h`
+    * `opentelemetry/ext/http/client/curl/http_time_util.h`
+    * `opentelemetry/ext/http/client/detail/default_factory.h`
+    * `opentelemetry/ext/http/server/http_server.h`
+    * `opentelemetry/ext/http/server/socket_tools.h`
+  * Code that included any of these headers must migrate to new internal
+    targets:
+    * Curl implementation details: use `//ext:curl_implementation_headers` in
+      `implementation_deps` (implementation only; not public API)
+    * Factory helper: use `//ext:http_client_detail` in `implementation_deps`
+      when calling `GetDefaultHttpClientFactory()`
+    * Server headers: depend on `//ext:server_headers` (for tests and examples)
+  * The public API (4 stable headers) remains unchanged:
+    * `opentelemetry/ext/http/client/http_client.h`
+    * `opentelemetry/ext/http/client/http_client_factory.h`
+    * `opentelemetry/ext/http/client/curl/http_client_factory_curl.h`
+    * `opentelemetry/ext/http/common/url_parser.h`
+  * Reason for change: Bazel target was using glob pattern that exposed
+    implementation details. CMake build has maintained explicit header list
+    for production use. This change aligns both build systems and prevents
+    accidental exposure of internal APIs.
+  * Related: #4327 (CMake narrowing), #4332 (server header relocation to test_common)
+
 ## [Unreleased]
 
 * [LOGS] Fix undefined behavior in `Logger::EmitLogRecord()` when a logger is
