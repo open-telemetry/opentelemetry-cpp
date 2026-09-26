@@ -64,6 +64,8 @@ Increment the:
 
 * [BUG] Do not queue a curl session closed by the Retry-After cap
   [#4632](https://github.com/open-telemetry/opentelemetry-cpp/pull/4632)
+* [BUG] Fix a data race on the curl operation's last result code
+  [#4618](https://github.com/open-telemetry/opentelemetry-cpp/pull/4618)
 
 ## [1.29.0] 2026-09-13
 
