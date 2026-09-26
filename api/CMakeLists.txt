@@ -8,6 +8,36 @@ target_include_directories(
             "$<INSTALL_INTERFACE:include>")
 
 set_target_properties(opentelemetry_api PROPERTIES EXPORT_NAME api)
+set(EXPORTED_OTELCPP_TARGETS opentelemetry_api)
+
+if(WIN32)
+  # - api_static
+  add_library(opentelemetry_api_static STATIC src/symbol_bridge_window.cc)
+  target_link_libraries(opentelemetry_api_static PUBLIC opentelemetry_api)
+  target_compile_definitions(opentelemetry_api_static INTERFACE OPENTELEMETRY_SYMBOL_BRIDGE_NOINLINE)
+  set_target_properties(opentelemetry_api_static PROPERTIES EXPORT_NAME api_static)
+  
+  list(APPEND EXPORTED_OTELCPP_TARGETS opentelemetry_api_static)
+  
+  # - abi_symbol_bridge
+  add_library(opentelemetry_api_symbol_bridge SHARED src/symbol_bridge_implementation_windows.cc)
+  target_link_libraries(opentelemetry_api_symbol_bridge PRIVATE opentelemetry_api_static)
+  set_target_properties(opentelemetry_api_symbol_bridge PROPERTIES
+    EXPORT_NAME api_symbol_bridge
+    RUNTIME_OUTPUT_NAME opentelemetry_api_symbol_bridge
+  )
+  
+  target_compile_options(opentelemetry_api_symbol_bridge PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>:/wd4190>
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wno-return-type-c-linkage>
+  )
+  target_link_options(opentelemetry_api_symbol_bridge INTERFACE
+    $<$<CXX_COMPILER_ID:MSVC>:/INCLUDE:OpenTelemetryAbiBridgeHook>
+    $<$<CXX_COMPILER_ID:GNU,Clang>:-Wl,-u,:OpenTelemetryAbiBridgeHook>
+  )
+  
+  list(APPEND EXPORTED_OTELCPP_TARGETS opentelemetry_api_symbol_bridge)
+endif()
 
 unset(TARGET_DEPS)
 
@@ -129,7 +159,7 @@ otel_add_component(
   COMPONENT
   api
   TARGETS
-  opentelemetry_api
+  ${EXPORTED_OTELCPP_TARGETS}
   FILES_DIRECTORY
   "include/opentelemetry"
   FILES_DESTINATION

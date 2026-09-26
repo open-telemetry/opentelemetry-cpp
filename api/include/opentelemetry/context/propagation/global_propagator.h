@@ -13,6 +13,10 @@
 
 #include "opentelemetry/version.h"
 
+#ifdef _WIN32
+# include "opentelemetry/common/detail/symbol_bridge_windows.h"
+#endif
+
 OPENTELEMETRY_BEGIN_NAMESPACE
 namespace context
 {
@@ -60,12 +64,20 @@ public:
 private:
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<TextMapPropagator> &GetPropagator() noexcept
   {
+#ifdef _WIN32
+    if (const auto address = common::detail::LoadSymbolBridgeSymbol<nostd::shared_ptr<TextMapPropagator>& (*)()>("OpenTelemetryContextPropagationGlobalTextMapPropagatorGetPropagator"))
+      return address();
+#endif
     static nostd::shared_ptr<TextMapPropagator> propagator(new NoOpPropagator());
     return propagator;
   }
 
   OPENTELEMETRY_API_SINGLETON static common::SpinLockMutex &GetLock() noexcept
   {
+#ifdef _WIN32
+    if (const auto address = common::detail::LoadSymbolBridgeSymbol<common::SpinLockMutex& (*)(), TextMapPropagator>("OpenTelemetryContextPropagationGlobalTextMapPropagatorGetLock"))
+      return address();
+#endif
     static common::SpinLockMutex lock;
     return lock;
   }
