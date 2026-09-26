@@ -143,7 +143,7 @@ TEST(SocketAddrTest, RejectPortOverflow)
 // legacy inet_aton()/inet_atdd() resolvers accepted. This holds on every platform (verified on
 // glibc and macOS). Leading-zero components ("01.02.03.004") are deliberately not asserted: glibc
 // rejects them but macOS inet_pton accepts them, so that outcome is platform-dependent.
-TEST(SocketAddrTest, RejectShorthandHost)
+TEST(SocketAddrTest, RejectsShorthandHost)
 {
   ExpectInvalid(SocketTools::SocketAddr("127.1:80"));
 }
