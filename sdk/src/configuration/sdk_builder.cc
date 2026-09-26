@@ -727,14 +727,15 @@ std::unique_ptr<ConfiguredSdk> SdkBuilder::CreateConfiguredSdk(
 
     if (model->distribution)
     {
-      // FIXME-CONFIG: Implement distribution configuration support
-      OTEL_INTERNAL_LOG_WARN("[SDK Builder] the distribution model is not yet supported, ignoring");
+      static const std::string message("distribution model is not yet supported");
+      throw UnsupportedException(message);
     }
 
     // FIXME-CONFIG: Implement instrumentation/development support
     // if(model->instrumentation)
     // {
-    //   OTEL_INTERNAL_LOG_WARN("[SDK Builder] instrumentation is not yet supported, ignoring");
+    //   static const std::string message("instrumentation/development model is not yet supported");
+    //   throw UnsupportedException(message);
     // }
   }
 
