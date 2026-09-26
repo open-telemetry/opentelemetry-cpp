@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <string>
 #ifndef _WIN32
-#  include <sys/socket.h>  // for sockaddr, AF_UNSPEC, AF_INET
+# include <sys/socket.h> // for sockaddr, AF_UNSPEC, AF_INET
 #endif
 
 #include "opentelemetry/ext/http/server/socket_tools.h"
@@ -17,14 +17,14 @@ namespace
 // corrupted while port() happens to still return -1.
 void ExpectInvalid(const SocketTools::SocketAddr &addr)
 {
-  EXPECT_EQ(addr.m_data.ss_family, AF_UNSPEC);
+  EXPECT_EQ(reinterpret_cast<const sockaddr*>(&addr.m_data)->sa_family, AF_UNSPEC);
   EXPECT_EQ(addr.port(), -1);
 }
 
 TEST(SocketAddrTest, ParsesHostAndPort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:8800");
-  EXPECT_EQ(addr.m_data.ss_family, AF_INET);
+  EXPECT_EQ(reinterpret_cast<const sockaddr*>(&addr.m_data)->sa_family, AF_INET);
   EXPECT_EQ(addr.port(), 8800);
   EXPECT_EQ(addr.toString(), "127.0.0.1:8800");
 }
@@ -57,7 +57,7 @@ TEST(SocketAddrTest, ParsesHostWithoutPort)
 TEST(SocketAddrTest, ParsesLegitimateZeroPort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:0");
-  EXPECT_EQ(addr.m_data.ss_family, AF_INET);
+  EXPECT_EQ(reinterpret_cast<const sockaddr*>(&addr.m_data)->sa_family, AF_INET);
   EXPECT_EQ(addr.port(), 0);
   EXPECT_EQ(addr.toString(), "127.0.0.1:0");
 }
@@ -67,7 +67,7 @@ TEST(SocketAddrTest, ParsesLegitimateZeroPort)
 TEST(SocketAddrTest, AcceptsLeadingZeroPort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:080");
-  EXPECT_EQ(addr.m_data.ss_family, AF_INET);
+  EXPECT_EQ(reinterpret_cast<const sockaddr*>(&addr.m_data)->sa_family, AF_INET);
   EXPECT_EQ(addr.port(), 80);
 }
 
@@ -79,13 +79,13 @@ TEST(SocketAddrTest, RejectsOutOfRangePort)
 
 // A host longer than the buffer must be rejected, not truncated into a different valid address:
 // "255.255.255.2559" must not become "255.255.255.255".
-TEST(SocketAddrTest, RejectsOverlongHostInsteadOfTruncating)
+TEST(SocketAddrTest, RejectOverlongHostInsteadOfTruncating)
 {
   SocketTools::SocketAddr addr("255.255.255.2559:80");
   ExpectInvalid(addr);
 }
 
-TEST(SocketAddrTest, RejectsTrailingGarbageInPort)
+TEST(SocketAddrTest, RejectTrailingGarbageInPort)
 {
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:80junk"));
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:80:90"));
@@ -99,7 +99,7 @@ TEST(SocketAddrTest, RejectsInvalidHost)
 
 // A host far longer than the 15-character dotted-quad maximum must be rejected by the length
 // bound before it can drive an out-of-bounds access on the fixed host buffer.
-TEST(SocketAddrTest, RejectsExtremelyOverlongHost)
+TEST(SocketAddrTest, RejectExtremelyOverlongHost)
 {
   const std::string overlong(512, '9');
   SocketTools::SocketAddr addr(overlong.c_str());
@@ -118,7 +118,7 @@ TEST(SocketAddrTest, RejectsNullInput)
   ExpectInvalid(addr);
 }
 
-TEST(SocketAddrTest, RejectsEmptyHostOrPort)
+TEST(SocketAddrTest, RejectEmptyHostOrPort)
 {
   ExpectInvalid(SocketTools::SocketAddr(":80"));
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:"));
@@ -126,24 +126,24 @@ TEST(SocketAddrTest, RejectsEmptyHostOrPort)
 
 // The port grammar is decimal digits only: a sign or whitespace that strtol would have accepted
 // must be rejected so both platforms agree.
-TEST(SocketAddrTest, RejectsSignAndWhitespaceInPort)
+TEST(SocketAddrTest, RejectSignAndWhitespaceInPort)
 {
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:+80"));
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:-0"));
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1: 80"));
 }
 
-TEST(SocketAddrTest, RejectsPortOverflow)
+TEST(SocketAddrTest, RejectPortOverflow)
 {
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:65536"));
   ExpectInvalid(SocketTools::SocketAddr("127.0.0.1:4294967377"));
 }
 
 // inet_pton() requires four decimal components, so it rejects the shorthand form ("127.1") that the
-// legacy inet_aton()/inet_addr() resolvers accepted. This holds on every platform (verified on
+// legacy inet_aton()/inet_aton() resolvers accepted. This holds on every platform (verified on
 // glibc and macOS). Leading-zero components ("01.02.03.004") are deliberately not asserted: glibc
 // rejects them but macOS inet_pton accepts them, so that outcome is platform-dependent.
-TEST(SocketAddrTest, RejectsShorthandHost)
+TEST(SocketAddrTest, RejectShorthandHost)
 {
   ExpectInvalid(SocketTools::SocketAddr("127.1:80"));
 }
