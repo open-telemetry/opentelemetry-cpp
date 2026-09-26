@@ -48,6 +48,8 @@ Increment the:
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+* [SDK] Optimize composite and probability samplers
+  [#4582](https://github.com/open-telemetry/opentelemetry-cpp/pull/4582)
 * [BUG] Send one request per curl session, rather than replacing the operation
   a running request still belongs to
   [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
