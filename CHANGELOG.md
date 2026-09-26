@@ -57,9 +57,11 @@ Increment the:
   request body on a 32-bit build
   [#4630](https://github.com/open-telemetry/opentelemetry-cpp/pull/4630)
 
+* [BUG] Do not queue a curl session closed by the Retry-After cap
+  [#4632](https://github.com/open-telemetry/opentelemetry-cpp/pull/4632)
+
 * [BUG] Elasticsearch: report an asynchronous export's outcome exactly once
   [#4502](https://github.com/open-telemetry/opentelemetry-cpp/pull/4502)
-
 * [BUG] Stop the Elasticsearch async ForceFlush reporting success without
   waiting for the sessions it was asked about
   [#4337](https://github.com/open-telemetry/opentelemetry-cpp/pull/4337)
