@@ -8,7 +8,6 @@ abseil=20230125.3
 zlib=v1.3.1
 curl=curl-8_12_0
 protobuf=v4.23.1
-re2=2023-03-01
 grpc=v1.55.0
 benchmark=v1.8.3
 googletest=v1.14.0

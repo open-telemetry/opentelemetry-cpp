@@ -36,7 +36,6 @@ benchmark/1.9.1
 [generators]
 CMakeToolchain
 CMakeDeps
-PkgConfigDeps
 
 [layout]
 cmake_layout

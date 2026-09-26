@@ -210,38 +210,14 @@ if(protobuf IN_LIST _THIRDPARTY_PACKAGE_LIST)
   add_dependencies(protobuf-build zlib-install abseil-install)
 endif()
 # ------------------------------------------------------------------------
-# ---- re2 ----
-if(re2 IN_LIST _THIRDPARTY_PACKAGE_LIST)
-  if(NOT re2_GIT_TAG)
-    message(FATAL_ERROR "re2_GIT_TAG is not set")
-  endif()
-  ExternalProject_Add(
-    re2
-    STEP_TARGETS install
-    GIT_REPOSITORY "https://github.com/google/re2.git"
-    GIT_TAG ${re2_GIT_TAG}
-    GIT_SHALLOW ON
-    PREFIX ${CMAKE_BINARY_DIR}/external/re2
-    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-    CMAKE_ARGS "${CMAKE_OPTIONS}" "-DRE2_BUILD_TESTING=OFF")
-endif()
-# ------------------------------------------------------------------------
 # ---- grpc ----
 if(grpc IN_LIST _THIRDPARTY_PACKAGE_LIST)
   if(NOT grpc_GIT_TAG)
     message(FATAL_ERROR "grpc_GIT_TAG is not set")
   endif()
-  set(_grpc_depends zlib abseil protobuf)
-  set(_grpc_build_depends zlib-install abseil-install protobuf-install)
-  set(_grpc_extra_cmake_args "")
-  if(re2 IN_LIST _THIRDPARTY_PACKAGE_LIST)
-    list(APPEND _grpc_depends re2)
-    list(APPEND _grpc_build_depends re2-install)
-    list(APPEND _grpc_extra_cmake_args "-DgRPC_RE2_PROVIDER=package")
-  endif()
   ExternalProject_Add(
     grpc
-    DEPENDS ${_grpc_depends}
+    DEPENDS zlib abseil protobuf
     STEP_TARGETS build
     GIT_REPOSITORY "https://github.com/grpc/grpc.git"
     GIT_TAG ${grpc_GIT_TAG}
@@ -265,10 +241,9 @@ if(grpc IN_LIST _THIRDPARTY_PACKAGE_LIST)
                "-DgRPC_ZLIB_PROVIDER=package"
                "-DgRPC_PROTOBUF_PROVIDER=package"
                "-DgRPC_PROTOBUF_PACKAGE_TYPE=CONFIG"
-               "-DgRPC_ABSL_PROVIDER=package"
-               ${_grpc_extra_cmake_args})
+               "-DgRPC_ABSL_PROVIDER=package")
 
-  add_dependencies(grpc-build ${_grpc_build_depends})
+  add_dependencies(grpc-build zlib-install abseil-install protobuf-install)
 endif()
 # ------------------------------------------------------------------------
 # ---- benchmark ----
