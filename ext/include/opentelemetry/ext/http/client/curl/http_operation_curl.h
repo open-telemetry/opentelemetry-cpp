@@ -298,6 +298,7 @@ public:
    * be called when got a CURLMSG_DONE.
    *
    * @param code CURLcode
+   * @return true if the request was re-armed for a retry, false if the operation was cleaned up
    */
   /**
    * Read one completed curl message.
