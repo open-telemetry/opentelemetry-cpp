@@ -19,10 +19,14 @@
 #include <gtest/gtest.h>
 #include <array>
 #include <chrono>
+#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
+#include <mutex>
 #include <string>
+#include <thread>  // IWYU pragma: keep
 #include <utility>
+#include <vector>
 #include "nlohmann/json.hpp"
 
 namespace
@@ -106,6 +110,114 @@ public:
   bool FinishSession() noexcept override { return true; }
 };
 
+// A client that owns what it creates, the way the curl client does: CreateSession() keeps a
+// reference in the client and only FinishSession() gives it back. CreateSession() also waits on
+// a gate, so a case can run Shutdown() while an export sits between its two shutdown checks.
+class RetainingSession final : public http_client::Session
+{
+public:
+  std::shared_ptr<http_client::Request> CreateRequest() noexcept override
+  {
+    return std::make_shared<FakeRequest>();
+  }
+
+  void SendRequest(std::shared_ptr<http_client::EventHandler>) noexcept override { sent_ = true; }
+
+  bool IsSessionActive() noexcept override { return finish_calls_ == 0; }
+  bool CancelSession() noexcept override { return true; }
+  // Counted rather than flagged: handing a session back twice is as wrong as not at all, and a
+  // flag reads the same either way.
+  bool FinishSession() noexcept override
+  {
+    ++finish_calls_;
+    return true;
+  }
+
+  bool sent_                = false;
+  std::size_t finish_calls_ = 0;
+};
+
+class RetainingHttpClient final : public http_client::HttpClient
+{
+public:
+  std::shared_ptr<http_client::Session> CreateSession(
+      opentelemetry::nostd::string_view) noexcept override
+  {
+    {
+      std::unique_lock<std::mutex> lock{gate_m_};
+      entered_ = true;
+      gate_cv_.notify_all();
+      gate_cv_.wait(lock, [this] { return released_; });
+    }
+    auto session = std::make_shared<RetainingSession>();
+    std::lock_guard<std::mutex> lock{sessions_m_};
+    sessions_.push_back(session);
+    return session;
+  }
+
+  bool CancelAllSessions() noexcept override { return true; }
+  bool FinishAllSessions() noexcept override { return true; }
+  void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
+
+  void WaitUntilCreating()
+  {
+    std::unique_lock<std::mutex> lock{gate_m_};
+    gate_cv_.wait(lock, [this] { return entered_; });
+  }
+
+  void Release()
+  {
+    {
+      std::lock_guard<std::mutex> lock{gate_m_};
+      released_ = true;
+    }
+    gate_cv_.notify_all();
+  }
+
+  std::size_t Sent()
+  {
+    std::lock_guard<std::mutex> lock{sessions_m_};
+    std::size_t n = 0;
+    for (const auto &s : sessions_)
+    {
+      n += s->sent_ ? 1 : 0;
+    }
+    return n;
+  }
+
+  std::size_t FinishCalls()
+  {
+    std::lock_guard<std::mutex> lock{sessions_m_};
+    std::size_t n = 0;
+    for (const auto &s : sessions_)
+    {
+      n += s->finish_calls_;
+    }
+    return n;
+  }
+
+  // What the client is still holding that nobody handed back.
+  std::size_t Retained()
+  {
+    std::lock_guard<std::mutex> lock{sessions_m_};
+    std::size_t n = 0;
+    for (const auto &s : sessions_)
+    {
+      n += s->finish_calls_ == 0 ? 1 : 0;
+    }
+    return n;
+  }
+
+private:
+  std::mutex gate_m_;
+  std::condition_variable gate_cv_;
+  bool entered_  = false;
+  bool released_ = false;
+
+  std::mutex sessions_m_;
+  std::vector<std::shared_ptr<RetainingSession>> sessions_;
+};
+
 class FakeHttpClient final : public http_client::HttpClient
 {
 public:
@@ -119,6 +231,62 @@ public:
   bool FinishAllSessions() noexcept override { return true; }
   void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
 };
+
+// A session that parks the handler it is given, in the test case rather than in the session
+// itself, without ever calling back into it. The handler stays alive (so the export it
+// represents keeps counting as outstanding) without creating a Session/AsyncResponseHandler
+// reference cycle: AsyncResponseHandler holds a shared_ptr to its session, so a session that
+// held the handler back would keep both alive for the exporter's own lifetime, which a leak
+// sanitizer would flag.
+//
+// Only meaningful under ENABLE_ASYNC_EXPORT: that is the only build where ForceFlush() waits on
+// anything at all (see ElasticsearchLogRecordExporter::ForceFlush).
+#ifdef ENABLE_ASYNC_EXPORT
+class HoldingSession final : public http_client::Session
+{
+public:
+  explicit HoldingSession(std::shared_ptr<http_client::EventHandler> *parked) : parked_(parked) {}
+
+  std::shared_ptr<http_client::Request> CreateRequest() noexcept override
+  {
+    return std::make_shared<FakeRequest>();
+  }
+
+  // Parked where the case can see it, not in this session: the handler owns its session, so a
+  // session that owned the handler back would keep the pair alive.
+  void SendRequest(std::shared_ptr<http_client::EventHandler> handler) noexcept override
+  {
+    *parked_ = std::move(handler);
+  }
+
+  bool IsSessionActive() noexcept override { return true; }
+  bool CancelSession() noexcept override { return true; }
+  bool FinishSession() noexcept override { return true; }
+
+private:
+  std::shared_ptr<http_client::EventHandler> *parked_;
+};
+
+class HoldingHttpClient final : public http_client::HttpClient
+{
+public:
+  explicit HoldingHttpClient(std::shared_ptr<http_client::EventHandler> *parked) : parked_(parked)
+  {}
+
+  std::shared_ptr<http_client::Session> CreateSession(
+      opentelemetry::nostd::string_view) noexcept override
+  {
+    return std::make_shared<HoldingSession>(parked_);
+  }
+
+  bool CancelAllSessions() noexcept override { return true; }
+  bool FinishAllSessions() noexcept override { return true; }
+  void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
+
+private:
+  std::shared_ptr<http_client::EventHandler> *parked_;
+};
+#endif  // ENABLE_ASYNC_EXPORT
 
 }  // namespace
 
@@ -155,6 +323,115 @@ TEST(ElasticsearchLogsExporterTests, CustomClientConstructionSucceeds)
   auto exporter = std::unique_ptr<sdklogs::LogRecordExporter>(
       new logs_exporter::ElasticsearchLogRecordExporter(opts));
   ASSERT_NE(exporter, nullptr);
+}
+
+// Regression test: Shutdown() used to ignore its timeout parameter entirely and always return
+// true, whether or not anything had actually flushed. It should now report what flushing (via
+// ForceFlush) actually found. With FakeHttpClient, every export completes synchronously inside
+// Export() itself, so there is nothing left pending by the time Shutdown() runs.
+TEST(ElasticsearchLogsExporterTests, ShutdownReportsFlushCompletion)
+{
+  logs_exporter::ElasticsearchExporterOptions options;
+  auto http_client = std::make_shared<FakeHttpClient>();
+  auto exporter    = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
+
+  auto record = exporter->MakeRecordable();
+  record->SetBody("shutdown regression test");
+  auto export_result =
+      exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
+  ASSERT_EQ(export_result, opentelemetry::sdk::common::ExportResult::kSuccess);
+
+  EXPECT_TRUE(exporter->Shutdown(std::chrono::seconds(1)));
+}
+
+// Regression test: ForceFlush()'s wait loop always waited the full response_timeout_ on its
+// condition variable, regardless of how much of the caller's own timeout was left. With an
+// export still outstanding and nothing to notify the condition variable, Shutdown(1us) waited
+// the full response_timeout_ (30s by default) instead of returning after about 1us. The wait
+// is now clamped to whatever remains of the caller's deadline, matching the pattern already
+// used by the OTLP HTTP client's ForceFlush().
+#ifdef ENABLE_ASYNC_EXPORT
+TEST(ElasticsearchLogsExporterTests, ShutdownClampsWaitToCallerTimeoutWhenExportIsOutstanding)
+{
+  // Declared first so it outlives the client and the session that point at it.
+  std::shared_ptr<http_client::EventHandler> parked;
+  logs_exporter::ElasticsearchExporterOptions options;
+  auto http_client = std::make_shared<HoldingHttpClient>(&parked);
+  auto exporter    = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
+
+  auto record = exporter->MakeRecordable();
+  record->SetBody("this export never completes");
+  auto export_result =
+      exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
+  ASSERT_EQ(export_result, opentelemetry::sdk::common::ExportResult::kSuccess);
+
+  auto start   = std::chrono::steady_clock::now();
+  bool result  = exporter->Shutdown(std::chrono::microseconds(1));
+  auto elapsed = std::chrono::steady_clock::now() - start;
+
+  EXPECT_FALSE(result);
+  EXPECT_LT(elapsed, std::chrono::seconds(1));
+
+  // Let the export finish now that the assertions are done.
+  parked.reset();
+}
+#endif  // ENABLE_ASYNC_EXPORT
+
+// Regression test: once Shutdown() has been called, any later Export() must fail rather than
+// silently trying to register a session against an exporter that is already tearing down.
+// The case is only meaningful where the second shutdown check exists, but it is registered in
+// both builds: gtest_add_tests reads the source, so a case behind #ifdef is still handed to CTest
+// in the build that does not compile it and reports a pass it never ran.
+TEST(ElasticsearchLogsExporterTests, ARejectedExportHandsItsSessionBack)
+{
+#ifndef ENABLE_ASYNC_EXPORT
+  GTEST_SKIP() << "the shutdown re-check this covers is compiled only with async export";
+#else
+  auto client = std::make_shared<RetainingHttpClient>();
+  logs_exporter::ElasticsearchExporterOptions options;
+  auto exporter = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, client));
+
+  auto record = exporter->MakeRecordable();
+  record->SetBody("a record the exporter will refuse");
+  std::array<std::unique_ptr<sdklogs::Recordable>, 1> batch = {std::move(record)};
+
+  auto result = opentelemetry::sdk::common::ExportResult::kSuccess;
+  std::thread exporting([&] {
+    result = exporter->Export(
+        nostd::span<std::unique_ptr<sdklogs::Recordable>>(batch.data(), batch.size()));
+  });
+
+  // Shutdown lands while the export is inside CreateSession, so it sees no registered session
+  // and returns, and the export then meets the second check on its way back.
+  client->WaitUntilCreating();
+  exporter->Shutdown();
+  client->Release();
+  exporting.join();
+
+  EXPECT_EQ(opentelemetry::sdk::common::ExportResult::kFailure, result);
+  EXPECT_EQ(0u, client->Sent()) << "a rejected export must not send";
+  EXPECT_EQ(0u, client->Retained())
+      << "the rejected session is still held by the client, so nothing will call FinishSession";
+  EXPECT_EQ(1u, client->FinishCalls()) << "handed back exactly once, not twice";
+#endif
+}
+
+TEST(ElasticsearchLogsExporterTests, ExportAfterShutdownFails)
+{
+  logs_exporter::ElasticsearchExporterOptions options;
+  auto http_client = std::make_shared<FakeHttpClient>();
+  auto exporter    = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
+
+  ASSERT_TRUE(exporter->Shutdown(std::chrono::seconds(1)));
+
+  auto record = exporter->MakeRecordable();
+  auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
+
+  EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kFailure);
 }
 
 // Attempt to write a log to an invalid host/port, test that the Export() returns failure
