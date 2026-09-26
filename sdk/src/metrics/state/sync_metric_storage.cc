@@ -26,6 +26,7 @@
 #  include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #  include "opentelemetry/sdk/metrics/data/exemplar_data.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -185,6 +186,13 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
 std::shared_ptr<BoundSyncWritableMetricStorage> SyncMetricStorage::Bind(
     const opentelemetry::common::KeyValueIterable &attributes) noexcept
 {
+  // Bound entries are only GC'd during Collect(), which a disabled Meter skips, so binding
+  // here would leak a cardinality slot. Returning nullptr defers the bind.
+  if (!meter_enabled_state_->IsEnabled())
+  {
+    return nullptr;
+  }
+
   // Filter attributes once, at bind time.
   MetricAttributes filtered{attributes, attributes_processor_.get()};
 

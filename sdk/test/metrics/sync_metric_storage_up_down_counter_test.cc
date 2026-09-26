@@ -21,6 +21,7 @@
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
+#include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
@@ -58,7 +59,7 @@ TEST_P(UpDownCounterWritableMetricStorageTestFixture, LongUpDownCounterSumAggreg
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
-      nullptr);
+      nullptr, std::make_shared<MeterEnabledState>());
 
   int64_t val1 = 10, val2 = 30, val3 = -5, val4 = -10;
   storage.RecordLong(val1, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
@@ -208,7 +209,7 @@ TEST_P(UpDownCounterWritableMetricStorageTestFixture, DoubleUpDownCounterSumAggr
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
-      nullptr);
+      nullptr, std::make_shared<MeterEnabledState>());
 
   storage.RecordDouble(10.0,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),

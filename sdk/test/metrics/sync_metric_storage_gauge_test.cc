@@ -28,6 +28,7 @@
 #  include "opentelemetry/sdk/metrics/data/point_data.h"
 #  include "opentelemetry/sdk/metrics/exemplar/filter_type.h"
 #  include "opentelemetry/sdk/metrics/exemplar/reservoir.h"
+#  include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #  include "opentelemetry/sdk/metrics/view/attributes_processor.h"
@@ -64,7 +65,7 @@ TEST_P(GaugeWritableMetricStorageTestFixture, LongGaugeLastValueAggregation)
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      nullptr);
+      nullptr, std::make_shared<MeterEnabledState>());
 
   int64_t bg_noise_level_1_roomA = 10;
   int64_t bg_noise_level_1_roomB = 20;
@@ -148,7 +149,7 @@ TEST_P(GaugeWritableMetricStorageTestFixture, DoubleGaugeLastValueAggregation)
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      nullptr);
+      nullptr, std::make_shared<MeterEnabledState>());
 
   double bg_noise_level_1_roomA = 4.3;
   double bg_noise_level_1_roomB = 2.5;
@@ -242,7 +243,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      nullptr);
+      nullptr, std::make_shared<MeterEnabledState>());
   auto after_creation = std::chrono::system_clock::now();
 
   // Two collectors force the slow path (collectors.size() > 1).
@@ -423,7 +424,7 @@ TEST_P(WritableMetricStorageDeltaMultiReaderTestFixture,
 #  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #  endif
-      nullptr);
+      nullptr, std::make_shared<MeterEnabledState>());
   auto after_creation = std::chrono::system_clock::now();
 
   std::shared_ptr<CollectorHandle> collector_a(new MockCollectorHandle(GetParam()));

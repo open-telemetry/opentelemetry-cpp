@@ -22,10 +22,8 @@
 #include <chrono>
 #include <initializer_list>
 #include <iostream>
-#include <string>
 #include <thread>
 #include <utility>
-#include <vector>
 
 #include "opentelemetry/exporters/ostream/span_exporter_factory.h"
 #include "opentelemetry/nostd/shared_ptr.h"
