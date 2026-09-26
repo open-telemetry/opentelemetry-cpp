@@ -1,3 +1,6 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
 #include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/context/runtime_context.h"
 #include "opentelemetry/context/propagation/global_propagator.h"
