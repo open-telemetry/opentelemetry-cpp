@@ -57,6 +57,8 @@ Increment the:
   request body on a 32-bit build
   [#4630](https://github.com/open-telemetry/opentelemetry-cpp/pull/4630)
 
+* [BUG] Do not queue a curl session closed by the Retry-After cap
+  [#4632](https://github.com/open-telemetry/opentelemetry-cpp/pull/4632)
 * [BUG] Decide Elasticsearch bulk export success from the HTTP status, the
   errors flag, and one acknowledgement per record that names its target index
   and says the operation applied
