@@ -32,6 +32,7 @@ cc_library(
     ],
     strip_include_prefix = "include",
     visibility = [
+        "//exporters/zipkin:__pkg__",
         "//ext/src/http/client/curl:__pkg__",
         "//ext/test/http:__pkg__",
         "//ext/test/w3c_tracecontext_http_test_server:__pkg__",
