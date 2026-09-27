@@ -4,10 +4,12 @@
 #pragma once
 
 #include <chrono>
-#include <cstddef>  // For std::size_t and std::max_align_t
+#include <cstddef>  // For std::size_t
 #include <cstdint>  // For std::uint32_t
 #include <limits>   // For std::numeric_limits
+#include <memory>
 #include <string>
+#include <utility>
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
@@ -53,8 +55,34 @@ public:
       std::uint32_t max_links                = (std::numeric_limits<std::uint32_t>::max)(),
       std::uint32_t max_attributes_per_event = (std::numeric_limits<std::uint32_t>::max)(),
       std::uint32_t max_attributes_per_link  = (std::numeric_limits<std::uint32_t>::max)())
-      : arena_{arena_initial_block_, sizeof(arena_initial_block_)},
-        span_{google::protobuf::Arena::Create<proto::trace::v1::Span>(&arena_)},
+      : OtlpRecordable(nullptr,
+                       max_attributes,
+                       max_events,
+                       max_links,
+                       max_attributes_per_event,
+                       max_attributes_per_link)
+  {}
+
+  /**
+   * Construct on the given Arena, with optional span limits parameters.
+   *
+   * The span message is created on arena, and the recordable keeps a reference to it, so the
+   * Arena outlives the recordable. The OTLP exporters pass the Arena they share across every
+   * recordable they create between two exports, so that the export request can be created on
+   * the same Arena and take the span message without a copy. A null arena gives the recordable
+   * an Arena of its own.
+   *
+   * @deprecated The span limit params, see the constructor above.
+   */
+  explicit OtlpRecordable(
+      std::shared_ptr<google::protobuf::Arena> arena,
+      std::uint32_t max_attributes           = (std::numeric_limits<std::uint32_t>::max)(),
+      std::uint32_t max_events               = (std::numeric_limits<std::uint32_t>::max)(),
+      std::uint32_t max_links                = (std::numeric_limits<std::uint32_t>::max)(),
+      std::uint32_t max_attributes_per_event = (std::numeric_limits<std::uint32_t>::max)(),
+      std::uint32_t max_attributes_per_link  = (std::numeric_limits<std::uint32_t>::max)())
+      : arena_{arena ? std::move(arena) : std::make_shared<google::protobuf::Arena>()},
+        span_{google::protobuf::Arena::Create<proto::trace::v1::Span>(arena_.get())},
         span_limits_{max_attributes,
                      (std::numeric_limits<std::size_t>::max)(),
                      max_events,
@@ -63,9 +91,9 @@ public:
                      max_attributes_per_link}
   {}
 
-  // The Arena member owns the memory the span message points into, and an Arena is neither
-  // copyable nor movable, so neither is the recordable. Recordables are created and handed
-  // around by pointer, so nothing in the SDK or the exporters needs these.
+  // The span message is owned by the Arena, not by the recordable, and an export request on the
+  // same Arena may hold it, so the recordable is neither copyable nor movable. Recordables are
+  // created and handed around by pointer, so nothing in the SDK or the exporters needs these.
   OtlpRecordable(const OtlpRecordable &)            = delete;
   OtlpRecordable &operator=(const OtlpRecordable &) = delete;
   OtlpRecordable(OtlpRecordable &&)                 = delete;
@@ -128,31 +156,12 @@ public:
                                    &instrumentation_scope) noexcept override;
 
 private:
-  // Size of the block the Arena starts from. The block lives inside the recordable, so a span
-  // whose recorded content fits in it never asks the heap for Arena memory at all. A span with
-  // the identity, the name, the kind and the timestamps recorded takes 288 bytes of Arena
-  // space, so 512 covers that plus a little, and a span that outgrows it keeps working, the
-  // Arena simply grows onto the heap from there. 512, 768 and 1024 were all measured end to
-  // end through a full BatchSpanProcessor queue. Larger blocks buy fewer allocations for spans
-  // with many long attributes, and for that shape a 768 byte block is actually ahead on both
-  // allocation count and record time, and on peak memory too, since which size wins there
-  // depends on where a span's overflow lands in protobuf's block doubling. What 512 buys is the
-  // other two columns: it is the smallest size that keeps a minimal span's identity fields off
-  // the heap, and it keeps the recordable small enough to avoid the regression seen at 768 and
-  // 1024 in the cost of starting a span while many are alive. That regression is a property of
-  // the allocator: on glibc malloc the boundary between the exact fit smallbins and the best
-  // fit largebins falls at a 1008 byte chunk, so it is worth re-measuring on a different one.
-  static constexpr std::size_t kArenaInitialBlockSize = 512;
-
-  // Declared before arena_ so the block is a live subobject before the Arena is pointed at it,
-  // and is still there when the Arena is destroyed. Deliberately left uninitialized, the Arena
-  // hands it out as it fills it. protobuf never frees a caller supplied initial block.
-  alignas(std::max_align_t) char arena_initial_block_[kArenaInitialBlockSize];
-  // Declared before span_ so the Arena is constructed first and destroyed last. The span message
-  // and everything recorded into it live on this Arena, so recording a field is an Arena bump
-  // instead of a heap allocation, and the whole span is released with the Arena.
-  google::protobuf::Arena arena_;
-  // Owned by arena_, never null, never deleted.
+  // Declared before span_ so the Arena is set before the span message is created on it. The Arena
+  // may be shared with other recordables and with export requests, and it is destroyed by the last
+  // of them, so the span message stays valid for as long as this recordable or a request built
+  // from it is alive.
+  std::shared_ptr<google::protobuf::Arena> arena_;
+  // Owned by the Arena, never null, never deleted.
   proto::trace::v1::Span *span_;
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =

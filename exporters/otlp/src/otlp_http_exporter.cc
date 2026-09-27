@@ -302,7 +302,7 @@ OtlpHttpExporter::OtlpHttpExporter(std::unique_ptr<OtlpHttpClient> http_client)
 std::unique_ptr<opentelemetry::sdk::trace::Recordable> OtlpHttpExporter::MakeRecordable() noexcept
 {
   return std::make_unique<exporter::otlp::OtlpRecordable>(
-      options_.max_attributes, options_.max_events, options_.max_links,
+      recordable_arena_.Get(), options_.max_attributes, options_.max_events, options_.max_links,
       options_.max_attributes_per_event, options_.max_attributes_per_link);
 }
 
@@ -323,18 +323,17 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
 
-  google::protobuf::ArenaOptions arena_options;
-  // It's easy to allocate datas larger than 1024 when we populate basic resource and attributes
-  arena_options.initial_block_size = 1024;
-  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
-  // block to reduce memory fragments.
-  arena_options.max_block_size = 65536;
-  // Ownership transfers into HttpSessionData until the request completes
-  auto arena = std::make_unique<google::protobuf::Arena>(arena_options);
+  // The request goes on the Arena the recordables since the last export were created on, so
+  // PopulateRequest moves their messages instead of copying them. handle_result keeps a reference
+  // to it until the request completes.
+  std::shared_ptr<google::protobuf::Arena> request_arena = recordable_arena_.Rotate();
+  // The response has an Arena of its own, whose ownership transfers into HttpSessionData until
+  // the request completes.
+  auto arena = std::make_unique<google::protobuf::Arena>();
 
   proto::collector::trace::v1::ExportTraceServiceRequest *service_request =
       google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
-          arena.get());
+          request_arena.get());
   OtlpRecordableUtils::PopulateRequest(spans, service_request);
   std::size_t span_count = spans.size();
 
@@ -342,8 +341,8 @@ opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
       google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceResponse>(
           arena.get());
 
-  auto handle_result = [span_count](opentelemetry::sdk::common::ExportResult result,
-                                    google::protobuf::Message *response_msg) {
+  auto handle_result = [span_count, request_arena](opentelemetry::sdk::common::ExportResult result,
+                                                   google::protobuf::Message *response_msg) {
     if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
     {
       OTEL_INTERNAL_LOG_ERROR("[OTLP TRACE HTTP Exporter] ERROR: Export "
@@ -386,6 +385,7 @@ bool OtlpHttpExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
 
 bool OtlpHttpExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  recordable_arena_.Release();
   return http_client_->Shutdown(timeout);
 }
 

@@ -92,9 +92,9 @@ OtlpGrpcExporter::~OtlpGrpcExporter()
 
 std::unique_ptr<sdk::trace::Recordable> OtlpGrpcExporter::MakeRecordable() noexcept
 {
-  return std::make_unique<OtlpRecordable>(options_.max_attributes, options_.max_events,
-                                          options_.max_links, options_.max_attributes_per_event,
-                                          options_.max_attributes_per_link);
+  return std::make_unique<OtlpRecordable>(
+      recordable_arena_.Get(), options_.max_attributes, options_.max_events, options_.max_links,
+      options_.max_attributes_per_event, options_.max_attributes_per_link);
 }
 
 sdk::common::ExportResult OtlpGrpcExporter::Export(
@@ -120,18 +120,17 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
     return sdk::common::ExportResult::kSuccess;
   }
 
-  google::protobuf::ArenaOptions arena_options;
-  // It's easy to allocate datas larger than 1024 when we populate basic resource and attributes
-  arena_options.initial_block_size = 1024;
-  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a larger
-  // block to reduce memory fragments.
-  arena_options.max_block_size = 65536;
-  std::unique_ptr<google::protobuf::Arena> arena =
-      std::make_unique<google::protobuf::Arena>(arena_options);
+  // The request goes on the Arena the recordables since the last export were created on, so
+  // PopulateRequest moves their messages instead of copying them. The asynchronous result callback
+  // keeps a reference to it until the call completes.
+  std::shared_ptr<google::protobuf::Arena> request_arena = recordable_arena_.Rotate();
+  // The response has an Arena of its own, whose ownership transfers to the gRPC client until the
+  // call completes.
+  std::unique_ptr<google::protobuf::Arena> arena = std::make_unique<google::protobuf::Arena>();
 
   proto::collector::trace::v1::ExportTraceServiceRequest *request =
       google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
-          arena.get());
+          request_arena.get());
   OtlpRecordableUtils::PopulateRequest(spans, request);
 
   auto context = OtlpGrpcClient::MakeClientContext(options_);
@@ -142,8 +141,8 @@ sdk::common::ExportResult OtlpGrpcExporter::Export(
     return client->DelegateAsyncExport(
         options_, trace_service_stub_.get(), std::move(context), std::move(arena), request,
         // Capture the trace_service_stub_ to ensure it is not destroyed before the callback is
-        // called.
-        [trace_service_stub = trace_service_stub_](
+        // called, and request_arena so the request stays alive until the call completes.
+        [trace_service_stub = trace_service_stub_, request_arena](
             opentelemetry::sdk::common::ExportResult result,
             std::unique_ptr<google::protobuf::Arena> &&arena,
             const proto::collector::trace::v1::ExportTraceServiceRequest &request,
@@ -228,6 +227,7 @@ bool OtlpGrpcExporter::Shutdown(
     OPENTELEMETRY_MAYBE_UNUSED std::chrono::microseconds timeout) noexcept
 {
   is_shutdown_ = true;
+  recordable_arena_.Release();
   // Maybe already shutdown, we need to keep thread-safety here.
   std::shared_ptr<OtlpGrpcClient> client;
   client.swap(client_);

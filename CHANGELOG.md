@@ -434,16 +434,21 @@ Breaking changes:
   [#4267](https://github.com/open-telemetry/opentelemetry-cpp/pull/4267)
 
 * [EXPORTER] Allocate the OTLP trace and log recordable messages on a
-  `google::protobuf::Arena` owned by the recordable, so recording a field is an
-  Arena bump instead of a heap allocation. Recording a span with attributes
-  drops from about 5 heap allocations per attribute to about 1. The Arena
-  starts from a block that lives inside the recordable rather than from the
-  heap, so starting a span takes 5 heap allocations instead of 9.
-  `OtlpRecordable` and `OtlpLogRecordable` are no longer copyable or movable,
-  and they are larger, since each one now carries that block. The `span()` and
-  `log_record()` accessors keep their signatures, and
-  `OtlpRecordableUtils::PopulateRequest` still copies each recordable message
-  into the Arena allocated request.
+  `google::protobuf::Arena` that the OTLP exporter shares across every
+  recordable it creates between two exports, and create the export request on
+  that same Arena, so recording a field is an Arena bump instead of a heap
+  allocation and the messages go into the request without a copy.
+  `OtlpRecordable` and `OtlpLogRecordable` gain constructors taking a
+  `std::shared_ptr<google::protobuf::Arena>`, keep a reference to it, and are
+  no longer copyable or movable. The existing constructors give the recordable
+  an Arena of its own. `OtlpRecordableUtils::PopulateRequest` now moves each
+  message that is on the request's Arena into the request instead of copying
+  it, which leaves those recordables moved-from: the request refers to their
+  messages, so they must not be modified or passed to `PopulateRequest` again.
+  Messages on any other Arena are still copied. The OTLP exporters gain a
+  member of the new `OtlpRecordableArena` class, which changes their layout
+  and makes the HTTP and file exporters non-movable, and they stop sharing the
+  Arena after `Shutdown()`.
   [#4558](https://github.com/open-telemetry/opentelemetry-cpp/issues/4558)
   [#4580](https://github.com/open-telemetry/opentelemetry-cpp/pull/4580)
 

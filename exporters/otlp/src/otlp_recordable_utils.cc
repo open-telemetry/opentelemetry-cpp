@@ -3,7 +3,9 @@
 
 #include <cstddef>
 #include <memory>
+#include <mutex>
 #include <unordered_map>
+#include <utility>
 
 #include "opentelemetry/exporters/otlp/otlp_log_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_populate_attribute_utils.h"
@@ -18,6 +20,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"  // IWYU pragma: keep
+#include "google/protobuf/arena.h"
 #include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
@@ -93,7 +96,7 @@ void OtlpRecordableUtils::PopulateRequest(
 
   for (const auto &recordable : spans)
   {
-    const auto *otlp_recordable = static_cast<const OtlpRecordable *>(recordable.get());
+    auto *otlp_recordable       = static_cast<OtlpRecordable *>(recordable.get());
     const auto *resource        = otlp_recordable->GetResource();
     const auto *instrumentation = otlp_recordable->GetInstrumentationScope();
 
@@ -130,8 +133,17 @@ void OtlpRecordableUtils::PopulateRequest(
       }
     }
 
-    // The recordable span can only be copied here since the request message is Arena allocated.
-    scope_spans->add_spans()->CopyFrom(otlp_recordable->span());
+    // A span on the request's Arena is added without a copy, AddAllocated only stores the pointer
+    // when the Arenas match. A span on any other Arena, or a request not on an Arena, is copied.
+    auto &span = otlp_recordable->span();
+    if (span.GetArena() != nullptr && span.GetArena() == scope_spans->GetArena())
+    {
+      scope_spans->mutable_spans()->AddAllocated(&span);
+    }
+    else
+    {
+      scope_spans->add_spans()->CopyFrom(span);
+    }
   }
 }
 
@@ -158,7 +170,7 @@ void OtlpRecordableUtils::PopulateRequest(
 
   for (const auto &recordable : logs)
   {
-    const auto *otlp_recordable = static_cast<const OtlpLogRecordable *>(recordable.get());
+    auto *otlp_recordable       = static_cast<OtlpLogRecordable *>(recordable.get());
     const auto *instrumentation = &otlp_recordable->GetInstrumentationScope();
     const auto *resource        = &otlp_recordable->GetResource();
 
@@ -191,9 +203,56 @@ void OtlpRecordableUtils::PopulateRequest(
       }
     }
 
-    // The recordable log can only be copied here since the request message is Arena allocated.
-    scope_logs->add_log_records()->CopyFrom(otlp_recordable->log_record());
+    // A log record on the request's Arena is added without a copy, AddAllocated only stores the
+    // pointer when the Arenas match. A log record on any other Arena, or a request not on an
+    // Arena, is copied.
+    auto &log_record = otlp_recordable->log_record();
+    if (log_record.GetArena() != nullptr && log_record.GetArena() == scope_logs->GetArena())
+    {
+      scope_logs->mutable_log_records()->AddAllocated(&log_record);
+    }
+    else
+    {
+      scope_logs->add_log_records()->CopyFrom(log_record);
+    }
   }
+}
+
+OtlpRecordableArena::OtlpRecordableArena() : arena_{MakeArena()} {}
+
+std::shared_ptr<google::protobuf::Arena> OtlpRecordableArena::Get()
+{
+  std::lock_guard<std::mutex> guard{lock_};
+  return arena_;
+}
+
+std::shared_ptr<google::protobuf::Arena> OtlpRecordableArena::Rotate()
+{
+  std::shared_ptr<google::protobuf::Arena> next = MakeArena();
+  std::lock_guard<std::mutex> guard{lock_};
+  if (arena_)
+  {
+    arena_.swap(next);
+  }
+  return next;
+}
+
+void OtlpRecordableArena::Release()
+{
+  std::shared_ptr<google::protobuf::Arena> released;
+  {
+    std::lock_guard<std::mutex> guard{lock_};
+    released.swap(arena_);
+  }
+}
+
+std::shared_ptr<google::protobuf::Arena> OtlpRecordableArena::MakeArena()
+{
+  google::protobuf::ArenaOptions arena_options;
+  // Every span or log record created between two exports lands on this Arena, and so does the
+  // request built from them, so allow larger blocks than the default to reduce fragmentation.
+  arena_options.max_block_size = 65536;
+  return std::make_shared<google::protobuf::Arena>(arena_options);
 }
 }  // namespace otlp
 }  // namespace exporter

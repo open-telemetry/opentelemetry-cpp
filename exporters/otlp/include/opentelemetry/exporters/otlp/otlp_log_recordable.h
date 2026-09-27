@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include <cstddef>  // For std::size_t and std::max_align_t
 #include <cstdint>
+#include <memory>
+#include <utility>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -32,14 +33,25 @@ namespace otlp
 class OtlpLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
 public:
-  OtlpLogRecordable()
-      : arena_{arena_initial_block_, sizeof(arena_initial_block_)},
-        proto_record_{google::protobuf::Arena::Create<proto::logs::v1::LogRecord>(&arena_)}
+  OtlpLogRecordable() : OtlpLogRecordable(nullptr) {}
+
+  /**
+   * Construct on the given Arena.
+   *
+   * The log record message is created on arena, and the recordable keeps a reference to it, so
+   * the Arena outlives the recordable. The OTLP exporters pass the Arena they share across every
+   * recordable they create between two exports, so that the export request can be created on the
+   * same Arena and take the log record message without a copy. A null arena gives the recordable
+   * an Arena of its own.
+   */
+  explicit OtlpLogRecordable(std::shared_ptr<google::protobuf::Arena> arena)
+      : arena_{arena ? std::move(arena) : std::make_shared<google::protobuf::Arena>()},
+        proto_record_{google::protobuf::Arena::Create<proto::logs::v1::LogRecord>(arena_.get())}
   {}
 
-  // The Arena member owns the memory the log record message points into, and an Arena is neither
-  // copyable nor movable, so neither is the recordable. Recordables are created and handed
-  // around by pointer, so nothing in the SDK or the exporters needs these.
+  // The log record message is owned by the Arena, not by the recordable, and an export request on
+  // the same Arena may hold it, so the recordable is neither copyable nor movable. Recordables are
+  // created and handed around by pointer, so nothing in the SDK or the exporters needs these.
   OtlpLogRecordable(const OtlpLogRecordable &)            = delete;
   OtlpLogRecordable &operator=(const OtlpLogRecordable &) = delete;
   OtlpLogRecordable(OtlpLogRecordable &&)                 = delete;
@@ -134,23 +146,12 @@ public:
                                    &instrumentation_scope) noexcept override;
 
 private:
-  // Size of the block the Arena starts from. The block lives inside the recordable, so a log
-  // record whose recorded content fits in it never asks the heap for Arena memory at all. See
-  // the same constant in otlp_recordable.h, which explains how the size was chosen. 256, 512
-  // and 768 were measured here. 512 is the smallest of the three that keeps a minimal record's
-  // Arena entirely inside the recordable, and it led on allocation count and on the nominal
-  // shape. It is not ahead on every shape, for the same reason as in otlp_recordable.h.
-  static constexpr std::size_t kArenaInitialBlockSize = 512;
-
-  // Declared before arena_ so the block is a live subobject before the Arena is pointed at it,
-  // and is still there when the Arena is destroyed. Deliberately left uninitialized, the Arena
-  // hands it out as it fills it. protobuf never frees a caller supplied initial block.
-  alignas(std::max_align_t) char arena_initial_block_[kArenaInitialBlockSize];
-  // Declared before proto_record_ so the Arena is constructed first and destroyed last. The log
-  // record message and everything recorded into it live on this Arena, so recording a field is an
-  // Arena bump instead of a heap allocation, and the whole record is released with the Arena.
-  google::protobuf::Arena arena_;
-  // Owned by arena_, never null, never deleted.
+  // Declared before proto_record_ so the Arena is set before the log record message is created on
+  // it. The Arena may be shared with other recordables and with export requests, and it is
+  // destroyed by the last of them, so the log record message stays valid for as long as this
+  // recordable or a request built from it is alive.
+  std::shared_ptr<google::protobuf::Arena> arena_;
+  // Owned by the Arena, never null, never deleted.
   proto::logs::v1::LogRecord *proto_record_;
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =

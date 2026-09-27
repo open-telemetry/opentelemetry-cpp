@@ -9,6 +9,7 @@
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_runtime_options.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/ext/http/client/http_client_factory.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
@@ -119,6 +120,9 @@ private:
 
   // Object that stores the HTTP sessions that have been created
   std::unique_ptr<OtlpHttpClient> http_client_;
+
+  // The Arena shared by the recordables created since the last export, see OtlpRecordableArena.
+  OtlpRecordableArena recordable_arena_;
   // For testing
   friend class OtlpHttpExporterTestPeer;
   friend class OtlpHttpExporterCustomClientTestPeer;
