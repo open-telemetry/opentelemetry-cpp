@@ -373,6 +373,12 @@ elif [[ "$1" == "cmake.iwyu.test" ]]; then
   include-what-you-use --version
   IWYU_LOG_VARIANT=$(basename "${OTELCPP_CMAKE_CACHE_FILE_PATH}" .cmake)
   LOG_FILE="${BUILD_DIR}/opentelemetry-cpp-iwyu-${IWYU_LOG_VARIANT}.log"
+  # IWYU only reports on source files and same-named headers by default. Include
+  # public headers without a matching source file when they appear in a build.
+  IWYU_PUBLIC_HEADERS_GLOB="${SRC_DIR}/api/include/opentelemetry/*.h"
+  CMAKE_IWYU_COMMAND="include-what-you-use;-w"
+  CMAKE_IWYU_COMMAND+=";-Xiwyu;--mapping_file=${SRC_DIR}/.iwyu.imp"
+  CMAKE_IWYU_COMMAND+=";-Xiwyu;--check_also=${IWYU_PUBLIC_HEADERS_GLOB}"
   cmake "${CMAKE_OPTIONS[@]}"  \
     -S "${SRC_DIR}" \
     -B "${BUILD_DIR}" \
@@ -380,7 +386,7 @@ elif [[ "$1" == "cmake.iwyu.test" ]]; then
     -DCMAKE_CXX_STANDARD=14 \
     -DOTELCPP_WITH_STL=CXX14 \
     -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" \
-    -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="include-what-you-use;-w;-Xiwyu;--mapping_file=${SRC_DIR}/.iwyu.imp;"
+    -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE="${CMAKE_IWYU_COMMAND}"
   if command -v ninja >/dev/null 2>&1; then
     IWYU_KEEP_GOING=(-k 0)
   else

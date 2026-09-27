@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [CI] Extend include-what-you-use reporting to public headers without a
+  matching source file
+  [#4581](https://github.com/open-telemetry/opentelemetry-cpp/issues/4581)
+
 * [LOGS] Fix undefined behavior in `Logger::EmitLogRecord()` when a logger is
   enabled (e.g. via `LoggerProvider::UpdateLoggerConfigurator()`) after
   `CreateLogRecord()` was called while it was still disabled. The disabled
