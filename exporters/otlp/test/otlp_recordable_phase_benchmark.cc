@@ -16,12 +16,18 @@
 //   DestroyRecordable Destruction of the recorded Recordable. OtlpRecordable has no End method,
 //                     and with a BatchSpanProcessor this cost is paid by the exporter thread
 //                     after the export, not by the application thread. It is measured separately
-//                     for that reason.
+//                     for that reason. As after a real export, the exporter no longer holds the
+//                     Arena the recordables were created on, so the last recordable destroyed
+//                     also frees the Arena.
+//
+// The exporter hands every recordable the Arena it shares across the recordables created between
+// two exports, the way the OTLP exporters do, and replaces it after each group of spans, the way
+// an export does.
 //
 // Every case is run twice over, with one span alive at a time and with 128 spans alive at a
-// time, because a recordable that owns an Arena holds a block of it for the whole life of the
-// span and the two cases land in different parts of the allocator. One live span is what a
-// simple processor gives, many live spans is what a batch processor queue gives.
+// time, because the recordables of a group share one Arena, which grows with the number of spans
+// alive on it, and the two cases land in different parts of the allocator. One live span is what
+// a simple processor gives, many live spans is what a batch processor queue gives.
 //
 // Only the phase under test is timed, through UseManualTime, so the reported Time column is the
 // cost of the phase for the whole group of live spans. The per span cost, which is the number to
@@ -50,6 +56,7 @@
 #include <vector>
 
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -161,32 +168,42 @@ constexpr bool kAllocationCountingEnabled =
     false;
 #endif
 
-// A no-op SpanExporter whose MakeRecordable creates an OtlpRecordable.
+// A no-op SpanExporter whose MakeRecordable creates an OtlpRecordable on the Arena it shares
+// across the recordables created between two exports, like the OTLP exporters.
 class NullSpanExporter final : public trace_sdk::SpanExporter
 {
 public:
   std::unique_ptr<trace_sdk::Recordable> MakeRecordable() noexcept override
   {
-    return std::make_unique<otlp::OtlpRecordable>();
+    return std::make_unique<otlp::OtlpRecordable>(recordable_arena_.Get());
   }
 
   opentelemetry::sdk::common::ExportResult Export(
       const opentelemetry::nostd::span<std::unique_ptr<trace_sdk::Recordable>> &) noexcept override
   {
+    RotateArena();
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
+
+  // What an export does to the shared Arena, without building a request on it: the exporter lets
+  // go of it and starts a new one, so the recordables created so far hold the only references.
+  void RotateArena() { recordable_arena_.Rotate(); }
 
   bool ForceFlush(std::chrono::microseconds) noexcept override { return true; }
 
   bool Shutdown(std::chrono::microseconds) noexcept override { return true; }
+
+private:
+  otlp::OtlpRecordableArena recordable_arena_;
 };
 
 constexpr const char *kSpanName = "benchmark_span";
 
 // How many spans the phase under test is run over before the batch is torn down again, which is
-// also how many spans are alive at once. It matters: a recordable that owns an Arena holds one
-// block of it for as long as the span lives, so a run that keeps many spans alive exercises a
-// different part of the allocator than a run that records one span and releases it. Both are
+// also how many spans are alive at once. It matters: the spans of a group share one Arena, which
+// grows with the spans alive on it and is freed with the last of them, so a run that keeps many
+// spans alive exercises a different part of the allocator than a run that records one span and
+// releases it. Both are
 // real, a simple processor releases immediately while a batch processor queues up to its whole
 // queue, so both are measured.
 constexpr std::int64_t kLiveSpansFew  = 1;
@@ -338,6 +355,8 @@ std::string CaseLabel(std::int64_t live_spans, SpanShape shape)
 
 // Benchmark fixture: a TracerProvider backed by a BufferingSpanProcessor with a NullSpanExporter,
 // so recordables are kept alive until ForceFlush and their destruction can be timed on its own.
+// BufferingSpanProcessor never calls Export, so the fixture rotates the exporter's Arena itself
+// after each group of spans has ended, outside the timed region.
 class OtlpRecordablePhaseFixture : public benchmark::Fixture
 {
 public:
@@ -345,12 +364,13 @@ public:
 
   void SetUp(benchmark::State &) override
   {
-    auto processor =
-        std::make_unique<test_utils::BufferingSpanProcessor>(std::make_unique<NullSpanExporter>());
-    provider_ = std::make_shared<trace_sdk::TracerProvider>(std::move(processor));
-    tracer_   = provider_->GetTracer(test_utils::TestScope().GetName(),
-                                     test_utils::TestScope().GetVersion(),
-                                     test_utils::TestScope().GetSchemaURL());
+    auto exporter  = std::make_unique<NullSpanExporter>();
+    exporter_      = exporter.get();
+    auto processor = std::make_unique<test_utils::BufferingSpanProcessor>(std::move(exporter));
+    provider_      = std::make_shared<trace_sdk::TracerProvider>(std::move(processor));
+    tracer_        = provider_->GetTracer(test_utils::TestScope().GetName(),
+                                          test_utils::TestScope().GetVersion(),
+                                          test_utils::TestScope().GetSchemaURL());
     test_utils::InitializeSpanTestData();
     LongStringAttributes();
     ClockOverheadSeconds();
@@ -385,6 +405,9 @@ protected:
     }
   }
 
+  // Stands in for the export of the group of spans just ended, as far as the Arena goes.
+  void RotateArena() { exporter_->RotateArena(); }
+
   // Drops the span handles and destroys every recordable the processor has buffered.
   void DestroyRecordables()
   {
@@ -392,6 +415,8 @@ protected:
     provider_->ForceFlush();
   }
 
+  // Owned by the processor, which the provider owns.
+  NullSpanExporter *exporter_ = nullptr;
   std::shared_ptr<trace_sdk::TracerProvider> provider_;
   opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> tracer_;
   std::vector<opentelemetry::nostd::shared_ptr<opentelemetry::trace::Span>> spans_;
@@ -433,6 +458,7 @@ BENCHMARK_DEFINE_F(OtlpRecordablePhaseFixture, StartSpan)(benchmark::State &stat
     allocations += CurrentAllocationCount() - allocations_before;
 
     EndSpans();
+    RotateArena();
     DestroyRecordables();
     const double elapsed = MeasuredSeconds(start, end);
     seconds += elapsed;
@@ -465,6 +491,7 @@ BENCHMARK_DEFINE_F(OtlpRecordablePhaseFixture, SetAttribute)(benchmark::State &s
     allocations += CurrentAllocationCount() - allocations_before;
 
     EndSpans();
+    RotateArena();
     DestroyRecordables();
     const double elapsed = MeasuredSeconds(start, end);
     seconds += elapsed;
@@ -503,6 +530,7 @@ BENCHMARK_DEFINE_F(OtlpRecordablePhaseFixture, End)(benchmark::State &state)
     const auto end = Clock::now();
     allocations += CurrentAllocationCount() - allocations_before;
 
+    RotateArena();
     DestroyRecordables();
     const double elapsed = MeasuredSeconds(start, end);
     seconds += elapsed;
@@ -529,6 +557,7 @@ BENCHMARK_DEFINE_F(OtlpRecordablePhaseFixture, DestroyRecordable)(benchmark::Sta
     StartSpans(live_spans);
     SetAttributes(attributes);
     EndSpans();
+    RotateArena();
 
     const std::size_t allocations_before = CurrentAllocationCount();
     const auto start                     = Clock::now();
