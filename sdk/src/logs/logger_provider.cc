@@ -68,6 +68,7 @@ LoggerProvider::LoggerProvider(
   context_ = std::make_shared<LoggerContext>(std::move(processors), resource,
                                              std::move(logger_configurator));
   OTEL_INTERNAL_LOG_DEBUG("[LoggerProvider] LoggerProvider created.");
+  initialized_ = true;
 }
 
 LoggerProvider::LoggerProvider(
@@ -78,16 +79,22 @@ LoggerProvider::LoggerProvider(
                                                resource,
                                                std::move(logger_configurator))},
       noop_logger_(CreateNoopLoggerFallback())
-{}
+{
+  initialized_ = true;
+}
 
 LoggerProvider::LoggerProvider()
     : context_{std::make_shared<LoggerContext>(std::vector<std::unique_ptr<LogRecordProcessor>>{})},
       noop_logger_(CreateNoopLoggerFallback())
-{}
+{
+  initialized_ = true;
+}
 
 LoggerProvider::LoggerProvider(std::unique_ptr<LoggerContext> context)
     : context_(std::move(context)), noop_logger_(CreateNoopLoggerFallback())
-{}
+{
+  initialized_ = true;
+}
 
 LoggerProvider::~LoggerProvider()
 {
@@ -131,11 +138,12 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   // recover after a construction failure. Retrying would re-throw, catch, and
   // log on later GetLogger calls. After the first failure, treat the provider
   // as non-functional for new loggers.
-  if (construction_failed_)
+  if (!initialized_)
   {
     return noop_logger_;
   }
 
+  initialized_ = false;
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
@@ -145,12 +153,13 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
 
     auto logger = std::make_shared<Logger>(logger_name, context_, std::move(lib));
     loggers_.push_back(logger);
-    return opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger>{logger};
+    opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> result{logger};
+    initialized_ = true;
+    return result;
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
   catch (const std::exception &ex)
   {
-    construction_failed_ = true;
     LogGetLoggerConstructionFailure(ex.what());
     return noop_logger_;
   }
@@ -158,7 +167,6 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   // std::exception. Catch everything so GetLogger stays noexcept.
   catch (...)
   {
-    construction_failed_ = true;
     LogGetLoggerConstructionFailure("unknown exception");
     return noop_logger_;
   }

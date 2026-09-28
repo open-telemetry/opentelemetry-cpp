@@ -79,11 +79,15 @@ MeterProvider::MeterProvider()
               instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(MeterConfig::Default())
                   .Build()))),
       noop_meter_(CreateNoopMeterFallback())
-{}
+{
+  initialized_ = true;
+}
 
 MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context)
     : context_(std::move(context)), noop_meter_(CreateNoopMeterFallback())
-{}
+{
+  initialized_ = true;
+}
 
 MeterProvider::MeterProvider(
     std::unique_ptr<ViewRegistry> views,
@@ -95,6 +99,7 @@ MeterProvider::MeterProvider(
       noop_meter_(CreateNoopMeterFallback())
 {
   OTEL_INTERNAL_LOG_DEBUG("[MeterProvider] MeterProvider created.");
+  initialized_ = true;
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -135,11 +140,12 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   // recover after a construction failure. Retrying would re-throw, catch, and
   // log on later GetMeter calls. After the first failure, treat the provider
   // as non-functional for new meters.
-  if (construction_failed_)
+  if (!initialized_)
   {
     return noop_meter_;
   }
 
+  initialized_ = false;
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
@@ -150,12 +156,13 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
 
     auto meter = std::make_shared<Meter>(context_, std::move(scope));
     context_->AddMeter(meter);
-    return nostd::shared_ptr<metrics_api::Meter>{meter};
+    nostd::shared_ptr<metrics_api::Meter> result{meter};
+    initialized_ = true;
+    return result;
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
   catch (const std::exception &ex)
   {
-    construction_failed_ = true;
     LogGetMeterConstructionFailure(ex.what());
     return noop_meter_;
   }
@@ -163,7 +170,6 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   // std::exception. Catch everything so GetMeter stays noexcept.
   catch (...)
   {
-    construction_failed_ = true;
     LogGetMeterConstructionFailure("unknown exception");
     return noop_meter_;
   }

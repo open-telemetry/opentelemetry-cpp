@@ -70,6 +70,7 @@ TracerProvider::TracerProvider(std::unique_ptr<TracerContext> context)
     : context_(std::move(context)), noop_tracer_(CreateNoopTracerFallback())
 {
   OTEL_INTERNAL_LOG_DEBUG("[TracerProvider] TracerProvider created.");
+  initialized_ = true;
 }
 
 TracerProvider::TracerProvider(
@@ -86,6 +87,7 @@ TracerProvider::TracerProvider(
   context_ = std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
                                              std::move(id_generator),
                                              std::move(tracer_configurator), span_limits);
+  initialized_ = true;
 }
 
 TracerProvider::TracerProvider(
@@ -102,7 +104,9 @@ TracerProvider::TracerProvider(
                                                std::move(tracer_configurator),
                                                span_limits)),
       noop_tracer_(CreateNoopTracerFallback())
-{}
+{
+  initialized_ = true;
+}
 
 TracerProvider::~TracerProvider()
 {
@@ -157,11 +161,12 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
   // recover after a construction failure. Retrying would re-throw, catch, and
   // log on hot paths such as GetTracer(...)->StartSpan(...). After the first
   // failure, treat the provider as non-functional for new tracers.
-  if (construction_failed_)
+  if (!initialized_)
   {
     return noop_tracer_;
   }
 
+  initialized_ = false;
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
@@ -172,12 +177,13 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
 
     auto tracer = std::make_shared<Tracer>(context_, std::move(scope));
     tracers_.push_back(tracer);
-    return nostd::shared_ptr<trace_api::Tracer>{tracer};
+    nostd::shared_ptr<trace_api::Tracer> result{tracer};
+    initialized_ = true;
+    return result;
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
   catch (const std::exception &ex)
   {
-    construction_failed_ = true;
     LogGetTracerConstructionFailure(ex.what());
     return noop_tracer_;
   }
@@ -185,7 +191,6 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
   // std::exception. Catch everything so GetTracer stays noexcept.
   catch (...)
   {
-    construction_failed_ = true;
     LogGetTracerConstructionFailure("unknown exception");
     return noop_tracer_;
   }
