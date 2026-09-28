@@ -17,7 +17,7 @@ namespace
 // corrupted while port() happens to still return -1.
 void ExpectInvalid(const SocketTools::SocketAddr &addr)
 {
-  EXPECT_EQ(addr.m_data.sa_family, AF_UNSPEC);
+  EXPECT_EQ(reinterpret_cast<const sockaddr*>(&addr.m_data)->sa_family, AF_UNSPEC);
   EXPECT_EQ(addr.port(), -1);
 }
 
