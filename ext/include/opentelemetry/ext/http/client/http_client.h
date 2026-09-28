@@ -90,7 +90,6 @@ enum class SessionState : std::uint8_t
   SendFailed,          // request send failed
   Response,            // response received
   SSLHandshakeFailed,  // SSL handshake failed
-  TimedOut,            // request time out
   NetworkError,        // network error
   ReadError,           // error reading response
   WriteError,          // error writing request
