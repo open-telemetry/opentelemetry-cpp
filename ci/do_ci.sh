@@ -527,11 +527,16 @@ elif [[ "$1" == "cmake.install.test" ]]; then
 
   mkdir -p "${BUILD_DIR}/install_test"
   cd "${BUILD_DIR}/install_test"
+  INSTALL_TEST_CMAKE_ARGS=()
+  if [[ "${OTEL_ENABLE_PKGCONFIG_INSTALL_TEST}" == "ON" ]]; then
+    INSTALL_TEST_CMAKE_ARGS+=("-DOTEL_ENABLE_PKGCONFIG_INSTALL_TEST=ON")
+  fi
   cmake  "${CMAKE_OPTIONS[@]}" \
          "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
          "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
          "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}" \
          "-DINSTALL_TEST_DEPRECATED_COMPONENTS=${DEPRECATED_COMPONENTS_STRING}" \
+         "${INSTALL_TEST_CMAKE_ARGS[@]}" \
          -S "${SRC_DIR}/install/test/cmake"
   ctest --output-on-failure
   exit 0
