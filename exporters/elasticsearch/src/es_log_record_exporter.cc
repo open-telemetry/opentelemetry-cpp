@@ -176,6 +176,10 @@ public:
         OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Failed SSL Handshake");
         recordCompletion(CompletionState::Failure);
         break;
+      case http_client::SessionState::TimedOut:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request timed out");
+        recordCompletion(CompletionState::Failure);
+        break;
       case http_client::SessionState::NetworkError:
         OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error");
         recordCompletion(CompletionState::Failure);
@@ -312,6 +316,10 @@ public:
         break;
       case http_client::SessionState::SSLHandshakeFailed:
         OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] SSL handshake to elasticsearch failed");
+        need_stop = true;
+        break;
+      case http_client::SessionState::TimedOut:
+        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch timed out");
         need_stop = true;
         break;
       case http_client::SessionState::NetworkError:

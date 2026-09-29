@@ -197,6 +197,7 @@ public:
       case http_client::SessionState::ConnectFailed:
       case http_client::SessionState::SendFailed:
       case http_client::SessionState::SSLHandshakeFailed:
+      case http_client::SessionState::TimedOut:
       case http_client::SessionState::NetworkError:
       case http_client::SessionState::Destroyed:
       case http_client::SessionState::ReadError:
@@ -291,6 +292,17 @@ public:
       case http_client::SessionState::SSLHandshakeFailed: {
         std::stringstream error_message;
         error_message << "[OTLP HTTP Client] Session state: SSL handshake failed.";
+        if (!reason.empty())
+        {
+          error_message.write(reason.data(), static_cast<std::streamsize>(reason.size()));
+        }
+        OTEL_INTERNAL_LOG_ERROR(error_message.str());
+      }
+      break;
+
+      case http_client::SessionState::TimedOut: {
+        std::stringstream error_message;
+        error_message << "[OTLP HTTP Client] Session state: request time out.";
         if (!reason.empty())
         {
           error_message.write(reason.data(), static_cast<std::streamsize>(reason.size()));

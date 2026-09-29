@@ -15,20 +15,13 @@ Increment the:
 
 ## [Unreleased]
 
-* [HTTP CLIENT] Remove `SessionState::TimedOut`, which no `HttpClient`
-  implementation in this repo ever dispatched. The curl client maps
-  `CURLE_OPERATION_TIMEDOUT` to `SendFailed` like any other transport error,
-  so the four branches handling `TimedOut` in the Elasticsearch and OTLP HTTP
-  exporters were unreachable, and the doc comment claiming a timeout arrives
-  as a `TimedOut` event was incorrect. Removed the dead branches and fixed
-  the comment instead of making `TimedOut` reachable, to avoid changing
-  behavior for any code that already handles a timeout via `SendFailed`.
+* [EXPORTER] Fix a doc comment on the Elasticsearch log exporter's
+  `ResponseHandler::waitForResponse()` claiming a request timeout (set via
+  `SetTimeoutMs()`) arrives as a `SessionState::TimedOut` event. No
+  `HttpClient` implementation in this repo dispatches `TimedOut`; the curl
+  client maps a timeout to `SendFailed` like any other transport error, which
+  is what the comment now says.
   [#4604](https://github.com/open-telemetry/opentelemetry-cpp/issues/4604)
-  * `SessionState`'s remaining enumerators past `SSLHandshakeFailed` shift
-    down by one integer value. Source code that only names enumerators (the
-    normal way to use a scoped enum) is unaffected; only code that depends on
-    an enumerator's specific integer value would need attention, and no code
-    in this repo does.
 
 * [LOGS] Fix undefined behavior in `Logger::EmitLogRecord()` when a logger is
   enabled (e.g. via `LoggerProvider::UpdateLoggerConfigurator()`) after
