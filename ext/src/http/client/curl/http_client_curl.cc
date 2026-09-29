@@ -549,9 +549,7 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               {
                 // Session can not be destroyed when calling PerformCurlMessage
                 auto hold_session = session->shared_from_this();
-                operation->PerformCurlMessage(result);
-
-                if (operation->IsRetryable())
+                if (operation->PerformCurlMessage(result))
                 {
                   self->pending_to_retry_sessions_.push_back(hold_session);
                 }
@@ -637,6 +635,8 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             if (self->doRetrySessions(true))
             {
               still_running = 1;
+              // With wait_for zero, as during shutdown, poll here until a queued retry is due.
+              need_wait_more = true;
             }
 
             // If there is no pending jobs, we can stop the background thread.

@@ -508,8 +508,8 @@ HttpOperation::~HttpOperation()
       {
         if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
         {
-          async_data_->result_future.wait();
-          last_curl_result_ = async_data_->result_future.get();
+          // PerformCurlMessage() stores this, then calls the Cleanup() that sets the promise.
+          static_cast<void>(async_data_->result_future.get());
         }
       }
       break;
@@ -533,8 +533,8 @@ void HttpOperation::Finish()
     // We should not wait in callback from Cleanup()
     if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
     {
-      async_data_->result_future.wait();
-      last_curl_result_ = async_data_->result_future.get();
+      // PerformCurlMessage() stores this, then calls the Cleanup() that sets the promise.
+      static_cast<void>(async_data_->result_future.get());
     }
   }
 }
@@ -1562,7 +1562,7 @@ void HttpOperation::Abort()
   }
 }
 
-void HttpOperation::PerformCurlMessage(CURLcode code)
+bool HttpOperation::PerformCurlMessage(CURLcode code)
 {
   ++retry_attempts_;
   last_attempt_time_      = std::chrono::system_clock::now();
@@ -1668,7 +1668,10 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
   {
     // Cleanup and unbind easy handle from multi handle, and finish callback
     Cleanup();
+    return false;
   }
+
+  return true;
 }
 
 }  // namespace curl
