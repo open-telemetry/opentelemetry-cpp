@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Enforce a runtime minimum scale of `-11` for
+  `Base2ExponentialHistogramAggregation`, so a recording that spans the full
+  double range no longer downscales without end.
+  [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
+
 * [LOGS] Fix undefined behavior in `Logger::EmitLogRecord()` when a logger is
   enabled (e.g. via `LoggerProvider::UpdateLoggerConfigurator()`) after
   `CreateLogRecord()` was called while it was still disabled. The disabled
