@@ -284,7 +284,7 @@ struct SocketAddr
     {
       case AF_INET: {
         const sockaddr_in &inet4 = reinterpret_cast<const sockaddr_in &>(m_data);
-        u_long addr = ntohl(inet4.sin_addr.s_addr);
+        u_long addr              = ntohl(inet4.sin_addr.s_addr);
         os << (addr >> 24) << '.' << ((addr >> 16) & 255) << '.' << ((addr >> 8) & 255) << '.'
            << (addr & 255);
         os << ':' << ntohs(inet4.sin_port);
