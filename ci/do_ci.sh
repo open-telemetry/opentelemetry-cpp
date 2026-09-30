@@ -189,6 +189,7 @@ elif [[ "$1" == "cmake.with_async_export.test" ]]; then
   rm -rf *
   cmake "${CMAKE_OPTIONS[@]}"  \
         -DOTELCPP_WITH_PROMETHEUS=ON \
+        -DOTELCPP_WITH_PROMETHEUS_PUSH=ON \
         -DOTELCPP_WITH_ZIPKIN=ON \
         -DOTELCPP_WITH_ELASTICSEARCH=ON \
         -DOTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=ON \
