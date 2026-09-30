@@ -264,8 +264,7 @@ struct SocketAddr
 
   int port() const
   {
-    const sockaddr &sa = reinterpret_cast<const sockaddr &>(m_data);
-    switch (sa.sa_family)
+    switch (m_data.ss_family)
     {
       case AF_INET: {
         const sockaddr_in &inet4 = reinterpret_cast<const sockaddr_in &>(m_data);
@@ -280,9 +279,8 @@ struct SocketAddr
   std::string toString() const
   {
     std::ostringstream os;
-    const sockaddr &sa = reinterpret_cast<const sockaddr &>(m_data);
 
-    switch (sa.sa_family)
+    switch (m_data.ss_family)
     {
       case AF_INET: {
         const sockaddr_in &inet4 = reinterpret_cast<const sockaddr_in &>(m_data);
@@ -294,7 +292,7 @@ struct SocketAddr
       }
 
       default:
-        os << "[?AF?" << sa.sa_family << ']';
+        os << "[?AF?" << m_data.ss_family << ']';
     }
     return os.str();
   }
