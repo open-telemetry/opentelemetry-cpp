@@ -18,6 +18,8 @@ add_library(
 set_target_properties(opentelemetry_configuration_core
                       PROPERTIES EXPORT_NAME configuration_core)
 
+set_target_version(opentelemetry_configuration_core)
+
 target_include_directories(
   opentelemetry_configuration_core
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>"
