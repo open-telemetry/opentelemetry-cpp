@@ -20,7 +20,6 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/semconv/incubating/rpc_attributes.h"
 #include "opentelemetry/semconv/network_attributes.h"
-#include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/span_startoptions.h"
