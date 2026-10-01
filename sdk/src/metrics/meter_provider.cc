@@ -78,16 +78,13 @@ MeterProvider::MeterProvider()
           std::make_unique<instrumentationscope::ScopeConfigurator<MeterConfig>>(
               instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(MeterConfig::Default())
                   .Build()))),
-      noop_meter_(CreateNoopMeterFallback())
-{
-  initialized_ = true;
-}
+      noop_meter_(CreateNoopMeterFallback()),
+      initialized_(true)
+{}
 
 MeterProvider::MeterProvider(std::unique_ptr<MeterContext> context)
-    : context_(std::move(context)), noop_meter_(CreateNoopMeterFallback())
-{
-  initialized_ = true;
-}
+    : context_(std::move(context)), noop_meter_(CreateNoopMeterFallback()), initialized_(true)
+{}
 
 MeterProvider::MeterProvider(
     std::unique_ptr<ViewRegistry> views,

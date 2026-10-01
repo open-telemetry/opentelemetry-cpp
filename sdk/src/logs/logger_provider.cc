@@ -78,23 +78,19 @@ LoggerProvider::LoggerProvider(
     : context_{std::make_shared<LoggerContext>(std::move(processors),
                                                resource,
                                                std::move(logger_configurator))},
-      noop_logger_(CreateNoopLoggerFallback())
-{
-  initialized_ = true;
-}
+      noop_logger_(CreateNoopLoggerFallback()),
+      initialized_(true)
+{}
 
 LoggerProvider::LoggerProvider()
     : context_{std::make_shared<LoggerContext>(std::vector<std::unique_ptr<LogRecordProcessor>>{})},
-      noop_logger_(CreateNoopLoggerFallback())
-{
-  initialized_ = true;
-}
+      noop_logger_(CreateNoopLoggerFallback()),
+      initialized_(true)
+{}
 
 LoggerProvider::LoggerProvider(std::unique_ptr<LoggerContext> context)
-    : context_(std::move(context)), noop_logger_(CreateNoopLoggerFallback())
-{
-  initialized_ = true;
-}
+    : context_(std::move(context)), noop_logger_(CreateNoopLoggerFallback()), initialized_(true)
+{}
 
 LoggerProvider::~LoggerProvider()
 {

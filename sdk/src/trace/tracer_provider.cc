@@ -87,7 +87,8 @@ TracerProvider::TracerProvider(
   context_ = std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
                                              std::move(id_generator),
                                              std::move(tracer_configurator), span_limits);
-  initialized_ = true;
+  // Context construction can throw, so mark initialized only after it succeeds.
+  initialized_ = true;  // NOLINT(cppcoreguidelines-prefer-member-initializer)
 }
 
 TracerProvider::TracerProvider(
@@ -103,10 +104,9 @@ TracerProvider::TracerProvider(
                                                std::move(id_generator),
                                                std::move(tracer_configurator),
                                                span_limits)),
-      noop_tracer_(CreateNoopTracerFallback())
-{
-  initialized_ = true;
-}
+      noop_tracer_(CreateNoopTracerFallback()),
+      initialized_(true)
+{}
 
 TracerProvider::~TracerProvider()
 {
