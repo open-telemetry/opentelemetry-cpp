@@ -4,7 +4,7 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
+#include <shared_mutex>
 
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/logs/recordable.h"
@@ -121,7 +121,7 @@ public:
 private:
   static std::shared_ptr<google::protobuf::Arena> MakeArena();
 
-  std::mutex lock_;
+  std::shared_timed_mutex lock_;
   std::shared_ptr<google::protobuf::Arena> arena_;
 };
 }  // namespace otlp

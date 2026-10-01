@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <unordered_map>
 #include <utility>
 
@@ -222,14 +223,14 @@ OtlpRecordableArena::OtlpRecordableArena() : arena_{MakeArena()} {}
 
 std::shared_ptr<google::protobuf::Arena> OtlpRecordableArena::Get()
 {
-  std::lock_guard<std::mutex> guard{lock_};
+  std::shared_lock<std::shared_timed_mutex> guard{lock_};
   return arena_;
 }
 
 std::shared_ptr<google::protobuf::Arena> OtlpRecordableArena::Rotate()
 {
   std::shared_ptr<google::protobuf::Arena> next = MakeArena();
-  std::lock_guard<std::mutex> guard{lock_};
+  std::unique_lock<std::shared_timed_mutex> guard{lock_};
   if (arena_)
   {
     arena_.swap(next);
@@ -241,7 +242,7 @@ void OtlpRecordableArena::Release()
 {
   std::shared_ptr<google::protobuf::Arena> released;
   {
-    std::lock_guard<std::mutex> guard{lock_};
+    std::unique_lock<std::shared_timed_mutex> guard{lock_};
     released.swap(arena_);
   }
 }
