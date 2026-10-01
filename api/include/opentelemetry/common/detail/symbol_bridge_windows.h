@@ -23,14 +23,14 @@ namespace detail
 
 struct LoadedBridgeSymbol
 {
-  void* address;
+  void *address;
   bool try_again;
 };
 
-LoadedBridgeSymbol LoadSymbolBridgeSymbol(const char* symbol_name) noexcept;
+LoadedBridgeSymbol LoadSymbolBridgeSymbol(const char *symbol_name) noexcept;
 
-template<typename Signature, typename Disambiguate = void>
-Signature LoadSymbolBridgeSymbol(const char* symbol_name) noexcept
+template <typename Signature, typename Disambiguate = void>
+Signature LoadSymbolBridgeSymbol(const char *symbol_name) noexcept
 {
   static LoadedBridgeSymbol symbol{nullptr, true};
   if (!symbol.address && symbol.try_again)
@@ -41,11 +41,11 @@ Signature LoadSymbolBridgeSymbol(const char* symbol_name) noexcept
 }
 
 #ifndef OPENTELEMETRY_SYMBOL_BRIDGE_NOINLINE
-
-#ifndef OPENTELEMETRY_SYMBOL_BRIDGE_IMPL
 inline
 #endif
-LoadedBridgeSymbol LoadSymbolBridgeSymbol(const char* symbol_name) noexcept
+
+#if !defined(OPENTELEMETRY_SYMBOL_BRIDGE_NOINLINE) || defined(OPENTELEMETRY_SYMBOL_BRIDGE_IMPL)
+    LoadedBridgeSymbol LoadSymbolBridgeSymbol(const char *symbol_name) noexcept
 {
   struct ModuleLifetime
   {
@@ -89,10 +89,10 @@ LoadedBridgeSymbol LoadSymbolBridgeSymbol(const char* symbol_name) noexcept
   }
 
   const auto address = ::GetProcAddress(bridge_module.module, symbol_name);
-  return {reinterpret_cast<void*>(address), false};
+  return {reinterpret_cast<void *>(address), false};
 }
 #endif
 
-} // namespace detail
-} // namespace common
+}  // namespace detail
+}  // namespace common
 OPENTELEMETRY_END_NAMESPACE

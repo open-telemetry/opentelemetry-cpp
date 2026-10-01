@@ -15,7 +15,7 @@
 #include "opentelemetry/version.h"
 
 #ifdef _WIN32
-# include "opentelemetry/common/detail/symbol_bridge_windows.h"
+#  include "opentelemetry/common/detail/symbol_bridge_windows.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -24,7 +24,7 @@ namespace context
 namespace detail
 {
 struct AbiBridgePrivacyIntruder;
-} // namespace detail
+}  // namespace detail
 
 // The Token object provides is returned when attaching objects to the
 // RuntimeContext object and is associated with a context object, and
@@ -202,7 +202,9 @@ private:
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<RuntimeContextStorage> &GetStorage() noexcept
   {
 #ifdef _WIN32
-    if (const auto address = common::detail::LoadSymbolBridgeSymbol<nostd::shared_ptr<RuntimeContextStorage>& (*)()>("OpenTelemetryContextRuntimeContextGetStorage"))
+    if (const auto address =
+            common::detail::LoadSymbolBridgeSymbol<nostd::shared_ptr<RuntimeContextStorage> &(*)()>(
+                "OpenTelemetryContextRuntimeContextGetStorage"))
       return address();
 #endif
     static nostd::shared_ptr<RuntimeContextStorage> context(GetDefaultStorage());
@@ -401,7 +403,8 @@ private:
   OPENTELEMETRY_API_SINGLETON Stack &GetStack()
   {
 #ifdef _WIN32
-    if (const auto address = common::detail::LoadSymbolBridgeSymbol<Stack& (*)()>("OpenTelemetryContextThreadLocalContextStorageStackGetStack"))
+    if (const auto address = common::detail::LoadSymbolBridgeSymbol<Stack &(*)()>(
+            "OpenTelemetryContextThreadLocalContextStorageStackGetStack"))
       return address();
 #endif
     static thread_local Stack stack_{};

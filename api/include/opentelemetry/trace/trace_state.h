@@ -16,7 +16,7 @@
 #include "opentelemetry/version.h"
 
 #ifdef _WIN32
-# include "opentelemetry/common/detail/symbol_bridge_windows.h"
+#  include "opentelemetry/common/detail/symbol_bridge_windows.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -25,7 +25,7 @@ namespace trace
 namespace detail
 {
 struct AbiBridgePrivacyIntruder;
-} // namespace detail
+}  // namespace detail
 
 /**
  * TraceState carries tracing-system specific context in a list of key-value pairs. TraceState
@@ -47,7 +47,9 @@ public:
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<TraceState> GetDefault()
   {
 #ifdef _WIN32
-    if (const auto address = common::detail::LoadSymbolBridgeSymbol<nostd::shared_ptr<TraceState> (*)()>("OpenTelemetryTraceTraceStateGetDefault"))
+    if (const auto address =
+            common::detail::LoadSymbolBridgeSymbol<nostd::shared_ptr<TraceState> (*)()>(
+                "OpenTelemetryTraceTraceStateGetDefault"))
       return address();
 #endif
     static nostd::shared_ptr<TraceState> ts{new TraceState()};

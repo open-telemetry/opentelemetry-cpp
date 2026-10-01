@@ -12,7 +12,7 @@
 #include "opentelemetry/version.h"
 
 #ifdef _WIN32
-# include "opentelemetry/common/detail/symbol_bridge_windows.h"
+#  include "opentelemetry/common/detail/symbol_bridge_windows.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -60,7 +60,9 @@ private:
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<MeterProvider> &GetProvider() noexcept
   {
 #ifdef _WIN32
-    if (const auto address = common::detail::LoadSymbolBridgeSymbol<nostd::shared_ptr<MeterProvider>& (*)()>("OpenTelemetryMetricsProviderGetProvider"))
+    if (const auto address =
+            common::detail::LoadSymbolBridgeSymbol<nostd::shared_ptr<MeterProvider> &(*)()>(
+                "OpenTelemetryMetricsProviderGetProvider"))
       return address();
 #endif
     static nostd::shared_ptr<MeterProvider> provider(new NoopMeterProvider);
@@ -70,7 +72,9 @@ private:
   OPENTELEMETRY_API_SINGLETON static common::SpinLockMutex &GetLock() noexcept
   {
 #ifdef _WIN32
-    if (const auto address = common::detail::LoadSymbolBridgeSymbol<common::SpinLockMutex& (*)(), MeterProvider>("OpenTelemetryMetricsProviderGetLock"))
+    if (const auto address =
+            common::detail::LoadSymbolBridgeSymbol<common::SpinLockMutex &(*)(), MeterProvider>(
+                "OpenTelemetryMetricsProviderGetLock"))
       return address();
 #endif
     static common::SpinLockMutex lock;

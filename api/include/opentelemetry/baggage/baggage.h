@@ -12,7 +12,7 @@
 #include "opentelemetry/version.h"
 
 #ifdef _WIN32
-# include "opentelemetry/common/detail/symbol_bridge_windows.h"
+#  include "opentelemetry/common/detail/symbol_bridge_windows.h"
 #endif
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -41,7 +41,9 @@ public:
   OPENTELEMETRY_API_SINGLETON static nostd::shared_ptr<Baggage> GetDefault()
   {
 #ifdef _WIN32
-    if (const auto address = common::detail::LoadSymbolBridgeSymbol<nostd::shared_ptr<Baggage> (*)()>("OpenTelemetryBaggageBaggageGetDefault"))
+    if (const auto address =
+            common::detail::LoadSymbolBridgeSymbol<nostd::shared_ptr<Baggage> (*)()>(
+                "OpenTelemetryBaggageBaggageGetDefault"))
       return address();
 #endif
     static nostd::shared_ptr<Baggage> baggage{new Baggage()};
