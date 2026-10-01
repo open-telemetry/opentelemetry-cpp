@@ -29,6 +29,10 @@ Increment the:
   change.
   [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
 
+* [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
+  from conflicting streams, and warn if stream conflicts were configured
+  [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
@@ -52,10 +56,6 @@ Increment the:
   a running request still belongs to
   [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
 
-* [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
-  from conflicting streams, and warn if stream conflicts were configured
-  [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
-
 * [BUG] Compare the curl seek offset in `curl_off_t` before narrowing it to
   `size_t`, so an offset past the `size_t` range cannot wrap back inside the
   request body on a 32-bit build
@@ -75,27 +75,6 @@ Increment the:
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
   [#4259](https://github.com/open-telemetry/opentelemetry-cpp/pull/4259)
 
-* [EXPORTER] Fix the Elasticsearch log exporter aborting the process when a log
-  record's body or attributes contain bytes that are not valid UTF-8. The
-  exporter now substitutes the replacement character for the invalid bytes
-  and continues, instead of `nlohmann::json::dump()` throwing out of a
-  `noexcept` function.
-  [#4439](https://github.com/open-telemetry/opentelemetry-cpp/issues/4439)
-
-* [CONFIGURATION] Apply general `attribute_limits` per individual limit field.
-  If a model-specific limit is set it is used, otherwise the matching general
-  limit, otherwise the model-specific default. Limit fields on
-  `AttributeLimitsConfiguration`, `SpanLimitsConfiguration`, and
-  `LogRecordLimitsConfiguration` are now optional so omitted keys and YAML
-  `null` are distinct from explicit values. This is a breaking change to the
-  experimental configuration model.
-  [#4467](https://github.com/open-telemetry/opentelemetry-cpp/issues/4467)
-
-* [CONFIGURATION] Add a configuration builder for the host resource detector
-  [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
-
-* [CONFIGURATION] Cleanup build targets and docs
-  [#4486](https://github.com/open-telemetry/opentelemetry-cpp/pull/4486)
 * docs: update supported development platforms (#4260)
   [#4260](https://github.com/open-telemetry/opentelemetry-cpp/pull/4260)
 
