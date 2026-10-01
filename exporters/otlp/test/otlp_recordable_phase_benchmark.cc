@@ -55,6 +55,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/common/macros.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable.h"
 #include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -93,7 +94,11 @@ void *CountedAllocate(std::size_t size)
   void *pointer = std::malloc(size != 0 ? size : 1);
   if (pointer == nullptr)
   {
+#  if OPENTELEMETRY_HAVE_EXCEPTIONS
     throw std::bad_alloc();
+#  else
+    std::abort();
+#  endif
   }
   return pointer;
 }

@@ -215,7 +215,7 @@ void OtlpRecordable::SetStatus(trace::StatusCode code, nostd::string_view descri
   }
   else
   {
-    span_.mutable_status()->clear_message();
+    span_->mutable_status()->clear_message();
   }
 }
 

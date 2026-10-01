@@ -1260,9 +1260,9 @@ if(OTELCPP_BUILD_TESTING AND OTELCPP_WITH_BENCHMARK)
             opentelemetry_test_common
             ${CMAKE_THREAD_LIBS_INIT})
 
-  # Counting the heap allocations of each phase replaces the global operator new, which perturbs
-  # the very allocations it measures. Build the same source a second time for the counts and keep
-  # the timing binary uninstrumented.
+  # Counting the heap allocations of each phase replaces the global operator
+  # new, which perturbs the very allocations it measures. Build the same source
+  # a second time for the counts and keep the timing binary uninstrumented.
   add_executable(otlp_recordable_phase_alloc_benchmark
                  test/otlp_recordable_phase_benchmark.cc)
 
