@@ -81,7 +81,7 @@ Increment the:
   [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
 
 * [API] Remove opentelemetry::plugin
-  [#NNNN](https://github.com/open-telemetry/opentelemetry-cpp/pull/NNNN)
+  [#4660](https://github.com/open-telemetry/opentelemetry-cpp/pull/4660)
 
 ## [1.29.0] 2026-09-13
 
