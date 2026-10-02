@@ -418,8 +418,8 @@ private:
 
   std::chrono::milliseconds background_thread_wait_for_;
   std::atomic<bool> is_shutdown_{false};
-  // Raised by every producer. curl_multi_wakeup needs a multi handle, so a wait taken without
-  // one watches this instead.
+  // Raised by every producer. curl_multi_wakeup, which is what breaks the thread out of
+  // curl_multi_poll, needs a multi handle, so a wait taken without one watches this instead.
   std::atomic<uint64_t> wakeup_generation_{0};
 };
 
