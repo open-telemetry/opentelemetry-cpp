@@ -356,12 +356,9 @@ HttpClient::~HttpClient()
     }
   }
 
-  // The background thread has gone and no more sessions are made here, so nothing else is
-  // coming back for what it left behind. Aborting first, because finishing an operation hands
-  // its easy handle and header list to the removal queue, and that queue holds two raw
-  // pointers whose container frees neither. Ordinarily both are already empty: this is for the
-  // case where the thread had retired before the sessions were cancelled, and it runs before
-  // the multi handle goes so a handle that is still attached can be given back.
+  // Abort before remove: finishing an operation queues its easy handle and header list for
+  // removal, and that queue frees neither. Both are empty unless the background thread retired
+  // first, and both run before the multi handle goes so an attached handle can be given back.
   doAbortSessions();
   doRemoveSessions();
 
@@ -565,11 +562,8 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
-              // In slices, because curl_multi_wakeup cannot reach this thread: it goes through
-              // the multi handle, and there is not one. What ends the wait early instead is the
-              // counter every producer raises, or shutdown. A whole delay spent either way would
-              // be a whole delay added to answering the next request, and to destroying the
-              // client.
+              // curl_multi_wakeup needs a multi handle, so poll wakeup_generation_ and
+              // is_shutdown_ in slices rather than sleeping out the whole delay.
               constexpr std::chrono::milliseconds kMissingHandleWaitSlice{16};
               for (std::chrono::milliseconds waited = std::chrono::milliseconds::zero();
                    waited < self->scheduled_delay_milliseconds_ &&
@@ -656,10 +650,8 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             still_running = 1;
           }
 
-          // Remove all pending easy handles. Detaching is the only thing here that wants a
-          // multi handle, and without one there is nothing to detach from, so this releases
-          // rather than waits: holding the resources back would hold them for the whole
-          // outage.
+          // Remove all pending easy handles. Detaching needs a multi handle, so without one
+          // the resources are released rather than held for the length of the outage.
           if (self->doRemoveSessions())
           {
             still_running = 1;
@@ -710,10 +702,9 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             // Double check, make sure no more pending sessions after locking background thread
             // management
 
-            // Read before the drains below, compared after them. Everything that queues work for
-            // this thread bumps it, and the producers of the abort and removal queues only wake
-            // this thread rather than starting one, so anything queued after a drain has already
-            // reported empty would sit there until the next request or the destructor.
+            // Read before the drains, compared after. Producers of the abort and removal queues
+            // only wake this thread, so work queued after a drain reported empty would wait for
+            // the next request or the destructor.
             const uint64_t generation_before =
                 self->wakeup_generation_.load(std::memory_order_acquire);
 
@@ -743,11 +734,9 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               need_wait_more = true;
             }
 
-            // Skipping those three reports nothing, which is not the same as having nothing to
-            // do. A request the client has accepted has to be either handed to libcurl or
-            // finished, and this thread is the only one that does either, so it stays while it
-            // owes one. Shutdown is exempt: there the queues that need a handle cannot drain
-            // without one, and staying for them is staying under the join that is waiting here.
+            // An accepted request must be either scheduled or finished, and only this thread
+            // does either, so keep running while one is outstanding. Not at shutdown: those
+            // queues cannot drain without a multi handle and the destructor is already joining.
             if (nullptr == self->multi_handle_ &&
                 !self->is_shutdown_.load(std::memory_order_acquire) && self->hasActionableWork())
             {
@@ -974,11 +963,8 @@ bool HttpClient::doRemoveSessions()
         curl_slist_free_all(removing_handle.second.headers_chunk);
       }
 
-      // Detaching needs something to detach from. Without a multi handle there is nothing
-      // this could name: the one it would have named was destroyed by curl_multi_cleanup,
-      // which detaches what it still holds, and nothing has been attached since. So the
-      // resource is released rather than kept, which is what resetMultiHandle asks for when
-      // curl_multi_init has just failed on it.
+      // curl_multi_cleanup detached whatever it held, so with no multi handle there is
+      // nothing to remove this from. Release the handle rather than keep it queued.
       if (nullptr != multi_handle_)
       {
         curl_multi_remove_handle(multi_handle_, removing_handle.second.easy_handle);
@@ -1005,11 +991,9 @@ bool HttpClient::doRemoveSessions()
 
 namespace
 {
-// One rule for the retry queue, shared by the pass that drains it and by the scan that decides
-// whether this thread still owes anybody an answer. They walk the same container, so a predicate
-// that disagreed would either keep the thread alive for an entry the retry pass is about to drop,
-// or drop one the retry pass still wants. Outside the retry guard because the scan runs in both
-// builds and the queue is empty rather than absent when the preview is off.
+// One rule for the retry queue, used by the pass that drains it and by the scan that decides
+// whether this thread still owes an answer. Two predicates would disagree about an entry one of
+// them is about to drop. Outside the retry guard because the scan runs in both builds.
 bool RetryEntryIsLive(const std::shared_ptr<Session> &session)
 {
   const auto operation = session ? session->GetOperation().get() : nullptr;
@@ -1038,10 +1022,9 @@ bool HttpClient::doRetrySessions(bool report_all)
   {
     const auto session = *retry_it;
 
-    // An operation that was cancelled, or torn down, is not going to be retried. Its easy
-    // handle has gone back to the client already, so what waiting for its turn would buy is a
-    // null handle offered to libcurl and an entry that keeps the background thread alive until
-    // a time that means nothing. At shutdown that time is time the join spends waiting.
+    // A cancelled or torn down operation is not going to be retried, and its easy handle has
+    // already gone back to the client, so leaving it queued offers libcurl a null handle and
+    // holds this thread to a deadline that means nothing. At shutdown the join waits it out.
     if (!RetryEntryIsLive(session))
     {
       retry_it = pending_to_retry_sessions_.erase(retry_it);
@@ -1093,10 +1076,8 @@ CURLMcode HttpClient::ReleaseMultiHandle()
 {
   if (nullptr == multi_handle_)
   {
-    // curl_multi_init says the other multi functions cannot be used once it has returned null,
-    // and curl_multi_cleanup is one of them. Reaching here with none is ordinary: the
-    // constructor may have started without one, and a reset that could not build a replacement
-    // leaves none behind.
+    // curl_multi_init says the other multi functions, curl_multi_cleanup included, cannot be
+    // used after it returns null. Having none here is ordinary: the constructor, or a failed reset.
     return CURLM_OK;
   }
 

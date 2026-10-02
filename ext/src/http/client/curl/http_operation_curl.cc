@@ -491,10 +491,9 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
     {
       const auto header = std::string(kv.first).append(": ").append(kv.second);
 
-      // Into a temporary first. curl_slist_append returns null without freeing the list it was
-      // given, so assigning the result straight back would drop the only pointer to everything
-      // appended so far, and Setup() would then send the request with none of these headers
-      // rather than not send it.
+      // Into a temporary first: curl_slist_append returns null without freeing the list it was
+      // given, so assigning straight back would lose everything appended so far, and Setup()
+      // would send the request with none of these headers rather than not send it.
       curl_slist *appended = curl_slist_append(curl_resource_.headers_chunk, header.c_str());
       if (nullptr == appended)
       {
