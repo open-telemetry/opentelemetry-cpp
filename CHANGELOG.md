@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Enforce a runtime minimum scale of `-11` for
+  `Base2ExponentialHistogramAggregation`, so a recording that spans the full
+  double range no longer downscales without end.
+  [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
+
 * [LOGS] Fix undefined behavior in `Logger::EmitLogRecord()` when a logger is
   enabled (e.g. via `LoggerProvider::UpdateLoggerConfigurator()`) after
   `CreateLogRecord()` was called while it was still disabled. The disabled
@@ -65,6 +70,15 @@ Increment the:
 * [BUG] Do not busy-spin the curl background thread while a retry is queued
   at shutdown
   [#4637](https://github.com/open-telemetry/opentelemetry-cpp/pull/4637)
+
+* [SDK] Fix spatial re-aggregation for asynchronous instruments. A view which
+  drops attributes is now applied to asynchronous instruments as well, and the
+  observations which collapse onto the same attribute set are re-aggregated
+  (summed up for the additive instruments) instead of the last observation
+  overwriting the previous ones.
+  Note that `AsyncMetricStorage`'s constructor now takes the view's
+  `AttributesProcessor`, matching `SyncMetricStorage`.
+  [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
 
 ## [1.29.0] 2026-09-13
 
