@@ -80,6 +80,9 @@ Increment the:
   `AttributesProcessor`, matching `SyncMetricStorage`.
   [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
 
+* [API] Remove opentelemetry::plugin
+  [#NNNN](https://github.com/open-telemetry/opentelemetry-cpp/pull/NNNN)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
