@@ -18,7 +18,7 @@ class RegistryFactory
 {
 public:
   // Returns a Registry pre-populated with all default signal builders.
-  static std::shared_ptr<Registry> Create();
+  static std::unique_ptr<Registry> Create();
 };
 
 }  // namespace configuration

@@ -318,7 +318,7 @@ static int parse_args(int argc, char *argv[])
   return 0;
 }
 
-typedef int (*test_func_t)();
+using test_func_t = int (*)();
 
 struct test_case
 {

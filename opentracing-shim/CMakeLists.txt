@@ -39,7 +39,7 @@ otel_add_component(
   PATTERN
   "*.h")
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   foreach(testname propagation_test shim_utils_test span_shim_test
                    span_context_shim_test tracer_shim_test)
     add_executable(${testname} "test/${testname}.cc")
@@ -51,4 +51,4 @@ if(BUILD_TESTING)
       TEST_PREFIX opentracing_shim.
       TEST_LIST ${testname})
   endforeach()
-endif() # BUILD_TESTING
+endif() # OTELCPP_BUILD_TESTING

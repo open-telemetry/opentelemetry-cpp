@@ -4,7 +4,7 @@
 add_executable(example_logs_simple main.cc)
 target_link_libraries(example_logs_simple PRIVATE common_logs_foo_library)
 
-if(DEFINED OPENTELEMETRY_BUILD_DLL)
+if(OTELCPP_BUILD_DLL)
   target_compile_definitions(example_logs_simple
                              PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
   target_link_libraries(example_logs_simple
@@ -17,7 +17,7 @@ else()
             opentelemetry-cpp::ostream_log_record_exporter)
 endif()
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_test(NAME examples.logs_simple
            COMMAND "$<TARGET_FILE:example_logs_simple>")
 endif()

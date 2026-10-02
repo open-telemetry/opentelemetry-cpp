@@ -9,6 +9,9 @@ file_format: "1.1"
 # If omitted or null, false is used.
 disabled: false
 
+# Configure the internal log level for the SDK.
+log_level: debug
+
 # Configure text map context propagators.
 # If omitted, a noop propagator is used.
 propagator:

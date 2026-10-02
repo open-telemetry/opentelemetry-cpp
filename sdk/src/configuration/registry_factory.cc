@@ -16,9 +16,9 @@ namespace sdk
 namespace configuration
 {
 
-std::shared_ptr<Registry> RegistryFactory::Create()
+std::unique_ptr<Registry> RegistryFactory::Create()
 {
-  auto registry = std::make_shared<Registry>();
+  auto registry = std::make_unique<Registry>();
   RegisterDefaultTraceBuilders(registry.get());
   RegisterDefaultMetricsBuilders(registry.get());
   RegisterDefaultLogsBuilders(registry.get());

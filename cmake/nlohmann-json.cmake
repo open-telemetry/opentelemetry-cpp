@@ -27,7 +27,7 @@ if(NOT nlohmann_json_FOUND)
   endif()
 
   set(JSON_BuildTests OFF CACHE BOOL "" FORCE)
-  set(JSON_Install ${OPENTELEMETRY_INSTALL} CACHE BOOL "" FORCE)
+  set(JSON_Install ${OTELCPP_INSTALL} CACHE BOOL "" FORCE)
   set(JSON_MultipleHeaders OFF CACHE BOOL "" FORCE)
 
   FetchContent_MakeAvailable(nlohmann_json)

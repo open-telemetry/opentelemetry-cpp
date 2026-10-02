@@ -13,6 +13,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <functional>
 #include <future>
@@ -334,6 +335,28 @@ size_t HttpOperation::ReadMemoryCallback(char *buffer, size_t size, size_t nitem
   return nwrite;
 }
 
+int HttpOperation::SeekCallback(void *userp, curl_off_t offset, int origin)
+{
+  HttpOperation *self = reinterpret_cast<HttpOperation *>(userp);
+  if (nullptr == self)
+  {
+    return CURL_SEEKFUNC_CANTSEEK;
+  }
+
+  // The body is a fully buffered span owned by the caller, so an absolute seek inside it is just a
+  // move of the read cursor. Anything else is refused rather than approximated, because reporting
+  // success without repositioning would resume the upload from the wrong offset and send a
+  // truncated or misaligned body.
+  if (origin != SEEK_SET || offset < 0 ||
+      offset > static_cast<curl_off_t>(self->request_body_.size()))
+  {
+    return CURL_SEEKFUNC_CANTSEEK;
+  }
+
+  self->request_nwrite_ = static_cast<size_t>(offset);
+  return CURL_SEEKFUNC_OK;
+}
+
 #if LIBCURL_VERSION_NUM >= 0x075000
 int HttpOperation::PreRequestCallback(void *clientp, char *, char *, int, int)
 {
@@ -485,8 +508,8 @@ HttpOperation::~HttpOperation()
       {
         if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
         {
-          async_data_->result_future.wait();
-          last_curl_result_ = async_data_->result_future.get();
+          // PerformCurlMessage() stores this, then calls the Cleanup() that sets the promise.
+          static_cast<void>(async_data_->result_future.get());
         }
       }
       break;
@@ -510,8 +533,8 @@ void HttpOperation::Finish()
     // We should not wait in callback from Cleanup()
     if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
     {
-      async_data_->result_future.wait();
-      last_curl_result_ = async_data_->result_future.get();
+      // PerformCurlMessage() stores this, then calls the Cleanup() that sets the promise.
+      static_cast<void>(async_data_->result_future.get());
     }
   }
 }
@@ -726,7 +749,7 @@ const char *HttpOperation::GetCurlErrorMessage(CURLcode code)
   return message;
 }
 
-CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, void *value)
+CURLcode HttpOperation::SetCurlPtrOption(CURLoption option, const void *value)
 {
   /*
     curl_easy_setopt() is a macro with variadic arguments, type unsafe.
@@ -917,6 +940,7 @@ CURLcode HttpOperation::Setup()
 
       struct curl_blob stblob
       {};
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       stblob.data  = const_cast<char *>(data);
       stblob.len   = data_len;
       stblob.flags = CURL_BLOB_COPY;
@@ -959,6 +983,7 @@ CURLcode HttpOperation::Setup()
 
       struct curl_blob stblob
       {};
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       stblob.data  = const_cast<char *>(data);
       stblob.len   = data_len;
       stblob.flags = CURL_BLOB_COPY;
@@ -1007,6 +1032,7 @@ CURLcode HttpOperation::Setup()
 
       struct curl_blob stblob
       {};
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
       stblob.data  = const_cast<char *>(data);
       stblob.len   = data_len;
       stblob.flags = CURL_BLOB_COPY;
@@ -1338,6 +1364,19 @@ CURLcode HttpOperation::Setup()
     {
       return rc;
     }
+
+    rc = SetCurlPtrOption(CURLOPT_SEEKFUNCTION,
+                          reinterpret_cast<void *>(&HttpOperation::SeekCallback));
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlPtrOption(CURLOPT_SEEKDATA, this);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
   }
   else if (method_ == opentelemetry::ext::http::client::Method::Get)
   {
@@ -1528,7 +1567,7 @@ void HttpOperation::Abort()
   }
 }
 
-void HttpOperation::PerformCurlMessage(CURLcode code)
+bool HttpOperation::PerformCurlMessage(CURLcode code)
 {
   ++retry_attempts_;
   last_attempt_time_     = std::chrono::system_clock::now();
@@ -1647,7 +1686,10 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
   {
     // Cleanup and unbind easy handle from multi handle, and finish callback
     Cleanup();
+    return false;
   }
+
+  return true;
 }
 
 }  // namespace curl

@@ -4,7 +4,7 @@
 exporters. This **MAY** change in future.
 
 OpenTelemetry C++ can be built into single DLL named opentelemetry_cpp.dll on
-Windows, with CMake flag `OPENTELEMETRY_BUILD_DLL` set to `ON`.
+Windows, with CMake flag `OTELCPP_BUILD_DLL` set to `ON`.
 
 To instrument an application based on the DLL, please define macro
 `OPENTELEMETRY_BUILD_IMPORT_DLL` before including any OpenTelemetry API header

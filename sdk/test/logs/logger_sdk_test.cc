@@ -407,6 +407,58 @@ TEST(LoggerSDK, LogToAProcessor)
       now);
 }
 
+// Regression test: while the logger is disabled, CreateLogRecord() used to hand back a
+// kNoopLogger-created NoopLogRecord, which is not an opentelemetry::sdk::logs::Recordable.
+// EmitLogRecord() re-checks the enabled state at emit time, so enabling the logger in between
+// (e.g. via UpdateLoggerConfig()) made that NoopLogRecord reach Logger::EmitLogRecord()'s
+// static_cast<Recordable *> and then MultiLogRecordProcessor::OnEmit()'s own
+// static_cast<MultiRecordable *>, both undefined behavior. CreateLogRecord() now returns an
+// empty MultiRecordable while disabled, which is a safe target for both casts either way: an
+// empty MultiRecordable's Set* calls and ReleaseRecordable() simply loop over zero wrapped
+// recordables, so the record is dropped without ever reaching a real processor. Covers both
+// CreateLogRecord() overloads, since the fix applies to each independently.
+TEST(LoggerSDK, EmitLogRecordSafeWhenEnabledBetweenCreateAndEmit)
+{
+  ScopeConfigurator<LoggerConfig> disabled_all_scopes =
+      ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Disabled()).Build();
+  auto shared_recordable = std::shared_ptr<MockLogRecordable>(new MockLogRecordable());
+  auto log_processor = std::unique_ptr<LogRecordProcessor>(new MockProcessor(shared_recordable));
+
+  const auto resource     = opentelemetry::sdk::resource::Resource::Create({});
+  auto scope_configurator = std::make_unique<ScopeConfigurator<LoggerConfig>>(disabled_all_scopes);
+  auto api_lp             = std::shared_ptr<logs_api::LoggerProvider>(
+      new LoggerProvider(std::move(log_processor), resource, std::move(scope_configurator)));
+  auto logger = api_lp->GetLogger("logger", "opentelelemtry_library");
+  auto sdk_lp = static_cast<LoggerProvider *>(api_lp.get());
+
+  // Created while disabled: this must be an empty MultiRecordable, not a NoopLogRecord.
+  auto log_record = logger->CreateLogRecord();
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  // The v2 overload takes the same fix; nothing exercises it otherwise, since the no-argument
+  // overload above is the only one a disabled logger reaches by default.
+  auto log_record_v2 =
+      logger->CreateLogRecord(nostd::variant<opentelemetry::trace::SpanContext, context::Context>{
+          opentelemetry::trace::SpanContext::GetInvalid()});
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+
+  // Enable the logger before the records are emitted.
+  sdk_lp->UpdateLoggerConfigurator(std::make_unique<ScopeConfigurator<LoggerConfig>>(
+      ScopeConfigurator<LoggerConfig>::Builder(LoggerConfig::Enabled()).Build()));
+  ASSERT_TRUE(logger->Enabled(logs_api::Severity::kInvalid));
+
+  // Must not crash, and the record has no wrapped recordable for this processor, so it is
+  // dropped rather than delivered.
+  logger->EmitLogRecord(std::move(log_record));
+  EXPECT_EQ(shared_recordable->GetSeverity(), logs_api::Severity::kInvalid);
+  EXPECT_EQ(shared_recordable->GetBody(), "");
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  logger->EmitLogRecord(std::move(log_record_v2));
+  EXPECT_EQ(shared_recordable->GetSeverity(), logs_api::Severity::kInvalid);
+  EXPECT_EQ(shared_recordable->GetBody(), "");
+#endif  // OPENTELEMETRY_ABI_VERSION_NO >= 2
+}
+
 TEST(LoggerSDK, LoggerWithDisabledConfig)
 {
   ScopeConfigurator<LoggerConfig> disabled_all_scopes =

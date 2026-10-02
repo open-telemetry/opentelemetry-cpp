@@ -7,6 +7,8 @@
 #include <opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h>
 #include <opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h>
 
+#include <opentelemetry/exporters/otlp/otlp_http_builder_utils.h>
+
 #include <opentelemetry/exporters/otlp/otlp_http_client.h>
 #include <opentelemetry/exporters/otlp/otlp_http_exporter_factory.h>
 #include <opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h>
@@ -82,4 +84,16 @@ TEST(ExportersOtlpHttpBuilderInstall, OtlpHttpLogRecordBuilder)
 
   auto exporter = builder->Build(&model);
   ASSERT_TRUE(exporter != nullptr);
+}
+
+TEST(ExportersOtlpHttpBuilderInstall, OtlpHttpBuilderUtilsConvertOtlpHttpEncoding)
+{
+  using opentelemetry::exporter::otlp::HttpRequestContentType;
+  using opentelemetry::exporter::otlp::OtlpHttpBuilderUtils;
+  using opentelemetry::sdk::configuration::OtlpHttpEncoding;
+
+  EXPECT_EQ(OtlpHttpBuilderUtils::ConvertOtlpHttpEncoding(OtlpHttpEncoding::json),
+            HttpRequestContentType::kJson);
+  EXPECT_EQ(OtlpHttpBuilderUtils::ConvertOtlpHttpEncoding(OtlpHttpEncoding::protobuf),
+            HttpRequestContentType::kBinary);
 }

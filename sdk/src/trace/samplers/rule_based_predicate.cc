@@ -7,6 +7,7 @@
 #include <cinttypes>
 #include <cmath>
 #include <cstdio>
+#include <limits>
 #include <string>
 #include <utility>
 
@@ -33,12 +34,17 @@ namespace nostd = opentelemetry::nostd;
 // Fits the widest value below: a 17 significant digit double takes 24 characters, an int64 20.
 constexpr std::size_t kValueBufferSize = 32;
 
+// No two doubles differ past max_digits10 significant digits.
+constexpr std::uint32_t kMaxDoublePrecision =
+    static_cast<std::uint32_t>(std::numeric_limits<double>::max_digits10);
+
 // Checks every string form of an attribute value; array values match if any item matches.
 class ValueMatcher
 {
 public:
-  ValueMatcher(function_ref<bool(nostd::string_view)> check, int double_precision)
-      : check_(check), double_precision_(double_precision)
+  ValueMatcher(function_ref<bool(nostd::string_view)> check, std::uint32_t double_precision)
+      : check_(check),
+        double_precision_(static_cast<int>((std::min)(double_precision, kMaxDoublePrecision)))
   {}
 
   bool operator()(bool v) const { return check_(v ? "true" : "false"); }
@@ -111,7 +117,7 @@ private:
 
 bool AttributeMatches(const opentelemetry::common::KeyValueIterable &attributes,
                       const std::string &key,
-                      int double_precision,
+                      std::uint32_t double_precision,
                       function_ref<bool(nostd::string_view)> check) noexcept
 {
   bool matched = false;

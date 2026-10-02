@@ -266,12 +266,12 @@ Assume the option `WITH_FOO` needs to be deprecated.
 Code using `WITH_FOO=OFF` or `WITH_FOO=ON` must build as before,
 yet users should be notified if they use `WITH_FOO` in their build.
 
-CMake defines a `WITH_NO_DEPRECATED_CODE` option, set to OFF by default.
+CMake defines a `OTELCPP_WITH_NO_DEPRECATED_CODE` option, set to OFF by default.
 
 In a normal build, used in production, code is compiled with
-`WITH_NO_DEPRECATED_CODE=OFF`.
+`OTELCPP_WITH_NO_DEPRECATED_CODE=OFF`.
 
-In a verification build, code is compiled with `WITH_NO_DEPRECATED_CODE=ON`.
+In a verification build, code is compiled with `OTELCPP_WITH_NO_DEPRECATED_CODE=ON`.
 This verification also defines `OPENTELEMETRY_NO_DEPRECATED_CODE`, for code
 level checks.
 
@@ -281,7 +281,7 @@ Implement the following logic in CMake:
   option(WITH_FOO "DEPRECATED - With the foo feature" OFF)
 
   if(WITH_FOO)
-    if(WITH_NO_DEPRECATED_CODE)
+    if(OTELCPP_WITH_NO_DEPRECATED_CODE)
       message(FATAL_ERROR "WITH_FOO is deprecated")
     else()
       message(WARNING "WITH_FOO is deprecated")

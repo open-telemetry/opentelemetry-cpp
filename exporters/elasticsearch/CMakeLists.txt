@@ -36,14 +36,14 @@ otel_add_component(
   "es_log_recordable.h"
   EXCLUDE)
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     exporter_elasticsearch_logs "OpenTelemetry Exporter - Elasticsearch"
     "Exports log records to Elasticsearch."
     "opentelemetry_trace opentelemetry_logs")
 endif()
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_executable(es_log_record_exporter_test
                  test/es_log_record_exporter_test.cc)
 
@@ -55,4 +55,4 @@ if(BUILD_TESTING)
     TARGET es_log_record_exporter_test
     TEST_PREFIX exporter.
     TEST_LIST es_log_record_exporter_test)
-endif() # BUILD_TESTING
+endif() # OTELCPP_BUILD_TESTING

@@ -44,8 +44,8 @@ target_include_directories(
 
 target_link_libraries(
   opentelemetry_exporter_prometheus_builder
-  PUBLIC opentelemetry_exporter_prometheus
-  PRIVATE opentelemetry_configuration_core)
+  PUBLIC opentelemetry_configuration_core opentelemetry_metrics
+  PRIVATE opentelemetry_exporter_prometheus)
 
 otel_add_component(
   COMPONENT
@@ -63,16 +63,17 @@ otel_add_component(
   PATTERN
   "*.h")
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     exporter_prometheus "OpenTelemetry Exporter - Prometheus"
     "Exports metrics in Prometheus format." "opentelemetry_metrics")
 
   opentelemetry_add_pkgconfig(
     exporter_prometheus_builder "OpenTelemetry Exporter - Prometheus Builder"
-    "Builder for Prometheus exporter." "opentelemetry_exporter_prometheus")
+    "Builder for Prometheus exporter."
+    "opentelemetry_exporter_prometheus opentelemetry_configuration_core")
 endif()
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_subdirectory(test)
 endif()

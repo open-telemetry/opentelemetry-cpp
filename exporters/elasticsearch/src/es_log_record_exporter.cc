@@ -429,7 +429,13 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
     // Add the context of the Recordable
     auto json_record = std::unique_ptr<ElasticSearchRecordable>(
         static_cast<ElasticSearchRecordable *>(record.release()));
-    body += json_record->GetJSON().dump() + "\n";
+    // A log record's body or attributes may carry bytes that are not valid UTF-8 (e.g. a
+    // truncated multibyte sequence, or a payload read in another encoding). dump() throws
+    // on those by default, and Export() is noexcept, so the exception would otherwise
+    // terminate the process. error_handler_t::replace substitutes U+FFFD for the invalid
+    // bytes instead, so the record is still exported with everything else intact.
+    body += json_record->GetJSON().dump(-1, ' ', false, nlohmann::json::error_handler_t::replace) +
+            "\n";
   }
   std::vector<uint8_t> body_vec(body.begin(), body.end());
   request->SetBody(body_vec);

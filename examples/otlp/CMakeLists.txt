@@ -1,14 +1,14 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-if(WITH_OTLP_GRPC)
+if(OTELCPP_WITH_OTLP_GRPC)
   # TRACE
 
   add_executable(example_otlp_grpc grpc_main.cc)
 
   target_link_libraries(example_otlp_grpc PRIVATE common_foo_library)
 
-  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(OTELCPP_BUILD_DLL)
     target_compile_definitions(example_otlp_grpc
                                PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
     target_link_libraries(example_otlp_grpc
@@ -25,7 +25,7 @@ if(WITH_OTLP_GRPC)
   target_link_libraries(example_otlp_grpc_metric
                         PRIVATE common_metrics_foo_library)
 
-  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(OTELCPP_BUILD_DLL)
     target_compile_definitions(example_otlp_grpc_metric
                                PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
     target_link_libraries(example_otlp_grpc_metric
@@ -40,7 +40,7 @@ if(WITH_OTLP_GRPC)
   add_executable(example_otlp_grpc_log grpc_log_main.cc)
 
   target_link_libraries(example_otlp_grpc_log PRIVATE common_logs_foo_library)
-  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(OTELCPP_BUILD_DLL)
     target_compile_definitions(example_otlp_grpc_log
                                PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
     target_link_libraries(example_otlp_grpc_log
@@ -53,13 +53,13 @@ if(WITH_OTLP_GRPC)
   endif()
 endif()
 
-if(WITH_OTLP_HTTP)
+if(OTELCPP_WITH_OTLP_HTTP)
   # TRACE
 
   add_executable(example_otlp_http http_main.cc)
 
   target_link_libraries(example_otlp_http PRIVATE common_foo_library)
-  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(OTELCPP_BUILD_DLL)
     target_compile_definitions(example_otlp_http
                                PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
     target_link_libraries(example_otlp_http
@@ -75,7 +75,7 @@ if(WITH_OTLP_HTTP)
   target_link_libraries(example_otlp_http_metric
                         PRIVATE common_metrics_foo_library)
 
-  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(OTELCPP_BUILD_DLL)
     target_compile_definitions(example_otlp_http_metric
                                PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
     target_link_libraries(example_otlp_http_metric
@@ -90,7 +90,7 @@ if(WITH_OTLP_HTTP)
   add_executable(example_otlp_http_log http_log_main.cc)
   target_link_libraries(example_otlp_http_log PRIVATE common_logs_foo_library)
 
-  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(OTELCPP_BUILD_DLL)
     target_compile_definitions(example_otlp_http_log
                                PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
     target_link_libraries(example_otlp_http_log
@@ -111,7 +111,7 @@ if(WITH_OTLP_HTTP)
     example_otlp_instrumented_http PRIVATE common_metrics_foo_library
                                            common_logs_foo_library)
 
-  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(OTELCPP_BUILD_DLL)
     target_compile_definitions(example_otlp_instrumented_http
                                PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
     target_link_libraries(example_otlp_instrumented_http
@@ -126,14 +126,14 @@ if(WITH_OTLP_HTTP)
 
 endif()
 
-if(WITH_OTLP_FILE)
+if(OTELCPP_WITH_OTLP_FILE)
   # TRACE
 
   add_executable(example_otlp_file file_main.cc)
 
   target_link_libraries(example_otlp_file PRIVATE common_foo_library)
 
-  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(OTELCPP_BUILD_DLL)
     target_compile_definitions(example_otlp_file
                                PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
     target_link_libraries(example_otlp_file
@@ -150,7 +150,7 @@ if(WITH_OTLP_FILE)
   target_link_libraries(example_otlp_file_metric
                         PRIVATE common_metrics_foo_library)
 
-  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(OTELCPP_BUILD_DLL)
     target_compile_definitions(example_otlp_file_metric
                                PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
     target_link_libraries(example_otlp_file_metric
@@ -165,7 +165,7 @@ if(WITH_OTLP_FILE)
   add_executable(example_otlp_file_log file_log_main.cc)
 
   target_link_libraries(example_otlp_file_log PRIVATE common_logs_foo_library)
-  if(DEFINED OPENTELEMETRY_BUILD_DLL)
+  if(OTELCPP_BUILD_DLL)
     target_compile_definitions(example_otlp_file_log
                                PRIVATE OPENTELEMETRY_BUILD_IMPORT_DLL)
     target_link_libraries(example_otlp_file_log

@@ -5,7 +5,9 @@
 
 #include <chrono>
 #include <cstddef>
+#include <cstdint>
 #include <functional>
+#include <limits>
 #include <memory>
 #include <string>
 #include <utility>
@@ -14,6 +16,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/composable_always_off_sampler_builder.h"
@@ -28,23 +31,33 @@
 #include "opentelemetry/sdk/configuration/composable_rule_based_sampler_rule_configuration.h"
 #include "opentelemetry/sdk/configuration/composite_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/jaeger_remote_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/probability_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
+#include "opentelemetry/sdk/configuration/sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/simple_span_processor_builder.h"
+#include "opentelemetry/sdk/configuration/span_limits_configuration.h"
+#include "opentelemetry/sdk/configuration/trace_builder_utils.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/trace_id_ratio_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_config_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_builder.h"
 #include "opentelemetry/sdk/configuration/tracer_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/tracer_matcher_and_config_configuration.h"
+#include "opentelemetry/sdk/configuration/tracer_provider_builder.h"
+#include "opentelemetry/sdk/configuration/tracer_provider_builder_context.h"
+#include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/unsupported_exception.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
+#include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/processor.h"
+#include "opentelemetry/sdk/trace/random_id_generator_factory.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_off_factory.h"
 #include "opentelemetry/sdk/trace/samplers/always_on_factory.h"
@@ -60,7 +73,11 @@
 #include "opentelemetry/sdk/trace/samplers/rule_based_predicate.h"
 #include "opentelemetry/sdk/trace/samplers/trace_id_ratio_factory.h"
 #include "opentelemetry/sdk/trace/simple_processor_factory.h"
+#include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
+#include "opentelemetry/sdk/trace/tracer_context.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/version.h"
 #include "src/common/wildcard_match.h"
 
@@ -324,6 +341,186 @@ public:
   }
 };
 
+struct TracerProviderComponents
+{
+  std::vector<std::unique_ptr<opentelemetry::sdk::trace::SpanProcessor>> processors;
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> sampler;
+  std::unique_ptr<opentelemetry::sdk::trace::IdGenerator> id_generator;
+  std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+      opentelemetry::sdk::trace::TracerConfig>>
+      tracer_configurator;
+  opentelemetry::sdk::trace::SpanLimits span_limits;
+};
+
+class DefaultTracerProviderBuilder : public TracerProviderBuilder
+{
+public:
+  std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> Build(
+      const TracerProviderBuilderContext &context,
+      const opentelemetry::sdk::configuration::TracerProviderConfiguration *model) const override
+  {
+    if (context.registry == nullptr || context.resource == nullptr)
+    {
+      static std::string message =
+          "TracerProviderBuilderContext must have non-null registry and resource.";
+      throw UnsupportedException(message);
+    }
+
+    auto components = BuildComponents(context, model);
+    auto ctx        = CreateContext(context, std::move(components));
+    return CreateProvider(std::move(ctx));
+  }
+
+private:
+  static std::uint32_t ToUint32Limit(std::size_t value)
+  {
+    constexpr auto kMax = (std::numeric_limits<std::uint32_t>::max)();
+    if (value > kMax)
+    {
+      return kMax;
+    }
+    return static_cast<std::uint32_t>(value);
+  }
+
+  /// Resolve one limit per
+  /// https://opentelemetry.io/docs/specs/otel/common/#attribute-limits
+  /// model-specific if set, else general if set, else the model-specific default.
+  template <typename T>
+  static T ResolveLimit(const OptionalValue<T> &model_specific,
+                        const OptionalValue<T> &general,
+                        T model_default)
+  {
+    if (model_specific.HasValue())
+    {
+      return model_specific.Value();
+    }
+    if (general.HasValue())
+    {
+      return general.Value();
+    }
+    return model_default;
+  }
+
+  static OptionalValue<std::uint32_t> ToOptionalUint32(const OptionalValue<std::size_t> &value)
+  {
+    if (!value.HasValue())
+    {
+      return OptionalValue<std::uint32_t>{};
+    }
+    return OptionalValue<std::uint32_t>{ToUint32Limit(value.Value())};
+  }
+
+  static TracerProviderComponents BuildComponents(
+      const TracerProviderBuilderContext &context,
+      const opentelemetry::sdk::configuration::TracerProviderConfiguration *model)
+  {
+    TracerProviderComponents components;
+
+    if (model->sampler)
+    {
+      components.sampler = TraceBuilderUtils::CreateSampler(context.registry, model->sampler);
+    }
+    else
+    {
+      // Spec default: parentbased_always_on
+      auto pb_config =
+          std::make_unique<opentelemetry::sdk::configuration::ParentBasedSamplerConfiguration>();
+      std::unique_ptr<opentelemetry::sdk::configuration::SamplerConfiguration> default_sampler =
+          std::move(pb_config);
+      components.sampler = TraceBuilderUtils::CreateSampler(context.registry, default_sampler);
+    }
+
+    for (const auto &processor_model : model->processors)
+    {
+      components.processors.push_back(
+          TraceBuilderUtils::CreateSpanProcessor(context.registry, processor_model));
+    }
+
+    opentelemetry::sdk::trace::SpanLimits span_limits;
+    OptionalValue<std::size_t> model_attribute_value_length_limit;
+    OptionalValue<std::uint32_t> model_attribute_count_limit;
+    OptionalValue<std::uint32_t> model_event_count_limit;
+    OptionalValue<std::uint32_t> model_link_count_limit;
+    OptionalValue<std::uint32_t> model_event_attribute_count_limit;
+    OptionalValue<std::uint32_t> model_link_attribute_count_limit;
+    if (model->limits)
+    {
+      model_attribute_value_length_limit = model->limits->attribute_value_length_limit;
+      model_attribute_count_limit        = model->limits->attribute_count_limit;
+      model_event_count_limit            = model->limits->event_count_limit;
+      model_link_count_limit             = model->limits->link_count_limit;
+      model_event_attribute_count_limit  = model->limits->event_attribute_count_limit;
+      model_link_attribute_count_limit   = model->limits->link_attribute_count_limit;
+    }
+
+    OptionalValue<std::size_t> general_attribute_value_length_limit;
+    OptionalValue<std::size_t> general_attribute_count_limit;
+    if (context.attribute_limits)
+    {
+      general_attribute_value_length_limit = context.attribute_limits->attribute_value_length_limit;
+      general_attribute_count_limit        = context.attribute_limits->attribute_count_limit;
+    }
+
+    using SpanLimitDefaults = SpanLimitsConfiguration;
+    span_limits.attribute_value_length_limit =
+        ResolveLimit(model_attribute_value_length_limit, general_attribute_value_length_limit,
+                     SpanLimitDefaults::kDefaultAttributeValueLengthLimit);
+    span_limits.attribute_count_limit =
+        ResolveLimit(model_attribute_count_limit, ToOptionalUint32(general_attribute_count_limit),
+                     SpanLimitDefaults::kDefaultAttributeCountLimit);
+    span_limits.event_count_limit =
+        ResolveLimit(model_event_count_limit, OptionalValue<std::uint32_t>{},
+                     SpanLimitDefaults::kDefaultEventCountLimit);
+    span_limits.link_count_limit =
+        ResolveLimit(model_link_count_limit, OptionalValue<std::uint32_t>{},
+                     SpanLimitDefaults::kDefaultLinkCountLimit);
+    span_limits.event_attribute_count_limit =
+        ResolveLimit(model_event_attribute_count_limit, OptionalValue<std::uint32_t>{},
+                     SpanLimitDefaults::kDefaultEventAttributeCountLimit);
+    span_limits.link_attribute_count_limit =
+        ResolveLimit(model_link_attribute_count_limit, OptionalValue<std::uint32_t>{},
+                     SpanLimitDefaults::kDefaultLinkAttributeCountLimit);
+
+    components.span_limits = span_limits;
+
+    if (model->tracer_configurator)
+    {
+      components.tracer_configurator =
+          TraceBuilderUtils::CreateTracerConfigurator(context.registry, model->tracer_configurator);
+    }
+    else
+    {
+      auto default_model =
+          std::make_unique<opentelemetry::sdk::configuration::TracerConfiguratorConfiguration>();
+      components.tracer_configurator =
+          TraceBuilderUtils::CreateTracerConfigurator(context.registry, default_model);
+    }
+
+    // FIXME-CONFIG: https://github.com/open-telemetry/opentelemetry-configuration/issues/70
+    // FIXME-CONFIG: Add support for IdGenerator schema node
+    components.id_generator = opentelemetry::sdk::trace::RandomIdGeneratorFactory::Create();
+
+    return components;
+  }
+
+  static std::unique_ptr<opentelemetry::sdk::trace::TracerContext> CreateContext(
+      const TracerProviderBuilderContext &context,
+      TracerProviderComponents &&components)
+  {
+    auto owned_components = std::move(components);
+    return std::make_unique<opentelemetry::sdk::trace::TracerContext>(
+        std::move(owned_components.processors), *context.resource,
+        std::move(owned_components.sampler), std::move(owned_components.id_generator),
+        std::move(owned_components.tracer_configurator), owned_components.span_limits);
+  }
+
+  static std::shared_ptr<opentelemetry::sdk::trace::TracerProvider> CreateProvider(
+      std::unique_ptr<opentelemetry::sdk::trace::TracerContext> &&ctx)
+  {
+    return opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(ctx));
+  }
+};
+
 }  // namespace
 
 void RegisterDefaultTraceBuilders(Registry *registry)
@@ -349,6 +546,7 @@ void RegisterDefaultTraceBuilders(Registry *registry)
   registry->SetComposableRuleBasedSamplerBuilder(
       std::make_unique<DefaultComposableRuleBasedSamplerBuilder>());
   registry->SetCompositeSamplerBuilder(std::make_unique<DefaultCompositeSamplerBuilder>());
+  registry->SetTracerProviderBuilder(std::make_unique<DefaultTracerProviderBuilder>());
 }
 
 }  // namespace configuration

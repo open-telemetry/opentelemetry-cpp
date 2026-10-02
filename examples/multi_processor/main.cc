@@ -4,7 +4,6 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -65,6 +64,38 @@ void CleanupTracer()
   trace_sdk::Provider::SetTracerProvider(none);
 }
 
+opentelemetry::nostd::string_view SpanKindToString(trace_api::SpanKind kind)
+{
+  switch (kind)
+  {
+    case trace_api::SpanKind::kInternal:
+      return "Internal";
+    case trace_api::SpanKind::kServer:
+      return "Server";
+    case trace_api::SpanKind::kClient:
+      return "Client";
+    case trace_api::SpanKind::kProducer:
+      return "Producer";
+    case trace_api::SpanKind::kConsumer:
+      return "Consumer";
+  }
+  return "Unknown";
+}
+
+opentelemetry::nostd::string_view StatusCodeToString(trace_api::StatusCode code)
+{
+  switch (code)
+  {
+    case trace_api::StatusCode::kUnset:
+      return "Unset";
+    case trace_api::StatusCode::kOk:
+      return "Ok";
+    case trace_api::StatusCode::kError:
+      return "Error";
+  }
+  return "Unknown";
+}
+
 void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
 {
   char span_buf[trace_api::SpanId::kSize * 2];
@@ -85,14 +116,8 @@ void dumpSpans(std::vector<std::unique_ptr<trace_sdk::SpanData>> &spans)
               << '\n';
 
     std::cout << "\t\tDescription: " << span->GetDescription() << '\n';
-    std::cout << "\t\tSpan kind:"
-              << static_cast<typename std::underlying_type<trace_api::SpanKind>::type>(
-                     span->GetSpanKind())
-              << '\n';
-    std::cout << "\t\tSpan Status: "
-              << static_cast<typename std::underlying_type<trace_api::StatusCode>::type>(
-                     span->GetStatus())
-              << '\n';
+    std::cout << "\t\tSpan kind: " << SpanKindToString(span->GetSpanKind()) << '\n';
+    std::cout << "\t\tSpan Status: " << StatusCodeToString(span->GetStatus()) << '\n';
   }
 }
 }  // namespace

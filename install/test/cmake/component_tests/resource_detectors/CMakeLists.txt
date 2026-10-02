@@ -22,6 +22,8 @@ target_link_libraries(
           opentelemetry-cpp::host_resource_detector_builder
           opentelemetry-cpp::process_resource_detector
           opentelemetry-cpp::process_resource_detector_builder
+          opentelemetry-cpp::service_resource_detector
+          opentelemetry-cpp::service_resource_detector_builder
           GTest::gtest
           GTest::gtest_main)
 

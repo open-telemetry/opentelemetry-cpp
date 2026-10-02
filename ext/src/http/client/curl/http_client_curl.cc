@@ -141,6 +141,21 @@ static int deflateInPlace(z_stream *strm, unsigned char *buf, uint32_t len, uint
 void Session::SendRequest(
     std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) noexcept
 {
+  if (send_started_.exchange(true, std::memory_order_acq_rel))
+  {
+    // The first request is not finished with this session. Its easy handle names the session in
+    // CURLOPT_PRIVATE and names its operation in every callback it was given, and the message
+    // loop resolves that name to whichever operation the session owns, so a second operation
+    // would be handed the first one's completion. Worse from a handler that sends again from
+    // OnResponse, where the operation being replaced is the one running that handler.
+    if (callback)
+    {
+      callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
+                        "a session carries one request");
+    }
+    return;
+  }
+
   is_session_active_.store(true, std::memory_order_release);
   const auto &url       = host_ + http_request_->uri_;
   auto callback_ptr     = callback.get();
@@ -184,19 +199,29 @@ void Session::SendRequest(
 
     if (stream != Z_OK)
     {
+      // zs.msg points into the stream deflateEnd() releases.
+      const std::string reason = (nullptr != zs.msg) ? zs.msg : "";
+      deflateEnd(&zs);
+
+      // The handler may start another request on this session or drop the last reference to it,
+      // so nothing below this point may touch the session.
+      is_session_active_.store(false, std::memory_order_release);
+
       if (callback)
       {
-        callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
-                          zs.msg ? zs.msg : "");
+        callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed, reason);
       }
-      is_session_active_.store(false, std::memory_order_release);
+
+      // deflateInPlace() rewrote part of the body before reporting that it would not fit, and no
+      // Content-Encoding header describes what is left. The request does not go out.
+      return;
     }
 
     deflateEnd(&zs);
 #else
     OTEL_INTERNAL_LOG_ERROR(
-        "[HTTP Client Curl] Set WITH_OTLP_HTTP_COMPRESSION=ON to use gzip compression with the "
-        "OTLP HTTP Exporter");
+        "[HTTP Client Curl] Set OTELCPP_WITH_OTLP_HTTP_COMPRESSION=ON to use gzip compression with "
+        "the OTLP HTTP Exporter");
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
   }
 
@@ -524,9 +549,7 @@ bool HttpClient::MaybeSpawnBackgroundThread()
               {
                 // Session can not be destroyed when calling PerformCurlMessage
                 auto hold_session = session->shared_from_this();
-                operation->PerformCurlMessage(result);
-
-                if (operation->IsRetryable())
+                if (operation->PerformCurlMessage(result))
                 {
                   self->pending_to_retry_sessions_.push_back(hold_session);
                 }
@@ -612,6 +635,8 @@ bool HttpClient::MaybeSpawnBackgroundThread()
             if (self->doRetrySessions(true))
             {
               still_running = 1;
+              // With wait_for zero, as during shutdown, poll here until a queued retry is due.
+              need_wait_more = true;
             }
 
             // If there is no pending jobs, we can stop the background thread.

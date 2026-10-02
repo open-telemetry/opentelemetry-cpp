@@ -4,6 +4,7 @@
 #include "opentelemetry/sdk/configuration/logs_builders.h"
 
 #include <chrono>
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <string>
@@ -12,20 +13,31 @@
 
 #include "opentelemetry/logs/severity.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_log_record_processor_configuration.h"
+#include "opentelemetry/sdk/configuration/log_record_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_config_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_builder.h"
 #include "opentelemetry/sdk/configuration/logger_configurator_configuration.h"
 #include "opentelemetry/sdk/configuration/logger_matcher_and_config_configuration.h"
+#include "opentelemetry/sdk/configuration/logger_provider_builder.h"
+#include "opentelemetry/sdk/configuration/logger_provider_builder_context.h"
+#include "opentelemetry/sdk/configuration/logger_provider_configuration.h"
+#include "opentelemetry/sdk/configuration/logs_builder_utils.h"
+#include "opentelemetry/sdk/configuration/optional_value.h"
 #include "opentelemetry/sdk/configuration/registry.h"
 #include "opentelemetry/sdk/configuration/severity_number.h"
 #include "opentelemetry/sdk/configuration/simple_log_record_processor_builder.h"
+#include "opentelemetry/sdk/configuration/unsupported_exception.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_factory.h"
 #include "opentelemetry/sdk/logs/batch_log_record_processor_options.h"
+#include "opentelemetry/sdk/logs/log_record_limits.h"
 #include "opentelemetry/sdk/logs/logger_config.h"
+#include "opentelemetry/sdk/logs/logger_provider.h"
+#include "opentelemetry/sdk/logs/logger_provider_factory.h"
 #include "opentelemetry/sdk/logs/processor.h"
 #include "opentelemetry/sdk/logs/simple_log_record_processor_factory.h"
 #include "opentelemetry/version.h"
@@ -161,6 +173,118 @@ public:
   }
 };
 
+struct LoggerProviderComponents
+{
+  std::vector<std::unique_ptr<opentelemetry::sdk::logs::LogRecordProcessor>> processors;
+  std::unique_ptr<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<
+      opentelemetry::sdk::logs::LoggerConfig>>
+      logger_configurator;
+  opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
+};
+
+class DefaultLoggerProviderBuilder : public LoggerProviderBuilder
+{
+public:
+  std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> Build(
+      const LoggerProviderBuilderContext &context,
+      const opentelemetry::sdk::configuration::LoggerProviderConfiguration *model) const override
+  {
+    if (context.registry == nullptr || context.resource == nullptr)
+    {
+      static std::string message =
+          "LoggerProviderBuilderContext must have non-null registry and resource.";
+      throw UnsupportedException(message);
+    }
+    auto components = BuildComponents(context, model);
+    return CreateProvider(context, std::move(components));
+  }
+
+private:
+  /// Resolve one limit per
+  /// https://opentelemetry.io/docs/specs/otel/common/#attribute-limits
+  /// model-specific if set, else general if set, else the model-specific default.
+  template <typename T>
+  static T ResolveLimit(const OptionalValue<T> &model_specific,
+                        const OptionalValue<T> &general,
+                        T model_default)
+  {
+    if (model_specific.HasValue())
+    {
+      return model_specific.Value();
+    }
+    if (general.HasValue())
+    {
+      return general.Value();
+    }
+    return model_default;
+  }
+
+  static LoggerProviderComponents BuildComponents(
+      const LoggerProviderBuilderContext &context,
+      const opentelemetry::sdk::configuration::LoggerProviderConfiguration *model)
+  {
+    LoggerProviderComponents components;
+
+    for (const auto &processor_model : model->processors)
+    {
+      components.processors.push_back(
+          LogsBuilderUtils::CreateLogRecordProcessor(context.registry, processor_model));
+    }
+
+    opentelemetry::sdk::logs::LogRecordLimits log_record_limits;
+    OptionalValue<std::size_t> model_attribute_value_length_limit;
+    OptionalValue<std::size_t> model_attribute_count_limit;
+    if (model->limits)
+    {
+      model_attribute_value_length_limit = model->limits->attribute_value_length_limit;
+      model_attribute_count_limit        = model->limits->attribute_count_limit;
+    }
+
+    OptionalValue<std::size_t> general_attribute_value_length_limit;
+    OptionalValue<std::size_t> general_attribute_count_limit;
+    if (context.attribute_limits)
+    {
+      general_attribute_value_length_limit = context.attribute_limits->attribute_value_length_limit;
+      general_attribute_count_limit        = context.attribute_limits->attribute_count_limit;
+    }
+
+    using LogLimitDefaults = LogRecordLimitsConfiguration;
+    log_record_limits.attribute_value_length_limit =
+        ResolveLimit(model_attribute_value_length_limit, general_attribute_value_length_limit,
+                     LogLimitDefaults::kDefaultAttributeValueLengthLimit);
+    log_record_limits.attribute_count_limit =
+        ResolveLimit(model_attribute_count_limit, general_attribute_count_limit,
+                     LogLimitDefaults::kDefaultAttributeCountLimit);
+
+    components.log_record_limits = log_record_limits;
+
+    if (model->logger_configurator)
+    {
+      components.logger_configurator =
+          LogsBuilderUtils::CreateLoggerConfigurator(context.registry, model->logger_configurator);
+    }
+    else
+    {
+      auto default_model =
+          std::make_unique<opentelemetry::sdk::configuration::LoggerConfiguratorConfiguration>();
+      components.logger_configurator =
+          LogsBuilderUtils::CreateLoggerConfigurator(context.registry, default_model);
+    }
+
+    return components;
+  }
+
+  static std::shared_ptr<opentelemetry::sdk::logs::LoggerProvider> CreateProvider(
+      const LoggerProviderBuilderContext &context,
+      LoggerProviderComponents &&components)
+  {
+    auto owned_components = std::move(components);
+    return opentelemetry::sdk::logs::LoggerProviderFactory::Create(
+        std::move(owned_components.processors), *context.resource,
+        std::move(owned_components.logger_configurator), owned_components.log_record_limits);
+  }
+};
+
 }  // namespace
 
 void RegisterDefaultLogsBuilders(Registry *registry)
@@ -170,6 +294,7 @@ void RegisterDefaultLogsBuilders(Registry *registry)
   registry->SetSimpleLogRecordProcessorBuilder(
       std::make_unique<DefaultSimpleLogRecordProcessorBuilder>());
   registry->SetLoggerConfiguratorBuilder(std::make_unique<DefaultLoggerConfiguratorBuilder>());
+  registry->SetLoggerProviderBuilder(std::make_unique<DefaultLoggerProviderBuilder>());
 }
 
 }  // namespace configuration

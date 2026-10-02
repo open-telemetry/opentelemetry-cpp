@@ -10,6 +10,7 @@ Checks: >
   -portability-avoid-pragma-once,
   abseil-*,
   -abseil-string-find-str-contains,
+  -abseil-string-find-startswith,
   bugprone-*,
   -bugprone-easily-swappable-parameters,
   -bugprone-implicit-widening-of-multiplication-result,

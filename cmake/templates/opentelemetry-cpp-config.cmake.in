@@ -109,6 +109,11 @@
 #   opentelemetry-cpp::metrics                           - Imported target of COMPONENT sdk
 #   opentelemetry-cpp::logs                              - Imported target of COMPONENT sdk
 #   opentelemetry-cpp::configuration_core                - Imported target of COMPONENT sdk
+#   opentelemetry-cpp::configuration_trace_builders      - Imported target of COMPONENT sdk
+#   opentelemetry-cpp::configuration_metrics_builders    - Imported target of COMPONENT sdk
+#   opentelemetry-cpp::configuration_logs_builders       - Imported target of COMPONENT sdk
+#   opentelemetry-cpp::configuration_registry_factory    - Imported target of COMPONENT sdk
+#   opentelemetry-cpp::configuration_yaml                - Imported target of COMPONENT configuration
 #   opentelemetry-cpp::configuration                     - Imported target of COMPONENT configuration
 #   opentelemetry-cpp::ext                               - Imported target of COMPONENT ext_common
 #   opentelemetry-cpp::http_client_curl                  - Imported target of COMPONENT ext_http_curl
