@@ -567,14 +567,10 @@ TEST(ElasticsearchBulkResponseTests, RejectsAnItemErrorUnderErrorsFalse)
       200, R"({"errors":false,"items":[{"index":{"_index":"logs","status":201,"error":null}}]})", 1,
       reason));
 }
-// ---------------------------------------------------------------------------
-// The response travelling from the HTTP callback to the verdict.
-//
-// The cases above call IsBulkResponseSuccessful() directly, so they cannot show
-// that the status and the body actually reach it. A fake HTTP client drives the
-// callbacks from inside SendRequest(), which runs before Export() reaches the
-// wait, and the assertions are on the ExportResult.
-// ---------------------------------------------------------------------------
+// The response travelling from the HTTP callback to the verdict. The cases above call
+// IsBulkResponseSuccessful() directly, so they cannot show that the status and the body reach it.
+// A fake HTTP client drives the callbacks from inside SendRequest(), which runs before Export()
+// reaches the wait, and the assertions are on the ExportResult.
 namespace
 {
 // The response has to answer one operation per record, so a case using a body with N items has to

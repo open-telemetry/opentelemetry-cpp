@@ -18,11 +18,10 @@ namespace detail
 {
 
 /**
- * What the bulk request itself has to answer with. Elasticsearch answers a bulk request with 200,
- * and the rest of the 2xx band does not say the batch was written. 202 is the one that matters:
- * it says the request was accepted and the processing is not finished, and may never be. Reading
- * that as success is not a conservative reading of a vague answer, it is the opposite of what the
- * answer says, and a success here lets the caller drop the records it just handed over.
+ * What the bulk request itself has to answer with. Elasticsearch answers a written batch with
+ * 200; the rest of the 2xx band does not say the batch was written. 202 says the request was
+ * accepted and the processing is unfinished, so treating it as success lets the caller drop
+ * records that may never land.
  */
 inline bool IsSuccessfulBulkStatus(int status_code) noexcept
 {
@@ -31,11 +30,10 @@ inline bool IsSuccessfulBulkStatus(int status_code) noexcept
 
 /**
  * Whether an acknowledged operation status is one that applied the operation. Elasticsearch
- * answers 201 when it created the document and 200 when it replaced an existing one.
+ * answers 201 when it created the document and 200 when it replaced one.
  *
- * Comparing the json value rather than extracting one keeps this noexcept without relying on the
- * type check to make an extraction safe. The check still has to be here: without it a float 200.5
- * would answer for 200.
+ * Compares the json value rather than extracting one, which keeps this noexcept. The type check
+ * stays: without it a float 200.5 would answer for 200.
  */
 inline bool IsAcknowledgedStatus(const nlohmann::json &status) noexcept
 {
@@ -45,16 +43,12 @@ inline bool IsAcknowledgedStatus(const nlohmann::json &status) noexcept
 /**
  * Decide whether an Elasticsearch bulk response reports the whole batch as written.
  *
- * Callers include noexcept response handlers, so nothing may escape. Anything that stops the body
- * being inspected counts as a failed export.
+ * Callers include noexcept response handlers, so nothing may escape, and anything that stops the
+ * body being inspected counts as a failed export. This reads the documented fields rather than
+ * hardening against a hostile responder: a repeated key is folded before this sees the document.
  *
- * This reads the fields the bulk response documents to decide an outcome. It is not a check
- * against a responder that is trying to be believed: a repeated key, for one, is folded before
- * this sees the document, so a body carrying both "errors": true and "errors": false arrives as
- * whichever one the parser kept, and nothing here can tell that the other was ever sent.
- *
- * @param status_code the response status, which the caller passes rather than this reading the
- *        body alone: "errors" describes item outcomes and cannot override a transport error
+ * @param status_code the response status, passed in because "errors" describes item outcomes and
+ *        cannot override a transport error
  * @param body the raw response body
  * @param expected_items the number of index operations the request submitted
  * @param failure_reason a best-effort explanation when this returns false
