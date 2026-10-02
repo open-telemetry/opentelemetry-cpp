@@ -129,9 +129,8 @@ public:
    *
    * @param timeout an option timeout, default to max.
    * @return true when each of those exports has reported a terminal outcome, false on timeout.
-   *         The outcome is published before the session is torn down, so a true return does not
-   *         mean FinishSession() has run. Nor does it mean the batch reached Elasticsearch: a
-   *         failed export reports too, through the internal log. Surfacing that here is
+   *         The outcome is published before the session is torn down, so true does not mean
+   *         FinishSession() has run, nor that the batch reached Elasticsearch, which is
    *         [#3075](https://github.com/open-telemetry/opentelemetry-cpp/issues/3075).
    */
   bool ForceFlush(

@@ -305,11 +305,9 @@ public:
     const std::string body(response.GetBody().begin(), response.GetBody().end());
     const bool written = body.find("\"failed\" : 0") != std::string::npos;
 
-    // Reported before anything is logged. CompleteOnce() retires the session and wakes
-    // ForceFlush() before it returns, and the log handler is replaceable, so one that calls
-    // ForceFlush() would otherwise wait for the session this call has not let go of. A response
-    // that loses the exchange says nothing either, since the outcome it would describe is not the
-    // one the caller was given.
+    // Report before logging: CompleteOnce() retires the session and wakes ForceFlush() first, so
+    // a log handler that flushes does not wait on the session this call still holds. A response
+    // that loses the exchange logs nothing, since its outcome is not the one the caller was given.
     if (!CompleteOnce(written ? sdk::common::ExportResult::kSuccess
                               : sdk::common::ExportResult::kFailure))
     {
@@ -469,14 +467,11 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
                          retire](opentelemetry::sdk::common::ExportResult result) noexcept {
     retire();
 
-    // Logged after the session is retired. The log handler is replaceable, and one that calls
-    // ForceFlush() would otherwise wait for the very session this call has not let go of yet.
-    //
-    // That is the whole of what the ordering buys, and it is worth being exact about the rest.
-    // It does not make a log handler safe to re-enter the exporter from in general: one that
-    // flushes from any callback the HTTP client dispatches can still wait on work that only the
-    // client thread it is standing on can advance. That is
-    // https://github.com/open-telemetry/opentelemetry-cpp/issues/4435, and it is not fixed here.
+    // Logged after the session is retired: a replaceable log handler that calls ForceFlush()
+    // would otherwise wait on the session this call has not let go of. That is all the ordering
+    // buys. A handler that flushes from any callback the HTTP client dispatches can still wait on
+    // work only that thread advances, which is
+    // https://github.com/open-telemetry/opentelemetry-cpp/issues/4435 and is not fixed here.
     if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
     {
       OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] ERROR: Export "

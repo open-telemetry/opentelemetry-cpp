@@ -31,9 +31,8 @@
 #include <thread>
 #include <utility>
 #include <vector>
-// nlohmann is used through its public header only, which is what every other file here
-// does. The detail headers below do not exist when it is installed as one amalgamated
-// header, so asking for them breaks that build.
+// nlohmann is used through its public header only, like every other file here. The detail
+// headers below do not exist in the amalgamated install, so asking for them breaks that build.
 // IWYU pragma: no_include <nlohmann/detail/json_ref.hpp>
 // IWYU pragma: no_include <nlohmann/json_fwd.hpp>
 #include "nlohmann/json.hpp"
@@ -100,11 +99,9 @@ public:
   void SetRetryPolicy(const http_client::RetryPolicy &) noexcept override {}
 };
 
-// What the client does with a request, called from inside SendRequest() so the exporter's own
-// wait returns without needing a connection. The handler travels as a shared_ptr because a case
-// that checks an outcome is reported once has to keep it and send a second event to it. The
-// default answers once, successfully, which is what a case wants when the response is not the
-// thing under test.
+// What the client does with a request, called from inside SendRequest() so the exporter's wait
+// returns without a connection. The handler travels as a shared_ptr because a case that checks an
+// outcome is reported once has to keep it and send a second event. The default answers once.
 using EventScript = std::function<void(const std::shared_ptr<http_client::EventHandler> &)>;
 
 EventScript AnswerSuccessfully()
@@ -808,11 +805,9 @@ TEST_F(ElasticsearchForceFlushTests, AFailedExportSettlesItsSessionAndIsReported
   EXPECT_TRUE(fixture.exporter->ForceFlush(std::chrono::milliseconds{20}));
 }
 
-// A caller with no deadline of its own still gets one. Nothing obliges an HTTP client to call
-// back, and a flush that waits for a callback that never comes would take the caller down with
-// it, so the exporter bounds the wait by its own response timeout and reports that it did not
-// finish. The elapsed time is asserted from below as well: a bound of zero would also return
-// false here, and would return it immediately.
+// A caller with no deadline of its own still gets one: nothing obliges an HTTP client to call
+// back, so the exporter bounds the wait by its own response timeout and reports that it did not
+// finish. The elapsed time is asserted from below too, since a bound of zero would also be false.
 TEST_F(ElasticsearchForceFlushTests, ANoDeadlineFlushGivesUpAtTheResponseTimeout)
 {
   // Kept for the same reason as the case at the top of this file: a dropped handler reports a
