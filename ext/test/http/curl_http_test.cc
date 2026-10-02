@@ -1722,9 +1722,8 @@ bool WaitFor(Predicate ready, std::chrono::milliseconds budget)
 }
 }  // namespace
 
-// A handler is allowed to finish the request it is being told about. On the IO thread's events
-// that used to be a deadlock, because Finish() waited on a promise only the thread running the
-// handler goes on to fulfil. Fixes #4402.
+// A handler may finish the request it is being told about, including on an IO thread event,
+// where Finish() must not wait on a promise only this thread will fulfil. Fixes #4402.
 TEST_F(BasicCurlHttpTests, FinishSessionFromAnEventTheIoThreadDelivers)
 {
   auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();

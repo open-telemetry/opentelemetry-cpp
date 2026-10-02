@@ -401,10 +401,8 @@ int HttpOperation::OnProgressCallback(void *clientp,
 }
 #endif
 
-// The atomic member is only free of layout cost while it stays the size and alignment of the
-// enum it replaced. The standard does not promise that, so it is checked here rather than
-// asserted in prose: a toolchain where it does not hold changes an installed type and should say
-// so at build time.
+// A toolchain where std::atomic<SessionState> is wider or more aligned than the enum would
+// change the layout of an installed type, so check it at build time rather than assume it.
 static_assert(sizeof(std::atomic<opentelemetry::ext::http::client::SessionState>) ==
                   sizeof(opentelemetry::ext::http::client::SessionState),
               "std::atomic<SessionState> grew, which changes the layout of HttpOperation");
@@ -415,14 +413,10 @@ static_assert(
 
 namespace
 {
-// Which operations the calling thread is currently inside a callback for. A handler is allowed to
-// call FinishSession() on the request it is being told about, and that call must not wait for a
-// completion only the thread it is running on can publish.
-// A stack of scopes linked through the scopes themselves, so entering one allocates nothing. Each
-// lives on the stack frame that dispatches the callback, which is exactly as long as the entry
-// needs to be there. A container here would put a heap allocation on every event, and would put
-// it inside a noexcept constructor, where running out of memory calls std::terminate rather than
-// reaching whoever asked for the request.
+// The operations this thread is inside a callback for. A handler may call FinishSession() on the
+// request it is being told about, and that must not wait for a completion only this thread
+// publishes. An intrusive stack rather than a container: entering allocates nothing, which a
+// noexcept constructor needs, since a failed allocation there would call std::terminate.
 class CallbackScope
 {
 public:
@@ -544,9 +538,8 @@ HttpOperation::~HttpOperation()
     case opentelemetry::ext::http::client::SessionState::Connecting:
     case opentelemetry::ext::http::client::SessionState::Connected:
     case opentelemetry::ext::http::client::SessionState::Sending: {
-      // Not while inside a callback this operation dispatched: a handler that destroys the
-      // operation it is being told about would be waiting for a completion that only the thread
-      // running the handler can publish.
+      // Not inside a callback this operation dispatched: the handler's own thread is the one
+      // that publishes the completion it would wait for.
       if (async_data_ && async_data_->result_future.valid() &&
           !CallbackScope::InsideCallbackFor(this))
       {
@@ -1546,10 +1539,8 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   async_data_->result_future  = async_data_->result_promise.get_future();
   async_data_->is_promise_running.store(true, std::memory_order_release);
 
-  // Last, and the only thing that makes this operation reachable from the IO thread: an abort is
-  // queued through this route, so nothing can bring the operation there before the callback and
-  // the completion above exist. Cleanup is therefore the only thing that ever fulfils the promise,
-  // at its tail, once the terminal event and the completion callback have run.
+  // Last: this store is what makes the operation reachable from the IO thread, so the callback
+  // and the promise above are published first. Cleanup() fulfils the promise, at its tail.
   async_data_->session.store(session, std::memory_order_release);
 
   DispatchEvent(opentelemetry::ext::http::client::SessionState::Connecting);
@@ -1625,15 +1616,9 @@ void HttpOperation::Abort()
 
 void HttpOperation::FinishUnscheduled(const char *reason)
 {
-  // The event first, because the operation holds the handler as a bare pointer and the only
-  // strong reference to it is the one the completion callback captured. Cleanup() takes that
-  // callback and lets it go, so an event dispatched afterwards can be talking to a handler
-  // nothing owns any more. A handler calling FinishSession() from here is inside a callback for
-  // this operation, so Finish() returns rather than waiting on a promise this thread has not
-  // published yet, which is what used to make the other order necessary.
-  //
-  // DispatchEvent stores the state before it calls the handler, so the cleanup below sees a
-  // terminal state and does not report a manual cancel for something nobody cancelled.
+  // Before Cleanup(), which releases the completion callback holding the only strong reference
+  // to the handler. DispatchEvent stores the terminal state first, so the Cleanup() below does
+  // not report a cancel as well.
   DispatchEvent(opentelemetry::ext::http::client::SessionState::CreateFailed,
                 nullptr != reason ? reason : "");
 
