@@ -1562,10 +1562,9 @@ bool HttpOperation::PerformCurlMessage(CURLcode code)
 {
   if (is_cleaned_.load(std::memory_order_acquire))
   {
-    // Some thread has entered Cleanup for this operation, which is as much as the flag says: it
-    // is taken before the terminal event, the hand over of the easy handle and the completion
-    // callback. Either way this message is not this operation's to read, and it is not to be
-    // taken on for another attempt on the strength of what an earlier message left behind.
+    // is_cleaned_ says only that some thread has entered Cleanup(), which it does before the
+    // terminal event, the hand over of the easy handle and the completion callback. Either way
+    // this message is not this operation's to read, nor to retry on what an earlier one left.
     return false;
   }
 

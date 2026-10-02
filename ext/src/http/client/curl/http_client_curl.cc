@@ -49,12 +49,10 @@ namespace curl
 
 namespace
 {
-// Only ever called with the handle detached, either because it has been given back or because
-// the multi handle that held it has been cleaned up.
-//
-// The reset clears the callbacks and the pointers they are given, so that freeing the handle
-// cannot reach the operation or the event handler the caller has let go of by then. The header
-// list goes next, because libcurl does not copy it and the reset is what stops it being read.
+// Only ever called with the handle detached, either given back or left by curl_multi_cleanup.
+// The reset clears the callbacks and the pointers they carry, so freeing cannot reach an
+// operation or handler the caller has let go of. The header list goes after it: libcurl does not
+// copy the list, and the reset is what stops it being read.
 void ReleaseCurlResource(HttpCurlEasyResource &resource) noexcept
 {
   if (nullptr != resource.easy_handle)
@@ -379,10 +377,9 @@ HttpClient::~HttpClient()
     multi_handle_ = nullptr;
   }
 
-  // The background thread has stopped, so nothing else is coming back for what it left behind.
-  // A batch at a time and with no lock held: a record owns the session it names, and letting one
-  // go runs a destructor that comes back through ScheduleRemoveSession. That can only queue what
-  // a session still held, and no more sessions are made here, so this ends.
+  // A batch at a time and with no lock held: a record owns the session it names, and releasing
+  // one runs a destructor that comes back through ScheduleRemoveSession. That can only queue what
+  // a session still held, and no more sessions are made here, so this terminates.
   releaseQuarantinedHandles();
 
   while (true)
@@ -757,10 +754,9 @@ void HttpClient::ScheduleAbortSession(uint64_t session_id)
 void HttpClient::ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource)
 {
   {
-    // The session is taken here, in the same breath as the record. Looking it up when the record
-    // is drained instead leaves a gap the calling thread runs through: it returns from
-    // FinishSession, CleanupSession takes the session out of sessions_, and by then this queue
-    // has been swapped away, so neither side would be holding a session the handle still names.
+    // Take the session with the record. Looking it up when the record drains leaves a gap: the
+    // caller returns from FinishSession, CleanupSession takes the session out of sessions_, and
+    // this queue has been swapped away by then, so nothing holds what the handle still names.
     std::lock_guard<std::mutex> session_lock_guard{sessions_m_};
     std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
 

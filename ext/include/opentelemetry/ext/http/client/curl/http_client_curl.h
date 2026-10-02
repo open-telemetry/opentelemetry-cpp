@@ -397,13 +397,10 @@ private:
   std::unordered_map<uint64_t, std::shared_ptr<Session>> sessions_;
   std::unordered_set<uint64_t> pending_to_add_session_ids_;
   std::unordered_map<uint64_t, std::shared_ptr<Session>> pending_to_abort_sessions_;
-  // One easy handle on its way back to libcurl, with the session it still names through
-  // CURLOPT_PRIVATE. The session is taken when the record is made, so that nothing has to find
-  // it again later against a sessions_ the calling thread is free to change in between.
-  //
-  // There is one of these per handle rather than per session, because a session that starts
-  // another request hands over a second handle while the first is still queued, and one entry
-  // per session would drop the first one, leaving its easy handle and header list with no owner.
+  // One easy handle on its way back to libcurl, with the session its CURLOPT_PRIVATE names. The
+  // session is taken when the record is made, so nothing has to find it again in a sessions_ the
+  // calling thread may change. One record per handle, not per session: a session that starts a
+  // second request queues a second handle, and one entry per session would orphan the first.
   struct PendingCurlRemoval
   {
     uint64_t session_id;
@@ -414,15 +411,13 @@ private:
   std::list<PendingCurlRemoval> pending_to_remove_session_handles_;
 
   // Which easy handles the multi handle holds, recorded when curl_multi_add_handle accepts one.
-  // What curl_multi_remove_handle returns cannot answer that question afterwards: it reports
-  // whether the removal succeeded, and libcurl 8.10 and 8.11 reject a handle the multi handle
-  // does not hold where every other version accepts it. Background thread only.
+  // curl_multi_remove_handle cannot answer that afterwards: libcurl 8.10 and 8.11 reject a handle
+  // the multi handle does not hold where every other version accepts it. Background thread only.
   std::unordered_set<CURL *> attached_handles_;
 
   // Handles libcurl would not give back. A transfer may still be running on one, and its
-  // CURLOPT_PRIVATE names the session, so freeing either would leave libcurl and this client
-  // reading storage that has been released. Both are held until curl_multi_cleanup detaches
-  // the handle, which is where they are freed.
+  // CURLOPT_PRIVATE names the session, so freeing either would leave released storage behind a
+  // live pointer. Both are held until curl_multi_cleanup detaches the handle and frees them.
   std::list<PendingCurlRemoval> quarantined_handles_;
   std::deque<std::shared_ptr<Session>> pending_to_retry_sessions_;
 
