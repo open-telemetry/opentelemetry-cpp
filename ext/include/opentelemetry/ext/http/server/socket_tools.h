@@ -1,11 +1,13 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 #pragma once
-
+ 
 #include <algorithm>
 #include <atomic>
 #include <cassert>
 #include <cerrno>
+#include <chrono>
+#include <climits>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
@@ -13,39 +15,41 @@
 #include <cstring>
 #include <iostream>
 #include <map>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <thread>
 #include <vector>
-
+ 
 #ifdef _WIN32
-
-// #  include <windows.h>
-
+ 
+#  ifndef WIN32_LEAN_AND_MEAN
+#    define WIN32_LEAN_AND_MEAN
+#  endif
+#  ifndef NOMINMAX
+#    define NOMINMAX
+#  endif
 #  include <winsock2.h>
-#  include <ws2tcpip.h>  // inet_pton
-
-// TODO: consider NOMINMAX
+#  include <ws2tcpip.h>  // inet_pton / inet_ntop
+ 
 #  undef min
 #  undef max
 #  pragma comment(lib, "ws2_32.lib")
-
+ 
 #else
-
+ 
 #  include <unistd.h>
-
+ 
 #  ifdef __linux__
 #    include <sys/epoll.h>
 #  endif
-
+ 
 #  ifdef __APPLE__
-#    include "TargetConditionals.h"
-// Use kqueue on mac
 #    include <sys/event.h>
 #    include <sys/time.h>
 #    include <sys/types.h>
 #  endif
-
+ 
 // Common POSIX headers for Linux and Mac OS X
 #  include <arpa/inet.h>
 #  include <fcntl.h>
@@ -53,64 +57,54 @@
 #  include <netinet/in.h>
 #  include <netinet/tcp.h>
 #  include <sys/socket.h>
-
+ 
 #endif
-
+ 
 #if defined(HAVE_CONSOLE_LOG) && !defined(LOG_DEBUG)
-// Log to console if there's no standard log facility defined
-#  include <cstdio>
-#  ifndef LOG_DEBUG
-#    define LOG_DEBUG(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_TRACE(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_INFO(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_WARN(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_ERROR(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
-#  endif
+#  define LOG_DEBUG(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#  define LOG_TRACE(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#  define LOG_INFO(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#  define LOG_WARN(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#  define LOG_ERROR(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
 #endif
-
+ 
 #ifndef LOG_DEBUG
-// Don't log anything if there's no standard log facility defined
 #  define LOG_DEBUG(fmt_, ...)
 #  define LOG_TRACE(fmt_, ...)
 #  define LOG_INFO(fmt_, ...)
 #  define LOG_WARN(fmt_, ...)
 #  define LOG_ERROR(fmt_, ...)
 #endif
-
+ 
 namespace common
 {
-
+ 
 /// <summary>
 /// A simple thread, derived class overloads onThread() method.
+/// NOTE: the most-derived class MUST call joinThread() in its own destructor, because by the
+/// time ~Thread() runs the derived part (and onThread()) no longer exists.
 /// </summary>
 struct Thread
 {
   std::thread m_thread;
-
   std::atomic<bool> m_terminate{false};
-
-  /// <summary>
-  /// Thread Constructor
-  /// </summary>
-  /// <returns>Thread</returns>
+ 
   Thread()                          = default;
   Thread(const Thread &)            = delete;
   Thread(Thread &&)                 = delete;
   Thread &operator=(const Thread &) = delete;
   Thread &operator=(Thread &&)      = delete;
-
-  /// <summary>
-  /// Start Thread
-  /// </summary>
+ 
   void startThread()
   {
+    if (m_thread.joinable())
+    {
+      return;  // already running
+    }
     m_terminate = false;
-    m_thread    = std::thread([&]() { this->onThread(); });
+    m_thread    = std::thread([this]() { this->onThread(); });
   }
-
-  /// <summary>
-  /// Join Thread
-  /// </summary>
+ 
   void joinThread()
   {
     m_terminate = true;
@@ -119,281 +113,379 @@ struct Thread
       m_thread.join();
     }
   }
-
-  /// <summary>
-  /// Indicates if this thread should terminate
-  /// </summary>
-  /// <returns></returns>
+ 
   bool shouldTerminate() const { return m_terminate; }
-
-  /// <summary>
-  /// Must be implemented by children
-  /// </summary>
+ 
   virtual void onThread() = 0;
-
-  /// <summary>
-  /// Thread destructor
-  /// </summary>
-  /// <returns></returns>
+ 
   virtual ~Thread() noexcept = default;
 };
-
+ 
 }  // namespace common
+ 
 namespace SocketTools
 {
-
+ 
 #ifdef _WIN32
-// WinSocks need extra (de)initialization, solved by a global object here,
-// whose constructor/destructor will be called before and after main().
 struct WsaInitializer
 {
   WsaInitializer()
   {
     WSADATA wsaData;
-    WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+    {
+      LOG_ERROR("WSAStartup failed");
+    }
   }
-
+ 
   ~WsaInitializer() { WSACleanup(); }
 };
-
-static WsaInitializer g_wsaInitializer;
-
+ 
+#  if defined(__cpp_inline_variables) || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+inline WsaInitializer g_wsaInitializer;
+#  else
+static WsaInitializer g_wsaInitializer;  // reference counted by WSAStartup, safe if duplicated
+#  endif
 #endif
-
+ 
 /// <summary>
-/// Encapsulation of sockaddr(_in)
+/// Encapsulation of sockaddr_storage for safe alignment and protocol independence.
+/// Accepts "a.b.c.d[:port]", "[v6addr][:port]" or a bare "v6addr".
 /// </summary>
 struct SocketAddr
 {
-  static u_long const Loopback = 0x7F000001;
-
-  sockaddr m_data{};
-
-  /// <summary>
-  /// SocketAddr constructor
-  /// </summary>
-  /// <returns>SocketAddr</returns>
-  SocketAddr() {}
-
-  SocketAddr(u_long addr, uint16_t port)
+  static uint32_t const Loopback = 0x7F000001;
+ 
+  sockaddr_storage m_data{};
+  socklen_t m_len{sizeof(sockaddr_storage)};
+ 
+  SocketAddr()
   {
-    sockaddr_in &inet4    = reinterpret_cast<sockaddr_in &>(m_data);
+    std::memset(&m_data, 0, sizeof(m_data));
+    m_data.ss_family = AF_UNSPEC;
+  }
+ 
+  SocketAddr(uint32_t addr, uint16_t port)
+  {
+    std::memset(&m_data, 0, sizeof(m_data));
+    sockaddr_in inet4{};
     inet4.sin_family      = AF_INET;
     inet4.sin_port        = htons(port);
     inet4.sin_addr.s_addr = htonl(addr);
+ 
+    std::memcpy(&m_data, &inet4, sizeof(inet4));
+    m_len = sizeof(sockaddr_in);
   }
-
-  /// Parses an IPv4 address in "host" or "host:port" form. Host parsing follows the platform's
-  /// inet_pton(AF_INET), which requires four decimal components; a port, when present, must be
-  /// decimal digits only in the range 0..65535, and an omitted port is represented as 0. Invalid
-  /// input leaves the address at AF_UNSPEC, for which port() returns -1.
+ 
   SocketAddr(char const *addr)
   {
-    // One parser for every platform: inet_pton (Winsock provides it since Vista) plus a strict
-    // decimal port. This avoids WSAStringToAddress, whose grammar and default-component filling
-    // differ from the POSIX path. Parse into a local sockaddr_in and commit with memcpy only on
-    // success, which keeps m_data at AF_UNSPEC on failure and avoids accessing the sockaddr
-    // storage through a sockaddr_in glvalue (an alignment/type-access issue tracked in #4307).
+    std::memset(&m_data, 0, sizeof(m_data));
+    m_data.ss_family = AF_UNSPEC;
+ 
     if (addr == nullptr)
     {
       LOG_WARN("SocketAddr: cannot parse a null address");
-      return;  // m_data is already AF_UNSPEC, so port() reports -1.
+      return;
     }
-
-    sockaddr_in parsed{};
-    parsed.sin_family = AF_INET;
-
-    char const *colon          = std::strchr(addr, ':');
-    char const *hostEnd        = colon ? colon : addr + std::strlen(addr);
-    ptrdiff_t const hostLength = hostEnd - addr;
-
-    // Reject a host that would not fit rather than truncating it into a different valid address
-    // (for example "255.255.255.2559" would otherwise become "255.255.255.255"). No dotted-quad
-    // exceeds 15 characters.
-    bool ok = (hostLength >= 1 && hostLength <= 15);
-    if (ok)
+ 
+    bool ok = false;
+    if (addr[0] == '[')
     {
-      char host[16];
-      std::memcpy(host, addr, static_cast<size_t>(hostLength));
-      host[hostLength] = '\0';
-      ok               = (::inet_pton(AF_INET, host, &parsed.sin_addr) == 1);
-    }
-
-    // Port: decimal digits only, with overflow checked before it can wrap. strtol would also
-    // accept a leading sign or whitespace and depend on the locale.
-    if (ok && colon)
-    {
-      char const *p = colon + 1;
-      uint16_t port = 0;
-      if (*p == '\0')
+      // "[v6]" or "[v6]:port"
+      char const *close = std::strchr(addr, ']');
+      if (close != nullptr && close > addr + 1)
       {
-        ok = false;  // empty port, e.g. "127.0.0.1:"
-      }
-      while (ok && *p != '\0')
-      {
-        if (*p < '0' || *p > '9')
+        uint16_t port = 0;
+        ok            = true;
+        if (close[1] == ':')
+        {
+          ok = parsePort(close + 2, port);
+        }
+        else if (close[1] != '\0')
         {
           ok = false;
-          break;
         }
-        const uint16_t digit = static_cast<uint16_t>(*p - '0');
-        if (port > (65535u - digit) / 10u)
+        if (ok)
         {
-          ok = false;  // would exceed 65535
-          break;
+          ok = assignV6(addr + 1, static_cast<size_t>(close - addr - 1), port);
         }
-        port = port * 10u + digit;
-        ++p;
       }
-      if (ok)
-      {
-        parsed.sin_port = htons(port);
-      }
-    }
-
-    if (ok)
-    {
-      std::memcpy(&m_data, &parsed, sizeof(parsed));
     }
     else
     {
-      // Leave m_data at AF_UNSPEC; port() returns -1 so callers can tell a parse failure from a
-      // real endpoint, including the legitimate ":0". Do not echo the raw input, which may be
-      // arbitrarily long.
+      char const *first = std::strchr(addr, ':');
+      char const *last  = std::strrchr(addr, ':');
+      if (first != nullptr && first != last)
+      {
+        // more than one colon and no brackets: bare IPv6, no port
+        ok = assignV6(addr, std::strlen(addr), 0);
+      }
+      else
+      {
+        char const *hostEnd = first ? first : addr + std::strlen(addr);
+        uint16_t port       = 0;
+        ok                  = true;
+        if (first != nullptr)
+        {
+          ok = parsePort(first + 1, port);
+        }
+        if (ok)
+        {
+          ok = assignV4(addr, static_cast<size_t>(hostEnd - addr), port);
+        }
+      }
+    }
+ 
+    if (!ok)
+    {
+      std::memset(&m_data, 0, sizeof(m_data));
+      m_data.ss_family = AF_UNSPEC;
+      m_len            = sizeof(sockaddr_storage);
       LOG_WARN("SocketAddr: cannot parse address");
     }
   }
-
-  operator sockaddr *() { return &m_data; }
-
-  operator const sockaddr *() const { return &m_data; }
-
+ 
+  operator sockaddr *() { return reinterpret_cast<sockaddr *>(&m_data); }
+ 
+  operator const sockaddr *() const { return reinterpret_cast<const sockaddr *>(&m_data); }
+ 
+  socklen_t length() const { return m_len; }
+ 
   int port() const
   {
-    switch (m_data.sa_family)
+    switch (m_data.ss_family)
     {
       case AF_INET: {
-        // Copy out rather than binding a sockaddr_in glvalue to sockaddr storage, which is an
-        // alignment/type-access issue (see the constructor and #4307).
         sockaddr_in inet4{};
         std::memcpy(&inet4, &m_data, sizeof(inet4));
         return ntohs(inet4.sin_port);
       }
-
+      case AF_INET6: {
+        sockaddr_in6 inet6{};
+        std::memcpy(&inet6, &m_data, sizeof(inet6));
+        return ntohs(inet6.sin6_port);
+      }
       default:
         return -1;
     }
   }
-
+ 
   std::string toString() const
   {
     std::ostringstream os;
-
-    switch (m_data.sa_family)
+    char buf[INET6_ADDRSTRLEN] = {};
+ 
+    switch (m_data.ss_family)
     {
       case AF_INET: {
         sockaddr_in inet4{};
         std::memcpy(&inet4, &m_data, sizeof(inet4));
-        u_long addr = ntohl(inet4.sin_addr.s_addr);
-        os << (addr >> 24) << '.' << ((addr >> 16) & 255) << '.' << ((addr >> 8) & 255) << '.'
-           << (addr & 255);
-        os << ':' << ntohs(inet4.sin_port);
+        if (::inet_ntop(AF_INET, &inet4.sin_addr, buf, sizeof(buf)) == nullptr)
+        {
+          buf[0] = '\0';
+        }
+        os << buf << ':' << ntohs(inet4.sin_port);
         break;
       }
-
+      case AF_INET6: {
+        sockaddr_in6 inet6{};
+        std::memcpy(&inet6, &m_data, sizeof(inet6));
+        if (::inet_ntop(AF_INET6, &inet6.sin6_addr, buf, sizeof(buf)) == nullptr)
+        {
+          buf[0] = '\0';
+        }
+        os << '[' << buf << "]:" << ntohs(inet6.sin6_port);
+        break;
+      }
       default:
-        os << "[?AF?" << m_data.sa_family << ']';
+        os << "[?AF?" << static_cast<int>(m_data.ss_family) << ']';
     }
     return os.str();
   }
+ 
+private:
+  static bool parsePort(char const *p, uint16_t &out)
+  {
+    if (p == nullptr || *p == '\0')
+    {
+      return false;
+    }
+    uint32_t value = 0;
+    for (; *p != '\0'; ++p)
+    {
+      if (*p < '0' || *p > '9')
+      {
+        return false;
+      }
+      value = value * 10u + static_cast<uint32_t>(*p - '0');
+      if (value > 65535u)
+      {
+        return false;
+      }
+    }
+    out = static_cast<uint16_t>(value);
+    return true;
+  }
+ 
+  bool assignV4(char const *host, size_t len, uint16_t port)
+  {
+    if (len < 1 || len > 15)
+    {
+      return false;
+    }
+    char buf[16];
+    std::memcpy(buf, host, len);
+    buf[len] = '\0';
+ 
+    sockaddr_in parsed{};
+    parsed.sin_family = AF_INET;
+    if (::inet_pton(AF_INET, buf, &parsed.sin_addr) != 1)
+    {
+      return false;
+    }
+    parsed.sin_port = htons(port);
+    std::memset(&m_data, 0, sizeof(m_data));
+    std::memcpy(&m_data, &parsed, sizeof(parsed));
+    m_len = sizeof(sockaddr_in);
+    return true;
+  }
+ 
+  bool assignV6(char const *host, size_t len, uint16_t port)
+  {
+    if (len < 2 || len >= INET6_ADDRSTRLEN)
+    {
+      return false;
+    }
+    char buf[INET6_ADDRSTRLEN];
+    std::memcpy(buf, host, len);
+    buf[len] = '\0';
+ 
+    sockaddr_in6 parsed{};
+    parsed.sin6_family = AF_INET6;
+    if (::inet_pton(AF_INET6, buf, &parsed.sin6_addr) != 1)
+    {
+      return false;
+    }
+    parsed.sin6_port = htons(port);
+    std::memset(&m_data, 0, sizeof(m_data));
+    std::memcpy(&m_data, &parsed, sizeof(parsed));
+    m_len = sizeof(sockaddr_in6);
+    return true;
+  }
 };
-
-// The parser memcpys a sockaddr_in into m_data, and the socket syscalls pass sizeof(SocketAddr)
-// as the address length. This wrapper is IPv4-only, so require sockaddr and sockaddr_in to have
-// the exact same size rather than trusting every ABI: passing an address length that is too large
-// for the family is a documented EINVAL for connect()/bind(). Exact equality also keeps the memcpy
-// safe. Together with the assertion below, sizeof(SocketAddr) == sizeof(sockaddr_in).
-static_assert(sizeof(sockaddr) == sizeof(sockaddr_in),
-              "SocketAddr is IPv4-only: sockaddr and sockaddr_in must have identical size");
-static_assert(offsetof(sockaddr, sa_family) == offsetof(sockaddr_in, sin_family),
-              "sockaddr and sockaddr_in must place the address family at the same offset");
-static_assert(sizeof(SocketAddr) == sizeof(sockaddr),
-              "SocketAddr must add no storage beyond its sockaddr, since syscalls use its size");
-
+ 
 /// <summary>
-/// Encapsulation of a socket (non-exclusive ownership)
+/// Encapsulation of a socket (non-exclusive ownership: the destructor does NOT close it)
 /// </summary>
 struct Socket
 {
 #ifdef _WIN32
   using Type                = SOCKET;
   static Type const Invalid = INVALID_SOCKET;
+  using IoLen               = int;
 #else
   using Type                = int;
   static Type const Invalid = -1;
+  using IoLen               = size_t;
 #endif
-
+ 
   Type m_sock;
-
+ 
   Socket(Type sock = Invalid) : m_sock(sock) {}
-
-  Socket(int af, int type, int proto) : m_sock(::socket(af, type, proto)) {}
-
-  operator Socket::Type() const { return m_sock; }
-
-  bool operator==(Socket const &other) const { return (m_sock == other.m_sock); }
-
-  bool operator!=(Socket const &other) const { return (m_sock != other.m_sock); }
-
-  bool operator<(Socket const &other) const { return (m_sock < other.m_sock); }
-
-  bool invalid() const { return (m_sock == Invalid); }
-
-  void setNonBlocking()
+ 
+  Socket(int af, int type, int proto) : m_sock(::socket(af, type, proto))
   {
-    assert(m_sock != Invalid);
+    if (!invalid())
+    {
+      setNoSigPipe();
+    }
+  }
+ 
+  operator Socket::Type() const { return m_sock; }
+ 
+  bool operator==(Socket const &other) const { return (m_sock == other.m_sock); }
+ 
+  bool operator!=(Socket const &other) const { return (m_sock != other.m_sock); }
+ 
+  bool operator<(Socket const &other) const { return (m_sock < other.m_sock); }
+ 
+  bool invalid() const { return (m_sock == Invalid); }
+ 
+  bool setNonBlocking()
+  {
+    if (invalid())
+    {
+      return false;
+    }
 #ifdef _WIN32
     u_long value = 1;
-    ::ioctlsocket(m_sock, FIONBIO, &value);
+    return (::ioctlsocket(m_sock, FIONBIO, &value) == 0);
 #else
     int flags = ::fcntl(m_sock, F_GETFL, 0);
-    ::fcntl(m_sock, F_SETFL, flags | O_NONBLOCK);
+    if (flags == -1)
+    {
+      return false;
+    }
+    return (::fcntl(m_sock, F_SETFL, flags | O_NONBLOCK) != -1);
 #endif
   }
-
+ 
   bool setReuseAddr()
   {
-    assert(m_sock != Invalid);
+    if (invalid())
+    {
+      return false;
+    }
 #ifdef _WIN32
     BOOL value = TRUE;
 #else
     int value = 1;
 #endif
-    return (::setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char *>(&value),
+    return (::setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char *>(&value),
                          sizeof(value)) == 0);
   }
-
+ 
   bool setNoDelay()
   {
-    assert(m_sock != Invalid);
+    if (invalid())
+    {
+      return false;
+    }
 #ifdef _WIN32
     BOOL value = TRUE;
 #else
     int value = 1;
 #endif
-    return (::setsockopt(m_sock, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<char *>(&value),
+    return (::setsockopt(m_sock, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<const char *>(&value),
                          sizeof(value)) == 0);
   }
-
+ 
+  /// Prevent SIGPIPE on macOS (Linux uses MSG_NOSIGNAL in send(); Windows has no SIGPIPE).
+  bool setNoSigPipe()
+  {
+#if defined(__APPLE__) && defined(SO_NOSIGPIPE)
+    int value = 1;
+    return (::setsockopt(m_sock, SOL_SOCKET, SO_NOSIGPIPE, &value, sizeof(value)) == 0);
+#else
+    return true;
+#endif
+  }
+ 
   bool connect(SocketAddr const &addr)
   {
-    assert(m_sock != Invalid);
-    return (::connect(m_sock, addr, sizeof(addr)) == 0);
+    if (invalid())
+    {
+      return false;
+    }
+    return (::connect(m_sock, addr, addr.length()) == 0);
   }
-
+ 
   void close()
   {
-    assert(m_sock != Invalid);
+    if (invalid())
+    {
+      return;
+    }
 #ifdef _WIN32
     ::closesocket(m_sock);
 #else
@@ -401,62 +493,115 @@ struct Socket
 #endif
     m_sock = Invalid;
   }
-
+ 
   int recv(void *buffer, unsigned size)
   {
-    assert(m_sock != Invalid);
-    int flags = 0;
-    return static_cast<int>(::recv(m_sock, reinterpret_cast<char *>(buffer), size, flags));
+    if (invalid())
+    {
+      return -1;
+    }
+    const IoLen len = clampLength(size);
+    for (;;)
+    {
+      auto result = ::recv(m_sock, reinterpret_cast<char *>(buffer), len, 0);
+      if (result < 0 && interrupted())
+      {
+        continue;
+      }
+      return static_cast<int>(result);
+    }
   }
-
+ 
   int send(void const *buffer, unsigned size)
   {
-    assert(m_sock != Invalid);
-    return static_cast<int>(::send(m_sock, reinterpret_cast<char const *>(buffer), size, 0));
+    if (invalid())
+    {
+      return -1;
+    }
+#ifdef MSG_NOSIGNAL
+    const int flags = MSG_NOSIGNAL;
+#else
+    const int flags = 0;
+#endif
+    const IoLen len = clampLength(size);
+    for (;;)
+    {
+      auto result = ::send(m_sock, reinterpret_cast<char const *>(buffer), len, flags);
+      if (result < 0 && interrupted())
+      {
+        continue;
+      }
+      return static_cast<int>(result);
+    }
   }
-
+ 
   bool bind(SocketAddr const &addr)
   {
-    assert(m_sock != Invalid);
-    return (::bind(m_sock, addr, sizeof(addr)) == 0);
+    if (invalid())
+    {
+      return false;
+    }
+    return (::bind(m_sock, addr, addr.length()) == 0);
   }
-
+ 
   bool getsockname(SocketAddr &addr) const
   {
-    assert(m_sock != Invalid);
-#ifdef _WIN32
-    int addrlen = sizeof(addr);
-#else
-    socklen_t addrlen = sizeof(addr);
-#endif
-    return (::getsockname(m_sock, addr, &addrlen) == 0);
+    if (invalid())
+    {
+      return false;
+    }
+    socklen_t addrlen = sizeof(addr.m_data);
+    if (::getsockname(m_sock, addr, &addrlen) == 0)
+    {
+      addr.m_len = addrlen;
+      return true;
+    }
+    return false;
   }
-
+ 
   bool listen(int backlog)
   {
-    assert(m_sock != Invalid);
+    if (invalid())
+    {
+      return false;
+    }
     return (::listen(m_sock, backlog) == 0);
   }
-
+ 
   bool accept(Socket &csock, SocketAddr &caddr)
   {
-    assert(m_sock != Invalid);
-#ifdef _WIN32
-    int addrlen = sizeof(caddr);
-#else
-    socklen_t addrlen = sizeof(caddr);
-#endif
-    csock = ::accept(m_sock, caddr, &addrlen);
-    return !csock.invalid();
+    if (invalid())
+    {
+      return false;
+    }
+    Type accepted = Invalid;
+    socklen_t addrlen;
+    do
+    {
+      addrlen  = sizeof(caddr.m_data);
+      accepted = ::accept(m_sock, caddr, &addrlen);
+    } while (accepted == Invalid && interrupted());
+ 
+    csock = Socket(accepted);
+    if (!csock.invalid())
+    {
+      csock.setNoSigPipe();
+      caddr.m_len = addrlen;
+      return true;
+    }
+    return false;
   }
-
+ 
   bool shutdown(int how)
   {
-    assert(m_sock != Invalid);
+    if (invalid())
+    {
+      return false;
+    }
     return (::shutdown(m_sock, how) == 0);
   }
-
-  int error() const
+ 
+  static int error()
   {
 #ifdef _WIN32
     return ::WSAGetLastError();
@@ -464,8 +609,18 @@ struct Socket
     return errno;
 #endif
   }
-
-  enum  // NOLINT(performance-enum-size,cppcoreguidelines-use-enum-class)
+ 
+  /// True if the error code means "try again later" on a non-blocking socket.
+  static bool isWouldBlock(int err)
+  {
+#ifdef _WIN32
+    return err == WSAEWOULDBLOCK;
+#else
+    return err == EWOULDBLOCK || err == EAGAIN;
+#endif
+  }
+ 
+  enum
   {
 #ifdef _WIN32
     ErrorWouldBlock = WSAEWOULDBLOCK
@@ -473,8 +628,8 @@ struct Socket
     ErrorWouldBlock = EWOULDBLOCK
 #endif
   };
-
-  enum  // NOLINT(performance-enum-size,cppcoreguidelines-use-enum-class)
+ 
+  enum
   {
 #ifdef _WIN32
     ShutdownReceive = SD_RECEIVE,
@@ -486,8 +641,24 @@ struct Socket
     ShutdownBoth    = SHUT_RDWR
 #endif
   };
+ 
+private:
+  static IoLen clampLength(unsigned size)
+  {
+    return static_cast<IoLen>(size > static_cast<unsigned>(INT_MAX) ? static_cast<unsigned>(INT_MAX)
+                                                                    : size);
+  }
+ 
+  static bool interrupted()
+  {
+#ifdef _WIN32
+    return false;
+#else
+    return errno == EINTR;
+#endif
+  }
 };
-
+ 
 /// <summary>
 /// Socket Data
 /// </summary>
@@ -495,447 +666,554 @@ struct SocketData
 {
   Socket socket;
   int flags{0};
-
-  bool operator==(const Socket &s) { return (socket == s); }
+#ifdef _WIN32
+  WSAEVENT event{WSA_INVALID_EVENT};
+#endif
+ 
+  bool operator==(const Socket &s) const { return (socket == s); }
 };
-
+ 
 /// <summary>
-/// Socket Reactor
+/// Socket Reactor.
+///
+/// Semantics (identical on all platforms):
+///  - Readable / Writable / Acceptable callbacks are delivered only if the matching flag is set.
+///    If both Acceptable and Readable are set, Acceptable wins for read-readiness.
+///  - Closed (peer hang-up / error) is ALWAYS delivered, independent of the Closed flag (the flag
+///    is kept for API compatibility). The socket is automatically unregistered from the reactor
+///    before onSocketClosed() is called; the reactor never closes the socket itself.
+///  - Callbacks run on the reactor thread without any internal lock held, so they may freely call
+///    addSocket() / removeSocket().
+///  - All public methods are thread-safe.
 /// </summary>
 struct Reactor : protected common::Thread
 {
-  /// <summary>
-  /// Socket State callback
-  /// </summary>
   class SocketCallback
   {
   public:
     SocketCallback() = default;
-
+ 
     SocketCallback(const SocketCallback &)            = delete;
     SocketCallback(SocketCallback &&)                 = delete;
     SocketCallback &operator=(const SocketCallback &) = delete;
     SocketCallback &operator=(SocketCallback &&)      = delete;
-
+ 
     virtual ~SocketCallback()                    = default;
     virtual void onSocketReadable(Socket sock)   = 0;
     virtual void onSocketWritable(Socket sock)   = 0;
     virtual void onSocketAcceptable(Socket sock) = 0;
     virtual void onSocketClosed(Socket sock)     = 0;
   };
-
-  /// <summary>
-  /// Socket State
-  /// </summary>
-  enum State : std::uint8_t  // NOLINT(cppcoreguidelines-use-enum-class)
+ 
+  enum State : std::uint8_t
   {
     Readable   = 1,
     Writable   = 2,
     Acceptable = 4,
     Closed     = 8
   };
-
+ 
   SocketCallback &m_callback;
-
   std::vector<SocketData> m_sockets;
-
-#ifdef _WIN32
-  /* use WinSock events on Windows */
-  std::vector<WSAEVENT> m_events{};
-#endif
-
+ 
+private:
+  std::mutex m_mutex;  // guards m_sockets (and the OS registration that mirrors it)
+ 
 #ifdef __linux__
-  /* use epoll on Linux */
-  int m_epollFd{};
+  int m_epollFd{-1};
 #endif
-
-#ifdef TARGET_OS_MAC
-  /* use kqueue on Mac */
-#  define KQUEUE_SIZE 32
-  int kq{0};
-  struct kevent m_events[KQUEUE_SIZE];
-#endif
-
-public:
-  Reactor(SocketCallback &callback)
-      : m_callback(callback)
-#ifdef __linux__
-        ,
-        m_epollFd{
-#  ifdef ANDROID
-            ::epoll_create(0)
-#  else
-            ::epoll_create1(0)
-#  endif
-        }
-#endif
+ 
+#ifdef __APPLE__
+  enum
   {
-#ifdef TARGET_OS_MAC
-    bzero(&m_events[0], sizeof(m_events));
-    kq = kqueue();
+    KqueueBatchSize = 32
+  };
+  int m_kq{-1};
+#endif
+ 
+public:
+  explicit Reactor(SocketCallback &callback) : m_callback(callback)
+  {
+#ifdef __linux__
+#  if defined(ANDROID) || defined(__ANDROID__)
+    m_epollFd = ::epoll_create(1);
+#  else
+    m_epollFd = ::epoll_create1(EPOLL_CLOEXEC);
+#  endif
+    if (m_epollFd == -1)
+    {
+      LOG_ERROR("Reactor: epoll_create failed, errno=%d", errno);
+    }
+#endif
+#ifdef __APPLE__
+    m_kq = ::kqueue();
+    if (m_kq == -1)
+    {
+      LOG_ERROR("Reactor: kqueue failed, errno=%d", errno);
+    }
 #endif
   }
-
+ 
   Reactor(const Reactor &)            = delete;
   Reactor(Reactor &&)                 = delete;
   Reactor &operator=(const Reactor &) = delete;
   Reactor &operator=(Reactor &&)      = delete;
-
+ 
   ~Reactor() override
   {
+    stop();  // joins the thread (must happen while the derived part is still alive)
 #ifdef __linux__
-    ::close(m_epollFd);
+    if (m_epollFd != -1)
+    {
+      ::close(m_epollFd);
+      m_epollFd = -1;
+    }
 #endif
-#ifdef TARGET_OS_MAC
-    ::close(kq);
+#ifdef __APPLE__
+    if (m_kq != -1)
+    {
+      ::close(m_kq);
+      m_kq = -1;
+    }
 #endif
   }
-
-  /// <summary>
-  /// Add Socket
-  /// </summary>
-  /// <param name="socket"></param>
-  /// <param name="flags"></param>
-  void addSocket(const Socket &socket, int flags)
+ 
+  /// Registers a socket or updates its flags. flags == 0 removes it.
+  /// Returns false if the OS registration failed.
+  bool addSocket(const Socket &socket, int flags)
   {
     if (flags == 0)
     {
       removeSocket(socket);
+      return true;
     }
-    else
+    if (socket.invalid())
     {
-      auto it = std::find(m_sockets.begin(), m_sockets.end(), socket);
-      if (it == m_sockets.end())
-      {
-        LOG_TRACE("Reactor: Adding socket 0x%x with flags 0x%x", static_cast<int>(socket), flags);
-#ifdef _WIN32
-        m_events.push_back(::WSACreateEvent());
-#endif
-#ifdef __linux__
-        epoll_event event = {};
-        event.data.fd     = socket;
-        event.events      = 0;
-        ::epoll_ctl(m_epollFd, EPOLL_CTL_ADD, socket, &event);
-#endif
-#ifdef TARGET_OS_MAC
-        struct kevent event;
-        bzero(&event, sizeof(event));
-        event.ident = socket.m_sock;
-        EV_SET(&event, event.ident, EVFILT_READ, EV_ADD, 0, 0, NULL);
-        kevent(kq, &event, 1, NULL, 0, NULL);
-        EV_SET(&event, event.ident, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
-        kevent(kq, &event, 1, NULL, 0, NULL);
-#endif
-        m_sockets.emplace_back();
-        m_sockets.back().socket = socket;
-        m_sockets.back().flags  = 0;
-        it                      = m_sockets.end() - 1;
-      }
-      else
-      {
-        LOG_TRACE("Reactor: Updating socket 0x%x with flags 0x%x", static_cast<int>(socket), flags);
-      }
-
-      if (it->flags != flags)
-      {
-        it->flags = flags;
-#ifdef _WIN32
-        long lNetworkEvents = 0;
-        if (it->flags & Readable)
-        {
-          lNetworkEvents |= FD_READ;
-        }
-        if (it->flags & Writable)
-        {
-          lNetworkEvents |= FD_WRITE;
-        }
-        if (it->flags & Acceptable)
-        {
-          lNetworkEvents |= FD_ACCEPT;
-        }
-        if (it->flags & Closed)
-        {
-          lNetworkEvents |= FD_CLOSE;
-        }
-        auto eventIt = m_events.begin() + std::distance(m_sockets.begin(), it);
-        ::WSAEventSelect(socket, *eventIt, lNetworkEvents);
-#endif
-#ifdef __linux__
-        int events = 0;
-        if (it->flags & Readable)
-        {
-          events |= EPOLLIN;
-        }
-        if (it->flags & Writable)
-        {
-          events |= EPOLLOUT;
-        }
-        if (it->flags & Acceptable)
-        {
-          events |= EPOLLIN;
-        }
-        // if (it->flags & Closed) - always handled (EPOLLERR | EPOLLHUP)
-        epoll_event event = {};
-        event.data.fd     = socket;
-        event.events      = events;
-        ::epoll_ctl(m_epollFd, EPOLL_CTL_MOD, socket, &event);
-#endif
-#ifdef TARGET_OS_MAC
-        // TODO: [MG] - Mac OS X socket doesn't currently support updating flags
-#endif
-      }
+      return false;
     }
+ 
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto it = findLocked(socket);
+    if (it == m_sockets.end())
+    {
+      LOG_TRACE("Reactor: Adding socket 0x%llx with flags 0x%x",
+                static_cast<unsigned long long>(socket.m_sock), flags);
+      SocketData sd;
+      sd.socket = socket;
+      sd.flags  = flags;
+      if (!registerLocked(sd))
+      {
+        LOG_ERROR("Reactor: failed to register socket");
+        return false;
+      }
+      m_sockets.push_back(sd);
+      return true;
+    }
+ 
+    LOG_TRACE("Reactor: Updating socket 0x%llx with flags 0x%x",
+              static_cast<unsigned long long>(socket.m_sock), flags);
+    if (it->flags != flags)
+    {
+      if (!updateLocked(*it, flags))
+      {
+        LOG_ERROR("Reactor: failed to update socket");
+        return false;
+      }
+      it->flags = flags;
+    }
+    return true;
   }
-
-  /// <summary>
-  /// Remove Socket
-  /// </summary>
-  /// <param name="socket"></param>
+ 
   void removeSocket(const Socket &socket)
   {
-    LOG_TRACE("Reactor: Removing socket 0x%x", static_cast<int>(socket));
-    auto it = std::find(m_sockets.begin(), m_sockets.end(), socket);
+    LOG_TRACE("Reactor: Removing socket 0x%llx", static_cast<unsigned long long>(socket.m_sock));
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto it = findLocked(socket);
     if (it != m_sockets.end())
     {
-#ifdef _WIN32
-      auto eventIt = m_events.begin() + std::distance(m_sockets.begin(), it);
-      ::WSAEventSelect(it->socket, *eventIt, 0);
-      ::WSACloseEvent(*eventIt);
-      m_events.erase(eventIt);
-#endif
-#ifdef __linux__
-      ::epoll_ctl(m_epollFd, EPOLL_CTL_DEL, socket, nullptr);
-#endif
-#ifdef TARGET_OS_MAC
-      struct kevent event;
-      bzero(&event, sizeof(event));
-      event.ident = socket;
-      EV_SET(&event, socket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-      if (-1 == kevent(kq, &event, 1, NULL, 0, NULL))
-      {
-        //// Already removed?
-        LOG_ERROR("cannot delete fd=0x%x from kqueue!", event.ident);
-      }
-      EV_SET(&event, socket, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-      if (-1 == kevent(kq, &event, 1, NULL, 0, NULL))
-      {
-        //// Already removed?
-        LOG_ERROR("cannot delete fd=0x%x from kqueue!", event.ident);
-      }
-#endif
+      unregisterLocked(*it);
       m_sockets.erase(it);
     }
   }
-
-  /// <summary>
-  /// Start server
-  /// </summary>
+ 
   void start()
   {
     LOG_INFO("Reactor: Starting...");
     startThread();
   }
-
-  /// <summary>
-  /// Stop server
-  /// </summary>
+ 
   void stop()
   {
     LOG_INFO("Reactor: Stopping...");
     joinThread();
-#ifdef _WIN32
-    for (auto &hEvent : m_events)
-    {
-      ::WSACloseEvent(hEvent);
-    }
-#else /* Linux and Mac */
+ 
+    std::lock_guard<std::mutex> lock(m_mutex);
     for (auto &sd : m_sockets)
     {
-#  ifdef __linux__
-      ::epoll_ctl(m_epollFd, EPOLL_CTL_DEL, sd.socket, nullptr);
-#  endif
-#  ifdef TARGET_OS_MAC
-      struct kevent event;
-      bzero(&event, sizeof(event));
-      event.ident = sd.socket;
-      EV_SET(&event, sd.socket, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-      if (-1 == kevent(kq, &event, 1, NULL, 0, NULL))
-      {
-        LOG_ERROR("cannot delete fd=0x%x from kqueue!", event.ident);
-      }
-      EV_SET(&event, sd.socket, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-      if (-1 == kevent(kq, &event, 1, NULL, 0, NULL))
-      {
-        LOG_ERROR("cannot delete fd=0x%x from kqueue!", event.ident);
-      }
-#  endif
+      unregisterLocked(sd);
     }
-#endif
     m_sockets.clear();
   }
-
+ 
 protected:
-  /// <summary>
-  /// Thread Loop for async events processing
-  /// </summary>
   void onThread() override
   {
     LOG_INFO("Reactor: Thread started");
     while (!shouldTerminate())
     {
-#ifdef _WIN32
-      DWORD dwResult = ::WSAWaitForMultipleEvents(static_cast<DWORD>(m_events.size()),
-                                                  m_events.data(), FALSE, 500, FALSE);
-      if (dwResult == WSA_WAIT_TIMEOUT)
-      {
-        continue;
-      }
-
-      assert(dwResult <= WSA_WAIT_EVENT_0 + m_events.size());
-      int index     = dwResult - WSA_WAIT_EVENT_0;
-      Socket socket = m_sockets[index].socket;
-      int flags     = m_sockets[index].flags;
-
-      WSANETWORKEVENTS ne;
-      ::WSAEnumNetworkEvents(socket, m_events[index], &ne);
-      LOG_TRACE(
-          "Reactor: Handling socket 0x%x (index %d) with active flags 0x%x "
-          "(armed 0x%x)",
-          static_cast<int>(socket), index, ne.lNetworkEvents, flags);
-
-      if ((flags & Readable) && (ne.lNetworkEvents & FD_READ))
-      {
-        m_callback.onSocketReadable(socket);
-      }
-      if ((flags & Writable) && (ne.lNetworkEvents & FD_WRITE))
-      {
-        m_callback.onSocketWritable(socket);
-      }
-      if ((flags & Acceptable) && (ne.lNetworkEvents & FD_ACCEPT))
-      {
-        m_callback.onSocketAcceptable(socket);
-      }
-      if ((flags & Closed) && (ne.lNetworkEvents & FD_CLOSE))
-      {
-        m_callback.onSocketClosed(socket);
-      }
-#endif
-
-#ifdef __linux__
-      epoll_event events[4];
-      int result = ::epoll_wait(m_epollFd, events, sizeof(events) / sizeof(events[0]), 500);
-      if (result == 0 || (result == -1 && errno == EINTR))
-      {
-        continue;
-      }
-
-      assert(result >= 1 && static_cast<size_t>(result) <= sizeof(events) / sizeof(events[0]));
-      for (int i = 0; i < result; i++)
-      {
-        auto it = std::find(m_sockets.begin(), m_sockets.end(), events[i].data.fd);
-        if (it == m_sockets.end())
-        {
-          // epoll_wait() fills a batch, and handling one event can remove a socket that a later
-          // entry in the same batch still names. Such an entry is stale, and reading it->socket
-          // would dereference end().
-          continue;
-        }
-        Socket socket = it->socket;
-        int flags     = it->flags;
-
-        LOG_TRACE("Reactor: Handling socket 0x%x active flags 0x%x (armed 0x%x)",
-                  static_cast<int>(socket), events[i].events, flags);
-
-        if ((flags & Readable) && (events[i].events & EPOLLIN))
-        {
-          m_callback.onSocketReadable(socket);
-        }
-        if ((flags & Writable) && (events[i].events & EPOLLOUT))
-        {
-          m_callback.onSocketWritable(socket);
-        }
-        if ((flags & Acceptable) && (events[i].events & EPOLLIN))
-        {
-          m_callback.onSocketAcceptable(socket);
-        }
-        if ((flags & Closed) && (events[i].events & (EPOLLHUP | EPOLLERR)))
-        {
-          m_callback.onSocketClosed(socket);
-        }
-      }
-#endif
-
-#if defined(TARGET_OS_MAC)
-      unsigned waitms = 500;  // never block for more than 500ms
-      struct timespec timeout;
-      timeout.tv_sec  = waitms / 1000;
-      timeout.tv_nsec = (waitms % 1000) * 1000 * 1000;
-
-      int nev = kevent(kq, NULL, 0, m_events, KQUEUE_SIZE, &timeout);
-      for (int i = 0; i < nev; i++)
-      {
-        struct kevent &event = m_events[i];
-        int fd               = (int)event.ident;
-        auto it              = std::find(m_sockets.begin(), m_sockets.end(), fd);
-        if (it == m_sockets.end())
-        {
-          // kevent() reports a batch, and handling one event can remove a socket that a later
-          // entry in the same batch still names. Such an entry is stale, and reading it->socket
-          // would dereference end().
-          continue;
-        }
-        Socket socket = it->socket;
-        int flags     = it->flags;
-
-        LOG_TRACE("Handling socket 0x%x active flags 0x%x (armed 0x%x)", static_cast<int>(socket),
-                  event.flags, event.fflags);
-
-        if (event.filter == EVFILT_READ)
-        {
-          if (flags & Acceptable)
-          {
-            m_callback.onSocketAcceptable(socket);
-          }
-          if (flags & Readable)
-          {
-            m_callback.onSocketReadable(socket);
-          }
-          continue;
-        }
-
-        if (event.filter == EVFILT_WRITE)
-        {
-          if (flags & Writable)
-          {
-            m_callback.onSocketWritable(socket);
-          }
-          continue;
-        }
-
-        if ((event.flags & EV_EOF) || (event.flags & EV_ERROR))
-        {
-          LOG_TRACE("event.filter=%s", "EVFILT_WRITE");
-          m_callback.onSocketClosed(socket);
-          it->flags = Closed;
-          struct kevent kevt;
-          EV_SET(&kevt, event.ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-          if (-1 == kevent(kq, &kevt, 1, NULL, 0, NULL))
-          {
-            LOG_ERROR("cannot delete fd=0x%x from kqueue!", event.ident);
-          }
-          EV_SET(&kevt, event.ident, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-          if (-1 == kevent(kq, &kevt, 1, NULL, 0, NULL))
-          {
-            LOG_ERROR("cannot delete fd=0x%x from kqueue!", event.ident);
-          }
-          continue;
-        }
-        LOG_ERROR("Reactor: unhandled kevent!");
-      }
-#endif
+      pollOnce();
     }
     LOG_TRACE("Reactor: Thread done");
   }
+ 
+private:
+  using Iterator = std::vector<SocketData>::iterator;
+ 
+  Iterator findLocked(const Socket &socket)
+  {
+    return std::find_if(m_sockets.begin(), m_sockets.end(),
+                        [&socket](const SocketData &sd) { return sd.socket == socket; });
+  }
+ 
+  bool getFlags(const Socket &socket, int &flags)
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto it = findLocked(socket);
+    if (it == m_sockets.end())
+    {
+      return false;
+    }
+    flags = it->flags;
+    return true;
+  }
+ 
+  void dispatchClosed(const Socket &socket)
+  {
+    removeSocket(socket);
+    m_callback.onSocketClosed(socket);
+  }
+ 
+  // ---------------------------------------------------------------- Windows
+#ifdef _WIN32
+  static long toNetworkEvents(int flags)
+  {
+    long events = FD_CLOSE;  // close is always reported
+    if (flags & Readable)   events |= FD_READ;
+    if (flags & Writable)   events |= FD_WRITE;
+    if (flags & Acceptable) events |= FD_ACCEPT;
+    return events;
+  }
+ 
+  bool registerLocked(SocketData &sd)
+  {
+    if (m_sockets.size() >= WSA_MAXIMUM_WAIT_EVENTS)
+    {
+      LOG_ERROR("Reactor: too many sockets (max %d)", static_cast<int>(WSA_MAXIMUM_WAIT_EVENTS));
+      return false;
+    }
+    WSAEVENT ev = ::WSACreateEvent();
+    if (ev == WSA_INVALID_EVENT)
+    {
+      return false;
+    }
+    if (::WSAEventSelect(sd.socket, ev, toNetworkEvents(sd.flags)) == SOCKET_ERROR)
+    {
+      ::WSACloseEvent(ev);
+      return false;
+    }
+    sd.event = ev;
+    return true;
+  }
+ 
+  bool updateLocked(SocketData &sd, int flags)
+  {
+    return ::WSAEventSelect(sd.socket, sd.event, toNetworkEvents(flags)) != SOCKET_ERROR;
+  }
+ 
+  void unregisterLocked(SocketData &sd)
+  {
+    if (sd.event != WSA_INVALID_EVENT)
+    {
+      ::WSAEventSelect(sd.socket, sd.event, 0);
+      ::WSACloseEvent(sd.event);
+      sd.event = WSA_INVALID_EVENT;
+    }
+  }
+ 
+  void pollOnce()
+  {
+    std::vector<SocketData> snapshot;
+    {
+      std::lock_guard<std::mutex> lock(m_mutex);
+      snapshot = m_sockets;
+    }
+    if (snapshot.empty())
+    {
+      std::this_thread::sleep_for(std::chrono::milliseconds(50));
+      return;
+    }
+ 
+    std::vector<WSAEVENT> events;
+    events.reserve(snapshot.size());
+    for (const auto &sd : snapshot)
+    {
+      events.push_back(sd.event);
+    }
+ 
+    // Only the lowest signaled index is returned, so afterwards every socket is polled.
+    DWORD result = ::WSAWaitForMultipleEvents(static_cast<DWORD>(events.size()), events.data(),
+                                              FALSE, 500, FALSE);
+    if (result == WSA_WAIT_TIMEOUT)
+    {
+      return;
+    }
+    if (result == WSA_WAIT_FAILED)
+    {
+      // e.g. an event was closed by removeSocket() after the snapshot; retry with a fresh one
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      return;
+    }
+ 
+    for (const auto &sd : snapshot)
+    {
+      if (shouldTerminate())
+      {
+        return;
+      }
+      WSANETWORKEVENTS ne{};
+      if (::WSAEnumNetworkEvents(sd.socket, sd.event, &ne) != 0 || ne.lNetworkEvents == 0)
+      {
+        continue;
+      }
+ 
+      int flags = 0;
+      if (!getFlags(sd.socket, flags))
+      {
+        continue;
+      }
+ 
+      if ((flags & Readable) && (ne.lNetworkEvents & FD_READ))
+        m_callback.onSocketReadable(sd.socket);
+      if ((flags & Writable) && (ne.lNetworkEvents & FD_WRITE))
+        m_callback.onSocketWritable(sd.socket);
+      if ((flags & Acceptable) && (ne.lNetworkEvents & FD_ACCEPT))
+        m_callback.onSocketAcceptable(sd.socket);
+      if (ne.lNetworkEvents & FD_CLOSE)
+        dispatchClosed(sd.socket);
+    }
+  }
+#endif  // _WIN32
+ 
+  // ------------------------------------------------------------------ Linux
+#ifdef __linux__
+  static uint32_t toEpollEvents(int flags)
+  {
+    uint32_t events = 0;  // EPOLLHUP / EPOLLERR are always reported by the kernel
+    if (flags & (Readable | Acceptable)) events |= EPOLLIN;
+    if (flags & Writable)                events |= EPOLLOUT;
+    return events;
+  }
+ 
+  bool registerLocked(SocketData &sd)
+  {
+    if (m_epollFd == -1)
+    {
+      return false;
+    }
+    epoll_event event = {};
+    event.data.fd     = sd.socket;
+    event.events      = toEpollEvents(sd.flags);
+    return ::epoll_ctl(m_epollFd, EPOLL_CTL_ADD, sd.socket, &event) == 0;
+  }
+ 
+  bool updateLocked(SocketData &sd, int flags)
+  {
+    if (m_epollFd == -1)
+    {
+      return false;
+    }
+    epoll_event event = {};
+    event.data.fd     = sd.socket;
+    event.events      = toEpollEvents(flags);
+    return ::epoll_ctl(m_epollFd, EPOLL_CTL_MOD, sd.socket, &event) == 0;
+  }
+ 
+  void unregisterLocked(SocketData &sd)
+  {
+    if (m_epollFd != -1)
+    {
+      ::epoll_ctl(m_epollFd, EPOLL_CTL_DEL, sd.socket, nullptr);
+    }
+  }
+ 
+  void pollOnce()
+  {
+    epoll_event events[64];
+    int result = ::epoll_wait(m_epollFd, events, static_cast<int>(sizeof(events) / sizeof(events[0])),
+                              500);
+    if (result < 0)
+    {
+      if (errno != EINTR)
+      {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // avoid a busy loop
+      }
+      return;
+    }
+ 
+    for (int i = 0; i < result; i++)
+    {
+      Socket socket(events[i].data.fd);
+      int flags = 0;
+      if (!getFlags(socket, flags))
+      {
+        continue;
+      }
+      const uint32_t ev = events[i].events;
+ 
+      if (flags & Acceptable)
+      {
+        if (ev & EPOLLIN)
+          m_callback.onSocketAcceptable(socket);
+      }
+      else if ((flags & Readable) && (ev & EPOLLIN))
+      {
+        m_callback.onSocketReadable(socket);
+      }
+      if ((flags & Writable) && (ev & EPOLLOUT))
+        m_callback.onSocketWritable(socket);
+      if (ev & (EPOLLHUP | EPOLLERR))
+        dispatchClosed(socket);
+    }
+  }
+#endif  // __linux__
+ 
+  // ------------------------------------------------------------------ macOS
+#ifdef __APPLE__
+  void kqSet(int fd, int16_t filter, uint16_t kflags)
+  {
+    struct kevent event;
+    EV_SET(&event, static_cast<uintptr_t>(fd), filter, kflags, 0, 0, nullptr);
+    ::kevent(m_kq, &event, 1, nullptr, 0, nullptr);  // EV_DELETE on a missing filter is harmless
+  }
+ 
+  // Brings the registered filters from oldFlags to newFlags.
+  void kqUpdate(int fd, int oldFlags, int newFlags)
+  {
+    const int readMask  = Readable | Acceptable;
+    const bool oldRead  = (oldFlags & (readMask | Closed)) != 0;
+    const bool newRead  = (newFlags & (readMask | Closed)) != 0;
+    const bool oldWrite = (oldFlags & Writable) != 0;
+    const bool newWrite = (newFlags & Writable) != 0;
+ 
+    if (newRead)
+    {
+      // Closed-only sockets use EV_CLEAR so unread data does not cause endless wake-ups.
+      const uint16_t extra = (newFlags & readMask) ? 0 : EV_CLEAR;
+      kqSet(fd, EVFILT_READ, static_cast<uint16_t>(EV_ADD | extra));
+    }
+    else if (oldRead)
+    {
+      kqSet(fd, EVFILT_READ, EV_DELETE);
+    }
+ 
+    if (newWrite)
+    {
+      kqSet(fd, EVFILT_WRITE, EV_ADD);
+    }
+    else if (oldWrite)
+    {
+      kqSet(fd, EVFILT_WRITE, EV_DELETE);
+    }
+  }
+ 
+  bool registerLocked(SocketData &sd)
+  {
+    if (m_kq == -1)
+    {
+      return false;
+    }
+    kqUpdate(sd.socket, 0, sd.flags);
+    return true;
+  }
+ 
+  bool updateLocked(SocketData &sd, int flags)
+  {
+    if (m_kq == -1)
+    {
+      return false;
+    }
+    kqUpdate(sd.socket, sd.flags, flags);
+    return true;
+  }
+ 
+  void unregisterLocked(SocketData &sd)
+  {
+    if (m_kq != -1)
+    {
+      kqUpdate(sd.socket, sd.flags, 0);
+    }
+  }
+ 
+  void pollOnce()
+  {
+    struct kevent events[KqueueBatchSize];
+    struct timespec timeout;
+    timeout.tv_sec  = 0;
+    timeout.tv_nsec = 500 * 1000 * 1000;
+ 
+    int nev = ::kevent(m_kq, nullptr, 0, events, KqueueBatchSize, &timeout);
+    if (nev < 0)
+    {
+      if (errno != EINTR)
+      {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      }
+      return;
+    }
+ 
+    for (int i = 0; i < nev; i++)
+    {
+      const struct kevent &event = events[i];
+      Socket socket(static_cast<int>(event.ident));
+      int flags = 0;
+      if (!getFlags(socket, flags))
+      {
+        continue;
+      }
+ 
+      // Errors and EOF are checked first, so they can never be swallowed by a filter branch.
+      if (event.flags & EV_ERROR)
+      {
+        dispatchClosed(socket);
+        continue;
+      }
+ 
+      if (event.filter == EVFILT_READ)
+      {
+        if (flags & Acceptable)
+        {
+          if (event.data > 0)
+            m_callback.onSocketAcceptable(socket);
+        }
+        else if ((flags & Readable) && event.data > 0)
+        {
+          m_callback.onSocketReadable(socket);  // deliver pending data before reporting EOF
+        }
+      }
+      else if (event.filter == EVFILT_WRITE)
+      {
+        if ((flags & Writable) && !(event.flags & EV_EOF))
+          m_callback.onSocketWritable(socket);
+      }
+ 
+      if (event.flags & EV_EOF)
+      {
+        dispatchClosed(socket);
+      }
+    }
+  }
+#endif  // __APPLE__
 };
-
+ 
 }  // namespace SocketTools
+ 
