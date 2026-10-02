@@ -299,9 +299,8 @@ static thread_local bool g_fail_curl_calloc = false;
 
 // NOLINTBEGIN(cppcoreguidelines-no-malloc,hicpp-no-malloc): these are the allocator libcurl
 // is given, so reaching for the C allocation functions is the point of them.
-// A curl_slist node is two pointers, and a curl easy handle is thousands of bytes on every
-// libcurl, so the bound aims the failure at the list append. Which call consumes the first
-// failing allocation is otherwise a property of the libcurl in use rather than of this test.
+// The bound aims the failure at the curl_slist append, which allocates two pointers where an
+// easy handle allocates thousands of bytes.
 static const size_t kCurlSmallAllocation = 64;
 
 // Named rather than measured. A case that wants one particular append to fail says which header
@@ -2252,13 +2251,10 @@ TEST_F(BasicCurlHttpTests, GzipIncompressibleData)
 }
 #endif  // ENABLE_OTLP_COMPRESSION_PREVIEW
 
-// A client whose multi handle can never be created has nothing to run. The IO loop reports a run
-// of failures once and waits between attempts, so a client left alive in that state costs neither
-// a core nor a log line per pass, and this holds both.
-// The phases the loop gates on a multi handle move sessions between queues. Ungated, a session
-// queued while the handle is missing leaves the pending queue for a multi function that cannot
-// take it, and the next reset cancels it, so the caller is told a request was cancelled that
-// nothing cancelled.
+// A client whose multi handle can never be created has nothing to run. This holds both halves:
+// the IO loop reports the run of failures once and waits between attempts, and the phases it
+// gates on a multi handle do not hand a session to a multi function that cannot take it, which
+// the next reset would report to the caller as a cancel nobody asked for.
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
 // The other half of the case above, and the one an exporter actually does: nothing cancels the
 // request, the client is simply destroyed. The entry left in the retry queue names an operation
@@ -2398,10 +2394,9 @@ TEST_F(BasicCurlHttpTests, AHandleQueuedWithoutAMultiHandleIsReleased)
             http_client::curl::HttpClientTestPeer::PendingRemovalCount(*concrete))
       << "the handle was never queued, so nothing was tested";
 
-  // What resetMultiHandle does when curl_multi_init has just failed on it. The easy handle and
-  // its header list are released rather than held until a multi handle comes back, and neither
-  // is handed to a multi function that has none to work with. LeakSanitizer is what says the
-  // release happened.
+  // What resetMultiHandle does when curl_multi_init has just failed: the easy handle and its
+  // header list are released rather than held for a multi handle that may never come back.
+  // LeakSanitizer is what says the release happened.
   EXPECT_TRUE(http_client::curl::HttpClientTestPeer::RemoveSessions(*concrete));
 
   http_client::curl::HttpClientTestPeer::ExchangeMultiHandle(*concrete, previous);
@@ -2427,11 +2422,9 @@ TEST_F(BasicCurlHttpTests, AQueuedRequestSurvivesAMissingMultiHandle)
 
   failing.ExemptThisThread();
 
-  // The idle grace is a minute by default, but only from libcurl 7.68: the line that gives it
-  // that value is behind a version check, and older libcurl leaves it at zero, where the IO
-  // thread reaches the retirement check on its first idle pass. CMake asks for no minimum
-  // libcurl, so both are supported, and this asks for the shorter one so the case runs the same
-  // way everywhere rather than the way whichever libcurl the job has happens to allow.
+  // background_thread_wait_for_ is a minute only from libcurl 7.68; the line that sets it is
+  // behind a version check and older libcurl leaves it at zero. CMake asks for no minimum, so
+  // this asks for the shorter wait and the case runs the same way on both.
   concrete->SetBackgroundWaitFor(std::chrono::milliseconds::zero());
 
   auto session = client->CreateSession("http://127.0.0.1:19000");
