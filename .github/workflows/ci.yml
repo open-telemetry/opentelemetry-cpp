@@ -1166,7 +1166,7 @@ jobs:
 
   windows:
     name: CMake -> exporter proto
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1187,7 +1187,7 @@ jobs:
 
   windows-build-dll:
     name: CMake -> exporter proto (Build as DLL)
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1210,7 +1210,7 @@ jobs:
 
   windows_with_async_export:
     name: CMake (With async export) -> exporter proto
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1231,7 +1231,7 @@ jobs:
 
   windows_bazel:
     name: Bazel Windows
-    runs-on: windows-2022
+    runs-on: windows-2025
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1250,7 +1250,7 @@ jobs:
 
   windows_plugin_test:
     name: Plugin -> CMake Windows
-    runs-on: windows-2022
+    runs-on: windows-2025
     # Deprecated, pending removal
     if: false
     steps:
