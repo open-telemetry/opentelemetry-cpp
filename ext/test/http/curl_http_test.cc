@@ -1395,13 +1395,11 @@ TEST_F(BasicCurlHttpTests, CancelFromCreatedCompletes)
   session_manager->FinishAllSessions();
 
   EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
-  // Exact, and the classification with it, because a count alone cannot tell an honoured cancel
-  // from a request that was never registered. What it reports today is the second one: Created is
-  // dispatched from the constructor, before curl_operation_ holds this operation, so the cancel
-  // reaches the Session but not the operation, and scheduling then finds no registration. The
-  // caller asked to cancel and is told the create failed. Moving the first events out of the
-  // constructor is what would make this a cancel, and that is the startup ordering #4390 is
-  // about rather than something to bolt on here. Pinned so the day it changes is visible.
+  // Exact, and the classification with it: a count alone cannot tell an honoured cancel from a
+  // request that was never registered. Today it is the second. Created is dispatched from the
+  // constructor, before curl_operation_ holds this operation, so the cancel reaches the Session
+  // and not the operation, and scheduling finds no registration. Moving the first events out of
+  // the constructor is the startup ordering #4390 is about. Pinned so a change here is visible.
   EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire));
   EXPECT_EQ(0, handler->cancelled_.load(std::memory_order_acquire));
   EXPECT_EQ(1, handler->create_failed_.load(std::memory_order_acquire));
@@ -2104,21 +2102,17 @@ TEST_F(BasicCurlHttpTests, ASessionResetTookBeforeItWasQueuedIsFinished)
   auto request = session->CreateRequest();
   request->SetUri("get/");
 
-  // The interleaving, in program order, which is what makes it a case rather than a window.
-  // A reset keeps the sessions whose ids are already in pending_to_add_session_ids_ and takes
-  // the rest, and a request that has not reached ScheduleAddSession yet is one of the rest:
-  // the caller is between CreateSession, which registered it, and SendAsync, which is what
-  // queues the id. Nothing here is sent, so the IO thread does not exist and this thread is
-  // standing exactly where it would be standing.
+  // The interleaving in program order. A reset keeps the sessions whose ids are already in
+  // pending_to_add_session_ids_ and takes the rest, and a request between CreateSession and
+  // SendAsync is one of the rest. Nothing is sent, so this thread stands where it would stand.
   http_client::curl::HttpClientTestPeer::ResetMultiHandle(*concrete);
 
   auto handler = std::make_shared<RecordingHandler>();
   session->SendRequest(handler);
 
-  // Nothing is going to run this operation: the session it names is not registered any more,
-  // and adding the id back would leave the caller waiting on a transfer nobody arranged. So
-  // what has to happen is that it is finished. Returning from here is the assertion, and
-  // without it this hangs rather than fails.
+  // Nothing is going to run this operation: the session it names is no longer registered, and
+  // adding the id back would leave the caller waiting on a transfer nobody arranged. Returning
+  // from here is the assertion; without the fix this hangs rather than fails.
   session->FinishSession();
 
   const auto states = handler->States();
