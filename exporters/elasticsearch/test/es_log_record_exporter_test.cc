@@ -29,9 +29,8 @@
 #include <thread>
 #include <utility>
 #include <vector>
-// nlohmann is used through its public header only, which is what every other file here
-// does. The detail headers below do not exist when it is installed as one amalgamated
-// header, so asking for them breaks that build.
+// nlohmann is used through its public header only, like every other file here. The detail
+// headers below do not exist in the amalgamated install, so asking for them breaks that build.
 // IWYU pragma: no_include <nlohmann/detail/json_ref.hpp>
 // IWYU pragma: no_include <nlohmann/json_fwd.hpp>
 #include "nlohmann/json.hpp"
