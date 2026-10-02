@@ -347,7 +347,8 @@ int HttpOperation::SeekCallback(void *userp, curl_off_t offset, int origin)
   // move of the read cursor. Anything else is refused rather than approximated, because reporting
   // success without repositioning would resume the upload from the wrong offset and send a
   // truncated or misaligned body.
-  if (origin != SEEK_SET || offset < 0 || static_cast<size_t>(offset) > self->request_body_.size())
+  if (origin != SEEK_SET || offset < 0 ||
+      offset > static_cast<curl_off_t>(self->request_body_.size()))
   {
     return CURL_SEEKFUNC_CANTSEEK;
   }
@@ -507,8 +508,8 @@ HttpOperation::~HttpOperation()
       {
         if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
         {
-          async_data_->result_future.wait();
-          last_curl_result_ = async_data_->result_future.get();
+          // PerformCurlMessage() stores this, then calls the Cleanup() that sets the promise.
+          static_cast<void>(async_data_->result_future.get());
         }
       }
       break;
@@ -532,8 +533,8 @@ void HttpOperation::Finish()
     // We should not wait in callback from Cleanup()
     if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
     {
-      async_data_->result_future.wait();
-      last_curl_result_ = async_data_->result_future.get();
+      // PerformCurlMessage() stores this, then calls the Cleanup() that sets the promise.
+      static_cast<void>(async_data_->result_future.get());
     }
   }
 }
@@ -1561,7 +1562,7 @@ void HttpOperation::Abort()
   }
 }
 
-void HttpOperation::PerformCurlMessage(CURLcode code)
+bool HttpOperation::PerformCurlMessage(CURLcode code)
 {
   ++retry_attempts_;
   last_attempt_time_      = std::chrono::system_clock::now();
@@ -1667,7 +1668,10 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
   {
     // Cleanup and unbind easy handle from multi handle, and finish callback
     Cleanup();
+    return false;
   }
+
+  return true;
 }
 
 }  // namespace curl

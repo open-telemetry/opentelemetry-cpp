@@ -3,12 +3,15 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
+#include <utility>
 
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/common/attributemap_hash.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/aggregation/default_aggregation.h"
 
@@ -39,6 +42,7 @@ public:
   // See SyncMetricStorage's constructor comment for what `recording_cardinality_limit` is for.
   AsyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
                      const AggregationType aggregation_type,
+                     std::shared_ptr<const AttributesProcessor> attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
                      ExemplarFilterType exemplar_filter_type,
                      nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
@@ -47,6 +51,7 @@ public:
       : AsyncMetricStorage(
             instrument_descriptor,
             aggregation_type,
+            std::move(attributes_processor),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
             exemplar_filter_type,
             std::move(exemplar_reservoir),
@@ -57,6 +62,7 @@ public:
 
   AsyncMetricStorage(const InstrumentDescriptor &instrument_descriptor,
                      const AggregationType aggregation_type,
+                     std::shared_ptr<const AttributesProcessor> attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
                      ExemplarFilterType exemplar_filter_type,
                      nostd::shared_ptr<ExemplarReservoir> &&exemplar_reservoir,
@@ -67,22 +73,31 @@ public:
         aggregation_type_{aggregation_type},
         aggregation_config_{AggregationConfig::GetOrDefault(aggregation_config)},
         recording_cardinality_limit_(recording_cardinality_limit),
-        cumulative_hash_map_(std::make_unique<AttributesHashMap>(recording_cardinality_limit_)),
+        attributes_processor_{std::move(attributes_processor)},
+        is_monotonic_sum_{IsMonotonicSum(aggregation_type, instrument_descriptor)},
+        last_observed_hash_map_(std::make_unique<AttributesHashMap>(recording_cardinality_limit_)),
         delta_hash_map_(std::make_unique<AttributesHashMap>(recording_cardinality_limit_)),
+        round_hash_map_(std::make_unique<AttributesHashMap>(recording_cardinality_limit_)),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
         exemplar_filter_type_(exemplar_filter_type),
         exemplar_reservoir_(std::move(exemplar_reservoir)),
 #endif
         temporal_metric_storage_(instrument_descriptor, aggregation_type, aggregation_config)
-  {}
+  {
+    create_default_aggregation_ = [this]() -> std::unique_ptr<Aggregation> {
+      return DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
+    };
+  }
 
+  /**
+   * Converts the absolute values reported by the callbacks into the deltas the temporal storage
+   * consumes. Runs once per callback registered on the instrument, so what it accumulates stays
+   * until the next Collect().
+   */
   template <class T>
   void Record(const std::unordered_map<MetricAttributes, T, AttributeHashGenerator> &measurements,
               opentelemetry::common::SystemTimestamp /* observation_time */) noexcept
   {
-    // Async counter always record monotonically increasing values, and the
-    // exporter/reader can request either for delta or cumulative value.
-    // So we convert the async counter value to delta before passing it to temporal storage.
     std::lock_guard<std::mutex> guard(hashmap_lock_);
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
     const bool offer_exemplars =
@@ -96,25 +111,15 @@ public:
         exemplar_reservoir_->OfferMeasurement(measurement.second, measurement.first, {});
       }
 #endif
-
-      auto aggr = DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_);
-      aggr->Aggregate(measurement.second);
-      auto prev = cumulative_hash_map_->Get(measurement.first);
-      if (prev)
+      if (is_monotonic_sum_)
       {
-        auto delta = prev->Diff(*aggr);
-        // store received value in cumulative map, and the diff in delta map (to pass it to temporal
-        // storage)
-        cumulative_hash_map_->Set(measurement.first, std::move(aggr));
-        delta_hash_map_->Set(measurement.first, std::move(delta));
+        RecordMonotonicSum(measurement.first, measurement.second);
       }
       else
       {
-        // store received value in cumulative and delta map.
-        cumulative_hash_map_->Set(
-            measurement.first,
-            DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_, *aggr));
-        delta_hash_map_->Set(measurement.first, std::move(aggr));
+        round_hash_map_
+            ->GetOrSetDefault(FilterAttributes(measurement.first), create_default_aggregation_)
+            ->Aggregate(measurement.second);
       }
     }
   }
@@ -151,6 +156,10 @@ public:
     std::shared_ptr<AttributesHashMap> delta_metrics = nullptr;
     {
       std::lock_guard<std::mutex> guard(hashmap_lock_);
+      if (!is_monotonic_sum_)
+      {
+        BuildDeltaFromRound();
+      }
       delta_metrics   = std::move(delta_hash_map_);
       delta_hash_map_ = std::make_unique<AttributesHashMap>(recording_cardinality_limit_);
     }
@@ -162,13 +171,153 @@ public:
   }
 
 private:
+  /**
+   * Differences a monotonic sum per source series - keyed by the unfiltered attributes - before
+   * the view merges anything. Diffing the merged group instead would turn a series which stops
+   * being reported into a spurious decrease.
+   */
+  template <class T>
+  void RecordMonotonicSum(const MetricAttributes &attributes, T value)
+  {
+    auto observed = create_default_aggregation_();
+    observed->Aggregate(value);
+
+    std::unique_ptr<Aggregation> delta;
+    auto previous = last_observed_hash_map_->Get(attributes);
+    if (previous)
+    {
+      delta = previous->Diff(*observed);
+    }
+    else
+    {
+      delta = DefaultAggregation::CloneAggregation(aggregation_type_, instrument_descriptor_,
+                                                   *observed);
+    }
+    last_observed_hash_map_->Set(attributes, std::move(observed));
+
+    AccumulateDelta(FilterAttributes(attributes), *delta);
+  }
+
+  /**
+   * Adds one series' delta to its output point. Merging, not overwriting, is what lets the series
+   * a view collapses together and the observations from different callbacks all contribute.
+   * Over-the-limit attribute sets resolve to the same otel.metric.overflow entry, which merges
+   * too.
+   *
+   * `merged` here already equals the bucket's full new total (whatever GetOrSetDefault resolved
+   * `attributes` to, plus `delta`), so it must be written back with an unconditional overwrite,
+   * not through Set()'s own overflow-merge path: Set() merges on the assumption that what it is
+   * given is a fresh, independent contribution still waiting to be added, and applying that a
+   * second time here would double-count the bucket's prior total. Resolving the same key
+   * GetOrSetDefault used (the real attributes, or the shared overflow entry if they were over
+   * capacity) and overwriting that key directly sidesteps Set()'s overflow routing entirely.
+   */
+  void AccumulateDelta(const MetricAttributes &attributes, const Aggregation &delta)
+  {
+    auto merged =
+        delta_hash_map_->GetOrSetDefault(attributes, create_default_aggregation_)->Merge(delta);
+    const MetricAttributes &target_key =
+        delta_hash_map_->Has(attributes) ? attributes : GetOverflowAttributes();
+    delta_hash_map_->Set(target_key, std::move(merged));
+  }
+
+  /**
+   * Differences this round's absolute observations and starts a fresh round, for everything but
+   * monotonic sums. An attribute set missing from this round keeps its baseline and contributes
+   * no delta; suppressing the stale output is the temporal storage's job.
+   */
+  void BuildDeltaFromRound() noexcept
+  {
+    round_hash_map_->GetAllEntries([this](const MetricAttributes &attributes,
+                                          Aggregation &aggregation) {
+      auto observed = DefaultAggregation::CloneAggregation(aggregation_type_,
+                                                           instrument_descriptor_, aggregation);
+      auto previous = last_observed_hash_map_->Get(attributes);
+      if (previous)
+      {
+        delta_hash_map_->Set(attributes, previous->Diff(*observed));
+      }
+      else
+      {
+        delta_hash_map_->Set(attributes, DefaultAggregation::CloneAggregation(
+                                             aggregation_type_, instrument_descriptor_, *observed));
+      }
+      last_observed_hash_map_->Set(attributes, std::move(observed));
+      return true;
+    });
+
+    round_hash_map_ = std::make_unique<AttributesHashMap>(recording_cardinality_limit_);
+  }
+
+  /**
+   * Returns a copy of the observed attributes with the attributes dropped by the view removed.
+   */
+  MetricAttributes FilterAttributes(const MetricAttributes &attributes) const
+  {
+    MetricAttributes filtered(attributes);
+    if (!attributes_processor_)
+    {
+      return filtered;
+    }
+
+    bool dropped = false;
+    for (auto iter = filtered.begin(); iter != filtered.end();)
+    {
+      if (attributes_processor_->isPresent(iter->first))
+      {
+        ++iter;
+      }
+      else
+      {
+        iter    = filtered.erase(iter);
+        dropped = true;
+      }
+    }
+
+    if (dropped)
+    {
+      filtered.UpdateHash();
+    }
+    return filtered;
+  }
+
+  /**
+   * Whether this storage aggregates into a monotonic sum, matching what
+   * DefaultAggregation::CreateAggregation() would create.
+   */
+  static bool IsMonotonicSum(AggregationType aggregation_type,
+                             const InstrumentDescriptor &instrument_descriptor) noexcept
+  {
+    bool is_monotonic = true;
+    if (aggregation_type == AggregationType::kDefault)
+    {
+      const AggregationType resolved =
+          DefaultAggregation::GetDefaultAggregationType(instrument_descriptor.type_, is_monotonic);
+      return resolved == AggregationType::kSum && is_monotonic;
+    }
+    if (aggregation_type != AggregationType::kSum)
+    {
+      return false;
+    }
+    return instrument_descriptor.type_ != InstrumentType::kUpDownCounter &&
+           instrument_descriptor.type_ != InstrumentType::kObservableUpDownCounter &&
+           instrument_descriptor.type_ != InstrumentType::kHistogram;
+  }
+
   InstrumentDescriptor instrument_descriptor_;
   AggregationType aggregation_type_;
   const AggregationConfig *aggregation_config_;
-  // Capacity used to (re)size cumulative_hash_map_/delta_hash_map_. See the constructor comment.
+  // Capacity used to (re)size last_observed_hash_map_/delta_hash_map_/round_hash_map_. See the
+  // constructor comment.
   const std::size_t recording_cardinality_limit_;
-  std::unique_ptr<AttributesHashMap> cumulative_hash_map_;
+  std::shared_ptr<const AttributesProcessor> attributes_processor_;
+  bool is_monotonic_sum_;
+  std::function<std::unique_ptr<Aggregation>()> create_default_aggregation_;
+
+  std::unique_ptr<AttributesHashMap> last_observed_hash_map_;
   std::unique_ptr<AttributesHashMap> delta_hash_map_;
+  std::unique_ptr<AttributesHashMap> round_hash_map_;
+
   std::mutex hashmap_lock_;
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
   ExemplarFilterType exemplar_filter_type_;

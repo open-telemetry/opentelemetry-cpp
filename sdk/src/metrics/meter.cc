@@ -659,7 +659,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
           auto recording_cardinality_limit = ResolveRecordingCardinalityLimit(
               view.GetAggregationConfig(), ctx->GetCollectors(), view_instr_desc.type_);
           async_storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
-              view_instr_desc, view.GetAggregationType(),
+              view_instr_desc, view.GetAggregationType(), view.GetAttributesProcessor(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
               exemplar_filter_type,
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),

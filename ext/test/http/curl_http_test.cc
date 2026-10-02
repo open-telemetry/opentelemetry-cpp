@@ -6,7 +6,13 @@
 #include "gtest/gtest.h"
 
 #ifdef ENABLE_OTLP_RETRY_PREVIEW
+#  include <ratio>
 #  include "gmock/gmock.h"
+#  ifdef _WIN32
+#    include <windows.h>
+#  else
+#    include <ctime>
+#  endif
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
@@ -17,8 +23,10 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <limits>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -293,6 +301,7 @@ protected:
     server_.addHandler("/get/", *this);
     server_.addHandler("/post/", *this);
     server_.addHandler("/retry/", *this);
+    server_.addHandler("/retry-after/", *this);
     server_.addHandler("/close/", *this);
     server_.start();
     is_running_ = true;
@@ -331,6 +340,14 @@ public:
       std::unique_lock<std::mutex> lk1(mtx_requests);
       received_requests_.push_back(request);
       response.headers["Content-Type"] = "text/plain";
+      response_status                  = 429;
+    }
+    else if (request.uri == "/retry-after/")
+    {
+      std::unique_lock<std::mutex> lk1(mtx_requests);
+      received_requests_.push_back(request);
+      response.headers["Content-Type"] = "text/plain";
+      response.headers["Retry-After"]  = "30";
       response_status                  = 429;
     }
     else if (request.uri == "/close/")
@@ -537,6 +554,12 @@ TEST_F(BasicCurlHttpTests, SeekCallbackRepositionsTheRequestBody)
   EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, -1, SEEK_SET));
   EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 0, SEEK_CUR));
   EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::Seek(operation, 0, SEEK_END));
+
+  // An offset past the range of size_t must stay out of range. Narrowing it to size_t first
+  // wrapped it back into the body on a build where size_t is 32 bits.
+  EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK,
+            Peer::Seek(operation, static_cast<curl_off_t>(std::numeric_limits<uint32_t>::max()) + 4,
+                       SEEK_SET));
   EXPECT_EQ(3u, Peer::ReadCursor(operation));
 
   EXPECT_EQ(CURL_SEEKFUNC_CANTSEEK, Peer::SeekNullUserData(0, SEEK_SET));
@@ -668,6 +691,148 @@ TEST_F(BasicCurlHttpTests, ExponentialBackoffRetry)
 
   ASSERT_EQ(CURLE_OK, operation.Send());
   ASSERT_FALSE(operation.IsRetryable());
+}
+
+// A Retry-After beyond max_backoff closes the session. The IO loop used to queue it anyway, where
+// it held back later retries and the background thread until the server's time.
+TEST_F(BasicCurlHttpTests, RetryAfterBeyondMaxBackoffIsNotQueued)
+{
+  received_requests_.clear();
+  curl::HttpClient http_client;
+  const http_client::RetryPolicy retry_policy = {2, std::chrono::duration<float>{0.1f},
+                                                 std::chrono::duration<float>{1.0f}, 1.0f};
+
+  auto capped_session = http_client.CreateSession("http://127.0.0.1:19000");
+  auto capped_request = capped_session->CreateRequest();
+  capped_request->SetMethod(http_client::Method::Post);
+  capped_request->SetUri("retry-after/");
+  capped_request->SetRetryPolicy(retry_policy);
+  auto capped_handler = std::make_shared<RetryEventHandler>();
+  capped_session->SendRequest(capped_handler);
+  capped_session->FinishSession();
+  ASSERT_TRUE(capped_handler->got_response_.load(std::memory_order_acquire));
+
+  auto session = http_client.CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetMethod(http_client::Method::Post);
+  request->SetUri("retry/");
+  request->SetRetryPolicy(retry_policy);
+  auto handler    = std::make_shared<RetryEventHandler>();
+  auto started_at = std::chrono::steady_clock::now();
+  session->SendRequest(handler);
+  session->FinishSession();
+  const auto retried_in = std::chrono::steady_clock::now() - started_at;
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+
+  started_at = std::chrono::steady_clock::now();
+  http_client.WaitBackgroundThreadExit();
+  const auto joined_in = std::chrono::steady_clock::now() - started_at;
+
+  // The server asks for 30 s; the policy backs off for about 0.1 s.
+  EXPECT_TRUE(retried_in < std::chrono::seconds{10})
+      << "retry ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(retried_in).count();
+  EXPECT_TRUE(joined_in < std::chrono::seconds{10})
+      << "join ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(joined_in).count();
+
+  std::unique_lock<std::mutex> lock_requests(mtx_requests);
+  const auto hits = [this](const char *uri) {
+    return std::count_if(
+        received_requests_.begin(), received_requests_.end(),
+        [uri](const HTTP_SERVER_NS::HttpRequest &received) { return received.uri == uri; });
+  };
+  EXPECT_EQ(1, hits("/retry-after/"));
+  EXPECT_EQ(2, hits("/retry/"));
+}
+
+// The shutdown half of #4631: the closed session used to hold the join until the server's time.
+TEST_F(BasicCurlHttpTests, RetryAfterBeyondMaxBackoffDoesNotDelayShutdown)
+{
+  received_requests_.clear();
+  curl::HttpClient http_client;
+  const http_client::RetryPolicy retry_policy = {2, std::chrono::duration<float>{0.1f},
+                                                 std::chrono::duration<float>{1.0f}, 1.0f};
+
+  auto session = http_client.CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetMethod(http_client::Method::Post);
+  request->SetUri("retry-after/");
+  request->SetRetryPolicy(retry_policy);
+  auto handler = std::make_shared<RetryEventHandler>();
+  session->SendRequest(handler);
+  session->FinishSession();
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+
+  const auto started_at = std::chrono::steady_clock::now();
+  http_client.WaitBackgroundThreadExit();
+  const auto joined_in = std::chrono::steady_clock::now() - started_at;
+
+  // The server asks for 30 s.
+  EXPECT_TRUE(joined_in < std::chrono::seconds{10})
+      << "join ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(joined_in).count();
+
+  std::unique_lock<std::mutex> lock_requests(mtx_requests);
+  EXPECT_EQ(1, std::count_if(received_requests_.begin(), received_requests_.end(),
+                             [](const HTTP_SERVER_NS::HttpRequest &received) {
+                               return received.uri == "/retry-after/";
+                             }));
+}
+
+// CPU time of the whole process. std::clock() measures wall time on Windows.
+std::chrono::microseconds ProcessCpuTime()
+{
+#  ifdef _WIN32
+  FILETIME created{}, exited{}, kernel{}, user{};
+  GetProcessTimes(GetCurrentProcess(), &created, &exited, &kernel, &user);
+  // FILETIME counts 100 ns ticks.
+  const auto ticks = [](const FILETIME &time) {
+    return (static_cast<std::uint64_t>(time.dwHighDateTime) << 32) | time.dwLowDateTime;
+  };
+  return std::chrono::microseconds{static_cast<std::int64_t>((ticks(kernel) + ticks(user)) / 10)};
+#  else
+  return std::chrono::microseconds{
+      static_cast<std::int64_t>(static_cast<double>(std::clock()) * 1000000 / CLOCKS_PER_SEC)};
+#  endif
+}
+
+// During shutdown the IO loop used to skip its poll while a retry waited out its backoff.
+TEST_F(BasicCurlHttpTests, ShutdownDoesNotSpinWhileARetryIsQueued)
+{
+  received_requests_.clear();
+  curl::HttpClient http_client;
+  // Three waits: the first can still sleep on a poll the loop asked for before the join.
+  const http_client::RetryPolicy retry_policy = {4, std::chrono::duration<float>{0.25f},
+                                                 std::chrono::duration<float>{5.0f}, 2.0f};
+
+  auto session = http_client.CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetMethod(http_client::Method::Post);
+  request->SetUri("retry/");
+  request->SetRetryPolicy(retry_policy);
+  auto handler = std::make_shared<RetryEventHandler>();
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+
+  const auto cpu_before = ProcessCpuTime();
+  const auto started_at = std::chrono::steady_clock::now();
+  http_client.WaitBackgroundThreadExit();
+  const auto joined_in = std::chrono::steady_clock::now() - started_at;
+  const auto cpu_used  = ProcessCpuTime() - cpu_before;
+
+  session->FinishSession();
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+
+  std::unique_lock<std::mutex> lock_requests(mtx_requests);
+  EXPECT_EQ(4, std::count_if(received_requests_.begin(), received_requests_.end(),
+                             [](const HTTP_SERVER_NS::HttpRequest &received) {
+                               return received.uri == "/retry/";
+                             }));
+
+#  ifdef __APPLE__
+  GTEST_SKIP() << "The test server's kqueue reactor spins while a connection is open";
+#  endif
+  EXPECT_TRUE(cpu_used * 2 < joined_in)
+      << "join ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(joined_in).count()
+      << ", CPU ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cpu_used).count();
 }
 #endif  // ENABLE_OTLP_RETRY_PREVIEW
 
