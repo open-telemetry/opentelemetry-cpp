@@ -550,8 +550,8 @@ HttpOperation::~HttpOperation()
       if (async_data_ && async_data_->result_future.valid() &&
           !CallbackScope::InsideCallbackFor(this))
       {
-        async_data_->result_future.wait();
-        last_curl_result_ = async_data_->result_future.get();
+        // PerformCurlMessage() stores this, then calls the Cleanup() that sets the promise.
+        static_cast<void>(async_data_->result_future.get());
       }
       break;
     }
@@ -579,8 +579,8 @@ void HttpOperation::Finish()
 
   if (async_data_ && async_data_->result_future.valid())
   {
-    async_data_->result_future.wait();
-    last_curl_result_ = async_data_->result_future.get();
+    // PerformCurlMessage() stores this, then calls the Cleanup() that sets the promise.
+    static_cast<void>(async_data_->result_future.get());
   }
 }
 
