@@ -289,16 +289,19 @@ Prepared -> Admitted -> Queued -> Attached -> Running -> Detaching -> Completed 
 The second `Attempting` above is a second attempt, not a resumption of the
 first, and that is what makes two machines necessary rather than tidy. Each
 attempt has its own deadline, its own backend handle and its own result, so if
-those live on the operation then the second one overwrites the first. #4403 is
-that shape already: the retry time is recomputed on every read, with fresh
-jitter each time, so it is not a property of anything that can be waited on.
+those live on the operation then the second one overwrites the first. #4403 was
+that shape: the retry time was recomputed on every read, with fresh jitter each
+time, so it was not a property of anything that could be waited on. #4452 fixed
+it by storing the deadline for the attempt, which is the per-attempt state this
+section argues for.
 
 Where `Admitted` falls relative to `Prepared` is one of the open decisions
 below rather than something this sequence settles. Charging the byte budget
 before serialization means guessing the size; charging it after means the bytes
 already exist by the time the governor is asked to allow them.
 
-Four of the open reports are about that second sequence:
+Five reports are about that second sequence. Three are open and two have been
+fixed since this section was written:
 
 - `Queued` that never reaches `Attached` is a rejected `curl_multi_add_handle`.
   The attempt never runs, and the operation still has to settle. Today the
@@ -309,12 +312,13 @@ Four of the open reports are about that second sequence:
 - `Completed` belongs to the attempt and `Settled` belongs to the operation.
   Collapsing them fails in both directions. An operation settles twice when a
   late callback arrives after another has already reported, which is #4360.
-  An operation never settles at all when a terminal backend state is delivered
-  as though it were progress, which is #4425. #4338 is both at once, and says
-  so in its title.
-- `CURLOPT_PRIVATE` should name an attempt. Today it names a `Session`, and the
-  background thread then asks that session for whichever operation it currently
-  holds, which is #4396.
+  An operation never settled at all when a terminal backend state was delivered
+  as though it were progress, which was #4425, fixed by #4453. #4338 is both at
+  once, is still open, and says so in its title.
+- `CURLOPT_PRIVATE` should name an attempt. It still names a `Session`, and the
+  background thread still asks that session for the operation it holds. #4431
+  closed #4396 by allowing one request per session, so the session now holds one
+  operation at a time; the indirection itself is unchanged.
 
 `ForceFlush` is stated against the first sequence and not the second: it
 answers for operations accepted before its watermark, whatever attempts those
@@ -326,7 +330,7 @@ operations are making when it is called.
 | --- | --- | --- | --- |
 | Throughput, connection reuse | keeps both | reuse yes, in-flight count owned above it | keeps both |
 | Cancellation | flag plus races | explicit, at a defined point | explicit, owner thread applies it |
-| Shutdown | four reports open | one deadline per operation | one owner to drain |
+| Shutdown | the caller's deadline does not reach the transport, #4336 and #4339 | one deadline per operation | one owner to drain |
 | Admission and retry owner | inside the transport | above the transport | above the transport |
 | Connection and stream scheduling | implicit, libcurl decides | backend policy | backend policy, one owner thread |
 | Installed interfaces | unchanged | new interface plus an adapter | unchanged, backend only |
