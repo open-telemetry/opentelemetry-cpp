@@ -157,6 +157,31 @@ struct InstrumentDescriptorUtil
   }
 };
 
+struct AggregationUtil
+{
+  static opentelemetry::nostd::string_view GetAggregationTypeString(
+      AggregationType aggregation_type) noexcept
+  {
+    switch (aggregation_type)
+    {
+      case AggregationType::kDrop:
+        return "Drop";
+      case AggregationType::kHistogram:
+        return "Histogram";
+      case AggregationType::kLastValue:
+        return "LastValue";
+      case AggregationType::kSum:
+        return "Sum";
+      case AggregationType::kDefault:
+        return "Default";
+      case AggregationType::kBase2ExponentialHistogram:
+        return "Base2ExponentialHistogram";
+      default:
+        return "Unknown";
+    }
+  }
+};
+
 struct InstrumentEqualNameCaseInsensitive
 {
   bool operator()(const InstrumentDescriptor &lhs, const InstrumentDescriptor &rhs) const noexcept
