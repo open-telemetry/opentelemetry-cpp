@@ -20,7 +20,6 @@
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/semconv/incubating/rpc_attributes.h"
 #include "opentelemetry/semconv/network_attributes.h"
-#include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_metadata.h"
 #include "opentelemetry/trace/span_startoptions.h"
@@ -116,10 +115,6 @@ void RunClient(uint16_t port)
 int main(int argc, char **argv)
 {
   InitTracer();
-  // set global propagator
-  context::propagation::GlobalTextMapPropagator::SetGlobalPropagator(
-      opentelemetry::nostd::shared_ptr<context::propagation::TextMapPropagator>(
-          new propagation::HttpTraceContext()));
   constexpr uint16_t default_port = 8800;
   uint16_t port{default_port};
   if (argc > 1)
