@@ -80,6 +80,9 @@ Increment the:
   `AttributesProcessor`, matching `SyncMetricStorage`.
   [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
 
+* [BUG] Keep the curl retry deadline stable within each attempt
+  [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
+
 * [API] Remove opentelemetry::plugin
   [#4660](https://github.com/open-telemetry/opentelemetry-cpp/pull/4660)
 
