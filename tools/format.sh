@@ -59,6 +59,6 @@ if which "$BUILDIFIER" >/dev/null; then
     -name '*.BUILD' -o -name '*.bzl' -print)
 else
   echo "Can't find buildifier. It can be installed with:"
-  echo " go install github.com/bazel-contrib/buildtools/v10/buildifier@latest"
+  echo "  go install github.com/bazel-contrib/buildtools/v10/buildifier@latest"
   exit 1
 fi
