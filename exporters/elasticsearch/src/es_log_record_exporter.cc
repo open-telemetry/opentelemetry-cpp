@@ -267,7 +267,28 @@ public:
   /**
    * Cleans up the session in the destructor.
    */
-  ~AsyncResponseHandler() override { session_->FinishSession(); }
+  ~AsyncResponseHandler() override
+  {
+    // Report before FinishSession(), which can block: an outcome is owed even here.
+    CompleteOnce(sdk::common::ExportResult::kFailure);
+    session_->FinishSession();
+  }
+
+  /**
+   * Report this export's outcome, at most once: one request can deliver both a response and a
+   * terminal event, and the exporter counts one finished session per export.
+   * @return whether this call is the one that reported.
+   */
+  bool CompleteOnce(sdk::common::ExportResult result) noexcept
+  {
+    bool expected = false;
+    if (!completed_.compare_exchange_strong(expected, true, std::memory_order_acq_rel))
+    {
+      return false;
+    }
+    result_callback_(result);
+    return true;
+  }
 
   /**
    * Automatically called when the response is received
@@ -275,66 +296,82 @@ public:
   void OnResponse(http_client::Response &response) noexcept override
   {
 
-    // Store the body of the response
-    body_ = std::string(response.GetBody().begin(), response.GetBody().end());
+    const std::string body(response.GetBody().begin(), response.GetBody().end());
+    const bool written = body.find("\"failed\" : 0") != std::string::npos;
+
+    // Report before logging: CompleteOnce() retires the session, and a replaceable handler that
+    // flushes would wait on it. A loser stays silent; its outcome went to nobody.
+    if (!CompleteOnce(written ? sdk::common::ExportResult::kSuccess
+                              : sdk::common::ExportResult::kFailure))
+    {
+      return;
+    }
+
     if (console_debug_)
     {
       OTEL_INTERNAL_LOG_DEBUG(
-          "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body_);
+          "[ES Log Exporter] Got response from Elasticsearch,  response body: " << body);
     }
-    if (body_.find("\"failed\" : 0") == std::string::npos)
+    if (!written)
     {
       OTEL_INTERNAL_LOG_ERROR(
           "[ES Log Exporter] Logs were not written to Elasticsearch correctly, response body: "
-          << body_);
-      result_callback_(sdk::common::ExportResult::kFailure);
-    }
-    else
-    {
-      result_callback_(sdk::common::ExportResult::kSuccess);
+          << body);
     }
   }
 
   // Callback method when an http event occurs
   void OnEvent(http_client::SessionState state, nostd::string_view /* reason */) noexcept override
   {
-    bool need_stop = false;
+    // No default label: -Wswitch then reports a state added upstream instead of dropping it.
+    const char *failure = nullptr;
     switch (state)
     {
+      // Progress only. The session is still registered, so a handler that flushed from a log
+      // line here would wait on the export it is standing in.
+      case http_client::SessionState::Created:
+      case http_client::SessionState::Connecting:
+      case http_client::SessionState::Connected:
+      case http_client::SessionState::Sending:
+      // The body arrives through OnResponse(), which is what reports the outcome.
+      case http_client::SessionState::Response:
+        break;
       case http_client::SessionState::CreateFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Create request to elasticsearch failed");
-        need_stop = true;
+        failure = "[ES Log Exporter] Create request to elasticsearch failed";
+        break;
+      case http_client::SessionState::Destroyed:
+        failure = "[ES Log Exporter] Session to elasticsearch destroyed before a response";
         break;
       case http_client::SessionState::ConnectFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Connection to elasticsearch failed");
-        need_stop = true;
+        failure = "[ES Log Exporter] Connection to elasticsearch failed";
         break;
       case http_client::SessionState::SendFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request failed to be sent to elasticsearch");
-        need_stop = true;
+        failure = "[ES Log Exporter] Request failed to be sent to elasticsearch";
         break;
       case http_client::SessionState::SSLHandshakeFailed:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] SSL handshake to elasticsearch failed");
-        need_stop = true;
+        failure = "[ES Log Exporter] SSL handshake to elasticsearch failed";
         break;
       case http_client::SessionState::TimedOut:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch timed out");
-        need_stop = true;
+        failure = "[ES Log Exporter] Request to elasticsearch timed out";
         break;
       case http_client::SessionState::NetworkError:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Network error to elasticsearch");
-        need_stop = true;
+        failure = "[ES Log Exporter] Network error to elasticsearch";
+        break;
+      case http_client::SessionState::ReadError:
+        failure = "[ES Log Exporter] Read error";
+        break;
+      case http_client::SessionState::WriteError:
+        failure = "[ES Log Exporter] Write error";
         break;
       case http_client::SessionState::Cancelled:
-        OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Request to elasticsearch cancelled");
-        need_stop = true;
-        break;
-      default:
+        failure = "[ES Log Exporter] Request to elasticsearch cancelled";
         break;
     }
-    if (need_stop)
+
+    // Only the event that decided the outcome speaks; a later one names a failure nobody got.
+    if (failure != nullptr && CompleteOnce(sdk::common::ExportResult::kFailure))
     {
-      result_callback_(sdk::common::ExportResult::kFailure);
+      OTEL_INTERNAL_LOG_ERROR(failure);
     }
   }
 
@@ -344,8 +381,8 @@ private:
   // Callback to call to on receiving events
   std::function<bool(opentelemetry::sdk::common::ExportResult)> result_callback_;
 
-  // A string to store the response body
-  std::string body_ = "";
+  // Whether the outcome has already been reported
+  std::atomic<bool> completed_{false};
 
   // Whether to print the results from the callback
   bool console_debug_ = false;
@@ -448,20 +485,22 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   auto handler              = std::make_shared<AsyncResponseHandler>(
       session,
       [span_count, synchronization_data](opentelemetry::sdk::common::ExportResult result) {
+        // Count and wake before logging: a handler that flushes from the line below would
+        // wait for the session reporting to it.
+        synchronization_data->finished_session_counter_.fetch_add(1, std::memory_order_release);
+        synchronization_data->force_flush_cv.notify_all();
+
         if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
         {
           OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] ERROR: Export "
                                                << span_count
-                                               << " trace span(s) error: " << static_cast<int>(result));
+                                               << " log record(s) error: " << static_cast<int>(result));
         }
         else
         {
           OTEL_INTERNAL_LOG_DEBUG("[ES Log Exporter] Export " << span_count
-                                                                           << " trace span(s) success");
+                                                                           << " log record(s) success");
         }
-
-        synchronization_data->finished_session_counter_.fetch_add(1, std::memory_order_release);
-        synchronization_data->force_flush_cv.notify_all();
         return true;
       },
       options_.console_debug_);
