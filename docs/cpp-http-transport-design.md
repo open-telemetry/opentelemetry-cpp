@@ -146,7 +146,7 @@ rotation heuristic, indirectly for the third. It says nothing about the rest.
 
 ## Where the current model breaks
 
-Five things are modelled inconsistently, and most reports are a consequence of
+Six things are modelled inconsistently, and most reports are a consequence of
 one of them.
 
 **Operation identity.** A `Session` holds one operation that can be replaced.
@@ -170,6 +170,12 @@ arrives, or who wins when a response and a cancel race.
 **Backend resources.** The easy handle, the header list, multi membership, the
 retry queue and the session registry are owned across three classes and two
 threads.
+
+**The loop's own lifecycle.** The background thread is spawned on demand, it
+retires itself when the queue empties, and it is the only reader of the multi
+handle. Nothing states who owns it, what it does when a libcurl call refuses,
+or what becomes of a send that arrives while it is being wound down. That gap
+is where #4664 and #4665 both sit.
 
 Adding another mutex or atomic can only synchronise a model. It cannot decide
 what the model is, which is why the individual fixes keep needing a contract
