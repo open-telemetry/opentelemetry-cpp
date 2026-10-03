@@ -5,15 +5,13 @@
 #include <curl/curlver.h>
 #include "gtest/gtest.h"
 
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <ratio>
-#  include "gmock/gmock.h"
-#  ifdef _WIN32
-#    include <windows.h>
-#  else
-#    include <ctime>
-#  endif
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
+#include <ratio>
+#include "gmock/gmock.h"
+#ifdef _WIN32
+#  include <windows.h>
+#else
+#  include <ctime>
+#endif
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 #  include <numeric>
@@ -267,7 +265,6 @@ public:
   }
 };
 
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
 class RetryDeadlineEventHandler : public RetryEventHandler
 {
 public:
@@ -285,7 +282,6 @@ public:
   int response_event_count_{0};
   std::chrono::system_clock::time_point retry_time_during_response_{};
 };
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 class BasicCurlHttpTests : public ::testing::Test, public HTTP_SERVER_NS::HttpRequestCallback
 {
@@ -639,7 +635,6 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   delete handler;
 }
 
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
 TEST_F(BasicCurlHttpTests, RetryPolicyEnabled)
 {
   RetryEventHandler handler;
@@ -893,7 +888,7 @@ TEST_F(BasicCurlHttpTests, RetryAfterBeyondMaxBackoffDoesNotDelayShutdown)
 // CPU time of the whole process. std::clock() measures wall time on Windows.
 std::chrono::microseconds ProcessCpuTime()
 {
-#  ifdef _WIN32
+#ifdef _WIN32
   FILETIME created{}, exited{}, kernel{}, user{};
   GetProcessTimes(GetCurrentProcess(), &created, &exited, &kernel, &user);
   // FILETIME counts 100 ns ticks.
@@ -901,10 +896,10 @@ std::chrono::microseconds ProcessCpuTime()
     return (static_cast<std::uint64_t>(time.dwHighDateTime) << 32) | time.dwLowDateTime;
   };
   return std::chrono::microseconds{static_cast<std::int64_t>((ticks(kernel) + ticks(user)) / 10)};
-#  else
+#else
   return std::chrono::microseconds{
       static_cast<std::int64_t>(static_cast<double>(std::clock()) * 1000000 / CLOCKS_PER_SEC)};
-#  endif
+#endif
 }
 
 // During shutdown the IO loop used to skip its poll while a retry waited out its backoff.
@@ -940,14 +935,13 @@ TEST_F(BasicCurlHttpTests, ShutdownDoesNotSpinWhileARetryIsQueued)
                                return received.uri == "/retry/";
                              }));
 
-#  ifdef __APPLE__
+#ifdef __APPLE__
   GTEST_SKIP() << "The test server's kqueue reactor spins while a connection is open";
-#  endif
+#endif
   EXPECT_TRUE(cpu_used * 2 < joined_in)
       << "join ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(joined_in).count()
       << ", CPU ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cpu_used).count();
 }
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 // A cancel that arrives once the server has answered used to deliver Cancelled and the response,
 // so a handler treating either as terminal saw one request finish twice.
