@@ -98,6 +98,10 @@ Breaking changes:
 * [BUG] Keep the curl retry deadline stable within each attempt
   [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
 
+* [SDK] Avoid throwing from `Resource::Create` when `process.executable.name`
+  has a non-string value and `service.name` is not set.
+  [#4535](https://github.com/open-telemetry/opentelemetry-cpp/issues/4535)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
