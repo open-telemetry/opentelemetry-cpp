@@ -34,6 +34,10 @@ Increment the:
   change.
   [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
 
+* [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
+  from conflicting streams, and warn if stream conflicts were configured
+  [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)

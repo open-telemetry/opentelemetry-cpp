@@ -190,6 +190,12 @@ private:
   static void WarnOnNameCaseConflict(const sdk::instrumentationscope::InstrumentationScope *scope,
                                      const InstrumentDescriptor &existing_instrument,
                                      const InstrumentDescriptor &new_instrument);
+
+  // Emits a warning that the view will create a semantic error and will be ignored.
+  static void WarnOnViewSemanticError(const sdk::instrumentationscope::InstrumentationScope *scope,
+                                      const InstrumentDescriptor &existing_instrument,
+                                      const InstrumentDescriptor &stream,
+                                      const View &view);
 };
 }  // namespace metrics
 }  // namespace sdk
