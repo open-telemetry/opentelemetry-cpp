@@ -37,11 +37,13 @@ cc_library(
     copts = [
         "-DCURL_STATICLIB",
     ],
+    implementation_deps = [
+        "//ext:http_client_detail",
+    ],
     strip_include_prefix = "include",
     tags = ["zipkin"],
     deps = [
         ":zipkin_recordable",
-        "//ext:http_client_detail",
         "//ext/src/http/client/curl:http_client_curl",
     ],
 )

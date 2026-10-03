@@ -5,7 +5,7 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
-# Public API: 4 stable headers forming the interface for HTTP clients
+# Headers installed by CMake and exposed to Bazel consumers
 cc_library(
     name = "headers",
     hdrs = [
@@ -45,7 +45,6 @@ cc_library(
 
 # Internal: Detail headers for factory implementations
 # Used by: exporters/otlp, exporters/elasticsearch, exporters/zipkin
-# Breaking change in v2.0.0: moved from public to internal target
 cc_library(
     name = "http_client_detail",
     hdrs = [

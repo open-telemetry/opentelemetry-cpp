@@ -116,7 +116,6 @@ cc_library(
     deps = [
         ":otlp_common",
         "//ext:headers",
-        "//ext:http_client_detail",
         "//sdk:headers",
         "//sdk/src/common:global_log_handler",
         "@com_github_grpc_grpc//:grpc++",
@@ -167,7 +166,6 @@ cc_library(
         ":otlp_recordable",
         ":otlp_grpc_client",
         "//ext:headers",
-        "//ext:http_client_detail",
         "//sdk/src/trace",
 
         # For gRPC
@@ -214,6 +212,9 @@ cc_library(
     copts = [
         "-DCURL_STATICLIB",
     ],
+    implementation_deps = [
+        "//ext:http_client_detail",
+    ],
     linkopts = select({
         "//bazel:windows": [
             "-DEFAULTLIB:advapi32.lib",
@@ -229,7 +230,6 @@ cc_library(
     ],
     deps = [
         "//api",
-        "//ext:http_client_detail",
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk:headers",
         "//sdk/src/common:base64",
@@ -395,7 +395,6 @@ cc_library(
         ":otlp_recordable",
         ":otlp_grpc_client",
         "//ext:headers",
-        "//ext:http_client_detail",
         "//sdk/src/metrics",
 
         # For gRPC
@@ -654,7 +653,6 @@ cc_library(
         ":otlp_recordable",
         ":otlp_grpc_client",
         "//ext:headers",
-        "//ext:http_client_detail",
         "//sdk/src/logs",
         # For gRPC
         "@com_github_opentelemetry_proto//:logs_service_grpc_cc",

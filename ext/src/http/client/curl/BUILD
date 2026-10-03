@@ -17,6 +17,9 @@ cc_library(
         "ENABLE_HTTP_CLIENT_CURL",
         "ENABLE_OTLP_RETRY_PREVIEW",
     ],
+    implementation_deps = [
+        "//ext:curl_implementation_headers",
+    ],
     include_prefix = "src/http/client/curl",
     linkopts = select({
         "//bazel:windows": [
@@ -35,8 +38,5 @@ cc_library(
         "//sdk/src/common:random",
         "@curl",
         "@zlib",
-    ],
-    implementation_deps = [
-        "//ext:curl_implementation_headers",
     ],
 )
