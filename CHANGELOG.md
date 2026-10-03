@@ -67,6 +67,10 @@ Increment the:
   change.
   [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
 
+* [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
+  from conflicting streams, and warn if stream conflicts were configured
+  [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
@@ -86,6 +90,17 @@ Increment the:
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+Breaking changes:
+
+* [SDK] Remove `noexcept` from the public SDK `TracerProvider`,
+  `LoggerProvider`, `MeterProvider`, `Tracer`, `Logger`, and `Meter`
+  constructors so initialization failures can propagate to callers.
+  `GetTracer`, `GetLogger`, and `GetMeter` remain `noexcept` and return a
+  pre-allocated noop object if constructing a new instrumentation object
+  fails. After the first failure, later uncached `Get*` calls return the same
+  noop immediately without retrying construction. Existing cached objects
+  continue to be returned.
+  [#4361](https://github.com/open-telemetry/opentelemetry-cpp/issues/4361)
 * [BUG] Send one request per curl session, rather than replacing the operation
   a running request still belongs to
   [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
@@ -112,6 +127,9 @@ Increment the:
   Note that `AsyncMetricStorage`'s constructor now takes the view's
   `AttributesProcessor`, matching `SyncMetricStorage`.
   [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
+
+* [BUG] Keep the curl retry deadline stable within each attempt
+  [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
 
 ## [1.29.0] 2026-09-13
 
