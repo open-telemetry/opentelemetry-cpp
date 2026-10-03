@@ -15,6 +15,14 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Fix a doc comment on the Elasticsearch log exporter's
+  `ResponseHandler::waitForResponse()` claiming a request timeout (set via
+  `SetTimeoutMs()`) arrives as a `SessionState::TimedOut` event. No
+  `HttpClient` implementation in this repo dispatches `TimedOut`; the curl
+  client maps a timeout to `SendFailed` like any other transport error, which
+  is what the comment now says.
+  [#4604](https://github.com/open-telemetry/opentelemetry-cpp/issues/4604)
+
 * [METRICS SDK] Enforce a runtime minimum scale of `-11` for
   `Base2ExponentialHistogramAggregation`, so a recording that spans the full
   double range no longer downscales without end.
