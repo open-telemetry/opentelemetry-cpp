@@ -91,7 +91,6 @@ The following legacy CMake option names are deprecated:
 | `WITH_OTLP_FILE` | `OTELCPP_WITH_OTLP_FILE` |
 | `WITH_OTLP_GRPC` | `OTELCPP_WITH_OTLP_GRPC` |
 | `WITH_OTLP_GRPC_CREDENTIAL_PREVIEW` | `OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW` |
-| `WITH_OTLP_GRPC_SSL_MTLS_PREVIEW` | `OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW` |
 | `WITH_OTLP_HTTP` | `OTELCPP_WITH_OTLP_HTTP` |
 | `WITH_OTLP_HTTP_COMPRESSION` | `OTELCPP_WITH_OTLP_HTTP_COMPRESSION` |
 | `WITH_OTLP_RETRY_PREVIEW` | `OTELCPP_WITH_OTLP_RETRY_PREVIEW` |
@@ -164,62 +163,6 @@ Make sure to properly initialize `retry_policy_max_attempts`
 to enable or disable the retry feature.
 
 #### Planned removal (OTELCPP_WITH_OTLP_RETRY_PREVIEW)
-
-This compilation flag will be removed after October 1st, 2026.
-
-### CMake OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
-
-#### Announcement (OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
-
-The CMake compile flag `OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW`, formerly
-named `WITH_OTLP_GRPC_SSL_MTLS_PREVIEW`, is deprecated by:
-
-* Enable WITH_OTLP_GRPC_SSL_MTLS_PREVIEW by default
-  [#3970](https://github.com/open-telemetry/opentelemetry-cpp/pull/3970)
-
-#### Motivation (OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
-
-Flags like `OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW` are used to conditionally
-compile new features when they are introduced in the code base.
-
-Now that this feature is stable, conditional compilation is no longer
-necessary.
-
-#### Scope (OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
-
-Remove the `OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW` compilation flag and its
-legacy name `WITH_OTLP_GRPC_SSL_MTLS_PREVIEW` from CMake.
-
-Remove the `ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW` preprocessor condition from C++.
-
-#### Mitigation (OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
-
-Applications built with `OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON` or
-`WITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON` need to:
-
-* remove the preview flag from CMake scripts
-
-Applications built with `OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF` or
-`WITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF` need to:
-
-* remove the preview flag from CMake scripts
-* initialize ssl client properties in the OTLP GRPC exporter options,
-  either with real KEY and CERT data, or with empty strings.
-
-See:
-
-* struct `OtlpGrpcClientOptions`
-* struct `OtlpGrpcLogRecordExporterOptions`
-* struct `OtlpGrpcMetricExporterOptions`
-* struct `OtlpGrpcExporterOptions`
-
-For Bazel, no compilation flag exists, the code is always built using
-ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW.
-
-Make sure to properly initialize ssl client properties
-to enable or disable the feature.
-
-#### Planned removal (OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
 
 This compilation flag will be removed after October 1st, 2026.
 
