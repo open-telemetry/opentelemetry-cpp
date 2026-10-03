@@ -718,6 +718,80 @@ private:
   std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
 };
 
+class BoundLongUpDownCounterImpl : public opentelemetry::metrics::BoundUpDownCounter<int64_t>
+{
+public:
+  explicit BoundLongUpDownCounterImpl(
+      std::shared_ptr<BoundSyncWritableMetricStorage> storage) noexcept
+      : storage_(std::move(storage))
+  {}
+  void Add(int64_t value) noexcept override
+  {
+    if (storage_)
+    {
+      storage_->RecordLong(value);
+    }
+  }
+
+private:
+  std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
+};
+
+class BoundDoubleUpDownCounterImpl : public opentelemetry::metrics::BoundUpDownCounter<double>
+{
+public:
+  explicit BoundDoubleUpDownCounterImpl(
+      std::shared_ptr<BoundSyncWritableMetricStorage> storage) noexcept
+      : storage_(std::move(storage))
+  {}
+  void Add(double value) noexcept override
+  {
+    if (storage_)
+    {
+      storage_->RecordDouble(value);
+    }
+  }
+
+private:
+  std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
+};
+
+class BoundLongGaugeImpl : public opentelemetry::metrics::BoundGauge<int64_t>
+{
+public:
+  explicit BoundLongGaugeImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage) noexcept
+      : storage_(std::move(storage))
+  {}
+  void Record(int64_t value) noexcept override
+  {
+    if (storage_)
+    {
+      storage_->RecordLong(value);
+    }
+  }
+
+private:
+  std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
+};
+
+class BoundDoubleGaugeImpl : public opentelemetry::metrics::BoundGauge<double>
+{
+public:
+  explicit BoundDoubleGaugeImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage) noexcept
+      : storage_(std::move(storage))
+  {}
+  void Record(double value) noexcept override
+  {
+    if (storage_)
+    {
+      storage_->RecordDouble(value);
+    }
+  }
+
+private:
+  std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
+};
+
 }  // namespace
 
 opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<uint64_t>> LongCounter::Bind(
@@ -766,6 +840,54 @@ DoubleHistogram::Bind(const opentelemetry::common::KeyValueIterable &attributes)
   }
   return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<double>>{
       new BoundDoubleHistogramImpl(std::move(bound))};
+}
+
+opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundUpDownCounter<int64_t>>
+LongUpDownCounter::Bind(const opentelemetry::common::KeyValueIterable &attributes) noexcept
+{
+  std::shared_ptr<BoundSyncWritableMetricStorage> bound;
+  if (storage_)
+  {
+    bound = storage_->Bind(attributes);
+  }
+  return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundUpDownCounter<int64_t>>{
+      new BoundLongUpDownCounterImpl(std::move(bound))};
+}
+
+opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundUpDownCounter<double>>
+DoubleUpDownCounter::Bind(const opentelemetry::common::KeyValueIterable &attributes) noexcept
+{
+  std::shared_ptr<BoundSyncWritableMetricStorage> bound;
+  if (storage_)
+  {
+    bound = storage_->Bind(attributes);
+  }
+  return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundUpDownCounter<double>>{
+      new BoundDoubleUpDownCounterImpl(std::move(bound))};
+}
+
+opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundGauge<int64_t>> LongGauge::Bind(
+    const opentelemetry::common::KeyValueIterable &attributes) noexcept
+{
+  std::shared_ptr<BoundSyncWritableMetricStorage> bound;
+  if (storage_)
+  {
+    bound = storage_->Bind(attributes);
+  }
+  return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundGauge<int64_t>>{
+      new BoundLongGaugeImpl(std::move(bound))};
+}
+
+opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundGauge<double>> DoubleGauge::Bind(
+    const opentelemetry::common::KeyValueIterable &attributes) noexcept
+{
+  std::shared_ptr<BoundSyncWritableMetricStorage> bound;
+  if (storage_)
+  {
+    bound = storage_->Bind(attributes);
+  }
+  return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundGauge<double>>{
+      new BoundDoubleGaugeImpl(std::move(bound))};
 }
 #endif
 

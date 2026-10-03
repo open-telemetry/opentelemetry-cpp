@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] Extend preview bound instruments to UpDownCounter and Gauge
+  [#4321](https://github.com/open-telemetry/opentelemetry-cpp/pull/4321)
 * [METRICS SDK] Enforce a runtime minimum scale of `-11` for
   `Base2ExponentialHistogramAggregation`, so a recording that spans the full
   double range no longer downscales without end.

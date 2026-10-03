@@ -77,6 +77,37 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.api_only.test
 
+  cmake_bound_metrics_preview_test:
+    name: CMake bound metrics preview test
+    runs-on: ubuntu-24.04
+    env:
+      CXX_STANDARD: '17'
+    steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+      with:
+        egress-policy: audit
+
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+        submodules: 'recursive'
+    - name: setup
+      run: |
+        sudo -E ./ci/setup_ci_environment.sh
+    - name: configure bound metrics preview
+      run: |
+        cmake -S . -B build \
+          -DOTELCPP_WITH_ABI_VERSION_1=OFF \
+          -DOTELCPP_WITH_ABI_VERSION_2=ON \
+          -DOTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW=ON \
+          -DOTELCPP_WITH_BENCHMARK=OFF \
+          -DOTELCPP_WITH_EXAMPLES=OFF
+    - name: build and test bound metrics preview
+      run: |
+        cmake --build build --target bound_sync_instruments_test --parallel 2
+        ctest --test-dir build --output-on-failure -R '^metrics\.BoundSyncInstruments'
+
   cmake_legacy_options_test:
     name: CMake legacy option names compatibility test
     runs-on: ubuntu-24.04
