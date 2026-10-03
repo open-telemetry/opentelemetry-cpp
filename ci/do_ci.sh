@@ -166,6 +166,7 @@ elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
         -DOTELCPP_WITH_OTLP_GRPC=ON \
         -DOTELCPP_WITH_OTLP_FILE=ON \
         -DOTELCPP_WITH_PROMETHEUS=ON \
+        -DOTELCPP_WITH_PROMETHEUS_PUSH=ON \
         -DOTELCPP_WITH_EXAMPLES=ON \
         -DOTELCPP_WITH_EXAMPLES_HTTP=ON \
         -DOTELCPP_WITH_ZIPKIN=ON \
