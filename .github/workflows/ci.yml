@@ -33,7 +33,7 @@ jobs:
 
   cmake_test:
     name: CMake test (prometheus, elasticsearch, zipkin)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       CXX_STANDARD: '17'
     steps:
@@ -540,7 +540,7 @@ jobs:
 
   cmake_test_cxx14_gcc:
     name: CMake C++14 test(GCC)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -568,7 +568,7 @@ jobs:
 
   cmake_test_cxx17_gcc:
     name: CMake C++17 test(GCC)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -593,7 +593,7 @@ jobs:
 
   cmake_test_cxx20_gcc:
     name: CMake C++20 test(GCC)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -618,7 +618,7 @@ jobs:
 
   cmake_test_cxx20_clang:
     name: CMake C++20 test(Clang with libc++)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -678,7 +678,7 @@ jobs:
 
   cmake_test_cxx23_clang:
     name: CMake C++23 test(Clang with libc++)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -713,7 +713,7 @@ jobs:
 
   cmake_otprotocol_test:
     name: CMake test (with otlp-exporter)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -766,7 +766,7 @@ jobs:
 
   cmake_do_not_install_test:
     name: CMake do not install test (with otlp-exporter)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -789,7 +789,7 @@ jobs:
 
   cmake_otprotocol_shared_libs_with_static_grpc_test:
     name: CMake test (build shared libraries with otlp-exporter and static gRPC)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -1151,7 +1151,7 @@ jobs:
 
   copyright:
     name: Copyright
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Harden the runner (Audit all outbound calls)
       uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
