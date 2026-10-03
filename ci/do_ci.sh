@@ -587,7 +587,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
         -DWITH_STL=ON \
         -DWITH_GSL=ON \
         -DWITH_OTLP_RETRY_PREVIEW=OFF \
-        -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF \
         -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
@@ -625,7 +624,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
       WITH_STL \
       WITH_GSL \
       WITH_OTLP_RETRY_PREVIEW \
-      WITH_OTLP_GRPC_SSL_MTLS_PREVIEW \
       WITH_OTLP_GRPC_CREDENTIAL_PREVIEW \
       WITH_OTLP_GRPC \
       WITH_OTLP_HTTP \
