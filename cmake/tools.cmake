@@ -15,12 +15,19 @@ if(NOT PATCH_PROTOBUF_SOURCES_OPTIONS_SET)
   if(MSVC)
     unset(PATCH_PROTOBUF_SOURCES_OPTIONS CACHE)
     set(PATCH_PROTOBUF_SOURCES_OPTIONS
+        /wd4100
         /wd4244
         /wd4251
         /wd4267
         /wd4309
         /wd4668
+        /wd4702
+        /wd4715
+        /wd4800
+        /wd4090
         /wd4946
+        /wd4996
+        /wd5054
         /wd6001
         /wd6244
         /wd6246)
@@ -43,8 +50,15 @@ if(NOT PATCH_PROTOBUF_SOURCES_OPTIONS_SET)
     unset(PATCH_PROTOBUF_SOURCES_OPTIONS CACHE)
     include(CheckCXXCompilerFlag)
     check_append_cxx_compiler_flag(
-      PATCH_PROTOBUF_SOURCES_OPTIONS -Wno-type-limits
-      -Wno-deprecated-declarations -Wno-unused-parameter)
+      PATCH_PROTOBUF_SOURCES_OPTIONS
+      -Wno-type-limits
+      -Wno-sign-compare
+      -Wno-sign-conversion
+      -Wno-shadow
+      -Wno-uninitialized
+      -Wno-conversion
+      -Wno-deprecated-declarations
+      -Wno-unused-parameter)
   endif()
   set(PATCH_PROTOBUF_SOURCES_OPTIONS_SET TRUE)
   if(PATCH_PROTOBUF_SOURCES_OPTIONS)
@@ -56,41 +70,121 @@ if(NOT PATCH_PROTOBUF_SOURCES_OPTIONS_SET)
 endif()
 
 function(patch_protobuf_sources)
-  if(PATCH_PROTOBUF_SOURCES_OPTIONS)
-    foreach(PROTO_SRC ${ARGN})
-      unset(PROTO_SRC_OPTIONS)
-      get_source_file_property(PROTO_SRC_OPTIONS ${PROTO_SRC} COMPILE_OPTIONS)
-      if(PROTO_SRC_OPTIONS)
-        list(APPEND PROTO_SRC_OPTIONS ${PATCH_PROTOBUF_SOURCES_OPTIONS})
+  if(protobuf_lib_compile_features_cxx_std)
+    if(MSVC)
+      set(__additional_cxx_standard
+          "/std:c++${protobuf_lib_compile_features_cxx_std}")
+    else()
+      set(__additional_cxx_standard
+          "-std=c++${protobuf_lib_compile_features_cxx_std}")
+    endif()
+  endif()
+
+  foreach(PROTO_SRC ${ARGN})
+    unset(PROTO_SRC_OPTIONS)
+    set(__proto_src_options_changed FALSE)
+    get_source_file_property(PROTO_SRC_OPTIONS ${PROTO_SRC} COMPILE_OPTIONS)
+    if(PROTO_SRC_OPTIONS)
+      set(__need_cxx_standard TRUE)
+      if(NOT protobuf_lib_compile_features_cxx_std
+         OR PROTO_SRC_OPTIONS MATCHES
+            "(/std:|-std=)(c|gnu)\\+\\+${protobuf_lib_compile_features_cxx_std}"
+      )
+        set(__need_cxx_standard FALSE)
       else()
-        set(PROTO_SRC_OPTIONS ${PATCH_PROTOBUF_SOURCES_OPTIONS})
+        if(MSVC)
+          string(REGEX REPLACE "/std:c\\+\\+[0-9a-zA-Z_]+" "" PROTO_SRC_OPTIONS
+                               "${PROTO_SRC_OPTIONS}")
+        endif()
+        string(REGEX REPLACE "-std=(c|gnu)\\+\\+[0-9a-zA-Z_]+" ""
+                             PROTO_SRC_OPTIONS "${PROTO_SRC_OPTIONS}")
+        set(__need_cxx_standard TRUE)
       endif()
 
+      foreach(TEST_OPTION ${PATCH_PROTOBUF_SOURCES_OPTIONS})
+        if(NOT "${TEST_OPTION}" IN_LIST PROTO_SRC_OPTIONS)
+          list(APPEND PROTO_SRC_OPTIONS "${TEST_OPTION}")
+          set(__proto_src_options_changed TRUE)
+        endif()
+      endforeach()
+      if(__need_cxx_standard)
+        list(APPEND PROTO_SRC_OPTIONS "${__additional_cxx_standard}")
+        set(__proto_src_options_changed TRUE)
+      endif()
+    else()
+      set(PROTO_SRC_OPTIONS ${PATCH_PROTOBUF_SOURCES_OPTIONS})
+      if(__additional_cxx_standard)
+        list(APPEND PROTO_SRC_OPTIONS "${__additional_cxx_standard}")
+      endif()
+      set(__proto_src_options_changed TRUE)
+    endif()
+
+    if(__proto_src_options_changed)
       set_source_files_properties(
         ${PROTO_SRC} PROPERTIES COMPILE_OPTIONS "${PROTO_SRC_OPTIONS}")
-    endforeach()
-    unset(PROTO_SRC)
-    unset(PROTO_SRC_OPTIONS)
-  endif()
+    endif()
+  endforeach()
 endfunction()
 
 function(patch_protobuf_targets)
-  if(PATCH_PROTOBUF_SOURCES_OPTIONS)
+  if(protobuf_lib_compile_features_cxx_std)
     foreach(PROTO_TARGET ${ARGN})
-      unset(PROTO_TARGET_OPTIONS)
-      get_target_property(PROTO_TARGET_OPTIONS ${PROTO_TARGET} COMPILE_OPTIONS)
-      if(PROTO_TARGET_OPTIONS)
-        list(APPEND PROTO_TARGET_OPTIONS ${PATCH_PROTOBUF_SOURCES_OPTIONS})
+      set_target_properties(
+        ${PROTO_TARGET} PROPERTIES CXX_STANDARD
+                                   ${protobuf_lib_compile_features_cxx_std})
+    endforeach()
+
+    if(MSVC)
+      set(__additional_cxx_standard
+          "/std:c++${protobuf_lib_compile_features_cxx_std}")
+    else()
+      set(__additional_cxx_standard
+          "-std=c++${protobuf_lib_compile_features_cxx_std}")
+    endif()
+  endif()
+
+  foreach(PROTO_TARGET ${ARGN})
+    set(__proto_target_options_changed FALSE)
+    get_target_property(PROTO_TARGET_OPTIONS ${PROTO_TARGET} COMPILE_OPTIONS)
+    if(PROTO_TARGET_OPTIONS)
+      set(__need_cxx_standard TRUE)
+      if(NOT protobuf_lib_compile_features_cxx_std
+         OR PROTO_TARGET_OPTIONS MATCHES
+            "(/std:|-std=)(c|gnu)\\+\\+${protobuf_lib_compile_features_cxx_std}"
+      )
+        set(__need_cxx_standard FALSE)
       else()
-        set(PROTO_TARGET_OPTIONS ${PATCH_PROTOBUF_SOURCES_OPTIONS})
+        if(MSVC)
+          string(REGEX REPLACE "/std:c\\+\\+[0-9a-zA-Z_]+" ""
+                               PROTO_TARGET_OPTIONS "${PROTO_TARGET_OPTIONS}")
+        endif()
+        string(REGEX REPLACE "-std=(c|gnu)\\+\\+[0-9a-zA-Z_]+" ""
+                             PROTO_TARGET_OPTIONS "${PROTO_TARGET_OPTIONS}")
+        set(__need_cxx_standard TRUE)
       endif()
 
+      foreach(TEST_OPTION ${PATCH_PROTOBUF_SOURCES_OPTIONS})
+        if(NOT "${TEST_OPTION}" IN_LIST PROTO_TARGET_OPTIONS)
+          list(APPEND PROTO_TARGET_OPTIONS "${TEST_OPTION}")
+          set(__proto_target_options_changed TRUE)
+        endif()
+      endforeach()
+      if(__need_cxx_standard)
+        list(APPEND PROTO_TARGET_OPTIONS "${__additional_cxx_standard}")
+        set(__proto_target_options_changed TRUE)
+      endif()
+    else()
+      set(PROTO_TARGET_OPTIONS ${PATCH_PROTOBUF_SOURCES_OPTIONS})
+      if(__additional_cxx_standard)
+        list(APPEND PROTO_TARGET_OPTIONS "${__additional_cxx_standard}")
+      endif()
+      set(__proto_target_options_changed TRUE)
+    endif()
+    if(__proto_target_options_changed)
       set_target_properties(
         ${PROTO_TARGET} PROPERTIES COMPILE_OPTIONS "${PROTO_TARGET_OPTIONS}")
-    endforeach()
-    unset(PROTO_TARGET)
-    unset(PROTO_TARGET_OPTIONS)
-  endif()
+    endif()
+  endforeach()
 endfunction()
 
 function(project_build_tools_get_imported_location OUTPUT_VAR_NAME TARGET_NAME)
