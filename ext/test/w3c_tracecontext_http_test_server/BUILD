@@ -19,7 +19,9 @@ cc_binary(
     deps = [
         "//api",
         "//exporters/ostream:ostream_span_exporter",
+        "//ext:curl_implementation_headers",
         "//ext:headers",
+        "//ext:server_headers",
         "//ext/src/http/client/curl:http_client_curl",
         "//sdk/src/trace",
         "@curl",

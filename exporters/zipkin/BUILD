@@ -37,6 +37,9 @@ cc_library(
     copts = [
         "-DCURL_STATICLIB",
     ],
+    implementation_deps = [
+        "//ext:http_client_detail",
+    ],
     strip_include_prefix = "include",
     tags = ["zipkin"],
     deps = [
@@ -68,6 +71,7 @@ cc_test(
     deps = [
         ":zipkin_exporter",
         ":zipkin_recordable",
+        "//ext:curl_implementation_headers",
         "//test_common/src/http/client/nosend:http_client_nosend",
         "@com_google_googletest//:gtest_main",
     ],
