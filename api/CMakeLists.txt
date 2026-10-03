@@ -94,13 +94,6 @@ else()
   message(WARNING "OTELCPP_WITH_OTLP_RETRY_PREVIEW=OFF is deprecated")
 endif()
 
-if(OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW)
-  target_compile_definitions(opentelemetry_api
-                             INTERFACE ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW)
-else()
-  message(WARNING "OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF is deprecated")
-endif()
-
 if(OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW)
