@@ -414,7 +414,6 @@ void OtlpGrpcClient::PopulateChannelArguments(const OtlpGrpcClientOptions &optio
     grpc_arguments.SetCompressionAlgorithm(GRPC_COMPRESS_GZIP);
   }
 
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
   if (options.retry_policy_max_attempts > 0U &&
       options.retry_policy_initial_backoff > std::chrono::duration<float>::zero() &&
       options.retry_policy_max_backoff > std::chrono::duration<float>::zero() &&
@@ -453,7 +452,6 @@ void OtlpGrpcClient::PopulateChannelArguments(const OtlpGrpcClientOptions &optio
 
     grpc_arguments.SetServiceConfigJSON(service_config);
   }
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
 }
 
 std::unique_ptr<grpc::ClientContext> OtlpGrpcClient::MakeClientContext(

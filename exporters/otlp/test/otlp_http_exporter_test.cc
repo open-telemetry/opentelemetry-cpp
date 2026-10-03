@@ -4,11 +4,15 @@
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <map>
 #include <string>
+#include <thread>
+#include <tuple>
 #include <utility>
+#include <variant>
 #include <vector>
 #include "gmock/gmock.h"
 #include "nlohmann/json.hpp"
@@ -19,8 +23,10 @@
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/ext/http/client/http_client.h"
+#include "opentelemetry/ext/http/server/http_server.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -34,7 +40,9 @@
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
 #include "opentelemetry/test_common/ext/http/client/nosend/http_client_nosend.h"
 #include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
@@ -53,18 +61,6 @@
 // clang-format on
 
 // IWYU pragma: no_include <google/protobuf/stubs/common.h>
-
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <cstddef>
-#  include <thread>
-#  include <tuple>
-#  include <variant>
-
-#  include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
-#  include "opentelemetry/ext/http/server/http_server.h"
-#  include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#endif
 
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
@@ -810,7 +806,6 @@ TEST_F(OtlpHttpExporterTestPeer, ConfigRetryGenericValuesFromEnv)
 }
 #endif  // NO_GETENV
 
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
 using StatusCodeVector = std::vector<int>;
 
 namespace
@@ -916,7 +911,6 @@ TEST_P(OtlpHttpExporterRetryIntegrationTests, StatusCodes)
 
   ASSERT_EQ(expected_attempts, request_count);
 }
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 using opentelemetry::test_common::ScopedTestLogHandler;
 
