@@ -9,6 +9,7 @@
 #include "opentelemetry/exporters/otlp/otlp_file_client.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_exporter_runtime_options.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/sdk/common/exporter_utils.h"
 #include "opentelemetry/sdk/trace/exporter.h"
@@ -82,6 +83,9 @@ private:
 
   // Object that stores the file context.
   std::unique_ptr<OtlpFileClient> file_client_;
+
+  // The Arena shared by the recordables created since the last export, see OtlpRecordableArena.
+  OtlpRecordableArena recordable_arena_;
 };
 }  // namespace otlp
 }  // namespace exporter

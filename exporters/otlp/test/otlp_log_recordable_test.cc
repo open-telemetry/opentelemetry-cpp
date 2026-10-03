@@ -31,6 +31,7 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 // IWYU pragma: no_include "net/proto2/public/repeated_field.h"
 // IWYU pragma: no_include <google/protobuf/repeated_ptr_field.h>
+#include "google/protobuf/arena.h"
 #include "opentelemetry/proto/collector/logs/v1/logs_service.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
@@ -422,6 +423,216 @@ TEST(OtlpLogRecordable, PopulateRequestSameScope)
   ASSERT_EQ(req.resource_logs(0).scope_logs_size(), 1);
   EXPECT_EQ(req.resource_logs(0).scope_logs(0).log_records_size(), 2);
   EXPECT_EQ(req.resource_logs(0).scope_logs(0).scope().name(), "lib");
+}
+
+namespace
+{
+// A value past the std::string small buffer, so the body also exercises the heap allocated
+// character buffer of an Arena backed string field.
+constexpr const char *kLongValue = "a string value that is longer than the small string buffer";
+
+std::unique_ptr<sdk::logs::Recordable> MakeLogOnArena(
+    std::shared_ptr<google::protobuf::Arena> arena,
+    const resource::Resource &resource,
+    const opentelemetry::sdk::instrumentationscope::InstrumentationScope &scope,
+    nostd::string_view event_name)
+{
+  std::unique_ptr<sdk::logs::Recordable> rec =
+      std::make_unique<OtlpLogRecordable>(std::move(arena));
+  rec->SetResource(resource);
+  rec->SetInstrumentationScope(scope);
+  rec->SetEventId(0, event_name);
+  rec->SetBody(nostd::string_view(kLongValue));
+  rec->SetAttribute("key", nostd::string_view(kLongValue));
+  return rec;
+}
+
+const proto::logs::v1::LogRecord &LogOf(const std::unique_ptr<sdk::logs::Recordable> &rec)
+{
+  return static_cast<const OtlpLogRecordable *>(rec.get())->log_record();
+}
+
+void ExpectLogContent(const proto::logs::v1::LogRecord &log_record, const std::string &event_name)
+{
+  EXPECT_EQ(log_record.event_name(), event_name);
+  EXPECT_EQ(log_record.body().string_value(), kLongValue);
+  ASSERT_EQ(log_record.attributes_size(), 1);
+  EXPECT_EQ(log_record.attributes(0).key(), "key");
+  EXPECT_EQ(log_record.attributes(0).value().string_value(), kLongValue);
+}
+}  // namespace
+
+// Log records created on the Arena the request is created on are moved into the request.
+TEST(OtlpLogRecordable, PopulateRequestSharedArenaMovesLogRecords)
+{
+  auto resource = resource::Resource::Create({{"service.name", "shared"}});
+  auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("lib", "1.0");
+  auto arena = std::make_shared<google::protobuf::Arena>();
+
+  std::vector<std::unique_ptr<sdk::logs::Recordable>> logs;
+  logs.push_back(MakeLogOnArena(arena, resource, *scope, "log0"));
+  logs.push_back(MakeLogOnArena(arena, resource, *scope, "log1"));
+  logs.push_back(MakeLogOnArena(arena, resource, *scope, "log2"));
+
+  auto *req = google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceRequest>(
+      arena.get());
+  OtlpRecordableUtils::PopulateRequest(
+      nostd::span<std::unique_ptr<sdk::logs::Recordable>>(logs.data(), logs.size()), req);
+
+  ASSERT_EQ(req->resource_logs_size(), 1);
+  ASSERT_EQ(req->resource_logs(0).scope_logs_size(), 1);
+  const auto &scope_logs = req->resource_logs(0).scope_logs(0);
+  ASSERT_EQ(scope_logs.log_records_size(), 3);
+  for (int i = 0; i < 3; ++i)
+  {
+    EXPECT_EQ(&scope_logs.log_records(i), &LogOf(logs[static_cast<std::size_t>(i)]));
+    ExpectLogContent(scope_logs.log_records(i), "log" + std::to_string(i));
+  }
+
+  std::string serialized;
+  ASSERT_TRUE(req->SerializeToString(&serialized));
+  proto::collector::logs::v1::ExportLogsServiceRequest parsed;
+  ASSERT_TRUE(parsed.ParseFromString(serialized));
+  ASSERT_EQ(parsed.resource_logs(0).scope_logs(0).log_records_size(), 3);
+  ExpectLogContent(parsed.resource_logs(0).scope_logs(0).log_records(2), "log2");
+
+  // The recordables and the request can go in either order, neither owns the messages.
+  logs.clear();
+  EXPECT_EQ(req->resource_logs(0).scope_logs(0).log_records_size(), 3);
+}
+
+// Only the log records on the request's Arena are moved, the others are copied.
+TEST(OtlpLogRecordable, PopulateRequestMixedArenas)
+{
+  auto resource = resource::Resource::Create({{"service.name", "mixed"}});
+  auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("lib", "1.0");
+  auto arena = std::make_shared<google::protobuf::Arena>();
+  auto other = std::make_shared<google::protobuf::Arena>();
+
+  std::vector<std::unique_ptr<sdk::logs::Recordable>> logs;
+  logs.push_back(MakeLogOnArena(arena, resource, *scope, "log0"));
+  logs.push_back(MakeLogOnArena(nullptr, resource, *scope, "log1"));
+  logs.push_back(MakeLogOnArena(arena, resource, *scope, "log2"));
+  logs.push_back(MakeLogOnArena(other, resource, *scope, "log3"));
+
+  auto *req = google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceRequest>(
+      arena.get());
+  OtlpRecordableUtils::PopulateRequest(
+      nostd::span<std::unique_ptr<sdk::logs::Recordable>>(logs.data(), logs.size()), req);
+
+  const auto &scope_logs = req->resource_logs(0).scope_logs(0);
+  ASSERT_EQ(scope_logs.log_records_size(), 4);
+  EXPECT_EQ(&scope_logs.log_records(0), &LogOf(logs[0]));
+  EXPECT_NE(&scope_logs.log_records(1), &LogOf(logs[1]));
+  EXPECT_EQ(&scope_logs.log_records(2), &LogOf(logs[2]));
+  EXPECT_NE(&scope_logs.log_records(3), &LogOf(logs[3]));
+  for (int i = 0; i < 4; ++i)
+  {
+    EXPECT_EQ(scope_logs.log_records(i).GetArena(), arena.get());
+    ExpectLogContent(scope_logs.log_records(i), "log" + std::to_string(i));
+  }
+
+  // The copies do not depend on the recordables they were copied from.
+  logs[1].reset();
+  logs[3].reset();
+  other.reset();
+  ExpectLogContent(scope_logs.log_records(1), "log1");
+  ExpectLogContent(scope_logs.log_records(3), "log3");
+  std::string serialized;
+  EXPECT_TRUE(req->SerializeToString(&serialized));
+}
+
+// A request that is not on an Arena copies every log record.
+TEST(OtlpLogRecordable, PopulateRequestWithoutArenaCopies)
+{
+  auto resource = resource::Resource::Create({{"service.name", "heap"}});
+  auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("lib", "1.0");
+  auto arena = std::make_shared<google::protobuf::Arena>();
+
+  std::vector<std::unique_ptr<sdk::logs::Recordable>> logs;
+  logs.push_back(MakeLogOnArena(arena, resource, *scope, "log0"));
+  logs.push_back(MakeLogOnArena(nullptr, resource, *scope, "log1"));
+
+  proto::collector::logs::v1::ExportLogsServiceRequest req;
+  OtlpRecordableUtils::PopulateRequest(
+      nostd::span<std::unique_ptr<sdk::logs::Recordable>>(logs.data(), logs.size()), &req);
+
+  const auto &scope_logs = req.resource_logs(0).scope_logs(0);
+  ASSERT_EQ(scope_logs.log_records_size(), 2);
+  for (int i = 0; i < 2; ++i)
+  {
+    EXPECT_NE(&scope_logs.log_records(i), &LogOf(logs[static_cast<std::size_t>(i)]));
+    EXPECT_EQ(scope_logs.log_records(i).GetArena(), nullptr);
+    ExpectLogContent(scope_logs.log_records(i), "log" + std::to_string(i));
+  }
+
+  logs.clear();
+  arena.reset();
+  ExpectLogContent(scope_logs.log_records(0), "log0");
+}
+
+// A log recordable created before an export and exported by a later one stays valid after the
+// request and the other recordables of its Arena are gone, and the Arena goes with the last one.
+TEST(OtlpLogRecordable, SharedArenaOutlivesEarlierExport)
+{
+  auto resource = resource::Resource::Create({{"service.name", "generations"}});
+  auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("lib", "1.0");
+  OtlpRecordableArena recordable_arena;
+
+  std::vector<std::unique_ptr<sdk::logs::Recordable>> first_batch;
+  first_batch.push_back(MakeLogOnArena(recordable_arena.Get(), resource, *scope, "a"));
+  std::unique_ptr<sdk::logs::Recordable> pending =
+      MakeLogOnArena(recordable_arena.Get(), resource, *scope, "b");
+
+  std::weak_ptr<google::protobuf::Arena> first_arena;
+  {
+    std::shared_ptr<google::protobuf::Arena> request_arena = recordable_arena.Rotate();
+    first_arena                                            = request_arena;
+    auto *req =
+        google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceRequest>(
+            request_arena.get());
+    OtlpRecordableUtils::PopulateRequest(
+        nostd::span<std::unique_ptr<sdk::logs::Recordable>>(first_batch.data(), first_batch.size()),
+        req);
+    ASSERT_EQ(req->resource_logs(0).scope_logs(0).log_records_size(), 1);
+    EXPECT_EQ(&req->resource_logs(0).scope_logs(0).log_records(0), &LogOf(first_batch[0]));
+    std::string serialized;
+    EXPECT_TRUE(req->SerializeToString(&serialized));
+    first_batch.clear();
+  }
+  EXPECT_FALSE(first_arena.expired());
+
+  // Keep recording on the old Arena after its request is gone.
+  pending->SetAttribute("late", nostd::string_view(kLongValue));
+
+  std::vector<std::unique_ptr<sdk::logs::Recordable>> second_batch;
+  second_batch.push_back(std::move(pending));
+  second_batch.push_back(MakeLogOnArena(recordable_arena.Get(), resource, *scope, "c"));
+  {
+    std::shared_ptr<google::protobuf::Arena> request_arena = recordable_arena.Rotate();
+    auto *req =
+        google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceRequest>(
+            request_arena.get());
+    OtlpRecordableUtils::PopulateRequest(nostd::span<std::unique_ptr<sdk::logs::Recordable>>(
+                                             second_batch.data(), second_batch.size()),
+                                         req);
+    const auto &scope_logs = req->resource_logs(0).scope_logs(0);
+    ASSERT_EQ(scope_logs.log_records_size(), 2);
+    // The record from the earlier Arena is copied, the one from this Arena is moved.
+    EXPECT_NE(&scope_logs.log_records(0), &LogOf(second_batch[0]));
+    EXPECT_EQ(&scope_logs.log_records(1), &LogOf(second_batch[1]));
+    EXPECT_EQ(scope_logs.log_records(0).event_name(), "b");
+    ASSERT_EQ(scope_logs.log_records(0).attributes_size(), 2);
+    EXPECT_EQ(scope_logs.log_records(0).attributes(1).key(), "late");
+    EXPECT_EQ(scope_logs.log_records(0).attributes(1).value().string_value(), kLongValue);
+    ExpectLogContent(scope_logs.log_records(1), "c");
+
+    second_batch.erase(second_batch.begin());
+    EXPECT_TRUE(first_arena.expired());
+
+    std::string serialized;
+    EXPECT_TRUE(req->SerializeToString(&serialized));
+  }
 }
 
 TEST(OtlpLogRecordable, AttributeCountLimitReportsDroppedCount)

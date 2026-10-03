@@ -55,13 +55,13 @@ OtlpLogRecordable::GetInstrumentationScope() const noexcept
 
 void OtlpLogRecordable::SetTimestamp(opentelemetry::common::SystemTimestamp timestamp) noexcept
 {
-  proto_record_.set_time_unix_nano(timestamp.time_since_epoch().count());
+  proto_record_->set_time_unix_nano(timestamp.time_since_epoch().count());
 }
 
 void OtlpLogRecordable::SetObservedTimestamp(
     opentelemetry::common::SystemTimestamp timestamp) noexcept
 {
-  proto_record_.set_observed_time_unix_nano(timestamp.time_since_epoch().count());
+  proto_record_->set_observed_time_unix_nano(timestamp.time_since_epoch().count());
 }
 
 void OtlpLogRecordable::SetSeverity(opentelemetry::logs::Severity severity) noexcept
@@ -69,128 +69,128 @@ void OtlpLogRecordable::SetSeverity(opentelemetry::logs::Severity severity) noex
   switch (severity)
   {
     case opentelemetry::logs::Severity::kTrace: {
-      proto_record_.set_severity_text("TRACE");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_TRACE);
+      proto_record_->set_severity_text("TRACE");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_TRACE);
       break;
     }
     case opentelemetry::logs::Severity::kTrace2: {
-      proto_record_.set_severity_text("TRACE2");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_TRACE2);
+      proto_record_->set_severity_text("TRACE2");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_TRACE2);
       break;
     }
     case opentelemetry::logs::Severity::kTrace3: {
-      proto_record_.set_severity_text("TRACE3");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_TRACE3);
+      proto_record_->set_severity_text("TRACE3");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_TRACE3);
       break;
     }
     case opentelemetry::logs::Severity::kTrace4: {
-      proto_record_.set_severity_text("TRACE4");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_TRACE4);
+      proto_record_->set_severity_text("TRACE4");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_TRACE4);
       break;
     }
     case opentelemetry::logs::Severity::kDebug: {
-      proto_record_.set_severity_text("DEBUG");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_DEBUG);
+      proto_record_->set_severity_text("DEBUG");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_DEBUG);
       break;
     }
     case opentelemetry::logs::Severity::kDebug2: {
-      proto_record_.set_severity_text("DEBUG2");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_DEBUG2);
+      proto_record_->set_severity_text("DEBUG2");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_DEBUG2);
       break;
     }
     case opentelemetry::logs::Severity::kDebug3: {
-      proto_record_.set_severity_text("DEBUG3");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_DEBUG3);
+      proto_record_->set_severity_text("DEBUG3");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_DEBUG3);
       break;
     }
     case opentelemetry::logs::Severity::kDebug4: {
-      proto_record_.set_severity_text("DEBUG4");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_DEBUG4);
+      proto_record_->set_severity_text("DEBUG4");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_DEBUG4);
       break;
     }
     case opentelemetry::logs::Severity::kInfo: {
-      proto_record_.set_severity_text("INFO");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_INFO);
+      proto_record_->set_severity_text("INFO");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_INFO);
       break;
     }
     case opentelemetry::logs::Severity::kInfo2: {
-      proto_record_.set_severity_text("INFO2");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_INFO2);
+      proto_record_->set_severity_text("INFO2");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_INFO2);
       break;
     }
     case opentelemetry::logs::Severity::kInfo3: {
-      proto_record_.set_severity_text("INFO3");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_INFO3);
+      proto_record_->set_severity_text("INFO3");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_INFO3);
       break;
     }
     case opentelemetry::logs::Severity::kInfo4: {
-      proto_record_.set_severity_text("INFO4");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_INFO4);
+      proto_record_->set_severity_text("INFO4");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_INFO4);
       break;
     }
     case opentelemetry::logs::Severity::kWarn: {
-      proto_record_.set_severity_text("WARN");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_WARN);
+      proto_record_->set_severity_text("WARN");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_WARN);
       break;
     }
     case opentelemetry::logs::Severity::kWarn2: {
-      proto_record_.set_severity_text("WARN2");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_WARN2);
+      proto_record_->set_severity_text("WARN2");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_WARN2);
       break;
     }
     case opentelemetry::logs::Severity::kWarn3: {
-      proto_record_.set_severity_text("WARN3");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_WARN3);
+      proto_record_->set_severity_text("WARN3");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_WARN3);
       break;
     }
     case opentelemetry::logs::Severity::kWarn4: {
-      proto_record_.set_severity_text("WARN4");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_WARN4);
+      proto_record_->set_severity_text("WARN4");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_WARN4);
       break;
     }
     case opentelemetry::logs::Severity::kError: {
-      proto_record_.set_severity_text("ERROR");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_ERROR);
+      proto_record_->set_severity_text("ERROR");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_ERROR);
       break;
     }
     case opentelemetry::logs::Severity::kError2: {
-      proto_record_.set_severity_text("ERROR2");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_ERROR2);
+      proto_record_->set_severity_text("ERROR2");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_ERROR2);
       break;
     }
     case opentelemetry::logs::Severity::kError3: {
-      proto_record_.set_severity_text("ERROR3");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_ERROR3);
+      proto_record_->set_severity_text("ERROR3");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_ERROR3);
       break;
     }
     case opentelemetry::logs::Severity::kError4: {
-      proto_record_.set_severity_text("ERROR4");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_ERROR4);
+      proto_record_->set_severity_text("ERROR4");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_ERROR4);
       break;
     }
     case opentelemetry::logs::Severity::kFatal: {
-      proto_record_.set_severity_text("FATAL");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_FATAL);
+      proto_record_->set_severity_text("FATAL");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_FATAL);
       break;
     }
     case opentelemetry::logs::Severity::kFatal2: {
-      proto_record_.set_severity_text("FATAL2");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_FATAL2);
+      proto_record_->set_severity_text("FATAL2");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_FATAL2);
       break;
     }
     case opentelemetry::logs::Severity::kFatal3: {
-      proto_record_.set_severity_text("FATAL3");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_FATAL3);
+      proto_record_->set_severity_text("FATAL3");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_FATAL3);
       break;
     }
     case opentelemetry::logs::Severity::kFatal4: {
-      proto_record_.set_severity_text("FATAL4");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_FATAL4);
+      proto_record_->set_severity_text("FATAL4");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_FATAL4);
       break;
     }
     default: {
-      proto_record_.set_severity_text("INVALID");
-      proto_record_.set_severity_number(proto::logs::v1::SEVERITY_NUMBER_UNSPECIFIED);
+      proto_record_->set_severity_text("INVALID");
+      proto_record_->set_severity_number(proto::logs::v1::SEVERITY_NUMBER_UNSPECIFIED);
       break;
     }
   }
@@ -198,24 +198,24 @@ void OtlpLogRecordable::SetSeverity(opentelemetry::logs::Severity severity) noex
 
 void OtlpLogRecordable::SetBody(const opentelemetry::common::AttributeValue &message) noexcept
 {
-  OtlpPopulateAttributeUtils::PopulateAnyValue(proto_record_.mutable_body(), message);
+  OtlpPopulateAttributeUtils::PopulateAnyValue(proto_record_->mutable_body(), message);
 }
 
 void OtlpLogRecordable::SetEventId(int64_t /* id */, nostd::string_view event_name) noexcept
 {
-  proto_record_.set_event_name(event_name.data(), event_name.size());
+  proto_record_->set_event_name(event_name.data(), event_name.size());
 }
 
 void OtlpLogRecordable::SetTraceId(const opentelemetry::trace::TraceId &trace_id) noexcept
 {
   if (trace_id.IsValid())
   {
-    proto_record_.set_trace_id(reinterpret_cast<const char *>(trace_id.Id().data()),
-                               trace_id.Id().size());
+    proto_record_->set_trace_id(reinterpret_cast<const char *>(trace_id.Id().data()),
+                                trace_id.Id().size());
   }
   else
   {
-    proto_record_.clear_trace_id();
+    proto_record_->clear_trace_id();
   }
 }
 
@@ -223,18 +223,18 @@ void OtlpLogRecordable::SetSpanId(const opentelemetry::trace::SpanId &span_id) n
 {
   if (span_id.IsValid())
   {
-    proto_record_.set_span_id(reinterpret_cast<const char *>(span_id.Id().data()),
-                              span_id.Id().size());
+    proto_record_->set_span_id(reinterpret_cast<const char *>(span_id.Id().data()),
+                               span_id.Id().size());
   }
   else
   {
-    proto_record_.clear_span_id();
+    proto_record_->clear_span_id();
   }
 }
 
 void OtlpLogRecordable::SetTraceFlags(const opentelemetry::trace::TraceFlags &trace_flags) noexcept
 {
-  proto_record_.set_flags(trace_flags.flags());
+  proto_record_->set_flags(trace_flags.flags());
 }
 
 void OtlpLogRecordable::SetAttribute(opentelemetry::nostd::string_view key,
@@ -244,15 +244,15 @@ void OtlpLogRecordable::SetAttribute(opentelemetry::nostd::string_view key,
   {
     return;
   }
-  if (static_cast<std::size_t>(proto_record_.attributes_size()) >= limits_.attribute_count_limit)
+  if (static_cast<std::size_t>(proto_record_->attributes_size()) >= limits_.attribute_count_limit)
   {
-    proto_record_.set_dropped_attributes_count(proto_record_.dropped_attributes_count() + 1);
+    proto_record_->set_dropped_attributes_count(proto_record_->dropped_attributes_count() + 1);
     return;
   }
 
   AttributeConverterOptions options;
   options.attribute_value_length_limit = limits_.attribute_value_length_limit;
-  OtlpPopulateAttributeUtils::PopulateAttribute(proto_record_.add_attributes(), key, value,
+  OtlpPopulateAttributeUtils::PopulateAttribute(proto_record_->add_attributes(), key, value,
                                                 options);
 }
 

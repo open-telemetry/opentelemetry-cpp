@@ -1089,3 +1089,41 @@ otel_cc_benchmark(
         "@com_github_opentelemetry_proto//:trace_service_proto_cc",
     ],
 )
+
+otel_cc_benchmark(
+    name = "otlp_recordable_phase_benchmark",
+    srcs = ["test/otlp_recordable_phase_benchmark.cc"],
+    tags = [
+        "benchmark",
+        "otlp",
+        "test",
+    ],
+    deps = [
+        ":otlp_recordable",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "//test_common:headers",
+    ],
+)
+
+# Counting the heap allocations of each phase replaces the global operator new, which perturbs
+# the very allocations it measures. The same source is built a second time for the counts so the
+# timing binary stays uninstrumented.
+otel_cc_benchmark(
+    name = "otlp_recordable_phase_alloc_benchmark",
+    srcs = ["test/otlp_recordable_phase_benchmark.cc"],
+    local_defines = ["OTELCPP_BENCHMARK_COUNT_ALLOCATIONS"],
+    tags = [
+        "benchmark",
+        "otlp",
+        "test",
+    ],
+    deps = [
+        ":otlp_recordable",
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+        "//sdk/src/trace",
+        "//test_common:headers",
+    ],
+)

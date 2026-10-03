@@ -4,6 +4,8 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
+#include <utility>
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
@@ -14,6 +16,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "google/protobuf/arena.h"
 #include "opentelemetry/proto/logs/v1/logs.pb.h"
 #include "opentelemetry/exporters/otlp/protobuf_include_suffix.h" // IWYU pragma: keep
 // clang-format on
@@ -30,8 +33,32 @@ namespace otlp
 class OtlpLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
 public:
-  proto::logs::v1::LogRecord &log_record() noexcept { return proto_record_; }
-  const proto::logs::v1::LogRecord &log_record() const noexcept { return proto_record_; }
+  OtlpLogRecordable() : OtlpLogRecordable(nullptr) {}
+
+  /**
+   * Construct on the given Arena.
+   *
+   * The log record message is created on arena, and the recordable keeps a reference to it, so
+   * the Arena outlives the recordable. The OTLP exporters pass the Arena they share across every
+   * recordable they create between two exports, so that the export request can be created on the
+   * same Arena and take the log record message without a copy. A null arena gives the recordable
+   * an Arena of its own.
+   */
+  explicit OtlpLogRecordable(std::shared_ptr<google::protobuf::Arena> arena)
+      : arena_{arena ? std::move(arena) : std::make_shared<google::protobuf::Arena>()},
+        proto_record_{google::protobuf::Arena::Create<proto::logs::v1::LogRecord>(arena_.get())}
+  {}
+
+  // The log record message is owned by the Arena, not by the recordable, and an export request on
+  // the same Arena may hold it, so the recordable is neither copyable nor movable. Recordables are
+  // created and handed around by pointer, so nothing in the SDK or the exporters needs these.
+  OtlpLogRecordable(const OtlpLogRecordable &)            = delete;
+  OtlpLogRecordable &operator=(const OtlpLogRecordable &) = delete;
+  OtlpLogRecordable(OtlpLogRecordable &&)                 = delete;
+  OtlpLogRecordable &operator=(OtlpLogRecordable &&)      = delete;
+
+  proto::logs::v1::LogRecord &log_record() noexcept { return *proto_record_; }
+  const proto::logs::v1::LogRecord &log_record() const noexcept { return *proto_record_; }
 
   /** Returns the associated resource */
   const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
@@ -119,7 +146,13 @@ public:
                                    &instrumentation_scope) noexcept override;
 
 private:
-  proto::logs::v1::LogRecord proto_record_;
+  // Declared before proto_record_ so the Arena is set before the log record message is created on
+  // it. The Arena may be shared with other recordables and with export requests, and it is
+  // destroyed by the last of them, so the log record message stays valid for as long as this
+  // recordable or a request built from it is alive.
+  std::shared_ptr<google::protobuf::Arena> arena_;
+  // Owned by the Arena, never null, never deleted.
+  proto::logs::v1::LogRecord *proto_record_;
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
       nullptr;

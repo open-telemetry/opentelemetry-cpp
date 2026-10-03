@@ -15,6 +15,7 @@
 
 #include "opentelemetry/exporters/otlp/otlp_environment.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_recordable_utils.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/logs/exporter.h"
 
@@ -111,6 +112,9 @@ private:
 
   std::shared_ptr<OtlpGrpcClient> client_;
   std::shared_ptr<OtlpGrpcClientReferenceGuard> client_reference_guard_;
+
+  // The Arena shared by the recordables created since the last export, see OtlpRecordableArena.
+  OtlpRecordableArena recordable_arena_;
 
   // For testing
   friend class OtlpGrpcLogRecordExporterTestPeer;
