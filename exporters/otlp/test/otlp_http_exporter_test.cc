@@ -9,13 +9,16 @@
 #include <cstdlib>
 #include <map>
 #include <string>
-#include <thread>
 #include <tuple>
 #include <utility>
 #include <variant>
 #include <vector>
 #include "gmock/gmock.h"
 #include "nlohmann/json.hpp"
+
+#ifdef ENABLE_ASYNC_EXPORT
+#  include <thread>
+#endif
 
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
