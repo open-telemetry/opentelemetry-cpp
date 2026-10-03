@@ -373,6 +373,58 @@ TEST(ComposableSampler, PreservesOtherSubkeysAndIgnoresInvalidValues)
   EXPECT_NE(std::string::npos, ot.find("keep:me"));
 }
 
+TEST(ComposableSampler, PreservesMultipleOtherSubkeys)
+{
+  // Two "other" subkeys in the input exercise the separator inserted between
+  // them (not just before/after a single one).
+  auto sampler = CompositeSamplerFactory::Create(std::make_shared<ComposableAlwaysOnSampler>());
+  auto parent  = MakeParent(false, "a:1;b:2");
+  opentelemetry::sdk::trace::SamplingResult result;
+  EXPECT_EQ(Decision::RECORD_AND_SAMPLE, Sample(*sampler, parent, MakeTraceId(0x00), &result));
+  EXPECT_EQ("th:0;a:1;b:2", OtOf(result));
+}
+
+TEST(ComposableSampler, PreservesUnrelatedTraceStateKey)
+{
+  // A sibling tracestate key (not "ot") must survive Set("ot", ...).
+  auto sampler = CompositeSamplerFactory::Create(std::make_shared<ComposableAlwaysOnSampler>());
+  uint8_t trace_buf[trace_api::TraceId::kSize] = {1};
+  uint8_t span_buf[trace_api::SpanId::kSize]   = {1};
+  auto trace_state = trace_api::TraceState::FromHeader("ot=th:8,vendor=xyz");
+  trace_api::SpanContext parent(trace_api::TraceId(trace_buf), trace_api::SpanId(span_buf),
+                                trace_api::TraceFlags(0), true, trace_state);
+
+  opentelemetry::sdk::trace::SamplingResult result;
+  EXPECT_EQ(Decision::RECORD_AND_SAMPLE, Sample(*sampler, parent, MakeTraceId(0x00), &result));
+  EXPECT_EQ("th:0", OtOf(result));
+
+  std::string vendor_value;
+  ASSERT_TRUE(result.trace_state->Get("vendor", vendor_value));
+  EXPECT_EQ("xyz", vendor_value);
+}
+
+TEST(ComposableSampler, NoOtKeyPreservesUnrelatedTraceStateKey)
+{
+  // Tracestate has a sibling key but no "ot" entry, and AlwaysOff never
+  // emits a threshold: "ot" must stay absent and the sibling key must survive
+  // (regression test for skipping Delete() based on ot_value, not Empty()).
+  auto sampler = CompositeSamplerFactory::Create(std::make_shared<ComposableAlwaysOffSampler>());
+  uint8_t trace_buf[trace_api::TraceId::kSize] = {1};
+  uint8_t span_buf[trace_api::SpanId::kSize]   = {1};
+  auto trace_state                             = trace_api::TraceState::FromHeader("vendor=xyz");
+  trace_api::SpanContext parent(trace_api::TraceId(trace_buf), trace_api::SpanId(span_buf),
+                                trace_api::TraceFlags(0), true, trace_state);
+
+  opentelemetry::sdk::trace::SamplingResult result;
+  EXPECT_EQ(Decision::DROP, Sample(*sampler, parent, MakeTraceId(0x00), &result));
+
+  std::string ot_value;
+  EXPECT_FALSE(result.trace_state->Get("ot", ot_value));
+  std::string vendor_value;
+  ASSERT_TRUE(result.trace_state->Get("vendor", vendor_value));
+  EXPECT_EQ("xyz", vendor_value);
+}
+
 TEST(ComposableSampler, ThresholdOmittedOverSizeLimit)
 {
   auto sampler = CompositeSamplerFactory::Create(std::make_shared<ComposableAlwaysOnSampler>());
