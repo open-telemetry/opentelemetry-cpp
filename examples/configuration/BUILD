@@ -47,7 +47,6 @@ cc_test(
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -77,7 +76,6 @@ cc_test(
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -107,6 +105,5 @@ cc_test(
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
     ],
 )
