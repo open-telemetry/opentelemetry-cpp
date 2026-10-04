@@ -565,15 +565,11 @@ void HttpOperation::Cleanup()
   // Only cleanup async once even in recursive calls
   if (async_data_)
   {
-    // Just reset and move easy_handle to owner if in async mode
+    // Hand the easy handle over untouched. It may still be attached to the multi handle, and the
+    // thread inside curl_multi_perform owns it until the IO thread removes it.
     Session *session = async_data_->session.exchange(nullptr, std::memory_order_acq_rel);
     if (session != nullptr)
     {
-      if (curl_resource_.easy_handle != nullptr)
-      {
-        curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_PRIVATE, NULL);
-        curl_easy_reset(curl_resource_.easy_handle);
-      }
       session->GetHttpClient().ScheduleRemoveSession(session->GetSessionId(),
                                                      std::move(curl_resource_));
     }
@@ -1569,6 +1565,14 @@ void HttpOperation::Abort()
 
 bool HttpOperation::PerformCurlMessage(CURLcode code)
 {
+  if (is_cleaned_.load(std::memory_order_acquire))
+  {
+    // is_cleaned_ says only that some thread has entered Cleanup(), which it does before the
+    // terminal event, the hand over of the easy handle and the completion callback. Either way
+    // this message is not this operation's to read, nor to retry on what an earlier one left.
+    return false;
+  }
+
   ++retry_attempts_;
   last_attempt_time_     = std::chrono::system_clock::now();
   last_curl_result_      = code;

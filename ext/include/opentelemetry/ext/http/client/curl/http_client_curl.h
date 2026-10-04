@@ -384,6 +384,9 @@ private:
   bool doRetrySessions(bool report_all);
   void resetMultiHandle();
 
+  bool detachHandle(CURL *easy_handle);
+  void releaseQuarantinedHandles();
+
   std::mutex multi_handle_m_;
   CURLM *multi_handle_;
   std::atomic<uint64_t> next_session_id_{0};
@@ -394,8 +397,28 @@ private:
   std::unordered_map<uint64_t, std::shared_ptr<Session>> sessions_;
   std::unordered_set<uint64_t> pending_to_add_session_ids_;
   std::unordered_map<uint64_t, std::shared_ptr<Session>> pending_to_abort_sessions_;
-  std::unordered_map<uint64_t, HttpCurlEasyResource> pending_to_remove_session_handles_;
-  std::list<std::shared_ptr<Session>> pending_to_remove_sessions_;
+  // One easy handle on its way back to libcurl, with the session its CURLOPT_PRIVATE names. The
+  // session is taken when the record is made, so nothing has to find it again in a sessions_ the
+  // calling thread may change. One record per handle, not per session: a session that starts a
+  // second request queues a second handle, and one entry per session would orphan the first.
+  struct PendingCurlRemoval
+  {
+    uint64_t session_id;
+    HttpCurlEasyResource resource;
+    std::shared_ptr<Session> owner;
+  };
+
+  std::list<PendingCurlRemoval> pending_to_remove_session_handles_;
+
+  // Which easy handles the multi handle holds, recorded when curl_multi_add_handle accepts one.
+  // curl_multi_remove_handle cannot answer that afterwards: libcurl 8.10 and 8.11 reject a handle
+  // the multi handle does not hold where every other version accepts it. Background thread only.
+  std::unordered_set<CURL *> attached_handles_;
+
+  // Handles libcurl would not give back. A transfer may still be running on one, and its
+  // CURLOPT_PRIVATE names the session, so freeing either would leave released storage behind a
+  // live pointer. Both are held until curl_multi_cleanup detaches the handle and frees them.
+  std::list<PendingCurlRemoval> quarantined_handles_;
   std::deque<std::shared_ptr<Session>> pending_to_retry_sessions_;
 
   std::mutex background_thread_m_;

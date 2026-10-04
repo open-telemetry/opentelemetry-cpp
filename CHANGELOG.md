@@ -94,6 +94,10 @@ Breaking changes:
   Note that `AsyncMetricStorage`'s constructor now takes the view's
   `AttributesProcessor`, matching `SyncMetricStorage`.
   [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
+* [BUG] Remove a curl easy handle from the multi handle before freeing that
+  handle and the header list it points at, and keep both when libcurl will not
+  take the handle back
+  [#4391](https://github.com/open-telemetry/opentelemetry-cpp/issues/4391)
 
 * [BUG] Keep the curl retry deadline stable within each attempt
   [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
