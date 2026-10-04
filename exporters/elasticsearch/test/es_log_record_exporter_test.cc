@@ -313,16 +313,17 @@ TEST(ElasticsearchLogRecordableTests, BasicTests)
 }
 
 // ---------------------------------------------------------------------------
-// ForceFlush deadline.
+// Async completion and terminal diagnostics.
 // ---------------------------------------------------------------------------
 namespace
 {
 namespace http_client = opentelemetry::ext::http::client;
 
-// Accepted by the substring check, by an "errors": false parse and by a 2xx operation result,
-// so these cases mean the same thing whichever success check is in place.
+// A success response under either success check: a substring search wants the spacing in
+// `"failed" : 0`, and parsing the operation results wants a string `_index` on each.
 constexpr const char *kAcceptedBody =
-    R"({"took":30,"errors":false,"items":[{"index":{"status":201,"_shards":{"failed" : 0}}}]})";
+    R"({"took":30,"errors":false,"items":[{"index":{"_index":"logs","status":201,)"
+    R"("_shards":{"failed" : 0}}}]})";
 
 }  // namespace
 
