@@ -140,7 +140,7 @@ TEST(HistogramStress, UnsignedInt64)
   collect_thread.join();
 
   //
-  // run the the final collection
+  // run the final collection
   //
   reader->Collect([&](ResourceMetrics &rm) {
     for (const ScopeMetrics &smd : rm.scope_metric_data_)
