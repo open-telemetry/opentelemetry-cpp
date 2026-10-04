@@ -11,6 +11,7 @@
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_metadata.h"
 
 using opentelemetry::trace::kSpanKey;
