@@ -11,7 +11,6 @@
 #include "opentelemetry/trace/noop.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
-#include "opentelemetry/trace/span_context.h"
 #include "opentelemetry/trace/span_metadata.h"
 
 using opentelemetry::trace::kSpanKey;
@@ -23,7 +22,7 @@ namespace context = opentelemetry::context;
 
 TEST(ScopeTest, Construct)
 {
-  nostd::shared_ptr<Span> span(new NoopSpan(nullptr));
+  nostd::shared_ptr<Span> span(new NoopSpan());
   Scope scope(span);
 
   context::ContextValue active_span_value = context::RuntimeContext::GetValue(kSpanKey);
@@ -35,11 +34,11 @@ TEST(ScopeTest, Construct)
 
 TEST(ScopeTest, Destruct)
 {
-  nostd::shared_ptr<Span> span(new NoopSpan(nullptr));
+  nostd::shared_ptr<Span> span(new NoopSpan());
   Scope scope(span);
 
   {
-    nostd::shared_ptr<Span> span_nested(new NoopSpan(nullptr));
+    nostd::shared_ptr<Span> span_nested(new NoopSpan());
     Scope scope_nested(span_nested);
 
     context::ContextValue active_span_value = context::RuntimeContext::GetValue(kSpanKey);
