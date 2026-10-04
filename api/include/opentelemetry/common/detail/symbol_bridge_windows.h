@@ -45,7 +45,8 @@ inline
 #endif
 
 #if !defined(OPENTELEMETRY_SYMBOL_BRIDGE_NOINLINE) || defined(OPENTELEMETRY_SYMBOL_BRIDGE_IMPL)
-    LoadedBridgeSymbol LoadSymbolBridgeSymbol(const char *symbol_name) noexcept
+    LoadedBridgeSymbol
+    LoadSymbolBridgeSymbol(const char *symbol_name) noexcept
 {
   struct ModuleLifetime
   {
