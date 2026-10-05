@@ -41,7 +41,7 @@ TEST(ETWProperties, SpanStringAttributeCopiesByViewLengthNotNul)
 {
   // Buffer continues past each logical view. A NUL-scanning copy would overrun
   // or include trailing characters; a length-aware copy must not.
-  const char buffer[] = {'a', 'b', 'c', 'X', 'Y', 'Z', '1', '2', '3'};
+  const char buffer[]              = {'a', 'b', 'c', 'X', 'Y', 'Z', '1', '2', '3'};
   const nostd::string_view views[] = {
       nostd::string_view(buffer, 3),      // "abc"
       nostd::string_view(buffer + 3, 3),  // "XYZ"
@@ -73,7 +73,7 @@ TEST(ETWProperties, StringAttributeCopiesByViewLengthNotNul)
 
 TEST(ETWProperties, PropertiesMapPreservesSpanStringAttribute)
 {
-  const nostd::string_view views[] = {"one", "two"};
+  const nostd::string_view views[]                                         = {"one", "two"};
   std::vector<std::pair<nostd::string_view, common::AttributeValue>> pairs = {
       {"tags", nostd::span<const nostd::string_view>{views}}};
   auto iterable = common::MakeKeyValueIterableView(pairs);
