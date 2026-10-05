@@ -323,7 +323,7 @@ switch ($action) {
     if ($exit -ne 0) {
       exit $exit
     }
-    $env:PATH = FindAndMergeDllPath "$BUILD_DIR\ext\src\dll\Debug", "$BUILD_DIR\api\Debug"
+    $env:PATH = FindAndMergeDllPath "$BUILD_DIR\ext\src\dll\Debug", "$BUILD_DIR\Debug", "$BUILD_DIR\api\Debug"
     ctest -C Debug
     $exit = $LASTEXITCODE
     if ($exit -ne 0) {
