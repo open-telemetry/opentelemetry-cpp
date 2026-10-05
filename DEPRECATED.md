@@ -94,7 +94,6 @@ The following legacy CMake option names are deprecated:
 | `WITH_OTLP_GRPC_SSL_MTLS_PREVIEW` | `OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW` |
 | `WITH_OTLP_HTTP` | `OTELCPP_WITH_OTLP_HTTP` |
 | `WITH_OTLP_HTTP_COMPRESSION` | `OTELCPP_WITH_OTLP_HTTP_COMPRESSION` |
-| `WITH_OTLP_RETRY_PREVIEW` | `OTELCPP_WITH_OTLP_RETRY_PREVIEW` |
 | `WITH_OTLP_UTF8_VALIDITY` | `OTELCPP_WITH_OTLP_UTF8_VALIDITY` |
 | `WITH_PROMETHEUS` | `OTELCPP_WITH_PROMETHEUS` |
 | `WITH_RESOURCE_DETECTORS_PREVIEW` | `OTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW` |
@@ -118,54 +117,6 @@ both names are set, the `OTELCPP_` name takes precedence.
 
 The legacy CMake option names will be removed in a future release. The
 replacement names are not affected by this removal.
-
-### CMake OTELCPP_WITH_OTLP_RETRY_PREVIEW
-
-#### Announcement (OTELCPP_WITH_OTLP_RETRY_PREVIEW)
-
-The CMake compile flag `OTELCPP_WITH_OTLP_RETRY_PREVIEW`, formerly named
-`WITH_OTLP_RETRY_PREVIEW`, is deprecated by:
-
-* Enable WITH_OTLP_RETRY_PREVIEW by default
-  [#3953](https://github.com/open-telemetry/opentelemetry-cpp/pull/3953)
-
-#### Motivation (OTELCPP_WITH_OTLP_RETRY_PREVIEW)
-
-Flags like `OTELCPP_WITH_OTLP_RETRY_PREVIEW` are used to conditionally compile
-new features when they are introduced in the code base.
-
-Now that this feature is stable, conditional compilation is no longer
-necessary.
-
-#### Scope (OTELCPP_WITH_OTLP_RETRY_PREVIEW)
-
-Remove the `OTELCPP_WITH_OTLP_RETRY_PREVIEW` compilation flag and its legacy
-name `WITH_OTLP_RETRY_PREVIEW` from CMake.
-
-Remove the `ENABLE_OTLP_RETRY_PREVIEW` preprocessor condition from C++.
-
-#### Mitigation (OTELCPP_WITH_OTLP_RETRY_PREVIEW)
-
-Applications built with `OTELCPP_WITH_OTLP_RETRY_PREVIEW=ON` or
-`WITH_OTLP_RETRY_PREVIEW=ON` need to:
-
-* remove the preview flag from CMake scripts
-
-Applications built with `OTELCPP_WITH_OTLP_RETRY_PREVIEW=OFF` or
-`WITH_OTLP_RETRY_PREVIEW=OFF` need to:
-
-* remove the preview flag from CMake scripts
-* use `retry_policy_max_attempts` = 0 in the OTLP exporter options.
-
-For Bazel, no compilation option exists,
-the bazel build enables unconditionally ENABLE_OTLP_RETRY_PREVIEW.
-
-Make sure to properly initialize `retry_policy_max_attempts`
-to enable or disable the retry feature.
-
-#### Planned removal (OTELCPP_WITH_OTLP_RETRY_PREVIEW)
-
-This compilation flag will be removed after October 1st, 2026.
 
 ### CMake OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
 
