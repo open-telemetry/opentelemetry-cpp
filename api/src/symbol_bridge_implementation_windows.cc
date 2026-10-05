@@ -113,8 +113,8 @@ OpenTelemetryContextPropagationGlobalTextMapPropagatorGetLock()
 
 // - logs provider
 __declspec(dllexport)
-    OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<OPENTELEMETRY_NAMESPACE::logs::LoggerProvider>
-        &OpenTelemetryLogsProviderGetProvider()
+OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<OPENTELEMETRY_NAMESPACE::logs::LoggerProvider> &
+OpenTelemetryLogsProviderGetProvider()
 {
   static OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<OPENTELEMETRY_NAMESPACE::logs::LoggerProvider>
       provider(new OPENTELEMETRY_NAMESPACE::logs::NoopLoggerProvider);
