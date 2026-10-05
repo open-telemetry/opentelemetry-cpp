@@ -64,6 +64,11 @@ struct InstrumentDescriptorLogStreamable
   std::reference_wrapper<const opentelemetry::sdk::metrics::InstrumentDescriptor> instrument;
 };
 
+struct ViewLogStreamable
+{
+  std::reference_wrapper<const opentelemetry::sdk::metrics::View> view;
+};
+
 std::ostream &operator<<(std::ostream &os,
                          const InstrumentationScopeLogStreamable &streamable) noexcept
 {
@@ -123,6 +128,26 @@ std::size_t ResolveRecordingCardinalityLimit(
   return max_limit;
 }
 
+std::ostream &operator<<(std::ostream &os, const ViewLogStreamable &streamable) noexcept
+{
+  using opentelemetry::sdk::metrics::AggregationUtil;
+  auto aggregation_type          = streamable.view.get().GetAggregationType();
+  const auto *aggregation_config = streamable.view.get().GetAggregationConfig();
+
+  os << "\n  name=\"" << streamable.view.get().GetName() << "\"" << "\n  description=\""
+     << streamable.view.get().GetDescription() << "\"" << "\n  aggregation_type=\""
+     << AggregationUtil::GetAggregationTypeString(aggregation_type) << "\""
+     << "\n  aggregation_config={"
+     << (aggregation_config
+             ? AggregationUtil::GetAggregationTypeString(aggregation_config->GetType())
+             : "null")
+     << (aggregation_config
+             ? ", cardinality_limit=" + std::to_string(aggregation_config->GetCardinalityLimit())
+             : "")
+     << "}";
+  return os;
+}
+
 }  // namespace
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -135,9 +160,8 @@ namespace metrics = opentelemetry::metrics;
 
 metrics::NoopMeter Meter::kNoopMeter = metrics::NoopMeter();
 
-Meter::Meter(
-    std::weak_ptr<MeterContext> meter_context,
-    std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
+Meter::Meter(std::weak_ptr<MeterContext> meter_context,
+             std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope)
     : scope_{std::move(instrumentation_scope)},
       meter_context_{std::move(meter_context)},
       observable_registry_(new ObservableRegistry()),
@@ -559,6 +583,17 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
        exemplar_filter_type
 #endif
   ](const View &view) {
+        OTEL_INTERNAL_LOG_DEBUG("[Meter::RegisterSyncMetricStorage] View matched."
+                                << "\nInstrumentationScope: "
+                                << InstrumentationScopeLogStreamable{*GetInstrumentationScope()}
+                                << "\nInstrument: "
+                                << InstrumentDescriptorLogStreamable{instrument_descriptor}
+                                << "\nView: " << ViewLogStreamable{view});
+
+        if (view.GetAggregationType() == AggregationType::kDrop)
+        {
+          return true;
+        }
         auto view_instr_desc = instrument_descriptor;
         if (!view.GetName().empty())
         {
@@ -594,7 +629,12 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
           storage_registry_.insert({view_instr_desc, sync_storage});
         }
         auto sync_multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
-        sync_multi_storage->AddStorage(sync_storage);
+        if (!sync_multi_storage->AddStorage(sync_storage))
+        {
+          WarnOnViewSemanticError(GetInstrumentationScope(), instrument_descriptor, view_instr_desc,
+                                  view);
+          return true;
+        }
         return true;
       });
 
@@ -634,6 +674,16 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
        exemplar_filter_type
 #endif
   ](const View &view) {
+        OTEL_INTERNAL_LOG_DEBUG("[Meter::RegisterAsyncMetricStorage] View matched."
+                                << "\nInstrumentationScope: "
+                                << InstrumentationScopeLogStreamable{*GetInstrumentationScope()}
+                                << "\nInstrument: "
+                                << InstrumentDescriptorLogStreamable{instrument_descriptor}
+                                << "\nView: " << ViewLogStreamable{view});
+        if (view.GetAggregationType() == AggregationType::kDrop)
+        {
+          return true;
+        }
         auto view_instr_desc = instrument_descriptor;
         if (!view.GetName().empty())
         {
@@ -669,7 +719,13 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
           storage_registry_.insert({view_instr_desc, async_storage});
         }
         auto async_multi_storage = static_cast<AsyncMultiMetricStorage *>(storages.get());
-        async_multi_storage->AddStorage(async_storage);
+        if (!async_multi_storage->AddStorage(async_storage))
+        {
+          WarnOnViewSemanticError(GetInstrumentationScope(), instrument_descriptor, view_instr_desc,
+                                  view);
+          return true;
+        }
+
         return true;
       });
   if (!success)
@@ -790,6 +846,26 @@ void Meter::WarnOnNameCaseConflict(const sdk::instrumentationscope::Instrumentat
         << "\nExisting instrument: " << InstrumentDescriptorLogStreamable{existing_instrument}
         << "\nDuplicate instrument: " << InstrumentDescriptorLogStreamable{new_instrument});
   }
+}
+
+// Implementation of the log message recommended by the SDK specification for semantic errors caused
+// by a View configuration. Views that create conflicting metric identities will be ignored and this
+// warning will be emitted. See
+// https://github.com/open-telemetry/opentelemetry-specification/blob/v1.60.0/specification/metrics/sdk.md?plain=1#L438
+// https://github.com/open-telemetry/opentelemetry-specification/blob/v1.60.0/specification/metrics/data-model.md#opentelemetry-protocol-data-model-producer-recommendations
+void Meter::WarnOnViewSemanticError(const sdk::instrumentationscope::InstrumentationScope *scope,
+                                    const InstrumentDescriptor &existing_instrument,
+                                    const InstrumentDescriptor &stream,
+                                    const View &view)
+{
+  OTEL_INTERNAL_LOG_WARN(
+      "[Meter::WarnOnViewSemanticError] The matched View may cause a semantic error in "
+      "the data exported from this meter by configuring a conflicting metric and is not applied. "
+      "To resolve this warning consider adjusting the View configuration to rename the stream."
+      << "\nScope: " << InstrumentationScopeLogStreamable{*scope}
+      << "\nInstrument: " << InstrumentDescriptorLogStreamable{existing_instrument}
+      << "\nMetric stream: " << InstrumentDescriptorLogStreamable{stream}
+      << "\nView: " << ViewLogStreamable{view});
 }
 
 }  // namespace metrics
