@@ -101,6 +101,9 @@ Breaking changes:
 * [BUG] Keep the curl retry deadline stable within each attempt
   [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
 
+* [REMOVAL] Remove WITH_OTLP_RETRY_PREVIEW - #4668
+  [#4668](https://github.com/open-telemetry/opentelemetry-cpp/pull/4668)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
