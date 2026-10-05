@@ -69,8 +69,8 @@ extern "C" {
 __declspec(dllexport) void OpenTelemetryAbiBridgeHook() {}
 
 // - baggage
-__declspec(dllexport) OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<
-    opentelemetry::baggage::Baggage> OpenTelemetryBaggageBaggageGetDefault()
+__declspec(dllexport) OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<opentelemetry::baggage::Baggage>
+OpenTelemetryBaggageBaggageGetDefault()
 {
   static OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<opentelemetry::baggage::Baggage> baggage{
       new OPENTELEMETRY_NAMESPACE::baggage::Baggage()};
@@ -79,32 +79,33 @@ __declspec(dllexport) OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<
 
 // - runtime_context
 __declspec(dllexport)
-    OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<opentelemetry::context::RuntimeContextStorage>
-        &OpenTelemetryContextRuntimeContextGetStorage()
+OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<opentelemetry::context::RuntimeContextStorage> &
+OpenTelemetryContextRuntimeContextGetStorage()
 {
   static OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<opentelemetry::context::RuntimeContextStorage>
       context(OPENTELEMETRY_NAMESPACE::context::GetDefaultStorage());
   return context;
 }
-__declspec(dllexport) OPENTELEMETRY_NAMESPACE::context::detail::AbiBridgePrivacyIntruder::
-    ThreadLocalContextStorageStack &OpenTelemetryContextThreadLocalContextStorageStackGetStack()
+__declspec(dllexport)
+OPENTELEMETRY_NAMESPACE::context::detail::AbiBridgePrivacyIntruder::ThreadLocalContextStorageStack &
+OpenTelemetryContextThreadLocalContextStorageStackGetStack()
 {
   return OPENTELEMETRY_NAMESPACE::context::detail::AbiBridgePrivacyIntruder::
       GetThreadLocalContextStorageStack();
 }
 
 // - global_propagator
-__declspec(dllexport) OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<
-    opentelemetry::context::propagation::TextMapPropagator>
-    &OpenTelemetryContextPropagationGlobalTextMapPropagatorGetPropagator()
+__declspec(dllexport)
+OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<opentelemetry::context::propagation::TextMapPropagator> &
+OpenTelemetryContextPropagationGlobalTextMapPropagatorGetPropagator()
 {
   static OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<
       opentelemetry::context::propagation::TextMapPropagator>
       propagator(new OPENTELEMETRY_NAMESPACE::context::propagation::NoOpPropagator());
   return propagator;
 }
-__declspec(dllexport) OPENTELEMETRY_NAMESPACE::common::SpinLockMutex
-    &OpenTelemetryContextPropagationGlobalTextMapPropagatorGetLock()
+__declspec(dllexport) OPENTELEMETRY_NAMESPACE::common::SpinLockMutex &
+OpenTelemetryContextPropagationGlobalTextMapPropagatorGetLock()
 {
   static OPENTELEMETRY_NAMESPACE::common::SpinLockMutex lock;
   return lock;
@@ -122,8 +123,8 @@ __declspec(dllexport)
 
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
 __declspec(dllexport)
-    OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<OPENTELEMETRY_NAMESPACE::logs::EventLoggerProvider>
-        &OpenTelemetryLogsProviderGetEventProvider()
+OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<OPENTELEMETRY_NAMESPACE::logs::EventLoggerProvider> &
+OpenTelemetryLogsProviderGetEventProvider()
 {
   static OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<
       OPENTELEMETRY_NAMESPACE::logs::EventLoggerProvider>
@@ -132,8 +133,8 @@ __declspec(dllexport)
 }
 #endif
 
-__declspec(dllexport)
-    OPENTELEMETRY_NAMESPACE::common::SpinLockMutex &OpenTelemetryLogsProviderGetLock()
+__declspec(dllexport) OPENTELEMETRY_NAMESPACE::common::SpinLockMutex &
+OpenTelemetryLogsProviderGetLock()
 {
   static OPENTELEMETRY_NAMESPACE::common::SpinLockMutex lock;
   return lock;
@@ -141,15 +142,15 @@ __declspec(dllexport)
 
 // - metrics provider
 __declspec(dllexport)
-    OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<OPENTELEMETRY_NAMESPACE::metrics::MeterProvider>
-        &OpenTelemetryMetricsProviderGetProvider()
+OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<OPENTELEMETRY_NAMESPACE::metrics::MeterProvider> &
+OpenTelemetryMetricsProviderGetProvider()
 {
   static OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<OPENTELEMETRY_NAMESPACE::metrics::MeterProvider>
       provider(new OPENTELEMETRY_NAMESPACE::metrics::NoopMeterProvider);
   return provider;
 }
-__declspec(dllexport)
-    OPENTELEMETRY_NAMESPACE::common::SpinLockMutex &OpenTelemetryMetricsProviderGetLock()
+__declspec(dllexport) OPENTELEMETRY_NAMESPACE::common::SpinLockMutex &
+OpenTelemetryMetricsProviderGetLock()
 {
   static OPENTELEMETRY_NAMESPACE::common::SpinLockMutex lock;
   return lock;
@@ -157,24 +158,25 @@ __declspec(dllexport)
 
 // - trace provider
 __declspec(dllexport)
-    OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<OPENTELEMETRY_NAMESPACE::trace::TracerProvider>
-        &OpenTelemetryTraceProviderGetProvider()
+OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<OPENTELEMETRY_NAMESPACE::trace::TracerProvider> &
+OpenTelemetryTraceProviderGetProvider()
 {
   static OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<OPENTELEMETRY_NAMESPACE::trace::TracerProvider>
       provider(new OPENTELEMETRY_NAMESPACE::trace::NoopTracerProvider);
   return provider;
 }
 
-__declspec(dllexport)
-    OPENTELEMETRY_NAMESPACE::common::SpinLockMutex &OpenTelemetryTraceProviderGetLock()
+__declspec(dllexport) OPENTELEMETRY_NAMESPACE::common::SpinLockMutex &
+OpenTelemetryTraceProviderGetLock()
 {
   static OPENTELEMETRY_NAMESPACE::common::SpinLockMutex lock;
   return lock;
 }
 
 // - trace_state
-__declspec(dllexport) OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<
-    OPENTELEMETRY_NAMESPACE::trace::TraceState> OpenTelemetryTraceTraceStateGetDefault()
+__declspec(dllexport)
+OPENTELEMETRY_NAMESPACE::nostd::shared_ptr<OPENTELEMETRY_NAMESPACE::trace::TraceState>
+OpenTelemetryTraceTraceStateGetDefault()
 {
   return OPENTELEMETRY_NAMESPACE::trace::detail::AbiBridgePrivacyIntruder::GetDefaultTraceState();
 }
