@@ -85,7 +85,6 @@ Increment the:
     targeting whichever key (`attributes`, or the overflow key) actually
     held it.
 
-
 Breaking changes:
 
 * [SDK] Remove `noexcept` from the public SDK `TracerProvider`,

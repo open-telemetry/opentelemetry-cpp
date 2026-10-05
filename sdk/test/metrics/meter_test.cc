@@ -962,7 +962,7 @@ TEST_F(MeterCreateInstrumentTest, SyncInstrumentWithMultipleAggregations)
           AggregationType::kHistogram);
 
   // Another view that matches counter_one with default aggregation and a cardinality limit
-  auto aggregation_config                = std::make_shared<sdk::metrics::AggregationConfig>();
+  auto aggregation_config = std::make_shared<sdk::metrics::AggregationConfig>();
   aggregation_config->SetCardinalityLimit(100);
   AddView("*", "", InstrumentType::kCounter, "", AggregationType::kDefault, aggregation_config);
 
@@ -1353,7 +1353,7 @@ TEST_F(MeterCreateInstrumentTest, ASyncInstrumentWithMultipleAggregations)
           "observable_counter_as_histogram", AggregationType::kHistogram);
 
   // Catch-all to set the default aggregation and a cardinality limit
-  auto aggregation_config                = std::make_shared<sdk::metrics::AggregationConfig>();
+  auto aggregation_config = std::make_shared<sdk::metrics::AggregationConfig>();
   aggregation_config->SetCardinalityLimit(100);
   AddView("*", "", InstrumentType::kObservableCounter, "", AggregationType::kSum,
           aggregation_config);
