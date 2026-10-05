@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Enforce a runtime minimum scale of `-11` for
+  `Base2ExponentialHistogramAggregation`, so a recording that spans the full
+  double range no longer downscales without end.
+  [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
+
 * [LOGS] Fix undefined behavior in `Logger::EmitLogRecord()` when a logger is
   enabled (e.g. via `LoggerProvider::UpdateLoggerConfigurator()`) after
   `CreateLogRecord()` was called while it was still disabled. The disabled
@@ -36,6 +41,10 @@ Increment the:
   supplied context on its way to the processor.
   [#4421](https://github.com/open-telemetry/opentelemetry-cpp/pull/4421)
 
+* [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
+  from conflicting streams, and warn if stream conflicts were configured
+  [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
@@ -55,9 +64,49 @@ Increment the:
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+Breaking changes:
+
+* [SDK] Remove `noexcept` from the public SDK `TracerProvider`,
+  `LoggerProvider`, `MeterProvider`, `Tracer`, `Logger`, and `Meter`
+  constructors so initialization failures can propagate to callers.
+  `GetTracer`, `GetLogger`, and `GetMeter` remain `noexcept` and return a
+  pre-allocated noop object if constructing a new instrumentation object
+  fails. After the first failure, later uncached `Get*` calls return the same
+  noop immediately without retrying construction. Existing cached objects
+  continue to be returned.
+  [#4361](https://github.com/open-telemetry/opentelemetry-cpp/issues/4361)
 * [BUG] Send one request per curl session, rather than replacing the operation
   a running request still belongs to
   [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
+
+* [BUG] Compare the curl seek offset in `curl_off_t` before narrowing it to
+  `size_t`, so an offset past the `size_t` range cannot wrap back inside the
+  request body on a 32-bit build
+  [#4630](https://github.com/open-telemetry/opentelemetry-cpp/pull/4630)
+
+* [BUG] Do not queue a curl session closed by the Retry-After cap
+  [#4632](https://github.com/open-telemetry/opentelemetry-cpp/pull/4632)
+* [BUG] Fix a data race on the curl operation's last result code
+  [#4618](https://github.com/open-telemetry/opentelemetry-cpp/pull/4618)
+
+* [BUG] Do not busy-spin the curl background thread while a retry is queued
+  at shutdown
+  [#4637](https://github.com/open-telemetry/opentelemetry-cpp/pull/4637)
+
+* [SDK] Fix spatial re-aggregation for asynchronous instruments. A view which
+  drops attributes is now applied to asynchronous instruments as well, and the
+  observations which collapse onto the same attribute set are re-aggregated
+  (summed up for the additive instruments) instead of the last observation
+  overwriting the previous ones.
+  Note that `AsyncMetricStorage`'s constructor now takes the view's
+  `AttributesProcessor`, matching `SyncMetricStorage`.
+  [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
+
+* [BUG] Keep the curl retry deadline stable within each attempt
+  [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
+
+* [REMOVAL] Remove WITH_OTLP_RETRY_PREVIEW - #4668
+  [#4668](https://github.com/open-telemetry/opentelemetry-cpp/pull/4668)
 
 ## [1.29.0] 2026-09-13
 
