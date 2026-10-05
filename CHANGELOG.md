@@ -63,7 +63,6 @@ Increment the:
   warning and skips it when configured.
   [#4309](https://github.com/open-telemetry/opentelemetry-cpp/pull/4309)
 
-
 Breaking changes:
 
 * [SDK] Remove `noexcept` from the public SDK `TracerProvider`,
