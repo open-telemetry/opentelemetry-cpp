@@ -5,9 +5,13 @@
 #include <curl/curlver.h>
 #include "gtest/gtest.h"
 
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include "gmock/gmock.h"
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
+#include <ratio>
+#include "gmock/gmock.h"
+#ifdef _WIN32
+#  include <windows.h>
+#else
+#  include <ctime>
+#endif
 
 #ifdef ENABLE_OTLP_COMPRESSION_PREVIEW
 #  include <numeric>
@@ -261,6 +265,24 @@ public:
   }
 };
 
+class RetryDeadlineEventHandler : public RetryEventHandler
+{
+public:
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    CustomEventHandler::OnEvent(state, reason);
+    if (state == http_client::SessionState::Response && operation_ != nullptr)
+    {
+      ++response_event_count_;
+      retry_time_during_response_ = operation_->NextRetryTime();
+    }
+  }
+
+  curl::HttpOperation *operation_{nullptr};
+  int response_event_count_{0};
+  std::chrono::system_clock::time_point retry_time_during_response_{};
+};
+
 class BasicCurlHttpTests : public ::testing::Test, public HTTP_SERVER_NS::HttpRequestCallback
 {
 protected:
@@ -296,6 +318,7 @@ protected:
     server_.addHandler("/post/", *this);
     server_.addHandler("/retry/", *this);
     server_.addHandler("/retry-after/", *this);
+    server_.addHandler("/retry-after-invalid/", *this);
     server_.addHandler("/close/", *this);
     server_.start();
     is_running_ = true;
@@ -329,12 +352,21 @@ public:
       response.body                    = "{'k1':'v1', 'k2':'v2', 'k3':'v3'}";
       response_status                  = 200;
     }
-    else if (request.uri == "/retry/")
+    else if (request.uri == "/retry/" || request.uri == "/retry-after/" ||
+             request.uri == "/retry-after-invalid/")
     {
       std::unique_lock<std::mutex> lk1(mtx_requests);
       received_requests_.push_back(request);
       response.headers["Content-Type"] = "text/plain";
-      response_status                  = 429;
+      if (request.uri == "/retry-after/")
+      {
+        response.headers["Retry-After"] = "2";
+      }
+      else if (request.uri == "/retry-after-invalid/")
+      {
+        response.headers["Retry-After"] = "invalid";
+      }
+      response_status = 429;
     }
     else if (request.uri == "/retry-after/")
     {
@@ -603,7 +635,6 @@ TEST_F(BasicCurlHttpTests, CurlHttpOperations)
   delete handler;
 }
 
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
 TEST_F(BasicCurlHttpTests, RetryPolicyEnabled)
 {
   RetryEventHandler handler;
@@ -685,6 +716,89 @@ TEST_F(BasicCurlHttpTests, ExponentialBackoffRetry)
 
   ASSERT_EQ(CURLE_OK, operation.Send());
   ASSERT_FALSE(operation.IsRetryable());
+}
+
+TEST_F(BasicCurlHttpTests, RetryDeadlineIsStableWithinAttempt)
+{
+  RetryEventHandler handler;
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::Compression compression  = http_client::Compression::kNone;
+  http_client::RetryPolicy retry_policy = {4, std::chrono::duration<float>{1.0f},
+                                           std::chrono::duration<float>{5.0f}, 2.0f};
+
+  curl::HttpOperation operation(http_client::Method::Post, "http://127.0.0.1:19000/retry/", no_ssl,
+                                &handler, headers, body, compression, false,
+                                curl::kDefaultHttpConnTimeout, false, false, retry_policy);
+
+  ASSERT_EQ(CURLE_OK, operation.Send());
+  ASSERT_TRUE(operation.IsRetryable());
+
+  const auto retry_time = operation.NextRetryTime();
+  for (int i = 0; i < 8; ++i)
+  {
+    EXPECT_EQ(retry_time, operation.NextRetryTime());
+  }
+}
+
+TEST_F(BasicCurlHttpTests, RetryDeadlineIsReadyDuringResponseEvent)
+{
+  RetryDeadlineEventHandler handler;
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::Compression compression  = http_client::Compression::kNone;
+  http_client::RetryPolicy retry_policy = {4, std::chrono::duration<float>{1.0f},
+                                           std::chrono::duration<float>{5.0f}, 2.0f};
+
+  curl::HttpOperation operation(http_client::Method::Post, "http://127.0.0.1:19000/retry-after/",
+                                no_ssl, &handler, headers, body, compression, false,
+                                curl::kDefaultHttpConnTimeout, false, false, retry_policy);
+  handler.operation_ = &operation;
+
+  const auto before_send = std::chrono::system_clock::now();
+  ASSERT_EQ(CURLE_OK, operation.Send());
+  const auto after_send = std::chrono::system_clock::now();
+
+  ASSERT_TRUE(operation.IsRetryable());
+  ASSERT_EQ(1, handler.response_event_count_);
+  EXPECT_EQ(handler.retry_time_during_response_, operation.NextRetryTime());
+  EXPECT_GE(handler.retry_time_during_response_.time_since_epoch().count(),
+            (before_send + std::chrono::seconds{2}).time_since_epoch().count());
+  EXPECT_LE(handler.retry_time_during_response_.time_since_epoch().count(),
+            (after_send + std::chrono::seconds{2}).time_since_epoch().count());
+}
+
+TEST_F(BasicCurlHttpTests, InvalidRetryAfterUsesStableBackoff)
+{
+  RetryDeadlineEventHandler handler;
+  http_client::HttpSslOptions no_ssl;
+  http_client::Body body;
+  http_client::Headers headers;
+  http_client::Compression compression  = http_client::Compression::kNone;
+  http_client::RetryPolicy retry_policy = {4, std::chrono::duration<float>{1.0f},
+                                           std::chrono::duration<float>{5.0f}, 2.0f};
+
+  curl::HttpOperation operation(
+      http_client::Method::Post, "http://127.0.0.1:19000/retry-after-invalid/", no_ssl, &handler,
+      headers, body, compression, false, curl::kDefaultHttpConnTimeout, false, false, retry_policy);
+  handler.operation_ = &operation;
+
+  const auto before_send = std::chrono::system_clock::now();
+  ASSERT_EQ(CURLE_OK, operation.Send());
+  const auto after_send = std::chrono::system_clock::now();
+
+  ASSERT_TRUE(operation.IsRetryable());
+  ASSERT_EQ(1, handler.response_event_count_);
+  for (int i = 0; i < 8; ++i)
+  {
+    EXPECT_EQ(handler.retry_time_during_response_, operation.NextRetryTime());
+  }
+  EXPECT_GE(handler.retry_time_during_response_.time_since_epoch().count(),
+            (before_send + std::chrono::milliseconds{750}).time_since_epoch().count());
+  EXPECT_LE(handler.retry_time_during_response_.time_since_epoch().count(),
+            (after_send + std::chrono::milliseconds{1250}).time_since_epoch().count());
 }
 
 // A Retry-After beyond max_backoff closes the session. The IO loop used to queue it anyway, where
@@ -770,7 +884,64 @@ TEST_F(BasicCurlHttpTests, RetryAfterBeyondMaxBackoffDoesNotDelayShutdown)
                                return received.uri == "/retry-after/";
                              }));
 }
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
+
+// CPU time of the whole process. std::clock() measures wall time on Windows.
+std::chrono::microseconds ProcessCpuTime()
+{
+#ifdef _WIN32
+  FILETIME created{}, exited{}, kernel{}, user{};
+  GetProcessTimes(GetCurrentProcess(), &created, &exited, &kernel, &user);
+  // FILETIME counts 100 ns ticks.
+  const auto ticks = [](const FILETIME &time) {
+    return (static_cast<std::uint64_t>(time.dwHighDateTime) << 32) | time.dwLowDateTime;
+  };
+  return std::chrono::microseconds{static_cast<std::int64_t>((ticks(kernel) + ticks(user)) / 10)};
+#else
+  return std::chrono::microseconds{
+      static_cast<std::int64_t>(static_cast<double>(std::clock()) * 1000000 / CLOCKS_PER_SEC)};
+#endif
+}
+
+// During shutdown the IO loop used to skip its poll while a retry waited out its backoff.
+TEST_F(BasicCurlHttpTests, ShutdownDoesNotSpinWhileARetryIsQueued)
+{
+  received_requests_.clear();
+  curl::HttpClient http_client;
+  // Three waits: the first can still sleep on a poll the loop asked for before the join.
+  const http_client::RetryPolicy retry_policy = {4, std::chrono::duration<float>{0.25f},
+                                                 std::chrono::duration<float>{5.0f}, 2.0f};
+
+  auto session = http_client.CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetMethod(http_client::Method::Post);
+  request->SetUri("retry/");
+  request->SetRetryPolicy(retry_policy);
+  auto handler = std::make_shared<RetryEventHandler>();
+  session->SendRequest(handler);
+  ASSERT_TRUE(waitForRequests(30, 1));
+
+  const auto cpu_before = ProcessCpuTime();
+  const auto started_at = std::chrono::steady_clock::now();
+  http_client.WaitBackgroundThreadExit();
+  const auto joined_in = std::chrono::steady_clock::now() - started_at;
+  const auto cpu_used  = ProcessCpuTime() - cpu_before;
+
+  session->FinishSession();
+  ASSERT_TRUE(handler->got_response_.load(std::memory_order_acquire));
+
+  std::unique_lock<std::mutex> lock_requests(mtx_requests);
+  EXPECT_EQ(4, std::count_if(received_requests_.begin(), received_requests_.end(),
+                             [](const HTTP_SERVER_NS::HttpRequest &received) {
+                               return received.uri == "/retry/";
+                             }));
+
+#ifdef __APPLE__
+  GTEST_SKIP() << "The test server's kqueue reactor spins while a connection is open";
+#endif
+  EXPECT_TRUE(cpu_used * 2 < joined_in)
+      << "join ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(joined_in).count()
+      << ", CPU ms: " << std::chrono::duration_cast<std::chrono::milliseconds>(cpu_used).count();
+}
 
 // A cancel that arrives once the server has answered used to deliver Cancelled and the response,
 // so a handler treating either as terminal saw one request finish twice.
