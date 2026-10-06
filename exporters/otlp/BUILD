@@ -172,7 +172,7 @@ cc_library(
     defines = select({
         ":enable_otlp_grpc_credential_preview": ["ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW"],
         "//conditions:default": [],
-    }) + ["ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW"] + ["ENABLE_OTLP_RETRY_PREVIEW"],
+    }) + ["ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW"],
     strip_include_prefix = "include",
     tags = [
         "otlp",
@@ -907,7 +907,6 @@ cc_test(
         "test/otlp_http_exporter_test.cc",
         "test/otlp_http_request_body_capture.h",
     ],
-    defines = ["ENABLE_OTLP_RETRY_PREVIEW"],
     tags = [
         "otlp",
         "otlp_http",
