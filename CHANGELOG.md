@@ -101,6 +101,9 @@ Breaking changes:
 * [REMOVAL] Remove WITH_OTLP_RETRY_PREVIEW - #4668
   [#4668](https://github.com/open-telemetry/opentelemetry-cpp/pull/4668)
 
+* [API] Remove opentelemetry::plugin
+  [#4660](https://github.com/open-telemetry/opentelemetry-cpp/pull/4660)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
