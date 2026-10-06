@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_builder.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_log_record_exporter_options.h"
@@ -42,7 +43,7 @@ std::unique_ptr<opentelemetry::sdk::logs::LogRecordExporter> OtlpGrpcLogRecordBu
 
   options.endpoint = model->endpoint;
 
-  options.use_ssl_credentials = OtlpBuilderUtils::GrpcUseSsl(options.endpoint, tls);
+  options.use_ssl_credentials = OtlpGrpcBuilderUtils::GrpcUseSsl(options.endpoint, tls);
 
   if (tls != nullptr)
   {

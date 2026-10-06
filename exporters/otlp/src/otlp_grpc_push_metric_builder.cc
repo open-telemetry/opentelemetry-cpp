@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_push_metric_builder.h"
@@ -49,7 +50,7 @@ std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpGrpcPushMet
 
   options.endpoint = model->endpoint;
 
-  options.use_ssl_credentials = OtlpBuilderUtils::GrpcUseSsl(options.endpoint, tls);
+  options.use_ssl_credentials = OtlpGrpcBuilderUtils::GrpcUseSsl(options.endpoint, tls);
 
   if (tls != nullptr)
   {

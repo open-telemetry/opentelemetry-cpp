@@ -3,16 +3,13 @@
 
 #include <curl/curl.h>
 #include <curl/curlver.h>
-
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <array>
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
-
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <cmath>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <functional>
 #include <future>
@@ -334,6 +331,28 @@ size_t HttpOperation::ReadMemoryCallback(char *buffer, size_t size, size_t nitem
   return nwrite;
 }
 
+int HttpOperation::SeekCallback(void *userp, curl_off_t offset, int origin)
+{
+  HttpOperation *self = reinterpret_cast<HttpOperation *>(userp);
+  if (nullptr == self)
+  {
+    return CURL_SEEKFUNC_CANTSEEK;
+  }
+
+  // The body is a fully buffered span owned by the caller, so an absolute seek inside it is just a
+  // move of the read cursor. Anything else is refused rather than approximated, because reporting
+  // success without repositioning would resume the upload from the wrong offset and send a
+  // truncated or misaligned body.
+  if (origin != SEEK_SET || offset < 0 ||
+      offset > static_cast<curl_off_t>(self->request_body_.size()))
+  {
+    return CURL_SEEKFUNC_CANTSEEK;
+  }
+
+  self->request_nwrite_ = static_cast<size_t>(offset);
+  return CURL_SEEKFUNC_OK;
+}
+
 #if LIBCURL_VERSION_NUM >= 0x075000
 int HttpOperation::PreRequestCallback(void *clientp, char *, char *, int, int)
 {
@@ -485,8 +504,8 @@ HttpOperation::~HttpOperation()
       {
         if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
         {
-          async_data_->result_future.wait();
-          last_curl_result_ = async_data_->result_future.get();
+          // PerformCurlMessage() stores this, then calls the Cleanup() that sets the promise.
+          static_cast<void>(async_data_->result_future.get());
         }
       }
       break;
@@ -510,8 +529,8 @@ void HttpOperation::Finish()
     // We should not wait in callback from Cleanup()
     if (HttpOperationAccessor::GetThreadId(*async_data_) != std::this_thread::get_id())
     {
-      async_data_->result_future.wait();
-      last_curl_result_ = async_data_->result_future.get();
+      // PerformCurlMessage() stores this, then calls the Cleanup() that sets the promise.
+      static_cast<void>(async_data_->result_future.get());
     }
   }
 }
@@ -588,7 +607,6 @@ void HttpOperation::Cleanup()
 
 bool HttpOperation::IsRetryable()
 {
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
   static constexpr auto kRetryableStatusCodes = std::array<decltype(response_code_), 4>{
       429,  // Too Many Requests
       502,  // Bad Gateway
@@ -601,18 +619,20 @@ bool HttpOperation::IsRetryable()
 
   return is_retryable && (last_curl_result_ == CURLE_OK) &&
          (retry_attempts_ < retry_policy_.max_attempts);
-#else
-  return false;
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
 }
 
 std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
 {
-  if (retry_after_time_point_ != std::chrono::system_clock::time_point{})
+  if (next_retry_time_point_ != std::chrono::system_clock::time_point{})
   {
-    return retry_after_time_point_;
+    return next_retry_time_point_;
   }
 
+  return CalculateNextRetryTime();
+}
+
+std::chrono::system_clock::time_point HttpOperation::CalculateNextRetryTime()
+{
   // One engine per thread. Every HttpClient drives its own background thread, and drawing from
   // the engine advances its state, so a shared one is written by all of them at once.
   static thread_local std::mt19937 gen{std::random_device{}()};
@@ -1336,6 +1356,19 @@ CURLcode HttpOperation::Setup()
     {
       return rc;
     }
+
+    rc = SetCurlPtrOption(CURLOPT_SEEKFUNCTION,
+                          reinterpret_cast<void *>(&HttpOperation::SeekCallback));
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
+
+    rc = SetCurlPtrOption(CURLOPT_SEEKDATA, this);
+    if (rc != CURLE_OK)
+    {
+      return rc;
+    }
   }
   else if (method_ == opentelemetry::ext::http::client::Method::Get)
   {
@@ -1526,12 +1559,12 @@ void HttpOperation::Abort()
   }
 }
 
-void HttpOperation::PerformCurlMessage(CURLcode code)
+bool HttpOperation::PerformCurlMessage(CURLcode code)
 {
   ++retry_attempts_;
-  last_attempt_time_      = std::chrono::system_clock::now();
-  last_curl_result_       = code;
-  retry_after_time_point_ = std::chrono::system_clock::time_point{};
+  last_attempt_time_     = std::chrono::system_clock::now();
+  last_curl_result_      = code;
+  next_retry_time_point_ = std::chrono::system_clock::time_point{};
 
   if (code != CURLE_OK)
   {
@@ -1562,6 +1595,49 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
     curl_easy_getinfo(curl_resource_.easy_handle, CURLINFO_RESPONSE_CODE, &response_code_);
   }
 
+  // Establish the deadline before dispatching Response. Event handlers run synchronously and may
+  // inspect it from the callback, so calculating it afterwards could expose a different jittered
+  // value from the one retained for scheduling this attempt.
+  const bool is_retryable            = IsRetryable();
+  bool retry_after_exceeds_max_delay = false;
+
+  if (is_retryable)
+  {
+    bool has_valid_retry_after = false;
+    nostd::string_view retry_after;
+    if (FindRetryAfterValue(response_headers_, retry_after))
+    {
+      std::chrono::seconds delay;
+      std::chrono::system_clock::time_point date;
+      const bool parsed_delay = HttpTimeUtil::ParseDelaySeconds(retry_after, delay);
+      const bool parsed_date  = !parsed_delay && HttpTimeUtil::ParseHttpDate(retry_after, date);
+
+      if (parsed_delay || parsed_date)
+      {
+        has_valid_retry_after = true;
+        // Reuse the attempt timestamp instead of calling now() again, so the
+        // retry-after delay is measured from the attempt that produced this
+        // response and we avoid an extra system_clock syscall on the hot path.
+        next_retry_time_point_ = parsed_delay
+                                     ? (last_attempt_time_ + delay)
+                                     : ((date > last_attempt_time_) ? date : last_attempt_time_);
+
+        const auto max_retry_time =
+            last_attempt_time_ +
+            std::chrono::duration_cast<std::chrono::milliseconds>(retry_policy_.max_backoff);
+        if (next_retry_time_point_ > max_retry_time)
+        {
+          retry_after_exceeds_max_delay = true;
+        }
+      }
+    }
+
+    if (!has_valid_retry_after)
+    {
+      next_retry_time_point_ = CalculateNextRetryTime();
+    }
+  }
+
   // Transform state
   if (GetSessionState() == opentelemetry::ext::http::client::SessionState::Connecting)
   {
@@ -1585,38 +1661,8 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
   // rather than honored. Cap the requested delay at max_backoff; if the
   // server-driven retry time still exceeds the maximum expected retry window,
   // the session is closed below and not retried.
-  const bool is_retryable            = IsRetryable();
-  bool retry_after_exceeds_max_delay = false;
-
   if (is_retryable)
   {
-    nostd::string_view retry_after;
-    if (FindRetryAfterValue(response_headers_, retry_after))
-    {
-      std::chrono::seconds delay;
-      std::chrono::system_clock::time_point date;
-      const bool parsed_delay = HttpTimeUtil::ParseDelaySeconds(retry_after, delay);
-      const bool parsed_date  = !parsed_delay && HttpTimeUtil::ParseHttpDate(retry_after, date);
-
-      if (parsed_delay || parsed_date)
-      {
-        // Reuse the attempt timestamp instead of calling now() again, so the
-        // retry-after delay is measured from the attempt that produced this
-        // response and we avoid an extra system_clock syscall on the hot path.
-        retry_after_time_point_ = parsed_delay
-                                      ? (last_attempt_time_ + delay)
-                                      : ((date > last_attempt_time_) ? date : last_attempt_time_);
-
-        const auto max_retry_time =
-            last_attempt_time_ +
-            std::chrono::duration_cast<std::chrono::milliseconds>(retry_policy_.max_backoff);
-        if (retry_after_time_point_ > max_retry_time)
-        {
-          retry_after_exceeds_max_delay = true;
-        }
-      }
-    }
-
     if (!retry_after_exceeds_max_delay)
     {
       // Clear any response data received in previous attempt
@@ -1632,7 +1678,10 @@ void HttpOperation::PerformCurlMessage(CURLcode code)
   {
     // Cleanup and unbind easy handle from multi handle, and finish callback
     Cleanup();
+    return false;
   }
+
+  return true;
 }
 
 }  // namespace curl

@@ -48,15 +48,10 @@ function run_benchmarks
 [ -z "${SRC_DIR}" ] && export SRC_DIR="`pwd`"
 [ -z "${BUILD_DIR}" ] && export BUILD_DIR=$HOME/build
 mkdir -p "${BUILD_DIR}"
-[ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
-mkdir -p "${PLUGIN_DIR}"
 [ -z "${INSTALL_TEST_DIR}" ] && export INSTALL_TEST_DIR=$HOME/install_test
 mkdir -p "${INSTALL_TEST_DIR}"
 
 export BAZEL_CXXOPTS="-std=c++17"
-
-# Work around for https://github.com/actions/runner-images/issues/13564
-export USE_BAZEL_VERSION="8.5.0"
 
 BAZEL_OPTIONS_DEFAULT="--copt=-DENABLE_METRICS_EXEMPLAR_PREVIEW --//exporters/otlp:with_otlp_grpc_credential_preview=true"
 BAZEL_OPTIONS="$BAZEL_OPTIONS_DEFAULT"
@@ -179,7 +174,6 @@ elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON \
         -DOTELCPP_WITH_OTLP_HTTP_COMPRESSION=ON \
-        -DOTELCPP_WITH_OTLP_RETRY_PREVIEW=ON \
         -DOTELCPP_WITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         -DOTELCPP_WITH_CONFIGURATION=ON \
         -DOTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW=ON \
@@ -405,7 +399,6 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
         -DOTELCPP_WITH_OTLP_FILE=ON \
         -DOTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
         -DOTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
-        -DOTELCPP_WITH_OTLP_RETRY_PREVIEW=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -590,7 +583,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
         -DWITH_NO_DEPRECATED_CODE=ON \
         -DWITH_STL=ON \
         -DWITH_GSL=ON \
-        -DWITH_OTLP_RETRY_PREVIEW=OFF \
         -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF \
         -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
         -DWITH_OTLP_GRPC=ON \
@@ -628,7 +620,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
       WITH_NO_DEPRECATED_CODE \
       WITH_STL \
       WITH_GSL \
-      WITH_OTLP_RETRY_PREVIEW \
       WITH_OTLP_GRPC_SSL_MTLS_PREVIEW \
       WITH_OTLP_GRPC_CREDENTIAL_PREVIEW \
       WITH_OTLP_GRPC \
@@ -670,7 +661,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
       "OTELCPP_WITH_NO_DEPRECATED_CODE:BOOL=ON" \
       "OTELCPP_WITH_STL:STRING=ON" \
       "OTELCPP_WITH_GSL:BOOL=ON" \
-      "OTELCPP_WITH_OTLP_RETRY_PREVIEW:BOOL=OFF" \
       "OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW:BOOL=OFF" \
       "OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW:BOOL=ON" \
       "OTELCPP_WITH_OTLP_GRPC:BOOL=ON" \
@@ -758,40 +748,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
     }
   done
   exit 0
-elif [[ "$1" == "cmake.test_example_plugin" ]]; then
-  # Build the plugin
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cat <<EOF > export.map
-{
-  global:
-    OpenTelemetryMakeFactoryImpl;
-  local: *;
-};
-EOF
-
-  LINKER_FLAGS="\
-    -static-libstdc++ \
-    -static-libgcc \
-    -Wl,--version-script=${PWD}/export.map \
-  "
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DOTELCPP_MAINTAINER_MODE=ON \
-        -DCMAKE_EXE_LINKER_FLAGS="$LINKER_FLAGS" \
-        -DCMAKE_SHARED_LINKER_FLAGS="$LINKER_FLAGS" \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}" --target example_plugin
-  cp examples/plugin/plugin/libexample_plugin.so ${PLUGIN_DIR}
-
-  # Verify we can load the plugin
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DOTELCPP_MAINTAINER_MODE=ON \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}" --target load_plugin_example
-  examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
-  exit 0
 elif [[ "$1" == "bazel.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS $BAZEL_WITH_PREVIEW //...
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS $BAZEL_WITH_PREVIEW //...
@@ -814,13 +770,35 @@ elif [[ "$1" == "bazel.legacy.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS test $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/otlp/... -//exporters/prometheus/...
   exit 0
 elif [[ "$1" == "bazel.noexcept" ]]; then
-  # there are some exceptions and error handling code from the Prometheus Client
-  # as well as Opentracing shim (due to some third party code in its Opentracing dependency)
-  # that make this test always fail. Ignore these packages in the noexcept test here.
-  # Set the api:with_cxx_stdlib=none because C++17 std::variant::get<> throws
+  # The following directories and targets use exceptions and are excluded.
+  # TODO: create an exception handling policy that defines which components allow excecptions.
 
-  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/... -//resource_detectors/...
-  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... -//exporters/prometheus/... -//examples/prometheus/... -//opentracing-shim/... -//examples/configuration/... -//sdk/src/configuration/... -//sdk/test/configuration/... -//resource_detectors/...
+  NOEXCEPT_EXCLUDES=(
+    -//exporters/prometheus/...
+    -//examples/prometheus/...
+    -//opentracing-shim/...
+    -//examples/configuration/...
+    -//sdk/src/configuration/...
+    -//sdk/test/configuration/...
+    -//resource_detectors/...
+    -//exporters/ostream:ostream_log_record_exporter_builder
+    -//exporters/ostream:ostream_metric_exporter_builder
+    -//exporters/ostream:ostream_span_exporter_builder
+    -//exporters/otlp:otlp_builder_utils
+    -//exporters/otlp:otlp_grpc_span_exporter_builder
+    -//exporters/otlp:otlp_grpc_log_record_exporter_builder
+    -//exporters/otlp:otlp_grpc_metric_exporter_builder
+    -//exporters/otlp:otlp_http_span_exporter_builder
+    -//exporters/otlp:otlp_http_log_record_exporter_builder
+    -//exporters/otlp:otlp_http_metric_exporter_builder
+    -//exporters/otlp:otlp_file_span_exporter_builder
+    -//exporters/otlp:otlp_file_log_record_exporter_builder
+    -//exporters/otlp:otlp_file_metric_exporter_builder
+  )
+
+  # Set the api:with_cxx_stdlib=none because C++17 std::variant::get<> throws
+  bazel $BAZEL_STARTUP_OPTIONS build --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_OPTIONS_ASYNC -- //... "${NOEXCEPT_EXCLUDES[@]}"
+  bazel $BAZEL_STARTUP_OPTIONS test --copt=-fno-exceptions --//api:with_cxx_stdlib=none $BAZEL_TEST_OPTIONS_ASYNC -- //... "${NOEXCEPT_EXCLUDES[@]}"
   exit 0
 elif [[ "$1" == "bazel.nortti" ]]; then
   # there are some exceptions and error handling code from the Prometheus Client
