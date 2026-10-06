@@ -4,10 +4,13 @@
 #include <gtest/gtest.h>
 #include <atomic>
 #include <cstdint>
+#include <functional>
 #include <future>
 #include <initializer_list>
 #include <map>
+#include <memory>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <thread>
 #include <utility>
@@ -1089,3 +1092,119 @@ TEST(MeterProvider, MeterWithExpiredContextIsDisabled)
   ASSERT_NE(nullptr, counter);
   counter->Add(1);  // Dropped: the meter is disabled.
 }
+
+TEST(MeterProvider, ConstructorsAreNotNoexcept)
+{
+  static_assert(!noexcept(MeterProvider()), "MeterProvider construction must be allowed to throw");
+  static_assert(!noexcept(MeterProvider(std::unique_ptr<MeterContext>{})),
+                "MeterProvider construction must be allowed to throw");
+  static_assert(!noexcept(Meter(std::weak_ptr<MeterContext>{})),
+                "Meter construction must be allowed to throw");
+}
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+TEST(MeterProvider, GetMeterReturnsNoopOnConstructionFailure)
+{
+  auto should_throw       = std::make_shared<bool>(true);
+  auto construct_attempts = std::make_shared<int>(0);
+  auto throwing_configurator =
+      std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<MeterConfig>>(
+          opentelemetry::sdk::instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(
+              MeterConfig::Default())
+              .AddCondition(
+                  [should_throw, construct_attempts](
+                      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &scope) {
+                    ++*construct_attempts;
+                    if (scope.GetName() == "throwing-scope" && *should_throw)
+                    {
+                      throw std::runtime_error("injected meter construction failure");
+                    }
+                    return false;
+                  },
+                  MeterConfig::Default())
+              .Build());
+
+  MeterProvider provider(std::unique_ptr<ViewRegistry>(new ViewRegistry()),
+                         opentelemetry::sdk::resource::Resource::Create({}),
+                         std::move(throwing_configurator));
+
+  auto cached = provider.GetMeter("cached-scope");
+  ASSERT_NE(cached, nullptr);
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  ASSERT_NE(dynamic_cast<Meter *>(cached.get()), nullptr);
+#  endif
+  EXPECT_EQ(*construct_attempts, 1);
+  EXPECT_EQ(provider.GetMeter("cached-scope"), cached);
+  EXPECT_EQ(*construct_attempts, 1);
+
+  auto failed = provider.GetMeter("throwing-scope");
+  ASSERT_NE(failed, nullptr);
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  EXPECT_EQ(dynamic_cast<Meter *>(failed.get()), nullptr);
+#  endif
+  EXPECT_EQ(*construct_attempts, 2);
+  auto failed_counter = failed->CreateUInt64Counter("requests");
+  ASSERT_NE(failed_counter, nullptr);
+  failed_counter->Add(1);
+
+  auto failed_again = provider.GetMeter("throwing-scope");
+  EXPECT_EQ(failed, failed_again);
+  EXPECT_EQ(*construct_attempts, 2);
+
+  auto other = provider.GetMeter("other-scope");
+  EXPECT_EQ(other, failed);
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  EXPECT_EQ(dynamic_cast<Meter *>(other.get()), nullptr);
+#  endif
+  EXPECT_EQ(*construct_attempts, 2);
+
+  *should_throw     = false;
+  auto still_failed = provider.GetMeter("throwing-scope");
+  EXPECT_EQ(still_failed, failed);
+  EXPECT_EQ(*construct_attempts, 2);
+
+  EXPECT_EQ(provider.GetMeter("cached-scope"), cached);
+}
+
+TEST(MeterProvider, GetMeterReturnsNoopOnNonStdConstructionFailure)
+{
+  auto construct_attempts = std::make_shared<int>(0);
+  auto throwing_configurator =
+      std::make_unique<opentelemetry::sdk::instrumentationscope::ScopeConfigurator<MeterConfig>>(
+          opentelemetry::sdk::instrumentationscope::ScopeConfigurator<MeterConfig>::Builder(
+              MeterConfig::Default())
+              .AddCondition(
+                  [construct_attempts](
+                      const opentelemetry::sdk::instrumentationscope::InstrumentationScope &scope) {
+                    ++*construct_attempts;
+                    if (scope.GetName() == "throwing-scope")
+                    {
+                      throw 1;
+                    }
+                    return false;
+                  },
+                  MeterConfig::Default())
+              .Build());
+
+  MeterProvider provider(std::unique_ptr<ViewRegistry>(new ViewRegistry()),
+                         opentelemetry::sdk::resource::Resource::Create({}),
+                         std::move(throwing_configurator));
+
+  auto failed = provider.GetMeter("throwing-scope");
+  ASSERT_NE(failed, nullptr);
+#  ifdef OPENTELEMETRY_RTTI_ENABLED
+  EXPECT_EQ(dynamic_cast<Meter *>(failed.get()), nullptr);
+#  endif
+  EXPECT_EQ(*construct_attempts, 1);
+  auto failed_counter = failed->CreateUInt64Counter("requests");
+  ASSERT_NE(failed_counter, nullptr);
+  failed_counter->Add(1);
+
+  auto failed_again = provider.GetMeter("throwing-scope");
+  EXPECT_EQ(failed, failed_again);
+  EXPECT_EQ(*construct_attempts, 1);
+  auto other = provider.GetMeter("other-scope");
+  EXPECT_EQ(other, failed);
+  EXPECT_EQ(*construct_attempts, 1);
+}
+#endif  // OPENTELEMETRY_HAVE_EXCEPTIONS

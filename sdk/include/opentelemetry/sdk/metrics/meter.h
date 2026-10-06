@@ -46,7 +46,7 @@ public:
   explicit Meter(
       std::weak_ptr<sdk::metrics::MeterContext> meter_context,
       std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope> scope =
-          opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("")) noexcept;
+          opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(""));
 
   nostd::unique_ptr<opentelemetry::metrics::Counter<uint64_t>> CreateUInt64Counter(
       nostd::string_view name,
@@ -204,6 +204,12 @@ private:
   static void WarnOnNameCaseConflict(const sdk::instrumentationscope::InstrumentationScope *scope,
                                      const InstrumentDescriptor &existing_instrument,
                                      const InstrumentDescriptor &new_instrument);
+
+  // Emits a warning that the view will create a semantic error and will be ignored.
+  static void WarnOnViewSemanticError(const sdk::instrumentationscope::InstrumentationScope *scope,
+                                      const InstrumentDescriptor &existing_instrument,
+                                      const InstrumentDescriptor &stream,
+                                      const View &view);
 };
 }  // namespace metrics
 }  // namespace sdk
