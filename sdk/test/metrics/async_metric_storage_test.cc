@@ -374,9 +374,9 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, StaleAttributeSetDropped)
   EXPECT_EQ(get_count, 1);
   EXPECT_EQ(put_count, 1);
 
-  // Collection 2: only GET reported – PUT is dropped by callback.
+  // Collection 2: GET is reported unchanged (and therefore has a zero delta); PUT is dropped.
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2 = {
-      {{{"RequestType", "GET"}}, 20}};
+      {{{"RequestType", "GET"}}, 10}};
   storage.RecordLong(measurements2,
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
@@ -406,8 +406,8 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, StaleAttributeSetDropped)
   // PUT must not appear – it was absent from the callback this cycle.
   EXPECT_EQ(put_count, 0) << "Stale PUT attribute set must be dropped";
   EXPECT_EQ(get_count, 1);
-  // Cumulative exports the absolute value (20); delta exports the increment since last seen (10).
-  const int64_t expected_get_value = (temporality == AggregationTemporality::kCumulative) ? 20 : 10;
+  // The unchanged observation is still exported: cumulative value 10, delta value 0.
+  const int64_t expected_get_value = (temporality == AggregationTemporality::kCumulative) ? 10 : 0;
   EXPECT_EQ(get_value, expected_get_value);
 }
 
@@ -543,7 +543,7 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, StaleAttributeSetDroppedMultiCol
                     });
   };
 
-  // Collection 1: both GET and PUT reported – both collectors see both attribute sets.
+  // Collection 1: GET and PUT are reported. Cumulative readers each get a callback round.
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
       {{{"RequestType", "GET"}}, 10}, {{{"RequestType", "PUT"}}, 5}};
   storage.RecordLong(measurements1,
@@ -552,12 +552,16 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, StaleAttributeSetDroppedMultiCol
   int c1_get = 0, c1_put = 0, c2_get = 0, c2_put = 0;
   int64_t c1_get_value = 0, c2_get_value = 0;
   collect_request_types(collector1.get(), collection_ts1, c1_get, c1_put, c1_get_value);
+  if (temporality == AggregationTemporality::kCumulative)
+  {
+    storage.RecordLong(measurements1,
+                       opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+  }
   collect_request_types(collector2.get(), collection_ts1, c2_get, c2_put, c2_get_value);
   EXPECT_EQ(c1_get, 1);
   EXPECT_EQ(c1_put, 1);
   EXPECT_EQ(c2_get, 1);
-  EXPECT_EQ(c2_put, 1) << "Second collector must observe PUT even though the first drained the "
-                          "shared delta";
+  EXPECT_EQ(c2_put, 1) << "PUT must be available to the second reader";
 
   // Collection 2: only GET reported – PUT is dropped by the callback.
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2 = {
@@ -566,6 +570,11 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, StaleAttributeSetDroppedMultiCol
                      opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
 
   collect_request_types(collector1.get(), collection_ts2, c1_get, c1_put, c1_get_value);
+  if (temporality == AggregationTemporality::kCumulative)
+  {
+    storage.RecordLong(measurements2,
+                       opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+  }
   collect_request_types(collector2.get(), collection_ts2, c2_get, c2_put, c2_get_value);
 
   // Cumulative exports the absolute value (20); delta exports the increment since last seen (10).
@@ -580,12 +589,8 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, StaleAttributeSetDroppedMultiCol
       << "Second collector must independently receive the still-reported GET value";
 }
 
-// A collector that skips a collection cycle must not lose values observed during its interval.
-// Deltas drained by another collector are stashed for every collector, so when the lagging
-// collector finally collects it receives the accumulated value — even though delta_metrics is empty
-// at that moment (already drained by the other collector). This is the exact case the per-collector
-// observed set fixes: suppression is driven by the collector's own unreported deltas, not by
-// delta_metrics.
+// A cumulative async reader must not export observations from another reader's callback round.
+// Delta temporality still reports the accumulated values queued while this collector lagged.
 TEST_P(AsyncMetricStorageStaleAttributeFixture, MultiCollectorLaggingCollector)
 {
   const AggregationTemporality temporality = GetParam();
@@ -649,22 +654,20 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, MultiCollectorLaggingCollector)
   // Cumulative: absolute 20; delta: increment since previous collection (20 - 10 = 10).
   EXPECT_EQ(c1_value, (temporality == AggregationTemporality::kCumulative) ? 20 : 10);
 
-  // collector2 finally collects. delta_metrics is empty now (collector1 already drained it), but
-  // collector2's stash accumulated both cycles -> it must still receive the value.
+  // collector2 collects without a callback observation in its current round. Its queued history
+  // remains available for delta temporality, but cumulative async output must be empty.
   collect(collector2.get(), collection_ts2, c2_count, c2_value);
-  EXPECT_EQ(c2_count, 1) << "Lagging collector must not drop a value observed during its interval";
-  // Both temporalities yield 20 here: cumulative absolute is 20, and delta since collector2's first
-  // (never) collection is the full accumulated 10 + 10 = 20.
-  EXPECT_EQ(c2_value, 20)
-      << "Lagging collector must receive the accumulated value from the cycles it missed";
+  const int expected_count = (temporality == AggregationTemporality::kCumulative) ? 0 : 1;
+  EXPECT_EQ(c2_count, expected_count);
+  if (temporality == AggregationTemporality::kDelta)
+  {
+    EXPECT_EQ(c2_value, 20)
+        << "Delta reader must receive the accumulated value from the cycles it missed";
+  }
 }
 
-// With more than one collector, delta temporality no longer short-circuits on the single-collector
-// fast path — it goes through the slow path instead. This exercises the delta branch that sets
-// start_ts to the previous collection's timestamp, and verifies both collectors independently
-// receive the correct value. Under cumulative every collector must observe the absolute value even
-// though only the first collector of a cycle drains the shared delta (the per-collector observed
-// set drives stale suppression, not delta_metrics), and start_ts stays at the SDK start.
+// With more than one collector, delta temporality goes through the slow path. For cumulative
+// temporality, record before each reader collects to model its independent callback round.
 TEST_P(AsyncMetricStorageStaleAttributeFixture, MultiCollector)
 {
   const AggregationTemporality temporality = GetParam();
@@ -706,7 +709,7 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, MultiCollector)
                     });
   };
 
-  // Cycle 1: A=10 observed once, both collectors drain the same value -> each sees 10.
+  // Cycle 1: each reader independently observes A=10.
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements1 = {
       {{{"attr", "A"}}, 10}};
   storage.RecordLong(measurements1,
@@ -719,16 +722,20 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, MultiCollector)
   opentelemetry::common::SystemTimestamp c1_end;
   opentelemetry::common::SystemTimestamp c2_end;
   collect_value(collector1.get(), collection_ts1, c1_value, c1_start, c1_end);
+  if (temporality == AggregationTemporality::kCumulative)
+  {
+    storage.RecordLong(measurements1,
+                       opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+  }
   collect_value(collector2.get(), collection_ts1, c2_value, c2_start, c2_end);
   EXPECT_EQ(c1_value, 10);
-  EXPECT_EQ(c2_value, 10) << "Second collector must observe the value even though the first "
-                             "collector drained the shared delta";
+  EXPECT_EQ(c2_value, 10) << "Second reader must export its own callback observation";
   EXPECT_EQ(c1_end, opentelemetry::common::SystemTimestamp(collection_ts1))
       << "end_ts must equal the collection timestamp";
   EXPECT_EQ(c2_end, opentelemetry::common::SystemTimestamp(collection_ts1))
       << "end_ts must equal the collection timestamp";
 
-  // Cycle 2: A=30 observed once.
+  // Cycle 2: each reader independently observes A=30.
   std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> measurements2 = {
       {{{"attr", "A"}}, 30}};
   storage.RecordLong(measurements2,
@@ -737,6 +744,11 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, MultiCollector)
   c1_value = -1;
   c2_value = -1;
   collect_value(collector1.get(), collection_ts2, c1_value, c1_start, c1_end);
+  if (temporality == AggregationTemporality::kCumulative)
+  {
+    storage.RecordLong(measurements2,
+                       opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+  }
   collect_value(collector2.get(), collection_ts2, c2_value, c2_start, c2_end);
 
   // end_ts always advances to the current collection timestamp, for both temporalities.
