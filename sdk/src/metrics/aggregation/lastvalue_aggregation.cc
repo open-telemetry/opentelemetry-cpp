@@ -25,11 +25,12 @@ namespace
 {
 
 // Returns whichever of `curr` and `other` has the newer sample, or `curr` if `other` is not a
-// LastValuePointData.
-const LastValuePointData &NewerPoint(const LastValuePointData &curr,
-                                     const PointType &other) noexcept
+// LastValue aggregation.
+LastValuePointData GetLastValuePointData(const LastValuePointData &curr,
+                                         const Aggregation &other) noexcept
 {
-  const auto *other_data = nostd::get_if<LastValuePointData>(&other);
+  const PointType other_point = other.ToPoint();
+  const auto *other_data      = nostd::get_if<LastValuePointData>(&other_point);
   if (other_data == nullptr)
   {
     OTEL_INTERNAL_LOG_ERROR("LastValueAggregation - Loss of type");
@@ -64,18 +65,24 @@ void LongLastValueAggregation::Aggregate(int64_t value,
 std::unique_ptr<Aggregation> LongLastValueAggregation::Merge(
     const Aggregation &delta) const noexcept
 {
-  const PointType delta_point = delta.ToPoint();
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  LastValuePointData curr_data;
+  {
+    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+    curr_data = point_data_;
+  }
   return std::unique_ptr<Aggregation>(
-      new LongLastValueAggregation(NewerPoint(point_data_, delta_point)));
+      new LongLastValueAggregation(GetLastValuePointData(curr_data, delta)));
 }
 
 std::unique_ptr<Aggregation> LongLastValueAggregation::Diff(const Aggregation &next) const noexcept
 {
-  const PointType next_point = next.ToPoint();
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  LastValuePointData curr_data;
+  {
+    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+    curr_data = point_data_;
+  }
   return std::unique_ptr<Aggregation>(
-      new LongLastValueAggregation(NewerPoint(point_data_, next_point)));
+      new LongLastValueAggregation(GetLastValuePointData(curr_data, next)));
 }
 
 PointType LongLastValueAggregation::ToPoint() const noexcept
@@ -106,19 +113,25 @@ void DoubleLastValueAggregation::Aggregate(double value,
 std::unique_ptr<Aggregation> DoubleLastValueAggregation::Merge(
     const Aggregation &delta) const noexcept
 {
-  const PointType delta_point = delta.ToPoint();
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  LastValuePointData curr_data;
+  {
+    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+    curr_data = point_data_;
+  }
   return std::unique_ptr<Aggregation>(
-      new DoubleLastValueAggregation(NewerPoint(point_data_, delta_point)));
+      new DoubleLastValueAggregation(GetLastValuePointData(curr_data, delta)));
 }
 
 std::unique_ptr<Aggregation> DoubleLastValueAggregation::Diff(
     const Aggregation &next) const noexcept
 {
-  const PointType next_point = next.ToPoint();
-  const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+  LastValuePointData curr_data;
+  {
+    const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
+    curr_data = point_data_;
+  }
   return std::unique_ptr<Aggregation>(
-      new DoubleLastValueAggregation(NewerPoint(point_data_, next_point)));
+      new DoubleLastValueAggregation(GetLastValuePointData(curr_data, next)));
 }
 
 PointType DoubleLastValueAggregation::ToPoint() const noexcept
