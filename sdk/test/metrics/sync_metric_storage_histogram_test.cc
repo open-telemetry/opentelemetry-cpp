@@ -22,7 +22,6 @@
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
@@ -60,7 +59,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, LongHistogram)
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
-      nullptr, std::make_shared<MeterEnabledState>());
+      nullptr);
 
   storage.RecordLong(10, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
@@ -201,7 +200,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, DoubleHistogram)
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
-      nullptr, std::make_shared<MeterEnabledState>());
+      nullptr);
 
   storage.RecordDouble(10.0,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
@@ -349,7 +348,7 @@ TEST_P(WritableMetricStorageHistogramTestFixture, Base2ExponentialDoubleHistogra
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
-      nullptr, std::make_shared<MeterEnabledState>());
+      nullptr);
 
   storage.RecordDouble(10.0,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),

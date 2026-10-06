@@ -22,7 +22,6 @@
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
-#include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/state/sync_metric_storage.h"
 #include "opentelemetry/sdk/metrics/view/attributes_processor.h"
@@ -60,7 +59,7 @@ TEST_P(CounterWritableMetricStorageTestFixture, LongCounterSumAggregation)
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
-      nullptr, std::make_shared<MeterEnabledState>());
+      nullptr);
 
   storage.RecordLong(10, KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
                      opentelemetry::context::Context{});
@@ -200,7 +199,7 @@ TEST_P(CounterWritableMetricStorageTestFixture, DoubleCounterSumAggregation)
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
-      nullptr, std::make_shared<MeterEnabledState>());
+      nullptr);
 
   storage.RecordDouble(10.0,
                        KeyValueIterableView<std::map<std::string, std::string>>(attributes_get),
@@ -336,7 +335,7 @@ TEST(SyncMetricStorageTest, DeltaCounterStartTimestampTracksEmptyCycles)
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
-      nullptr, std::make_shared<MeterEnabledState>());
+      nullptr);
 
   std::map<std::string, std::string> attributes = {{"RequestType", "GET"}};
   std::shared_ptr<CollectorHandle> collector(
@@ -414,7 +413,7 @@ TEST(SyncMetricStorageTest, DeltaCounterFirstIntervalUsesInstrumentCreationTime)
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
-      nullptr, std::make_shared<MeterEnabledState>());
+      nullptr);
   auto after_creation = std::chrono::system_clock::now();
 
   // sdk_start_ts is intentionally well before storage construction.
@@ -467,7 +466,7 @@ TEST(SyncMetricStorageTest, DeltaCounterMultiCollectorFirstIntervalUsesInstrumen
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
-      nullptr, std::make_shared<MeterEnabledState>());
+      nullptr);
   auto after_creation = std::chrono::system_clock::now();
 
   auto sdk_start_ts  = before_creation - std::chrono::seconds(60);

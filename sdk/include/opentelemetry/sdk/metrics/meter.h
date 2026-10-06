@@ -147,7 +147,7 @@ private:
   friend class MeterProvider;
 
   /**
-   * Update this meter's MeterConfig. Called only by
+   * Update this meter's MeterConfig. Called on construction, and by
    * MeterProvider::UpdateMeterConfigurator when the provider-level MeterConfigurator is
    * replaced at runtime.
    */

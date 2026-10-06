@@ -3,10 +3,12 @@
 
 #include <atomic>
 #include <chrono>
+#include <memory>
 #include <mutex>
 #include <utility>
 
 #include "opentelemetry/common/key_value_iterable.h"  // IWYU pragma: keep
+#include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
 #include "opentelemetry/nostd/string_view.h"
@@ -156,15 +158,12 @@ void MeterProvider::UpdateMeterConfigurator(
   const std::lock_guard<std::mutex> guard(lock_);
   context_->SetMeterConfigurator(std::move(meter_configurator));
 
-  // Meter construction and Meter::UpdateMeterConfig both hold lock_, so this span is safe. Do NOT
-  // use ForEachMeter: it takes meter_lock_, which the collect path holds before lock_, so
-  // deadlocks.
-  for (auto &meter : context_->GetMeters())
-  {
-    MeterConfig new_config =
-        context_->GetMeterConfigurator().ComputeConfig(*meter->GetInstrumentationScope());
-    meter->UpdateMeterConfig(new_config);
-  }
+  // Takes meter_lock_ after lock_, the same order as GetMeter and RemoveMeter.
+  const auto &configurator = context_->GetMeterConfigurator();
+  context_->ForEachMeter([&configurator](std::shared_ptr<Meter> &meter) {
+    meter->UpdateMeterConfig(configurator.ComputeConfig(*meter->GetInstrumentationScope()));
+    return true;
+  });
 }
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW

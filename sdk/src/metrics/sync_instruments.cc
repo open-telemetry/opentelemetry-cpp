@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <limits>
 #include <memory>  // IWYU pragma: keep
-#include <mutex>   // IWYU pragma: keep
 #include <ostream>
 #include <string>
 #include <utility>
@@ -13,18 +12,10 @@
 #include "opentelemetry/version.h"
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
-#  include <cstddef>
-#  include <vector>
-#  include "opentelemetry/common/attribute_value.h"
-#  include "opentelemetry/common/key_value_iterable.h"
 #  include "opentelemetry/metrics/sync_instruments.h"
-#  include "opentelemetry/nostd/function_ref.h"
-#  include "opentelemetry/nostd/span.h"
-#  include "opentelemetry/nostd/string_view.h"
-#  include "opentelemetry/nostd/unique_ptr.h"
-#  include "opentelemetry/nostd/variant.h"
-#  include "opentelemetry/sdk/common/attribute_utils.h"
 #endif
+
+#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_enabled_state.h"
@@ -773,164 +764,12 @@ void DoubleHistogram::Record(double value) noexcept
 namespace
 {
 
-// Owns a copy of an attribute set so a deferred bind can replay it. AttributeValue's
-// string_view and span alternatives point at caller memory, so values are stored owned.
-class OwnedAttributesIterable final : public opentelemetry::common::KeyValueIterable
-{
-public:
-  explicit OwnedAttributesIterable(const opentelemetry::common::KeyValueIterable &attributes)
-  {
-    entries_.reserve(attributes.size());
-    attributes.ForEachKeyValue([this](nostd::string_view key,
-                                      opentelemetry::common::AttributeValue value) {
-      entries_.emplace_back(std::string{key.data(), key.size()},
-                            nostd::visit(opentelemetry::sdk::common::AttributeConverter{}, value));
-      return true;
-    });
-  }
-
-  bool ForEachKeyValue(
-      nostd::function_ref<bool(nostd::string_view, opentelemetry::common::AttributeValue)> callback)
-      const noexcept override
-  {
-    for (const auto &entry : entries_)
-    {
-      if (!callback(entry.first, ToAttributeValue(entry.second)))
-      {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  size_t size() const noexcept override { return entries_.size(); }
-
-private:
-  // Borrows from the owned value. get_if rather than a visitor so this cannot throw.
-  static opentelemetry::common::AttributeValue ToAttributeValue(
-      const opentelemetry::sdk::common::OwnedAttributeValue &owned) noexcept
-  {
-    if (const auto *v = nostd::get_if<bool>(&owned))
-    {
-      return *v;
-    }
-    if (const auto *v = nostd::get_if<int32_t>(&owned))
-    {
-      return *v;
-    }
-    if (const auto *v = nostd::get_if<uint32_t>(&owned))
-    {
-      return *v;
-    }
-    if (const auto *v = nostd::get_if<int64_t>(&owned))
-    {
-      return *v;
-    }
-    if (const auto *v = nostd::get_if<uint64_t>(&owned))
-    {
-      return *v;
-    }
-    if (const auto *v = nostd::get_if<double>(&owned))
-    {
-      return *v;
-    }
-    if (const auto *v = nostd::get_if<std::string>(&owned))
-    {
-      return nostd::string_view{*v};
-    }
-    if (const auto *v = nostd::get_if<std::vector<int32_t>>(&owned))
-    {
-      return nostd::span<const int32_t>{v->data(), v->size()};
-    }
-    if (const auto *v = nostd::get_if<std::vector<uint32_t>>(&owned))
-    {
-      return nostd::span<const uint32_t>{v->data(), v->size()};
-    }
-    if (const auto *v = nostd::get_if<std::vector<int64_t>>(&owned))
-    {
-      return nostd::span<const int64_t>{v->data(), v->size()};
-    }
-    if (const auto *v = nostd::get_if<std::vector<uint64_t>>(&owned))
-    {
-      return nostd::span<const uint64_t>{v->data(), v->size()};
-    }
-    if (const auto *v = nostd::get_if<std::vector<double>>(&owned))
-    {
-      return nostd::span<const double>{v->data(), v->size()};
-    }
-    if (const auto *v = nostd::get_if<std::vector<uint8_t>>(&owned))
-    {
-      return nostd::span<const uint8_t>{v->data(), v->size()};
-    }
-    // vector<bool> is bit-packed and a string_view span cannot borrow from vector<string>,
-    // so neither can be replayed by borrowing.
-    return nostd::string_view{};
-  }
-
-  std::vector<std::pair<std::string, opentelemetry::sdk::common::OwnedAttributeValue>> entries_;
-};
-
-// Defers Bind until the Meter is enabled, so a handle taken while disabled starts working
-// instead of staying dead. Storage that refuses while enabled cannot bind at all, so that
-// case is latched.
-class LazyBoundEntry
-{
-public:
-  LazyBoundEntry(SyncWritableMetricStorage *storage,
-                 const opentelemetry::common::KeyValueIterable &attributes,
-                 std::shared_ptr<BoundSyncWritableMetricStorage> bound)
-      : storage_(storage), bound_(std::move(bound))
-  {
-    if (storage_ == nullptr)
-    {
-      unbindable_ = true;
-    }
-    else if (!bound_)
-    {
-      attributes_ = std::make_unique<OwnedAttributesIterable>(attributes);
-    }
-  }
-
-  // Binds on first use if needed. Only call once the Meter is known to be enabled.
-  BoundSyncWritableMetricStorage *Get() noexcept
-  {
-    const std::lock_guard<std::mutex> guard(lock_);
-    if (bound_)
-    {
-      return bound_.get();
-    }
-    if (unbindable_ || !attributes_)
-    {
-      return nullptr;
-    }
-    bound_ = storage_->Bind(*attributes_);
-    if (!bound_)
-    {
-      // Enabled and still refused: binding is unsupported here.
-      unbindable_ = true;
-      return nullptr;
-    }
-    attributes_.reset();
-    return bound_.get();
-  }
-
-private:
-  SyncWritableMetricStorage *storage_;
-  std::unique_ptr<OwnedAttributesIterable> attributes_;
-  std::mutex lock_;
-  std::shared_ptr<BoundSyncWritableMetricStorage> bound_;
-  bool unbindable_ = false;
-};
-
 class BoundLongCounterImpl : public opentelemetry::metrics::BoundCounter<uint64_t>
 {
 public:
-  BoundLongCounterImpl(SyncWritableMetricStorage *storage,
-                       const opentelemetry::common::KeyValueIterable &attributes,
-                       std::shared_ptr<BoundSyncWritableMetricStorage> bound,
+  BoundLongCounterImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage,
                        std::shared_ptr<MeterEnabledState> meter_enabled_state) noexcept
-      : entry_(storage, attributes, std::move(bound)),
-        meter_enabled_state_(std::move(meter_enabled_state))
+      : storage_(std::move(storage)), meter_enabled_state_(std::move(meter_enabled_state))
   {}
   void Add(uint64_t value) noexcept override
   {
@@ -938,32 +777,27 @@ public:
     {
       return;
     }
-    auto *entry = entry_.Get();
-    if (entry == nullptr)
+    if (storage_)
     {
-      return;
-    }
-    int64_t converted = 0;
-    if (ToInt64Value(value, "[BoundLongCounter::Add(V)]", converted))
-    {
-      entry->RecordLong(converted);
+      int64_t converted = 0;
+      if (ToInt64Value(value, "[BoundLongCounter::Add(V)]", converted))
+      {
+        storage_->RecordLong(converted);
+      }
     }
   }
 
 private:
-  LazyBoundEntry entry_;
+  std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
   std::shared_ptr<MeterEnabledState> meter_enabled_state_;
 };
 
 class BoundDoubleCounterImpl : public opentelemetry::metrics::BoundCounter<double>
 {
 public:
-  BoundDoubleCounterImpl(SyncWritableMetricStorage *storage,
-                         const opentelemetry::common::KeyValueIterable &attributes,
-                         std::shared_ptr<BoundSyncWritableMetricStorage> bound,
+  BoundDoubleCounterImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage,
                          std::shared_ptr<MeterEnabledState> meter_enabled_state) noexcept
-      : entry_(storage, attributes, std::move(bound)),
-        meter_enabled_state_(std::move(meter_enabled_state))
+      : storage_(std::move(storage)), meter_enabled_state_(std::move(meter_enabled_state))
   {}
   void Add(double value) noexcept override
   {
@@ -976,28 +810,23 @@ public:
       OTEL_INTERNAL_LOG_WARN("[BoundDoubleCounter::Add(V)] Value not recorded - negative value");
       return;
     }
-    auto *entry = entry_.Get();
-    if (entry == nullptr)
+    if (storage_)
     {
-      return;
+      storage_->RecordDouble(value);
     }
-    entry->RecordDouble(value);
   }
 
 private:
-  LazyBoundEntry entry_;
+  std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
   std::shared_ptr<MeterEnabledState> meter_enabled_state_;
 };
 
 class BoundLongHistogramImpl : public opentelemetry::metrics::BoundHistogram<uint64_t>
 {
 public:
-  BoundLongHistogramImpl(SyncWritableMetricStorage *storage,
-                         const opentelemetry::common::KeyValueIterable &attributes,
-                         std::shared_ptr<BoundSyncWritableMetricStorage> bound,
+  BoundLongHistogramImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage,
                          std::shared_ptr<MeterEnabledState> meter_enabled_state) noexcept
-      : entry_(storage, attributes, std::move(bound)),
-        meter_enabled_state_(std::move(meter_enabled_state))
+      : storage_(std::move(storage)), meter_enabled_state_(std::move(meter_enabled_state))
   {}
   void Record(uint64_t value) noexcept override
   {
@@ -1005,32 +834,27 @@ public:
     {
       return;
     }
-    auto *entry = entry_.Get();
-    if (entry == nullptr)
+    if (storage_)
     {
-      return;
-    }
-    int64_t converted = 0;
-    if (ToInt64Value(value, "[BoundLongHistogram::Record(V)]", converted))
-    {
-      entry->RecordLong(converted);
+      int64_t converted = 0;
+      if (ToInt64Value(value, "[BoundLongHistogram::Record(V)]", converted))
+      {
+        storage_->RecordLong(converted);
+      }
     }
   }
 
 private:
-  LazyBoundEntry entry_;
+  std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
   std::shared_ptr<MeterEnabledState> meter_enabled_state_;
 };
 
 class BoundDoubleHistogramImpl : public opentelemetry::metrics::BoundHistogram<double>
 {
 public:
-  BoundDoubleHistogramImpl(SyncWritableMetricStorage *storage,
-                           const opentelemetry::common::KeyValueIterable &attributes,
-                           std::shared_ptr<BoundSyncWritableMetricStorage> bound,
+  BoundDoubleHistogramImpl(std::shared_ptr<BoundSyncWritableMetricStorage> storage,
                            std::shared_ptr<MeterEnabledState> meter_enabled_state) noexcept
-      : entry_(storage, attributes, std::move(bound)),
-        meter_enabled_state_(std::move(meter_enabled_state))
+      : storage_(std::move(storage)), meter_enabled_state_(std::move(meter_enabled_state))
   {}
   void Record(double value) noexcept override
   {
@@ -1044,16 +868,14 @@ public:
           "[BoundDoubleHistogram::Record(V)] Value not recorded - negative value");
       return;
     }
-    auto *entry = entry_.Get();
-    if (entry == nullptr)
+    if (storage_)
     {
-      return;
+      storage_->RecordDouble(value);
     }
-    entry->RecordDouble(value);
   }
 
 private:
-  LazyBoundEntry entry_;
+  std::shared_ptr<BoundSyncWritableMetricStorage> storage_;
   std::shared_ptr<MeterEnabledState> meter_enabled_state_;
 };
 
@@ -1067,9 +889,8 @@ opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<uint64_t>>
   {
     bound = storage_->Bind(attributes);
   }
-  // A null entry is not final: the handle binds later, once the Meter is enabled.
   return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<uint64_t>>{
-      new BoundLongCounterImpl(storage_.get(), attributes, std::move(bound), meter_enabled_state_)};
+      new BoundLongCounterImpl(std::move(bound), meter_enabled_state_)};
 }
 
 opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<double>> DoubleCounter::Bind(
@@ -1081,8 +902,7 @@ opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<double>> D
     bound = storage_->Bind(attributes);
   }
   return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundCounter<double>>{
-      new BoundDoubleCounterImpl(storage_.get(), attributes, std::move(bound),
-                                 meter_enabled_state_)};
+      new BoundDoubleCounterImpl(std::move(bound), meter_enabled_state_)};
 }
 
 opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<uint64_t>>
@@ -1094,8 +914,7 @@ LongHistogram::Bind(const opentelemetry::common::KeyValueIterable &attributes) n
     bound = storage_->Bind(attributes);
   }
   return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<uint64_t>>{
-      new BoundLongHistogramImpl(storage_.get(), attributes, std::move(bound),
-                                 meter_enabled_state_)};
+      new BoundLongHistogramImpl(std::move(bound), meter_enabled_state_)};
 }
 
 opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<double>>
@@ -1107,8 +926,7 @@ DoubleHistogram::Bind(const opentelemetry::common::KeyValueIterable &attributes)
     bound = storage_->Bind(attributes);
   }
   return opentelemetry::nostd::unique_ptr<opentelemetry::metrics::BoundHistogram<double>>{
-      new BoundDoubleHistogramImpl(storage_.get(), attributes, std::move(bound),
-                                   meter_enabled_state_)};
+      new BoundDoubleHistogramImpl(std::move(bound), meter_enabled_state_)};
 }
 #endif
 

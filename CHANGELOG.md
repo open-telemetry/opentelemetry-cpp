@@ -38,8 +38,9 @@ Increment the:
 * [API] Remove regex from trace_state.h
   [#4570](https://github.com/open-telemetry/opentelemetry-cpp/pull/4570)
 * [SDK] Add `MeterProvider::UpdateMeterConfigurator()` and example. Instruments
-  observe the enabled state of the Meter that created them, so a disabled Meter
-  behaves as a no-op Meter without instruments having to be recreated
+  observe the enabled state of the Meter that created them, so they do not
+  have to be recreated. Data recorded before a Meter is disabled is still
+  exported
   [#4313](https://github.com/open-telemetry/opentelemetry-cpp/pull/4313)
 
 * [API] `TraceState::Set` now overwrites an entry with the same key, and

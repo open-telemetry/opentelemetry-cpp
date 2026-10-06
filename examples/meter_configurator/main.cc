@@ -15,13 +15,15 @@
 //
 // Stage 1: Startup. All meters are enabled and all three scopes report metrics.
 // Stage 2: The noisy external_library metrics are not needed in steady state, so its meter is
-//          disabled. Its measurements are no longer collected or exported.
+//          disabled. New measurements are dropped.
 // Stage 3: A user reports unexpected behavior, so the external_library meter is re-enabled to
 //          investigate. Its metrics are collected and exported again.
 // Stage 4: The investigation completes and the external_library meter is disabled again.
 //
 // Instruments observe their Meter's enabled state, so they need not be recreated after an update.
-// Measurements recorded while a Meter is disabled are dropped, not buffered.
+// Measurements recorded while a Meter is disabled are dropped, not buffered. Data recorded before
+// the Meter was disabled is still exported, so with cumulative temporality the disabled stream
+// keeps reporting its last value.
 
 #include <chrono>
 #include <cstdint>
@@ -193,7 +195,7 @@ int main()
 
   // Stage 2: Steady state. Disable the noisy external_library meter.
   std::cout << "\nStage 2: steady state, external_library meter disabled\n";
-  std::cout << "  only my_application and my_library report metrics\n";
+  std::cout << "  external_library stops recording, its last value is still reported\n";
 
   sdk_meter_provider->UpdateMeterConfigurator(
       MakeMeterConfigurator(enabled_config, {{"external_library", disabled_config}}));
@@ -203,7 +205,7 @@ int main()
 
   // Stage 3: A user reports unexpected behavior. Re-enable the external_library meter.
   std::cout << "\nStage 3: investigating, external_library meter re-enabled\n";
-  std::cout << "  all three scopes report metrics again\n";
+  std::cout << "  external_library records again\n";
 
   sdk_meter_provider->UpdateMeterConfigurator(MakeMeterConfigurator(enabled_config));
 
@@ -212,7 +214,7 @@ int main()
 
   // Stage 4: Investigation complete. Disable the external_library meter again.
   std::cout << "\nStage 4: investigation complete, external_library meter disabled again\n";
-  std::cout << "  only my_application and my_library report metrics\n";
+  std::cout << "  external_library stops recording, its last value is still reported\n";
 
   sdk_meter_provider->UpdateMeterConfigurator(
       MakeMeterConfigurator(enabled_config, {{"external_library", disabled_config}}));

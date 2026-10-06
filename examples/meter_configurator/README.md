@@ -37,11 +37,14 @@ enabled, and stops again when the meter is disabled. This matters for
 third-party instrumentation, which an application cannot force to rebuild
 its instruments.
 
-Disabling a meter stops collection and export for that scope, and
-measurements recorded while it is disabled are dropped rather than buffered.
-They are not revealed by a later export, which is why
-`external_library.requests` reports `2` in stage 3: the stage 2 measurement
-is not retained.
+When a meter is disabled, new measurements are dropped and its asynchronous
+callbacks are not called. Anything recorded before it was disabled is still
+exported.
+
+This example uses cumulative temporality, so while `external_library` is
+disabled it keeps reporting its last total (`1` in stage 2, `2` in stage 4).
+The measurement made during stage 2 is dropped, which is why stage 3 reports
+`2` and not `3`.
 
 ## Build and run
 
@@ -116,7 +119,7 @@ Stage 1: startup, all meters enabled
 }
 
 Stage 2: steady state, external_library meter disabled
-  only my_application and my_library report metrics
+  external_library stops recording, its last value is still reported
 {
   scope name    : my_application
   schema url    :
@@ -153,9 +156,27 @@ Stage 2: steady state, external_library meter disabled
         telemetry.sdk.name: opentelemetry
         telemetry.sdk.version: 1.29.0-dev
 }
+{
+  scope name    : external_library
+  schema url    :
+  version       :
+  start time    : Mon Jul 27 09:32:35 2026
+  end time      : Mon Jul 27 09:32:35 2026
+  instrument name       : external_library.requests
+  description   : Requests handled by the external library
+  unit          : {request}
+  type          : SumPointData
+  value         : 1
+  attributes            :
+  resources     :
+        service.name: meter_configurator_example
+        telemetry.sdk.language: cpp
+        telemetry.sdk.name: opentelemetry
+        telemetry.sdk.version: 1.29.0-dev
+}
 
 Stage 3: investigating, external_library meter re-enabled
-  all three scopes report metrics again
+  external_library records again
 {
   scope name    : my_application
   schema url    :
@@ -212,7 +233,7 @@ Stage 3: investigating, external_library meter re-enabled
 }
 
 Stage 4: investigation complete, external_library meter disabled again
-  only my_application and my_library report metrics
+  external_library stops recording, its last value is still reported
 {
   scope name    : my_application
   schema url    :
@@ -242,6 +263,24 @@ Stage 4: investigation complete, external_library meter disabled again
   unit          : {call}
   type          : SumPointData
   value         : 4
+  attributes            :
+  resources     :
+        service.name: meter_configurator_example
+        telemetry.sdk.language: cpp
+        telemetry.sdk.name: opentelemetry
+        telemetry.sdk.version: 1.29.0-dev
+}
+{
+  scope name    : external_library
+  schema url    :
+  version       :
+  start time    : Mon Jul 27 09:32:35 2026
+  end time      : Mon Jul 27 09:32:35 2026
+  instrument name       : external_library.requests
+  description   : Requests handled by the external library
+  unit          : {request}
+  type          : SumPointData
+  value         : 2
   attributes            :
   resources     :
         service.name: meter_configurator_example

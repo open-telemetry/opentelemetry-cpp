@@ -94,6 +94,17 @@ namespace metrics
 
 namespace metrics = opentelemetry::metrics;
 
+namespace
+{
+
+bool IsAsyncInstrument(InstrumentType type) noexcept
+{
+  return type == InstrumentType::kObservableCounter || type == InstrumentType::kObservableGauge ||
+         type == InstrumentType::kObservableUpDownCounter;
+}
+
+}  // namespace
+
 Meter::Meter(
     std::weak_ptr<MeterContext> meter_context,
     std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope) noexcept
@@ -107,7 +118,8 @@ Meter::Meter(
   }
   else
   {
-    UpdateMeterConfig(MeterConfig::Default());
+    // Without a context the meter can never be collected, so recording would be wasted work.
+    UpdateMeterConfig(MeterConfig::Disabled());
     OTEL_INTERNAL_LOG_ERROR("[Meter::Meter()] - Error during initialization."
                             << "The metric context is invalid")
   }
@@ -482,7 +494,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
                                    view_instr_desc, exemplar_filter_type),
 #endif
-              view.GetAggregationConfig(), meter_enabled_state_));
+              view.GetAggregationConfig()));
           storage_registry_.insert({view_instr_desc, sync_storage});
         }
         auto sync_multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
@@ -575,11 +587,14 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
 std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
                                        opentelemetry::common::SystemTimestamp collect_ts) noexcept
 {
-  if (!IsEnabled())
+  // A disabled meter still exports what its sync instruments recorded before it was disabled.
+  // Async callbacks are skipped, and so are async storages, which would otherwise re-export
+  // their last cumulative values.
+  const bool enabled = IsEnabled();
+  if (enabled)
   {
-    return std::vector<MetricData>();
+    observable_registry_->Observe(collect_ts);
   }
-  observable_registry_->Observe(collect_ts);
   std::vector<MetricData> metric_data_list;
   auto ctx = meter_context_.lock();
   if (!ctx)
@@ -591,6 +606,10 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
   std::lock_guard<std::mutex> guard(storage_lock_);
   for (auto &metric_storage : storage_registry_)
   {
+    if (!enabled && IsAsyncInstrument(metric_storage.first.type_))
+    {
+      continue;
+    }
     metric_storage.second->Collect(collector, ctx->GetCollectors(), ctx->GetSDKStartTime(),
                                    collect_ts, [&metric_data_list](const MetricData &metric_data) {
                                      metric_data_list.push_back(metric_data);

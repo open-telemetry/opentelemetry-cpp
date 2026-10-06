@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <future>
 #include <initializer_list>
+#include <map>
 #include <set>
 #include <string>
 #include <thread>
@@ -18,7 +19,9 @@
 #endif
 
 #include "opentelemetry/common/macros.h"
+#include "opentelemetry/metrics/async_instruments.h"
 #include "opentelemetry/metrics/meter.h"
+#include "opentelemetry/metrics/observer_result.h"
 #include "opentelemetry/metrics/sync_instruments.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -28,6 +31,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -58,7 +62,6 @@ using opentelemetry::sdk::common::unsetenv;
 #endif
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
-#  include <map>
 #  include <unordered_map>
 
 #  include "opentelemetry/common/attribute_value.h"
@@ -560,9 +563,11 @@ std::unique_ptr<scope_sdk::ScopeConfigurator<MeterConfig>> DisableByName(
 // Builds a MeterProvider whose MetricReader pointer is returned via the out parameter.
 std::shared_ptr<MeterProvider> MakeProvider(
     MetricReader *&reader_out,
-    std::unique_ptr<scope_sdk::ScopeConfigurator<MeterConfig>> configurator = EnableAll())
+    std::unique_ptr<scope_sdk::ScopeConfigurator<MeterConfig>> configurator = EnableAll(),
+    AggregationTemporality temporality = AggregationTemporality::kCumulative)
 {
-  std::unique_ptr<MetricReader> reader{new MockMetricReader()};
+  std::unique_ptr<MetricReader> reader{new MockMetricReader(
+      std::unique_ptr<PushMetricExporter>(new MockMetricExporter(temporality)))};
   reader_out    = reader.get();
   auto provider = std::make_shared<MeterProvider>(
       std::unique_ptr<ViewRegistry>(new ViewRegistry()),
@@ -623,12 +628,46 @@ int64_t CollectCounterSum(MetricReader *reader,
   return sum;
 }
 
+// Collected sum of each uint64 counter stream in a scope, keyed by stream name.
+std::map<std::string, int64_t> CollectCounterSums(MetricReader *reader,
+                                                  const std::string &scope_name)
+{
+  std::map<std::string, int64_t> sums;
+  reader->Collect([&](ResourceMetrics &metric_data) {
+    for (const auto &scope_metrics : metric_data.scope_metric_data_)
+    {
+      if (scope_metrics.scope_->GetName() != scope_name)
+      {
+        continue;
+      }
+      for (const auto &md : scope_metrics.metric_data_)
+      {
+        for (const auto &pd : md.point_data_attr_)
+        {
+          const auto *sum_point = opentelemetry::nostd::get_if<SumPointData>(&pd.point_data);
+          if (sum_point != nullptr)
+          {
+            const auto *value = opentelemetry::nostd::get_if<int64_t>(&sum_point->value_);
+            if (value != nullptr)
+            {
+              sums[md.instrument_descriptor.name_] += *value;
+            }
+          }
+        }
+      }
+    }
+    return true;
+  });
+  return sums;
+}
+
 }  // namespace
 
 TEST(MeterProvider, UpdateMeterConfiguratorDisableByName)
 {
+  // Delta, so data exported before the update is not carried into later collections.
   MetricReader *reader{};
-  auto provider = MakeProvider(reader);
+  auto provider = MakeProvider(reader, EnableAll(), AggregationTemporality::kDelta);
   ASSERT_NE(nullptr, reader);
 
   auto meter_disabled_by_update = provider->GetMeter("scope.disabled");
@@ -645,7 +684,7 @@ TEST(MeterProvider, UpdateMeterConfiguratorDisableByName)
 
   provider->UpdateMeterConfigurator(DisableByName("scope.disabled"));
 
-  // The disabled meter is no longer collected, the other scope is untouched.
+  // The disabled meter has nothing new to export, the other scope is untouched.
   counter_disabled_by_update->Add(1);
   counter_unaffected->Add(1);
   EXPECT_EQ(CollectScopeNames(reader), (std::set<std::string>{"scope.unaffected"}));
@@ -708,12 +747,174 @@ TEST(MeterProvider, UpdateMeterConfiguratorInstrumentStopsRecordingAfterDisable)
 
   provider->UpdateMeterConfigurator(DisableAll());
   counter->Add(1);
-  EXPECT_TRUE(CollectScopeNames(reader).empty());
+  // The cumulative stream is still exported, but the measurement made while disabled is dropped.
+  EXPECT_EQ(1, CollectCounterSum(reader, "scope.silenced", "counter.silenced"));
 
   // Re-enabling must not reveal the measurement that was recorded while disabled.
   provider->UpdateMeterConfigurator(EnableAll());
   EXPECT_EQ(1, CollectCounterSum(reader, "scope.silenced", "counter.silenced"));
 }
+
+// Data recorded before the meter is disabled, but not yet collected, must still be exported.
+TEST(MeterProvider, UpdateMeterConfiguratorDisabledMeterExportsPendingSyncData)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader, EnableAll(), AggregationTemporality::kDelta);
+  ASSERT_NE(nullptr, reader);
+
+  auto meter   = provider->GetMeter("scope.pending");
+  auto counter = meter->CreateUInt64Counter("counter.pending");
+
+  counter->Add(3);
+  provider->UpdateMeterConfigurator(DisableAll());
+  counter->Add(1);
+
+  EXPECT_EQ(3, CollectCounterSum(reader, "scope.pending", "counter.pending"));
+  // The pending data was exported once, and nothing new is recorded while disabled.
+  EXPECT_EQ(-1, CollectCounterSum(reader, "scope.pending", "counter.pending"));
+}
+
+// Async callbacks are not invoked while the meter is disabled, and stale async data is not
+// re-exported.
+TEST(MeterProvider, UpdateMeterConfiguratorDisabledMeterSkipsAsyncInstruments)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader);
+  ASSERT_NE(nullptr, reader);
+
+  auto meter      = provider->GetMeter("scope.async");
+  auto observable = meter->CreateInt64ObservableCounter("observable.counter");
+  int calls       = 0;
+  observable->AddCallback(
+      [](opentelemetry::metrics::ObserverResult result, void *state) {
+        ++*static_cast<int *>(state);
+        opentelemetry::nostd::get<
+            opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(
+            result)
+            ->Observe(10);
+      },
+      &calls);
+
+  EXPECT_EQ(CollectScopeNames(reader), (std::set<std::string>{"scope.async"}));
+  EXPECT_EQ(1, calls);
+
+  provider->UpdateMeterConfigurator(DisableAll());
+  EXPECT_TRUE(CollectScopeNames(reader).empty());
+  EXPECT_EQ(1, calls);
+
+  provider->UpdateMeterConfigurator(EnableAll());
+  EXPECT_EQ(CollectScopeNames(reader), (std::set<std::string>{"scope.async"}));
+  EXPECT_EQ(2, calls);
+}
+
+// With cumulative temporality the disabled stream keeps its last value, and recording resumes from
+// it after re-enabling.
+TEST(MeterProvider, UpdateMeterConfiguratorCumulativeStreamResumesAfterReEnable)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader);
+  ASSERT_NE(nullptr, reader);
+
+  auto meter   = provider->GetMeter("scope.cumulative");
+  auto counter = meter->CreateUInt64Counter("counter.cumulative");
+
+  counter->Add(5);
+  provider->UpdateMeterConfigurator(DisableAll());
+  counter->Add(100);
+  EXPECT_EQ(5, CollectCounterSum(reader, "scope.cumulative", "counter.cumulative"));
+  EXPECT_EQ(5, CollectCounterSum(reader, "scope.cumulative", "counter.cumulative"));
+
+  provider->UpdateMeterConfigurator(EnableAll());
+  counter->Add(1);
+  EXPECT_EQ(6, CollectCounterSum(reader, "scope.cumulative", "counter.cumulative"));
+}
+
+// The instrument checks the enabled state before writing to its streams, so every stream of an
+// instrument with several views behaves the same.
+TEST(MeterProvider, UpdateMeterConfiguratorAppliesToAllViewsOfAnInstrument)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader, EnableAll(), AggregationTemporality::kDelta);
+  ASSERT_NE(nullptr, reader);
+  for (const char *stream : {"stream.a", "stream.b"})
+  {
+    provider->AddView(std::unique_ptr<InstrumentSelector>(
+                          new InstrumentSelector(InstrumentType::kCounter, "counter", "")),
+                      std::unique_ptr<MeterSelector>(new MeterSelector("scope.views", "", "")),
+                      std::unique_ptr<View>(new View(stream, "", AggregationType::kSum)));
+  }
+
+  auto meter   = provider->GetMeter("scope.views");
+  auto counter = meter->CreateUInt64Counter("counter");
+
+  counter->Add(7);
+  provider->UpdateMeterConfigurator(DisableAll());
+  counter->Add(1);
+  EXPECT_EQ((std::map<std::string, int64_t>{{"stream.a", 7}, {"stream.b", 7}}),
+            CollectCounterSums(reader, "scope.views"));
+
+  provider->UpdateMeterConfigurator(EnableAll());
+  counter->Add(2);
+  EXPECT_EQ((std::map<std::string, int64_t>{{"stream.a", 2}, {"stream.b", 2}}),
+            CollectCounterSums(reader, "scope.views"));
+}
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2 && \
+    defined(OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW)
+// A handle bound while the meter is disabled records once it is enabled, and its pending data is
+// still exported after the meter is disabled again.
+TEST(MeterProvider, UpdateMeterConfiguratorBoundCounter)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader, DisableAll(), AggregationTemporality::kDelta);
+  ASSERT_NE(nullptr, reader);
+
+  auto meter   = provider->GetMeter("scope.bound");
+  auto counter = meter->CreateUInt64Counter("counter.bound");
+  auto bound   = counter->Bind({{"key", "value"}});
+  ASSERT_NE(nullptr, bound);
+
+  bound->Add(100);
+  EXPECT_EQ(-1, CollectCounterSum(reader, "scope.bound", "counter.bound"));
+
+  provider->UpdateMeterConfigurator(EnableAll());
+  bound->Add(2);
+  provider->UpdateMeterConfigurator(DisableAll());
+  bound->Add(100);
+  EXPECT_EQ(2, CollectCounterSum(reader, "scope.bound", "counter.bound"));
+  EXPECT_EQ(-1, CollectCounterSum(reader, "scope.bound", "counter.bound"));
+}
+
+// Handles bound and released while the meter is disabled are reclaimed by collection, so they do
+// not exhaust the cardinality limit.
+TEST(MeterProvider, UpdateMeterConfiguratorBindWhileDisabledDoesNotExhaustCardinality)
+{
+  MetricReader *reader{};
+  auto provider = MakeProvider(reader, DisableAll(), AggregationTemporality::kDelta);
+  ASSERT_NE(nullptr, reader);
+  provider->AddView(std::unique_ptr<InstrumentSelector>(
+                        new InstrumentSelector(InstrumentType::kCounter, "counter.limited", "")),
+                    std::unique_ptr<MeterSelector>(new MeterSelector("scope.limited", "", "")),
+                    std::unique_ptr<View>(new View("counter.limited", "", AggregationType::kSum,
+                                                   std::make_shared<AggregationConfig>(3))));
+
+  auto meter   = provider->GetMeter("scope.limited");
+  auto counter = meter->CreateUInt64Counter("counter.limited");
+  for (int i = 0; i < 50; ++i)
+  {
+    auto bound = counter->Bind({{"key", std::to_string(i)}});
+    ASSERT_NE(nullptr, bound);
+    bound->Add(1);
+  }
+  EXPECT_EQ(-1, CollectCounterSum(reader, "scope.limited", "counter.limited"));
+
+  provider->UpdateMeterConfigurator(EnableAll());
+  auto bound = counter->Bind({{"key", "after-enable"}});
+  ASSERT_NE(nullptr, bound);
+  bound->Add(7);
+  EXPECT_EQ(7, CollectCounterSum(reader, "scope.limited", "counter.limited"));
+}
+#endif
 
 TEST(MeterProvider, UpdateMeterConfiguratorAppliesToAllExistingMeters)
 {
@@ -753,8 +954,8 @@ TEST(MeterProvider, UpdateMeterConfiguratorNewMeterUsesUpdatedConfig)
 
   provider->UpdateMeterConfigurator(DisableByName("scope.disabled"));
 
-  // Meters created after the update use the updated configurator. A meter that is disabled at
-  // instrument creation time returns no-op instruments.
+  // Meters created after the update use the updated configurator. Instruments of a meter that is
+  // disabled at creation time do not record.
   auto meter_disabled = provider->GetMeter("scope.disabled");
   auto meter_enabled  = provider->GetMeter("scope.enabled");
 
@@ -800,6 +1001,9 @@ TEST(MeterProvider, UpdateMeterConfiguratorConcurrentGetMeter)
   std::promise<void> worker_ready;
   std::future<void> worker_ready_future = worker_ready.get_future();
 
+  std::promise<void> collector_ready;
+  std::future<void> collector_ready_future = collector_ready.get_future();
+
   // Worker: create meters and record measurements while the configurator is being replaced.
   std::thread worker([&] {
     worker_ready.set_value();
@@ -812,7 +1016,17 @@ TEST(MeterProvider, UpdateMeterConfiguratorConcurrentGetMeter)
     }
   });
 
+  // Collector: collect while meters are being enabled and disabled.
+  std::thread collector([&] {
+    collector_ready.set_value();
+    while (!stop.load(std::memory_order_relaxed))
+    {
+      CollectScopeNames(reader);
+    }
+  });
+
   worker_ready_future.wait();
+  collector_ready_future.wait();
 
   for (int i = 0; i < kUpdateCount; ++i)
   {
@@ -821,6 +1035,7 @@ TEST(MeterProvider, UpdateMeterConfiguratorConcurrentGetMeter)
 
   stop.store(true, std::memory_order_relaxed);
   worker.join();
+  collector.join();
 
   // With the final configurator enabling all scopes, every existing meter must be collectable.
   provider->UpdateMeterConfigurator(EnableAll());
@@ -849,7 +1064,7 @@ TEST(MeterProvider, SetMeterConfiguratorNullIgnoredOnContext)
   EXPECT_FALSE(context->GetMeterConfigurator().ComputeConfig(*scope).IsEnabled());
 }
 
-TEST(MeterProvider, MeterWithExpiredContextIsEnabledByDefault)
+TEST(MeterProvider, MeterWithExpiredContextIsDisabled)
 {
   ScopedTestLogHandler log_handler{LogLevel::Error};
 
@@ -862,7 +1077,7 @@ TEST(MeterProvider, MeterWithExpiredContextIsEnabledByDefault)
   }
   ASSERT_TRUE(expired_context.expired());
 
-  // A Meter cannot compute its config without a context, so it falls back to the default config.
+  // A Meter cannot compute its config or be collected without a context, so it is disabled.
   Meter meter{expired_context,
               opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("scope")};
 
@@ -870,6 +1085,7 @@ TEST(MeterProvider, MeterWithExpiredContextIsEnabledByDefault)
   ASSERT_EQ(logs.size(), 1);
   EXPECT_NE(logs[0].msg.find("The metric context is invalid"), std::string::npos);
 
-  // MeterConfig::Default() is enabled, so instrument creation is not short circuited.
-  EXPECT_NE(nullptr, meter.CreateUInt64Counter("counter"));
+  auto counter = meter.CreateUInt64Counter("counter");
+  ASSERT_NE(nullptr, counter);
+  counter->Add(1);  // Dropped: the meter is disabled.
 }
