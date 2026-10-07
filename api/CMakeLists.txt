@@ -87,13 +87,6 @@ if(OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW)
                              INTERFACE ENABLE_METRICS_BOUND_INSTRUMENTS_PREVIEW)
 endif()
 
-if(OTELCPP_WITH_OTLP_RETRY_PREVIEW)
-  target_compile_definitions(opentelemetry_api
-                             INTERFACE ENABLE_OTLP_RETRY_PREVIEW)
-else()
-  message(WARNING "OTELCPP_WITH_OTLP_RETRY_PREVIEW=OFF is deprecated")
-endif()
-
 if(OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW)
   target_compile_definitions(opentelemetry_api
                              INTERFACE ENABLE_OTLP_GRPC_CREDENTIAL_PREVIEW)

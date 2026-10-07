@@ -7,9 +7,11 @@
 #include <grpcpp/resource_quota.h>
 #include <grpcpp/security/credentials.h>
 #include <grpcpp/support/channel_arguments.h>
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cstdint>
+#include <cstdio>
 #include <fstream>
 #include <iterator>
 #include <memory>
@@ -17,6 +19,7 @@
 #include <utility>
 
 #include "opentelemetry/ext/http/common/url_parser.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 
 // clang-format off
@@ -31,14 +34,11 @@
 // clang-format on
 
 #ifdef ENABLE_ASYNC_EXPORT
-#  include <algorithm>
 #  include <condition_variable>
-#  include <cstdio>
 #  include <mutex>
 #  include <unordered_set>
 
 #  include "opentelemetry/common/timestamp.h"
-#  include "opentelemetry/nostd/string_view.h"
 #endif /* ENABLE_ASYNC_EXPORT */
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -411,7 +411,6 @@ void OtlpGrpcClient::PopulateChannelArguments(const OtlpGrpcClientOptions &optio
     grpc_arguments.SetCompressionAlgorithm(GRPC_COMPRESS_GZIP);
   }
 
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
   if (options.retry_policy_max_attempts > 0U &&
       options.retry_policy_initial_backoff > std::chrono::duration<float>::zero() &&
       options.retry_policy_max_backoff > std::chrono::duration<float>::zero() &&
@@ -450,7 +449,6 @@ void OtlpGrpcClient::PopulateChannelArguments(const OtlpGrpcClientOptions &optio
 
     grpc_arguments.SetServiceConfigJSON(service_config);
   }
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
 }
 
 std::unique_ptr<grpc::ClientContext> OtlpGrpcClient::MakeClientContext(

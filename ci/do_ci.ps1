@@ -25,11 +25,6 @@ if (!(test-path install_test)) {
 }
 $INSTALL_TEST_DIR = Join-Path "$SRC_DIR" "install_test"
 
-if (!(test-path plugin)) {
-  mkdir plugin
-}
-$PLUGIN_DIR = Join-Path "$SRC_DIR" "plugin"
-
 $VCPKG_DIR = Join-Path "$SRC_DIR" "tools/vcpkg"
 
 $Env:CTEST_OUTPUT_ON_FAILURE = "1"
@@ -356,46 +351,6 @@ switch ($action) {
       exit $exit
     }
   }
-  "cmake.build_example_plugin" {
-    cd "$BUILD_DIR"
-    cmake $SRC_DIR `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `
-      -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-    cmake --build . -j $nproc
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-    cp examples/plugin/plugin/Debug/example_plugin.dll ${PLUGIN_DIR}
-  }
-  "cmake.test_example_plugin" {
-    cd "$BUILD_DIR"
-    cmake $SRC_DIR `
-      -DVCPKG_TARGET_TRIPLET=x64-windows `
-      -DOTELCPP_WITH_ASYNC_EXPORT_PREVIEW=ON `
-      "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_DIR/scripts/buildsystems/vcpkg.cmake"
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-    cmake --build . -j $nproc
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-    cp examples/plugin/plugin/Debug/example_plugin.dll ${PLUGIN_DIR}
-    $config = New-TemporaryFile
-    examples/plugin/load/Debug/load_plugin_example.exe ${PLUGIN_DIR}/example_plugin.dll $config
-    $exit = $LASTEXITCODE
-    if ($exit -ne 0) {
-      exit $exit
-    }
-  }
   "cmake.install.test" {
     Remove-Item -Recurse -Force "$BUILD_DIR\*"
     Remove-Item -Recurse -Force "$INSTALL_TEST_DIR\*"
@@ -553,7 +508,6 @@ switch ($action) {
       -DOTELCPP_WITH_CONFIGURATION=OFF `
       -DOTELCPP_WITH_OPENTRACING=OFF `
       -DOTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW=OFF `
-      -DOTELCPP_WITH_OTLP_RETRY_PREVIEW=OFF `
       -DOTELCPP_WITH_OTLP_GRPC=OFF `
       -DOTELCPP_WITH_OTLP_HTTP=OFF `
       -DOTELCPP_WITH_OTLP_FILE=OFF `

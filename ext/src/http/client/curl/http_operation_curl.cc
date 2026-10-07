@@ -3,12 +3,8 @@
 
 #include <curl/curl.h>
 #include <curl/curlver.h>
-
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <array>
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
-
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <cmath>
@@ -35,6 +31,7 @@
 #  include <cctype>
 #endif
 
+#include "opentelemetry/common/string_util.h"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_time_util.h"
@@ -611,7 +608,6 @@ void HttpOperation::Cleanup()
 
 bool HttpOperation::IsRetryable()
 {
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
   static constexpr auto kRetryableStatusCodes = std::array<decltype(response_code_), 4>{
       429,  // Too Many Requests
       502,  // Bad Gateway
@@ -624,9 +620,6 @@ bool HttpOperation::IsRetryable()
 
   return is_retryable && (last_curl_result_ == CURLE_OK) &&
          (retry_attempts_ < retry_policy_.max_attempts);
-#else
-  return false;
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
 }
 
 std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
@@ -818,7 +811,7 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
 
   if (!text_to_log.empty() && text_to_log[size - 1] == '\n')
   {
-    text_to_log = text_to_log.substr(0, size - 1);
+    text_to_log = common::StringUtil::Substr(text_to_log, 0, size - 1);
   }
 
   if (type == CURLINFO_TEXT)
@@ -826,11 +819,11 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
     static const auto kTlsInfo    = nostd::string_view("SSL connection using");
     static const auto kFailureMsg = nostd::string_view("Recv failure:");
 
-    if (text_to_log.substr(0, kTlsInfo.size()) == kTlsInfo)
+    if (common::StringUtil::Substr(text_to_log, 0, kTlsInfo.size()) == kTlsInfo)
     {
       OTEL_INTERNAL_LOG_INFO(text_to_log);
     }
-    else if (text_to_log.substr(0, kFailureMsg.size()) == kFailureMsg)
+    else if (common::StringUtil::Substr(text_to_log, 0, kFailureMsg.size()) == kFailureMsg)
     {
       OTEL_INTERNAL_LOG_ERROR(text_to_log);
     }
@@ -856,8 +849,8 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
 
       if (pos != nostd::string_view::npos)
       {
-        OTEL_INTERNAL_LOG_DEBUG(kHeaderSent << text_to_log.substr(0, pos - 1));
-        text_to_log = text_to_log.substr(pos + 1);
+        OTEL_INTERNAL_LOG_DEBUG(kHeaderSent << common::StringUtil::Substr(text_to_log, 0, pos - 1));
+        text_to_log = common::StringUtil::Substr(text_to_log, pos + 1);
       }
     }
   }
