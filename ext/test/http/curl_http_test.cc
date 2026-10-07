@@ -1162,6 +1162,50 @@ TEST_F(BasicCurlHttpTests, RepeatedCallerThreadCancelsAreClean)
   EXPECT_GE(terminal_total, 20);
 }
 
+// CancelSession from one thread while another is still inside SendRequest used to read
+// Session::curl_operation_ while SendRequest was assigning it (#4438). The cancel now waits for
+// SendRequest to publish the operation, so every attempt must still end with exactly the
+// terminal events the handler can count, and a thread sanitizer must stay quiet.
+TEST_F(BasicCurlHttpTests, CancelRacingSendRequestIsClean)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  // Warm the client so its IO thread is already running.
+  {
+    auto warm = session_manager->CreateSession("http://127.0.0.1:19937");
+    warm->CreateRequest()->SetUri("get/");
+    auto warm_handler = std::make_shared<TerminalCountingHandler>();
+    warm->SendRequest(warm_handler);
+    warm->FinishSession();
+  }
+
+  for (int i = 0; i < 50; ++i)
+  {
+    auto session = session_manager->CreateSession("http://127.0.0.1:19937");
+    session->CreateRequest()->SetUri("get/");
+    auto handler = std::make_shared<TerminalCountingHandler>();
+
+    std::atomic<bool> go{false};
+    std::thread canceller([&session, &go]() {
+      while (!go.load(std::memory_order_acquire))
+      {
+        std::this_thread::yield();
+      }
+      session->CancelSession();
+    });
+
+    go.store(true, std::memory_order_release);
+    session->SendRequest(handler);
+    canceller.join();
+    session->FinishSession();
+
+    EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  }
+
+  session_manager->FinishAllSessions();
+}
+
 TEST_F(BasicCurlHttpTests, SendGetRequestSync)
 {
   received_requests_.clear();

@@ -206,6 +206,7 @@ void Session::SendRequest(
       // The handler may start another request on this session or drop the last reference to it,
       // so nothing below this point may touch the session.
       is_session_active_.store(false, std::memory_order_release);
+      PublishOperation();
 
       if (callback)
       {
@@ -259,31 +260,99 @@ void Session::SendRequest(
   }
   else
   {
+    is_session_active_.store(false, std::memory_order_release);
+    // Publish before the handler runs: it may drop the last reference to this session.
+    PublishOperation();
     if (callback)
     {
       callback->OnEvent(opentelemetry::ext::http::client::SessionState::CreateFailed, "");
     }
-    is_session_active_.store(false, std::memory_order_release);
+    return;
+  }
+
+  PublishOperation();
+}
+
+void Session::PublishOperation() noexcept
+{
+  // The operation, if there is one, is complete: its callback, promise, future and session route
+  // are all in place. From here on other threads may read curl_operation_. A cancel or finish
+  // that arrived while this thread was still building the operation left a note instead of
+  // touching it, so apply it now. The stores and loads are sequentially consistent so that
+  // either the other thread sees the operation published or this thread sees its note, never
+  // neither.
+  MarkOperationPublished();
+  if (cancel_requested_.load(std::memory_order_seq_cst))
+  {
+    AbortPublishedOperation();
+  }
+  else if (finish_requested_.load(std::memory_order_seq_cst))
+  {
+    FinishPublishedOperation();
   }
 }
 
-bool Session::CancelSession() noexcept
+void Session::AbortPublishedOperation() noexcept
 {
   if (curl_operation_)
   {
     curl_operation_->Abort();
   }
   http_client_.CleanupSession(session_id_);
-  return true;
 }
 
-bool Session::FinishSession() noexcept
+void Session::FinishPublishedOperation() noexcept
 {
   if (curl_operation_)
   {
     curl_operation_->Finish();
   }
   http_client_.CleanupSession(session_id_);
+}
+
+bool Session::CancelSession() noexcept
+{
+  if (!send_started_.exchange(true, std::memory_order_acq_rel))
+  {
+    // Nothing was sent and nothing ever will be: the claim above makes a later SendRequest
+    // report CreateFailed. There is no operation to read, only the registration to drop.
+    http_client_.CleanupSession(session_id_);
+    return true;
+  }
+
+  if (!operation_published_.load(std::memory_order_seq_cst))
+  {
+    // SendRequest is still building the operation on another thread, or on this one from inside
+    // a handler. Leave a note for it to apply once the operation is complete.
+    cancel_requested_.store(true, std::memory_order_seq_cst);
+    if (!operation_published_.load(std::memory_order_seq_cst))
+    {
+      return true;
+    }
+  }
+
+  AbortPublishedOperation();
+  return true;
+}
+
+bool Session::FinishSession() noexcept
+{
+  if (!send_started_.exchange(true, std::memory_order_acq_rel))
+  {
+    http_client_.CleanupSession(session_id_);
+    return true;
+  }
+
+  if (!operation_published_.load(std::memory_order_seq_cst))
+  {
+    finish_requested_.store(true, std::memory_order_seq_cst);
+    if (!operation_published_.load(std::memory_order_seq_cst))
+    {
+      return true;
+    }
+  }
+
+  FinishPublishedOperation();
   return true;
 }
 
@@ -663,13 +732,21 @@ bool HttpClient::MaybeSpawnBackgroundThread()
   return true;
 }
 
-void HttpClient::ScheduleAddSession(uint64_t session_id)
+void HttpClient::ScheduleAddSession(uint64_t session_id,
+                                    const std::function<void()> &on_scheduled)
 {
   {
     std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};
     pending_to_add_session_ids_.insert(session_id);
     pending_to_remove_session_handles_.erase(session_id);
     pending_to_abort_sessions_.erase(session_id);
+    // Still under the lock the IO thread takes before it can see this session, so anything it
+    // does with the session happens after this. A cancel that sees the flag also comes after the
+    // erase above, so it is not undone by it.
+    if (on_scheduled)
+    {
+      on_scheduled();
+    }
   }
 
   wakeupBackgroundThread();
@@ -911,7 +988,11 @@ void HttpClient::resetMultiHandle()
     std::lock_guard<std::recursive_mutex> session_id_lock_guard{session_ids_m_};
     for (auto &session : sessions_)
     {
-      if (pending_to_add_session_ids_.end() == pending_to_add_session_ids_.find(session.first))
+      // A session whose SendRequest has not published its operation yet is not ours to touch:
+      // curl_operation_ is still being written by the caller thread. Once it is published it is
+      // scheduled like any other and reaches the new multi handle.
+      if (pending_to_add_session_ids_.end() == pending_to_add_session_ids_.find(session.first) &&
+          session.second->IsOperationPublished())
       {
         sessions.push_back(session.second);
       }

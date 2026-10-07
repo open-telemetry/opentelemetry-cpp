@@ -1502,7 +1502,11 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   }
   async_data_->callback = std::move(callback);
 
-  session->GetHttpClient().ScheduleAddSession(session->GetSessionId());
+  // Everything the session route and the IO thread read is in place. Publish while the session is
+  // being queued, so the IO thread, which reaches the session only through that queue, never runs
+  // ahead of the flag.
+  session->GetHttpClient().ScheduleAddSession(session->GetSessionId(),
+                                              [session]() { session->MarkOperationPublished(); });
   return CURLE_OK;
 }
 
