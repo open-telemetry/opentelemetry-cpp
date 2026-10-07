@@ -96,33 +96,29 @@ add_test(NAME full-package-run-test
 option(OTEL_ENABLE_PKGCONFIG_INSTALL_TEST
        "Run pkg-config consumer tests against installed .pc files" OFF)
 if(OTEL_ENABLE_PKGCONFIG_INSTALL_TEST)
-  find_package(PkgConfig QUIET)
-  if(PKG_CONFIG_FOUND)
-    add_test(
-      NAME pkgconfig-test-config-test
-      COMMAND
-        ${CMAKE_COMMAND} --log-level=DEBUG -S
-        ${CMAKE_SOURCE_DIR}/pkgconfig_test -B build-pkgconfig-test
-        "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
-        ${INSTALL_TEST_CMAKE_OPTIONS}
-        "-DINSTALL_TEST_COMPONENTS=${INSTALL_TEST_COMPONENTS}"
-        "-DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR}")
+  find_package(PkgConfig REQUIRED)
+  add_test(
+    NAME pkgconfig-test-config-test
+    COMMAND
+      ${CMAKE_COMMAND} --log-level=DEBUG -S
+      ${CMAKE_SOURCE_DIR}/pkgconfig_test -B build-pkgconfig-test
+      "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+      ${INSTALL_TEST_CMAKE_OPTIONS}
+      "-DINSTALL_TEST_COMPONENTS=${INSTALL_TEST_COMPONENTS}"
+      "-DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR}")
 
-    set_tests_properties(
-      pkgconfig-test-config-test
-      PROPERTIES ENVIRONMENT
-                 "PKG_CONFIG_PATH=${CMAKE_PREFIX_PATH}/lib/pkgconfig")
+  set_tests_properties(
+    pkgconfig-test-config-test
+    PROPERTIES ENVIRONMENT
+               "PKG_CONFIG_PATH=${CMAKE_PREFIX_PATH}/lib/pkgconfig")
 
-    add_test(NAME pkgconfig-test-build-test
-             COMMAND ${CMAKE_COMMAND} --build
-                     ${CMAKE_BINARY_DIR}/build-pkgconfig-test --parallel)
+  add_test(NAME pkgconfig-test-build-test
+           COMMAND ${CMAKE_COMMAND} --build
+                   ${CMAKE_BINARY_DIR}/build-pkgconfig-test --parallel)
 
-    add_test(
-      NAME pkgconfig-test-run-test
-      COMMAND ${CMAKE_BINARY_DIR}/build-pkgconfig-test/full_pkgconfig_test)
-  else()
-    message(STATUS "PkgConfig not found; skipping pkg-config install tests")
-  endif()
+  add_test(
+    NAME pkgconfig-test-run-test
+    COMMAND ${CMAKE_BINARY_DIR}/build-pkgconfig-test/full_pkgconfig_test)
 endif()
 
 # -----------------------------------------------------------
