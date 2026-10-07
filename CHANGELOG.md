@@ -20,6 +20,9 @@ Increment the:
   nlohmann-json one.
   [#2541](https://github.com/open-telemetry/opentelemetry-cpp/issues/2541)
 
+* [CODE HEALTH] Prevent `std::out_of_range` escaping `noexcept` substr callers.
+  [#4562](https://github.com/open-telemetry/opentelemetry-cpp/pull/4562)
+
 * [METRICS SDK] Enforce a runtime minimum scale of `-11` for
   `Base2ExponentialHistogramAggregation`, so a recording that spans the full
   double range no longer downscales without end.
