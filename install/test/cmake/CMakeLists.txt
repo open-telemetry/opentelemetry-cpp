@@ -108,16 +108,14 @@ if(OTEL_ENABLE_PKGCONFIG_INSTALL_TEST)
 
   set_tests_properties(
     pkgconfig-test-config-test
-    PROPERTIES ENVIRONMENT
-               "PKG_CONFIG_PATH=${CMAKE_PREFIX_PATH}/lib/pkgconfig")
+    PROPERTIES ENVIRONMENT "PKG_CONFIG_PATH=${CMAKE_PREFIX_PATH}/lib/pkgconfig")
 
   add_test(NAME pkgconfig-test-build-test
            COMMAND ${CMAKE_COMMAND} --build
                    ${CMAKE_BINARY_DIR}/build-pkgconfig-test --parallel)
 
-  add_test(
-    NAME pkgconfig-test-run-test
-    COMMAND ${CMAKE_BINARY_DIR}/build-pkgconfig-test/full_pkgconfig_test)
+  add_test(NAME pkgconfig-test-run-test
+           COMMAND ${CMAKE_BINARY_DIR}/build-pkgconfig-test/full_pkgconfig_test)
 endif()
 
 # -----------------------------------------------------------
