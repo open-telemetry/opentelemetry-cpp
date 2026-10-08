@@ -100,9 +100,8 @@ if(OTEL_ENABLE_PKGCONFIG_INSTALL_TEST)
   add_test(
     NAME pkgconfig-test-config-test
     COMMAND
-      ${CMAKE_COMMAND} --log-level=DEBUG -S
-      ${CMAKE_SOURCE_DIR}/pkgconfig_test -B build-pkgconfig-test
-      "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+      ${CMAKE_COMMAND} --log-level=DEBUG -S ${CMAKE_SOURCE_DIR}/pkgconfig_test
+      -B build-pkgconfig-test "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
       ${INSTALL_TEST_CMAKE_OPTIONS}
       "-DINSTALL_TEST_COMPONENTS=${INSTALL_TEST_COMPONENTS}"
       "-DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR}")
