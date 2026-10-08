@@ -203,6 +203,28 @@ public:
   std::atomic<int> cancelled_from_callback_{0};
 };
 
+// Finishes its own session from the Connecting event, which SendRequest dispatches from the
+// calling thread while the operation is still being built.
+class FinishAtConnectingHandler : public CustomEventHandler
+{
+public:
+  void OnEvent(http_client::SessionState state, nostd::string_view reason) noexcept override
+  {
+    CustomEventHandler::OnEvent(state, reason);
+
+    if (state == http_client::SessionState::Connecting && session_ != nullptr)
+    {
+      auto *session  = session_;
+      session_       = nullptr;
+      finished_from_ = std::this_thread::get_id();
+      session->FinishSession();
+    }
+  }
+
+  http_client::Session *session_ = nullptr;
+  std::thread::id finished_from_{};
+};
+
 class GetEventHandler : public CustomEventHandler
 {
 public:
@@ -1202,6 +1224,90 @@ TEST_F(BasicCurlHttpTests, CancelRacingSendRequestIsClean)
 
     EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
   }
+
+  session_manager->FinishAllSessions();
+}
+
+// A session that is cancelled or finished before it is sent never gets an operation, and the send
+// that follows is refused rather than starting a request nobody is tracking.
+TEST_F(BasicCurlHttpTests, ACancelOrFinishBeforeSendingRefusesTheSend)
+{
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto cancelled = session_manager->CreateSession("http://127.0.0.1:19000");
+  cancelled->CreateRequest()->SetUri("get/");
+  EXPECT_TRUE(cancelled->CancelSession());
+
+  auto cancelled_handler = std::make_shared<ReentrantSendHandler>();
+  cancelled->SendRequest(cancelled_handler);
+  EXPECT_EQ(1, cancelled_handler->create_failed_.load(std::memory_order_acquire));
+  EXPECT_FALSE(cancelled_handler->got_response_.load(std::memory_order_acquire));
+
+  auto finished = session_manager->CreateSession("http://127.0.0.1:19000");
+  finished->CreateRequest()->SetUri("get/");
+  EXPECT_TRUE(finished->FinishSession());
+
+  auto finished_handler = std::make_shared<ReentrantSendHandler>();
+  finished->SendRequest(finished_handler);
+  EXPECT_EQ(1, finished_handler->create_failed_.load(std::memory_order_acquire));
+  EXPECT_FALSE(finished_handler->got_response_.load(std::memory_order_acquire));
+
+  session_manager->FinishAllSessions();
+}
+
+// The Connecting event is dispatched on the calling thread while SendRequest is still building the
+// operation, so a cancel from it cannot touch the operation yet. It is applied once SendRequest
+// has published it, and must not be lost. Holding mtx_requests keeps the server from answering
+// first, so the abort has a request to land on.
+TEST_F(BasicCurlHttpTests, ACancelWhileTheSendIsBeingBuiltIsApplied)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler            = std::make_shared<TerminalCountingHandler>();
+  handler->cancel_target_ = session.get();
+  handler->cancel_at_     = http_client::SessionState::Connecting;
+
+  {
+    std::unique_lock<std::mutex> lock_requests(mtx_requests);
+    session->SendRequest(handler);
+    session->FinishSession();
+  }
+
+  EXPECT_FALSE(handler->got_response_.load(std::memory_order_acquire));
+  EXPECT_EQ(1, handler->cancelled_from_callback_.load(std::memory_order_acquire));
+  EXPECT_EQ(handler->cancelled_from_, std::this_thread::get_id())
+      << "this case cancels from an event the calling thread dispatches";
+
+  session_manager->FinishAllSessions();
+}
+
+// The same window for FinishSession: it waits for the request to complete, so it is applied once
+// SendRequest has published the operation, and the response still arrives.
+TEST_F(BasicCurlHttpTests, AFinishWhileTheSendIsBeingBuiltIsApplied)
+{
+  received_requests_.clear();
+  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+  ASSERT_TRUE(session_manager != nullptr);
+
+  auto session = session_manager->CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+
+  auto handler      = std::make_shared<FinishAtConnectingHandler>();
+  handler->session_ = session.get();
+
+  session->SendRequest(handler);
+
+  EXPECT_EQ(handler->finished_from_, std::this_thread::get_id())
+      << "this case finishes from an event the calling thread dispatches";
+  EXPECT_TRUE(handler->got_response_.load(std::memory_order_acquire));
 
   session_manager->FinishAllSessions();
 }
