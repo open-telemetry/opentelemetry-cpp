@@ -100,6 +100,11 @@ Breaking changes:
 
 * [BUG] Keep the curl retry deadline stable within each attempt
   [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
+* [BUG] Elasticsearch: report an asynchronous export's outcome exactly once
+  [#4502](https://github.com/open-telemetry/opentelemetry-cpp/pull/4502)
+* [BUG] Stop the Elasticsearch async ForceFlush reporting success without
+  waiting for the sessions it was asked about
+  [#4337](https://github.com/open-telemetry/opentelemetry-cpp/pull/4337)
 
 * [REMOVAL] Remove WITH_OTLP_RETRY_PREVIEW - #4668
   [#4668](https://github.com/open-telemetry/opentelemetry-cpp/pull/4668)
