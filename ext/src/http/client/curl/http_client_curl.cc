@@ -732,8 +732,7 @@ bool HttpClient::MaybeSpawnBackgroundThread()
   return true;
 }
 
-void HttpClient::ScheduleAddSession(uint64_t session_id,
-                                    const std::function<void()> &on_scheduled)
+void HttpClient::ScheduleAddSession(uint64_t session_id, const std::function<void()> &on_scheduled)
 {
   {
     std::lock_guard<std::recursive_mutex> lock_guard{session_ids_m_};

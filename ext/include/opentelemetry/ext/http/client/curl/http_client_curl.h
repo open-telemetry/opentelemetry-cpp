@@ -9,9 +9,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <deque>
+#include <functional>
 #include <list>
 #include <map>
-#include <functional>
 #include <memory>
 #include <mutex>
 #include <string>
