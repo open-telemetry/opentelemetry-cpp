@@ -810,33 +810,6 @@ jobs:
       run: |
         ./ci/do_ci.sh cmake.exporter.otprotocol.shared_libs.with_static_grpc.test
 
-  plugin_test:
-    name: Plugin -> CMake
-    runs-on: ubuntu-24.04
-    # Deprecated, pending removal
-    if: false
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
-      run: |
-        sudo -E ./ci/setup_ci_environment.sh
-    - name: run tests
-      env:
-        CC: /usr/bin/gcc-12
-        CXX: /usr/bin/g++-12
-      run: ./ci/do_ci.sh cmake.test_example_plugin
-
   bazel_test:
     name: Bazel
     runs-on: ubuntu-24.04
@@ -1247,27 +1220,6 @@ jobs:
         ./ci/install_windows_bazelisk.ps1
     - name: run tests
       run: ./ci/do_ci.ps1 bazel.build
-
-  windows_plugin_test:
-    name: Plugin -> CMake Windows
-    runs-on: windows-2025
-    # Deprecated, pending removal
-    if: false
-    steps:
-    - name: Harden the runner (Audit all outbound calls)
-      uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
-      with:
-        egress-policy: audit
-
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-        submodules: 'recursive'
-    - name: setup
-      run: |
-        ./ci/setup_windows_ci_environment.ps1
-    - name: run tests
-      run: ./ci/do_ci.ps1 cmake.test_example_plugin
 
   code_coverage:
     name: Code coverage

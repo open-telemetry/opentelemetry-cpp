@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Prevent `std::out_of_range` escaping `noexcept` substr callers.
+  [#4562](https://github.com/open-telemetry/opentelemetry-cpp/pull/4562)
+
 * [METRICS SDK] Enforce a runtime minimum scale of `-11` for
   `Base2ExponentialHistogramAggregation`, so a recording that spans the full
   double range no longer downscales without end.
@@ -100,6 +103,9 @@ Breaking changes:
 
 * [REMOVAL] Remove WITH_OTLP_RETRY_PREVIEW - #4668
   [#4668](https://github.com/open-telemetry/opentelemetry-cpp/pull/4668)
+
+* [API] Remove opentelemetry::plugin
+  [#4660](https://github.com/open-telemetry/opentelemetry-cpp/pull/4660)
 
 ## [1.29.0] 2026-09-13
 

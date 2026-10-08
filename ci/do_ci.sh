@@ -48,8 +48,6 @@ function run_benchmarks
 [ -z "${SRC_DIR}" ] && export SRC_DIR="`pwd`"
 [ -z "${BUILD_DIR}" ] && export BUILD_DIR=$HOME/build
 mkdir -p "${BUILD_DIR}"
-[ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
-mkdir -p "${PLUGIN_DIR}"
 [ -z "${INSTALL_TEST_DIR}" ] && export INSTALL_TEST_DIR=$HOME/install_test
 mkdir -p "${INSTALL_TEST_DIR}"
 
@@ -749,40 +747,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
       exit 1
     }
   done
-  exit 0
-elif [[ "$1" == "cmake.test_example_plugin" ]]; then
-  # Build the plugin
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cat <<EOF > export.map
-{
-  global:
-    OpenTelemetryMakeFactoryImpl;
-  local: *;
-};
-EOF
-
-  LINKER_FLAGS="\
-    -static-libstdc++ \
-    -static-libgcc \
-    -Wl,--version-script=${PWD}/export.map \
-  "
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DOTELCPP_MAINTAINER_MODE=ON \
-        -DCMAKE_EXE_LINKER_FLAGS="$LINKER_FLAGS" \
-        -DCMAKE_SHARED_LINKER_FLAGS="$LINKER_FLAGS" \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}" --target example_plugin
-  cp examples/plugin/plugin/libexample_plugin.so ${PLUGIN_DIR}
-
-  # Verify we can load the plugin
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DOTELCPP_MAINTAINER_MODE=ON \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}" --target load_plugin_example
-  examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
   exit 0
 elif [[ "$1" == "bazel.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS $BAZEL_WITH_PREVIEW //...
