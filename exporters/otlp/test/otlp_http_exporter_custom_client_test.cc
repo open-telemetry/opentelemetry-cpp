@@ -10,6 +10,7 @@
 #include <utility>
 #include "gmock/gmock.h"
 
+#include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
 #include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
@@ -28,6 +29,7 @@
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
 #include "opentelemetry/version.h"
+#include "otlp_stub_json_writer.h"
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h"  // IWYU pragma: keep
@@ -351,6 +353,87 @@ TEST_F(OtlpHttpExporterCustomClientTestPeer, ALateTerminalEventDoesNotReportASec
     EXPECT_EQ(1, calls->load(std::memory_order_acquire))
         << "a state arriving after the response reported the request a second time";
   }
+}
+
+// Only catches a regression when built without a default JSON backend.
+TEST_F(OtlpHttpExporterCustomClientTestPeer, BinaryExportDoesNotNeedAJsonWriterFactory)
+{
+  auto client         = http_client::HttpClientTestFactory::Create();
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto session = std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+
+  std::shared_ptr<opentelemetry::ext::http::client::EventHandler> pending;
+  EXPECT_CALL(*session, SendRequest)
+      .WillOnce(
+          [&pending](std::shared_ptr<opentelemetry::ext::http::client::EventHandler> callback) {
+            pending = std::move(callback);
+          });
+
+  auto options                = MakeOtlpHttpClientOptions(std::chrono::seconds{30});
+  options.content_type        = HttpRequestContentType::kBinary;
+  options.json_writer_factory = nullptr;
+  OtlpHttpClient otlp_client(std::move(options), client);
+
+  auto calls  = std::make_shared<std::atomic<int>>(0);
+  auto result = std::make_shared<sdk::common::ExportResult>(sdk::common::ExportResult::kFailure);
+  ExportOneRequest(otlp_client, calls, result);
+  ASSERT_NE(pending, nullptr);
+
+  http_client::nosend::Response sent;
+  sent.Finish(*pending);
+
+  EXPECT_EQ(1, calls->load(std::memory_order_acquire));
+  EXPECT_EQ(sdk::common::ExportResult::kSuccess, *result);
+}
+
+TEST_F(OtlpHttpExporterCustomClientTestPeer, JsonExportFailsWhenTheWriterFailsInToString)
+{
+  auto client         = http_client::HttpClientTestFactory::Create();
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto session = std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+  EXPECT_CALL(*session, SendRequest).Times(0);
+
+  auto options                = MakeOtlpHttpClientOptions();
+  options.content_type        = HttpRequestContentType::kJson;
+  options.json_writer_factory = std::make_shared<test::StubJsonWriterFactory>([] {
+    auto writer          = std::make_unique<test::StubJsonWriter>();
+    auto failed          = std::make_shared<bool>(false);
+    writer->on_ok        = [failed] { return !*failed; };
+    writer->on_to_string = [failed] {
+      *failed = true;
+      return std::string("/*failed-writer-output*/");
+    };
+    return writer;
+  });
+  OtlpHttpClient otlp_client(std::move(options), client);
+
+  auto calls  = std::make_shared<std::atomic<int>>(0);
+  auto result = std::make_shared<sdk::common::ExportResult>(sdk::common::ExportResult::kSuccess);
+  ExportOneRequest(otlp_client, calls, result);
+
+  EXPECT_EQ(1, calls->load(std::memory_order_acquire));
+  EXPECT_EQ(sdk::common::ExportResult::kFailure, *result);
+}
+
+TEST_F(OtlpHttpExporterCustomClientTestPeer, JsonExportFailsWhenTheFactoryReturnsNull)
+{
+  auto client         = http_client::HttpClientTestFactory::Create();
+  auto no_send_client = std::static_pointer_cast<http_client::nosend::HttpClient>(client);
+  auto session = std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
+  EXPECT_CALL(*session, SendRequest).Times(0);
+
+  auto options         = MakeOtlpHttpClientOptions();
+  options.content_type = HttpRequestContentType::kJson;
+  options.json_writer_factory =
+      std::make_shared<test::StubJsonWriterFactory>([] { return nullptr; });
+  OtlpHttpClient otlp_client(std::move(options), client);
+
+  auto calls  = std::make_shared<std::atomic<int>>(0);
+  auto result = std::make_shared<sdk::common::ExportResult>(sdk::common::ExportResult::kSuccess);
+  ExportOneRequest(otlp_client, calls, result);
+
+  EXPECT_EQ(1, calls->load(std::memory_order_acquire));
+  EXPECT_EQ(sdk::common::ExportResult::kFailure, *result);
 }
 
 }  // namespace otlp
