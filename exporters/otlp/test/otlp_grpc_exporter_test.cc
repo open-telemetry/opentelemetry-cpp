@@ -8,15 +8,19 @@
 #include <cstddef>
 #include <cstdlib>
 #include <functional>
+#include <future>
 #include <map>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <tuple>
 #include <utility>
+#include <variant>
 #include <vector>
 #include "gmock/gmock.h"
 
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_exporter_options.h"
 #include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/span.h"
@@ -26,7 +30,9 @@
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
+#include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
@@ -43,18 +49,7 @@
 
 // IWYU pragma: no_include <grpc/support/port_platform.h>
 // IWYU pragma: no_include <grpcpp/support/status.h>
-
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <future>
-#  include <tuple>
-#  include <variant>
-
 // IWYU pragma: no_include <grpcpp/security/server_credentials.h>
-
-#  include "opentelemetry/exporters/otlp/otlp_grpc_exporter_factory.h"
-#  include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#  include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#endif
 
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
@@ -620,7 +615,6 @@ TEST_F(OtlpGrpcExporterTestPeer, ConfigRetryGenericValuesFromEnv)
 }
 #endif  // NO_GETENV
 
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
 namespace
 {
 struct TestTraceService : public opentelemetry::proto::collector::trace::v1::TraceService::Service
@@ -780,7 +774,6 @@ TEST_P(OtlpGrpcExporterRetryIntegrationTests, StatusCodes)
 
   ASSERT_EQ(expected_attempts, service.request_count_);
 }
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 }  // namespace otlp
 }  // namespace exporter
