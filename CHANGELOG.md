@@ -22,6 +22,8 @@ Increment the:
   Force-flush exports also respect `max_export_batch_size`, splitting buffered
   spans into multiple batches when needed.
   [#4466](https://github.com/open-telemetry/opentelemetry-cpp/pull/4466)
+* [CODE HEALTH] Prevent `std::out_of_range` escaping `noexcept` substr callers.
+  [#4562](https://github.com/open-telemetry/opentelemetry-cpp/pull/4562)
 
 * [METRICS SDK] Enforce a runtime minimum scale of `-11` for
   `Base2ExponentialHistogramAggregation`, so a recording that spans the full
@@ -108,6 +110,12 @@ Breaking changes:
 
 * [REMOVAL] Remove WITH_OTLP_RETRY_PREVIEW - #4668
   [#4668](https://github.com/open-telemetry/opentelemetry-cpp/pull/4668)
+
+* [API] Remove opentelemetry::plugin
+  [#4660](https://github.com/open-telemetry/opentelemetry-cpp/pull/4660)
+
+* [REMOVAL] Remove WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
+  [#4666](https://github.com/open-telemetry/opentelemetry-cpp/pull/4666)
 
 ## [1.29.0] 2026-09-13
 
