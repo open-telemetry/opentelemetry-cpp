@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [CODE HEALTH] Prevent `std::out_of_range` escaping `noexcept` substr callers.
+  [#4562](https://github.com/open-telemetry/opentelemetry-cpp/pull/4562)
+
 * [METRICS SDK] Enforce a runtime minimum scale of `-11` for
   `Base2ExponentialHistogramAggregation`, so a recording that spans the full
   double range no longer downscales without end.
@@ -107,6 +110,9 @@ Breaking changes:
 * [SDK] Avoid throwing from `Resource::Create` when `process.executable.name`
   has a non-string value and `service.name` is not set.
   [#4535](https://github.com/open-telemetry/opentelemetry-cpp/issues/4535)
+
+* [REMOVAL] Remove WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
+  [#4666](https://github.com/open-telemetry/opentelemetry-cpp/pull/4666)
 
 ## [1.29.0] 2026-09-13
 
