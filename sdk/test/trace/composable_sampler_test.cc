@@ -257,6 +257,29 @@ TEST(ComposableSampler, TraceIdRatioUsesTraceRandomness)
             Sample(*sampler, trace_api::SpanContext::GetInvalid(), MakeTraceId(0x00)));
 }
 
+TEST(ComposableSampler, UnchangedThresholdCleansDuplicateSubkey)
+{
+  auto sampler =
+      CompositeSamplerFactory::Create(std::make_shared<ComposableProbabilitySampler>(0.5));
+  auto parent = MakeParent(false, "th:0;th:8");
+
+  opentelemetry::sdk::trace::SamplingResult result;
+  EXPECT_EQ(Decision::RECORD_AND_SAMPLE, Sample(*sampler, parent, MakeTraceId(0xFF), &result));
+  EXPECT_EQ("th:8", OtOf(result));
+}
+
+TEST(ComposableSampler, UnchangedThresholdKeepsParentTraceState)
+{
+  auto sampler =
+      CompositeSamplerFactory::Create(std::make_shared<ComposableProbabilitySampler>(0.5));
+  auto parent = MakeParent(false, "th:8");
+
+  opentelemetry::sdk::trace::SamplingResult result;
+  EXPECT_EQ(Decision::RECORD_AND_SAMPLE, Sample(*sampler, parent, MakeTraceId(0xFF), &result));
+  ASSERT_NE(nullptr, result.trace_state);
+  EXPECT_EQ(parent.trace_state().get(), result.trace_state.get());
+}
+
 TEST(ComposableSampler, ExplicitRandomnessOverridesTraceId)
 {
   auto sampler =

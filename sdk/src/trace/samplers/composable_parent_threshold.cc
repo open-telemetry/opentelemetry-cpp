@@ -42,8 +42,7 @@ SamplingIntent ComposableParentThresholdSampler::GetSamplingIntent(
   }
 
   const auto &parent_trace_state = parent_context.trace_state();
-  nostd::string_view ot_value    = GetOtValue(parent_trace_state);
-  OtelTraceState ot_state        = OtelTraceState::Parse(ot_value);
+  const OtelTraceState ot_state  = OtelTraceState::Parse(GetOtValue(parent_trace_state));
 
   SamplingIntent intent;
   if (ot_state.has_threshold)

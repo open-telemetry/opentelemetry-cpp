@@ -206,6 +206,10 @@ OtelTraceState OtelTraceState::Parse(nostd::string_view ot_value) noexcept
   {
 #endif
     std::size_t pos = 0;
+    if (ot_value[len - 1] == ';')
+    {
+      state.requires_serialization = true;
+    }
     while (pos < len)
     {
       std::size_t sep   = ot_value.find(';', pos);
@@ -221,10 +225,16 @@ OtelTraceState OtelTraceState::Parse(nostd::string_view ot_value) noexcept
         if (key_len == 2 && ot_value.compare(pos, 2, "th") == 0)
         {
           uint64_t threshold_value{0};
-          if (value_len <= 14 && ParseHex(ot_value, value_start, value_len, threshold_value))
+          if (value_len != 0 && value_len <= 14 &&
+              ParseHex(ot_value, value_start, value_len, threshold_value))
           {
-            state.has_threshold = true;
-            state.threshold     = threshold_value;
+            state.requires_serialization = state.requires_serialization || state.has_threshold;
+            state.has_threshold          = true;
+            state.threshold              = threshold_value;
+          }
+          else
+          {
+            state.requires_serialization = true;
           }
         }
         else if (key_len == 2 && ot_value.compare(pos, 2, "rv") == 0)
@@ -232,14 +242,23 @@ OtelTraceState OtelTraceState::Parse(nostd::string_view ot_value) noexcept
           uint64_t random_value{0};
           if (value_len == 14 && ParseHex(ot_value, value_start, value_len, random_value))
           {
-            state.has_random_value = true;
-            state.random_value     = random_value;
+            state.requires_serialization = state.requires_serialization || state.has_random_value;
+            state.has_random_value       = true;
+            state.random_value           = random_value;
+          }
+          else
+          {
+            state.requires_serialization = true;
           }
         }
         else
         {
           state.other_subkeys.push_back(ot_value.substr(pos, end - pos));
         }
+      }
+      else
+      {
+        state.requires_serialization = true;
       }
 
       if (sep == std::string::npos)
@@ -254,18 +273,21 @@ OtelTraceState OtelTraceState::Parse(nostd::string_view ot_value) noexcept
   // value's length, which the loop bounds never allow; stay defensive anyway.
   catch (const std::out_of_range &)
   {
+    state                 = OtelTraceState{};
+    state.parse_succeeded = false;
     return state;
   }
   catch (const std::bad_alloc &)
   {
-    // Out of memory recording a sub-key: keep whatever th/rv was parsed so far.
+    state                 = OtelTraceState{};
+    state.parse_succeeded = false;
     return state;
   }
 #endif
   return state;
 }
 
-std::string OtelTraceState::Serialize() const
+std::string OtelTraceState::Serialize(uint64_t desired_threshold) const
 {
   // Inherited sub-keys are never dropped (the tracestate spec requires
   // preserving existing OpenTelemetry concerns); when adding "th" would push
@@ -282,9 +304,9 @@ std::string OtelTraceState::Serialize() const
   // it would exceed the value limit.
   std::size_t th_digits = 0;
   std::size_t th_size   = 0;
-  if (has_threshold && threshold < kMaxThreshold)
+  if (desired_threshold < kMaxThreshold)
   {
-    th_digits                = ThresholdHexDigitCount(threshold);
+    th_digits                = ThresholdHexDigitCount(desired_threshold);
     const std::size_t th_len = kThPrefixSize + th_digits;
     if (CombinedSize(th_len, rest_size) <= kMaxOtValueSize)
     {
@@ -309,7 +331,7 @@ std::string OtelTraceState::Serialize() const
   if (th_size != 0)
   {
     out.append("th:");
-    AppendThresholdHex(out, threshold, th_digits);
+    AppendThresholdHex(out, desired_threshold, th_digits);
   }
   if (has_random_value)
   {
@@ -341,43 +363,33 @@ uint64_t GetSamplingRandomness(const OtelTraceState &ot_state,
   return GetRandomnessFromTraceId(trace_id);
 }
 
-nostd::shared_ptr<opentelemetry::trace::TraceState> GetTraceStateForOtValue(
-    const OtelTraceState &ot_state,
-    bool had_threshold,
-    uint64_t had_threshold_value,
-    nostd::string_view ot_value,
-    nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state)
+nostd::shared_ptr<opentelemetry::trace::TraceState> OtelTraceState::GetTraceStateWithThreshold(
+    nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state,
+    uint64_t desired_threshold) const noexcept
 {
-  // "th" is the only field ever mutated here. "rv" and other sub-keys always
-  // pass through unchanged. So if the threshold state numerically matches what
-  // was parsed, the effective "ot" content is unchanged regardless of how it
-  // was ordered/formatted on input, and nothing needs to be (re)serialized or
-  // written.
-  const bool threshold_changed =
-      ot_state.has_threshold != had_threshold ||
-      (ot_state.has_threshold && ot_state.threshold != had_threshold_value);
-  if (!threshold_changed)
+  if (!parse_succeeded)
+  {
+    return trace_state->Delete(kOtTraceStateKey);
+  }
+
+  // "th" is the only field replaced in the output. "rv" and other sub-keys pass
+  // through unchanged unless parsing discarded a malformed or repeated sub-key.
+  const bool desired_has_threshold = desired_threshold < kMaxThreshold;
+  const bool threshold_changed     = has_threshold != desired_has_threshold ||
+                                 (desired_has_threshold && threshold != desired_threshold);
+  if (!threshold_changed && !requires_serialization)
   {
     return trace_state;
   }
 
-  std::string new_ot_value = ot_state.Serialize();
+  std::string new_ot_value = Serialize(desired_threshold);
   // Set()/Delete() always deep-copy the tracestate, so only call them when
   // the "ot" sub-key actually needs to change.
   if (new_ot_value.empty())
   {
-    // An "ot" entry can never have an empty value, so an empty ot_value means
-    // there was no "ot" key to remove, regardless of other tracestate entries.
-    if (!ot_value.empty())
-    {
-      trace_state = trace_state->Delete(kOtTraceStateKey);
-    }
+    return trace_state->Delete(kOtTraceStateKey);
   }
-  else
-  {
-    trace_state = trace_state->Set(kOtTraceStateKey, new_ot_value);
-  }
-  return trace_state;
+  return trace_state->Set(kOtTraceStateKey, new_ot_value);
 }
 
 }  // namespace trace

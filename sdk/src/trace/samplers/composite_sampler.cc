@@ -43,10 +43,7 @@ SamplingResult CompositeSampler::ShouldSample(
 {
   const auto &parent_trace_state = parent_context.trace_state();
 
-  nostd::string_view ot_value        = GetOtValue(parent_trace_state);
-  OtelTraceState ot_state            = OtelTraceState::Parse(ot_value);
-  const bool had_threshold           = ot_state.has_threshold;
-  const uint64_t had_threshold_value = ot_state.threshold;
+  const OtelTraceState ot_state = OtelTraceState::Parse(GetOtValue(parent_trace_state));
 
   SamplingIntent intent =
       delegate_->GetSamplingIntent(parent_context, trace_id, name, span_kind, attributes, links);
@@ -84,15 +81,8 @@ SamplingResult CompositeSampler::ShouldSample(
   // Write the effective threshold back only when the span is kept with a
   // reliable adjusted count. Otherwise drop the "th" sub-key. The "rv" sub-key
   // and any other sub-keys are always preserved.
-  if (is_sampled && reliable)
-  {
-    ot_state.has_threshold = true;
-    ot_state.threshold     = intent.threshold_value;
-  }
-  else
-  {
-    ot_state.has_threshold = false;
-  }
+  const uint64_t desired_threshold =
+      is_sampled && reliable ? intent.threshold_value : kMaxThreshold;
 
   nostd::shared_ptr<opentelemetry::trace::TraceState> out_trace_state =
       parent_trace_state ? parent_trace_state : opentelemetry::trace::TraceState::GetDefault();
@@ -114,8 +104,7 @@ SamplingResult CompositeSampler::ShouldSample(
   }
 
   return {decision, std::move(attributes_out),
-          GetTraceStateForOtValue(ot_state, had_threshold, had_threshold_value, ot_value,
-                                  std::move(out_trace_state))};
+          ot_state.GetTraceStateWithThreshold(std::move(out_trace_state), desired_threshold)};
 }
 
 nostd::string_view CompositeSampler::GetDescription() const noexcept

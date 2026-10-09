@@ -45,13 +45,10 @@ SamplingResult ProbabilitySampler::ShouldSample(
 {
   const auto &parent_trace_state = parent_context.trace_state();
 
-  nostd::string_view ot_value        = GetOtValue(parent_trace_state);
-  OtelTraceState ot_state            = OtelTraceState::Parse(ot_value);
-  const bool had_threshold           = ot_state.has_threshold;
-  const uint64_t had_threshold_value = ot_state.threshold;
+  const OtelTraceState ot_state = OtelTraceState::Parse(GetOtValue(parent_trace_state));
 
   // A threshold of 0 keeps every span regardless of randomness (e.g. a 100%
-  // sampling ratio), so skip computing it entirely.
+  // sampling ratio). In that case do not compute randomness or warn if the random flag is not set.
   bool is_sampled = threshold_ != kMaxThreshold;
   if (is_sampled && threshold_ != 0)
   {
@@ -69,27 +66,17 @@ SamplingResult ProbabilitySampler::ShouldSample(
     is_sampled = GetSamplingRandomness(ot_state, trace_id) >= threshold_;
   }
 
-  Decision decision = is_sampled ? Decision::RECORD_AND_SAMPLE : Decision::DROP;
+  Decision decision                  = is_sampled ? Decision::RECORD_AND_SAMPLE : Decision::DROP;
+  const uint64_t effective_threshold = is_sampled ? threshold_ : kMaxThreshold;
 
   // Record the effective threshold when sampling; a dropped span carries no
   // probability, so its inherited (now stale) "th" must be erased. The "rv"
   // sub-key and any other "ot" sub-keys are preserved by OtelTraceState.
-  if (is_sampled)
-  {
-    ot_state.has_threshold = true;
-    ot_state.threshold     = threshold_;
-  }
-  else
-  {
-    ot_state.has_threshold = false;
-  }
-
   nostd::shared_ptr<trace_api::TraceState> trace_state =
       parent_trace_state ? parent_trace_state : trace_api::TraceState::GetDefault();
 
   return {decision, nullptr,
-          GetTraceStateForOtValue(ot_state, had_threshold, had_threshold_value, ot_value,
-                                  std::move(trace_state))};
+          ot_state.GetTraceStateWithThreshold(std::move(trace_state), effective_threshold)};
 }
 
 nostd::string_view ProbabilitySampler::GetDescription() const noexcept

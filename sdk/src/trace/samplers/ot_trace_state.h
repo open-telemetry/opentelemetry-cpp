@@ -61,21 +61,37 @@ struct OtelTraceState
   bool has_random_value = false;
   uint64_t random_value = 0;  // valid in [0, kMaxRandomValue]
 
+  // True when parsing discarded a malformed or repeated sub-key.
+  bool requires_serialization = false;
+
+  bool parse_succeeded = true;
+
   // Views into the ot_value passed to Parse(): valid only as long as that
   // tracestate buffer is alive.
   std::vector<nostd::string_view> other_subkeys;
 
-  // Parses the value of the "ot" tracestate key. On any parse error the
-  // offending sub-key is dropped; the parser never throws.
+  // Parses the value of the "ot" tracestate key. When parsing cannot complete,
+  // the result is empty with parse_succeeded set to false. On malformed
+  // input, the offending sub-key is dropped. The parser never throws.
   //
   // other_subkeys in the result view into ot_value, so ot_value's backing
   // storage must outlive the returned OtelTraceState.
   static OtelTraceState Parse(
       nostd::string_view ot_value OPENTELEMETRY_ATTRIBUTE_LIFETIME_BOUND) noexcept;
 
-  // Serializes back to the "ot" tracestate value. Returns an empty string when
-  // there is nothing to emit.
-  std::string Serialize() const;
+  // Serializes the "ot" tracestate value using desired_threshold instead of the
+  // parsed threshold, without changing this object. Preserves parsed "rv" and
+  // other sub-keys. kMaxThreshold omits "th". Returns an empty string when there
+  // is nothing to emit.
+  std::string Serialize(uint64_t desired_threshold) const;
+
+  // Returns trace_state with desired_threshold in its "ot" entry, without changing this object.
+  // kMaxThreshold removes
+  // "th". Parse failure removes "ot". An unchanged threshold with no normalization
+  // needed returns trace_state as-is.
+  nostd::shared_ptr<opentelemetry::trace::TraceState> GetTraceStateWithThreshold(
+      nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state,
+      uint64_t desired_threshold) const noexcept;
 };
 
 // The randomness value to use for a sampling decision: the explicit "rv" from
@@ -83,18 +99,6 @@ struct OtelTraceState
 // consistent across the trace), otherwise derived from the trace id.
 uint64_t GetSamplingRandomness(const OtelTraceState &ot_state,
                                const opentelemetry::trace::TraceId &trace_id) noexcept;
-
-// Applies a sampling decision's threshold state to trace_state's "ot" entry.
-// had_threshold/had_threshold_value are what OtelTraceState::Parse(ot_value)
-// produced before the decision mutated ot_state. If "th" ends up numerically
-// unchanged, trace_state is returned as-is (no allocation, no Set()/Delete()).
-// Otherwise "ot" is rewritten, or removed if nothing of it remains.
-nostd::shared_ptr<opentelemetry::trace::TraceState> GetTraceStateForOtValue(
-    const OtelTraceState &ot_state,
-    bool had_threshold,
-    uint64_t had_threshold_value,
-    nostd::string_view ot_value,
-    nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state);
 
 }  // namespace trace
 }  // namespace sdk
