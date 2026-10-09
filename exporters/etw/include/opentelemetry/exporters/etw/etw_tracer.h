@@ -510,8 +510,7 @@ public:
     if (sampling_result.decision == sdk::trace::Decision::DROP)
     {
       auto noopSpan = nostd::shared_ptr<opentelemetry::trace::Span>{
-          new (std::nothrow)
-              opentelemetry::trace::NoopSpan(this->shared_from_this(), std::move(spanContext))};
+          new (std::nothrow) opentelemetry::trace::NoopSpan(std::move(spanContext))};
       return noopSpan;
     }
 

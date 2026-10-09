@@ -99,9 +99,7 @@ TEST(NoopTest, CreateSpanValidSpanContext)
   auto span_id                  = trace_api::SpanId{buf_span};
   auto span_context             = nonstd::unique_ptr<trace_api::SpanContext>(
       new trace_api::SpanContext{trace_id, span_id, trace_api::TraceFlags{true}, false});
-  std::shared_ptr<trace_api::Tracer> tracer{new trace_api::NoopTracer{}};
-  auto s1 =
-      nonstd::shared_ptr<trace_api::Span>(new trace_api::NoopSpan(tracer, std::move(span_context)));
+  auto s1 = nonstd::shared_ptr<trace_api::Span>(new trace_api::NoopSpan(std::move(span_context)));
   auto stored_span_context = s1->GetContext();
   EXPECT_EQ(stored_span_context.span_id(), span_id);
   EXPECT_EQ(stored_span_context.trace_id(), trace_id);
