@@ -37,6 +37,15 @@ Increment the:
   change.
   [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
 
+* [EXPORTER] Fix the Elasticsearch log exporter's `Shutdown()` ignoring its
+  timeout and always reporting success. It now flushes pending exports against
+  the caller's deadline before cancelling sessions, and returns whether that
+  flush actually completed in time. Also closes a race where a session could
+  register for export after `Shutdown()` had already taken its snapshot of
+  in-flight sessions, so `ForceFlush()` could return without ever waiting for
+  it.
+  [#4359](https://github.com/open-telemetry/opentelemetry-cpp/issues/4359)
+
 * [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
   from conflicting streams, and warn if stream conflicts were configured
   [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
