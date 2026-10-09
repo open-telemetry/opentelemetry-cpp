@@ -112,6 +112,9 @@ Breaking changes:
 * [API] Remove opentelemetry::plugin
   [#4660](https://github.com/open-telemetry/opentelemetry-cpp/pull/4660)
 
+* [REMOVAL] Remove WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
+  [#4666](https://github.com/open-telemetry/opentelemetry-cpp/pull/4666)
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
