@@ -4,12 +4,16 @@
 #pragma once
 
 #include <chrono>
+#include <cstddef>  // For std::size_t
 #include <cstdint>  // For std::uint32_t
 #include <limits>   // For std::numeric_limits
+#include <memory>
 #include <string>
+#include <utility>
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "google/protobuf/arena.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
 #include "opentelemetry/proto/trace/v1/trace.pb.h"
@@ -51,7 +55,35 @@ public:
       std::uint32_t max_links                = (std::numeric_limits<std::uint32_t>::max)(),
       std::uint32_t max_attributes_per_event = (std::numeric_limits<std::uint32_t>::max)(),
       std::uint32_t max_attributes_per_link  = (std::numeric_limits<std::uint32_t>::max)())
-      : span_limits_{max_attributes,
+      : OtlpRecordable(nullptr,
+                       max_attributes,
+                       max_events,
+                       max_links,
+                       max_attributes_per_event,
+                       max_attributes_per_link)
+  {}
+
+  /**
+   * Construct on the given Arena, with optional span limits parameters.
+   *
+   * The span message is created on arena, and the recordable keeps a reference to it, so the
+   * Arena outlives the recordable. The OTLP exporters pass the Arena they share across every
+   * recordable they create between two exports, so that the export request can be created on
+   * the same Arena and take the span message without a copy. A null arena gives the recordable
+   * an Arena of its own.
+   *
+   * @deprecated The span limit params, see the constructor above.
+   */
+  explicit OtlpRecordable(
+      std::shared_ptr<google::protobuf::Arena> arena,
+      std::uint32_t max_attributes           = (std::numeric_limits<std::uint32_t>::max)(),
+      std::uint32_t max_events               = (std::numeric_limits<std::uint32_t>::max)(),
+      std::uint32_t max_links                = (std::numeric_limits<std::uint32_t>::max)(),
+      std::uint32_t max_attributes_per_event = (std::numeric_limits<std::uint32_t>::max)(),
+      std::uint32_t max_attributes_per_link  = (std::numeric_limits<std::uint32_t>::max)())
+      : arena_{arena ? std::move(arena) : std::make_shared<google::protobuf::Arena>()},
+        span_{google::protobuf::Arena::Create<proto::trace::v1::Span>(arena_.get())},
+        span_limits_{max_attributes,
                      (std::numeric_limits<std::size_t>::max)(),
                      max_events,
                      max_links,
@@ -59,8 +91,16 @@ public:
                      max_attributes_per_link}
   {}
 
-  proto::trace::v1::Span &span() noexcept { return span_; }
-  const proto::trace::v1::Span &span() const noexcept { return span_; }
+  // The span message is owned by the Arena, not by the recordable, and an export request on the
+  // same Arena may hold it, so the recordable is neither copyable nor movable. Recordables are
+  // created and handed around by pointer, so nothing in the SDK or the exporters needs these.
+  OtlpRecordable(const OtlpRecordable &)            = delete;
+  OtlpRecordable &operator=(const OtlpRecordable &) = delete;
+  OtlpRecordable(OtlpRecordable &&)                 = delete;
+  OtlpRecordable &operator=(OtlpRecordable &&)      = delete;
+
+  proto::trace::v1::Span &span() noexcept { return *span_; }
+  const proto::trace::v1::Span &span() const noexcept { return *span_; }
 
   /** Dynamically converts the resource of this span into a proto. */
   proto::resource::v1::Resource ProtoResource() const noexcept;
@@ -116,7 +156,13 @@ public:
                                    &instrumentation_scope) noexcept override;
 
 private:
-  proto::trace::v1::Span span_;
+  // Declared before span_ so the Arena is set before the span message is created on it. The Arena
+  // may be shared with other recordables and with export requests, and it is destroyed by the last
+  // of them, so the span message stays valid for as long as this recordable or a request built
+  // from it is alive.
+  std::shared_ptr<google::protobuf::Arena> arena_;
+  // Owned by the Arena, never null, never deleted.
+  proto::trace::v1::Span *span_;
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
       nullptr;

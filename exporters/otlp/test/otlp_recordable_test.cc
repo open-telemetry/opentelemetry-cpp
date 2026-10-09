@@ -7,6 +7,7 @@
 #include <cstring>
 #include <limits>
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -43,6 +44,7 @@
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
 // IWYU pragma: no_include "net/proto2/public/repeated_field.h"
 // IWYU pragma: no_include <google/protobuf/repeated_ptr_field.h>
+#include "google/protobuf/arena.h"
 #include "opentelemetry/proto/collector/trace/v1/trace_service.pb.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
@@ -796,6 +798,266 @@ TEST(OtlpRecordable, PopulateRequestSameScope)
   EXPECT_EQ(req.resource_spans(0).scope_spans(0).spans_size(), 2);
   EXPECT_EQ(req.resource_spans(0).scope_spans(0).scope().name(), "lib");
 }
+namespace
+{
+// A value past the std::string small buffer, so the attribute also exercises the heap allocated
+// character buffer of an Arena backed string field.
+constexpr const char *kLongValue = "a string value that is longer than the small string buffer";
+
+std::unique_ptr<sdk::trace::Recordable> MakeSpanOnArena(
+    std::shared_ptr<google::protobuf::Arena> arena,
+    const resource::Resource &resource,
+    const trace_sdk::InstrumentationScope &scope,
+    nostd::string_view name)
+{
+  std::unique_ptr<sdk::trace::Recordable> rec = std::make_unique<OtlpRecordable>(std::move(arena));
+  rec->SetResource(resource);
+  rec->SetInstrumentationScope(scope);
+  rec->SetName(name);
+  rec->SetAttribute("key", nostd::string_view(kLongValue));
+  return rec;
+}
+
+const proto::trace::v1::Span &SpanOf(const std::unique_ptr<sdk::trace::Recordable> &rec)
+{
+  return static_cast<const OtlpRecordable *>(rec.get())->span();
+}
+
+void ExpectSpanContent(const proto::trace::v1::Span &span, const std::string &name)
+{
+  EXPECT_EQ(span.name(), name);
+  ASSERT_EQ(span.attributes_size(), 1);
+  EXPECT_EQ(span.attributes(0).key(), "key");
+  EXPECT_EQ(span.attributes(0).value().string_value(), kLongValue);
+}
+}  // namespace
+
+// Spans created on the Arena the request is created on are moved into the request, not copied.
+TEST(OtlpRecordable, PopulateRequestSharedArenaMovesSpans)
+{
+  auto resource = resource::Resource::Create({{"service.name", "shared"}});
+  auto scope    = trace_sdk::InstrumentationScope::Create("lib", "1.0");
+  auto arena    = std::make_shared<google::protobuf::Arena>();
+
+  std::vector<std::unique_ptr<sdk::trace::Recordable>> spans;
+  spans.push_back(MakeSpanOnArena(arena, resource, *scope, "span0"));
+  spans.push_back(MakeSpanOnArena(arena, resource, *scope, "span1"));
+  spans.push_back(MakeSpanOnArena(arena, resource, *scope, "span2"));
+
+  auto *req =
+      google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
+          arena.get());
+  OtlpRecordableUtils::PopulateRequest(
+      nostd::span<std::unique_ptr<sdk::trace::Recordable>>(spans.data(), spans.size()), req);
+
+  ASSERT_EQ(req->resource_spans_size(), 1);
+  ASSERT_EQ(req->resource_spans(0).scope_spans_size(), 1);
+  const auto &scope_spans = req->resource_spans(0).scope_spans(0);
+  ASSERT_EQ(scope_spans.spans_size(), 3);
+  for (int i = 0; i < 3; ++i)
+  {
+    EXPECT_EQ(&scope_spans.spans(i), &SpanOf(spans[static_cast<std::size_t>(i)]));
+    ExpectSpanContent(scope_spans.spans(i), "span" + std::to_string(i));
+  }
+
+  std::string serialized;
+  ASSERT_TRUE(req->SerializeToString(&serialized));
+  proto::collector::trace::v1::ExportTraceServiceRequest parsed;
+  ASSERT_TRUE(parsed.ParseFromString(serialized));
+  ASSERT_EQ(parsed.resource_spans(0).scope_spans(0).spans_size(), 3);
+  ExpectSpanContent(parsed.resource_spans(0).scope_spans(0).spans(2), "span2");
+
+  // The recordables and the request can go in either order, neither owns the span messages.
+  spans.clear();
+  EXPECT_EQ(req->resource_spans(0).scope_spans(0).spans_size(), 3);
+}
+
+// Only the spans on the request's Arena are moved, the others are copied.
+TEST(OtlpRecordable, PopulateRequestMixedArenas)
+{
+  auto resource = resource::Resource::Create({{"service.name", "mixed"}});
+  auto scope    = trace_sdk::InstrumentationScope::Create("lib", "1.0");
+  auto arena    = std::make_shared<google::protobuf::Arena>();
+  auto other    = std::make_shared<google::protobuf::Arena>();
+
+  std::vector<std::unique_ptr<sdk::trace::Recordable>> spans;
+  spans.push_back(MakeSpanOnArena(arena, resource, *scope, "span0"));
+  spans.push_back(MakeSpanOnArena(nullptr, resource, *scope, "span1"));
+  spans.push_back(MakeSpanOnArena(arena, resource, *scope, "span2"));
+  spans.push_back(MakeSpanOnArena(other, resource, *scope, "span3"));
+
+  auto *req =
+      google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
+          arena.get());
+  OtlpRecordableUtils::PopulateRequest(
+      nostd::span<std::unique_ptr<sdk::trace::Recordable>>(spans.data(), spans.size()), req);
+
+  const auto &scope_spans = req->resource_spans(0).scope_spans(0);
+  ASSERT_EQ(scope_spans.spans_size(), 4);
+  EXPECT_EQ(&scope_spans.spans(0), &SpanOf(spans[0]));
+  EXPECT_NE(&scope_spans.spans(1), &SpanOf(spans[1]));
+  EXPECT_EQ(&scope_spans.spans(2), &SpanOf(spans[2]));
+  EXPECT_NE(&scope_spans.spans(3), &SpanOf(spans[3]));
+  for (int i = 0; i < 4; ++i)
+  {
+    EXPECT_EQ(scope_spans.spans(i).GetArena(), arena.get());
+    ExpectSpanContent(scope_spans.spans(i), "span" + std::to_string(i));
+  }
+
+  // The copies do not depend on the recordables they were copied from.
+  spans[1].reset();
+  spans[3].reset();
+  other.reset();
+  ExpectSpanContent(scope_spans.spans(1), "span1");
+  ExpectSpanContent(scope_spans.spans(3), "span3");
+  std::string serialized;
+  EXPECT_TRUE(req->SerializeToString(&serialized));
+}
+
+// A request that is not on an Arena copies every span.
+TEST(OtlpRecordable, PopulateRequestWithoutArenaCopies)
+{
+  auto resource = resource::Resource::Create({{"service.name", "heap"}});
+  auto scope    = trace_sdk::InstrumentationScope::Create("lib", "1.0");
+  auto arena    = std::make_shared<google::protobuf::Arena>();
+
+  std::vector<std::unique_ptr<sdk::trace::Recordable>> spans;
+  spans.push_back(MakeSpanOnArena(arena, resource, *scope, "span0"));
+  spans.push_back(MakeSpanOnArena(nullptr, resource, *scope, "span1"));
+
+  proto::collector::trace::v1::ExportTraceServiceRequest req;
+  OtlpRecordableUtils::PopulateRequest(
+      nostd::span<std::unique_ptr<sdk::trace::Recordable>>(spans.data(), spans.size()), &req);
+
+  const auto &scope_spans = req.resource_spans(0).scope_spans(0);
+  ASSERT_EQ(scope_spans.spans_size(), 2);
+  for (int i = 0; i < 2; ++i)
+  {
+    EXPECT_NE(&scope_spans.spans(i), &SpanOf(spans[static_cast<std::size_t>(i)]));
+    EXPECT_EQ(scope_spans.spans(i).GetArena(), nullptr);
+    ExpectSpanContent(scope_spans.spans(i), "span" + std::to_string(i));
+  }
+
+  spans.clear();
+  arena.reset();
+  ExpectSpanContent(scope_spans.spans(0), "span0");
+}
+
+// A recordable created before an export and exported by a later one, the way a span that is
+// still open during an export is, stays valid after the request and the other recordables
+// of its Arena are gone, and the Arena goes with the last recordable.
+TEST(OtlpRecordable, SharedArenaOutlivesEarlierExport)
+{
+  auto resource = resource::Resource::Create({{"service.name", "generations"}});
+  auto scope    = trace_sdk::InstrumentationScope::Create("lib", "1.0");
+  OtlpRecordableArena recordable_arena;
+
+  std::vector<std::unique_ptr<sdk::trace::Recordable>> first_batch;
+  first_batch.push_back(MakeSpanOnArena(recordable_arena.Get(), resource, *scope, "a"));
+  std::unique_ptr<sdk::trace::Recordable> open_span =
+      MakeSpanOnArena(recordable_arena.Get(), resource, *scope, "b");
+
+  std::weak_ptr<google::protobuf::Arena> first_arena;
+  {
+    std::shared_ptr<google::protobuf::Arena> request_arena = recordable_arena.Rotate();
+    first_arena                                            = request_arena;
+    auto *req =
+        google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
+            request_arena.get());
+    OtlpRecordableUtils::PopulateRequest(nostd::span<std::unique_ptr<sdk::trace::Recordable>>(
+                                             first_batch.data(), first_batch.size()),
+                                         req);
+    ASSERT_EQ(req->resource_spans(0).scope_spans(0).spans_size(), 1);
+    EXPECT_EQ(&req->resource_spans(0).scope_spans(0).spans(0), &SpanOf(first_batch[0]));
+    std::string serialized;
+    EXPECT_TRUE(req->SerializeToString(&serialized));
+    first_batch.clear();
+  }
+  EXPECT_FALSE(first_arena.expired());
+
+  // Keep recording on the old Arena after its request is gone.
+  open_span->SetAttribute("late", nostd::string_view(kLongValue));
+  open_span->SetStatus(trace_api::StatusCode::kError, kLongValue);
+
+  std::vector<std::unique_ptr<sdk::trace::Recordable>> second_batch;
+  second_batch.push_back(std::move(open_span));
+  second_batch.push_back(MakeSpanOnArena(recordable_arena.Get(), resource, *scope, "c"));
+  {
+    std::shared_ptr<google::protobuf::Arena> request_arena = recordable_arena.Rotate();
+    auto *req =
+        google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
+            request_arena.get());
+    OtlpRecordableUtils::PopulateRequest(nostd::span<std::unique_ptr<sdk::trace::Recordable>>(
+                                             second_batch.data(), second_batch.size()),
+                                         req);
+    const auto &scope_spans = req->resource_spans(0).scope_spans(0);
+    ASSERT_EQ(scope_spans.spans_size(), 2);
+    // The span from the earlier Arena is copied, the one from this Arena is moved.
+    EXPECT_NE(&scope_spans.spans(0), &SpanOf(second_batch[0]));
+    EXPECT_EQ(&scope_spans.spans(1), &SpanOf(second_batch[1]));
+    EXPECT_EQ(scope_spans.spans(0).name(), "b");
+    ASSERT_EQ(scope_spans.spans(0).attributes_size(), 2);
+    EXPECT_EQ(scope_spans.spans(0).attributes(1).key(), "late");
+    EXPECT_EQ(scope_spans.spans(0).attributes(1).value().string_value(), kLongValue);
+    EXPECT_EQ(scope_spans.spans(0).status().message(), kLongValue);
+    ExpectSpanContent(scope_spans.spans(1), "c");
+
+    second_batch.erase(second_batch.begin());
+    EXPECT_TRUE(first_arena.expired());
+
+    std::string serialized;
+    EXPECT_TRUE(req->SerializeToString(&serialized));
+  }
+}
+
+TEST(OtlpRecordableArena, RotateReturnsTheCurrentArena)
+{
+  OtlpRecordableArena recordable_arena;
+  std::shared_ptr<google::protobuf::Arena> first = recordable_arena.Get();
+  ASSERT_NE(first, nullptr);
+  EXPECT_EQ(recordable_arena.Get(), first);
+
+  std::shared_ptr<google::protobuf::Arena> rotated = recordable_arena.Rotate();
+  EXPECT_EQ(rotated, first);
+  std::shared_ptr<google::protobuf::Arena> second = recordable_arena.Get();
+  ASSERT_NE(second, nullptr);
+  EXPECT_NE(second, first);
+
+  // An Arena handed out earlier stays alive and usable for as long as it is held.
+  std::weak_ptr<google::protobuf::Arena> weak_first = first;
+  rotated.reset();
+  EXPECT_FALSE(weak_first.expired());
+  auto *span = google::protobuf::Arena::Create<proto::trace::v1::Span>(first.get());
+  span->set_name(kLongValue);
+  EXPECT_EQ(span->name(), kLongValue);
+  first.reset();
+  EXPECT_TRUE(weak_first.expired());
+  EXPECT_EQ(recordable_arena.Get(), second);
+}
+
+TEST(OtlpRecordableArena, ReleaseStopsSharing)
+{
+  OtlpRecordableArena recordable_arena;
+  std::shared_ptr<google::protobuf::Arena> held    = recordable_arena.Get();
+  std::weak_ptr<google::protobuf::Arena> weak_held = held;
+
+  recordable_arena.Release();
+  EXPECT_EQ(recordable_arena.Get(), nullptr);
+  EXPECT_FALSE(weak_held.expired());
+  held.reset();
+  EXPECT_TRUE(weak_held.expired());
+
+  // Rotate still hands out an Arena for a request, without keeping it.
+  std::shared_ptr<google::protobuf::Arena> request_arena = recordable_arena.Rotate();
+  EXPECT_NE(request_arena, nullptr);
+  EXPECT_EQ(recordable_arena.Get(), nullptr);
+
+  // A recordable created after Release has an Arena of its own.
+  OtlpRecordable rec(recordable_arena.Get());
+  rec.SetName("after release");
+  EXPECT_NE(rec.span().GetArena(), nullptr);
+}
+
 // Test that setting an attribute with an existing key overwrites the value in place
 // without creating a duplicate entry (spec: attribute keys MUST be unique).
 TEST(OtlpRecordable, DISABLED_SetAttributeDeduplicatesKey)

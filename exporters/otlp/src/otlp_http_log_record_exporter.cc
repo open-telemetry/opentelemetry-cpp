@@ -308,7 +308,7 @@ OtlpHttpLogRecordExporter::OtlpHttpLogRecordExporter(std::unique_ptr<OtlpHttpCli
 std::unique_ptr<opentelemetry::sdk::logs::Recordable>
 OtlpHttpLogRecordExporter::MakeRecordable() noexcept
 {
-  return std::make_unique<OtlpLogRecordable>();
+  return std::make_unique<OtlpLogRecordable>(recordable_arena_.Get());
 }
 
 opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
@@ -328,18 +328,17 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
 
-  google::protobuf::ArenaOptions arena_options;
-  // It's easy to allocate datas larger than 1024 when we populate basic resource and attributes
-  arena_options.initial_block_size = 1024;
-  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
-  // block to reduce memory fragments.
-  arena_options.max_block_size = 65536;
-  // Ownership transfers into HttpSessionData until the request completes
-  auto arena = std::make_unique<google::protobuf::Arena>(arena_options);
+  // The request goes on the Arena the recordables since the last export were created on, so
+  // PopulateRequest moves their messages instead of copying them. handle_result keeps a reference
+  // to it until the request completes.
+  std::shared_ptr<google::protobuf::Arena> request_arena = recordable_arena_.Rotate();
+  // The response has an Arena of its own, whose ownership transfers into HttpSessionData until
+  // the request completes.
+  auto arena = std::make_unique<google::protobuf::Arena>();
 
   proto::collector::logs::v1::ExportLogsServiceRequest *service_request =
       google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceRequest>(
-          arena.get());
+          request_arena.get());
   OtlpRecordableUtils::PopulateRequest(logs, service_request);
   std::size_t log_count = logs.size();
 
@@ -347,8 +346,8 @@ opentelemetry::sdk::common::ExportResult OtlpHttpLogRecordExporter::Export(
       google::protobuf::Arena::Create<proto::collector::logs::v1::ExportLogsServiceResponse>(
           arena.get());
 
-  auto handle_result = [log_count](opentelemetry::sdk::common::ExportResult result,
-                                   google::protobuf::Message *response_msg) {
+  auto handle_result = [log_count, request_arena](opentelemetry::sdk::common::ExportResult result,
+                                                  google::protobuf::Message *response_msg) {
     if (result != opentelemetry::sdk::common::ExportResult::kSuccess)
     {
       OTEL_INTERNAL_LOG_ERROR("[OTLP LOG HTTP Exporter] ERROR: Export "
@@ -390,6 +389,7 @@ bool OtlpHttpLogRecordExporter::ForceFlush(std::chrono::microseconds timeout) no
 
 bool OtlpHttpLogRecordExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+  recordable_arena_.Release();
   return http_client_->Shutdown(timeout);
 }
 
