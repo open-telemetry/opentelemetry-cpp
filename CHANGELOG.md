@@ -37,6 +37,8 @@ Increment the:
   change.
   [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
 
+* [CMAKE] Add pkg-config install consumer tests for Ubuntu system packages
+  [#4503](https://github.com/open-telemetry/opentelemetry-cpp/issues/4503)
 * [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
   from conflicting streams, and warn if stream conflicts were configured
   [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
