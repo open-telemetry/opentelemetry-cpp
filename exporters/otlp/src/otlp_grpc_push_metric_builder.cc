@@ -55,17 +55,8 @@ std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpGrpcPushMet
   if (tls != nullptr)
   {
     options.ssl_credentials_cacert_path = tls->ca_file;
-#ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
-    options.ssl_client_key_path  = tls->key_file;
-    options.ssl_client_cert_path = tls->cert_file;
-#else
-    if (!tls->key_file.empty() || !tls->cert_file.empty())
-    {
-      OTEL_INTERNAL_LOG_WARN(
-          "[Otlp Grpc Exporter] mTLS client key/cert configured but the SDK was built without "
-          "ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW: tls.cert_file and tls.key_file will be ignored");
-    }
-#endif
+    options.ssl_client_key_path         = tls->key_file;
+    options.ssl_client_cert_path        = tls->cert_file;
   }
 
   options.timeout = std::chrono::duration_cast<std::chrono::system_clock::duration>(

@@ -348,8 +348,6 @@ set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_FILE "WITH_OTLP_FILE")
 set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_GRPC "WITH_OTLP_GRPC")
 set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW
     "WITH_OTLP_GRPC_CREDENTIAL_PREVIEW")
-set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
-    "WITH_OTLP_GRPC_SSL_MTLS_PREVIEW")
 set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_HTTP "WITH_OTLP_HTTP")
 set(_otelcpp_legacy_option_name_OTELCPP_WITH_OTLP_HTTP_COMPRESSION
     "WITH_OTLP_HTTP_COMPRESSION")
