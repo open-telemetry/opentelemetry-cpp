@@ -111,7 +111,8 @@ public:
   /**
    * A method the user calls to block their thread until the request has either produced a
    * response or failed. The longest duration is the timeout of the request, set by
-   * SetTimeoutMs(), which arrives here as a TimedOut session event.
+   * SetTimeoutMs(); the curl client reports that as a SendFailed session event, the same as any
+   * other transport failure, since it does not distinguish a timeout from other CURL errors.
    */
   bool waitForResponse()
   {
