@@ -106,6 +106,8 @@ Breaking changes:
   Note that `AsyncMetricStorage`'s constructor now takes the view's
   `AttributesProcessor`, matching `SyncMetricStorage`.
   [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
+* [BUG] End the Elasticsearch exporter's wait on a read or write error
+  [#4331](https://github.com/open-telemetry/opentelemetry-cpp/pull/4331)
 
 * [BUG] Keep the curl retry deadline stable within each attempt
   [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
