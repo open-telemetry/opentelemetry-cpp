@@ -1,6 +1,8 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <mutex>
@@ -29,6 +31,7 @@
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
 #include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
+#include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #include "opentelemetry/sdk/metrics/state/metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/multi_metric_storage.h"
@@ -89,6 +92,42 @@ std::ostream &operator<<(std::ostream &os,
   return os;
 }
 
+// When a view sets an explicit cardinality limit (IsCardinalityLimitExplicit()), it wins
+// outright (View > Reader > SDK default), so the raw recording storage is simply sized to that
+// limit, unchanged. A non-null AggregationConfig does not by itself mean the view set an
+// explicit cardinality limit: e.g. SdkBuilder::AddView() may build one purely to carry
+// histogram boundaries, leaving the limit at its compiled-in default and
+// IsCardinalityLimitExplicit() false.
+//
+// When a view has no explicit limit, the shared recording storage must be sized to the highest
+// limit configured across all MetricReaders currently attached, so no reader loses data purely
+// because the shared cap was sized for a stricter reader. Do not floor this at the SDK default:
+// a reader may configure a limit lower than the default, and that stricter limit must still
+// apply when it is the only (or the strictest) reader attached. Each reader's own (possibly
+// lower) limit is then re-applied to just its own output during collection; see
+// TemporalMetricStorage::buildMetrics().
+std::size_t ResolveRecordingCardinalityLimit(
+    const opentelemetry::sdk::metrics::AggregationConfig *aggregation_config,
+    opentelemetry::nostd::span<std::shared_ptr<opentelemetry::sdk::metrics::CollectorHandle>>
+        collectors,
+    opentelemetry::sdk::metrics::InstrumentType instrument_type)
+{
+  if (aggregation_config && aggregation_config->IsCardinalityLimitExplicit())
+  {
+    return aggregation_config->GetCardinalityLimit();
+  }
+  if (collectors.empty())
+  {
+    return opentelemetry::sdk::metrics::kAggregationCardinalityLimit;
+  }
+  std::size_t max_limit = 0;
+  for (auto &collector : collectors)
+  {
+    max_limit = (std::max)(max_limit, collector->GetCardinalityLimit(instrument_type));
+  }
+  return max_limit;
+}
+
 std::ostream &operator<<(std::ostream &os, const ViewLogStreamable &streamable) noexcept
 {
   using opentelemetry::sdk::metrics::AggregationUtil;
@@ -103,7 +142,7 @@ std::ostream &operator<<(std::ostream &os, const ViewLogStreamable &streamable) 
              ? AggregationUtil::GetAggregationTypeString(aggregation_config->GetType())
              : "null")
      << (aggregation_config
-             ? ", cardinality_limit=" + std::to_string(aggregation_config->cardinality_limit_)
+             ? ", cardinality_limit=" + std::to_string(aggregation_config->GetCardinalityLimit())
              : "")
      << "}";
   return os;
@@ -538,7 +577,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
 
   auto success = view_registry->FindViews(
       instrument_descriptor, *scope_,
-      [this, &instrument_descriptor, &storages
+      [this, &instrument_descriptor, &storages, ctx
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
        ,
        exemplar_filter_type
@@ -577,6 +616,8 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
         else
         {
           WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_, view_instr_desc);
+          auto recording_cardinality_limit = ResolveRecordingCardinalityLimit(
+              view.GetAggregationConfig(), ctx->GetCollectors(), view_instr_desc.type_);
           sync_storage = std::shared_ptr<SyncMetricStorage>(new SyncMetricStorage(
               view_instr_desc, view.GetAggregationType(), view.GetAttributesProcessor(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -584,7 +625,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
                                    view_instr_desc, exemplar_filter_type),
 #endif
-              view.GetAggregationConfig()));
+              view.GetAggregationConfig(), recording_cardinality_limit));
           storage_registry_.insert({view_instr_desc, sync_storage});
         }
         auto sync_multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
@@ -627,7 +668,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
 
   auto success = view_registry->FindViews(
       instrument_descriptor, *GetInstrumentationScope(),
-      [this, &instrument_descriptor, &storages
+      [this, &instrument_descriptor, &storages, ctx
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
        ,
        exemplar_filter_type
@@ -665,6 +706,8 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
         else
         {
           WarnOnDuplicateInstrument(GetInstrumentationScope(), storage_registry_, view_instr_desc);
+          auto recording_cardinality_limit = ResolveRecordingCardinalityLimit(
+              view.GetAggregationConfig(), ctx->GetCollectors(), view_instr_desc.type_);
           async_storage = std::shared_ptr<AsyncMetricStorage>(new AsyncMetricStorage(
               view_instr_desc, view.GetAggregationType(), view.GetAttributesProcessor(),
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -672,7 +715,7 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
               GetExemplarReservoir(view.GetAggregationType(), view.GetAggregationConfig(),
                                    view_instr_desc, exemplar_filter_type),
 #endif
-              view.GetAggregationConfig()));
+              view.GetAggregationConfig(), recording_cardinality_limit));
           storage_registry_.insert({view_instr_desc, async_storage});
         }
         auto async_multi_storage = static_cast<AsyncMultiMetricStorage *>(storages.get());
