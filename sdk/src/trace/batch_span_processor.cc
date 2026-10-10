@@ -348,6 +348,11 @@ void BatchSpanProcessor::GetWaitAdjustedTime(
     std::chrono::microseconds &timeout,
     std::chrono::time_point<std::chrono::system_clock> &start_time)
 {
+  if (timeout == (std::chrono::microseconds::max)())
+  {
+    return;
+  }
+
   auto end_time = std::chrono::system_clock::now();
   auto offset   = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
   start_time    = end_time;

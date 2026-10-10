@@ -88,13 +88,16 @@ public:
     return true;
   }
 
-  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
+  bool Shutdown(std::chrono::microseconds timeout) noexcept override
   {
-    *is_shutdown_ = true;
+    shutdown_timeout_ = timeout;
+    *is_shutdown_     = true;
     return true;
   }
 
   bool IsExportCompleted() { return is_export_completed_->load(); }
+
+  std::chrono::microseconds GetShutdownTimeout() const noexcept { return shutdown_timeout_; }
 
 private:
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received_;
@@ -103,6 +106,7 @@ private:
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   // Meant exclusively to test force flush timeout
   std::chrono::milliseconds export_delay_;
+  std::chrono::microseconds shutdown_timeout_{std::chrono::microseconds::zero()};
 };
 
 /**
@@ -138,11 +142,10 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
   std::shared_ptr<std::vector<std::unique_ptr<sdk::trace::SpanData>>> spans_received(
       new std::vector<std::unique_ptr<sdk::trace::SpanData>>);
 
-  auto batch_processor =
-      std::shared_ptr<sdk::trace::BatchSpanProcessor>(new sdk::trace::BatchSpanProcessor(
-          std::unique_ptr<sdk::trace::SpanExporter>(
-              new MockSpanExporter(spans_received, shut_down_counter, is_shutdown)),
-          sdk::trace::BatchSpanProcessorOptions()));
+  auto exporter        = new MockSpanExporter(spans_received, shut_down_counter, is_shutdown);
+  auto batch_processor = std::shared_ptr<sdk::trace::BatchSpanProcessor>(
+      new sdk::trace::BatchSpanProcessor(std::unique_ptr<sdk::trace::SpanExporter>(exporter),
+                                         sdk::trace::BatchSpanProcessorOptions()));
   const int num_spans = 3;
 
   auto test_spans = GetTestSpans(batch_processor, num_spans);
@@ -163,6 +166,7 @@ TEST_F(BatchSpanProcessorTestPeer, TestShutdown)
   }
 
   EXPECT_TRUE(is_shutdown->load());
+  EXPECT_EQ((std::chrono::microseconds::max)(), exporter->GetShutdownTimeout());
 }
 
 TEST_F(BatchSpanProcessorTestPeer, TestForceFlush)

@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Preserve the default unlimited timeout when batch span and log record
+  processors shut down their exporters.
+  [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)
+
 * [CODE HEALTH] Prevent `std::out_of_range` escaping `noexcept` substr callers.
   [#4562](https://github.com/open-telemetry/opentelemetry-cpp/pull/4562)
 
