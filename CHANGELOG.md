@@ -62,6 +62,9 @@ Increment the:
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+* [SDK] Add Entity support to Resource
+  [#3652](https://github.com/open-telemetry/opentelemetry-cpp/issues/3652)
+
 Breaking changes:
 
 * [SDK] Remove `noexcept` from the public SDK `TracerProvider`,
@@ -73,6 +76,7 @@ Breaking changes:
   noop immediately without retrying construction. Existing cached objects
   continue to be returned.
   [#4361](https://github.com/open-telemetry/opentelemetry-cpp/issues/4361)
+
 * [BUG] Send one request per curl session, rather than replacing the operation
   a running request still belongs to
   [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
