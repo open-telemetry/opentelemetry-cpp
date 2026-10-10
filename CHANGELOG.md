@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] Extend preview bound instruments to UpDownCounter and Gauge
+  [#4321](https://github.com/open-telemetry/opentelemetry-cpp/pull/4321)
 * [CODE HEALTH] Prevent `std::out_of_range` escaping `noexcept` substr callers.
   [#4562](https://github.com/open-telemetry/opentelemetry-cpp/pull/4562)
 
