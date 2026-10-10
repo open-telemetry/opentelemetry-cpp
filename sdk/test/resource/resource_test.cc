@@ -14,6 +14,7 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/resource/resource_detector.h"
 #include "opentelemetry/sdk/version/version.h"
+#include "opentelemetry/semconv/incubating/process_attributes.h"
 #include "opentelemetry/semconv/service_attributes.h"
 #include "opentelemetry/semconv/telemetry_attributes.h"
 
@@ -82,6 +83,31 @@ TEST(ResourceTest, create_without_servicename)
     }
   }
   EXPECT_EQ(received_attributes.size(), expected_attributes.size());  // for missing service.name
+}
+
+TEST(ResourceTest, create_with_non_string_process_executable_name)
+{
+  ResourceAttributes attributes = {{semconv::process::kProcessExecutableName, true}};
+
+  auto resource                   = Resource::Create(attributes);
+  const auto &received_attributes = resource.GetAttributes();
+  auto service_name               = received_attributes.find(semconv::service::kServiceName);
+
+  ASSERT_NE(service_name, received_attributes.end());
+  EXPECT_EQ(nostd::get<std::string>(service_name->second), "unknown_service");
+}
+
+TEST(ResourceTest, create_with_process_executable_name)
+{
+  ResourceAttributes attributes = {
+      {semconv::process::kProcessExecutableName, std::string{"otel-service"}}};
+
+  auto resource                   = Resource::Create(attributes);
+  const auto &received_attributes = resource.GetAttributes();
+  auto service_name               = received_attributes.find(semconv::service::kServiceName);
+
+  ASSERT_NE(service_name, received_attributes.end());
+  EXPECT_EQ(nostd::get<std::string>(service_name->second), "unknown_service:otel-service");
 }
 
 TEST(ResourceTest, create_with_servicename)

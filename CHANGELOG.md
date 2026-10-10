@@ -109,6 +109,10 @@ Breaking changes:
 * [API] Remove opentelemetry::plugin
   [#4660](https://github.com/open-telemetry/opentelemetry-cpp/pull/4660)
 
+* [SDK] Avoid throwing from `Resource::Create` when `process.executable.name`
+  has a non-string value and `service.name` is not set.
+  [#4535](https://github.com/open-telemetry/opentelemetry-cpp/issues/4535)
+
 * [REMOVAL] Remove WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
   [#4666](https://github.com/open-telemetry/opentelemetry-cpp/pull/4666)
 
