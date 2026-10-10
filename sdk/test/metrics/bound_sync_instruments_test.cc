@@ -11,7 +11,7 @@
 #  include <cstdint>
 #  include <limits>
 #  include <map>
-#  include <memory>
+#  include <memory>  // IWYU pragma: keep
 #  include <string>
 #  include <utility>
 #  include <vector>
@@ -25,12 +25,14 @@
 #  include "opentelemetry/nostd/function_ref.h"
 #  include "opentelemetry/nostd/span.h"
 #  include "opentelemetry/nostd/string_view.h"
+#  include "opentelemetry/nostd/unique_ptr.h"
 #  include "opentelemetry/nostd/utility.h"
 #  include "opentelemetry/nostd/variant.h"
 #  include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #  include "opentelemetry/sdk/metrics/data/metric_data.h"
 #  include "opentelemetry/sdk/metrics/data/point_data.h"
 #  include "opentelemetry/sdk/metrics/instruments.h"
+#  include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 #  include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #  include "opentelemetry/sdk/metrics/state/metric_collector.h"
 #  include "opentelemetry/sdk/metrics/state/metric_storage.h"
@@ -193,7 +195,7 @@ TEST(BoundSyncInstruments, BoundCounterBindInitializerList)
 #  endif
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
-  LongCounter counter(desc, std::move(storage));
+  LongCounter counter(desc, std::move(storage), std::make_shared<MeterEnabledState>());
   opentelemetry::metrics::Counter<uint64_t> &api_counter = counter;
 
   auto bound = api_counter.Bind({{"key", "v"}});
@@ -245,7 +247,7 @@ TEST(BoundSyncInstruments, UnboundCounterDropsValueAboveInt64Max)
 #  endif
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
-  LongCounter counter(desc, std::move(storage));
+  LongCounter counter(desc, std::move(storage), std::make_shared<MeterEnabledState>());
   M attrs = {{"key", "v"}};
   auto kv = KeyValueIterableView<M>(attrs);
 
@@ -268,7 +270,7 @@ TEST(BoundSyncInstruments, BoundCounterDropsValueAboveInt64Max)
 #  endif
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
-  LongCounter counter(desc, std::move(storage));
+  LongCounter counter(desc, std::move(storage), std::make_shared<MeterEnabledState>());
   M attrs    = {{"key", "v"}};
   auto bound = counter.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(bound, nullptr);
@@ -322,7 +324,7 @@ TEST(BoundSyncInstruments, UnboundHistogramDropsValueAboveInt64Max)
 #  endif
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
-  LongHistogram histogram(desc, std::move(storage));
+  LongHistogram histogram(desc, std::move(storage), std::make_shared<MeterEnabledState>());
   M attrs = {{"key", "v"}};
   auto kv = KeyValueIterableView<M>(attrs);
 
@@ -361,7 +363,7 @@ TEST(BoundSyncInstruments, BoundHistogramDropsValueAboveInt64Max)
 #  endif
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
-  LongHistogram histogram(desc, std::move(storage));
+  LongHistogram histogram(desc, std::move(storage), std::make_shared<MeterEnabledState>());
   M attrs    = {{"key", "v"}};
   auto bound = histogram.Bind(KeyValueIterableView<M>(attrs));
   ASSERT_NE(bound, nullptr);
@@ -401,7 +403,7 @@ TEST(BoundSyncInstruments, BoundHistogramBindInitializerList)
 #  endif
       &cfg));
   SyncMetricStorage *storage_ptr = storage.get();
-  LongHistogram histogram(desc, std::move(storage));
+  LongHistogram histogram(desc, std::move(storage), std::make_shared<MeterEnabledState>());
   opentelemetry::metrics::Histogram<uint64_t> &api_histogram = histogram;
 
   auto bound = api_histogram.Bind({{"key", "v"}});
@@ -1124,6 +1126,42 @@ TEST(BoundSyncInstruments, OverflowParityAllowsFillingRemainingSlot)
   EXPECT_TRUE(a5_seen);
   EXPECT_EQ(a5_value, 42);
   EXPECT_FALSE(overflow_seen);
+}
+
+// A bound instrument caches its storage at Bind time, so it must still observe the live state.
+TEST(BoundSyncInstruments, BoundCounterObservesMeterEnabledState)
+{
+  InstrumentDescriptor desc{"name", "desc", "1unit", InstrumentType::kCounter,
+                            InstrumentValueType::kLong};
+  std::shared_ptr<DefaultAttributesProcessor> proc(new DefaultAttributesProcessor{});
+  AggregationConfig cfg;
+  auto meter_enabled_state = std::make_shared<MeterEnabledState>(false);
+  std::unique_ptr<SyncMetricStorage> storage(new SyncMetricStorage(
+      desc, AggregationType::kSum, proc,
+#  ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#  endif
+      &cfg));
+  SyncMetricStorage *storage_ptr = storage.get();
+
+  LongCounter counter(desc, std::move(storage), meter_enabled_state);
+  opentelemetry::metrics::Counter<uint64_t> &api_counter = counter;
+
+  // Bound while disabled: the handle must start recording once the meter is enabled.
+  auto bound = api_counter.Bind({{"key", "v"}});
+  ASSERT_NE(bound, nullptr);
+
+  M attrs = {{"key", "v"}};
+  bound->Add(5);
+  EXPECT_EQ(SumLongFor(*storage_ptr, AggregationTemporality::kDelta, attrs), 0);
+
+  meter_enabled_state->SetEnabled(true);
+  bound->Add(5);
+  EXPECT_EQ(SumLongFor(*storage_ptr, AggregationTemporality::kDelta, attrs), 5);
+
+  meter_enabled_state->SetEnabled(false);
+  bound->Add(5);
+  EXPECT_EQ(SumLongFor(*storage_ptr, AggregationTemporality::kDelta, attrs), 0);
 }
 
 #endif  // OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
