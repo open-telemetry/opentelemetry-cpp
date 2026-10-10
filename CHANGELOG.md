@@ -106,6 +106,15 @@ Breaking changes:
   Note that `AsyncMetricStorage`'s constructor now takes the view's
   `AttributesProcessor`, matching `SyncMetricStorage`.
   [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
+* [BUG] Elasticsearch: report an asynchronous export's outcome exactly once
+  [#4502](https://github.com/open-telemetry/opentelemetry-cpp/pull/4502)
+* [BUG] Elasticsearch: retire an asynchronous session before the completion
+  callback writes its diagnostic, so a log handler that flushes does not wait
+  for the export reporting to it
+  [#4502](https://github.com/open-telemetry/opentelemetry-cpp/pull/4502)
+* [CODE HEALTH] Elasticsearch: say log record(s) rather than trace span(s) in
+  the asynchronous export result
+  [#4502](https://github.com/open-telemetry/opentelemetry-cpp/pull/4502)
 
 * [BUG] Keep the curl retry deadline stable within each attempt
   [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
