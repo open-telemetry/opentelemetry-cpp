@@ -41,6 +41,8 @@ Increment the:
   change.
   [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
 
+* [CMAKE] Add pkg-config install consumer tests for Ubuntu system packages
+  [#4503](https://github.com/open-telemetry/opentelemetry-cpp/issues/4503)
 * [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
   from conflicting streams, and warn if stream conflicts were configured
   [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
@@ -63,6 +65,13 @@ Increment the:
   on a transitive include from elsewhere in the translation unit and failed
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
+
+* [EXPORTER ETW] Fix `PropertyValue` string conversions that pre-sized a
+  `vector<string>` then `push_back`'d (doubling length) and that built
+  `std::string` from `string_view::data()` without using the view length
+  (reading past non-NUL-terminated views). Copies now use length-aware
+  conversion. No API or ABI change.
+  [#4347](https://github.com/open-telemetry/opentelemetry-cpp/issues/4347)
 
 Breaking changes:
 
