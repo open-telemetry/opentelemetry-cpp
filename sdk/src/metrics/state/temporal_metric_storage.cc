@@ -135,6 +135,7 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
           return true;
         });
   }
+
   // Get the last reported metrics for the `collector` from `last reported metrics` stash
   //   - If the aggregation_temporarily for the collector is cumulative
   //       - Merge the last reported metrics with unreported metrics (which is in merged_metrics),
@@ -160,6 +161,9 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
             }
             else
             {
+              // Always carry forward cumulative state so the baseline survives gaps.
+              // For async instruments, stale suppression is applied only when building
+              // the exported MetricData below.
               auto def_agg = DefaultAggregation::CreateAggregation(
                   aggregation_type_, instrument_descriptor_, aggregation_config_);
               merged_metrics->Set(attributes, def_agg->Merge(aggregation));
@@ -192,14 +196,31 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   metric_data.aggregation_temporality = aggregation_temporarily;
   metric_data.start_ts                = last_collection_ts;
   metric_data.end_ts                  = collection_ts;
+  // Async observations apply only to the reader whose callback produced delta_metrics.
+  const bool async_cumulative =
+      InstrumentDescriptorUtil::IsInstrumentTypeAsync(instrument_descriptor_.type_) &&
+      aggregation_temporarily == AggregationTemporality::kCumulative;
   result_to_export->GetAllEntries(
-      [&metric_data](const MetricAttributes &attributes, Aggregation &aggregation) {
+      [&metric_data, delta_metrics, async_cumulative](const MetricAttributes &attributes,
+                                                      Aggregation &aggregation) {
+        if (async_cumulative && !delta_metrics->Has(attributes))
+        {
+          // Omit attribute sets not observed by this reader's callback, while keeping the
+          // internal cumulative state.
+          return true;
+        }
+
         PointDataAttributes point_data_attr;
         point_data_attr.point_data = aggregation.ToPoint();
         point_data_attr.attributes = attributes;
         metric_data.point_data_attr_.emplace_back(std::move(point_data_attr));
         return true;
       });
+
+  if (metric_data.point_data_attr_.empty())
+  {
+    return true;
+  }
   return callback(metric_data);
 }
 
