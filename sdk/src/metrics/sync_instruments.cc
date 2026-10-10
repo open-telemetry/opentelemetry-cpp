@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <limits>
+#include <memory>  // IWYU pragma: keep
 #include <ostream>
 #include <string>
 #include <utility>
