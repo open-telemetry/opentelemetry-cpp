@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <limits>
-#include <memory>  // IWYU pragma: keep
 #include <ostream>
 #include <string>
 #include <utility>
@@ -15,7 +14,6 @@
 #  include "opentelemetry/metrics/sync_instruments.h"
 #endif
 
-#include "opentelemetry/nostd/unique_ptr.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter_enabled_state.h"

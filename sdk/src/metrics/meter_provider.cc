@@ -4,7 +4,6 @@
 #include <atomic>
 #include <chrono>
 #include <exception>
-#include <memory>
 #include <mutex>
 #include <ostream>
 #include <utility>

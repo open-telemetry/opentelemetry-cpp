@@ -8,7 +8,6 @@
 #include <future>
 #include <initializer_list>
 #include <map>
-#include <memory>
 #include <set>
 #include <stdexcept>
 #include <string>
