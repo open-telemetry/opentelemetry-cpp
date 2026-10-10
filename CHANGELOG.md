@@ -15,6 +15,22 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUILD] Narrow the `//ext:headers` Bazel target to the four headers the
+  CMake package installs, and add internal targets for the rest
+  [#4634](https://github.com/open-telemetry/opentelemetry-cpp/pull/4634)
+  * `//ext:headers` now exposes only the four that `ext/CMakeLists.txt`
+    installs: `http/client/http_client.h`,
+    `http/client/http_client_factory.h`,
+    `http/client/curl/http_client_factory_curl.h` and
+    `http/common/url_parser.h`.
+  * Code that included any of the other six moves to an internal target:
+    `//ext:curl_implementation_headers` or `//ext:http_client_detail` in
+    `implementation_deps`, and `//ext:server_headers` for tests and examples.
+  * CMake narrowed to the same four in #4327, which first shipped in 1.29.0.
+    A CMake consumer of the other six lost them there, so this change brings
+    the Bazel surface in line rather than removing anything CMake still
+    installs.
+
 * [CODE HEALTH] Prevent `std::out_of_range` escaping `noexcept` substr callers.
   [#4562](https://github.com/open-telemetry/opentelemetry-cpp/pull/4562)
 

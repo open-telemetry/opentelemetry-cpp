@@ -16,6 +16,9 @@ cc_library(
     defines = [
         "ENABLE_HTTP_CLIENT_CURL",
     ],
+    implementation_deps = [
+        "//ext:curl_implementation_headers",
+    ],
     include_prefix = "src/http/client/curl",
     linkopts = select({
         "//bazel:windows": [
