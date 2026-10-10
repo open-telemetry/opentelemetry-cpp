@@ -11,7 +11,7 @@ namespace sdk
 namespace metrics
 {
 std::unique_ptr<Predicate> PredicateFactory::GetPredicate(opentelemetry::nostd::string_view pattern,
-                                                 PredicateType type)
+                                                          PredicateType type)
 {
   if (((type == PredicateType::kPattern || type == PredicateType::kWildcard) && pattern == "*") ||
       (type == PredicateType::kExact && pattern == ""))
@@ -32,6 +32,6 @@ std::unique_ptr<Predicate> PredicateFactory::GetPredicate(opentelemetry::nostd::
   }
   return std::unique_ptr<Predicate>(new MatchNothingPattern());
 }
-}
-}
+}  // namespace metrics
+}  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
