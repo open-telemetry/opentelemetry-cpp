@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Fix a data race between `Session::SendRequest` and
+  `Session::CancelSession` / `Session::FinishSession` in the curl HTTP
+  client, which read `curl_operation_` while it was still being built
+  [#4438](https://github.com/open-telemetry/opentelemetry-cpp/issues/4438)
+
 * [CODE HEALTH] Prevent `std::out_of_range` escaping `noexcept` substr callers.
   [#4562](https://github.com/open-telemetry/opentelemetry-cpp/pull/4562)
 

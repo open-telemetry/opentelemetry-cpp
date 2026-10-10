@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <deque>
+#include <functional>
 #include <list>
 #include <map>
 #include <memory>
@@ -217,6 +218,20 @@ public:
     return is_session_active_.load(std::memory_order_acquire);
   }
 
+  /**
+   * True once SendRequest has finished building the operation (or will never build one), so
+   * other threads may read it.
+   */
+  void MarkOperationPublished() noexcept
+  {
+    operation_published_.store(true, std::memory_order_seq_cst);
+  }
+
+  bool IsOperationPublished() const noexcept
+  {
+    return operation_published_.load(std::memory_order_acquire);
+  }
+
   void SetId(uint64_t session_id) { session_id_ = session_id; }
 
   /**
@@ -244,6 +259,10 @@ public:
   void FinishOperation();
 
 private:
+  void PublishOperation() noexcept;
+  void AbortPublishedOperation() noexcept;
+  void FinishPublishedOperation() noexcept;
+
   std::shared_ptr<Request> http_request_;
   std::string host_;
   std::unique_ptr<HttpOperation> curl_operation_;
@@ -253,6 +272,13 @@ private:
 
   // Raised by the first SendRequest and never lowered. A session carries one request.
   std::atomic<bool> send_started_{false};
+
+  // Raised by SendRequest once curl_operation_ is complete and may be read by other threads.
+  // CancelSession and FinishSession touch the operation only after seeing it, and until then
+  // leave a note in the two flags below for SendRequest to apply.
+  std::atomic<bool> operation_published_{false};
+  std::atomic<bool> cancel_requested_{false};
+  std::atomic<bool> finish_requested_{false};
 };
 
 class HttpClientSync : public opentelemetry::ext::http::client::HttpClientSync
@@ -366,7 +392,11 @@ public:
   // return true if create background thread, false is already exist background thread
   bool MaybeSpawnBackgroundThread();
 
-  void ScheduleAddSession(uint64_t session_id);
+  /**
+   * Queue a session for the IO thread. on_scheduled, if given, runs once the session is queued
+   * and before the IO thread can see it.
+   */
+  void ScheduleAddSession(uint64_t session_id, const std::function<void()> &on_scheduled = nullptr);
   void ScheduleAbortSession(uint64_t session_id);
   void ScheduleRemoveSession(uint64_t session_id, HttpCurlEasyResource &&resource);
 
