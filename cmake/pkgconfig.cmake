@@ -27,13 +27,17 @@ endmacro ()
 # * name:        the displayed name of the library, such as "OpenTelemetry API".
 # * description: the description of the library.
 # * ARGN:        the names of any pkgconfig modules the generated module depends on.
+# * EXTRA_LIBS:  optional extra `-l` names for dependencies with no usable
+#                pkg-config module. Must come last. Each name is emitted as
+#                `-l<lib>` in Libs.
 #
 function (opentelemetry_add_pkgconfig library name description)
+  cmake_parse_arguments(pkgcfg "" "" "EXTRA_LIBS" ${ARGN})
   opentelemetry_set_pkgconfig_paths()
   set(target "opentelemetry_${library}")
   set(OPENTELEMETRY_PC_NAME "${name}")
   set(OPENTELEMETRY_PC_DESCRIPTION ${description})
-  string(JOIN " " OPENTELEMETRY_PC_REQUIRES ${ARGN})
+  string(JOIN " " OPENTELEMETRY_PC_REQUIRES ${pkgcfg_UNPARSED_ARGUMENTS})
   get_target_property(target_type ${target} TYPE)
   if ("${target_type}" STREQUAL "INTERFACE_LIBRARY")
     # Interface libraries only contain headers. They do not generate lib files
@@ -42,9 +46,13 @@ function (opentelemetry_add_pkgconfig library name description)
   else ()
     set(OPENTELEMETRY_PC_LIBS "-l${target}")
   endif ()
+  foreach (_extra_lib IN LISTS pkgcfg_EXTRA_LIBS)
+    string(APPEND OPENTELEMETRY_PC_LIBS " -l${_extra_lib}")
+  endforeach ()
   get_target_property(target_defs ${target} INTERFACE_COMPILE_DEFINITIONS)
   if (target_defs)
     foreach (def ${target_defs})
+      string(REPLACE "\"" "\\\"" def "${def}")
       string(APPEND OPENTELEMETRY_PC_CFLAGS " -D${def}")
     endforeach ()
   endif ()
