@@ -43,12 +43,7 @@ SamplingResult CompositeSampler::ShouldSample(
 {
   const auto &parent_trace_state = parent_context.trace_state();
 
-  std::string ot_value;
-  if (parent_trace_state)
-  {
-    parent_trace_state->Get(kOtTraceStateKey, ot_value);
-  }
-  OtelTraceState ot_state = OtelTraceState::Parse(ot_value);
+  const OtelTraceState ot_state = OtelTraceState::Parse(GetOtValue(parent_trace_state));
 
   SamplingIntent intent =
       delegate_->GetSamplingIntent(parent_context, trace_id, name, span_kind, attributes, links);
@@ -57,20 +52,28 @@ SamplingResult CompositeSampler::ShouldSample(
   bool reliable   = false;
   if (intent.has_threshold)
   {
-    reliable            = intent.threshold_reliable;
-    uint64_t randomness = 0;
-    if (reliable)
+    reliable = intent.threshold_reliable;
+    // A threshold of 0 keeps every span regardless of randomness (e.g.
+    // AlwaysOn, or any 100%-ratio sampler), so skip computing it entirely.
+    if (intent.threshold_value == 0)
     {
-      randomness =
-          ot_state.has_random_value ? ot_state.random_value : GetRandomnessFromTraceId(trace_id);
+      is_sampled = true;
     }
     else
     {
-      // The decision does not carry a reliable adjusted count, so the trace
-      // randomness must not be reused (the threshold may correlate with it).
-      randomness = opentelemetry::sdk::common::Random::GenerateRandom64() & kMaxRandomValue;
+      uint64_t randomness = 0;
+      if (reliable)
+      {
+        randomness = GetSamplingRandomness(ot_state, trace_id);
+      }
+      else
+      {
+        // The decision does not carry a reliable adjusted count, so the trace
+        // randomness must not be reused (the threshold may correlate with it).
+        randomness = opentelemetry::sdk::common::Random::GenerateRandom64() & kMaxRandomValue;
+      }
+      is_sampled = intent.threshold_value <= randomness;
     }
-    is_sampled = intent.threshold_value <= randomness;
   }
 
   Decision decision = is_sampled ? Decision::RECORD_AND_SAMPLE : Decision::DROP;
@@ -78,30 +81,14 @@ SamplingResult CompositeSampler::ShouldSample(
   // Write the effective threshold back only when the span is kept with a
   // reliable adjusted count. Otherwise drop the "th" sub-key. The "rv" sub-key
   // and any other sub-keys are always preserved.
-  if (is_sampled && reliable)
-  {
-    ot_state.has_threshold = true;
-    ot_state.threshold     = intent.threshold_value;
-  }
-  else
-  {
-    ot_state.has_threshold = false;
-  }
-  std::string new_ot_value = ot_state.Serialize();
+  const uint64_t desired_threshold =
+      is_sampled && reliable ? intent.threshold_value : kMaxThreshold;
 
   nostd::shared_ptr<opentelemetry::trace::TraceState> out_trace_state =
       parent_trace_state ? parent_trace_state : opentelemetry::trace::TraceState::GetDefault();
   if (intent.trace_state_provider)
   {
     out_trace_state = intent.trace_state_provider(out_trace_state);
-  }
-  if (new_ot_value.empty())
-  {
-    out_trace_state = out_trace_state->Delete(kOtTraceStateKey);
-  }
-  else
-  {
-    out_trace_state = out_trace_state->Set(kOtTraceStateKey, new_ot_value);
   }
 
   std::unique_ptr<const std::map<std::string, opentelemetry::common::AttributeValue>>
@@ -116,7 +103,8 @@ SamplingResult CompositeSampler::ShouldSample(
     }
   }
 
-  return {decision, std::move(attributes_out), out_trace_state};
+  return {decision, std::move(attributes_out),
+          ot_state.GetTraceStateWithThreshold(std::move(out_trace_state), desired_threshold)};
 }
 
 nostd::string_view CompositeSampler::GetDescription() const noexcept

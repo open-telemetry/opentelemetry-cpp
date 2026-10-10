@@ -62,6 +62,9 @@ Increment the:
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+* [SDK] Optimize composite and probability samplers
+  [#4582](https://github.com/open-telemetry/opentelemetry-cpp/pull/4582)
+
 Breaking changes:
 
 * [SDK] Remove `noexcept` from the public SDK `TracerProvider`,
