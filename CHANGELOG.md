@@ -62,6 +62,13 @@ Increment the:
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+* [EXPORTER ETW] Fix `PropertyValue` string conversions that pre-sized a
+  `vector<string>` then `push_back`'d (doubling length) and that built
+  `std::string` from `string_view::data()` without using the view length
+  (reading past non-NUL-terminated views). Copies now use length-aware
+  conversion. No API or ABI change.
+  [#4347](https://github.com/open-telemetry/opentelemetry-cpp/issues/4347)
+
 Breaking changes:
 
 * [SDK] Remove `noexcept` from the public SDK `TracerProvider`,
