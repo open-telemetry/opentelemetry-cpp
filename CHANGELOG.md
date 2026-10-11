@@ -76,8 +76,6 @@ Increment the:
 * [CODE HEALTH] Fix bugprone-exception-escape in NoopTracer::StartSpan()
   [#4673](https://github.com/open-telemetry/opentelemetry-cpp/pull/4673)
 
-Breaking changes:
-
 * [BUG] Send one request per curl session, rather than replacing the operation
   a running request still belongs to
   [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
