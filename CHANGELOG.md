@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Preserve the default unlimited timeout when batch span and log record
+  processors shut down their exporters.
+  [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)
+
 * [CODE HEALTH] Prevent `std::out_of_range` escaping `noexcept` substr callers.
   [#4562](https://github.com/open-telemetry/opentelemetry-cpp/pull/4562)
 
@@ -61,6 +65,13 @@ Increment the:
   on a transitive include from elsewhere in the translation unit and failed
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
+
+* [EXPORTER ETW] Fix `PropertyValue` string conversions that pre-sized a
+  `vector<string>` then `push_back`'d (doubling length) and that built
+  `std::string` from `string_view::data()` without using the view length
+  (reading past non-NUL-terminated views). Copies now use length-aware
+  conversion. No API or ABI change.
+  [#4347](https://github.com/open-telemetry/opentelemetry-cpp/issues/4347)
 
 Breaking changes:
 
