@@ -13,6 +13,7 @@
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
 #  include "opentelemetry/metrics/sync_instruments.h"
+#  include "opentelemetry/nostd/unique_ptr.h"
 #endif
 
 #include "opentelemetry/sdk/common/global_log_handler.h"
