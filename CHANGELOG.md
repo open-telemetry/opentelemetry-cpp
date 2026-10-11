@@ -89,17 +89,9 @@ Increment the:
   conversion. No API or ABI change.
   [#4347](https://github.com/open-telemetry/opentelemetry-cpp/issues/4347)
 
-Breaking changes:
+* [CODE HEALTH] Fix bugprone-exception-escape in NoopTracer::StartSpan()
+  [#4673](https://github.com/open-telemetry/opentelemetry-cpp/pull/4673)
 
-* [SDK] Remove `noexcept` from the public SDK `TracerProvider`,
-  `LoggerProvider`, `MeterProvider`, `Tracer`, `Logger`, and `Meter`
-  constructors so initialization failures can propagate to callers.
-  `GetTracer`, `GetLogger`, and `GetMeter` remain `noexcept` and return a
-  pre-allocated noop object if constructing a new instrumentation object
-  fails. After the first failure, later uncached `Get*` calls return the same
-  noop immediately without retrying construction. Existing cached objects
-  continue to be returned.
-  [#4361](https://github.com/open-telemetry/opentelemetry-cpp/issues/4361)
 * [BUG] Send one request per curl session, rather than replacing the operation
   a running request still belongs to
   [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
@@ -111,6 +103,7 @@ Breaking changes:
 
 * [BUG] Do not queue a curl session closed by the Retry-After cap
   [#4632](https://github.com/open-telemetry/opentelemetry-cpp/pull/4632)
+
 * [BUG] Fix a data race on the curl operation's last result code
   [#4618](https://github.com/open-telemetry/opentelemetry-cpp/pull/4618)
 
@@ -130,14 +123,42 @@ Breaking changes:
 * [BUG] Keep the curl retry deadline stable within each attempt
   [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
 
+Breaking changes:
+
+* [SDK] Handle instrumentation object construction failures safely
+  [#4469](https://github.com/open-telemetry/opentelemetry-cpp/pull/4469)
+  * Removed `noexcept` from the public SDK `TracerProvider`,
+    `LoggerProvider`, `MeterProvider`, `Tracer`, `Logger`, and `Meter`
+    constructors so initialization failures can propagate to callers.
+  * `GetTracer`, `GetLogger`, and `GetMeter` remain `noexcept` and return a
+    pre-allocated noop object if constructing a new instrumentation object
+    fails.
+  * After the first failure, later uncached `Get*` calls return the same
+    noop immediately without retrying construction. Existing cached objects
+    continue to be returned.
+
 * [REMOVAL] Remove WITH_OTLP_RETRY_PREVIEW - #4668
   [#4668](https://github.com/open-telemetry/opentelemetry-cpp/pull/4668)
+  * CMake flags WITH_OTLP_RETRY_PREVIEW is removed,
+    the feature is no longer in preview status.
 
 * [API] Remove opentelemetry::plugin
   [#4660](https://github.com/open-telemetry/opentelemetry-cpp/pull/4660)
+  * The unused opentelemetry::plugin framework is removed.
 
 * [REMOVAL] Remove WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
   [#4666](https://github.com/open-telemetry/opentelemetry-cpp/pull/4666)
+  * CMake flags WITH_OTLP_GRPC_SSL_MTLS_PREVIEW is removed,
+    the feature is no longer in preview status.
+
+* [CODE HEALTH] Fix bugprone-exception-escape in NoopTracer::StartSpan()
+  [#4673](https://github.com/open-telemetry/opentelemetry-cpp/pull/4673)
+  * The NoopSpan class in the API has changed.
+  * For applications only instrumenting code, this has no impact,
+    as this class is not used for instrumentation.
+  * For applications implementing a custom trace exporter,
+    the exporter implementation needs to be adjusted,
+    when using the NoopSpan.
 
 ## [1.29.0] 2026-09-13
 
