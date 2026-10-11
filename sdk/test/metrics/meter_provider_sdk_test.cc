@@ -20,7 +20,6 @@
 #  include <cstdlib>
 #endif
 
-#include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/async_instruments.h"
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/observer_result.h"
@@ -33,7 +32,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
-#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"  // IWYU pragma: keep
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
@@ -50,7 +49,7 @@
 #include "opentelemetry/sdk/metrics/view/view.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/version.h"
+#include "opentelemetry/version.h"  // IWYU pragma: keep
 
 #include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 
