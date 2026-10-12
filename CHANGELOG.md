@@ -147,19 +147,13 @@ Breaking changes:
     the exporter implementation needs to be adjusted,
     when using the NoopSpan.
 
-* [EXPORTER] Allocate the OTLP trace and log recordable messages on a
-  `google::protobuf::Arena` owned by the recordable, so recording a field is an
-  Arena bump instead of a heap allocation. Recording a span with attributes
-  drops from about 5 heap allocations per attribute to about 1. The Arena
-  starts from a block that lives inside the recordable rather than from the
-  heap, so starting a span takes 5 heap allocations instead of 9.
-  `OtlpRecordable` and `OtlpLogRecordable` are no longer copyable or movable,
-  and they are larger, since each one now carries that block. The `span()` and
-  `log_record()` accessors keep their signatures, and
-  `OtlpRecordableUtils::PopulateRequest` still copies each recordable message
-  into the Arena allocated request.
-  [#4558](https://github.com/open-telemetry/opentelemetry-cpp/issues/4558)
+* [EXPORTER] Allocate the OTLP trace and log recordable messages on an Arena
+  owned by the recordable
   [#4580](https://github.com/open-telemetry/opentelemetry-cpp/pull/4580)
+  * Recording a field is an Arena bump instead of a heap allocation.
+  * `OtlpRecordable` and `OtlpLogRecordable` are larger and no longer
+    copyable or movable. `span()`, `log_record()` and
+    `OtlpRecordableUtils::PopulateRequest` are unchanged.
 
 ## [1.29.0] 2026-09-13
 

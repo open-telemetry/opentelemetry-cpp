@@ -122,19 +122,12 @@ public:
 
 private:
   // Size of the block the Arena starts from. The block lives inside the recordable, so a span
-  // whose recorded content fits in it never asks the heap for Arena memory at all. A span with
-  // the identity, the name, the kind and the timestamps recorded takes 288 bytes of Arena
-  // space, so 512 covers that plus a little, and a span that outgrows it keeps working, the
-  // Arena simply grows onto the heap from there. 512, 768 and 1024 were all measured end to
-  // end through a full BatchSpanProcessor queue. Larger blocks buy fewer allocations for spans
-  // with many long attributes, and for that shape a 768 byte block is actually ahead on both
-  // allocation count and record time, and on peak memory too, since which size wins there
-  // depends on where a span's overflow lands in protobuf's block doubling. What 512 buys is the
-  // other two columns: it is the smallest size that keeps a minimal span's identity fields off
-  // the heap, and it keeps the recordable small enough to avoid the regression seen at 768 and
-  // 1024 in the cost of starting a span while many are alive. That regression is a property of
-  // the allocator: on glibc malloc the boundary between the exact fit smallbins and the best
-  // fit largebins falls at a 1008 byte chunk, so it is worth re-measuring on a different one.
+  // whose recorded content fits in it never asks the heap for Arena memory. A span with the
+  // identity, the name, the kind and the timestamps takes 288 bytes of Arena space, so 512
+  // covers a minimal span with room to spare, and a span that outgrows it grows onto the heap
+  // with protobuf's normal block policy. Larger blocks (768, 1024) were measured and bought
+  // fewer allocations for spans with many long attributes, but made starting a span slower
+  // while many spans are alive on glibc malloc, so 512 is the compromise.
   static constexpr std::size_t kArenaInitialBlockSize = 512;
 
   // Declared before arena_ so the block is a live subobject before the Arena is pointed at it,
