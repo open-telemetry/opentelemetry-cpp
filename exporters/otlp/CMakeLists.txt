@@ -520,9 +520,14 @@ if(OTELCPP_WITH_OTLP_HTTP)
        opentelemetry_exporter_otlp_http_metric_builder)
 
   if(OTELCPP_INSTALL)
+    set(_otlp_http_client_pc_requires "opentelemetry_api")
+    if(OTELCPP_WITH_HTTP_CLIENT_CURL)
+      string(APPEND _otlp_http_client_pc_requires
+             " opentelemetry_http_client_curl")
+    endif()
     opentelemetry_add_pkgconfig(
       exporter_otlp_http_client "OpenTelemetry OTLP - HTTP Client"
-      "HTTP client for OTLP protocol." "opentelemetry_api")
+      "HTTP client for OTLP protocol." "${_otlp_http_client_pc_requires}")
 
     opentelemetry_add_pkgconfig(
       exporter_otlp_http

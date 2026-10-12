@@ -37,6 +37,7 @@ add_library(
   view/view_factory.cc
   view/view_registry.cc
   view/view_registry_factory.cc
+  view/predicate_factory.cc
   sync_instruments.cc)
 
 set_target_properties(opentelemetry_metrics PROPERTIES EXPORT_NAME metrics)

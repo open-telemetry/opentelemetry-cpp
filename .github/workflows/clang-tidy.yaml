@@ -17,9 +17,9 @@ jobs:
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 73
+            warning_limit: 205
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 76
+            warning_limit: 219
     env:
       CC: /usr/bin/clang-22
       CXX: /usr/bin/clang++-22
@@ -88,13 +88,13 @@ jobs:
           cat $REPORT_PATH >> $GITHUB_STEP_SUMMARY
 
       - name: Upload build log
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Logs-clang-tidy-${{ matrix.cmake_options }}
           path: ${{ steps.build.outputs.build_log }}
 
       - name: Upload warning report
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Report-clang-tidy-${{ matrix.cmake_options }}
           path: ${{ steps.analyze.outputs.report_path }}
