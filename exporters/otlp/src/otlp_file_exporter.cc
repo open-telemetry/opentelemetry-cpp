@@ -50,7 +50,7 @@ OtlpFileExporter::OtlpFileExporter(const OtlpFileExporterOptions &options,
 
 std::unique_ptr<opentelemetry::sdk::trace::Recordable> OtlpFileExporter::MakeRecordable() noexcept
 {
-  return std::make_unique<exporter::otlp::OtlpRecordable>(recordable_arena_.Get());
+  return std::make_unique<exporter::otlp::OtlpRecordable>();
 }
 
 opentelemetry::sdk::common::ExportResult OtlpFileExporter::Export(
@@ -69,13 +69,17 @@ opentelemetry::sdk::common::ExportResult OtlpFileExporter::Export(
     return opentelemetry::sdk::common::ExportResult::kSuccess;
   }
 
-  // The request goes on the Arena the recordables since the last export were created on, so
-  // PopulateRequest moves their messages instead of copying them.
-  std::shared_ptr<google::protobuf::Arena> request_arena = recordable_arena_.Rotate();
+  google::protobuf::ArenaOptions arena_options;
+  // It's easy to allocate datas larger than 1024 when we populate basic resource and attributes
+  arena_options.initial_block_size = 1024;
+  // When in batch mode, it's easy to export a large number of spans at once, we can alloc a lager
+  // block to reduce memory fragments.
+  arena_options.max_block_size = 65536;
+  google::protobuf::Arena arena{arena_options};
 
   proto::collector::trace::v1::ExportTraceServiceRequest *service_request =
       google::protobuf::Arena::Create<proto::collector::trace::v1::ExportTraceServiceRequest>(
-          request_arena.get());
+          &arena);
   OtlpRecordableUtils::PopulateRequest(spans, service_request);
   std::size_t span_count = spans.size();
   opentelemetry::sdk::common::ExportResult result =
@@ -100,7 +104,6 @@ bool OtlpFileExporter::ForceFlush(std::chrono::microseconds timeout) noexcept
 
 bool OtlpFileExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
-  recordable_arena_.Release();
   return file_client_->Shutdown(timeout);
 }
 
