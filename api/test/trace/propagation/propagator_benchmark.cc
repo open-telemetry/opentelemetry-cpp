@@ -77,20 +77,30 @@
 // clang-format on
 
 #include <benchmark/benchmark.h>
-#include <memory>
+
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/baggage/baggage.h"
 #include "opentelemetry/baggage/baggage_context.h"
 #include "opentelemetry/baggage/propagation/baggage_propagator.h"
+#include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/composite_propagator.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
+#include "opentelemetry/nostd/shared_ptr.h"
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/trace/context.h"
 #include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/propagation/b3_propagator.h"
 #include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/propagation/jaeger.h"
+#include "opentelemetry/trace/span.h"
+#include "opentelemetry/trace/span_context.h"
+#include "opentelemetry/trace/span_id.h"
+#include "opentelemetry/trace/trace_flags.h"
+#include "opentelemetry/trace/trace_id.h"
+#include "opentelemetry/trace/trace_state.h"
 
 using namespace opentelemetry;
 using namespace opentelemetry::trace::propagation;
