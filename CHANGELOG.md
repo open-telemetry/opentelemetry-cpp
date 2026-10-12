@@ -15,6 +15,38 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Preserve the default unlimited timeout when batch span and log record
+  processors shut down their exporters.
+  [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)
+
+* [CODE HEALTH] Prevent `std::out_of_range` escaping `noexcept` substr callers.
+  [#4562](https://github.com/open-telemetry/opentelemetry-cpp/pull/4562)
+
+* [METRICS SDK] Enforce a runtime minimum scale of `-11` for
+  `Base2ExponentialHistogramAggregation`, so a recording that spans the full
+  double range no longer downscales without end.
+  [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
+
+* [LOGS] Fix undefined behavior in `Logger::EmitLogRecord()` when a logger is
+  enabled (e.g. via `LoggerProvider::UpdateLoggerConfigurator()`) after
+  `CreateLogRecord()` was called while it was still disabled. The disabled
+  path previously returned a `NoopLogRecord`, which is not the SDK's internal
+  `Recordable`; `EmitLogRecord()` re-checks the enabled state at emit time, so
+  such a record could reach its unconditional `static_cast<Recordable *>` and
+  then `MultiLogRecordProcessor::OnEmit()`'s own `static_cast`, both undefined
+  behavior. `CreateLogRecord()` now returns an empty `MultiRecordable` while
+  disabled instead, which is a safe target either way: every `Set*` call and
+  `ReleaseRecordable()` on it simply loop over zero wrapped recordables, so
+  the record is dropped without reaching a real processor. No API or ABI
+  change.
+  [#4624](https://github.com/open-telemetry/opentelemetry-cpp/pull/4624)
+
+* [CMAKE] Add pkg-config install consumer tests for Ubuntu system packages
+  [#4503](https://github.com/open-telemetry/opentelemetry-cpp/issues/4503)
+* [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
+  from conflicting streams, and warn if stream conflicts were configured
+  [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
+
 * [EXAMPLES] Fix random attribute selection in metrics foo example to include
   all key-value pairs
   [#4585](https://github.com/open-telemetry/opentelemetry-cpp/pull/4585)
@@ -24,17 +56,100 @@ Increment the:
 * [API] Remove regex from trace_state.h
   [#4570](https://github.com/open-telemetry/opentelemetry-cpp/pull/4570)
 
+* [API] `TraceState::Set` now overwrites an entry with the same key, and
+ `TraceState::FromHeader` discards duplicate keys.
+  [#4586](https://github.com/open-telemetry/opentelemetry-cpp/pull/4586)
+
 * [SDK] Add a missing `<cstdint>` include to `predicate_factory.h`, which
   uses `uint8_t` without including the header that declares it. This relied
   on a transitive include from elsewhere in the translation unit and failed
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+* [CI] Enable the bugprone-unhandled-exception-at-new check
+  [#4689](https://github.com/open-telemetry/opentelemetry-cpp/pull/4689)
+
+* [EXPORTER ETW] Fix `PropertyValue` string conversions that pre-sized a
+  `vector<string>` then `push_back`'d (doubling length) and that built
+  `std::string` from `string_view::data()` without using the view length
+  (reading past non-NUL-terminated views). Copies now use length-aware
+  conversion. No API or ABI change.
+  [#4347](https://github.com/open-telemetry/opentelemetry-cpp/issues/4347)
+
+* [CODE HEALTH] Fix bugprone-exception-escape in NoopTracer::StartSpan()
+  [#4673](https://github.com/open-telemetry/opentelemetry-cpp/pull/4673)
+
+* [BUG] Send one request per curl session, rather than replacing the operation
+  a running request still belongs to
+  [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
+
+* [BUG] Compare the curl seek offset in `curl_off_t` before narrowing it to
+  `size_t`, so an offset past the `size_t` range cannot wrap back inside the
+  request body on a 32-bit build
+  [#4630](https://github.com/open-telemetry/opentelemetry-cpp/pull/4630)
+
+* [BUG] Do not queue a curl session closed by the Retry-After cap
+  [#4632](https://github.com/open-telemetry/opentelemetry-cpp/pull/4632)
+
+* [BUG] Fix a data race on the curl operation's last result code
+  [#4618](https://github.com/open-telemetry/opentelemetry-cpp/pull/4618)
+
+* [BUG] Do not busy-spin the curl background thread while a retry is queued
+  at shutdown
+  [#4637](https://github.com/open-telemetry/opentelemetry-cpp/pull/4637)
+
+* [SDK] Fix spatial re-aggregation for asynchronous instruments. A view which
+  drops attributes is now applied to asynchronous instruments as well, and the
+  observations which collapse onto the same attribute set are re-aggregated
+  (summed up for the additive instruments) instead of the last observation
+  overwriting the previous ones.
+  Note that `AsyncMetricStorage`'s constructor now takes the view's
+  `AttributesProcessor`, matching `SyncMetricStorage`.
+  [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
+
+* [BUG] Keep the curl retry deadline stable within each attempt
+  [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
+
 * [METRICS SDK] Avoid materializing owned exemplar attributes before
   fixed-size reservoir selection.
   [#4475](https://github.com/open-telemetry/opentelemetry-cpp/pull/4475)
 
 Breaking changes:
+
+* [SDK] Handle instrumentation object construction failures safely
+  [#4469](https://github.com/open-telemetry/opentelemetry-cpp/pull/4469)
+  * Removed `noexcept` from the public SDK `TracerProvider`,
+    `LoggerProvider`, `MeterProvider`, `Tracer`, `Logger`, and `Meter`
+    constructors so initialization failures can propagate to callers.
+  * `GetTracer`, `GetLogger`, and `GetMeter` remain `noexcept` and return a
+    pre-allocated noop object if constructing a new instrumentation object
+    fails.
+  * After the first failure, later uncached `Get*` calls return the same
+    noop immediately without retrying construction. Existing cached objects
+    continue to be returned.
+
+* [REMOVAL] Remove WITH_OTLP_RETRY_PREVIEW - #4668
+  [#4668](https://github.com/open-telemetry/opentelemetry-cpp/pull/4668)
+  * CMake flags WITH_OTLP_RETRY_PREVIEW is removed,
+    the feature is no longer in preview status.
+
+* [API] Remove opentelemetry::plugin
+  [#4660](https://github.com/open-telemetry/opentelemetry-cpp/pull/4660)
+  * The unused opentelemetry::plugin framework is removed.
+
+* [REMOVAL] Remove WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
+  [#4666](https://github.com/open-telemetry/opentelemetry-cpp/pull/4666)
+  * CMake flags WITH_OTLP_GRPC_SSL_MTLS_PREVIEW is removed,
+    the feature is no longer in preview status.
+
+* [CODE HEALTH] Fix bugprone-exception-escape in NoopTracer::StartSpan()
+  [#4673](https://github.com/open-telemetry/opentelemetry-cpp/pull/4673)
+  * The NoopSpan class in the API has changed.
+  * For applications only instrumenting code, this has no impact,
+    as this class is not used for instrumentation.
+  * For applications implementing a custom trace exporter,
+    the exporter implementation needs to be adjusted,
+    when using the NoopSpan.
 
 * [METRICS SDK] Add non-owning `KeyValueIterable` overloads to the preview
   `ExemplarReservoir` and `ReservoirCellSelector` interfaces. Custom reservoir

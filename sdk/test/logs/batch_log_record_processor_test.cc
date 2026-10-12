@@ -142,11 +142,14 @@ public:
   }
 
   // toggles the boolean flag marking this exporter as shut down
-  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
+  bool Shutdown(std::chrono::microseconds timeout) noexcept override
   {
-    *is_shutdown_ = true;
+    shutdown_timeout_ = timeout;
+    *is_shutdown_     = true;
     return true;
   }
+
+  std::chrono::microseconds GetShutdownTimeout() const noexcept { return shutdown_timeout_; }
 
 private:
   std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received_;
@@ -154,6 +157,7 @@ private:
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   std::chrono::milliseconds export_delay_;
+  std::chrono::microseconds shutdown_timeout_{std::chrono::microseconds::zero()};
 };
 
 /**
@@ -191,8 +195,12 @@ TEST_F(BatchLogRecordProcessorTest, TestShutdown)
       new std::vector<std::unique_ptr<MockLogRecordable>>);
   std::shared_ptr<std::atomic<std::size_t>> force_flush_counter(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
+  std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
 
-  auto batch_processor = GetMockProcessor(logs_received, force_flush_counter, is_shutdown);
+  auto exporter =
+      new MockLogExporter(logs_received, force_flush_counter, is_shutdown, is_export_completed);
+  auto batch_processor = std::shared_ptr<LogRecordProcessor>(
+      new BatchLogRecordProcessor(std::unique_ptr<LogRecordExporter>(exporter)));
 
   // Create a few test log records and send them to the processor
   const int num_logs = 3;
@@ -221,6 +229,7 @@ TEST_F(BatchLogRecordProcessorTest, TestShutdown)
 
   // Also check that the processor is shut down at the end
   EXPECT_TRUE(is_shutdown->load());
+  EXPECT_EQ((std::chrono::microseconds::max)(), exporter->GetShutdownTimeout());
 }
 
 TEST_F(BatchLogRecordProcessorTest, TestForceFlush)
