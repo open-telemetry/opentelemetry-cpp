@@ -3,12 +3,8 @@
 
 #include <curl/curl.h>
 #include <curl/curlver.h>
-
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
-#  include <array>
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
-
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <cmath>
@@ -35,6 +31,7 @@
 #  include <cctype>
 #endif
 
+#include "opentelemetry/common/string_util.h"
 #include "opentelemetry/ext/http/client/curl/http_client_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_operation_curl.h"
 #include "opentelemetry/ext/http/client/curl/http_time_util.h"
@@ -611,7 +608,6 @@ void HttpOperation::Cleanup()
 
 bool HttpOperation::IsRetryable()
 {
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
   static constexpr auto kRetryableStatusCodes = std::array<decltype(response_code_), 4>{
       429,  // Too Many Requests
       502,  // Bad Gateway
@@ -624,18 +620,20 @@ bool HttpOperation::IsRetryable()
 
   return is_retryable && (last_curl_result_ == CURLE_OK) &&
          (retry_attempts_ < retry_policy_.max_attempts);
-#else
-  return false;
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
 }
 
 std::chrono::system_clock::time_point HttpOperation::NextRetryTime()
 {
-  if (retry_after_time_point_ != std::chrono::system_clock::time_point{})
+  if (next_retry_time_point_ != std::chrono::system_clock::time_point{})
   {
-    return retry_after_time_point_;
+    return next_retry_time_point_;
   }
 
+  return CalculateNextRetryTime();
+}
+
+std::chrono::system_clock::time_point HttpOperation::CalculateNextRetryTime()
+{
   // One engine per thread. Every HttpClient drives its own background thread, and drawing from
   // the engine advances its state, so a shared one is written by all of them at once.
   static thread_local std::mt19937 gen{std::random_device{}()};
@@ -813,7 +811,7 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
 
   if (!text_to_log.empty() && text_to_log[size - 1] == '\n')
   {
-    text_to_log = text_to_log.substr(0, size - 1);
+    text_to_log = common::StringUtil::Substr(text_to_log, 0, size - 1);
   }
 
   if (type == CURLINFO_TEXT)
@@ -821,11 +819,11 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
     static const auto kTlsInfo    = nostd::string_view("SSL connection using");
     static const auto kFailureMsg = nostd::string_view("Recv failure:");
 
-    if (text_to_log.substr(0, kTlsInfo.size()) == kTlsInfo)
+    if (common::StringUtil::Substr(text_to_log, 0, kTlsInfo.size()) == kTlsInfo)
     {
       OTEL_INTERNAL_LOG_INFO(text_to_log);
     }
-    else if (text_to_log.substr(0, kFailureMsg.size()) == kFailureMsg)
+    else if (common::StringUtil::Substr(text_to_log, 0, kFailureMsg.size()) == kFailureMsg)
     {
       OTEL_INTERNAL_LOG_ERROR(text_to_log);
     }
@@ -851,8 +849,8 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
 
       if (pos != nostd::string_view::npos)
       {
-        OTEL_INTERNAL_LOG_DEBUG(kHeaderSent << text_to_log.substr(0, pos - 1));
-        text_to_log = text_to_log.substr(pos + 1);
+        OTEL_INTERNAL_LOG_DEBUG(kHeaderSent << common::StringUtil::Substr(text_to_log, 0, pos - 1));
+        text_to_log = common::StringUtil::Substr(text_to_log, pos + 1);
       }
     }
   }
@@ -1565,9 +1563,9 @@ void HttpOperation::Abort()
 bool HttpOperation::PerformCurlMessage(CURLcode code)
 {
   ++retry_attempts_;
-  last_attempt_time_      = std::chrono::system_clock::now();
-  last_curl_result_       = code;
-  retry_after_time_point_ = std::chrono::system_clock::time_point{};
+  last_attempt_time_     = std::chrono::system_clock::now();
+  last_curl_result_      = code;
+  next_retry_time_point_ = std::chrono::system_clock::time_point{};
 
   if (code != CURLE_OK)
   {
@@ -1598,6 +1596,49 @@ bool HttpOperation::PerformCurlMessage(CURLcode code)
     curl_easy_getinfo(curl_resource_.easy_handle, CURLINFO_RESPONSE_CODE, &response_code_);
   }
 
+  // Establish the deadline before dispatching Response. Event handlers run synchronously and may
+  // inspect it from the callback, so calculating it afterwards could expose a different jittered
+  // value from the one retained for scheduling this attempt.
+  const bool is_retryable            = IsRetryable();
+  bool retry_after_exceeds_max_delay = false;
+
+  if (is_retryable)
+  {
+    bool has_valid_retry_after = false;
+    nostd::string_view retry_after;
+    if (FindRetryAfterValue(response_headers_, retry_after))
+    {
+      std::chrono::seconds delay;
+      std::chrono::system_clock::time_point date;
+      const bool parsed_delay = HttpTimeUtil::ParseDelaySeconds(retry_after, delay);
+      const bool parsed_date  = !parsed_delay && HttpTimeUtil::ParseHttpDate(retry_after, date);
+
+      if (parsed_delay || parsed_date)
+      {
+        has_valid_retry_after = true;
+        // Reuse the attempt timestamp instead of calling now() again, so the
+        // retry-after delay is measured from the attempt that produced this
+        // response and we avoid an extra system_clock syscall on the hot path.
+        next_retry_time_point_ = parsed_delay
+                                     ? (last_attempt_time_ + delay)
+                                     : ((date > last_attempt_time_) ? date : last_attempt_time_);
+
+        const auto max_retry_time =
+            last_attempt_time_ +
+            std::chrono::duration_cast<std::chrono::milliseconds>(retry_policy_.max_backoff);
+        if (next_retry_time_point_ > max_retry_time)
+        {
+          retry_after_exceeds_max_delay = true;
+        }
+      }
+    }
+
+    if (!has_valid_retry_after)
+    {
+      next_retry_time_point_ = CalculateNextRetryTime();
+    }
+  }
+
   // Transform state
   if (GetSessionState() == opentelemetry::ext::http::client::SessionState::Connecting)
   {
@@ -1621,38 +1662,8 @@ bool HttpOperation::PerformCurlMessage(CURLcode code)
   // rather than honored. Cap the requested delay at max_backoff; if the
   // server-driven retry time still exceeds the maximum expected retry window,
   // the session is closed below and not retried.
-  const bool is_retryable            = IsRetryable();
-  bool retry_after_exceeds_max_delay = false;
-
   if (is_retryable)
   {
-    nostd::string_view retry_after;
-    if (FindRetryAfterValue(response_headers_, retry_after))
-    {
-      std::chrono::seconds delay;
-      std::chrono::system_clock::time_point date;
-      const bool parsed_delay = HttpTimeUtil::ParseDelaySeconds(retry_after, delay);
-      const bool parsed_date  = !parsed_delay && HttpTimeUtil::ParseHttpDate(retry_after, date);
-
-      if (parsed_delay || parsed_date)
-      {
-        // Reuse the attempt timestamp instead of calling now() again, so the
-        // retry-after delay is measured from the attempt that produced this
-        // response and we avoid an extra system_clock syscall on the hot path.
-        retry_after_time_point_ = parsed_delay
-                                      ? (last_attempt_time_ + delay)
-                                      : ((date > last_attempt_time_) ? date : last_attempt_time_);
-
-        const auto max_retry_time =
-            last_attempt_time_ +
-            std::chrono::duration_cast<std::chrono::milliseconds>(retry_policy_.max_backoff);
-        if (retry_after_time_point_ > max_retry_time)
-        {
-          retry_after_exceeds_max_delay = true;
-        }
-      }
-    }
-
     if (!retry_after_exceeds_max_delay)
     {
       // Clear any response data received in previous attempt

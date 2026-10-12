@@ -25,8 +25,8 @@
 //    ENABLE_METRICS_EXEMPLAR_PREVIEW = ON
 //    OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW = OFF
 // -------------------------------------------------------------------------------------------------------
-//  ~/build/sdk/test/metrics/sync_instruments_benchmark
-// 2026-08-22T20:05:18+00:00
+// ~/build/sdk/test/metrics/sync_instruments_benchmark
+// 2026-09-02T04:44:52+00:00
 // Running /home/devuser/build/sdk/test/metrics/sync_instruments_benchmark
 // Run on (32 X 5700 MHz CPU s)
 // CPU Caches:
@@ -34,63 +34,63 @@
 //   L1 Instruction 32 KiB (x16)
 //   L2 Unified 2048 KiB (x16)
 //   L3 Unified 36864 KiB (x1)
-// Load Average: 2.11, 4.01, 3.82
+// Load Average: 1.28, 3.38, 2.89
 // ***WARNING*** ASLR is enabled, the results may have unreproducible noise in them.
 // -----------------------------------------------------------------------------------------------------
 // Benchmark                                                           Time             CPU   Iterations
 // -----------------------------------------------------------------------------------------------------
-// BM_Record_Counter_Disabled_ByThreads/threads:1                  0.223 ns        0.223 ns   3149132264
-// BM_Record_Counter_Disabled_ByThreads/threads:2                  0.334 ns        0.334 ns   2424266898
-// BM_Record_Counter_Disabled_ByThreads/threads:4                  0.335 ns        0.335 ns   1860780336
-// BM_Record_Counter_Drop_ByThreads/threads:1                        181 ns          181 ns      3883111
-// BM_Record_Counter_Drop_ByThreads/threads:2                        336 ns          336 ns      3412070
-// BM_Record_Counter_Drop_ByThreads/threads:4                        548 ns          519 ns      1265888
-// BM_Record_Counter_Sum_ByThreads/threads:1                         183 ns          183 ns      3725731
-// BM_Record_Counter_Sum_ByThreads/threads:2                         313 ns          313 ns      1731700
-// BM_Record_Counter_Sum_ByThreads/threads:4                         658 ns          605 ns      1074776
-// BM_Record_Counter_Sum_ByAttributes/0                             21.7 ns         21.7 ns     32259034
-// BM_Record_Counter_Sum_ByAttributes/1                             63.7 ns         63.7 ns     11103173
-// BM_Record_Counter_Sum_ByAttributes/10                             665 ns          665 ns      1067127
-// BM_Record_Counter_Sum_ByAttributes/128                          11495 ns        11495 ns        58949
-// BM_Record_Counter_Sum_ByCardinality/10                            189 ns          189 ns      3620079
-// BM_Record_Counter_Sum_ByCardinality/500                           187 ns          187 ns      3732425
-// BM_Record_Counter_Sum_ByCardinality/2000                          185 ns          185 ns      3746437
-// BM_Record_Counter_Sum_ByCardinality/4000                          195 ns          195 ns      3587680
-// BM_Record_Histogram_Disabled_ByThreads/threads:1                0.215 ns        0.215 ns   3245684429
-// BM_Record_Histogram_Disabled_ByThreads/threads:2                0.215 ns        0.215 ns   3219420938
-// BM_Record_Histogram_Disabled_ByThreads/threads:4                0.227 ns        0.227 ns   2728839212
-// BM_Record_Histogram_Drop_ByThreads/threads:1                      180 ns          180 ns      3891143
-// BM_Record_Histogram_Drop_ByThreads/threads:2                      198 ns          198 ns      3255264
-// BM_Record_Histogram_Drop_ByThreads/threads:4                      556 ns          515 ns      1294128
-// BM_Record_Histogram_Explicit_ByThreads/threads:1                  192 ns          192 ns      3652980
-// BM_Record_Histogram_Explicit_ByThreads/threads:2                  473 ns          471 ns      1458558
-// BM_Record_Histogram_Explicit_ByThreads/threads:4                  910 ns          806 ns       840420
-// BM_Record_Histogram_Explicit_ByAttributes/0                      25.4 ns         25.4 ns     27240860
-// BM_Record_Histogram_Explicit_ByAttributes/1                      73.7 ns         73.7 ns      9490681
-// BM_Record_Histogram_Explicit_ByAttributes/10                      662 ns          662 ns      1069361
-// BM_Record_Histogram_Explicit_ByAttributes/128                   10666 ns        10665 ns        65408
-// BM_Record_Histogram_Explicit_ByCardinality/10                     202 ns          202 ns      3515610
-// BM_Record_Histogram_Explicit_ByCardinality/500                    202 ns          202 ns      3499771
-// BM_Record_Histogram_Explicit_ByCardinality/2000                   205 ns          205 ns      3499176
-// BM_Record_Histogram_Base2Expo_ByThreads/threads:1                 209 ns          209 ns      3356693
-// BM_Record_Histogram_Base2Expo_ByThreads/threads:2                 378 ns          378 ns      1566898
-// BM_Record_Histogram_Base2Expo_ByThreads/threads:4                 884 ns          786 ns       881608
-// BM_Record_Histogram_Base2Expo_ByAttributes/0                     27.4 ns         27.4 ns     23210481
-// BM_Record_Histogram_Base2Expo_ByAttributes/1                     72.1 ns         72.1 ns      9380658
-// BM_Record_Histogram_Base2Expo_ByAttributes/10                     662 ns          662 ns      1060240
-// BM_Record_Histogram_Base2Expo_ByAttributes/128                  10619 ns        10618 ns        57887
-// BM_Record_Histogram_Base2Expo_ByCardinality/10                    207 ns          207 ns      3466383
-// BM_Record_Histogram_Base2Expo_ByCardinality/500                   203 ns          203 ns      3436550
-// BM_Record_Histogram_Base2Expo_ByCardinality/2000                  206 ns          206 ns      3400210
-// BM_Record_Counter_Sum_Exemplar_AlwaysOff                          181 ns          181 ns      3876313
-// BM_Record_Counter_Sum_Exemplar_AlwaysOn                           331 ns          331 ns      2119737
-// BM_Record_Counter_Sum_Exemplar_TraceBased_EmptyContext            188 ns          188 ns      3748573
-// BM_Record_Counter_Sum_Exemplar_TraceBased_UnsampledContext        191 ns          191 ns      3628388
-// BM_Record_Counter_Sum_Exemplar_TraceBased_SampledContext          341 ns          341 ns      2064088
-// BM_Record_Histogram_Explicit_Exemplar_AlwaysOff                   191 ns          191 ns      3657244
-// BM_Record_Histogram_Explicit_Exemplar_AlwaysOn                    339 ns          339 ns      2063476
-// BM_Record_Histogram_Base2Expo_Exemplar_AlwaysOff                  190 ns          190 ns      3650174
-// BM_Record_Histogram_Base2Expo_Exemplar_AlwaysOn                   343 ns          343 ns      2076733
+// BM_Record_Counter_Disabled_ByThreads/threads:1                  0.219 ns        0.219 ns   3178418618
+// BM_Record_Counter_Disabled_ByThreads/threads:2                  0.220 ns        0.220 ns   3107456060
+// BM_Record_Counter_Disabled_ByThreads/threads:4                  0.228 ns        0.227 ns   2777031836
+// BM_Record_Counter_Drop_ByThreads/threads:1                       2.29 ns         2.29 ns    305338324
+// BM_Record_Counter_Drop_ByThreads/threads:2                       2.29 ns         2.29 ns    269371614
+// BM_Record_Counter_Drop_ByThreads/threads:4                       2.35 ns         2.35 ns    240692852
+// BM_Record_Counter_Sum_ByThreads/threads:1                         173 ns          173 ns      4033669
+// BM_Record_Counter_Sum_ByThreads/threads:2                         263 ns          263 ns      2105922
+// BM_Record_Counter_Sum_ByThreads/threads:4                         820 ns          728 ns       932456
+// BM_Record_Counter_Sum_ByAttributes/0                             21.7 ns         21.7 ns     32237207
+// BM_Record_Counter_Sum_ByAttributes/1                             59.0 ns         59.0 ns     11865426
+// BM_Record_Counter_Sum_ByAttributes/10                             615 ns          615 ns      1132969
+// BM_Record_Counter_Sum_ByAttributes/128                          10473 ns        10471 ns        61260
+// BM_Record_Counter_Sum_ByCardinality/10                            178 ns          178 ns      3741926
+// BM_Record_Counter_Sum_ByCardinality/500                           178 ns          178 ns      3875935
+// BM_Record_Counter_Sum_ByCardinality/2000                          180 ns          180 ns      3765961
+// BM_Record_Counter_Sum_ByCardinality/4000                          187 ns          187 ns      3731380
+// BM_Record_Histogram_Disabled_ByThreads/threads:1                0.213 ns        0.213 ns   3288043694
+// BM_Record_Histogram_Disabled_ByThreads/threads:2                0.214 ns        0.214 ns   3239303644
+// BM_Record_Histogram_Disabled_ByThreads/threads:4                0.219 ns        0.219 ns   2444940680
+// BM_Record_Histogram_Drop_ByThreads/threads:1                     2.50 ns         2.50 ns    279768220
+// BM_Record_Histogram_Drop_ByThreads/threads:2                     2.52 ns         2.52 ns    231723630
+// BM_Record_Histogram_Drop_ByThreads/threads:4                     2.56 ns         2.56 ns    230104300
+// BM_Record_Histogram_Explicit_ByThreads/threads:1                  184 ns          184 ns      3795006
+// BM_Record_Histogram_Explicit_ByThreads/threads:2                  459 ns          458 ns      1409266
+// BM_Record_Histogram_Explicit_ByThreads/threads:4                  989 ns          873 ns       767192
+// BM_Record_Histogram_Explicit_ByAttributes/0                      25.5 ns         25.5 ns     27761752
+// BM_Record_Histogram_Explicit_ByAttributes/1                      68.1 ns         68.0 ns     10269587
+// BM_Record_Histogram_Explicit_ByAttributes/10                      616 ns          616 ns      1137361
+// BM_Record_Histogram_Explicit_ByAttributes/128                   11633 ns        11631 ns        59646
+// BM_Record_Histogram_Explicit_ByCardinality/10                     187 ns          187 ns      3740950
+// BM_Record_Histogram_Explicit_ByCardinality/500                    193 ns          193 ns      3644548
+// BM_Record_Histogram_Explicit_ByCardinality/2000                   197 ns          197 ns      3590726
+// BM_Record_Histogram_Base2Expo_ByThreads/threads:1                 186 ns          186 ns      3695842
+// BM_Record_Histogram_Base2Expo_ByThreads/threads:2                 306 ns          306 ns      2236848
+// BM_Record_Histogram_Base2Expo_ByThreads/threads:4                 724 ns          654 ns       967532
+// BM_Record_Histogram_Base2Expo_ByAttributes/0                     29.6 ns         29.6 ns     22206631
+// BM_Record_Histogram_Base2Expo_ByAttributes/1                     75.2 ns         75.2 ns      9902341
+// BM_Record_Histogram_Base2Expo_ByAttributes/10                     653 ns          653 ns      1089054
+// BM_Record_Histogram_Base2Expo_ByAttributes/128                  10788 ns        10788 ns        65623
+// BM_Record_Histogram_Base2Expo_ByCardinality/10                    194 ns          194 ns      3329016
+// BM_Record_Histogram_Base2Expo_ByCardinality/500                   198 ns          198 ns      3574653
+// BM_Record_Histogram_Base2Expo_ByCardinality/2000                  197 ns          197 ns      3499208
+// BM_Record_Counter_Sum_Exemplar_AlwaysOff                          173 ns          173 ns      4040048
+// BM_Record_Counter_Sum_Exemplar_AlwaysOn                           320 ns          320 ns      2235414
+// BM_Record_Counter_Sum_Exemplar_TraceBased_EmptyContext            181 ns          181 ns      3851898
+// BM_Record_Counter_Sum_Exemplar_TraceBased_UnsampledContext        186 ns          186 ns      3714975
+// BM_Record_Counter_Sum_Exemplar_TraceBased_SampledContext          323 ns          323 ns      2173860
+// BM_Record_Histogram_Explicit_Exemplar_AlwaysOff                   182 ns          182 ns      3824218
+// BM_Record_Histogram_Explicit_Exemplar_AlwaysOn                    324 ns          324 ns      2166338
+// BM_Record_Histogram_Base2Expo_Exemplar_AlwaysOff                  182 ns          182 ns      3739049
+// BM_Record_Histogram_Base2Expo_Exemplar_AlwaysOn                   326 ns          326 ns      2165242
 //
 // *******************************************************************************************************
 // ABIv2 with preview options
@@ -98,7 +98,7 @@
 //    OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW = ON
 // -------------------------------------------------------------------------------------------------------
 // ~/build/sdk/test/metrics/sync_instruments_benchmark
-// 2026-08-22T19:58:12+00:00
+// 2026-09-02T04:38:03+00:00
 // Running /home/devuser/build/sdk/test/metrics/sync_instruments_benchmark
 // Run on (32 X 5700 MHz CPU s)
 // CPU Caches:
@@ -106,100 +106,100 @@
 //   L1 Instruction 32 KiB (x16)
 //   L2 Unified 2048 KiB (x16)
 //   L3 Unified 36864 KiB (x1)
-// Load Average: 1.76, 4.54, 3.46
+// Load Average: 0.22, 1.44, 1.97
 // ***WARNING*** ASLR is enabled, the results may have unreproducible noise in them.
 // -----------------------------------------------------------------------------------------------------
 // Benchmark                                                           Time             CPU   Iterations
 // -----------------------------------------------------------------------------------------------------
-// BM_Record_Counter_Disabled_ByThreads/threads:1                  0.225 ns        0.225 ns   3106874136
-// BM_Record_Counter_Disabled_ByThreads/threads:2                  0.235 ns        0.235 ns   2399463178
-// BM_Record_Counter_Disabled_ByThreads/threads:4                  0.235 ns        0.235 ns   3078807728
-// BM_Record_Counter_Drop_ByThreads/threads:1                        291 ns          291 ns      2434016
-// BM_Record_Counter_Drop_ByThreads/threads:2                        545 ns          536 ns      1124740
-// BM_Record_Counter_Drop_ByThreads/threads:4                       1222 ns         1021 ns       646440
-// BM_Record_Counter_Sum_ByThreads/threads:1                         293 ns          293 ns      2380047
-// BM_Record_Counter_Sum_ByThreads/threads:2                         546 ns          541 ns      1106950
-// BM_Record_Counter_Sum_ByThreads/threads:4                        1372 ns         1130 ns       480448
-// BM_Record_Counter_Sum_ByAttributes/0                             26.3 ns         26.3 ns     26542376
-// BM_Record_Counter_Sum_ByAttributes/1                              102 ns          102 ns      6829105
-// BM_Record_Counter_Sum_ByAttributes/10                            1086 ns         1086 ns       638378
-// BM_Record_Counter_Sum_ByAttributes/128                          17152 ns        17151 ns        41400
-// BM_Record_Counter_Sum_ByCardinality/10                            296 ns          296 ns      2372167
-// BM_Record_Counter_Sum_ByCardinality/500                           293 ns          293 ns      2327678
-// BM_Record_Counter_Sum_ByCardinality/2000                          308 ns          308 ns      2324245
-// BM_Record_Counter_Sum_ByCardinality/4000                          285 ns          285 ns      2494418
-// BM_Record_Histogram_Disabled_ByThreads/threads:1                0.219 ns        0.219 ns   3091515656
-// BM_Record_Histogram_Disabled_ByThreads/threads:2                0.220 ns        0.220 ns   3112553734
-// BM_Record_Histogram_Disabled_ByThreads/threads:4                0.228 ns        0.228 ns   3084546480
-// BM_Record_Histogram_Drop_ByThreads/threads:1                      288 ns          288 ns      2422775
-// BM_Record_Histogram_Drop_ByThreads/threads:2                      540 ns          535 ns      1184022
-// BM_Record_Histogram_Drop_ByThreads/threads:4                     1423 ns         1175 ns       453324
-// BM_Record_Histogram_Explicit_ByThreads/threads:1                  297 ns          297 ns      2348315
-// BM_Record_Histogram_Explicit_ByThreads/threads:2                  746 ns          683 ns       960462
-// BM_Record_Histogram_Explicit_ByThreads/threads:4                 1759 ns         1392 ns       396388
-// BM_Record_Histogram_Explicit_ByAttributes/0                      34.0 ns         34.0 ns     20428456
-// BM_Record_Histogram_Explicit_ByAttributes/1                       113 ns          113 ns      6214071
-// BM_Record_Histogram_Explicit_ByAttributes/10                     1078 ns         1077 ns       650557
-// BM_Record_Histogram_Explicit_ByAttributes/128                   17187 ns        17185 ns        41086
-// BM_Record_Histogram_Explicit_ByCardinality/10                     305 ns          305 ns      2279601
-// BM_Record_Histogram_Explicit_ByCardinality/500                    313 ns          313 ns      2186641
-// BM_Record_Histogram_Explicit_ByCardinality/2000                   332 ns          332 ns      2170545
-// BM_Record_Histogram_Base2Expo_ByThreads/threads:1                 300 ns          300 ns      2344747
-// BM_Record_Histogram_Base2Expo_ByThreads/threads:2                 588 ns          582 ns      1194796
-// BM_Record_Histogram_Base2Expo_ByThreads/threads:4                1500 ns         1196 ns       518668
-// BM_Record_Histogram_Base2Expo_ByAttributes/0                     39.3 ns         39.3 ns     19087472
-// BM_Record_Histogram_Base2Expo_ByAttributes/1                      115 ns          115 ns      5936592
-// BM_Record_Histogram_Base2Expo_ByAttributes/10                    1067 ns         1067 ns       656089
-// BM_Record_Histogram_Base2Expo_ByAttributes/128                  18242 ns        18241 ns        38268
-// BM_Record_Histogram_Base2Expo_ByCardinality/10                    313 ns          313 ns      2235656
-// BM_Record_Histogram_Base2Expo_ByCardinality/500                   317 ns          317 ns      2232139
-// BM_Record_Histogram_Base2Expo_ByCardinality/2000                  331 ns          331 ns      2086932
-// BM_Record_Gauge_Disabled_ByThreads/threads:1                    0.219 ns        0.219 ns   3205741054
-// BM_Record_Gauge_Disabled_ByThreads/threads:2                    0.223 ns        0.223 ns   2690301556
-// BM_Record_Gauge_Disabled_ByThreads/threads:4                    0.229 ns        0.229 ns   2606758588
-// BM_Record_Gauge_Drop_ByThreads/threads:1                          286 ns          286 ns      2439706
-// BM_Record_Gauge_Drop_ByThreads/threads:2                          546 ns          539 ns      1177080
-// BM_Record_Gauge_Drop_ByThreads/threads:4                         1200 ns         1012 ns       497924
-// BM_Record_Gauge_LastValue_ByThreads/threads:1                     293 ns          293 ns      2371945
-// BM_Record_Gauge_LastValue_ByThreads/threads:2                     564 ns          559 ns      1232712
-// BM_Record_Gauge_LastValue_ByThreads/threads:4                    1513 ns         1214 ns       520464
-// BM_Record_Gauge_LastValue_ByAttributes/0                         37.1 ns         37.1 ns     18902040
-// BM_Record_Gauge_LastValue_ByAttributes/1                          108 ns          108 ns      6302008
-// BM_Record_Gauge_LastValue_ByAttributes/10                        1092 ns         1092 ns       647118
-// BM_Record_Gauge_LastValue_ByAttributes/128                      16605 ns        16604 ns        41995
-// BM_Record_Gauge_LastValue_ByCardinality/10                        298 ns          298 ns      2289380
-// BM_Record_Gauge_LastValue_ByCardinality/500                       309 ns          309 ns      2298937
-// BM_Record_Gauge_LastValue_ByCardinality/2000                      318 ns          318 ns      2242299
-// BM_Record_Counter_Sum_Exemplar_AlwaysOff                          296 ns          295 ns      2395056
-// BM_Record_Counter_Sum_Exemplar_AlwaysOn                           437 ns          437 ns      1585966
-// BM_Record_Counter_Sum_Exemplar_TraceBased_EmptyContext            302 ns          302 ns      2365598
-// BM_Record_Counter_Sum_Exemplar_TraceBased_UnsampledContext        303 ns          303 ns      2348573
-// BM_Record_Counter_Sum_Exemplar_TraceBased_SampledContext          450 ns          450 ns      1557082
-// BM_Record_Histogram_Explicit_Exemplar_AlwaysOff                   301 ns          301 ns      2266520
-// BM_Record_Histogram_Explicit_Exemplar_AlwaysOn                    453 ns          453 ns      1573692
-// BM_Record_Histogram_Base2Expo_Exemplar_AlwaysOff                  303 ns          303 ns      2274437
-// BM_Record_Histogram_Base2Expo_Exemplar_AlwaysOn                   453 ns          453 ns      1550092
-// BM_Record_BoundCounter_Disabled_ByThreads/threads:1             0.221 ns        0.221 ns   3142560276
-// BM_Record_BoundCounter_Disabled_ByThreads/threads:2             0.222 ns        0.222 ns   2660334766
-// BM_Record_BoundCounter_Disabled_ByThreads/threads:4             0.226 ns        0.226 ns   2861051432
-// BM_Record_BoundCounter_Drop_ByThreads/threads:1                  5.81 ns         5.81 ns    120342496
-// BM_Record_BoundCounter_Drop_ByThreads/threads:2                  34.8 ns         33.5 ns     20000000
-// BM_Record_BoundCounter_Drop_ByThreads/threads:4                   123 ns          112 ns      6062044
-// BM_Record_BoundCounter_Sum_ByThreads/threads:1                   10.7 ns         10.7 ns     65164652
-// BM_Record_BoundCounter_Sum_ByThreads/threads:2                   19.6 ns         13.2 ns     48429404
-// BM_Record_BoundCounter_Sum_ByThreads/threads:4                   73.4 ns         41.7 ns     32971620
-// BM_Record_BoundHistogram_Disabled_ByThreads/threads:1           0.214 ns        0.214 ns   3277171217
-// BM_Record_BoundHistogram_Disabled_ByThreads/threads:2           0.214 ns        0.214 ns   2444610710
-// BM_Record_BoundHistogram_Disabled_ByThreads/threads:4           0.224 ns        0.224 ns   2556315680
-// BM_Record_BoundHistogram_Drop_ByThreads/threads:1                6.19 ns         6.19 ns    113761230
-// BM_Record_BoundHistogram_Drop_ByThreads/threads:2                32.6 ns         29.9 ns     61564776
-// BM_Record_BoundHistogram_Drop_ByThreads/threads:4                 155 ns          145 ns     42223756
-// BM_Record_BoundHistogram_Explicit_ByThreads/threads:1            11.8 ns         11.8 ns     59006925
-// BM_Record_BoundHistogram_Explicit_ByThreads/threads:2            23.6 ns         13.5 ns     44770066
-// BM_Record_BoundHistogram_Explicit_ByThreads/threads:4             196 ns          133 ns      9838224
-// BM_Record_BoundHistogram_Base2Expo_ByThreads/threads:1           19.3 ns         19.3 ns     37052293
-// BM_Record_BoundHistogram_Base2Expo_ByThreads/threads:2           32.8 ns         21.5 ns     35315540
-// BM_Record_BoundHistogram_Base2Expo_ByThreads/threads:4           67.1 ns         25.8 ns     31687100
+// BM_Record_Counter_Disabled_ByThreads/threads:1                  0.222 ns        0.222 ns   3157611074
+// BM_Record_Counter_Disabled_ByThreads/threads:2                  0.228 ns        0.228 ns   2317559982
+// BM_Record_Counter_Disabled_ByThreads/threads:4                  0.224 ns        0.224 ns   2449047760
+// BM_Record_Counter_Drop_ByThreads/threads:1                       1.75 ns         1.75 ns    398352965
+// BM_Record_Counter_Drop_ByThreads/threads:2                       1.77 ns         1.77 ns    395926306
+// BM_Record_Counter_Drop_ByThreads/threads:4                       1.80 ns         1.80 ns    385184052
+// BM_Record_Counter_Sum_ByThreads/threads:1                         290 ns          290 ns      2411526
+// BM_Record_Counter_Sum_ByThreads/threads:2                         524 ns          519 ns      1299874
+// BM_Record_Counter_Sum_ByThreads/threads:4                        1337 ns         1107 ns       637784
+// BM_Record_Counter_Sum_ByAttributes/0                             26.3 ns         26.3 ns     26555865
+// BM_Record_Counter_Sum_ByAttributes/1                              104 ns          104 ns      6677963
+// BM_Record_Counter_Sum_ByAttributes/10                            1061 ns         1061 ns       666984
+// BM_Record_Counter_Sum_ByAttributes/128                          16510 ns        16509 ns        42555
+// BM_Record_Counter_Sum_ByCardinality/10                            305 ns          305 ns      2273336
+// BM_Record_Counter_Sum_ByCardinality/500                           309 ns          309 ns      2362157
+// BM_Record_Counter_Sum_ByCardinality/2000                          306 ns          306 ns      2259027
+// BM_Record_Counter_Sum_ByCardinality/4000                          282 ns          282 ns      2441950
+// BM_Record_Histogram_Disabled_ByThreads/threads:1                0.237 ns        0.237 ns   3065761938
+// BM_Record_Histogram_Disabled_ByThreads/threads:2                0.230 ns        0.230 ns   2427449390
+// BM_Record_Histogram_Disabled_ByThreads/threads:4                0.233 ns        0.233 ns   2243067152
+// BM_Record_Histogram_Drop_ByThreads/threads:1                     2.12 ns         2.12 ns    330519632
+// BM_Record_Histogram_Drop_ByThreads/threads:2                     2.16 ns         2.16 ns    326855378
+// BM_Record_Histogram_Drop_ByThreads/threads:4                     2.16 ns         2.16 ns    285233320
+// BM_Record_Histogram_Explicit_ByThreads/threads:1                  303 ns          303 ns      2305548
+// BM_Record_Histogram_Explicit_ByThreads/threads:2                  584 ns          583 ns      1179140
+// BM_Record_Histogram_Explicit_ByThreads/threads:4                 1474 ns         1210 ns       478800
+// BM_Record_Histogram_Explicit_ByAttributes/0                      34.0 ns         34.0 ns     20382028
+// BM_Record_Histogram_Explicit_ByAttributes/1                       116 ns          116 ns      6048721
+// BM_Record_Histogram_Explicit_ByAttributes/10                     1135 ns         1135 ns       615638
+// BM_Record_Histogram_Explicit_ByAttributes/128                   18457 ns        18457 ns        36005
+// BM_Record_Histogram_Explicit_ByCardinality/10                     318 ns          318 ns      2152688
+// BM_Record_Histogram_Explicit_ByCardinality/500                    312 ns          312 ns      2213058
+// BM_Record_Histogram_Explicit_ByCardinality/2000                   327 ns          327 ns      2140112
+// BM_Record_Histogram_Base2Expo_ByThreads/threads:1                 308 ns          308 ns      2273908
+// BM_Record_Histogram_Base2Expo_ByThreads/threads:2                 801 ns          722 ns       919292
+// BM_Record_Histogram_Base2Expo_ByThreads/threads:4                1710 ns         1357 ns       467556
+// BM_Record_Histogram_Base2Expo_ByAttributes/0                     32.4 ns         32.4 ns     19635763
+// BM_Record_Histogram_Base2Expo_ByAttributes/1                      117 ns          117 ns      5991477
+// BM_Record_Histogram_Base2Expo_ByAttributes/10                    1070 ns         1070 ns       649709
+// BM_Record_Histogram_Base2Expo_ByAttributes/128                  18389 ns        18388 ns        36322
+// BM_Record_Histogram_Base2Expo_ByCardinality/10                    317 ns          317 ns      2225556
+// BM_Record_Histogram_Base2Expo_ByCardinality/500                   315 ns          315 ns      2219892
+// BM_Record_Histogram_Base2Expo_ByCardinality/2000                  344 ns          344 ns      2133056
+// BM_Record_Gauge_Disabled_ByThreads/threads:1                    0.231 ns        0.230 ns   2985182463
+// BM_Record_Gauge_Disabled_ByThreads/threads:2                    0.258 ns        0.258 ns   2535349748
+// BM_Record_Gauge_Disabled_ByThreads/threads:4                    0.263 ns        0.263 ns   2058977740
+// BM_Record_Gauge_Drop_ByThreads/threads:1                         1.77 ns         1.77 ns    396510306
+// BM_Record_Gauge_Drop_ByThreads/threads:2                         1.76 ns         1.76 ns    396203792
+// BM_Record_Gauge_Drop_ByThreads/threads:4                         1.88 ns         1.88 ns    378999736
+// BM_Record_Gauge_LastValue_ByThreads/threads:1                     301 ns          301 ns      2322567
+// BM_Record_Gauge_LastValue_ByThreads/threads:2                     684 ns          627 ns      1054172
+// BM_Record_Gauge_LastValue_ByThreads/threads:4                    1454 ns         1180 ns       485272
+// BM_Record_Gauge_LastValue_ByAttributes/0                         36.4 ns         36.4 ns     19232981
+// BM_Record_Gauge_LastValue_ByAttributes/1                          112 ns          112 ns      6230722
+// BM_Record_Gauge_LastValue_ByAttributes/10                        1091 ns         1090 ns       644785
+// BM_Record_Gauge_LastValue_ByAttributes/128                      19942 ns        19941 ns        35750
+// BM_Record_Gauge_LastValue_ByCardinality/10                        310 ns          310 ns      2220110
+// BM_Record_Gauge_LastValue_ByCardinality/500                       310 ns          310 ns      2273872
+// BM_Record_Gauge_LastValue_ByCardinality/2000                      315 ns          315 ns      2176490
+// BM_Record_Counter_Sum_Exemplar_AlwaysOff                          297 ns          297 ns      2346887
+// BM_Record_Counter_Sum_Exemplar_AlwaysOn                           437 ns          437 ns      1607196
+// BM_Record_Counter_Sum_Exemplar_TraceBased_EmptyContext            304 ns          304 ns      2307315
+// BM_Record_Counter_Sum_Exemplar_TraceBased_UnsampledContext        303 ns          303 ns      2307124
+// BM_Record_Counter_Sum_Exemplar_TraceBased_SampledContext          449 ns          449 ns      1569626
+// BM_Record_Histogram_Explicit_Exemplar_AlwaysOff                   307 ns          307 ns      2287304
+// BM_Record_Histogram_Explicit_Exemplar_AlwaysOn                    443 ns          443 ns      1578995
+// BM_Record_Histogram_Base2Expo_Exemplar_AlwaysOff                  310 ns          310 ns      2219974
+// BM_Record_Histogram_Base2Expo_Exemplar_AlwaysOn                   448 ns          448 ns      1564477
+// BM_Record_BoundCounter_Disabled_ByThreads/threads:1             0.225 ns        0.225 ns   3109199368
+// BM_Record_BoundCounter_Disabled_ByThreads/threads:2             0.221 ns        0.221 ns   3139159388
+// BM_Record_BoundCounter_Disabled_ByThreads/threads:4             0.230 ns        0.230 ns   2444090640
+// BM_Record_BoundCounter_Drop_ByThreads/threads:1                  1.14 ns         1.14 ns    602944599
+// BM_Record_BoundCounter_Drop_ByThreads/threads:2                  1.16 ns         1.16 ns    582566836
+// BM_Record_BoundCounter_Drop_ByThreads/threads:4                  1.20 ns         1.20 ns    527738312
+// BM_Record_BoundCounter_Sum_ByThreads/threads:1                   15.7 ns         15.7 ns     44638005
+// BM_Record_BoundCounter_Sum_ByThreads/threads:2                    487 ns          487 ns      1730740
+// BM_Record_BoundCounter_Sum_ByThreads/threads:4                    334 ns          288 ns      3176988
+// BM_Record_BoundHistogram_Disabled_ByThreads/threads:1           0.225 ns        0.225 ns   3074007094
+// BM_Record_BoundHistogram_Disabled_ByThreads/threads:2           0.298 ns        0.298 ns   2348095536
+// BM_Record_BoundHistogram_Disabled_ByThreads/threads:4           0.267 ns        0.267 ns   1925459520
+// BM_Record_BoundHistogram_Drop_ByThreads/threads:1                1.76 ns         1.76 ns    397471719
+// BM_Record_BoundHistogram_Drop_ByThreads/threads:2                1.76 ns         1.76 ns    391899074
+// BM_Record_BoundHistogram_Drop_ByThreads/threads:4                1.79 ns         1.79 ns    357721228
+// BM_Record_BoundHistogram_Explicit_ByThreads/threads:1            16.6 ns         16.6 ns     42000966
+// BM_Record_BoundHistogram_Explicit_ByThreads/threads:2             237 ns          230 ns      3395654
+// BM_Record_BoundHistogram_Explicit_ByThreads/threads:4             473 ns          394 ns      2378376
+// BM_Record_BoundHistogram_Base2Expo_ByThreads/threads:1           23.9 ns         23.9 ns     28651138
+// BM_Record_BoundHistogram_Base2Expo_ByThreads/threads:2            489 ns          489 ns      2000000
+// BM_Record_BoundHistogram_Base2Expo_ByThreads/threads:4            590 ns          494 ns      1754400
 //
 // clang-format on
 

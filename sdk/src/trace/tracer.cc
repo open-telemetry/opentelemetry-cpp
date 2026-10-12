@@ -94,7 +94,7 @@ OPENTELEMETRY_BEGIN_NAMESPACE namespace sdk
   }  // namespace
 
   Tracer::Tracer(std::shared_ptr<TracerContext> context,
-                 std::unique_ptr<InstrumentationScope> instrumentation_scope) noexcept
+                 std::unique_ptr<InstrumentationScope> instrumentation_scope)
       : instrumentation_scope_{std::move(instrumentation_scope)},
         context_{std::move(context)},
         tracer_config_(context_->GetTracerConfigurator().ComputeConfig(*instrumentation_scope_)),
