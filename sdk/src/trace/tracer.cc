@@ -151,14 +151,14 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
 
     if (!sampling_result.IsRecording())
     {
-      span = nostd::shared_ptr<opentelemetry::trace::Span>(
-          new opentelemetry::trace::DefaultSpan(std::move(span_context)));
+      span = nostd::shared_ptr<opentelemetry::trace::Span>{
+          std::make_shared<opentelemetry::trace::DefaultSpan>(std::move(span_context))};
     }
     else
     {
-      span = nostd::shared_ptr<opentelemetry::trace::Span>(
-          new Span(shared_from_this(), name, attributes, links, options, sampling_result,
-                   parent_context, std::move(span_context)));
+      span = nostd::shared_ptr<opentelemetry::trace::Span>{
+          std::make_shared<Span>(shared_from_this(), name, attributes, links, options,
+                                 sampling_result, parent_context, std::move(span_context))};
     }
 
     return span;
