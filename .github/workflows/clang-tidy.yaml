@@ -109,7 +109,7 @@ jobs:
           readonly LIMIT="$WARNING_LIMIT"
 
           # Print instructions to help investigations
-          echo "::important::See instructions below to investigate warnings"
+          echo "::notice::See instructions below to investigate warnings"
           echo "1) Find the previous job in CI, named 'Upload warning report'"
           echo "2) In the job logs, search for 'Artifact download URL:'"
           echo "3) Upload the report given by the URL"

@@ -87,7 +87,7 @@ jobs:
           readonly WARNING_LIMIT=${{ matrix.warning_limit }}
 
           # Print instructions to help investigations
-          echo "::important::See instructions below to investigate warnings"
+          echo "::notice::See instructions below to investigate warnings"
           echo "1) Find the previous job in CI, named 'Build with include-what-you-use'"
           echo "2) In the job logs, search for 'Warning: include-what-you-use reported diagnostics:'"
           echo "3) Read the warning messages, and adjust the code accordingly."
