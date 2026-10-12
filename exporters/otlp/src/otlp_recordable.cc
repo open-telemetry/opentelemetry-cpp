@@ -3,7 +3,9 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <string>
 
 #include "opentelemetry/common/attribute_value.h"
@@ -38,6 +40,25 @@ namespace exporter
 {
 namespace otlp
 {
+
+// Defined here rather than in the header so that Arena::Create is instantiated where the protobuf
+// headers come in through protobuf_include_prefix.h. arena_initial_block_ is deliberately left
+// uninitialized, the Arena hands it out as it fills it.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+OtlpRecordable::OtlpRecordable(std::uint32_t max_attributes,
+                               std::uint32_t max_events,
+                               std::uint32_t max_links,
+                               std::uint32_t max_attributes_per_event,
+                               std::uint32_t max_attributes_per_link)
+    : arena_{arena_initial_block_, sizeof(arena_initial_block_)},
+      span_{google::protobuf::Arena::Create<proto::trace::v1::Span>(&arena_)},
+      span_limits_{max_attributes,
+                   (std::numeric_limits<std::size_t>::max)(),
+                   max_events,
+                   max_links,
+                   max_attributes_per_event,
+                   max_attributes_per_link}
+{}
 
 void OtlpRecordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
                                  opentelemetry::trace::SpanId parent_span_id) noexcept

@@ -32,10 +32,9 @@ namespace otlp
 class OtlpLogRecordable final : public opentelemetry::sdk::logs::Recordable
 {
 public:
-  OtlpLogRecordable()
-      : arena_{arena_initial_block_, sizeof(arena_initial_block_)},
-        proto_record_{google::protobuf::Arena::Create<proto::logs::v1::LogRecord>(&arena_)}
-  {}
+  OtlpLogRecordable();
+
+  ~OtlpLogRecordable() override = default;
 
   // The Arena member owns the memory the log record message points into, and an Arena is neither
   // copyable nor movable, so neither is the recordable. Recordables are created and handed

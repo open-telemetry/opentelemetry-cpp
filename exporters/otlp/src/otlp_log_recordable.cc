@@ -32,6 +32,15 @@ namespace exporter
 namespace otlp
 {
 
+// Defined here rather than in the header so that Arena::Create is instantiated where the protobuf
+// headers come in through protobuf_include_prefix.h. arena_initial_block_ is deliberately left
+// uninitialized, the Arena hands it out as it fills it.
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+OtlpLogRecordable::OtlpLogRecordable()
+    : arena_{arena_initial_block_, sizeof(arena_initial_block_)},
+      proto_record_{google::protobuf::Arena::Create<proto::logs::v1::LogRecord>(&arena_)}
+{}
+
 const opentelemetry::sdk::resource::Resource &OtlpLogRecordable::GetResource() const noexcept
 {
   if OPENTELEMETRY_LIKELY_CONDITION (nullptr != resource_)

@@ -52,16 +52,9 @@ public:
       std::uint32_t max_events               = (std::numeric_limits<std::uint32_t>::max)(),
       std::uint32_t max_links                = (std::numeric_limits<std::uint32_t>::max)(),
       std::uint32_t max_attributes_per_event = (std::numeric_limits<std::uint32_t>::max)(),
-      std::uint32_t max_attributes_per_link  = (std::numeric_limits<std::uint32_t>::max)())
-      : arena_{arena_initial_block_, sizeof(arena_initial_block_)},
-        span_{google::protobuf::Arena::Create<proto::trace::v1::Span>(&arena_)},
-        span_limits_{max_attributes,
-                     (std::numeric_limits<std::size_t>::max)(),
-                     max_events,
-                     max_links,
-                     max_attributes_per_event,
-                     max_attributes_per_link}
-  {}
+      std::uint32_t max_attributes_per_link  = (std::numeric_limits<std::uint32_t>::max)());
+
+  ~OtlpRecordable() override = default;
 
   // The Arena member owns the memory the span message points into, and an Arena is neither
   // copyable nor movable, so neither is the recordable. Recordables are created and handed
