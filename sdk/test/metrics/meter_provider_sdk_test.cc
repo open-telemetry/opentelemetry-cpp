@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <functional>
-#include <memory>
+#include <memory>  // IWYU pragma: keep
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -22,6 +22,7 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_config.h"

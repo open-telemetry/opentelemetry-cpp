@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <functional>
 #include <future>
-#include <memory>
+#include <memory>  // IWYU pragma: keep
 #include <mutex>
 #include <stdexcept>
 #include <string>

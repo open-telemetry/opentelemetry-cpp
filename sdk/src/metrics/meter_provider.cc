@@ -122,31 +122,32 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     name = "";
   }
 
-  std::unique_lock<std::mutex> guard(lock_);
-
-  for (auto &meter : context_->GetMeters())
-  {
-    auto meter_lib = meter->GetInstrumentationScope();
-    if (meter_lib->equal(name, version, schema_url, attributes))
-    {
-      return nostd::shared_ptr<metrics_api::Meter>{meter};
-    }
-  }
-
-  // GetMeter is noexcept and does not surface an error, so callers cannot
-  // recover after a construction failure. Retrying would re-throw, catch, and
-  // log on later GetMeter calls. After the first failure, treat the provider
-  // as non-functional for new meters.
-  if (!initialized_)
-  {
-    return noop_meter_;
-  }
-
-  initialized_ = false;
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   try
   {
 #endif
+    // Release the lock before construction-failure diagnostics can re-enter the provider.
+    const std::lock_guard<std::mutex> guard(lock_);
+
+    for (auto &meter : context_->GetMeters())
+    {
+      auto meter_lib = meter->GetInstrumentationScope();
+      if (meter_lib->equal(name, version, schema_url, attributes))
+      {
+        return nostd::shared_ptr<metrics_api::Meter>{meter};
+      }
+    }
+
+    // GetMeter is noexcept and does not surface an error, so callers cannot
+    // recover after a construction failure. Retrying would re-throw, catch, and
+    // log on later GetMeter calls. After the first failure, treat the provider
+    // as non-functional for new meters.
+    if (!initialized_)
+    {
+      return noop_meter_;
+    }
+
+    initialized_ = false;
     instrumentationscope::InstrumentationScopeAttributes attrs_map(attributes);
     auto scope =
         instrumentationscope::InstrumentationScope::Create(name, version, schema_url, attrs_map);
@@ -160,8 +161,6 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   }
   catch (const std::exception &ex)
   {
-    // Diagnostics may re-enter the provider, so release the lock first.
-    guard.unlock();
     LogGetMeterConstructionFailure(ex.what());
     return noop_meter_;
   }
@@ -169,7 +168,6 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   // std::exception. Catch everything so GetMeter stays noexcept.
   catch (...)
   {
-    guard.unlock();
     LogGetMeterConstructionFailure("unknown exception");
     return noop_meter_;
   }

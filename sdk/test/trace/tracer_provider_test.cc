@@ -9,7 +9,7 @@
 #include <functional>
 #include <future>
 #include <limits>
-#include <memory>
+#include <memory>  // IWYU pragma: keep
 #include <stdexcept>
 #include <string>
 #include <thread>
