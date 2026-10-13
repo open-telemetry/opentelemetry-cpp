@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Handle scope-attribute key and map allocation failures without
+  terminating, and reject incomplete attribute copies during scope construction
+  so providers can return their noop fallback.
+  [#4694](https://github.com/open-telemetry/opentelemetry-cpp/issues/4694)
+
 * [SDK] Preserve the default unlimited timeout when batch span and log record
   processors shut down their exporters.
   [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)

@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cstddef>
+#include <new>
 #include <string>
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
@@ -84,7 +85,12 @@ public:
     result->attributes_.reserve(opentelemetry::nostd::size(arg));
     for (auto &argv : arg)
     {
-      result->SetAttribute(argv.first, argv.second);
+      if (!result->attributes_.SetAttribute(argv.first, argv.second))
+      {
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+        throw std::bad_alloc();
+#endif
+      }
     }
 
     return result;

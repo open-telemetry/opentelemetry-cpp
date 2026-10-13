@@ -287,19 +287,31 @@ struct AttributeEqualToVisitor
  * @param map The map to insert or assign the key-value pair into.
  * @param key The key to insert or assign.
  * @param value The value to insert or assign.
- * @return A pair of an iterator to the element and a bool (true if the insertion took place).
+ * @return A pair of an iterator to the element and a bool (true if the insertion took place),
+ * or {map.end(), false} on allocation failure.
  */
 template <typename Map, typename Value>
 inline std::pair<typename Map::iterator, bool>
 AttributeInsertOrAssign(Map &map, opentelemetry::nostd::string_view key, Value &&value) noexcept
 {
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
 #if __cplusplus >= 201703L
-  // Use insert_or_assign if C++17 is available
-  return map.insert_or_assign(std::string(key), std::forward<Value>(value));
+    // Use insert_or_assign if C++17 is available
+    return map.insert_or_assign(std::string(key), std::forward<Value>(value));
 #else
   auto result          = map.emplace(std::string(key), typename Map::mapped_type{});
   result.first->second = std::forward<Value>(value);
   return result;
+#endif
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (const std::bad_alloc &)
+  {
+    return {map.end(), false};
+  }
 #endif
 }
 
@@ -414,17 +426,27 @@ public:
   {
     for (auto &kv : attributes)
     {
-      SetAttribute(kv.first, kv.second);
+      if (!SetAttribute(kv.first, kv.second))
+      {
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+        throw std::bad_alloc();
+#endif
+      }
     }
   }
 
   void ConstructFrom(const opentelemetry::common::KeyValueIterable &attributes)
   {
-    attributes.ForEachKeyValue(
-        [&](nostd::string_view key, const opentelemetry::common::AttributeValue &value) noexcept {
-          SetAttribute(key, value);
-          return true;
-        });
+    if (!attributes.ForEachKeyValue(
+            [&](nostd::string_view key,
+                const opentelemetry::common::AttributeValue &value) noexcept {
+              return SetAttribute(key, value);
+            }))
+    {
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+      throw std::bad_alloc();
+#endif
+    }
   }
 
   // Returns a reference to this map
@@ -442,8 +464,7 @@ public:
         VisitVariant(AttributeConverter(max_length), value);
     if (result.second)
     {
-      AttributeInsertOrAssign(*this, key, std::move(result.first));
-      return true;
+      return AttributeInsertOrAssign(*this, key, std::move(result.first)).first != this->end();
     }
     return false;
   }

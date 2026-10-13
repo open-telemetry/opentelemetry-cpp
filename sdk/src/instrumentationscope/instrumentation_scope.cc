@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include "opentelemetry/nostd/variant.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 
@@ -89,8 +88,7 @@ const InstrumentationScopeAttributes &InstrumentationScope::GetAttributes() cons
 void InstrumentationScope::SetAttribute(nostd::string_view key,
                                         const opentelemetry::common::AttributeValue &value) noexcept
 {
-  attributes_[std::string(key)] =
-      nostd::visit(opentelemetry::sdk::common::AttributeConverter(), value);
+  attributes_.SetAttribute(key, value);
 }
 
 InstrumentationScope::InstrumentationScope(nostd::string_view name,
