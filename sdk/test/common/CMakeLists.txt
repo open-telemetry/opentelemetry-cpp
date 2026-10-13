@@ -27,6 +27,15 @@ foreach(
     TEST_LIST ${testname})
 endforeach()
 
+# Executable allocation overrides cannot intercept Windows DLL allocations.
+if(NOT (WIN32 AND BUILD_SHARED_LIBS))
+  add_executable(attribute_allocation_test attribute_allocation_test.cc)
+  target_link_libraries(
+    attribute_allocation_test ${GTEST_BOTH_LIBRARIES} opentelemetry_trace
+    opentelemetry_logs opentelemetry_metrics)
+  gtest_add_tests(TARGET attribute_allocation_test TEST_PREFIX common.)
+endif()
+
 add_executable(base64_test base64_test.cc)
 target_link_libraries(base64_test ${GTEST_BOTH_LIBRARIES} opentelemetry_common)
 gtest_add_tests(

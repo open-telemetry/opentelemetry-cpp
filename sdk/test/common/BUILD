@@ -6,6 +6,21 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 
 cc_test(
+    name = "attribute_allocation_test",
+    srcs = ["attribute_allocation_test.cc"],
+    # Preserve the test's new/delete overrides; libc malloc/free are still checked.
+    env = {"VALGRIND_OPTS": "--soname-synonyms=somalloc=nouserintercepts"},
+    tags = ["test"],
+    deps = [
+        "//sdk/src/instrumentationscope",
+        "//sdk/src/logs",
+        "//sdk/src/metrics",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "wildcard_match_test",
     srcs = [
         "wildcard_match_test.cc",
