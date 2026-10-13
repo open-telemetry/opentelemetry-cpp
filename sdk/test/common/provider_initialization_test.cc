@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <cstddef>
+#include <cstddef>  // IWYU pragma: keep
 #include <cstdlib>
 #include <memory>
 #include <new>
@@ -21,9 +21,11 @@
 #include "opentelemetry/sdk/metrics/meter_provider.h"
 #include "opentelemetry/sdk/metrics/view/view_registry.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/multi_span_processor.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"
+#include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/samplers/always_on.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
@@ -48,11 +50,15 @@ private:
   std::size_t previous_;
 };
 
-// Target the owned resource string, not allocations preparing constructor arguments.
+// Target the resource's schema string, not variant-copy cleanup or constructor arguments.
 constexpr std::size_t kResourceValueSize = 4096;
 }  // namespace
 
 // Keep allocation injection in this dedicated test executable.
+// Keep the malloc/free implementations out of line to avoid GCC mismatch warnings.
+#  if defined(__GNUC__) && !defined(__clang__)
+[[gnu::noinline]]
+#  endif
 void *operator new(std::size_t size)
 {
   // A threshold also covers standard libraries that round string capacities up.
@@ -72,6 +78,9 @@ void *operator new[](std::size_t size)
 {
   return ::operator new(size);
 }
+#  if defined(__GNUC__) && !defined(__clang__)
+[[gnu::noinline]]
+#  endif
 void operator delete(void *ptr) noexcept
 {
   std::free(ptr);  // NOLINT(cppcoreguidelines-no-malloc)
@@ -119,7 +128,7 @@ using opentelemetry::sdk::resource::Resource;
 
 TEST(ProviderInitialization, TracerContextResourceCopyThrows)
 {
-  Resource resource({{"key", std::string(kResourceValueSize, 'x')}});
+  Resource resource({{"key", true}}, std::string(kResourceValueSize, 'x'));
   auto sampler   = std::make_unique<trace_sdk::AlwaysOnSampler>();
   auto generator = std::make_unique<trace_sdk::RandomIdGenerator>();
   FailAllocation failure(kResourceValueSize + 1);
@@ -129,14 +138,14 @@ TEST(ProviderInitialization, TracerContextResourceCopyThrows)
 
 TEST(ProviderInitialization, LoggerContextResourceCopyThrows)
 {
-  Resource resource({{"key", std::string(kResourceValueSize, 'x')}});
+  Resource resource({{"key", true}}, std::string(kResourceValueSize, 'x'));
   FailAllocation failure(kResourceValueSize + 1);
   EXPECT_THROW(logs_sdk::LoggerContext({}, resource), std::bad_alloc);
 }
 
 TEST(ProviderInitialization, MeterContextResourceCopyThrows)
 {
-  Resource resource({{"key", std::string(kResourceValueSize, 'x')}});
+  Resource resource({{"key", true}}, std::string(kResourceValueSize, 'x'));
   auto views = std::make_unique<metrics_sdk::ViewRegistry>();
   FailAllocation failure(kResourceValueSize + 1);
   EXPECT_THROW(metrics_sdk::MeterContext(std::move(views), resource), std::bad_alloc);
@@ -144,7 +153,7 @@ TEST(ProviderInitialization, MeterContextResourceCopyThrows)
 
 TEST(ProviderInitialization, TracerProviderResourceCopyReachesCaller)
 {
-  Resource resource({{"key", std::string(kResourceValueSize, 'x')}});
+  Resource resource({{"key", true}}, std::string(kResourceValueSize, 'x'));
   auto sampler   = std::make_unique<trace_sdk::AlwaysOnSampler>();
   auto generator = std::make_unique<trace_sdk::RandomIdGenerator>();
   FailAllocation failure(kResourceValueSize + 1);
@@ -155,7 +164,7 @@ TEST(ProviderInitialization, TracerProviderResourceCopyReachesCaller)
 
 TEST(ProviderInitialization, LoggerProviderResourceCopyReachesCaller)
 {
-  Resource resource({{"key", std::string(kResourceValueSize, 'x')}});
+  Resource resource({{"key", true}}, std::string(kResourceValueSize, 'x'));
   FailAllocation failure(kResourceValueSize + 1);
   EXPECT_THROW(logs_sdk::LoggerProvider(
                    std::vector<std::unique_ptr<logs_sdk::LogRecordProcessor>>{}, resource),
@@ -164,7 +173,7 @@ TEST(ProviderInitialization, LoggerProviderResourceCopyReachesCaller)
 
 TEST(ProviderInitialization, MeterProviderResourceCopyReachesCaller)
 {
-  Resource resource({{"key", std::string(kResourceValueSize, 'x')}});
+  Resource resource({{"key", true}}, std::string(kResourceValueSize, 'x'));
   auto views = std::make_unique<metrics_sdk::ViewRegistry>();
   FailAllocation failure(kResourceValueSize + 1);
   EXPECT_THROW(metrics_sdk::MeterProvider(std::move(views), resource), std::bad_alloc);
