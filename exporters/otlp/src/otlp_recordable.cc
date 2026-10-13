@@ -29,6 +29,7 @@
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "google/protobuf/arena.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
 #include "opentelemetry/proto/trace/v1/trace.pb.h"
@@ -44,6 +45,7 @@ namespace otlp
 // Defined here rather than in the header so that Arena::Create is instantiated where the protobuf
 // headers come in through protobuf_include_prefix.h. arena_initial_block_ is deliberately left
 // uninitialized, the Arena hands it out as it fills it.
+// cppcheck-suppress uninitMemberVar
 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 OtlpRecordable::OtlpRecordable(std::uint32_t max_attributes,
                                std::uint32_t max_events,
