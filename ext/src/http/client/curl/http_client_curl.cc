@@ -156,7 +156,7 @@ void Session::SendRequest(
     return;
   }
 
-  is_session_active_.store(true, std::memory_order_release);
+  SetStateFlags(kSessionActive);
   const auto &url       = host_ + http_request_->uri_;
   auto callback_ptr     = callback.get();
   bool reuse_connection = false;
@@ -205,7 +205,7 @@ void Session::SendRequest(
 
       // The handler may start another request on this session or drop the last reference to it,
       // so nothing below this point may touch the session.
-      is_session_active_.store(false, std::memory_order_release);
+      ClearStateFlags(kSessionActive);
       PublishOperation();
 
       if (callback)
@@ -249,7 +249,7 @@ void Session::SendRequest(
           // Manually cancelled
           callback->OnEvent(opentelemetry::ext::http::client::SessionState::Cancelled, "");
         }
-        is_session_active_.store(false, std::memory_order_release);
+        ClearStateFlags(kSessionActive);
       });
 
   if (success)
@@ -260,7 +260,7 @@ void Session::SendRequest(
   }
   else
   {
-    is_session_active_.store(false, std::memory_order_release);
+    ClearStateFlags(kSessionActive);
     // Publish before the handler runs: it may drop the last reference to this session.
     PublishOperation();
     if (callback)
@@ -278,15 +278,17 @@ void Session::PublishOperation() noexcept
   // The operation, if there is one, is complete: its callback, promise, future and session route
   // are all in place. From here on other threads may read curl_operation_. A cancel or finish
   // that arrived while this thread was still building the operation left a note instead of
-  // touching it, so apply it now. The stores and loads are sequentially consistent so that
+  // touching it, so apply it now.
+  //
+  // Publishing and reading the notes is one atomic read-modify-write on the packed state, so
   // either the other thread sees the operation published or this thread sees its note, never
-  // neither.
-  MarkOperationPublished();
-  if (cancel_requested_.load(std::memory_order_seq_cst))
+  // neither, and never both.
+  const uint32_t previous_state = MarkOperationPublished();
+  if ((previous_state & kCancelRequested) != 0)
   {
     AbortPublishedOperation();
   }
-  else if (finish_requested_.load(std::memory_order_seq_cst))
+  else if ((previous_state & kFinishRequested) != 0)
   {
     FinishPublishedOperation();
   }
@@ -320,15 +322,14 @@ bool Session::CancelSession() noexcept
     return true;
   }
 
-  if (!operation_published_.load(std::memory_order_seq_cst))
+  // Leave a note and learn, in the same atomic step, whether the operation was already published.
+  // If it was not, SendRequest is still building it on another thread, or on this one from inside
+  // a handler, and it will see the note when it publishes and apply it once the operation is
+  // complete.
+  const uint32_t previous_state = SetStateFlags(kCancelRequested);
+  if ((previous_state & kOperationPublished) == 0)
   {
-    // SendRequest is still building the operation on another thread, or on this one from inside
-    // a handler. Leave a note for it to apply once the operation is complete.
-    cancel_requested_.store(true, std::memory_order_seq_cst);
-    if (!operation_published_.load(std::memory_order_seq_cst))
-    {
-      return true;
-    }
+    return true;
   }
 
   AbortPublishedOperation();
@@ -343,13 +344,10 @@ bool Session::FinishSession() noexcept
     return true;
   }
 
-  if (!operation_published_.load(std::memory_order_seq_cst))
+  const uint32_t previous_state = SetStateFlags(kFinishRequested);
+  if ((previous_state & kOperationPublished) == 0)
   {
-    finish_requested_.store(true, std::memory_order_seq_cst);
-    if (!operation_published_.load(std::memory_order_seq_cst))
-    {
-      return true;
-    }
+    return true;
   }
 
   FinishPublishedOperation();

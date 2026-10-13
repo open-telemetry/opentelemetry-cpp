@@ -213,24 +213,20 @@ public:
 
   bool FinishSession() noexcept override;
 
-  bool IsSessionActive() noexcept override
-  {
-    return is_session_active_.load(std::memory_order_acquire);
-  }
+  bool IsSessionActive() noexcept override { return HasStateFlags(kSessionActive); }
 
   /**
-   * True once SendRequest has finished building the operation (or will never build one), so
-   * other threads may read it.
+   * Mark the operation as published: SendRequest has finished building it (or will never build
+   * one), so other threads may read it.
+   *
+   * @return the state as it was immediately before this call. Because the flag is set and the
+   *         previous state is read in a single atomic step, SendRequest sees exactly the
+   *         cancel/finish requests that were left before it published, and the thread that
+   *         left a request sees whether the operation was already published.
    */
-  void MarkOperationPublished() noexcept
-  {
-    operation_published_.store(true, std::memory_order_seq_cst);
-  }
+  uint32_t MarkOperationPublished() noexcept { return SetStateFlags(kOperationPublished); }
 
-  bool IsOperationPublished() const noexcept
-  {
-    return operation_published_.load(std::memory_order_acquire);
-  }
+  bool IsOperationPublished() const noexcept { return HasStateFlags(kOperationPublished); }
 
   void SetId(uint64_t session_id) { session_id_ = session_id; }
 
@@ -259,6 +255,43 @@ public:
   void FinishOperation();
 
 private:
+  /**
+   * The session state, packed into one atomic word so that a sequence of updates is a single
+   * read-modify-write (fetch_or / fetch_and / compare_exchange) instead of several independent
+   * atomics. Separate atomics are only individually atomic, so another thread could observe an
+   * inconsistent mix of them, and adjacent atomics tend to share a cache line and false-share.
+   */
+  enum StateFlag : uint32_t
+  {
+    // The session has a request in flight.
+    kSessionActive = 1U << 0,
+
+    // Raised by SendRequest once curl_operation_ is complete and may be read by other threads.
+    // CancelSession and FinishSession touch the operation only after seeing it, and until then
+    // leave a note in the two flags below for SendRequest to apply.
+    kOperationPublished = 1U << 1,
+    kCancelRequested    = 1U << 2,
+    kFinishRequested    = 1U << 3,
+  };
+
+  /** Set the given flags. @return the state as it was before the call. */
+  uint32_t SetStateFlags(uint32_t flags) noexcept
+  {
+    return state_.fetch_or(flags, std::memory_order_seq_cst);
+  }
+
+  /** Clear the given flags. @return the state as it was before the call. */
+  uint32_t ClearStateFlags(uint32_t flags) noexcept
+  {
+    return state_.fetch_and(~flags, std::memory_order_seq_cst);
+  }
+
+  /** @return true if every one of the given flags is set. */
+  bool HasStateFlags(uint32_t flags) const noexcept
+  {
+    return (state_.load(std::memory_order_acquire) & flags) == flags;
+  }
+
   void PublishOperation() noexcept;
   void AbortPublishedOperation() noexcept;
   void FinishPublishedOperation() noexcept;
@@ -268,17 +301,12 @@ private:
   std::unique_ptr<HttpOperation> curl_operation_;
   uint64_t session_id_ = 0UL;
   HttpClient &http_client_;
-  std::atomic<bool> is_session_active_{false};
 
   // Raised by the first SendRequest and never lowered. A session carries one request.
   std::atomic<bool> send_started_{false};
 
-  // Raised by SendRequest once curl_operation_ is complete and may be read by other threads.
-  // CancelSession and FinishSession touch the operation only after seeing it, and until then
-  // leave a note in the two flags below for SendRequest to apply.
-  std::atomic<bool> operation_published_{false};
-  std::atomic<bool> cancel_requested_{false};
-  std::atomic<bool> finish_requested_{false};
+  // Packed session state, see StateFlag.
+  std::atomic<uint32_t> state_{0};
 };
 
 class HttpClientSync : public opentelemetry::ext::http::client::HttpClientSync
