@@ -85,6 +85,13 @@ jobs:
           echo "include-what-you-use reported ${WARNING_COUNT} warning(s) with cmake options preset '${{ matrix.cmake_options }}'"
           # Acceptable limit, to decrease over time down to 0
           readonly WARNING_LIMIT=${{ matrix.warning_limit }}
+
+          # Print instructions to help investigations
+          echo "::notice::See instructions below to investigate warnings"
+          echo "1) Find the previous job in CI, named 'Build with include-what-you-use'"
+          echo "2) In the job logs, search for 'Warning: include-what-you-use reported diagnostics:'"
+          echo "3) Read the warning messages, and adjust the code accordingly."
+
           # FAIL the build if WARNING_COUNT > WARNING_LIMIT
           if [ $WARNING_COUNT -gt $WARNING_LIMIT ] ; then
             echo "include-what-you-use reported ${WARNING_COUNT} warning(s) exceeding the existing warning limit of ${WARNING_LIMIT} with cmake options preset '${{ matrix.cmake_options }}'"
