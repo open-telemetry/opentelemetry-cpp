@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include "opentelemetry/nostd/variant.h"
 
 OPENTELEMETRY_BEGIN_NAMESPACE
 

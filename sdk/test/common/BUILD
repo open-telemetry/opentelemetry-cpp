@@ -8,6 +8,8 @@ load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
 cc_test(
     name = "attribute_allocation_test",
     srcs = ["attribute_allocation_test.cc"],
+    # Preserve the test's new/delete overrides; libc malloc/free are still checked.
+    env = {"VALGRIND_OPTS": "--soname-synonyms=somalloc=nouserintercepts"},
     tags = ["test"],
     deps = [
         "//sdk/src/instrumentationscope",

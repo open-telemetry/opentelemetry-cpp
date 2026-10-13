@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <cstddef>
+#include <cstddef>  // IWYU pragma: keep
 #include <cstdlib>
 #include <new>
 #include <string>
@@ -14,14 +14,18 @@
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/logs/logger.h"
 #include "opentelemetry/nostd/function_ref.h"
-#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/nostd/utility.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/logs/logger_provider.h"
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
+#  include "opentelemetry/nostd/shared_ptr.h"
 #  include "opentelemetry/sdk/metrics/meter_provider.h"
+#  include "opentelemetry/sdk/trace/exporter.h"
+#  include "opentelemetry/sdk/trace/processor.h"
 #  include "opentelemetry/sdk/trace/simple_processor_factory.h"
 #  include "opentelemetry/sdk/trace/tracer_provider.h"
 #  include "opentelemetry/trace/span.h"
@@ -60,6 +64,10 @@ constexpr std::size_t kLongValueSize = 4096;
 }  // namespace
 
 // Keep allocation injection in this dedicated test executable.
+// Keep the malloc/free implementations out of line to avoid GCC mismatch warnings.
+#  if defined(__GNUC__) && !defined(__clang__)
+[[gnu::noinline]]
+#  endif
 void *operator new(std::size_t size)
 {
   // A threshold also covers standard libraries that round string capacities up.
@@ -80,6 +88,9 @@ void *operator new[](std::size_t size)
 {
   return ::operator new(size);
 }
+#  if defined(__GNUC__) && !defined(__clang__)
+[[gnu::noinline]]
+#  endif
 void operator delete(void *ptr) noexcept
 {
   std::free(ptr);  // NOLINT(cppcoreguidelines-no-malloc)
