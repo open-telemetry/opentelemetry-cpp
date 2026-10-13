@@ -397,7 +397,6 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
         -DOTELCPP_WITH_OTLP_GRPC=ON \
         -DOTELCPP_WITH_OTLP_HTTP=ON \
         -DOTELCPP_WITH_OTLP_FILE=ON \
-        -DOTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
         -DOTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
@@ -583,7 +582,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
         -DWITH_NO_DEPRECATED_CODE=ON \
         -DWITH_STL=ON \
         -DWITH_GSL=ON \
-        -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF \
         -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
@@ -620,7 +618,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
       WITH_NO_DEPRECATED_CODE \
       WITH_STL \
       WITH_GSL \
-      WITH_OTLP_GRPC_SSL_MTLS_PREVIEW \
       WITH_OTLP_GRPC_CREDENTIAL_PREVIEW \
       WITH_OTLP_GRPC \
       WITH_OTLP_HTTP \
@@ -661,7 +658,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
       "OTELCPP_WITH_NO_DEPRECATED_CODE:BOOL=ON" \
       "OTELCPP_WITH_STL:STRING=ON" \
       "OTELCPP_WITH_GSL:BOOL=ON" \
-      "OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW:BOOL=OFF" \
       "OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW:BOOL=ON" \
       "OTELCPP_WITH_OTLP_GRPC:BOOL=ON" \
       "OTELCPP_WITH_OTLP_HTTP:BOOL=ON" \
