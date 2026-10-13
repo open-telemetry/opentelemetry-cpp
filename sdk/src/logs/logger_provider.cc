@@ -117,7 +117,7 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   }
 
   // Ensure only one thread can read/write from the map of loggers
-  std::lock_guard<std::mutex> lock_guard{lock_};
+  std::unique_lock<std::mutex> lock_guard{lock_};
 
   // If a logger with a name "logger_name" already exists, return it
   for (auto &logger : loggers_)
@@ -156,6 +156,8 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   }
   catch (const std::exception &ex)
   {
+    // Diagnostics may re-enter the provider, so release the lock first.
+    lock_guard.unlock();
     LogGetLoggerConstructionFailure(ex.what());
     return noop_logger_;
   }
@@ -163,6 +165,7 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
   // std::exception. Catch everything so GetLogger stays noexcept.
   catch (...)
   {
+    lock_guard.unlock();
     LogGetLoggerConstructionFailure("unknown exception");
     return noop_logger_;
   }

@@ -146,7 +146,7 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
     OTEL_INTERNAL_LOG_ERROR("[TracerProvider::GetTracer] Library name is empty.");
   }
 
-  const std::lock_guard<std::mutex> guard(lock_);
+  std::unique_lock<std::mutex> guard(lock_);
 
   for (auto &tracer : tracers_)
   {
@@ -184,6 +184,8 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
   }
   catch (const std::exception &ex)
   {
+    // Diagnostics may re-enter the provider, so release the lock first.
+    guard.unlock();
     LogGetTracerConstructionFailure(ex.what());
     return noop_tracer_;
   }
@@ -191,6 +193,7 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
   // std::exception. Catch everything so GetTracer stays noexcept.
   catch (...)
   {
+    guard.unlock();
     LogGetTracerConstructionFailure("unknown exception");
     return noop_tracer_;
   }

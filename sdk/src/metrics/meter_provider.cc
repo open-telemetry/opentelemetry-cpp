@@ -122,7 +122,7 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
     name = "";
   }
 
-  const std::lock_guard<std::mutex> guard(lock_);
+  std::unique_lock<std::mutex> guard(lock_);
 
   for (auto &meter : context_->GetMeters())
   {
@@ -160,6 +160,8 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   }
   catch (const std::exception &ex)
   {
+    // Diagnostics may re-enter the provider, so release the lock first.
+    guard.unlock();
     LogGetMeterConstructionFailure(ex.what());
     return noop_meter_;
   }
@@ -167,6 +169,7 @@ nostd::shared_ptr<metrics_api::Meter> MeterProvider::GetMeter(
   // std::exception. Catch everything so GetMeter stays noexcept.
   catch (...)
   {
+    guard.unlock();
     LogGetMeterConstructionFailure("unknown exception");
     return noop_meter_;
   }
