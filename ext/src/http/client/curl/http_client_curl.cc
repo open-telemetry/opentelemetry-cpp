@@ -280,9 +280,11 @@ void Session::PublishOperation() noexcept
   // that arrived while this thread was still building the operation left a note instead of
   // touching it, so apply it now.
   //
-  // Publishing and reading the notes is one atomic read-modify-write on the packed state, so
-  // either the other thread sees the operation published or this thread sees its note, never
-  // neither, and never both.
+  // Publishing and reading the notes is one atomic read-modify-write on the packed state. Notes
+  // are only left while the operation is unpublished (see LeaveNoteIfUnpublished), so either the
+  // other thread sees the operation published and acts itself, or its note is already in the
+  // state returned here, never neither. HttpOperation::SendAsync may already have set the
+  // published bit through ScheduleAddSession; the notes left before that are still in the state.
   const uint32_t previous_state = MarkOperationPublished();
   if ((previous_state & kCancelRequested) != 0)
   {
@@ -322,12 +324,10 @@ bool Session::CancelSession() noexcept
     return true;
   }
 
-  // Leave a note and learn, in the same atomic step, whether the operation was already published.
-  // If it was not, SendRequest is still building it on another thread, or on this one from inside
-  // a handler, and it will see the note when it publishes and apply it once the operation is
-  // complete.
-  const uint32_t previous_state = SetStateFlags(kCancelRequested);
-  if ((previous_state & kOperationPublished) == 0)
+  // If the operation is not published yet, SendRequest is still building it on another thread, or
+  // on this one from inside a handler. Leave a note for it to apply once the operation is
+  // complete. The note is only ever left while unpublished, so it is applied exactly once.
+  if (LeaveNoteIfUnpublished(kCancelRequested))
   {
     return true;
   }
@@ -344,8 +344,7 @@ bool Session::FinishSession() noexcept
     return true;
   }
 
-  const uint32_t previous_state = SetStateFlags(kFinishRequested);
-  if ((previous_state & kOperationPublished) == 0)
+  if (LeaveNoteIfUnpublished(kFinishRequested))
   {
     return true;
   }

@@ -286,6 +286,28 @@ private:
     return state_.fetch_and(~flags, std::memory_order_seq_cst);
   }
 
+  /**
+   * Leave a cancel/finish note, but only while the operation is not published yet. The check and
+   * the update are one compare-exchange, so a note can never be added after publication.
+   *
+   * @return true if the note was left and SendRequest will apply it once it publishes the
+   *         operation. false if the operation is already published, in which case the caller
+   *         must act on the operation itself.
+   */
+  bool LeaveNoteIfUnpublished(StateFlag note) noexcept
+  {
+    uint32_t state = state_.load(std::memory_order_seq_cst);
+    while ((state & kOperationPublished) == 0)
+    {
+      if (state_.compare_exchange_weak(state, state | note, std::memory_order_seq_cst,
+                                       std::memory_order_seq_cst))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /** @return true if every one of the given flags is set. */
   bool HasStateFlags(uint32_t flags) const noexcept
   {
