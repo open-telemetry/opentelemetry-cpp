@@ -38,7 +38,7 @@ void MultiRecordable::AddRecordable(const SpanProcessor &processor,
     recordables_[MakeKey(processor)] = std::move(recordable);
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
   }
-  catch (...)
+  catch (...)  // NOLINT(bugprone-empty-catch)
   {
     // Drop the recordable, the processor will skip this span.
   }

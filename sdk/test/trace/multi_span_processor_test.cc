@@ -59,6 +59,7 @@ public:
     ++started_;
   }
 
+  // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
   void OnEnd(std::unique_ptr<Recordable> && /* span */) noexcept override { ++ended_; }
 
   bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return true; }

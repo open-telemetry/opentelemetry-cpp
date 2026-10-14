@@ -245,7 +245,7 @@ void *operator new(std::size_t size)
     ++g_failed_allocations;
     throw std::bad_alloc();
   }
-  void *ptr = std::malloc(size);
+  void *ptr = std::malloc(size);  // NOLINT(cppcoreguidelines-no-malloc)
   if (ptr == nullptr)
   {
     throw std::bad_alloc();
@@ -255,12 +255,12 @@ void *operator new(std::size_t size)
 
 void operator delete(void *ptr) noexcept
 {
-  std::free(ptr);
+  std::free(ptr);  // NOLINT(cppcoreguidelines-no-malloc)
 }
 
 void operator delete(void *ptr, std::size_t /* size */) noexcept
 {
-  std::free(ptr);
+  std::free(ptr);  // NOLINT(cppcoreguidelines-no-malloc)
 }
 #endif
 
