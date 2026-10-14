@@ -19,10 +19,6 @@ Increment the:
   processors shut down their exporters.
   [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)
 
-* [SDK] Allow allocation failures in tracer, logger, and meter context
-  construction to reach provider initialization callers instead of terminating.
-  [#4695](https://github.com/open-telemetry/opentelemetry-cpp/issues/4695)
-
 * [CODE HEALTH] Prevent `std::out_of_range` escaping `noexcept` substr callers.
   [#4562](https://github.com/open-telemetry/opentelemetry-cpp/pull/4562)
 
@@ -115,6 +111,12 @@ Increment the:
   [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
 
 Breaking changes:
+
+* [SDK] Remove `noexcept` from the public `TracerContext`, `LoggerContext`,
+  and `MeterContext` constructors so allocation failures propagate to provider
+  initialization callers instead of terminating. This changes their exception
+  contract and may affect code relying on nothrow construction.
+  [#4695](https://github.com/open-telemetry/opentelemetry-cpp/issues/4695)
 
 * [SDK] Handle instrumentation object construction failures safely
   [#4469](https://github.com/open-telemetry/opentelemetry-cpp/pull/4469)

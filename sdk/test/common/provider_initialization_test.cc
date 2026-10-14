@@ -51,6 +51,8 @@ private:
 };
 
 // Target the resource's schema string, not variant-copy cleanup or constructor arguments.
+// Track the separate attribute-copy cleanup failure in:
+// https://github.com/open-telemetry/opentelemetry-cpp/issues/4707
 constexpr std::size_t kResourceValueSize = 4096;
 }  // namespace
 
