@@ -2,12 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <atomic>
 #include <cassert>
 #include <chrono>
 #include <cstdint>
+#include <cstdlib>
 #include <functional>
 #include <initializer_list>
 #include <map>
+#include <memory>
+#include <new>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -17,6 +21,7 @@
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
+#include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -30,6 +35,7 @@
 #include "opentelemetry/sdk/resource/resource.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/id_generator.h"
+#include "opentelemetry/sdk/trace/multi_recordable.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator.h"
 #include "opentelemetry/sdk/trace/sampler.h"
@@ -43,6 +49,7 @@
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/context.h"
+#include "opentelemetry/trace/propagation/http_trace_context.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
@@ -203,7 +210,59 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context, std::move(scope)));
 }
 
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+// Allocation failure injection: while armed, the next allocation of a MultiRecordable throws
+// std::bad_alloc. MultiRecordable is what MultiSpanProcessor::MakeRecordable() allocates for
+// every SDK span, so this simulates the span allocation failing.
+std::atomic<bool> g_fail_multi_recordable_allocation{false};
+std::atomic<int> g_failed_allocations{0};
+
+class MapCarrier : public opentelemetry::context::propagation::TextMapCarrier
+{
+public:
+  nostd::string_view Get(nostd::string_view key) const noexcept override
+  {
+    auto it = headers_.find(std::string(key));
+    return it != headers_.end() ? nostd::string_view(it->second) : nostd::string_view();
+  }
+
+  void Set(nostd::string_view key, nostd::string_view value) noexcept override
+  {
+    headers_[std::string(key)] = std::string(value);
+  }
+
+  std::map<std::string, std::string> headers_;
+};
+#endif
+
 }  // namespace
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+void *operator new(std::size_t size)
+{
+  if (size == sizeof(MultiRecordable) && g_fail_multi_recordable_allocation.exchange(false))
+  {
+    ++g_failed_allocations;
+    throw std::bad_alloc();
+  }
+  void *ptr = std::malloc(size);
+  if (ptr == nullptr)
+  {
+    throw std::bad_alloc();
+  }
+  return ptr;
+}
+
+void operator delete(void *ptr) noexcept
+{
+  std::free(ptr);
+}
+
+void operator delete(void *ptr, std::size_t /* size */) noexcept
+{
+  std::free(ptr);
+}
+#endif
 
 TEST(Tracer, ToInMemorySpanExporter)
 {
@@ -1590,3 +1649,57 @@ TEST(Tracer, SpanLimits)
   EXPECT_EQ(limits.attribute_value_length_limit,
             nostd::get<std::string>(events.at(0).GetAttributes().at("one")).size());
 }
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+TEST(Tracer, FailedSpanAllocationPreservesContextOnExtract)
+{
+  InMemorySpanExporter *exporter = new InMemorySpanExporter();
+  auto tracer                    = initTracer(std::unique_ptr<SpanExporter>{exporter});
+
+  const std::uint8_t trace_id_bytes[trace_api::TraceId::kSize] = {1, 2,  3,  4,  5,  6,  7,  8,
+                                                                  9, 10, 11, 12, 13, 14, 15, 16};
+  const std::uint8_t span_id_bytes[trace_api::SpanId::kSize]   = {1, 2, 3, 4, 5, 6, 7, 8};
+  const SpanContext parent(trace_api::TraceId(trace_id_bytes), trace_api::SpanId(span_id_bytes),
+                           trace_api::TraceFlags(trace_api::TraceFlags::kIsSampled), true);
+
+  trace_api::StartSpanOptions options;
+  options.parent = parent;
+
+  g_failed_allocations               = 0;
+  g_fail_multi_recordable_allocation = true;
+  auto span                          = tracer->StartSpan("span", options);
+  g_fail_multi_recordable_allocation = false;
+
+  // The injected allocation failure was hit and handled, and the span is not recording ...
+  ASSERT_EQ(1, g_failed_allocations.load());
+  EXPECT_FALSE(span->IsRecording());
+
+  // ... but it still carries the parent trace and a fresh span id.
+  const SpanContext span_context = span->GetContext();
+  EXPECT_TRUE(span_context.IsValid());
+  EXPECT_EQ(parent.trace_id(), span_context.trace_id());
+  EXPECT_NE(parent.span_id(), span_context.span_id());
+  EXPECT_TRUE(span_context.IsSampled());
+
+  // Injecting the failed span into a carrier and extracting it back keeps the original context.
+  MapCarrier carrier;
+  opentelemetry::trace::propagation::HttpTraceContext propagator;
+  opentelemetry::context::Context inject_context;
+  propagator.Inject(carrier, trace_api::SetSpan(inject_context, span));
+
+  opentelemetry::context::Context extract_context;
+  const auto extracted = trace_api::GetSpanContext(propagator.Extract(carrier, extract_context));
+  EXPECT_TRUE(extracted.IsValid());
+  EXPECT_TRUE(extracted.IsRemote());
+  EXPECT_EQ(parent.trace_id(), extracted.trace_id());
+  EXPECT_EQ(span_context.span_id(), extracted.span_id());
+  EXPECT_EQ(span_context.trace_flags(), extracted.trace_flags());
+
+  span->End();
+
+  // The failure is transient: the next span on the same tracer records normally.
+  auto next_span = tracer->StartSpan("next", options);
+  EXPECT_TRUE(next_span->IsRecording());
+  next_span->End();
+}
+#endif
