@@ -12,6 +12,7 @@
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/trace/span_context.h"
 
 using namespace opentelemetry::sdk::trace;
 using opentelemetry::trace::SpanContext;
