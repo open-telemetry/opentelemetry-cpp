@@ -59,7 +59,7 @@ Span::Span(std::shared_ptr<Tracer> &&tracer,
            const opentelemetry::trace::StartSpanOptions &options,
            const opentelemetry::sdk::trace::SamplingResult &sampling_result,
            const opentelemetry::trace::SpanContext &parent_span_context,
-           opentelemetry::trace::SpanContext span_context)
+           opentelemetry::trace::SpanContext span_context) noexcept
     : tracer_{std::move(tracer)},
       recordable_{tracer_->GetProcessor().MakeRecordable()},
       start_steady_time{options.start_steady_time},

@@ -35,7 +35,7 @@ public:
        const opentelemetry::trace::StartSpanOptions &options,
        const opentelemetry::sdk::trace::SamplingResult &sampling_result,
        const opentelemetry::trace::SpanContext &parent_span_context,
-       opentelemetry::trace::SpanContext span_context);
+       opentelemetry::trace::SpanContext span_context) noexcept;
 
   Span(const Span &)            = delete;
   Span(Span &&)                 = delete;

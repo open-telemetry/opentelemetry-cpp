@@ -31,7 +31,18 @@ std::size_t MultiRecordable::MakeKey(const SpanProcessor &processor) noexcept
 void MultiRecordable::AddRecordable(const SpanProcessor &processor,
                                     std::unique_ptr<Recordable> recordable) noexcept
 {
-  recordables_[MakeKey(processor)] = std::move(recordable);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    recordables_[MakeKey(processor)] = std::move(recordable);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (...)
+  {
+    // Drop the recordable, the processor will skip this span.
+  }
+#endif
 }
 
 const std::unique_ptr<Recordable> &MultiRecordable::GetRecordable(
