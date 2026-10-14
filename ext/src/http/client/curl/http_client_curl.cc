@@ -911,7 +911,6 @@ bool HttpClient::doRemoveSessions()
   return has_data;
 }
 
-#ifdef ENABLE_OTLP_RETRY_PREVIEW
 bool HttpClient::doRetrySessions(bool report_all)
 {
   const auto now = std::chrono::system_clock::now();
@@ -948,12 +947,6 @@ bool HttpClient::doRetrySessions(bool report_all)
   report_all = report_all && !pending_to_retry_sessions_.empty();
   return has_data || report_all;
 }
-#else
-bool HttpClient::doRetrySessions(bool /* report_all */)
-{
-  return false;
-}
-#endif  // ENABLE_OTLP_RETRY_PREVIEW
 
 void HttpClient::resetMultiHandle()
 {

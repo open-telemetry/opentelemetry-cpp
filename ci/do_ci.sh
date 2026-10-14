@@ -48,8 +48,6 @@ function run_benchmarks
 [ -z "${SRC_DIR}" ] && export SRC_DIR="`pwd`"
 [ -z "${BUILD_DIR}" ] && export BUILD_DIR=$HOME/build
 mkdir -p "${BUILD_DIR}"
-[ -z "${PLUGIN_DIR}" ] && export PLUGIN_DIR=$HOME/plugin
-mkdir -p "${PLUGIN_DIR}"
 [ -z "${INSTALL_TEST_DIR}" ] && export INSTALL_TEST_DIR=$HOME/install_test
 mkdir -p "${INSTALL_TEST_DIR}"
 
@@ -176,7 +174,6 @@ elif [[ "$1" == "cmake.maintainer.yaml.test" ]]; then
         -DOTELCPP_MAINTAINER_MODE=ON \
         -DOTELCPP_WITH_NO_DEPRECATED_CODE=ON \
         -DOTELCPP_WITH_OTLP_HTTP_COMPRESSION=ON \
-        -DOTELCPP_WITH_OTLP_RETRY_PREVIEW=ON \
         -DOTELCPP_WITH_THREAD_INSTRUMENTATION_PREVIEW=ON \
         -DOTELCPP_WITH_CONFIGURATION=ON \
         -DOTELCPP_WITH_RESOURCE_DETECTORS_PREVIEW=ON \
@@ -400,9 +397,7 @@ elif [[ "$1" == "cmake.exporter.otprotocol.test" ]]; then
         -DOTELCPP_WITH_OTLP_GRPC=ON \
         -DOTELCPP_WITH_OTLP_HTTP=ON \
         -DOTELCPP_WITH_OTLP_FILE=ON \
-        -DOTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW=ON \
         -DOTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
-        -DOTELCPP_WITH_OTLP_RETRY_PREVIEW=ON \
         "${SRC_DIR}"
   cmake --build . "${CMAKE_BUILD_ARGS[@]}"
   ctest --output-on-failure
@@ -527,11 +522,16 @@ elif [[ "$1" == "cmake.install.test" ]]; then
 
   mkdir -p "${BUILD_DIR}/install_test"
   cd "${BUILD_DIR}/install_test"
+  INSTALL_TEST_CMAKE_ARGS=()
+  if [[ "${OTEL_ENABLE_PKGCONFIG_INSTALL_TEST}" == "ON" ]]; then
+    INSTALL_TEST_CMAKE_ARGS+=("-DOTEL_ENABLE_PKGCONFIG_INSTALL_TEST=ON")
+  fi
   cmake  "${CMAKE_OPTIONS[@]}" \
          "-DCMAKE_PREFIX_PATH=${INSTALL_TEST_DIR}" \
          "-DINSTALL_TEST_CMAKE_OPTIONS=${CMAKE_OPTIONS_STRING}" \
          "-DINSTALL_TEST_COMPONENTS=${EXPECTED_COMPONENTS_STRING}" \
          "-DINSTALL_TEST_DEPRECATED_COMPONENTS=${DEPRECATED_COMPONENTS_STRING}" \
+         "${INSTALL_TEST_CMAKE_ARGS[@]}" \
          -S "${SRC_DIR}/install/test/cmake"
   ctest --output-on-failure
   exit 0
@@ -587,8 +587,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
         -DWITH_NO_DEPRECATED_CODE=ON \
         -DWITH_STL=ON \
         -DWITH_GSL=ON \
-        -DWITH_OTLP_RETRY_PREVIEW=OFF \
-        -DWITH_OTLP_GRPC_SSL_MTLS_PREVIEW=OFF \
         -DWITH_OTLP_GRPC_CREDENTIAL_PREVIEW=ON \
         -DWITH_OTLP_GRPC=ON \
         -DWITH_OTLP_HTTP=ON \
@@ -625,8 +623,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
       WITH_NO_DEPRECATED_CODE \
       WITH_STL \
       WITH_GSL \
-      WITH_OTLP_RETRY_PREVIEW \
-      WITH_OTLP_GRPC_SSL_MTLS_PREVIEW \
       WITH_OTLP_GRPC_CREDENTIAL_PREVIEW \
       WITH_OTLP_GRPC \
       WITH_OTLP_HTTP \
@@ -667,8 +663,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
       "OTELCPP_WITH_NO_DEPRECATED_CODE:BOOL=ON" \
       "OTELCPP_WITH_STL:STRING=ON" \
       "OTELCPP_WITH_GSL:BOOL=ON" \
-      "OTELCPP_WITH_OTLP_RETRY_PREVIEW:BOOL=OFF" \
-      "OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW:BOOL=OFF" \
       "OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW:BOOL=ON" \
       "OTELCPP_WITH_OTLP_GRPC:BOOL=ON" \
       "OTELCPP_WITH_OTLP_HTTP:BOOL=ON" \
@@ -754,40 +748,6 @@ elif [[ "$1" == "cmake.legacy_options.test" ]]; then
       exit 1
     }
   done
-  exit 0
-elif [[ "$1" == "cmake.test_example_plugin" ]]; then
-  # Build the plugin
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cat <<EOF > export.map
-{
-  global:
-    OpenTelemetryMakeFactoryImpl;
-  local: *;
-};
-EOF
-
-  LINKER_FLAGS="\
-    -static-libstdc++ \
-    -static-libgcc \
-    -Wl,--version-script=${PWD}/export.map \
-  "
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DOTELCPP_MAINTAINER_MODE=ON \
-        -DCMAKE_EXE_LINKER_FLAGS="$LINKER_FLAGS" \
-        -DCMAKE_SHARED_LINKER_FLAGS="$LINKER_FLAGS" \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}" --target example_plugin
-  cp examples/plugin/plugin/libexample_plugin.so ${PLUGIN_DIR}
-
-  # Verify we can load the plugin
-  cd "${BUILD_DIR}"
-  rm -rf *
-  cmake "${CMAKE_OPTIONS[@]}"  \
-        -DOTELCPP_MAINTAINER_MODE=ON \
-        "${SRC_DIR}"
-  cmake --build . "${CMAKE_BUILD_ARGS[@]}" --target load_plugin_example
-  examples/plugin/load/load_plugin_example ${PLUGIN_DIR}/libexample_plugin.so /dev/null
   exit 0
 elif [[ "$1" == "bazel.test" ]]; then
   bazel $BAZEL_STARTUP_OPTIONS build $BAZEL_OPTIONS $BAZEL_WITH_PREVIEW //...
