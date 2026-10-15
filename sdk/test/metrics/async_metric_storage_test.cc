@@ -352,8 +352,7 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, StaleAttributeSetDropped)
   collectors.push_back(collector);
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kSum,
-      nullptr,
+      instr_desc, AggregationType::kSum, nullptr,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
@@ -439,8 +438,7 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, AttributeReappearanceAfterGap)
   collectors.push_back(collector);
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kSum,
-      nullptr,
+      instr_desc, AggregationType::kSum, nullptr,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
@@ -520,8 +518,7 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, StaleAttributeSetDroppedMultiCol
   collectors.push_back(collector2);
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kSum,
-      nullptr,
+      instr_desc, AggregationType::kSum, nullptr,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
@@ -620,8 +617,7 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, MultiCollectorLaggingCollector)
   collectors.push_back(collector2);
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kSum,
-      nullptr,
+      instr_desc, AggregationType::kSum, nullptr,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
@@ -698,8 +694,7 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, MultiCollector)
   collectors.push_back(collector2);
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-      instr_desc, AggregationType::kSum,
-      nullptr,
+      instr_desc, AggregationType::kSum, nullptr,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
       ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
@@ -804,7 +799,7 @@ TEST_P(WritableMetricStorageTestFilteredAttributesFixture, TestAggregation)
   AggregationTemporality temporality = GetParam();
 
   InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kObservableCounter,
-             InstrumentValueType::kLong};
+                                     InstrumentValueType::kLong};
 
   auto sdk_start_ts  = std::chrono::system_clock::now();
   auto collection_ts = std::chrono::system_clock::now() + std::chrono::seconds(5);
@@ -816,14 +811,14 @@ TEST_P(WritableMetricStorageTestFilteredAttributesFixture, TestAggregation)
   FilterAttributeMap allowed_attributes;
   allowed_attributes["RequestType"] = true;
   std::shared_ptr<const AttributesProcessor> attributes_processor{
-  new FilteringAttributesProcessor(allowed_attributes)};
+      new FilteringAttributesProcessor(allowed_attributes)};
 
   opentelemetry::sdk::metrics::AsyncMetricStorage storage(
-  instr_desc, AggregationType::kSum, attributes_processor,
+      instr_desc, AggregationType::kSum, attributes_processor,
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
-  ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
 #endif
-  nullptr);
+      nullptr);
 
   int64_t get_count_v1 = 20;
   int64_t get_count_v2 = 10;

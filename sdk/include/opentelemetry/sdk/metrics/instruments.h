@@ -161,19 +161,14 @@ struct InstrumentDescriptorUtil
     switch (type)
     {
       case InstrumentType::kCounter:
-        return false;
+      case InstrumentType::kGauge:
+      case InstrumentType::kHistogram:
       case InstrumentType::kUpDownCounter:
         return false;
-      case InstrumentType::kHistogram:
-        return false;
       case InstrumentType::kObservableCounter:
-        return true;
+      case InstrumentType::kObservableGauge:
       case InstrumentType::kObservableUpDownCounter:
         return true;
-      case InstrumentType::kObservableGauge:
-        return true;
-      case InstrumentType::kGauge:
-        return false;
       default:
         return false;
     }
