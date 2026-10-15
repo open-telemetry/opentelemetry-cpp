@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 #include <functional>
-#include <memory>
+#include <memory>  // IWYU pragma: keep
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -17,10 +17,12 @@
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/metrics/meter.h"
 #include "opentelemetry/metrics/sync_instruments.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
+#include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_config.h"
@@ -531,6 +533,60 @@ TEST(MeterProvider, ConstructorsAreNotNoexcept)
 }
 
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
+TEST(MeterProvider, ConstructionFailureDiagnosticsAllowProviderReentry)
+{
+  using opentelemetry::sdk::instrumentationscope::InstrumentationScope;
+  using opentelemetry::sdk::instrumentationscope::ScopeConfigurator;
+  for (int exception_type = 0; exception_type < 2; ++exception_type)
+  {
+    SCOPED_TRACE(exception_type);
+    int construct_attempts = 0;
+    auto configurator      = std::make_unique<ScopeConfigurator<MeterConfig>>(
+        ScopeConfigurator<MeterConfig>::Builder(MeterConfig::Default())
+            .AddCondition(
+                [&](const InstrumentationScope &scope) {
+                  ++construct_attempts;
+                  if (scope.GetName() == "throwing-scope")
+                  {
+                    if (exception_type == 0)
+                    {
+                      throw std::runtime_error("injected construction failure");
+                    }
+                    throw 1;
+                  }
+                  return false;
+                },
+                MeterConfig::Default())
+            .Build());
+    MeterProvider provider(std::make_unique<ViewRegistry>(),
+                           opentelemetry::sdk::resource::Resource::Create({}),
+                           std::move(configurator));
+    auto cached = provider.GetMeter("cached-scope");
+    opentelemetry::nostd::shared_ptr<opentelemetry::metrics::Meter> reentrant_noop;
+    int diagnostics = 0;
+    ScopedTestLogHandler handler(LogLevel::Error, [&](const ScopedTestLogHandler::Entry &entry) {
+      ++diagnostics;
+      EXPECT_EQ(entry.level, LogLevel::Error);
+      EXPECT_EQ(provider.GetMeter("cached-scope"), cached);
+      reentrant_noop = provider.GetMeter("uncached-scope");
+    });
+
+    auto failed = provider.GetMeter("throwing-scope");
+    ASSERT_NE(failed, nullptr);
+    EXPECT_EQ(diagnostics, 1);
+    EXPECT_EQ(reentrant_noop, failed);
+    EXPECT_EQ(provider.GetMeter("cached-scope"), cached);
+    EXPECT_EQ(provider.GetMeter("another-scope"), failed);
+    EXPECT_EQ(construct_attempts, 2);
+    EXPECT_EQ(diagnostics, 1);
+    auto entries = handler.Drain();
+    ASSERT_EQ(entries.size(), 1u);
+    EXPECT_NE(entries[0].msg.find(exception_type == 0 ? "injected construction failure"
+                                                      : "unknown exception"),
+              std::string::npos);
+  }
+}
+
 TEST(MeterProvider, GetMeterReturnsNoopOnConstructionFailure)
 {
   auto should_throw       = std::make_shared<bool>(true);

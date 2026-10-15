@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -172,7 +173,14 @@ TEST(MultiLogRecordProcessorTest, EmptyProcessorIsDisabled)
 class FixedResultProcessor final : public LogRecordProcessor
 {
 public:
-  explicit FixedResultProcessor(bool result) : result_(result) {}
+  explicit FixedResultProcessor(
+      bool result,
+      std::shared_ptr<std::chrono::microseconds> shutdown_timeout = nullptr,
+      std::chrono::microseconds shutdown_delay = std::chrono::microseconds::zero())
+      : result_(result),
+        shutdown_timeout_(std::move(shutdown_timeout)),
+        shutdown_delay_(shutdown_delay)
+  {}
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
@@ -187,10 +195,20 @@ public:
 
   bool ForceFlush(std::chrono::microseconds /* timeout */) noexcept override { return result_; }
 
-  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override { return result_; }
+  bool Shutdown(std::chrono::microseconds timeout) noexcept override
+  {
+    if (shutdown_timeout_ != nullptr)
+    {
+      *shutdown_timeout_ = timeout;
+    }
+    std::this_thread::sleep_for(shutdown_delay_);
+    return result_;
+  }
 
 private:
   bool result_;
+  std::shared_ptr<std::chrono::microseconds> shutdown_timeout_;
+  std::chrono::microseconds shutdown_delay_;
 };
 
 std::unique_ptr<LogRecordProcessor> MakeMultiProcessor(bool first, bool second)
@@ -215,6 +233,38 @@ TEST(MultiLogRecordProcessorTest, ShutdownFailsWhenAnyChildFails)
 
   EXPECT_FALSE(MakeMultiProcessor(true, false)->Shutdown());
   EXPECT_FALSE(MakeMultiProcessor(false, true)->Shutdown());
+}
+
+TEST(MultiLogRecordProcessorTest, DefaultShutdownPassesUnlimitedTimeoutToAllChildren)
+{
+  auto first_timeout  = std::make_shared<std::chrono::microseconds>();
+  auto second_timeout = std::make_shared<std::chrono::microseconds>();
+
+  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
+  processors.emplace_back(new FixedResultProcessor(true, first_timeout));
+  processors.emplace_back(new FixedResultProcessor(true, second_timeout));
+  MultiLogRecordProcessor processor(std::move(processors));
+
+  EXPECT_TRUE(processor.Shutdown());
+  EXPECT_EQ((std::chrono::microseconds::max)(), *first_timeout);
+  EXPECT_EQ((std::chrono::microseconds::max)(), *second_timeout);
+}
+
+TEST(MultiLogRecordProcessorTest, FiniteShutdownSharesTimeoutBudgetAcrossChildren)
+{
+  auto first_timeout  = std::make_shared<std::chrono::microseconds>();
+  auto second_timeout = std::make_shared<std::chrono::microseconds>();
+  auto timeout        = std::chrono::milliseconds(100);
+
+  std::vector<std::unique_ptr<LogRecordProcessor>> processors;
+  processors.emplace_back(
+      new FixedResultProcessor(true, first_timeout, std::chrono::milliseconds(2)));
+  processors.emplace_back(new FixedResultProcessor(true, second_timeout));
+  MultiLogRecordProcessor processor(std::move(processors));
+
+  EXPECT_TRUE(processor.Shutdown(timeout));
+  EXPECT_EQ(timeout, *first_timeout);
+  EXPECT_LT(*second_timeout, timeout);
 }
 
 }  // namespace

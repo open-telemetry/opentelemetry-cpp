@@ -52,6 +52,10 @@ foreach(
     TEST_LIST ${testname})
 endforeach()
 
+set_tests_properties(
+  metrics.MeterProvider.ConstructionFailureDiagnosticsAllowProviderReentry
+  PROPERTIES TIMEOUT 10)
+
 if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
   add_executable(multi_observer_test multi_observer_test.cc)
   target_link_libraries(
