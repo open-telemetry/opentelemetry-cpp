@@ -10,7 +10,6 @@
 #include <functional>
 #include <initializer_list>
 #include <map>
-#include <memory>
 #include <new>
 #include <string>
 #include <unordered_map>
@@ -210,7 +209,18 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
   return std::shared_ptr<opentelemetry::trace::Tracer>(new Tracer(context, std::move(scope)));
 }
 
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#if defined(__SANITIZE_ADDRESS__)
+#  define OTEL_TEST_ASAN 1
+#elif defined(__has_feature)
+#  if __has_feature(address_sanitizer)
+#    define OTEL_TEST_ASAN 1
+#  endif
+#endif
+#ifndef OTEL_TEST_ASAN
+#  define OTEL_TEST_ASAN 0
+#endif
+
+#if OPENTELEMETRY_HAVE_EXCEPTIONS && !OTEL_TEST_ASAN
 // Allocation failure injection: while armed, the next allocation of a MultiRecordable throws
 // std::bad_alloc. MultiRecordable is what MultiSpanProcessor::MakeRecordable() allocates for
 // every SDK span, so this simulates the span allocation failing.
@@ -237,7 +247,7 @@ public:
 
 }  // namespace
 
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#if OPENTELEMETRY_HAVE_EXCEPTIONS && !OTEL_TEST_ASAN
 void *operator new(std::size_t size)
 {
   if (size == sizeof(MultiRecordable) && g_fail_multi_recordable_allocation.exchange(false))
@@ -253,6 +263,11 @@ void *operator new(std::size_t size)
   return ptr;
 }
 
+// free() pairs with the malloc() in the replacement operator new above.
+#  if defined(__GNUC__) && !defined(__clang__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wmismatched-new-delete"
+#  endif
 void operator delete(void *ptr) noexcept
 {
   std::free(ptr);  // NOLINT(cppcoreguidelines-no-malloc)
@@ -262,6 +277,9 @@ void operator delete(void *ptr, std::size_t /* size */) noexcept
 {
   std::free(ptr);  // NOLINT(cppcoreguidelines-no-malloc)
 }
+#  if defined(__GNUC__) && !defined(__clang__)
+#    pragma GCC diagnostic pop
+#  endif
 #endif
 
 TEST(Tracer, ToInMemorySpanExporter)
@@ -1650,7 +1668,7 @@ TEST(Tracer, SpanLimits)
             nostd::get<std::string>(events.at(0).GetAttributes().at("one")).size());
 }
 
-#if OPENTELEMETRY_HAVE_EXCEPTIONS
+#if OPENTELEMETRY_HAVE_EXCEPTIONS && !OTEL_TEST_ASAN
 TEST(Tracer, FailedSpanAllocationPreservesContextOnExtract)
 {
   InMemorySpanExporter *exporter = new InMemorySpanExporter();
