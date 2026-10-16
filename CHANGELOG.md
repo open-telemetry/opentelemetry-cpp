@@ -124,6 +124,12 @@ Increment the:
 
 Breaking changes:
 
+* [SDK] Remove `noexcept` from the public `TracerContext`, `LoggerContext`,
+  and `MeterContext` constructors so allocation failures propagate to provider
+  initialization callers instead of terminating. This changes their exception
+  contract and may affect code relying on nothrow construction.
+  [#4695](https://github.com/open-telemetry/opentelemetry-cpp/issues/4695)
+
 * [SDK] Handle instrumentation object construction failures safely
   [#4469](https://github.com/open-telemetry/opentelemetry-cpp/pull/4469)
   * Removed `noexcept` from the public SDK `TracerProvider`,
