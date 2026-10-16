@@ -4,12 +4,14 @@
 #pragma once
 
 #include <chrono>
+#include <cstddef>  // For std::size_t and std::max_align_t
 #include <cstdint>  // For std::uint32_t
 #include <limits>   // For std::numeric_limits
 #include <string>
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
+#include "google/protobuf/arena.h"
 #include "opentelemetry/proto/common/v1/common.pb.h"
 #include "opentelemetry/proto/resource/v1/resource.pb.h"
 #include "opentelemetry/proto/trace/v1/trace.pb.h"
@@ -50,17 +52,20 @@ public:
       std::uint32_t max_events               = (std::numeric_limits<std::uint32_t>::max)(),
       std::uint32_t max_links                = (std::numeric_limits<std::uint32_t>::max)(),
       std::uint32_t max_attributes_per_event = (std::numeric_limits<std::uint32_t>::max)(),
-      std::uint32_t max_attributes_per_link  = (std::numeric_limits<std::uint32_t>::max)())
-      : span_limits_{max_attributes,
-                     (std::numeric_limits<std::size_t>::max)(),
-                     max_events,
-                     max_links,
-                     max_attributes_per_event,
-                     max_attributes_per_link}
-  {}
+      std::uint32_t max_attributes_per_link  = (std::numeric_limits<std::uint32_t>::max)());
 
-  proto::trace::v1::Span &span() noexcept { return span_; }
-  const proto::trace::v1::Span &span() const noexcept { return span_; }
+  ~OtlpRecordable() override = default;
+
+  // The Arena member owns the memory the span message points into, and an Arena is neither
+  // copyable nor movable, so neither is the recordable. Recordables are created and handed
+  // around by pointer, so nothing in the SDK or the exporters needs these.
+  OtlpRecordable(const OtlpRecordable &)            = delete;
+  OtlpRecordable &operator=(const OtlpRecordable &) = delete;
+  OtlpRecordable(OtlpRecordable &&)                 = delete;
+  OtlpRecordable &operator=(OtlpRecordable &&)      = delete;
+
+  proto::trace::v1::Span &span() noexcept { return *span_; }
+  const proto::trace::v1::Span &span() const noexcept { return *span_; }
 
   /** Dynamically converts the resource of this span into a proto. */
   proto::resource::v1::Resource ProtoResource() const noexcept;
@@ -116,7 +121,25 @@ public:
                                    &instrumentation_scope) noexcept override;
 
 private:
-  proto::trace::v1::Span span_;
+  // Size of the block the Arena starts from. The block lives inside the recordable, so a span
+  // whose recorded content fits in it never asks the heap for Arena memory. A span with the
+  // identity, the name, the kind and the timestamps takes 288 bytes of Arena space, so 512
+  // covers a minimal span with room to spare, and a span that outgrows it grows onto the heap
+  // with protobuf's normal block policy. Larger blocks (768, 1024) were measured and bought
+  // fewer allocations for spans with many long attributes, but made starting a span slower
+  // while many spans are alive on glibc malloc, so 512 is the compromise.
+  static constexpr std::size_t kArenaInitialBlockSize = 512;
+
+  // Declared before arena_ so the block is a live subobject before the Arena is pointed at it,
+  // and is still there when the Arena is destroyed. Deliberately left uninitialized, the Arena
+  // hands it out as it fills it. protobuf never frees a caller supplied initial block.
+  alignas(std::max_align_t) char arena_initial_block_[kArenaInitialBlockSize];
+  // Declared before span_ so the Arena is constructed first and destroyed last. The span message
+  // and everything recorded into it live on this Arena, so recording a field is an Arena bump
+  // instead of a heap allocation, and the whole span is released with the Arena.
+  google::protobuf::Arena arena_;
+  // Owned by arena_, never null, never deleted.
+  proto::trace::v1::Span *span_;
   const opentelemetry::sdk::resource::Resource *resource_ = nullptr;
   const opentelemetry::sdk::instrumentationscope::InstrumentationScope *instrumentation_scope_ =
       nullptr;
