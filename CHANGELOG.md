@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Release provider mutexes before construction-failure diagnostics so
+  custom log handlers can retrieve cached or noop tracers, loggers, and meters
+  from the same provider without deadlocking.
+  [#4693](https://github.com/open-telemetry/opentelemetry-cpp/issues/4693)
+
 * [SDK] Preserve the default unlimited timeout when batch span and log record
   processors shut down their exporters.
   [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)
