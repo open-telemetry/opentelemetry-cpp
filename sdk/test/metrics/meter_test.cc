@@ -400,6 +400,93 @@ TEST(MeterTest, BasicAsyncTests)
   observable_counter->RemoveCallback(asyc_generate_measurements_long, nullptr);
 }
 
+TEST(MeterTest, AsyncCumulativeObservationsAreReaderScoped)
+{
+  struct CallbackState
+  {
+    bool report_get = true;
+    int64_t get     = 10;
+    bool report_put = true;
+    int64_t put     = 5;
+  } callback_state;
+
+  auto provider = std::make_shared<MeterProvider>();
+  std::shared_ptr<MetricReader> reader1(new MockMetricReader());
+  std::shared_ptr<MetricReader> reader2(new MockMetricReader());
+  provider->AddMetricReader(reader1);
+  provider->AddMetricReader(reader2);
+
+  auto meter              = provider->GetMeter("async_reader_scoped_test");
+  auto observable_counter = meter->CreateInt64ObservableCounter("request_count");
+  auto callback           = [](opentelemetry::metrics::ObserverResult observer, void *state) {
+    auto observer_long =
+        nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(observer);
+    auto &measurements = *static_cast<CallbackState *>(state);
+    if (measurements.report_get)
+    {
+      observer_long->Observe(measurements.get, {{"RequestType", "GET"}});
+    }
+    if (measurements.report_put)
+    {
+      observer_long->Observe(measurements.put, {{"RequestType", "PUT"}});
+    }
+  };
+  observable_counter->AddCallback(callback, &callback_state);
+
+  auto collect_and_check = [](const std::shared_ptr<MetricReader> &reader, int expected_get_count,
+                              int64_t expected_get_value, int expected_put_count) {
+    int get_count     = 0;
+    int put_count     = 0;
+    int64_t get_value = 0;
+    EXPECT_TRUE(reader->Collect([&](ResourceMetrics &resource_metrics) {
+      for (const auto &scope_metrics : resource_metrics.scope_metric_data_)
+      {
+        for (const auto &metric_data : scope_metrics.metric_data_)
+        {
+          for (const auto &point : metric_data.point_data_attr_)
+          {
+            const auto &request_type = opentelemetry::nostd::get<std::string>(
+                point.attributes.find("RequestType")->second);
+            if (request_type == "GET")
+            {
+              get_count++;
+              get_value = opentelemetry::nostd::get<int64_t>(
+                  opentelemetry::nostd::get<SumPointData>(point.point_data).value_);
+            }
+            else if (request_type == "PUT")
+            {
+              put_count++;
+            }
+          }
+        }
+      }
+      return true;
+    }));
+    EXPECT_EQ(get_count, expected_get_count);
+    EXPECT_EQ(put_count, expected_put_count);
+    if (expected_get_count != 0)
+    {
+      EXPECT_EQ(get_value, expected_get_value);
+    }
+  };
+
+  // Each reader runs the callback independently and initially observes both attributes.
+  collect_and_check(reader1, 1, 10, 1);
+  collect_and_check(reader2, 1, 10, 1);
+
+  // GET is unchanged, so its callback produces a zero delta; PUT is absent from both rounds.
+  callback_state.report_put = false;
+  collect_and_check(reader1, 1, 10, 0);
+  collect_and_check(reader2, 1, 10, 0);
+
+  // An empty callback round emits no points, even though both attributes remain in history.
+  callback_state.report_get = false;
+  collect_and_check(reader1, 0, 0, 0);
+  collect_and_check(reader2, 0, 0, 0);
+
+  observable_counter->RemoveCallback(callback, &callback_state);
+}
+
 constexpr static unsigned MAX_THREADS       = 25;
 constexpr static unsigned MAX_ITERATIONS_MT = 1000;
 
