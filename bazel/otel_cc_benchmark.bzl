@@ -4,7 +4,7 @@
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
-def otel_cc_benchmark(name, srcs, deps, tags = [""]):
+def otel_cc_benchmark(name, srcs, deps, tags = [""], defines = []):
     """
     Creates targets for the benchmark and related targets.
 
@@ -30,7 +30,7 @@ def otel_cc_benchmark(name, srcs, deps, tags = [""]):
         srcs = srcs,
         deps = deps + ["@com_github_google_benchmark//:benchmark"],
         tags = tags + ["manual"],
-        defines = ["BAZEL_BUILD"],
+        defines = ["BAZEL_BUILD"] + defines,
     )
 
     # The result of running the benchmark, captured into a text file.
@@ -51,5 +51,5 @@ def otel_cc_benchmark(name, srcs, deps, tags = [""]):
         deps = deps + ["@com_github_google_benchmark//:benchmark"],
         args = ["--benchmark_min_time=1x"],
         tags = tags + ["benchmark"],
-        defines = ["BAZEL_BUILD"],
+        defines = ["BAZEL_BUILD"] + defines,
     )
