@@ -16,7 +16,7 @@
 #include "opentelemetry/version.h"
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
-#  include <stddef.h>
+#  include <cstddef>
 #  include <cstdint>
 #  include <functional>
 #  include <unordered_map>
@@ -33,6 +33,9 @@ namespace sdk
 namespace metrics
 {
 
+// AttributesHashMap::Set hashes the fixed boolean overflow attribute. Its variant is never
+// valueless, so the reported bad_variant_access path through nostd::visit is unreachable.
+// NOLINTNEXTLINE(bugprone-exception-escape)
 bool SyncMetricStorage::Collect(CollectorHandle *collector,
                                 nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                                 opentelemetry::common::SystemTimestamp sdk_start_ts,
@@ -91,6 +94,9 @@ std::shared_ptr<BoundSyncWritableMetricStorage> SyncMetricStorage::Bind(
   return GetOrCreateEntry(filtered);
 }
 
+// MetricAttributes have already been constructed and hashed, and stored keys are immutable.
+// Their variants (including the boolean overflow attribute) cannot be valueless during lookup.
+// NOLINTNEXTLINE(bugprone-exception-escape)
 std::shared_ptr<SyncMetricStorage::BoundEntry> SyncMetricStorage::GetOrCreateEntry(
     const MetricAttributes &attributes) noexcept
 {
@@ -101,9 +107,9 @@ std::shared_ptr<SyncMetricStorage::BoundEntry> SyncMetricStorage::GetOrCreateEnt
     return it->second;
   }
 
-  const auto &overflow           = GetOverflowAttributes();
-  auto overflow_it               = entries_.find(overflow);
-  const size_t non_overflow_size = entries_.size() - (overflow_it != entries_.end() ? 1 : 0);
+  const auto &overflow                = GetOverflowAttributes();
+  auto overflow_it                    = entries_.find(overflow);
+  const std::size_t non_overflow_size = entries_.size() - (overflow_it != entries_.end() ? 1 : 0);
   const bool use_overflow =
       attributes == overflow || non_overflow_size >= aggregation_config_->cardinality_limit_;
   if (use_overflow && overflow_it != entries_.end())

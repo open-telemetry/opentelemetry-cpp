@@ -1295,6 +1295,12 @@ public:
     }
   }
 
+  // The collector captures this, so the fixture must keep its address and thread ownership.
+  GaugeRecordingBenchmark(const GaugeRecordingBenchmark &)            = delete;
+  GaugeRecordingBenchmark &operator=(const GaugeRecordingBenchmark &) = delete;
+  GaugeRecordingBenchmark(GaugeRecordingBenchmark &&)                 = delete;
+  GaugeRecordingBenchmark &operator=(GaugeRecordingBenchmark &&)      = delete;
+
   ~GaugeRecordingBenchmark()
   {
     stop.store(true, std::memory_order_relaxed);
