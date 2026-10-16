@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Release provider mutexes before construction-failure diagnostics so
+  custom log handlers can retrieve cached or noop tracers, loggers, and meters
+  from the same provider without deadlocking.
+  [#4693](https://github.com/open-telemetry/opentelemetry-cpp/issues/4693)
+
 * [SDK] Preserve the default unlimited timeout when batch span and log record
   processors shut down their exporters.
   [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)
@@ -113,6 +118,12 @@ Increment the:
   [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
 
 Breaking changes:
+
+* [SDK] Remove `noexcept` from the public `TracerContext`, `LoggerContext`,
+  and `MeterContext` constructors so allocation failures propagate to provider
+  initialization callers instead of terminating. This changes their exception
+  contract and may affect code relying on nothrow construction.
+  [#4695](https://github.com/open-telemetry/opentelemetry-cpp/issues/4695)
 
 * [SDK] Handle instrumentation object construction failures safely
   [#4469](https://github.com/open-telemetry/opentelemetry-cpp/pull/4469)

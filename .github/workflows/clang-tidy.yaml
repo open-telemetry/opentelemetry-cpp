@@ -17,15 +17,15 @@ jobs:
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 205
+            warning_limit: 204
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 219
+            warning_limit: 218
     env:
       CC: /usr/bin/clang-22
       CXX: /usr/bin/clang++-22
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
         with:
           egress-policy: audit
 
@@ -107,6 +107,13 @@ jobs:
         run: |
           readonly COUNT="$WARNING_COUNT"
           readonly LIMIT="$WARNING_LIMIT"
+
+          # Print instructions to help investigations
+          echo "::notice::See instructions below to investigate warnings"
+          echo "1) Find the previous job in CI, named 'Upload warning report'"
+          echo "2) In the job logs, search for 'Artifact download URL:'"
+          echo "3) Upload the report given by the URL"
+          echo "4) Read the warnings in the report, and adjust the code accordingly."
 
           echo "clang-tidy reported ${COUNT} unique warning(s) with preset '${CMAKE_OPTIONS}'"
           echo "Limit is ${LIMIT}"

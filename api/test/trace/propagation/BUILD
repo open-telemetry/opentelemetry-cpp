@@ -2,6 +2,18 @@
 # SPDX-License-Identifier: Apache-2.0
 
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
+load("//bazel:otel_cc_benchmark.bzl", "otel_cc_benchmark")
+
+otel_cc_benchmark(
+    name = "propagator_benchmark",
+    srcs = ["propagator_benchmark.cc"],
+    tags = [
+        "api",
+        "benchmark",
+        "propagation",
+    ],
+    deps = ["//api"],
+)
 
 cc_test(
     name = "http_text_format_test",

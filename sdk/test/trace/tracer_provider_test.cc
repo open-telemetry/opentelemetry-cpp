@@ -9,7 +9,7 @@
 #include <functional>
 #include <future>
 #include <limits>
-#include <memory>
+#include <memory>  // IWYU pragma: keep
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -19,7 +19,9 @@
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/exporters/memory/in_memory_span_data.h"
 #include "opentelemetry/exporters/memory/in_memory_span_exporter.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/instrumentationscope/scope_configurator.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -39,6 +41,7 @@
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/tracer_provider_factory.h"
+#include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/tracer.h"
 
@@ -746,6 +749,61 @@ TEST(TracerProvider, ConstructorsAreNotNoexcept)
 }
 
 #if OPENTELEMETRY_HAVE_EXCEPTIONS
+TEST(TracerProvider, ConstructionFailureDiagnosticsAllowProviderReentry)
+{
+  using opentelemetry::sdk::common::internal_log::LogLevel;
+  using opentelemetry::test_common::ScopedTestLogHandler;
+  for (int exception_type = 0; exception_type < 2; ++exception_type)
+  {
+    SCOPED_TRACE(exception_type);
+    int construct_attempts = 0;
+    auto configurator      = std::make_unique<ScopeConfigurator<TracerConfig>>(
+        ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Default())
+            .AddCondition(
+                [&](const InstrumentationScope &scope) {
+                  ++construct_attempts;
+                  if (scope.GetName() == "throwing-scope")
+                  {
+                    if (exception_type == 0)
+                    {
+                      throw std::runtime_error("injected construction failure");
+                    }
+                    throw 1;
+                  }
+                  return false;
+                },
+                TracerConfig::Default())
+            .Build());
+    TracerProvider provider(SimpleSpanProcessorFactory::Create(nullptr), Resource::Create({}),
+                            std::make_unique<AlwaysOnSampler>(),
+                            std::make_unique<RandomIdGenerator>(), std::move(configurator));
+    auto cached = provider.GetTracer("cached-scope");
+    opentelemetry::nostd::shared_ptr<opentelemetry::trace::Tracer> reentrant_noop;
+    int diagnostics = 0;
+    ScopedTestLogHandler handler(LogLevel::Error, [&](const ScopedTestLogHandler::Entry &entry) {
+      ++diagnostics;
+      EXPECT_EQ(entry.level, LogLevel::Error);
+      EXPECT_EQ(provider.GetTracer("cached-scope"), cached);
+      reentrant_noop = provider.GetTracer("uncached-scope");
+    });
+
+    auto failed = provider.GetTracer("throwing-scope");
+    ASSERT_NE(failed, nullptr);
+    EXPECT_EQ(diagnostics, 1);
+    EXPECT_EQ(reentrant_noop, failed);
+    EXPECT_FALSE(failed->StartSpan("noop")->IsRecording());
+    EXPECT_EQ(provider.GetTracer("cached-scope"), cached);
+    EXPECT_EQ(provider.GetTracer("another-scope"), failed);
+    EXPECT_EQ(construct_attempts, 2);
+    EXPECT_EQ(diagnostics, 1);
+    auto entries = handler.Drain();
+    ASSERT_EQ(entries.size(), 1u);
+    EXPECT_NE(entries[0].msg.find(exception_type == 0 ? "injected construction failure"
+                                                      : "unknown exception"),
+              std::string::npos);
+  }
+}
+
 TEST(TracerProvider, GetTracerReturnsNoopOnConstructionFailure)
 {
   auto should_throw          = std::make_shared<bool>(true);
