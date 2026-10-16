@@ -226,6 +226,9 @@ std::shared_ptr<opentelemetry::trace::Tracer> initTracer(
 // every SDK span, so this simulates the span allocation failing.
 std::atomic<bool> g_fail_multi_recordable_allocation{false};
 std::atomic<int> g_failed_allocations{0};
+// Counts calls into the replacement operator new. Tools such as valgrind substitute their own
+// operator new, in which case this stays at zero and the test is skipped.
+std::atomic<int> g_replaced_new_calls{0};
 
 class MapCarrier : public opentelemetry::context::propagation::TextMapCarrier
 {
@@ -250,6 +253,7 @@ public:
 #if OPENTELEMETRY_HAVE_EXCEPTIONS && !OTEL_TEST_ASAN
 void *operator new(std::size_t size)
 {
+  ++g_replaced_new_calls;
   if (size == sizeof(MultiRecordable) && g_fail_multi_recordable_allocation.exchange(false))
   {
     ++g_failed_allocations;
@@ -1684,9 +1688,15 @@ TEST(Tracer, FailedSpanAllocationPreservesContextOnExtract)
   options.parent = parent;
 
   g_failed_allocations               = 0;
+  g_replaced_new_calls               = 0;
   g_fail_multi_recordable_allocation = true;
   auto span                          = tracer->StartSpan("span", options);
   g_fail_multi_recordable_allocation = false;
+
+  if (g_replaced_new_calls.load() == 0)
+  {
+    GTEST_SKIP() << "global operator new is not replaceable in this environment";
+  }
 
   // The injected allocation failure was hit and handled, and the span is not recording ...
   ASSERT_EQ(1, g_failed_allocations.load());
