@@ -1078,6 +1078,155 @@ void BM_Record_BoundHistogram_Base2Expo_ByThreads(benchmark::State &state)
 BENCHMARK(BM_Record_BoundHistogram_Base2Expo_ByThreads)
     ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
 
+void BM_Record_BoundUpDownCounter_Disabled_ByThreads(benchmark::State &state)
+{
+  static BenchmarkProvider provider(false);
+  static auto counter = provider.meter->CreateDoubleUpDownCounter("updown_counter_bound_disabled");
+  static auto attributes = MakeAttributes(kNominalAttributeCount);
+  static auto bound      = counter->Bind(AttributesView(attributes));
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(bound);
+    bound->Add(1.0);
+  }
+}
+BENCHMARK(BM_Record_BoundUpDownCounter_Disabled_ByThreads)
+    ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
+
+void BM_Record_BoundUpDownCounter_Drop_ByThreads(benchmark::State &state)
+{
+  static BenchmarkProvider provider = []() -> BenchmarkProvider {
+    BenchmarkProvider p;
+    p.AddView(metrics_sdk::InstrumentType::kUpDownCounter, "updown_counter_bound_drop",
+              metrics_sdk::AggregationType::kDrop);
+    return p;
+  }();
+  static auto counter    = provider.meter->CreateDoubleUpDownCounter("updown_counter_bound_drop");
+  static auto attributes = MakeAttributes(kNominalAttributeCount);
+  static auto bound      = counter->Bind(AttributesView(attributes));
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(bound);
+    bound->Add(1.0);
+  }
+}
+BENCHMARK(BM_Record_BoundUpDownCounter_Drop_ByThreads)
+    ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
+
+void BM_Record_BoundUpDownCounter_Sum_ByThreads(benchmark::State &state)
+{
+  static BenchmarkProvider provider;
+  static auto counter    = provider.meter->CreateDoubleUpDownCounter("updown_counter_bound_shared");
+  static auto attributes = MakeAttributes(kNominalAttributeCount);
+  static auto bound      = counter->Bind(AttributesView(attributes));
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(bound);
+    bound->Add(1.0);
+  }
+}
+BENCHMARK(BM_Record_BoundUpDownCounter_Sum_ByThreads)
+    ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
+
+void BM_Record_BoundGauge_Disabled_ByThreads(benchmark::State &state)
+{
+  static BenchmarkProvider provider(false);
+  static auto gauge      = provider.meter->CreateDoubleGauge("gauge_bound_disabled");
+  static auto attributes = MakeAttributes(kNominalAttributeCount);
+  static auto bound      = gauge->Bind(AttributesView(attributes));
+  const auto values      = MakeRecordingValues();
+  std::size_t index      = 0;
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(bound);
+    bound->Record(values[index++ % values.size()]);
+  }
+}
+BENCHMARK(BM_Record_BoundGauge_Disabled_ByThreads)
+    ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
+
+void BM_Record_BoundGauge_Drop_ByThreads(benchmark::State &state)
+{
+  static BenchmarkProvider provider = []() -> BenchmarkProvider {
+    BenchmarkProvider p;
+    p.AddView(metrics_sdk::InstrumentType::kGauge, "gauge_bound_drop",
+              metrics_sdk::AggregationType::kDrop);
+    return p;
+  }();
+  static auto gauge      = provider.meter->CreateDoubleGauge("gauge_bound_drop");
+  static auto attributes = MakeAttributes(kNominalAttributeCount);
+  static auto bound      = gauge->Bind(AttributesView(attributes));
+  const auto values      = MakeRecordingValues();
+  std::size_t index      = 0;
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(bound);
+    bound->Record(values[index++ % values.size()]);
+  }
+}
+BENCHMARK(BM_Record_BoundGauge_Drop_ByThreads)
+    ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
+
+void BM_Record_BoundGauge_LastValue_ByThreads(benchmark::State &state)
+{
+  static BenchmarkProvider provider;
+  static auto gauge      = provider.meter->CreateDoubleGauge("gauge_bound_shared");
+  static auto attributes = MakeAttributes(kNominalAttributeCount);
+  static auto bound      = gauge->Bind(AttributesView(attributes));
+  const auto values      = MakeRecordingValues();
+  std::size_t index      = 0;
+  for (auto _ : state)
+  {
+    benchmark::DoNotOptimize(bound);
+    bound->Record(values[index++ % values.size()]);
+  }
+}
+BENCHMARK(BM_Record_BoundGauge_LastValue_ByThreads)
+    ->ThreadRange(1, static_cast<int>(GetBenchmarkThreads()));
+
+// PR #4321 results, 2026-10-14, source 83c75eb4.
+// Apple M4 Pro (12 cores), macOS 26.7.1 arm64, Apple Clang 21.0.0.
+// Release (-O3 -DNDEBUG), C++17, Google Benchmark 1.9.5.
+// CMake: OTELCPP_WITH_ABI_VERSION_1=OFF, OTELCPP_WITH_ABI_VERSION_2=ON,
+// OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW=ON,
+// OTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=OFF, OTELCPP_WITH_STL=OFF,
+// OTELCPP_BUILD_TESTING=ON, OTELCPP_WITH_BENCHMARK=ON.
+// Five repetitions, --benchmark_min_time=0.25s --benchmark_repetitions=5.
+// Machine-specific measurements. Threads were not pinned.
+// Run sync_instruments_benchmark with:
+// --benchmark_filter='BM_Record_Bound'
+// Median ns/iteration, BM_Record_Bound<Instrument>_<Aggregation>_ByThreads.
+// Run-to-run real-time CV reached 5.2% in a contended case.
+// clang-format off
+// Benchmark                   Threads     Real time      CPU time
+// Counter_Disabled                  1          0.71          0.71
+// Counter_Disabled                  4          0.75          0.75
+// Counter_Drop                      1          1.25          1.25
+// Counter_Drop                      4          1.27          1.27
+// Counter_Sum                       1          8.24          8.24
+// Counter_Sum                       4        108.41         79.51
+// UpDownCounter_Disabled            1          0.72          0.72
+// UpDownCounter_Disabled            4          0.75          0.75
+// UpDownCounter_Drop                1          0.84          0.84
+// UpDownCounter_Drop                4          0.77          0.77
+// UpDownCounter_Sum                 1          7.99          7.99
+// UpDownCounter_Sum                 4        101.95         74.88
+// Histogram_Disabled                1          1.43          1.43
+// Histogram_Disabled                4          1.49          1.49
+// Histogram_Drop                    1          1.99          1.99
+// Histogram_Drop                    4          2.03          2.02
+// Histogram_Explicit                1         15.22         15.22
+// Histogram_Explicit                4        182.76        135.04
+// Histogram_Base2Expo               1         17.16         17.12
+// Histogram_Base2Expo               4        235.73        174.82
+// Gauge_Disabled                    1          1.44          1.44
+// Gauge_Disabled                    4          1.50          1.50
+// Gauge_Drop                        1          1.51          1.51
+// Gauge_Drop                        4          1.65          1.65
+// Gauge_LastValue                   1         22.45         22.43
+// Gauge_LastValue                   4        246.89        184.26
+// clang-format on
+
 // PR #4321 results, 2026-09-21, source b3e71a6b.
 // Apple M4 Pro (12 cores), macOS 26.6.2 arm64, Apple Clang 21.0.0.
 // Release (-O3 -DNDEBUG), C++17, Google Benchmark 1.9.5.
