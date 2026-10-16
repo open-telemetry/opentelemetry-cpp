@@ -20,6 +20,14 @@ Increment the:
   from the same provider without deadlocking.
   [#4693](https://github.com/open-telemetry/opentelemetry-cpp/issues/4693)
 
+* [SDK] Do not mark the SDK Span constructor noexcept, so allocation failures
+  are handled by Tracer::StartSpan instead of terminating the process.
+  [#4685](https://github.com/open-telemetry/opentelemetry-cpp/issues/4685)
+
+* [SDK] Return a null recordable when MakeRecordable() fails to allocate,
+  instead of terminating the process from a noexcept function.
+  [#4700](https://github.com/open-telemetry/opentelemetry-cpp/pull/4700)
+
 * [SDK] Preserve the default unlimited timeout when batch span and log record
   processors shut down their exporters.
   [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)
