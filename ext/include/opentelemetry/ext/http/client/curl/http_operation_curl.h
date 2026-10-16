@@ -13,13 +13,13 @@
 #  include <future>
 #endif
 
+#include <atomic>
 #include <cstdint>
 #include <functional>
 #include <map>
 #include <regex>
 #include <sstream>
 #include <string>
-#include <thread>
 #include <vector>
 #ifdef _WIN32
 #  include <io.h>
@@ -260,7 +260,7 @@ public:
    */
   opentelemetry::ext::http::client::SessionState GetSessionState() const noexcept
   {
-    return session_state_;
+    return session_state_.load(std::memory_order_acquire);
   }
 
   /**
@@ -305,6 +305,16 @@ public:
   inline CURL *GetCurlEasyHandle() noexcept { return curl_resource_.easy_handle; }
 
 private:
+  // The client is what discovers that nothing will run a request, so it is what gets to say so.
+  friend class HttpClient;
+
+  /**
+   * Finish an operation that nothing is going to run, and say why. Not for callers: it forces a
+   * terminal state, cleans up, dispatches the terminal event, fulfils the promise and hands the
+   * easy resource back, none of which is safe to ask for from outside the client.
+   */
+  void FinishUnscheduled(const char *reason);
+
   CURLcode SetCurlPtrOption(CURLoption option, const void *value);
 
   CURLcode SetCurlStrOption(CURLoption option, const char *str)
@@ -354,7 +364,8 @@ private:
   const Headers &request_headers_;
   const opentelemetry::ext::http::client::Body &request_body_;
   size_t request_nwrite_{0};
-  opentelemetry::ext::http::client::SessionState session_state_{
+  // Atomic because a handler that cancels from one event can overlap the next dispatch.
+  std::atomic<opentelemetry::ext::http::client::SessionState> session_state_{
       opentelemetry::ext::http::client::SessionState::Created};
 
   const opentelemetry::ext::http::client::Compression &compression_;
@@ -381,7 +392,6 @@ private:
     // Read by Abort() on whichever thread cancels, cleared by Cleanup() on the IO thread.
     std::atomic<Session *> session{nullptr};  // Owner Session
 
-    std::thread::id callback_thread;
     std::function<void(HttpOperation &)> callback;
     std::atomic<bool> is_promise_running{false};
     std::promise<CURLcode> result_promise;
