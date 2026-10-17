@@ -115,6 +115,13 @@ Increment the:
 * [BUG] Keep the curl retry deadline stable within each attempt
   [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
 
+* [METRICS SDK] Fix preview exemplar reservoirs to serialize concurrent
+  measurement offers and collection, reset stored cells and sampling state
+  between collection intervals, remain usable after collection, and omit empty
+  cells from collected results. Correct the simple fixed-size reservoir's
+  sampling bounds so the current measurement can be discarded.
+  [#4429](https://github.com/open-telemetry/opentelemetry-cpp/pull/4429)
+
 Breaking changes:
 
 * [SDK] Remove `noexcept` from the public `TracerContext`, `LoggerContext`,
