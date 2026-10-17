@@ -86,7 +86,7 @@ public:
           ,
       ExemplarFilterType exemplar_filter_type = exemplar_filter_env::GetExemplarFilterFromEnv()
 #endif
-          ) noexcept;
+  );
 
   /**
    * Obtain the resource associated with this meter context.
