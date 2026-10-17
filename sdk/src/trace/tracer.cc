@@ -57,12 +57,6 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   try
   {
 #endif
-    // Check if the tracer is enabled using the API Tracer::Enabled() accessor if available.
-    if (!Enabled())
-    {
-      return noop_span_;
-    }
-
     // Resolve parent span context from options or fall back to the current runtime context.
     const auto parent_context = [&options]() noexcept -> opentelemetry::trace::SpanContext {
       // 1. If the parent is a valid SpanContext, use it directly.
@@ -94,6 +88,15 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
       return opentelemetry::trace::GetSpanContext(
           opentelemetry::context::RuntimeContext::GetCurrent());
     }();
+
+    if (!Enabled())
+    {
+      if (!parent_context.IsValid())
+      {
+        return noop_span_;
+      }
+      return {std::make_shared<opentelemetry::trace::DefaultSpan>(parent_context)};
+    }
 
     IdGenerator &generator                     = GetIdGenerator();
     const opentelemetry::trace::SpanId span_id = generator.GenerateSpanId();
