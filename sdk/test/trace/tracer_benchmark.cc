@@ -118,6 +118,48 @@ void BM_StartSpanTracerDisabled(benchmark::State &state)
 }
 BENCHMARK(BM_StartSpanTracerDisabled);
 
+void BM_StartSpanTracerWithImplicitParentDisabled(benchmark::State &state)
+{
+  auto tracer = CreateTracer(false);
+  auto parent = tracer->StartSpan("parent");
+  auto scope  = trace_api::Scope{parent};
+  while (state.KeepRunning())
+  {
+    auto span = tracer->StartSpan("span");
+    span->End();
+  }
+}
+BENCHMARK(BM_StartSpanTracerWithImplicitParentDisabled);
+
+void BM_StartSpanTracerWithExplicitParentDisabled(benchmark::State &state)
+{
+  auto tracer = CreateTracer(false);
+  auto parent = tracer->StartSpan("parent");
+  context::Context parent_context{};
+  trace_api::StartSpanOptions options;
+  options.parent = trace_api::SetSpan(parent_context, parent);
+  while (state.KeepRunning())
+  {
+    auto span = tracer->StartSpan("span", options);
+    span->End();
+  }
+}
+BENCHMARK(BM_StartSpanTracerWithExplicitParentDisabled);
+
+void BM_StartSpanTracerWithExplicitParentSpanContextDisabled(benchmark::State &state)
+{
+  auto tracer = CreateTracer(false);
+  auto parent = tracer->StartSpan("parent");
+  trace_api::StartSpanOptions options;
+  options.parent = parent->GetContext();
+  while (state.KeepRunning())
+  {
+    auto span = tracer->StartSpan("span", options);
+    span->End();
+  }
+}
+BENCHMARK(BM_StartSpanTracerWithExplicitParentSpanContextDisabled);
+
 // Test to measure performance for span creation
 void BM_StartSpan(benchmark::State &state)
 {
