@@ -3,7 +3,6 @@
 
 #include <chrono>
 #include <cstdint>
-#include <mutex>
 #include <utility>
 
 #include "opentelemetry/context/context.h"
