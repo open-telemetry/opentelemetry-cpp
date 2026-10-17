@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <cstdint>
 #include <limits>
 #include <map>
 #include <memory>
@@ -196,22 +197,68 @@ TEST(SyncInstruments, DoubleHistogram)
                    opentelemetry::context::Context{});
 }
 
+namespace
+{
+
+// Sums every value written to it, so tests can check what an instrument actually recorded.
+class RecordingStorage : public SyncWritableMetricStorage
+{
+public:
+  void RecordLong(int64_t value, const opentelemetry::context::Context &) noexcept override
+  {
+    sum_ += value;
+  }
+  void RecordLong(int64_t value,
+                  const opentelemetry::common::KeyValueIterable &,
+                  const opentelemetry::context::Context &) noexcept override
+  {
+    sum_ += value;
+  }
+  void RecordDouble(double, const opentelemetry::context::Context &) noexcept override {}
+  void RecordDouble(double,
+                    const opentelemetry::common::KeyValueIterable &,
+                    const opentelemetry::context::Context &) noexcept override
+  {}
+
+  int64_t sum() const noexcept { return sum_; }
+
+private:
+  int64_t sum_ = 0;
+};
+
+// Adds value through every Add overload.
+void AddWithAllOverloads(LongCounter &counter, uint64_t value)
+{
+  counter.Add(value);
+  counter.Add(value, opentelemetry::context::Context{});
+  counter.Add(value, opentelemetry::common::KeyValueIterableView<M>({{"k", "v"}}));
+  counter.Add(value, opentelemetry::common::KeyValueIterableView<M>({{"k", "v"}}),
+              opentelemetry::context::Context{});
+}
+
+}  // namespace
+
 TEST(SyncInstruments, DisabledMeterStateSuppressesRecording)
 {
   InstrumentDescriptor instrument_descriptor = {
       "long_counter", "description", "1", InstrumentType::kCounter, InstrumentValueType::kLong};
-  std::unique_ptr<SyncWritableMetricStorage> metric_storage(new SyncMultiMetricStorage());
+  auto *storage = new RecordingStorage();
+  std::unique_ptr<SyncWritableMetricStorage> metric_storage(storage);
   auto meter_enabled_state = std::make_shared<MeterEnabledState>(false);
   LongCounter counter(instrument_descriptor, std::move(metric_storage), meter_enabled_state);
 
   EXPECT_FALSE(counter.IsEnabled());
-  counter.Add(10);
+  AddWithAllOverloads(counter, 10);
+  EXPECT_EQ(storage->sum(), 0);
 
   // Enabling the meter enables the instrument without recreating it.
   meter_enabled_state->SetEnabled(true);
   EXPECT_TRUE(counter.IsEnabled());
-  counter.Add(10);
+  AddWithAllOverloads(counter, 10);
+  EXPECT_EQ(storage->sum(), 40);
 
   meter_enabled_state->SetEnabled(false);
   EXPECT_FALSE(counter.IsEnabled());
+  AddWithAllOverloads(counter, 10);
+  EXPECT_EQ(storage->sum(), 40);
 }
