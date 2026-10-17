@@ -32,6 +32,9 @@ Increment the:
   double range no longer downscales without end.
   [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
 
+* [SDK] Remove TracerConfig copy from Tracer
+  [#4712](https://github.com/open-telemetry/opentelemetry-cpp/pull/4712)
+
 * [LOGS] Fix undefined behavior in `Logger::EmitLogRecord()` when a logger is
   enabled (e.g. via `LoggerProvider::UpdateLoggerConfigurator()`) after
   `CreateLogRecord()` was called while it was still disabled. The disabled
