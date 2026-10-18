@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
         with:
           egress-policy: audit
 
@@ -70,7 +70,7 @@ jobs:
           ./ci/do_ci.sh cmake.iwyu.test
           cp "${BUILD_DIR}/opentelemetry-cpp-iwyu-${{ matrix.cmake_options }}.log" iwyu-${{ matrix.cmake_options }}.log
 
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: success() || failure()
         with:
           name: Logs-iwyu-${{ matrix.cmake_options }}
@@ -85,6 +85,13 @@ jobs:
           echo "include-what-you-use reported ${WARNING_COUNT} warning(s) with cmake options preset '${{ matrix.cmake_options }}'"
           # Acceptable limit, to decrease over time down to 0
           readonly WARNING_LIMIT=${{ matrix.warning_limit }}
+
+          # Print instructions to help investigations
+          echo "::notice::See instructions below to investigate warnings"
+          echo "1) Find the previous job in CI, named 'Build with include-what-you-use'"
+          echo "2) In the job logs, search for 'Warning: include-what-you-use reported diagnostics:'"
+          echo "3) Read the warning messages, and adjust the code accordingly."
+
           # FAIL the build if WARNING_COUNT > WARNING_LIMIT
           if [ $WARNING_COUNT -gt $WARNING_LIMIT ] ; then
             echo "include-what-you-use reported ${WARNING_COUNT} warning(s) exceeding the existing warning limit of ${WARNING_LIMIT} with cmake options preset '${{ matrix.cmake_options }}'"

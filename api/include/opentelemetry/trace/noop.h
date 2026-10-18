@@ -37,13 +37,10 @@ namespace trace
 class OPENTELEMETRY_EXPORT NoopSpan final : public Span
 {
 public:
-  explicit NoopSpan(const std::shared_ptr<Tracer> &tracer) noexcept
-      : tracer_{tracer}, span_context_{new SpanContext(false, false)}
-  {}
+  explicit NoopSpan() : span_context_{new SpanContext(false, false)} {}
 
-  explicit NoopSpan(const std::shared_ptr<Tracer> &tracer,
-                    nostd::unique_ptr<SpanContext> span_context) noexcept
-      : tracer_{tracer}, span_context_{std::move(span_context)}
+  explicit NoopSpan(nostd::unique_ptr<SpanContext> span_context)
+      : span_context_{std::move(span_context)}
   {}
 
   void SetAttribute(nostd::string_view /*key*/,
@@ -84,7 +81,6 @@ public:
   SpanContext GetContext() const noexcept override { return *span_context_.get(); }
 
 private:
-  std::shared_ptr<Tracer> tracer_;
   nostd::unique_ptr<SpanContext> span_context_;
 };
 
@@ -96,7 +92,7 @@ class OPENTELEMETRY_EXPORT NoopTracer final : public Tracer,
 {
 public:
   // Tracer
-  NoopTracer()
+  NoopTracer() : noop_span_(new trace::NoopSpan())
   {
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
     UpdateEnabled(false);
@@ -108,11 +104,7 @@ public:
                                     const SpanContextKeyValueIterable & /*links*/,
                                     const StartSpanOptions & /*options*/) noexcept override
   {
-    // Don't allocate a no-op span for every StartSpan call, but use a static
-    // singleton for this case.
-    static nostd::shared_ptr<trace::Span> noop_span(new trace::NoopSpan{this->shared_from_this()});
-
-    return noop_span;
+    return noop_span_;
   }
 
 #if OPENTELEMETRY_ABI_VERSION_NO == 1
@@ -122,6 +114,9 @@ public:
   void CloseWithMicroseconds(uint64_t /*timeout*/) noexcept override {}
 
 #endif /* OPENTELEMETRY_ABI_VERSION_NO */
+
+private:
+  std::shared_ptr<trace::Span> noop_span_;
 };
 
 /**
@@ -130,9 +125,7 @@ public:
 class OPENTELEMETRY_EXPORT NoopTracerProvider final : public trace::TracerProvider
 {
 public:
-  NoopTracerProvider() noexcept
-      : tracer_{nostd::shared_ptr<trace::NoopTracer>(new trace::NoopTracer)}
-  {}
+  NoopTracerProvider() : tracer_{nostd::shared_ptr<trace::NoopTracer>(new trace::NoopTracer)} {}
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   nostd::shared_ptr<trace::Tracer> GetTracer(
