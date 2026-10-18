@@ -135,7 +135,6 @@ These tests build the core API and SDK components in maintainer mode.
   test.
 * `cmake.fetch_content.test`: Validate building the project via
   `FetchContent`.
-* `cmake.test_example_plugin`: Build and load-test the example plugin.
 
 ### Bazel targets
 
