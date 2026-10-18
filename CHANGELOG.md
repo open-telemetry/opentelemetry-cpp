@@ -16,7 +16,7 @@ Increment the:
 ## [Unreleased]
 
 * [API/SDK] Add ASCII helpers and remove regex from InstrumentMetaDataValidator
-  [#XXXX](https://github.com/open-telemetry/opentelemetry-cpp/pull/XXXX)
+  [#4715](https://github.com/open-telemetry/opentelemetry-cpp/pull/4715)
 
 * [SDK] Release provider mutexes before construction-failure diagnostics so
   custom log handlers can retrieve cached or noop tracers, loggers, and meters
