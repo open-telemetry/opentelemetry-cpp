@@ -40,7 +40,11 @@ Increment the:
   request and never calls back (a dead thread, a reused socket, a swallowed
   error) left `Export()` blocked for the life of the process. The wait now
   has its own deadline derived from the configured response timeout, so a
-  non-responding client fails the export instead of hanging it.
+  non-responding client fails the export instead of hanging it. A
+  `response_timeout` of 0 means no timeout, matching the curl client's own
+  `CURLOPT_TIMEOUT_MS` 0 semantics, so it no longer maps to a deadline
+  already in the past: that previously failed every synchronous export
+  immediately, even one the client was about to answer successfully.
   [#4362](https://github.com/open-telemetry/opentelemetry-cpp/issues/4362)
 
 * [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording

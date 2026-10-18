@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <thread>
 #include <utility>
 #include "nlohmann/json.hpp"
 
@@ -113,6 +114,47 @@ public:
       opentelemetry::nostd::string_view) noexcept override
   {
     return std::make_shared<FakeSession>();
+  }
+
+  bool CancelAllSessions() noexcept override { return true; }
+  bool FinishAllSessions() noexcept override { return true; }
+  void SetMaxSessionsPerConnection(std::size_t) noexcept override {}
+};
+
+// A session that answers on a background thread after a short, fixed delay, so the exporter's
+// wait genuinely blocks for a moment rather than finding the response already recorded: a
+// response_timeout_ of 0 that mapped to a deadline already in the past would still pass a wait
+// whose predicate is satisfied before the wait is even entered, so this is the only way to
+// exercise a deadline comparison at all.
+class DelayedSession final : public http_client::Session
+{
+public:
+  std::shared_ptr<http_client::Request> CreateRequest() noexcept override
+  {
+    return std::make_shared<FakeRequest>();
+  }
+
+  void SendRequest(std::shared_ptr<http_client::EventHandler> handler) noexcept override
+  {
+    std::thread([handler] {
+      std::this_thread::sleep_for(std::chrono::milliseconds(20));
+      FakeResponse response;
+      handler->OnResponse(response);
+    }).detach();
+  }
+
+  bool IsSessionActive() noexcept override { return true; }
+  bool CancelSession() noexcept override { return true; }
+  bool FinishSession() noexcept override { return true; }
+};
+
+class DelayedHttpClient final : public http_client::HttpClient
+{
+public:
+  std::shared_ptr<http_client::Session> CreateSession(
+      opentelemetry::nostd::string_view) noexcept override
+  {
+    return std::make_shared<DelayedSession>();
   }
 
   bool CancelAllSessions() noexcept override { return true; }
@@ -335,6 +377,28 @@ TEST(ElasticsearchLogsExporterTests, ExportFinishesSessionOnTerminalFailureInste
   // Confirms the failure was reported promptly rather than by the 30s response_timeout_
   // expiring, which would also leave cancel_called_ true.
   EXPECT_LT(elapsed, std::chrono::seconds(1));
+}
+
+// Regression test: response_timeout = 0 is documented to mean no timeout, matching curl's own
+// CURLOPT_TIMEOUT_MS 0 semantics. Deriving the wait's deadline as now() + seconds(0) instead
+// mapped that to a deadline already in the past, so every sync export failed immediately even
+// when the client was about to answer successfully. DelayedSession answers on a separate
+// thread after a short, genuine delay, so a deadline already elapsed and a deadline far in the
+// future are actually distinguishable here.
+TEST(ElasticsearchLogsExporterTests, ZeroResponseTimeoutMeansNoTimeout)
+{
+  logs_exporter::ElasticsearchExporterOptions options("localhost", 9200, "logs",
+                                                      /*response_timeout=*/0);
+  auto http_client = std::make_shared<DelayedHttpClient>();
+  auto exporter    = std::unique_ptr<sdklogs::LogRecordExporter>(
+      new logs_exporter::ElasticsearchLogRecordExporter(options, http_client));
+
+  auto record = exporter->MakeRecordable();
+  record->SetBody("this export should wait for the delayed response, not time out instantly");
+
+  auto result = exporter->Export(nostd::span<std::unique_ptr<sdklogs::Recordable>>(&record, 1));
+
+  EXPECT_EQ(result, opentelemetry::sdk::common::ExportResult::kSuccess);
 }
 #endif  // !ENABLE_ASYNC_EXPORT
 

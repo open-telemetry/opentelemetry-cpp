@@ -111,10 +111,12 @@ public:
   /**
    * A method the user calls to block their thread until the request has either produced a
    * response or failed, or until the given deadline passes. Ordinarily the request's own
-   * timeout (set by SetTimeoutMs()) arrives here first, as a TimedOut session event. But that
-   * guarantee belongs to the injected HttpClient, not to this exporter: a client that accepts
-   * a handler and never delivers a terminal event (a dead thread, a reused socket, a swallowed
-   * error) would otherwise leave this wait blocked for the life of the process. The deadline is
+   * timeout (set by SetTimeoutMs()) arrives here first; the curl client reports that as a
+   * SendFailed session event, the same as any other transport failure, since it does not
+   * distinguish a timeout from other CURL errors. But a terminal event at all is a guarantee
+   * that belongs to the injected HttpClient, not to this exporter: a client that accepts a
+   * handler and never delivers one (a dead thread, a reused socket, a swallowed error) would
+   * otherwise leave this wait blocked for the life of the process. The deadline is
    * this exporter's own backstop, independent of whether the client honors its side of the
    * contract.
    *
@@ -488,9 +490,14 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   // Send the request
   auto handler = std::make_shared<ResponseHandler>(options_.console_debug_);
   // Captured before SendRequest() so the deadline reflects this exporter's own timeout budget,
-  // not whatever the injected HttpClient decides to do with it (see waitForResponse()).
-  auto deadline =
-      std::chrono::steady_clock::now() + std::chrono::seconds(options_.response_timeout_);
+  // not whatever the injected HttpClient decides to do with it (see waitForResponse()). A
+  // non-positive response_timeout_ means no timeout, matching the curl client's own
+  // CURLOPT_TIMEOUT_MS 0 semantics, so it gets the max time_point rather than one already in
+  // the past; this backstop only bounds the wait when the caller actually asked for a bound.
+  auto deadline = options_.response_timeout_ > 0
+                      ? std::chrono::steady_clock::now() +
+                            std::chrono::seconds(options_.response_timeout_)
+                      : std::chrono::steady_clock::time_point::max();
   session->SendRequest(handler);
 
   // Wait for the response to be received
