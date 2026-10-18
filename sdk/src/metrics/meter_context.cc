@@ -94,7 +94,7 @@ MeterContext::MeterContext(
     ,
     ExemplarFilterType exemplar_filter_type
 #endif
-    ) noexcept
+    )
     : resource_{resource},
       views_(std::move(views)),
       sdk_start_ts_{std::chrono::system_clock::now()},

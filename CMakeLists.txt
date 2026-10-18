@@ -170,9 +170,6 @@ if(NOT OTELCPP_WITH_STL STREQUAL "OFF")
   endif()
 endif()
 
-otelcpp_option_flag(OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
-                    "Whether to enable mTLS support for gRPC" ON)
-
 otelcpp_option_flag(
   OTELCPP_WITH_OTLP_GRPC_CREDENTIAL_PREVIEW
   "Whether to enable gRPC credentials option in OTLP gRPC Exporter" OFF)
@@ -627,10 +624,6 @@ message(
 message(
   STATUS
     "OTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW: ${OTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW}"
-)
-message(
-  STATUS
-    "OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW: ${OTELCPP_WITH_OTLP_GRPC_SSL_MTLS_PREVIEW}"
 )
 message(
   STATUS
