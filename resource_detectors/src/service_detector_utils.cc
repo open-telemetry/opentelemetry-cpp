@@ -15,6 +15,7 @@
 #  include <unistd.h>
 #endif
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/resource_detectors/detail/process_detector_utils.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/version.h"
@@ -31,21 +32,16 @@ namespace
 constexpr const char *kOtelServiceName      = "OTEL_SERVICE_NAME";
 constexpr const char *kUnknownService       = "unknown_service";
 constexpr const char *kUnknownServicePrefix = "unknown_service:";
-constexpr const char kUuidHexDigits[]       = "0123456789abcdef";
 
 std::string FormatUuidV4(const uint8_t bytes[16]) noexcept
 {
-  std::string uuid;
-  uuid.reserve(36);
-  for (size_t i = 0; i < 16; ++i)
-  {
-    if (i == 4 || i == 6 || i == 8 || i == 10)
-    {
-      uuid.push_back('-');
-    }
-    uuid.push_back(kUuidHexDigits[bytes[i] >> 4]);
-    uuid.push_back(kUuidHexDigits[bytes[i] & 0x0F]);
-  }
+  // Groups of 8, 4, 4, 4 and 12 hexadecimal digits, separated by dashes.
+  std::string uuid(36, '-');
+  opentelemetry::common::detail::EncodeLowerHex(&bytes[0], 4, &uuid[0]);
+  opentelemetry::common::detail::EncodeLowerHex(&bytes[4], 2, &uuid[9]);
+  opentelemetry::common::detail::EncodeLowerHex(&bytes[6], 2, &uuid[14]);
+  opentelemetry::common::detail::EncodeLowerHex(&bytes[8], 2, &uuid[19]);
+  opentelemetry::common::detail::EncodeLowerHex(&bytes[10], 6, &uuid[24]);
   return uuid;
 }
 

@@ -6,6 +6,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
+#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <list>
@@ -17,13 +18,8 @@
 #include <utility>
 #include <vector>
 
-#if defined(HAVE_GSL)
-#  include <gsl/gsl>
-#else
-#  include <cassert>
-#endif
-
 #include "nlohmann/json.hpp"
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
 #include "opentelemetry/exporters/otlp/otlp_http_client.h"
@@ -422,33 +418,11 @@ private:
   bool console_debug_ = false;
 };
 
-static inline char HexEncode(unsigned char byte)
-{
-#if defined(HAVE_GSL)
-  Expects(byte <= 16);
-#else
-  assert(byte <= 16);
-#endif
-  if (byte >= 10)
-  {
-    return static_cast<char>(byte - 10 + 'a');
-  }
-  else
-  {
-    return static_cast<char>(byte + '0');
-  }
-}
-
 static std::string HexEncode(const std::string &bytes)
 {
-  std::string ret;
-  ret.reserve(bytes.size() * 2);
-  for (std::string::size_type i = 0; i < bytes.size(); ++i)
-  {
-    unsigned char byte = static_cast<unsigned char>(bytes[i]);
-    ret.push_back(HexEncode(byte >> 4));
-    ret.push_back(HexEncode(byte & 0x0f));
-  }
+  std::string ret(bytes.size() * 2, '\0');
+  opentelemetry::common::detail::EncodeLowerHex(reinterpret_cast<const uint8_t *>(bytes.data()),
+                                                bytes.size(), &ret[0]);
   return ret;
 }
 
