@@ -13,8 +13,7 @@ OPENTELEMETRY_EXPORT LogRecordExporter::LogRecordExporter() {}
 
 OPENTELEMETRY_EXPORT LogRecordExporter::~LogRecordExporter() {}
 
-OPENTELEMETRY_EXPORT bool LogRecordExporter::ForceFlush(
-    std::chrono::microseconds /*timeout*/) noexcept
+OPENTELEMETRY_EXPORT bool LogRecordExporter::ForceFlush(std::chrono::microseconds /*timeout*/)
 {
   return true;
 }

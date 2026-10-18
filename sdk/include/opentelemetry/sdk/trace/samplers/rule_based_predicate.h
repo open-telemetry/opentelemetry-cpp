@@ -60,18 +60,17 @@ class RuleBasedPredicate : public Predicate
 public:
   explicit RuleBasedPredicate(RuleBasedPredicateOptions options);
 
-  bool SpanMatches(
-      const opentelemetry::trace::SpanContext &parent_context,
-      nostd::string_view name,
-      opentelemetry::trace::SpanKind span_kind,
-      const opentelemetry::common::KeyValueIterable &attributes,
-      const opentelemetry::trace::SpanContextKeyValueIterable &links) const noexcept override;
+  bool SpanMatches(const opentelemetry::trace::SpanContext &parent_context,
+                   nostd::string_view name,
+                   opentelemetry::trace::SpanKind span_kind,
+                   const opentelemetry::common::KeyValueIterable &attributes,
+                   const opentelemetry::trace::SpanContextKeyValueIterable &links) const override;
 
-  nostd::string_view GetDescription() const noexcept override;
+  nostd::string_view GetDescription() const override;
 
 private:
-  bool ParentMatches(const opentelemetry::trace::SpanContext &parent_context) const noexcept;
-  bool SpanKindMatches(opentelemetry::trace::SpanKind span_kind) const noexcept;
+  bool ParentMatches(const opentelemetry::trace::SpanContext &parent_context) const;
+  bool SpanKindMatches(opentelemetry::trace::SpanKind span_kind) const;
 
   RuleBasedPredicateOptions options_;
 };

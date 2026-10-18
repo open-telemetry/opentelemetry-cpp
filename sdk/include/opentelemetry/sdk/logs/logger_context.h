@@ -55,7 +55,7 @@ public:
    *
    * Note: This method is not thread safe.
    */
-  void AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept;
+  void AddProcessor(std::unique_ptr<LogRecordProcessor> processor);
 
   /**
    * Obtain the configured (composite) processor.
@@ -63,26 +63,25 @@ public:
    * Note: When more than one processor is active, this will
    * return an "aggregate" processor
    */
-  LogRecordProcessor &GetProcessor() const noexcept;
+  LogRecordProcessor &GetProcessor() const;
 
   /**
    * Obtain the resource associated with this tracer context.
    * @return The resource for this tracer context.
    */
-  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
+  const opentelemetry::sdk::resource::Resource &GetResource() const;
 
   /**
    * Obtain the ScopeConfigurator with this logger context.
    * @return The ScopeConfigurator for this logger context.
    */
-  const instrumentationscope::ScopeConfigurator<LoggerConfig> &GetLoggerConfigurator()
-      const noexcept;
+  const instrumentationscope::ScopeConfigurator<LoggerConfig> &GetLoggerConfigurator() const;
 
   /**
    * Obtain the LogRecord limits applied by this context.
    * @return The LogRecordLimits for this logger context.
    */
-  const LogRecordLimits &GetLogRecordLimits() const noexcept;
+  const LogRecordLimits &GetLogRecordLimits() const;
 
   /**
    * Whether any configured processor produces a recordable that enforces the
@@ -91,25 +90,25 @@ public:
    * SetLogRecordLimits() virtual call when no processor needs it.
    * @return true if at least one processor enforces limits.
    */
-  bool RecordableEnforcesLogRecordLimits() const noexcept;
+  bool RecordableEnforcesLogRecordLimits() const;
 
   /**
    * Replace the ScopeConfigurator for this logger context.
    * @param logger_configurator The new configurator.
    */
-  void SetLoggerConfigurator(std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
-                                 logger_configurator) noexcept;
+  void SetLoggerConfigurator(
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator);
 
   /**
    * Force all active LogProcessors to flush any buffered logs
    * within the given timeout.
    */
-  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
   /**
    * Shutdown the log processor associated with this tracer provider.
    */
-  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
 private:
   //  order of declaration is important here - resource object should be destroyed after processor.

@@ -170,14 +170,13 @@ opentelemetry::nostd::shared_ptr<opentelemetry::logs::Logger> LoggerProvider::Ge
 #endif
 }
 
-void LoggerProvider::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept
+void LoggerProvider::AddProcessor(std::unique_ptr<LogRecordProcessor> processor)
 {
   context_->AddProcessor(std::move(processor));
 }
 
 void LoggerProvider::UpdateLoggerConfigurator(
-    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
-        logger_configurator) noexcept
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator)
 {
   if (!logger_configurator)
   {
@@ -205,17 +204,17 @@ void LoggerProvider::UpdateLoggerConfigurator(
   }
 }
 
-const opentelemetry::sdk::resource::Resource &LoggerProvider::GetResource() const noexcept
+const opentelemetry::sdk::resource::Resource &LoggerProvider::GetResource() const
 {
   return context_->GetResource();
 }
 
-bool LoggerProvider::Shutdown(std::chrono::microseconds timeout) noexcept
+bool LoggerProvider::Shutdown(std::chrono::microseconds timeout)
 {
   return context_->Shutdown(timeout);
 }
 
-bool LoggerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool LoggerProvider::ForceFlush(std::chrono::microseconds timeout)
 {
   return context_->ForceFlush(timeout);
 }

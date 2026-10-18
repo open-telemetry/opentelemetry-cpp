@@ -45,7 +45,7 @@ public:
    *
    * Note: This method must be callable from multiple threads.
    */
-  virtual std::unique_ptr<Recordable> MakeRecordable() noexcept = 0;
+  virtual std::unique_ptr<Recordable> MakeRecordable() = 0;
 
   /**
    * OnStart is called when a span is started.
@@ -53,13 +53,13 @@ public:
    * @param parent_context The parent context of the span that just started
    */
   virtual void OnStart(Recordable &span,
-                       const opentelemetry::trace::SpanContext &parent_context) noexcept = 0;
+                       const opentelemetry::trace::SpanContext &parent_context) = 0;
 
   /**
    * OnEnd is called when a span is ended.
    * @param span a recordable for a span that was ended
    */
-  virtual void OnEnd(std::unique_ptr<Recordable> &&span) noexcept = 0;
+  virtual void OnEnd(std::unique_ptr<Recordable> &&span) = 0;
 
   /**
    * Export all ended spans that have not yet been exported.
@@ -67,7 +67,7 @@ public:
    * timeout is applied.
    */
   virtual bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) = 0;
 
   /**
    * Shut down the processor and do any cleanup required. Ended spans are
@@ -77,8 +77,7 @@ public:
    * @param timeout an optional timeout, the default timeout means that no
    * timeout is applied.
    */
-  virtual bool Shutdown(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+  virtual bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) = 0;
 };
 }  // namespace trace
 }  // namespace sdk

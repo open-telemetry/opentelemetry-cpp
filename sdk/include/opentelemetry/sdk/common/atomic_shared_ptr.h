@@ -25,15 +25,15 @@ template <class T>
 class AtomicSharedPtr
 {
 public:
-  explicit AtomicSharedPtr(std::shared_ptr<T> ptr) noexcept : ptr_{std::move(ptr)} {}
+  explicit AtomicSharedPtr(std::shared_ptr<T> ptr) : ptr_{std::move(ptr)} {}
 
-  void store(const std::shared_ptr<T> &other) noexcept
+  void store(const std::shared_ptr<T> &other)
   {
     std::lock_guard<std::mutex> lock_guard{mu_};
     ptr_ = other;
   }
 
-  std::shared_ptr<T> load() const noexcept
+  std::shared_ptr<T> load() const
   {
     std::lock_guard<std::mutex> lock_guard{mu_};
     return ptr_;
@@ -48,11 +48,11 @@ template <class T>
 class AtomicSharedPtr
 {
 public:
-  explicit AtomicSharedPtr(std::shared_ptr<T> ptr) noexcept : ptr_{std::move(ptr)} {}
+  explicit AtomicSharedPtr(std::shared_ptr<T> ptr) : ptr_{std::move(ptr)} {}
 
-  void store(const std::shared_ptr<T> &other) noexcept { std::atomic_store(&ptr_, other); }
+  void store(const std::shared_ptr<T> &other) { std::atomic_store(&ptr_, other); }
 
-  std::shared_ptr<T> load() const noexcept { return std::atomic_load(&ptr_); }
+  std::shared_ptr<T> load() const { return std::atomic_load(&ptr_); }
 
 private:
   std::shared_ptr<T> ptr_;

@@ -45,7 +45,7 @@ PatternPredicate::PatternPredicate(opentelemetry::nostd::string_view pattern)
 
 PatternPredicate::~PatternPredicate() = default;
 
-bool PatternPredicate::Match(opentelemetry::nostd::string_view str) const noexcept
+bool PatternPredicate::Match(opentelemetry::nostd::string_view str) const
 {
 #if OPENTELEMETRY_HAVE_WORKING_REGEX
   return std::regex_match(str.data(), str.data() + str.size(), impl_->reg_key_);
@@ -60,7 +60,7 @@ WildcardPredicate::WildcardPredicate(opentelemetry::nostd::string_view pattern)
     : pattern_{pattern.data(), pattern.size()}
 {}
 
-bool WildcardPredicate::Match(opentelemetry::nostd::string_view str) const noexcept
+bool WildcardPredicate::Match(opentelemetry::nostd::string_view str) const
 {
   return opentelemetry::sdk::common::WildcardMatch(pattern_, str);
 }
@@ -69,17 +69,17 @@ ExactPredicate::ExactPredicate(opentelemetry::nostd::string_view pattern)
     : pattern_{pattern.data(), pattern.size()}
 {}
 
-bool ExactPredicate::Match(opentelemetry::nostd::string_view str) const noexcept
+bool ExactPredicate::Match(opentelemetry::nostd::string_view str) const
 {
   return pattern_ == str;
 }
 
-bool MatchEverythingPattern::Match(opentelemetry::nostd::string_view /* str */) const noexcept
+bool MatchEverythingPattern::Match(opentelemetry::nostd::string_view /* str */) const
 {
   return true;
 }
 
-bool MatchNothingPattern::Match(opentelemetry::nostd::string_view /* str */) const noexcept
+bool MatchNothingPattern::Match(opentelemetry::nostd::string_view /* str */) const
 {
   return false;
 }

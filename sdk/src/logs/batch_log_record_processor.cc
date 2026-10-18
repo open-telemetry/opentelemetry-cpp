@@ -393,7 +393,7 @@ BatchLogRecordProcessor::~BatchLogRecordProcessor()
   }
 }
 
-bool BatchLogRecordProcessor::InternalShutdown(std::chrono::microseconds timeout) noexcept
+bool BatchLogRecordProcessor::InternalShutdown(std::chrono::microseconds timeout)
 {
   auto start_time = std::chrono::system_clock::now();
 

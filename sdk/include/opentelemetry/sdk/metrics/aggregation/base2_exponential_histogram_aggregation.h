@@ -28,29 +28,28 @@ public:
   Base2ExponentialHistogramAggregation(const Base2ExponentialHistogramPointData &point_data);
   Base2ExponentialHistogramAggregation(Base2ExponentialHistogramPointData &&point_data);
 
-  void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept override;
-  void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
+  void Aggregate(int64_t value, const PointAttributes &attributes = {}) override;
+  void Aggregate(double value, const PointAttributes &attributes = {}) override;
 
   /* Returns the result of merge of the existing aggregation with delta
    * aggregation with same boundaries */
-  std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const noexcept override;
+  std::unique_ptr<Aggregation> Merge(const Aggregation &delta) const override;
 
   /* Returns the new delta aggregation by comparing existing aggregation with
    * next aggregation with same boundaries. Data points for `next` aggregation
    * (sum , bucket-counts) should be more than the current aggregation - which
    * is the normal scenario as measurements values are monotonic increasing.
    */
-  std::unique_ptr<Aggregation> Diff(const Aggregation &next) const noexcept override;
+  std::unique_ptr<Aggregation> Diff(const Aggregation &next) const override;
 
-  PointType ToPoint() const noexcept override;
+  PointType ToPoint() const override;
 
 private:
-  void AggregateIntoBuckets(std::unique_ptr<AdaptingCircularBufferCounter> &buckets,
-                            double value) noexcept;
+  void AggregateIntoBuckets(std::unique_ptr<AdaptingCircularBufferCounter> &buckets, double value);
 
   /* Reduces the scale by up to `by`, stopping at kMinRuntimeScale. Returns the reduction that was
    * actually applied, which callers must use to shift bucket indices. */
-  uint32_t Downscale(uint32_t by) noexcept;
+  uint32_t Downscale(uint32_t by);
 
   mutable opentelemetry::common::SpinLockMutex lock_;
   Base2ExponentialHistogramPointData point_data_;

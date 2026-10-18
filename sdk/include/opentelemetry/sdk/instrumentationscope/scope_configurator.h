@@ -34,8 +34,7 @@ public:
      * @param default_scope_config The default scope config that the built configurator should fall
      * back on.
      */
-    explicit Builder(T default_scope_config) noexcept : default_scope_config_(default_scope_config)
-    {}
+    explicit Builder(T default_scope_config) : default_scope_config_(default_scope_config) {}
 
     /**
      * Allows the user to pass a generic function that evaluates an instrumentation scope through a

@@ -105,24 +105,23 @@ MeterContext::MeterContext(
 #endif
 {}
 
-const resource::Resource &MeterContext::GetResource() const noexcept
+const resource::Resource &MeterContext::GetResource() const
 {
   return resource_;
 }
 
-ViewRegistry *MeterContext::GetViewRegistry() const noexcept
+ViewRegistry *MeterContext::GetViewRegistry() const
 {
   return views_.get();
 }
 
 const instrumentationscope::ScopeConfigurator<MeterConfig> &MeterContext::GetMeterConfigurator()
-    const noexcept
+    const
 {
   return *meter_configurator_;
 }
 
-bool MeterContext::ForEachMeter(
-    nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback) noexcept
+bool MeterContext::ForEachMeter(nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback)
 {
   std::lock_guard<std::mutex> guard(meter_lock_);
   for (auto &meter : meters_)
@@ -135,24 +134,24 @@ bool MeterContext::ForEachMeter(
   return true;
 }
 
-nostd::span<std::shared_ptr<Meter>> MeterContext::GetMeters() noexcept
+nostd::span<std::shared_ptr<Meter>> MeterContext::GetMeters()
 {
   // no lock required, as this is called by MeterProvider in thread-safe manner.
   return nostd::span<std::shared_ptr<Meter>>{meters_.data(), meters_.size()};
 }
 
-nostd::span<std::shared_ptr<CollectorHandle>> MeterContext::GetCollectors() noexcept
+nostd::span<std::shared_ptr<CollectorHandle>> MeterContext::GetCollectors()
 {
   return nostd::span<std::shared_ptr<CollectorHandle>>(collectors_.data(), collectors_.size());
 }
 
-opentelemetry::common::SystemTimestamp MeterContext::GetSDKStartTime() noexcept
+opentelemetry::common::SystemTimestamp MeterContext::GetSDKStartTime()
 {
   return sdk_start_ts_;
 }
 
 void MeterContext::AddMetricReader(std::shared_ptr<MetricReader> reader,
-                                   std::unique_ptr<MetricFilter> metric_filter) noexcept
+                                   std::unique_ptr<MetricFilter> metric_filter)
 {
   auto collector = std::shared_ptr<MetricCollector>{
       new MetricCollector(this, std::move(reader), std::move(metric_filter))};
@@ -161,19 +160,19 @@ void MeterContext::AddMetricReader(std::shared_ptr<MetricReader> reader,
 
 void MeterContext::AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
                            std::unique_ptr<MeterSelector> meter_selector,
-                           std::unique_ptr<View> view) noexcept
+                           std::unique_ptr<View> view)
 {
   views_->AddView(std::move(instrument_selector), std::move(meter_selector), std::move(view));
 }
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-void MeterContext::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type) noexcept
+void MeterContext::SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type)
 {
   exemplar_filter_type_ = exemplar_filter_type;
 }
 
-ExemplarFilterType MeterContext::GetExemplarFilter() const noexcept
+ExemplarFilterType MeterContext::GetExemplarFilter() const
 {
   return exemplar_filter_type_;
 }
@@ -212,7 +211,7 @@ void MeterContext::RemoveMeter(nostd::string_view name,
   meters_.swap(filtered_meters);
 }
 
-bool MeterContext::Shutdown(std::chrono::microseconds timeout) noexcept
+bool MeterContext::Shutdown(std::chrono::microseconds timeout)
 {
   bool result = true;
   // Shutdown only once.
@@ -235,7 +234,7 @@ bool MeterContext::Shutdown(std::chrono::microseconds timeout) noexcept
   return result;
 }
 
-bool MeterContext::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool MeterContext::ForceFlush(std::chrono::microseconds timeout)
 {
   bool result = true;
   // Simultaneous flush not allowed.

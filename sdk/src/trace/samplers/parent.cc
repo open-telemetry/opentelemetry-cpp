@@ -23,7 +23,7 @@ ParentBasedSampler::ParentBasedSampler(
     const std::shared_ptr<Sampler> &remote_parent_sampled_sampler,
     const std::shared_ptr<Sampler> &remote_parent_nonsampled_sampler,
     const std::shared_ptr<Sampler> &local_parent_sampled_sampler,
-    const std::shared_ptr<Sampler> &local_parent_nonsampled_sampler) noexcept
+    const std::shared_ptr<Sampler> &local_parent_nonsampled_sampler)
     : root_sampler_(root_sampler),
       remote_parent_sampled_sampler_(remote_parent_sampled_sampler),
       remote_parent_nonsampled_sampler_(remote_parent_nonsampled_sampler),
@@ -38,7 +38,7 @@ SamplingResult ParentBasedSampler::ShouldSample(
     nostd::string_view name,
     trace_api::SpanKind span_kind,
     const opentelemetry::common::KeyValueIterable &attributes,
-    const trace_api::SpanContextKeyValueIterable &links) noexcept
+    const trace_api::SpanContextKeyValueIterable &links)
 {
   if (!parent_context.IsValid())
   {
@@ -69,7 +69,7 @@ SamplingResult ParentBasedSampler::ShouldSample(
                                                         attributes, links);
 }
 
-nostd::string_view ParentBasedSampler::GetDescription() const noexcept
+nostd::string_view ParentBasedSampler::GetDescription() const
 {
   return description_;
 }

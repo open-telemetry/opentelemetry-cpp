@@ -100,7 +100,7 @@ public:
    * Obtain the resource associated with this meter provider.
    * @return The resource for this meter provider.
    */
-  const sdk::resource::Resource &GetResource() const noexcept;
+  const sdk::resource::Resource &GetResource() const;
 
   /**
    * Create a MetricCollector from a MetricReader using the MeterContext of this MeterProvider and
@@ -114,7 +114,7 @@ public:
    * Note: This method is not thread safe, and should ideally be called from main thread.
    */
   void AddMetricReader(std::shared_ptr<MetricReader> reader,
-                       std::unique_ptr<MetricFilter> metric_filter = nullptr) noexcept;
+                       std::unique_ptr<MetricFilter> metric_filter = nullptr);
 
   /**
    * Attaches a View to list of configured Views for this Meter provider.
@@ -128,24 +128,24 @@ public:
    */
   void AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
                std::unique_ptr<MeterSelector> meter_selector,
-               std::unique_ptr<View> view) noexcept;
+               std::unique_ptr<View> view);
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-  void SetExemplarFilter(metrics::ExemplarFilterType exemplar_filter_type =
-                             metrics::ExemplarFilterType::kTraceBased) noexcept;
+  void SetExemplarFilter(
+      metrics::ExemplarFilterType exemplar_filter_type = metrics::ExemplarFilterType::kTraceBased);
 
 #endif
 
   /**
    * Shutdown the meter provider.
    */
-  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
   /**
    * Force flush the meter provider.
    */
-  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
   ~MeterProvider() override;
 

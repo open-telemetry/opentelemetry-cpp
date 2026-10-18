@@ -20,8 +20,7 @@ void MetricReader::SetMetricProducer(MetricProducer *metric_producer)
   OnInitialized();
 }
 
-bool MetricReader::Collect(
-    nostd::function_ref<bool(ResourceMetrics &metric_data)> callback) noexcept
+bool MetricReader::Collect(nostd::function_ref<bool(ResourceMetrics &metric_data)> callback)
 {
   if (!metric_producer_)
   {
@@ -42,7 +41,7 @@ bool MetricReader::Collect(
   return (result.status_ == MetricProducer::Status::kSuccess) && success;
 }
 
-bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept
+bool MetricReader::Shutdown(std::chrono::microseconds timeout)
 {
   // Serialize so concurrent calls block until the first call's shutdown has completed.
   std::lock_guard<std::mutex> shutdown_guard{shutdown_m_};
@@ -62,7 +61,7 @@ bool MetricReader::Shutdown(std::chrono::microseconds timeout) noexcept
 }
 
 /** Flush metric read by this reader **/
-bool MetricReader::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool MetricReader::ForceFlush(std::chrono::microseconds timeout)
 {
   if (IsShutdown())
   {
@@ -80,12 +79,12 @@ bool MetricReader::ForceFlush(std::chrono::microseconds timeout) noexcept
   return status;
 }
 
-bool MetricReader::IsShutdown() const noexcept
+bool MetricReader::IsShutdown() const
 {
   return shutdown_.load(std::memory_order_acquire);
 }
 
-std::size_t MetricReader::GetCardinalityLimit(InstrumentType instrument_type) const noexcept
+std::size_t MetricReader::GetCardinalityLimit(InstrumentType instrument_type) const
 {
   switch (instrument_type)
   {
@@ -108,7 +107,7 @@ std::size_t MetricReader::GetCardinalityLimit(InstrumentType instrument_type) co
   }
 }
 
-void MetricReader::SetCardinalityLimits(const CardinalityLimits &limits) noexcept
+void MetricReader::SetCardinalityLimits(const CardinalityLimits &limits)
 {
   cardinality_limits_ = limits;
   // TODO: Reader-level limits are stored but not yet enforced as a per-collector

@@ -174,7 +174,11 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
 #endif
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+void Tracer::ForceFlushWithMicroseconds(uint64_t timeout)
+#else
 void Tracer::ForceFlushWithMicroseconds(uint64_t timeout) noexcept
+#endif
 {
   if (context_)
   {
@@ -183,7 +187,11 @@ void Tracer::ForceFlushWithMicroseconds(uint64_t timeout) noexcept
   }
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+void Tracer::CloseWithMicroseconds(uint64_t timeout)
+#else
 void Tracer::CloseWithMicroseconds(uint64_t timeout) noexcept
+#endif
 {
   // Trace context is shared by many tracers.So we just call ForceFlush to flush all pending spans
   // and do not shutdown it.
@@ -194,7 +202,7 @@ void Tracer::CloseWithMicroseconds(uint64_t timeout) noexcept
   }
 }
 
-void Tracer::UpdateTracerConfig(TracerConfig config) noexcept
+void Tracer::UpdateTracerConfig(TracerConfig config)
 {
   const bool enabled = config.IsEnabled();
   {

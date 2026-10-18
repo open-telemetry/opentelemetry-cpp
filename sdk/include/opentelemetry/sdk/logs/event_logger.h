@@ -32,7 +32,7 @@ public:
    * @param event_domain Event domain
    */
   explicit EventLogger(nostd::shared_ptr<opentelemetry::logs::Logger> delegate_logger,
-                       nostd::string_view event_domain) noexcept;
+                       nostd::string_view event_domain);
 
   /**
    * Returns the name of this logger.

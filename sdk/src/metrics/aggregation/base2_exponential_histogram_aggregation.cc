@@ -32,7 +32,7 @@ namespace metrics
 namespace
 {
 
-uint32_t GetScaleReduction(int32_t start_index, int32_t end_index, size_t max_buckets) noexcept
+uint32_t GetScaleReduction(int32_t start_index, int32_t end_index, size_t max_buckets)
 {
   uint32_t scale_reduction = 0;
   // Both indices have collapsed to -1 or 0 after 31 shifts, so further iterations cannot narrow
@@ -49,7 +49,7 @@ uint32_t GetScaleReduction(int32_t start_index, int32_t end_index, size_t max_bu
 
 uint32_t GetScaleReductionForUnion(const AdaptingCircularBufferCounter &low,
                                    const AdaptingCircularBufferCounter &high,
-                                   size_t max_buckets) noexcept
+                                   size_t max_buckets)
 {
   if (low.Empty() && high.Empty())
   {
@@ -67,7 +67,7 @@ uint32_t GetScaleReductionForUnion(const AdaptingCircularBufferCounter &low,
 
 void DiffBuckets(const AdaptingCircularBufferCounter &left,
                  const AdaptingCircularBufferCounter &right,
-                 AdaptingCircularBufferCounter &out) noexcept
+                 AdaptingCircularBufferCounter &out)
 {
   if (left.Empty() && right.Empty())
   {
@@ -96,7 +96,7 @@ void DiffBuckets(const AdaptingCircularBufferCounter &left,
   }
 }
 
-void DownscaleBuckets(std::unique_ptr<AdaptingCircularBufferCounter> &buckets, uint32_t by) noexcept
+void DownscaleBuckets(std::unique_ptr<AdaptingCircularBufferCounter> &buckets, uint32_t by)
 {
   // Downscaling is done in place, which preserves the existing bucket size
   // optimisation (integer width) and avoids allocating a replacement buffer.
@@ -106,7 +106,7 @@ void DownscaleBuckets(std::unique_ptr<AdaptingCircularBufferCounter> &buckets, u
 // Folds `high_res` onto `target_scale`. The bucket shift has to match the scale delta exactly, so
 // the runtime floor is deliberately not applied here: it bounds the reductions the SDK chooses,
 // not the alignment of an operand that already sits lower.
-void AlignToScale(Base2ExponentialHistogramPointData &high_res, int32_t target_scale) noexcept
+void AlignToScale(Base2ExponentialHistogramPointData &high_res, int32_t target_scale)
 {
   if (high_res.scale_ <= target_scale)
   {
@@ -132,15 +132,14 @@ void AlignToScale(Base2ExponentialHistogramPointData &high_res, int32_t target_s
 // Guards point data that arrives through the public constructors with a smaller budget than the
 // configuration validator would ever produce. A configured max_size is at least kMaxSizeMin, so
 // this never allocates more buckets than the user asked for.
-size_t BucketCapacity(size_t max_buckets) noexcept
+size_t BucketCapacity(size_t max_buckets)
 {
   return (std::max)(max_buckets, kMaxSizeMin);
 }
 
 // Point data handed to the public constructors carries buffers the caller sized, which can be
 // narrower than the capacity this class guarantees; move the counts into a wide enough buffer.
-void EnsureBucketCapacity(std::unique_ptr<AdaptingCircularBufferCounter> &buckets,
-                          size_t capacity) noexcept
+void EnsureBucketCapacity(std::unique_ptr<AdaptingCircularBufferCounter> &buckets, size_t capacity)
 {
   if (!buckets)
   {
@@ -173,13 +172,13 @@ void EnsureBucketCapacity(std::unique_ptr<AdaptingCircularBufferCounter> &bucket
 
 bool BucketIndicesMatchScale(const AdaptingCircularBufferCounter *buckets,
                              int32_t min_index,
-                             int32_t max_index) noexcept
+                             int32_t max_index)
 {
   return buckets == nullptr || buckets->Empty() ||
          (buckets->StartIndex() >= min_index && buckets->EndIndex() <= max_index);
 }
 
-void NormalizeSuppliedPointData(Base2ExponentialHistogramPointData &point_data) noexcept
+void NormalizeSuppliedPointData(Base2ExponentialHistogramPointData &point_data)
 {
   // Index bounds above kMaxScaleMax overflow int32_t; folding keeps every supplied count.
   AlignToScale(point_data, kMaxScaleMax);
@@ -211,7 +210,7 @@ void NormalizeSuppliedPointData(Base2ExponentialHistogramPointData &point_data) 
 
 // Truncates `requested` to the reduction that can be applied without pushing `current_scale` below
 // kMinRuntimeScale. Returns 0 once the floor is reached.
-uint32_t ClampScaleReduction(int32_t current_scale, uint32_t requested) noexcept
+uint32_t ClampScaleReduction(int32_t current_scale, uint32_t requested)
 {
   const int64_t headroom = static_cast<int64_t>(current_scale) - kMinRuntimeScale;
   if (headroom <= 0)
@@ -223,7 +222,7 @@ uint32_t ClampScaleReduction(int32_t current_scale, uint32_t requested) noexcept
 
 // Single entry point for scale reduction: clamps to the runtime floor, folds both bucket arrays by
 // the clamped amount and moves scale_ by exactly that amount. Returns the reduction applied.
-uint32_t ApplyDownscale(Base2ExponentialHistogramPointData &point_data, uint32_t requested) noexcept
+uint32_t ApplyDownscale(Base2ExponentialHistogramPointData &point_data, uint32_t requested)
 {
   const uint32_t applied = ClampScaleReduction(point_data.scale_, requested);
   if (applied == 0)
@@ -330,16 +329,14 @@ Base2ExponentialHistogramAggregation::Base2ExponentialHistogramAggregation(
   indexer_ = Base2ExponentialHistogramIndexer(point_data_.scale_);
 }
 
-void Base2ExponentialHistogramAggregation::Aggregate(
-    int64_t value,
-    const PointAttributes & /* attributes */) noexcept
+void Base2ExponentialHistogramAggregation::Aggregate(int64_t value,
+                                                     const PointAttributes & /* attributes */)
 {
   Aggregate(static_cast<double>(value));
 }
 
-void Base2ExponentialHistogramAggregation::Aggregate(
-    double value,
-    const PointAttributes & /* attributes */) noexcept
+void Base2ExponentialHistogramAggregation::Aggregate(double value,
+                                                     const PointAttributes & /* attributes */)
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.sum_ += value;
@@ -374,7 +371,7 @@ void Base2ExponentialHistogramAggregation::Aggregate(
 
 void Base2ExponentialHistogramAggregation::AggregateIntoBuckets(
     std::unique_ptr<AdaptingCircularBufferCounter> &buckets,
-    double value) noexcept
+    double value)
 {
   if (!buckets)
   {
@@ -412,7 +409,7 @@ void Base2ExponentialHistogramAggregation::AggregateIntoBuckets(
   }
 }
 
-uint32_t Base2ExponentialHistogramAggregation::Downscale(uint32_t by) noexcept
+uint32_t Base2ExponentialHistogramAggregation::Downscale(uint32_t by)
 {
   if (by == 0)
   {
@@ -483,7 +480,7 @@ static AdaptingCircularBufferCounter MergeBuckets(size_t max_buckets,
 }
 
 std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
-    const Aggregation &delta) const noexcept
+    const Aggregation &delta) const
 {
   auto left  = nostd::get<Base2ExponentialHistogramPointData>(ToPoint());
   auto right = nostd::get<Base2ExponentialHistogramPointData>(
@@ -544,7 +541,7 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Merge(
 }
 
 std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
-    const Aggregation &next) const noexcept
+    const Aggregation &next) const
 {
   auto left  = nostd::get<Base2ExponentialHistogramPointData>(ToPoint());
   auto right = nostd::get<Base2ExponentialHistogramPointData>(
@@ -596,7 +593,7 @@ std::unique_ptr<Aggregation> Base2ExponentialHistogramAggregation::Diff(
       new Base2ExponentialHistogramAggregation(std::move(result_value))};
 }
 
-PointType Base2ExponentialHistogramAggregation::ToPoint() const noexcept
+PointType Base2ExponentialHistogramAggregation::ToPoint() const
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
 

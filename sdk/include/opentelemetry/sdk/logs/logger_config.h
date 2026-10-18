@@ -20,25 +20,25 @@ namespace logs
 class OPENTELEMETRY_EXPORT LoggerConfig
 {
 public:
-  bool operator==(const LoggerConfig &other) const noexcept;
+  bool operator==(const LoggerConfig &other) const;
 
   /**
    * Returns if the Logger is enabled or disabled. Loggers are enabled by default.
    * @return a boolean indicating if the Logger is enabled. Defaults to true.
    */
-  bool IsEnabled() const noexcept;
+  bool IsEnabled() const;
 
   /**
    * Returns the configured minimum severity for the Logger.
    * @return the minimum severity. Defaults to Severity::kInvalid.
    */
-  opentelemetry::logs::Severity GetMinimumSeverity() const noexcept;
+  opentelemetry::logs::Severity GetMinimumSeverity() const;
 
   /**
    * Returns if trace-based filtering is enabled for the Logger.
    * @return a boolean indicating if trace-based filtering is enabled. Defaults to false.
    */
-  bool IsTraceBased() const noexcept;
+  bool IsTraceBased() const;
 
   /**
    * Returns a LoggerConfig with the provided settings.
@@ -49,7 +49,7 @@ public:
    */
   static LoggerConfig Create(bool enabled,
                              opentelemetry::logs::Severity minimum_severity,
-                             bool trace_based) noexcept;
+                             bool trace_based);
 
   /**
    * Returns a LoggerConfig that represents an enabled Logger.
@@ -76,7 +76,7 @@ private:
   explicit LoggerConfig(
       bool enabled                                   = true,
       opentelemetry::logs::Severity minimum_severity = opentelemetry::logs::Severity::kInvalid,
-      bool trace_based                               = false) noexcept
+      bool trace_based                               = false)
       : enabled_(enabled), minimum_severity_(minimum_severity), trace_based_(trace_based)
   {}
 

@@ -26,7 +26,7 @@ public:
 
   virtual ~Predicate() = default;
 
-  virtual bool Match(opentelemetry::nostd::string_view string) const noexcept = 0;
+  virtual bool Match(opentelemetry::nostd::string_view string) const = 0;
 };
 
 class PatternPredicate : public Predicate
@@ -41,7 +41,7 @@ public:
 
   ~PatternPredicate() override;
 
-  bool Match(opentelemetry::nostd::string_view str) const noexcept override;
+  bool Match(opentelemetry::nostd::string_view str) const override;
 
 private:
   class Impl;
@@ -53,7 +53,7 @@ class WildcardPredicate : public Predicate
 public:
   explicit WildcardPredicate(opentelemetry::nostd::string_view pattern);
 
-  bool Match(opentelemetry::nostd::string_view str) const noexcept override;
+  bool Match(opentelemetry::nostd::string_view str) const override;
 
 private:
   std::string pattern_;
@@ -64,7 +64,7 @@ class ExactPredicate : public Predicate
 public:
   explicit ExactPredicate(opentelemetry::nostd::string_view pattern);
 
-  bool Match(opentelemetry::nostd::string_view str) const noexcept override;
+  bool Match(opentelemetry::nostd::string_view str) const override;
 
 private:
   std::string pattern_;
@@ -73,13 +73,13 @@ private:
 class MatchEverythingPattern : public Predicate
 {
 public:
-  bool Match(opentelemetry::nostd::string_view str) const noexcept override;
+  bool Match(opentelemetry::nostd::string_view str) const override;
 };
 
 class MatchNothingPattern : public Predicate
 {
 public:
-  bool Match(opentelemetry::nostd::string_view str) const noexcept override;
+  bool Match(opentelemetry::nostd::string_view str) const override;
 };
 }  // namespace metrics
 }  // namespace sdk

@@ -36,7 +36,7 @@ struct LogRecordLimits
    * injects the configured limits, so a recordable created outside a provider
    * does not enforce any limit on its own.
    */
-  static constexpr LogRecordLimits NoLimits() noexcept
+  static constexpr LogRecordLimits NoLimits()
   {
     return LogRecordLimits{(std::numeric_limits<std::size_t>::max)(),
                            (std::numeric_limits<std::size_t>::max)()};

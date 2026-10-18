@@ -118,7 +118,7 @@ private:
 bool AttributeMatches(const opentelemetry::common::KeyValueIterable &attributes,
                       const std::string &key,
                       std::uint32_t double_precision,
-                      function_ref<bool(nostd::string_view)> check) noexcept
+                      function_ref<bool(nostd::string_view)> check)
 {
   bool matched = false;
   attributes.ForEachKeyValue(
@@ -152,7 +152,7 @@ bool RuleBasedPredicate::SpanMatches(
     nostd::string_view /* name */,
     opentelemetry::trace::SpanKind span_kind,
     const opentelemetry::common::KeyValueIterable &attributes,
-    const opentelemetry::trace::SpanContextKeyValueIterable & /* links */) const noexcept
+    const opentelemetry::trace::SpanContextKeyValueIterable & /* links */) const
 {
   if (!ParentMatches(parent_context))
   {
@@ -200,13 +200,13 @@ bool RuleBasedPredicate::SpanMatches(
   return true;
 }
 
-nostd::string_view RuleBasedPredicate::GetDescription() const noexcept
+nostd::string_view RuleBasedPredicate::GetDescription() const
 {
   return "RuleBasedPredicate";
 }
 
 bool RuleBasedPredicate::ParentMatches(
-    const opentelemetry::trace::SpanContext &parent_context) const noexcept
+    const opentelemetry::trace::SpanContext &parent_context) const
 {
   if (!(options_.match_parent_none || options_.match_parent_remote || options_.match_parent_local))
   {
@@ -219,7 +219,7 @@ bool RuleBasedPredicate::ParentMatches(
   return parent_context.IsRemote() ? options_.match_parent_remote : options_.match_parent_local;
 }
 
-bool RuleBasedPredicate::SpanKindMatches(opentelemetry::trace::SpanKind span_kind) const noexcept
+bool RuleBasedPredicate::SpanKindMatches(opentelemetry::trace::SpanKind span_kind) const
 {
   if (!(options_.match_span_kind_internal || options_.match_span_kind_server ||
         options_.match_span_kind_client || options_.match_span_kind_producer ||

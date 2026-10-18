@@ -14,8 +14,7 @@ namespace sdk
 namespace metrics
 {
 
-void Provider::SetMeterProvider(
-    const nostd::shared_ptr<opentelemetry::metrics::MeterProvider> &mp) noexcept
+void Provider::SetMeterProvider(const nostd::shared_ptr<opentelemetry::metrics::MeterProvider> &mp)
 {
   bool disabled = opentelemetry::sdk::common::GetSdkDisabled();
 

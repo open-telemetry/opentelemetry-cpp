@@ -28,7 +28,7 @@ public:
   AggregationConfig &operator=(const AggregationConfig &) = default;
   AggregationConfig &operator=(AggregationConfig &&)      = default;
 
-  virtual AggregationType GetType() const noexcept { return AggregationType::kDefault; }
+  virtual AggregationType GetType() const { return AggregationType::kDefault; }
 
   static const AggregationConfig *GetOrDefault(const AggregationConfig *config)
   {
@@ -51,7 +51,7 @@ public:
       : AggregationConfig(cardinality_limit)
   {}
 
-  AggregationType GetType() const noexcept override { return AggregationType::kHistogram; }
+  AggregationType GetType() const override { return AggregationType::kHistogram; }
 
   // The SDK-specified default bucket boundaries, used when no boundaries are configured.
   static const std::vector<double> &DefaultBoundaries()
@@ -87,10 +87,7 @@ public:
       : AggregationConfig(cardinality_limit)
   {}
 
-  AggregationType GetType() const noexcept override
-  {
-    return AggregationType::kBase2ExponentialHistogram;
-  }
+  AggregationType GetType() const override { return AggregationType::kBase2ExponentialHistogram; }
 
   size_t max_size_     = 160;
   int32_t max_scale_   = 20;

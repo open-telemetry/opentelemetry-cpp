@@ -54,26 +54,26 @@ public:
    * @param timeout to complete the flush
    */
   template <class Rep, class Period>
-  void ForceFlush(std::chrono::duration<Rep, Period> timeout) noexcept
+  void ForceFlush(std::chrono::duration<Rep, Period> timeout)
   {
     this->ForceFlushWithMicroseconds(static_cast<uint64_t>(
         std::chrono::duration_cast<std::chrono::microseconds>(timeout).count()));
   }
 
-  void ForceFlushWithMicroseconds(uint64_t timeout) noexcept;
+  void ForceFlushWithMicroseconds(uint64_t timeout);
 
   /**
    * ForceFlush any buffered spans and stop reporting spans.
    * @param timeout to complete the flush
    */
   template <class Rep, class Period>
-  void Close(std::chrono::duration<Rep, Period> timeout) noexcept
+  void Close(std::chrono::duration<Rep, Period> timeout)
   {
     this->CloseWithMicroseconds(static_cast<uint64_t>(
         std::chrono::duration_cast<std::chrono::microseconds>(timeout).count()));
   }
 
-  void CloseWithMicroseconds(uint64_t timeout) noexcept;
+  void CloseWithMicroseconds(uint64_t timeout);
 #else
   /* Exposed in the API in ABI version 1, but does not belong to the API */
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override;
@@ -82,22 +82,19 @@ public:
 #endif
 
   /** Returns the configured span processor. */
-  SpanProcessor &GetProcessor() noexcept { return context_->GetProcessor(); }
+  SpanProcessor &GetProcessor() { return context_->GetProcessor(); }
 
   /** Returns the configured span limits. */
-  const SpanLimits &GetSpanLimits() const noexcept { return context_->GetSpanLimits(); }
+  const SpanLimits &GetSpanLimits() const { return context_->GetSpanLimits(); }
 
   /** Returns the configured Id generator */
-  IdGenerator &GetIdGenerator() const noexcept { return context_->GetIdGenerator(); }
+  IdGenerator &GetIdGenerator() const { return context_->GetIdGenerator(); }
 
   /** Returns the associated instrumentation scope */
-  const InstrumentationScope &GetInstrumentationScope() const noexcept
-  {
-    return *instrumentation_scope_;
-  }
+  const InstrumentationScope &GetInstrumentationScope() const { return *instrumentation_scope_; }
 
   OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
-  const InstrumentationScope &GetInstrumentationLibrary() const noexcept
+  const InstrumentationScope &GetInstrumentationLibrary() const
   {
     return GetInstrumentationScope();
   }
@@ -110,14 +107,11 @@ public:
 
 #if OPENTELEMETRY_ABI_VERSION_NO < 2
   /** Returns whether the tracer is enabled. ABIv1 only.*/
-  bool Enabled() const noexcept { return is_enabled_.load(std::memory_order_relaxed); }
+  bool Enabled() const { return is_enabled_.load(std::memory_order_relaxed); }
 
 protected:
   /** Updates the enabled state of the tracer. ABIv1 only. */
-  void UpdateEnabled(const bool enabled) noexcept
-  {
-    is_enabled_.store(enabled, std::memory_order_relaxed);
-  }
+  void UpdateEnabled(const bool enabled) { is_enabled_.store(enabled, std::memory_order_relaxed); }
 #endif
 
 private:
@@ -130,7 +124,7 @@ private:
    * TracerProvider::UpdateTracerConfigurator when the provider-level
    * TracerConfigurator is replaced at runtime.
    */
-  void UpdateTracerConfig(TracerConfig config) noexcept;
+  void UpdateTracerConfig(TracerConfig config);
 
   // order of declaration is important here - instrumentation scope should destroy after
   // tracer-context.

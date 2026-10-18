@@ -25,7 +25,7 @@ namespace metrics
  *   - kTraceBased : eligible only when recorded inside a valid, sampled span.
  */
 inline bool ExemplarFilterEnabled(ExemplarFilterType filter_type,
-                                  const opentelemetry::context::Context &context) noexcept
+                                  const opentelemetry::context::Context &context)
 {
   switch (filter_type)
   {

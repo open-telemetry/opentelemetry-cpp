@@ -92,25 +92,25 @@ public:
    * Obtain the resource associated with this meter context.
    * @return The resource for this meter context
    */
-  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
+  const opentelemetry::sdk::resource::Resource &GetResource() const;
 
   /**
    * Obtain the View Registry configured
    * @return The reference to view registry
    */
-  ViewRegistry *GetViewRegistry() const noexcept;
+  ViewRegistry *GetViewRegistry() const;
 
   /**
    * Obtain the ScopeConfigurator with this meter context.
    * @return The ScopeConfigurator for this meter context.
    */
-  const instrumentationscope::ScopeConfigurator<MeterConfig> &GetMeterConfigurator() const noexcept;
+  const instrumentationscope::ScopeConfigurator<MeterConfig> &GetMeterConfigurator() const;
 
   /**
    * NOTE - INTERNAL method, can change in the future.
    * Process callback for each meter in thread-safe manner
    */
-  bool ForEachMeter(nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback) noexcept;
+  bool ForEachMeter(nostd::function_ref<bool(std::shared_ptr<Meter> &meter)> callback);
 
   /**
    * NOTE - INTERNAL method, can change in the future.
@@ -118,19 +118,19 @@ public:
    * This method is NOT thread safe, and only called through MeterProvider
    *
    */
-  nostd::span<std::shared_ptr<Meter>> GetMeters() noexcept;
+  nostd::span<std::shared_ptr<Meter>> GetMeters();
 
   /**
    * Obtain the configured collectors.
    *
    */
-  nostd::span<std::shared_ptr<CollectorHandle>> GetCollectors() noexcept;
+  nostd::span<std::shared_ptr<CollectorHandle>> GetCollectors();
 
   /**
    * GET SDK Start time
    *
    */
-  opentelemetry::common::SystemTimestamp GetSDKStartTime() noexcept;
+  opentelemetry::common::SystemTimestamp GetSDKStartTime();
 
   /**
    * Create a MetricCollector from a MetricReader using this MeterContext and add it to the list of
@@ -144,7 +144,7 @@ public:
    * Note: This method is not thread safe, and should ideally be called from main thread.
    */
   void AddMetricReader(std::shared_ptr<MetricReader> reader,
-                       std::unique_ptr<MetricFilter> metric_filter = nullptr) noexcept;
+                       std::unique_ptr<MetricFilter> metric_filter = nullptr);
 
   /**
    * Attaches a View to list of configured Views for this Meter context.
@@ -158,13 +158,13 @@ public:
    */
   void AddView(std::unique_ptr<InstrumentSelector> instrument_selector,
                std::unique_ptr<MeterSelector> meter_selector,
-               std::unique_ptr<View> view) noexcept;
+               std::unique_ptr<View> view);
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
-  void SetExemplarFilter(ExemplarFilterType exemplar_filter_type) noexcept;
+  void SetExemplarFilter(ExemplarFilterType exemplar_filter_type);
 
-  ExemplarFilterType GetExemplarFilter() const noexcept;
+  ExemplarFilterType GetExemplarFilter() const;
 
 #endif
 
@@ -185,12 +185,12 @@ public:
    * within the given timeout.
    */
 
-  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
   /**
    * Shutdown the Collectors associated with this meter provider.
    */
-  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
 private:
   friend class ::testing::MetricCollectorTest;

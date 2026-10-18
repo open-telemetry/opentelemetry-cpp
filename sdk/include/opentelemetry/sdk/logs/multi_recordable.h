@@ -26,17 +26,14 @@ namespace logs
 {
 class MultiRecordable final : public Recordable
 {
-  static std::size_t MakeKey(
-      const opentelemetry::sdk::logs::LogRecordProcessor &processor) noexcept;
+  static std::size_t MakeKey(const opentelemetry::sdk::logs::LogRecordProcessor &processor);
 
 public:
-  void AddRecordable(const LogRecordProcessor &processor,
-                     std::unique_ptr<Recordable> recordable) noexcept;
+  void AddRecordable(const LogRecordProcessor &processor, std::unique_ptr<Recordable> recordable);
 
-  const std::unique_ptr<Recordable> &GetRecordable(
-      const LogRecordProcessor &processor) const noexcept;
+  const std::unique_ptr<Recordable> &GetRecordable(const LogRecordProcessor &processor) const;
 
-  std::unique_ptr<Recordable> ReleaseRecordable(const LogRecordProcessor &processor) noexcept;
+  std::unique_ptr<Recordable> ReleaseRecordable(const LogRecordProcessor &processor);
 
   /**
    * Set the timestamp for this log.

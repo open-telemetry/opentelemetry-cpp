@@ -75,7 +75,7 @@ public:
    */
   template <class T>
   void Record(const std::unordered_map<MetricAttributes, T, AttributeHashGenerator> &measurements,
-              opentelemetry::common::SystemTimestamp /* observation_time */) noexcept
+              opentelemetry::common::SystemTimestamp /* observation_time */)
   {
     std::lock_guard<std::mutex> guard(hashmap_lock_);
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
@@ -105,7 +105,7 @@ public:
 
   void RecordLong(
       const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+      opentelemetry::common::SystemTimestamp observation_time) override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
@@ -116,7 +116,7 @@ public:
 
   void RecordDouble(
       const std::unordered_map<MetricAttributes, double, AttributeHashGenerator> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+      opentelemetry::common::SystemTimestamp observation_time) override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
@@ -196,7 +196,7 @@ private:
    * monotonic sums. An attribute set missing from this round keeps its baseline and contributes
    * no delta; suppressing the stale output is the temporal storage's job.
    */
-  void BuildDeltaFromRound() noexcept
+  void BuildDeltaFromRound()
   {
     round_hash_map_->GetAllEntries([this](const MetricAttributes &attributes,
                                           Aggregation &aggregation) {
@@ -256,7 +256,7 @@ private:
    * DefaultAggregation::CreateAggregation() would create.
    */
   static bool IsMonotonicSum(AggregationType aggregation_type,
-                             const InstrumentDescriptor &instrument_descriptor) noexcept
+                             const InstrumentDescriptor &instrument_descriptor)
   {
     bool is_monotonic = true;
     if (aggregation_type == AggregationType::kDefault)

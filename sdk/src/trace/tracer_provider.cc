@@ -198,14 +198,13 @@ nostd::shared_ptr<trace_api::Tracer> TracerProvider::GetTracer(
 #endif
 }
 
-void TracerProvider::AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept
+void TracerProvider::AddProcessor(std::unique_ptr<SpanProcessor> processor)
 {
   context_->AddProcessor(std::move(processor));
 }
 
 void TracerProvider::UpdateTracerConfigurator(
-    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
-        tracer_configurator) noexcept
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator)
 {
   if (!tracer_configurator)
   {
@@ -233,22 +232,22 @@ void TracerProvider::UpdateTracerConfigurator(
   }
 }
 
-const resource::Resource &TracerProvider::GetResource() const noexcept
+const resource::Resource &TracerProvider::GetResource() const
 {
   return context_->GetResource();
 }
 
-const opentelemetry::sdk::trace::SpanLimits &TracerProvider::GetSpanLimits() const noexcept
+const opentelemetry::sdk::trace::SpanLimits &TracerProvider::GetSpanLimits() const
 {
   return context_->GetSpanLimits();
 }
 
-bool TracerProvider::Shutdown(std::chrono::microseconds timeout) noexcept
+bool TracerProvider::Shutdown(std::chrono::microseconds timeout)
 {
   return context_->Shutdown(timeout);
 }
 
-bool TracerProvider::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool TracerProvider::ForceFlush(std::chrono::microseconds timeout)
 {
   return context_->ForceFlush(timeout);
 }

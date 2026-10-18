@@ -40,7 +40,7 @@ bool SetAttributeImpl(opentelemetry::sdk::common::AttributeMap &attribute_map,
                       nostd::string_view key,
                       const opentelemetry::common::AttributeValue &value,
                       std::uint32_t attribute_count_limit,
-                      std::size_t attribute_value_length_limit) noexcept
+                      std::size_t attribute_value_length_limit)
 {
   if (attribute_map.size() >= attribute_count_limit)
   {
@@ -103,7 +103,7 @@ SpanDataEvent::SpanDataEvent(std::string name,
 }
 
 const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
-SpanDataEvent::GetAttributes() const noexcept
+SpanDataEvent::GetAttributes() const
 {
   return attribute_map_.GetAttributes();
 }
@@ -119,12 +119,12 @@ SpanDataLink::SpanDataLink(opentelemetry::trace::SpanContext span_context,
 }
 
 const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
-SpanDataLink::GetAttributes() const noexcept
+SpanDataLink::GetAttributes() const
 {
   return attribute_map_.GetAttributes();
 }
 
-const opentelemetry::sdk::resource::Resource &SpanData::GetResource() const noexcept
+const opentelemetry::sdk::resource::Resource &SpanData::GetResource() const
 {
   if (resource_ == nullptr)
   {
@@ -136,8 +136,7 @@ const opentelemetry::sdk::resource::Resource &SpanData::GetResource() const noex
   return *resource_;
 }
 
-const opentelemetry::sdk::trace::InstrumentationScope &SpanData::GetInstrumentationScope()
-    const noexcept
+const opentelemetry::sdk::trace::InstrumentationScope &SpanData::GetInstrumentationScope() const
 {
   if (instrumentation_scope_ == nullptr)
   {
@@ -152,7 +151,7 @@ const opentelemetry::sdk::trace::InstrumentationScope &SpanData::GetInstrumentat
 }
 
 const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
-SpanData::GetAttributes() const noexcept
+SpanData::GetAttributes() const
 {
   return attribute_map_.GetAttributes();
 }
