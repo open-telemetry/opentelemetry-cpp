@@ -4,6 +4,7 @@
 #include <benchmark/benchmark.h>
 #include <string>
 
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
 
 using opentelemetry::sdk::metrics::InstrumentMetaDataValidator;
