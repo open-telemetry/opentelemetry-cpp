@@ -31,4 +31,5 @@
       matchUpdateTypes: ["major"],
     },
   ],
+  labels: ["dependencies"],
 }

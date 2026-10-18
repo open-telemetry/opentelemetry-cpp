@@ -104,9 +104,9 @@ public:
           {
             first = false;
           }
-          header_s.append(std::string(key.data(), key.size()));
+          header_s.append(key.data(), key.size());
           header_s.append(1, kKeyValueSeparator);
-          header_s.append(std::string(value.data(), value.size()));
+          header_s.append(value.data(), value.size());
           return true;
         });
     return header_s;

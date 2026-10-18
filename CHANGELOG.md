@@ -15,6 +15,18 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Release provider mutexes before construction-failure diagnostics so
+  custom log handlers can retrieve cached or noop tracers, loggers, and meters
+  from the same provider without deadlocking.
+  [#4693](https://github.com/open-telemetry/opentelemetry-cpp/issues/4693)
+
+* [SDK] Preserve the default unlimited timeout when batch span and log record
+  processors shut down their exporters.
+  [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)
+
+* [CODE HEALTH] Prevent `std::out_of_range` escaping `noexcept` substr callers.
+  [#4562](https://github.com/open-telemetry/opentelemetry-cpp/pull/4562)
+
 * [METRICS SDK] Enforce a runtime minimum scale of `-11` for
   `Base2ExponentialHistogramAggregation`, so a recording that spans the full
   double range no longer downscales without end.
@@ -43,6 +55,8 @@ Increment the:
   it.
   [#4359](https://github.com/open-telemetry/opentelemetry-cpp/issues/4359)
 
+* [CMAKE] Add pkg-config install consumer tests for Ubuntu system packages
+  [#4503](https://github.com/open-telemetry/opentelemetry-cpp/issues/4503)
 * [METRICS SDK] Drop aggregation behaves as a no-op, prevent duplicate metric recording
   from conflicting streams, and warn if stream conflicts were configured
   [#4515](https://github.com/open-telemetry/opentelemetry-cpp/pull/4515)
@@ -66,17 +80,19 @@ Increment the:
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
-Breaking changes:
+* [CI] Enable the bugprone-unhandled-exception-at-new check
+  [#4689](https://github.com/open-telemetry/opentelemetry-cpp/pull/4689)
 
-* [SDK] Remove `noexcept` from the public SDK `TracerProvider`,
-  `LoggerProvider`, `MeterProvider`, `Tracer`, `Logger`, and `Meter`
-  constructors so initialization failures can propagate to callers.
-  `GetTracer`, `GetLogger`, and `GetMeter` remain `noexcept` and return a
-  pre-allocated noop object if constructing a new instrumentation object
-  fails. After the first failure, later uncached `Get*` calls return the same
-  noop immediately without retrying construction. Existing cached objects
-  continue to be returned.
-  [#4361](https://github.com/open-telemetry/opentelemetry-cpp/issues/4361)
+* [EXPORTER ETW] Fix `PropertyValue` string conversions that pre-sized a
+  `vector<string>` then `push_back`'d (doubling length) and that built
+  `std::string` from `string_view::data()` without using the view length
+  (reading past non-NUL-terminated views). Copies now use length-aware
+  conversion. No API or ABI change.
+  [#4347](https://github.com/open-telemetry/opentelemetry-cpp/issues/4347)
+
+* [CODE HEALTH] Fix bugprone-exception-escape in NoopTracer::StartSpan()
+  [#4673](https://github.com/open-telemetry/opentelemetry-cpp/pull/4673)
+
 * [BUG] Send one request per curl session, rather than replacing the operation
   a running request still belongs to
   [#4396](https://github.com/open-telemetry/opentelemetry-cpp/issues/4396)
@@ -88,6 +104,7 @@ Breaking changes:
 
 * [BUG] Do not queue a curl session closed by the Retry-After cap
   [#4632](https://github.com/open-telemetry/opentelemetry-cpp/pull/4632)
+
 * [BUG] Fix a data race on the curl operation's last result code
   [#4618](https://github.com/open-telemetry/opentelemetry-cpp/pull/4618)
 
@@ -107,8 +124,56 @@ Breaking changes:
 * [BUG] Keep the curl retry deadline stable within each attempt
   [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
 
+* [SDK] `BatchSpanProcessor` now waits for a full batch
+  (`max_export_batch_size`) before exporting, instead of draining the buffer
+  whenever it is non-empty. This reduces gRPC request count and CPU usage
+  under steady load while preserving `ForceFlush`/`Shutdown` drain semantics.
+  Force-flush exports also respect `max_export_batch_size`, splitting buffered
+  spans into multiple batches when needed.
+  [#4466](https://github.com/open-telemetry/opentelemetry-cpp/pull/4466)
+
+Breaking changes:
+
+* [SDK] Remove `noexcept` from the public `TracerContext`, `LoggerContext`,
+  and `MeterContext` constructors so allocation failures propagate to provider
+  initialization callers instead of terminating. This changes their exception
+  contract and may affect code relying on nothrow construction.
+  [#4695](https://github.com/open-telemetry/opentelemetry-cpp/issues/4695)
+
+* [SDK] Handle instrumentation object construction failures safely
+  [#4469](https://github.com/open-telemetry/opentelemetry-cpp/pull/4469)
+  * Removed `noexcept` from the public SDK `TracerProvider`,
+    `LoggerProvider`, `MeterProvider`, `Tracer`, `Logger`, and `Meter`
+    constructors so initialization failures can propagate to callers.
+  * `GetTracer`, `GetLogger`, and `GetMeter` remain `noexcept` and return a
+    pre-allocated noop object if constructing a new instrumentation object
+    fails.
+  * After the first failure, later uncached `Get*` calls return the same
+    noop immediately without retrying construction. Existing cached objects
+    continue to be returned.
+
 * [REMOVAL] Remove WITH_OTLP_RETRY_PREVIEW - #4668
   [#4668](https://github.com/open-telemetry/opentelemetry-cpp/pull/4668)
+  * CMake flags WITH_OTLP_RETRY_PREVIEW is removed,
+    the feature is no longer in preview status.
+
+* [API] Remove opentelemetry::plugin
+  [#4660](https://github.com/open-telemetry/opentelemetry-cpp/pull/4660)
+  * The unused opentelemetry::plugin framework is removed.
+
+* [REMOVAL] Remove WITH_OTLP_GRPC_SSL_MTLS_PREVIEW
+  [#4666](https://github.com/open-telemetry/opentelemetry-cpp/pull/4666)
+  * CMake flags WITH_OTLP_GRPC_SSL_MTLS_PREVIEW is removed,
+    the feature is no longer in preview status.
+
+* [CODE HEALTH] Fix bugprone-exception-escape in NoopTracer::StartSpan()
+  [#4673](https://github.com/open-telemetry/opentelemetry-cpp/pull/4673)
+  * The NoopSpan class in the API has changed.
+  * For applications only instrumenting code, this has no impact,
+    as this class is not used for instrumentation.
+  * For applications implementing a custom trace exporter,
+    the exporter implementation needs to be adjusted,
+    when using the NoopSpan.
 
 ## [1.29.0] 2026-09-13
 

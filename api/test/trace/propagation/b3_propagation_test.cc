@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <vector>
 #include "util.h"
 
 #include "opentelemetry/context/context.h"
@@ -64,6 +65,28 @@ TEST(B3PropagationTest, TraceFlagsBufferGeneration)
   EXPECT_EQ(MapB3Context::TraceFlagsFromHex("1"), trace::TraceFlags(trace::TraceFlags::kIsSampled));
 }
 
+TEST(B3PropagationTest, PropagateEmptyContext)
+{
+  TextMapCarrierTest carrier;
+  context::Context ctx;
+  format.Inject(carrier, ctx);
+  EXPECT_TRUE(carrier.headers_.empty());
+  formatMultiHeader.Inject(carrier, ctx);
+  EXPECT_TRUE(carrier.headers_.empty());
+}
+
+TEST(B3PropagationTest, ExtractMissingHeaders)
+{
+  TextMapCarrierTest carrier;
+  context::Context ctx;
+  auto extracted = format.Extract(carrier, ctx);
+  EXPECT_FALSE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(
+      extracted.GetValue(trace::kSpanKey)));
+  extracted = formatMultiHeader.Extract(carrier, ctx);
+  EXPECT_FALSE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(
+      extracted.GetValue(trace::kSpanKey)));
+}
+
 TEST(B3PropagationTest, PropagateInvalidContext)
 {
   // Do not propagate invalid trace context.
@@ -73,6 +96,50 @@ TEST(B3PropagationTest, PropagateInvalidContext)
       nostd::shared_ptr<trace::Span>(new trace::DefaultSpan(trace::SpanContext::GetInvalid()))};
   format.Inject(carrier, ctx);
   EXPECT_TRUE(carrier.headers_.count("b3") == 0);
+  formatMultiHeader.Inject(carrier, ctx);
+  EXPECT_TRUE(carrier.headers_.empty());
+}
+
+TEST(B3PropagationTest, ExtractInvalidMultiHeaderContext)
+{
+  const std::vector<std::pair<std::string, std::string>> identities = {
+      {"", "e457b5a2e4d86bd1"},
+      {"80f198ee56343ba864fe8b2a57d3eff7", ""},
+      {"00000000000000000000000000000000", "e457b5a2e4d86bd1"},
+      {"80f198ee56343ba864fe8b2a57d3eff7", "0000000000000000"},
+      {"0000000zzz0000000000000000000000", "e457b5a2e4d86bd1"},
+      {"80f198ee56343ba864fe8b2a57d3eff7", "0000000zzz000000"},
+  };
+  trace::SpanContext span_context{MapB3Context::TraceIdFromHex("80f198ee56343ba864fe8b2a57d3eff7"),
+                                  MapB3Context::SpanIdFromHex("e457b5a2e4d86bd1"),
+                                  trace::TraceFlags{1}, false};
+  nostd::shared_ptr<trace::Span> existing_span{new trace::DefaultSpan{span_context}};
+
+  for (const auto &identity : identities)
+  {
+    SCOPED_TRACE(identity.first + ":" + identity.second);
+    TextMapCarrierTest carrier;
+    carrier.headers_["X-B3-Sampled"] = "1";
+    if (!identity.first.empty())
+    {
+      carrier.headers_["X-B3-TraceId"] = identity.first;
+    }
+    if (!identity.second.empty())
+    {
+      carrier.headers_["X-B3-SpanId"] = identity.second;
+    }
+
+    context::Context empty_context;
+    auto extracted = formatMultiHeader.Extract(carrier, empty_context);
+    EXPECT_FALSE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(
+        extracted.GetValue(trace::kSpanKey)));
+
+    context::Context existing_context{trace::kSpanKey, existing_span};
+    extracted       = formatMultiHeader.Extract(carrier, existing_context);
+    auto span_value = extracted.GetValue(trace::kSpanKey);
+    ASSERT_TRUE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(span_value));
+    EXPECT_EQ(nostd::get<nostd::shared_ptr<trace::Span>>(span_value).get(), existing_span.get());
+  }
 }
 
 TEST(B3PropagationTest, ExtractInvalidContext)
