@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <cstddef>
 #include <cstdint>
 
 #include "opentelemetry/version.h"
@@ -78,26 +77,6 @@ constexpr char LowerHexDigit(int value) noexcept
 constexpr char UpperHexDigit(int value) noexcept
 {
   return "0123456789ABCDEF"[value & 0xF];
-}
-
-// Writes two hexadecimal digits per byte, high nibble first, to out, which must
-// have room for 2 * size characters.
-inline void EncodeLowerHex(const uint8_t *bytes, std::size_t size, char *out) noexcept
-{
-  for (std::size_t i = 0; i < size; ++i)
-  {
-    out[2 * i]     = LowerHexDigit(bytes[i] >> 4);
-    out[2 * i + 1] = LowerHexDigit(bytes[i]);
-  }
-}
-
-inline void EncodeUpperHex(const uint8_t *bytes, std::size_t size, char *out) noexcept
-{
-  for (std::size_t i = 0; i < size; ++i)
-  {
-    out[2 * i]     = UpperHexDigit(bytes[i] >> 4);
-    out[2 * i + 1] = UpperHexDigit(bytes[i]);
-  }
 }
 
 // 0x00 to 0x1F and 0x7F: what std::iscntrl accepts in the "C" locale.

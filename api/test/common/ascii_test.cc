@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 #include <cctype>
-#include <cstdint>
 #include <cstdio>
 #include <string>
 
@@ -55,32 +54,6 @@ std::string EncodingMismatches(Encoder encoder, const char *format)
     }
   }
   return mismatches;
-}
-
-template <typename Encoder>
-std::string EncodeEveryByte(Encoder encoder)
-{
-  uint8_t bytes[256];
-  for (int byte = 0; byte < 256; ++byte)
-  {
-    bytes[byte] = static_cast<uint8_t>(byte);
-  }
-  std::string encoded(2 * sizeof(bytes), '\0');
-  encoder(bytes, sizeof(bytes), &encoded[0]);
-  return encoded;
-}
-
-// Every byte value in order, each formatted by printf with format.
-std::string ReferenceEncoding(const char *format)
-{
-  std::string encoded;
-  for (int byte = 0; byte < 256; ++byte)
-  {
-    char digits[3];
-    std::snprintf(digits, sizeof(digits), format, byte);
-    encoded += digits;
-  }
-  return encoded;
 }
 
 }  // namespace
@@ -156,14 +129,4 @@ TEST(AsciiTest, LowerHexDigit)
 TEST(AsciiTest, UpperHexDigit)
 {
   EXPECT_EQ(EncodingMismatches(ascii::UpperHexDigit, "%X"), "");
-}
-
-TEST(AsciiTest, EncodeLowerHex)
-{
-  EXPECT_EQ(EncodeEveryByte(ascii::EncodeLowerHex), ReferenceEncoding("%02x"));
-}
-
-TEST(AsciiTest, EncodeUpperHex)
-{
-  EXPECT_EQ(EncodeEveryByte(ascii::EncodeUpperHex), ReferenceEncoding("%02X"));
 }

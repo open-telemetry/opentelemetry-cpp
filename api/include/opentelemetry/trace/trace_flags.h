@@ -45,7 +45,8 @@ public:
   // Populates the buffer with the lowercase base16 representation of the flags.
   void ToLowerBase16(nostd::span<char, 2> buffer) const noexcept
   {
-    common::detail::EncodeUpperHex(&rep_, 1, buffer.data());
+    buffer[0] = common::detail::UpperHexDigit(rep_ >> 4);
+    buffer[1] = common::detail::UpperHexDigit(rep_);
   }
 
   uint8_t flags() const noexcept { return rep_; }

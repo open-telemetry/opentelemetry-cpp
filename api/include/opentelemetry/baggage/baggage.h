@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/common/macros.h"
@@ -230,10 +228,9 @@ private:
       }
       else
       {
-        const auto byte = static_cast<uint8_t>(c);
-        char escaped[]  = {'%', '\0', '\0'};
-        common::detail::EncodeUpperHex(&byte, 1, &escaped[1]);
-        ret.append(escaped, sizeof(escaped));
+        ret.push_back('%');
+        ret.push_back(common::detail::UpperHexDigit(static_cast<unsigned char>(c) >> 4));
+        ret.push_back(common::detail::UpperHexDigit(c));
       }
     }
 

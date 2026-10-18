@@ -6,7 +6,6 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
-#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <list>
@@ -420,9 +419,14 @@ private:
 
 static std::string HexEncode(const std::string &bytes)
 {
-  std::string ret(bytes.size() * 2, '\0');
-  opentelemetry::common::detail::EncodeLowerHex(reinterpret_cast<const uint8_t *>(bytes.data()),
-                                                bytes.size(), &ret[0]);
+  std::string ret;
+  ret.reserve(bytes.size() * 2);
+  for (std::string::size_type i = 0; i < bytes.size(); ++i)
+  {
+    unsigned char byte = static_cast<unsigned char>(bytes[i]);
+    ret.push_back(opentelemetry::common::detail::LowerHexDigit(byte >> 4));
+    ret.push_back(opentelemetry::common::detail::LowerHexDigit(byte));
+  }
   return ret;
 }
 

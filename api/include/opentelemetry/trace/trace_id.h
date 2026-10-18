@@ -35,7 +35,11 @@ public:
   // Populates the buffer with the lowercase base16 representation of the ID.
   void ToLowerBase16(nostd::span<char, 2 * kSize> buffer) const noexcept
   {
-    common::detail::EncodeLowerHex(rep_, kSize, buffer.data());
+    for (size_t i = 0; i < kSize; ++i)
+    {
+      buffer[i * 2 + 0] = common::detail::LowerHexDigit(rep_[i] >> 4);
+      buffer[i * 2 + 1] = common::detail::LowerHexDigit(rep_[i]);
+    }
   }
 
   // Returns a nostd::span of the ID.
