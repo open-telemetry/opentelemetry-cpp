@@ -77,6 +77,8 @@ Increment the:
   to compile standalone on newer standard library implementations.
   [#4574](https://github.com/open-telemetry/opentelemetry-cpp/pull/4574)
 
+* [SDK] Optimize composite and probability samplers
+  [#4582](https://github.com/open-telemetry/opentelemetry-cpp/pull/4582)
 * [CI] Enable the bugprone-unhandled-exception-at-new check
   [#4689](https://github.com/open-telemetry/opentelemetry-cpp/pull/4689)
 
