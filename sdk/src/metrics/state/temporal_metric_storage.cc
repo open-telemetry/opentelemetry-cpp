@@ -95,6 +95,12 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
     return callback(metric_data);
   }
 
+  const bool async_cumulative =
+      InstrumentDescriptorUtil::IsInstrumentTypeAsync(instrument_descriptor_.type_) &&
+      aggregation_temporarily == AggregationTemporality::kCumulative;
+  bool async_cumulative_overflow_observed =
+      async_cumulative && delta_metrics->Has(GetOverflowAttributes());
+
   if (delta_metrics->Size())
   {
     for (auto &col : collectors)
@@ -116,64 +122,57 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   std::unique_ptr<AttributesHashMap> merged_metrics(
       new AttributesHashMap(aggregation_config_ ? aggregation_config_->cardinality_limit_
                                                 : kAggregationCardinalityLimit));
-  for (auto &agg_hashmap : unreported_list)
-  {
-    agg_hashmap->GetAllEntries(
-        [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-          auto agg = merged_metrics->Get(attributes);
-          if (agg)
-          {
-            merged_metrics->Set(attributes, agg->Merge(aggregation));
-          }
-          else
-          {
-            merged_metrics->Set(attributes,
-                                DefaultAggregation::CreateAggregation(
-                                    aggregation_type_, instrument_descriptor_, aggregation_config_)
-                                    ->Merge(aggregation));
-          }
-          return true;
+  auto merge_aggregation =
+      [this, &merged_metrics, async_cumulative, &async_cumulative_overflow_observed](
+          const MetricAttributes &attributes, Aggregation &aggregation, bool is_current_delta) {
+        auto *existing = merged_metrics->GetOrSetDefault(attributes, [this]() {
+          return DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_,
+                                                       aggregation_config_);
         });
-  }
-
-  // Get the last reported metrics for the `collector` from `last reported metrics` stash
-  //   - If the aggregation_temporarily for the collector is cumulative
-  //       - Merge the last reported metrics with unreported metrics (which is in merged_metrics),
-  //           Final result of merge would be in merged_metrics.
-  //       - Move the final merge to the `last reported metrics` stash.
-  //   - If the aggregation_temporarily is delta
-  //       - Store the unreported metrics for `collector` (which is in merged_mtrics) to
-  //          `last reported metrics` stash.
+        if (async_cumulative && is_current_delta &&
+            (attributes == GetOverflowAttributes() || !merged_metrics->Has(attributes)))
+        {
+          async_cumulative_overflow_observed = true;
+        }
+        auto merged = existing->Merge(aggregation);
+        const auto &merged_attributes =
+            merged_metrics->Has(attributes) ? attributes : GetOverflowAttributes();
+        merged_metrics->Set(merged_attributes, std::move(merged));
+        return true;
+      };
 
   auto reported = last_reported_metrics_.find(collector);
+  std::unique_ptr<AttributesHashMap> last_aggr_hashmap;
   if (reported != last_reported_metrics_.end())
   {
-    auto last_aggr_hashmap = std::move(last_reported_metrics_[collector].attributes_map);
+    last_aggr_hashmap = std::move(reported->second.attributes_map);
     if (aggregation_temporarily == AggregationTemporality::kCumulative)
     {
-      // merge current delta to previous cumulative
+      // Preserve the existing cumulative series before admitting new ones under the limit.
       last_aggr_hashmap->GetAllEntries(
-          [&merged_metrics, this](const MetricAttributes &attributes, Aggregation &aggregation) {
-            auto agg = merged_metrics->Get(attributes);
-            if (agg)
-            {
-              merged_metrics->Set(attributes, agg->Merge(aggregation));
-            }
-            else
-            {
-              // Always carry forward cumulative state so the baseline survives gaps.
-              // For async instruments, stale suppression is applied only when building
-              // the exported MetricData below.
-              auto def_agg = DefaultAggregation::CreateAggregation(
-                  aggregation_type_, instrument_descriptor_, aggregation_config_);
-              merged_metrics->Set(attributes, def_agg->Merge(aggregation));
-            }
-            return true;
+          [&merge_aggregation](const MetricAttributes &attributes, Aggregation &aggregation) {
+            return merge_aggregation(attributes, aggregation, false);
           });
     }
-    else
+  }
+
+  for (auto &agg_hashmap : unreported_list)
+  {
+    const bool is_current_delta = agg_hashmap.get() == delta_metrics.get();
+    agg_hashmap->GetAllEntries([&merge_aggregation, is_current_delta](
+                                   const MetricAttributes &attributes, Aggregation &aggregation) {
+      return merge_aggregation(attributes, aggregation, is_current_delta);
+    });
+  }
+
+  // Cumulative storage admits the previous state first to preserve its cardinality slots.
+  // Delta storage carries forward only the unreported metrics.
+
+  if (reported != last_reported_metrics_.end())
+  {
+    if (aggregation_temporarily != AggregationTemporality::kCumulative)
     {
-      last_collection_ts = last_reported_metrics_[collector].collection_ts;
+      last_collection_ts = reported->second.collection_ts;
     }
     last_reported_metrics_[collector] =
         LastReportedMetrics{std::move(merged_metrics), collection_ts};
@@ -197,13 +196,11 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   metric_data.start_ts                = last_collection_ts;
   metric_data.end_ts                  = collection_ts;
   // Async observations apply only to the reader whose callback produced delta_metrics.
-  const bool async_cumulative =
-      InstrumentDescriptorUtil::IsInstrumentTypeAsync(instrument_descriptor_.type_) &&
-      aggregation_temporarily == AggregationTemporality::kCumulative;
   result_to_export->GetAllEntries(
-      [&metric_data, delta_metrics, async_cumulative](const MetricAttributes &attributes,
-                                                      Aggregation &aggregation) {
-        if (async_cumulative && !delta_metrics->Has(attributes))
+      [&metric_data, delta_metrics, async_cumulative, async_cumulative_overflow_observed](
+          const MetricAttributes &attributes, Aggregation &aggregation) {
+        if (async_cumulative && !delta_metrics->Has(attributes) &&
+            !(attributes == GetOverflowAttributes() && async_cumulative_overflow_observed))
         {
           // Omit attribute sets not observed by this reader's callback, while keeping the
           // internal cumulative state.

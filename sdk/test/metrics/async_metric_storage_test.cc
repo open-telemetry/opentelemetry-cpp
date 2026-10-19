@@ -497,6 +497,88 @@ TEST_P(AsyncMetricStorageStaleAttributeFixture, AttributeReappearanceAfterGap)
       << "After a gap, reappearing attribute must preserve the baseline across the absent cycle";
 }
 
+TEST_P(AsyncMetricStorageStaleAttributeFixture, NonMonotonicInstrumentsDropStaleObservations)
+{
+  const AggregationTemporality temporality = GetParam();
+
+  for (const auto instrument_type :
+       {InstrumentType::kObservableGauge, InstrumentType::kObservableUpDownCounter})
+  {
+    InstrumentDescriptor instr_desc = {"name", "desc", "1unit", instrument_type,
+                                       InstrumentValueType::kLong};
+
+    auto sdk_start_ts  = std::chrono::system_clock::now();
+    auto collection_ts = sdk_start_ts + std::chrono::seconds(5);
+    std::shared_ptr<CollectorHandle> collector(new MockCollectorHandle(temporality));
+    std::vector<std::shared_ptr<CollectorHandle>> collectors{collector};
+
+    const auto aggregation_type = instrument_type == InstrumentType::kObservableGauge
+                                      ? AggregationType::kLastValue
+                                      : AggregationType::kSum;
+    opentelemetry::sdk::metrics::AsyncMetricStorage storage(
+        instr_desc, aggregation_type, nullptr,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+        ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+        nullptr);
+
+    std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> observation = {
+        {{{"attr", "A"}}, 10}};
+    storage.RecordLong(observation,
+                       opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+    size_t point_count = 0;
+    storage.Collect(collector.get(), collectors, sdk_start_ts, collection_ts,
+                    [&](const MetricData &metric_data) {
+                      point_count += metric_data.point_data_attr_.size();
+                      return true;
+                    });
+    EXPECT_EQ(1U, point_count);
+
+    std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> no_observations;
+    storage.RecordLong(no_observations,
+                       opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+    point_count = 0;
+    storage.Collect(collector.get(), collectors, sdk_start_ts,
+                    collection_ts + std::chrono::seconds(5), [&](const MetricData &metric_data) {
+                      point_count += metric_data.point_data_attr_.size();
+                      return true;
+                    });
+    EXPECT_EQ(0U, point_count) << "An absent gauge or up-down counter observation must be omitted";
+
+    observation.begin()->second = 30;
+    storage.RecordLong(observation,
+                       opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+    point_count              = 0;
+    int64_t reappeared_value = -1;
+    storage.Collect(
+        collector.get(), collectors, sdk_start_ts, collection_ts + std::chrono::seconds(10),
+        [&](const MetricData &metric_data) {
+          for (const auto &point : metric_data.point_data_attr_)
+          {
+            ++point_count;
+            if (instrument_type == InstrumentType::kObservableGauge)
+            {
+              reappeared_value = opentelemetry::nostd::get<int64_t>(
+                  opentelemetry::nostd::get<LastValuePointData>(point.point_data).value_);
+            }
+            else
+            {
+              reappeared_value = opentelemetry::nostd::get<int64_t>(
+                  opentelemetry::nostd::get<SumPointData>(point.point_data).value_);
+            }
+          }
+          return true;
+        });
+    EXPECT_EQ(1U, point_count) << "A reappearing observation must be exported";
+    const int64_t expected_value = instrument_type == InstrumentType::kObservableGauge ||
+                                           temporality == AggregationTemporality::kCumulative
+                                       ? 30
+                                       : 20;
+    EXPECT_EQ(expected_value, reappeared_value);
+  }
+}
+
 // Stale suppression must apply to every collector, not just the one that drains the shared delta
 // first. With two collectors, an attribute dropped by the callback must disappear from both
 // collectors' exports while the still-reported attribute keeps its correct value for both.
@@ -1154,6 +1236,71 @@ TEST(WritableMetricStorageCardinalityLimit, OverflowCombinesContributions)
   EXPECT_TRUE(has_overflow);
   EXPECT_EQ(1 + 2 + 3 + 4 + 5, total);
   EXPECT_GT(overflow_value, 0);
+}
+
+TEST(WritableMetricStorageCardinalityLimit, AsyncCumulativeOverflowIsExportedForLaggingReader)
+{
+  InstrumentDescriptor instr_desc = {"name", "desc", "1unit", InstrumentType::kObservableCounter,
+                                     InstrumentValueType::kLong};
+
+  std::shared_ptr<CollectorHandle> collector1(
+      new MockCollectorHandle(AggregationTemporality::kCumulative));
+  std::shared_ptr<CollectorHandle> collector2(
+      new MockCollectorHandle(AggregationTemporality::kCumulative));
+  std::vector<std::shared_ptr<CollectorHandle>> collectors{collector1, collector2};
+
+  constexpr size_t kCardinalityLimit = 2;
+  AggregationConfig aggregation_config{kCardinalityLimit};
+  opentelemetry::sdk::metrics::AsyncMetricStorage storage(
+      instr_desc, AggregationType::kSum, nullptr,
+#ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
+      ExemplarFilterType::kAlwaysOff, ExemplarReservoir::GetNoExemplarReservoir(),
+#endif
+      &aggregation_config);
+
+  const auto sdk_start_ts = std::chrono::system_clock::now();
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> first_reader_round = {
+      {{{"id", "a"}}, 1}, {{{"id", "b"}}, 2}};
+  storage.RecordLong(first_reader_round,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+  size_t first_reader_points = 0;
+  storage.Collect(collector1.get(), collectors, sdk_start_ts,
+                  sdk_start_ts + std::chrono::seconds(5), [&](const MetricData &metric_data) {
+                    first_reader_points = metric_data.point_data_attr_.size();
+                    return true;
+                  });
+  EXPECT_EQ(2U, first_reader_points);
+
+  std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> second_reader_round = {
+      {{{"id", "x"}}, 7}};
+  storage.RecordLong(second_reader_round,
+                     opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()));
+
+  auto expect_overflow_point = [&](CollectorHandle *collector) {
+    size_t point_count     = 0;
+    size_t overflow_count  = 0;
+    int64_t overflow_value = 0;
+    storage.Collect(
+        collector, collectors, sdk_start_ts, sdk_start_ts + std::chrono::seconds(10),
+        [&](const MetricData &metric_data) {
+          point_count = metric_data.point_data_attr_.size();
+          for (const auto &point : metric_data.point_data_attr_)
+          {
+            if (point.attributes.find(kAttributesLimitOverflowKey) != point.attributes.end())
+            {
+              ++overflow_count;
+              overflow_value = opentelemetry::nostd::get<int64_t>(
+                  opentelemetry::nostd::get<SumPointData>(point.point_data).value_);
+            }
+          }
+          return true;
+        });
+    EXPECT_EQ(1U, point_count);
+    EXPECT_EQ(1U, overflow_count);
+    EXPECT_EQ(7, overflow_value);
+  };
+
+  expect_overflow_point(collector2.get());
 }
 
 }  // namespace
