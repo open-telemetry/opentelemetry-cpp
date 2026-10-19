@@ -257,6 +257,7 @@ private:
     };
 
     std::string ret;
+    ret.reserve(str.size());
 
     for (size_t i = 0; i < str.size(); i++)
     {
