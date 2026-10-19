@@ -6,6 +6,7 @@
 #include <chrono>
 #include <memory>
 #include <mutex>
+#include <utility>
 #include <vector>
 
 #include "opentelemetry/sdk/trace/multi_recordable.h"
@@ -65,16 +66,31 @@ public:
 
   std::unique_ptr<Recordable> MakeRecordable() noexcept override
   {
-    auto recordable       = std::unique_ptr<Recordable>(new MultiRecordable);
-    auto multi_recordable = static_cast<MultiRecordable *>(recordable.get());
-    ProcessorNode *node   = head_;
-    while (node != nullptr)
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
     {
-      auto processor = node->value_.get();
-      multi_recordable->AddRecordable(*processor, processor->MakeRecordable());
-      node = node->next_;
+#endif
+      auto recordable       = std::unique_ptr<Recordable>(new MultiRecordable);
+      auto multi_recordable = static_cast<MultiRecordable *>(recordable.get());
+      ProcessorNode *node   = head_;
+      while (node != nullptr)
+      {
+        auto processor      = node->value_.get();
+        auto sub_recordable = processor->MakeRecordable();
+        if (sub_recordable != nullptr)
+        {
+          multi_recordable->AddRecordable(*processor, std::move(sub_recordable));
+        }
+        node = node->next_;
+      }
+      return recordable;
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
     }
-    return recordable;
+    catch (...)
+    {
+      return nullptr;
+    }
+#endif
   }
 
   void OnStart(Recordable &span,

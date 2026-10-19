@@ -45,7 +45,18 @@ public:
    */
   std::unique_ptr<sdk::trace::Recordable> MakeRecordable() noexcept override
   {
-    return std::unique_ptr<sdk::trace::Recordable>(new sdk::trace::SpanData());
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    try
+    {
+#endif
+      return std::unique_ptr<sdk::trace::Recordable>(new sdk::trace::SpanData());
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+    }
+    catch (...)
+    {
+      return nullptr;
+    }
+#endif
   }
 
   /**

@@ -92,9 +92,20 @@ OtlpGrpcExporter::~OtlpGrpcExporter()
 
 std::unique_ptr<sdk::trace::Recordable> OtlpGrpcExporter::MakeRecordable() noexcept
 {
-  return std::make_unique<OtlpRecordable>(options_.max_attributes, options_.max_events,
-                                          options_.max_links, options_.max_attributes_per_event,
-                                          options_.max_attributes_per_link);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    return std::make_unique<OtlpRecordable>(options_.max_attributes, options_.max_events,
+                                            options_.max_links, options_.max_attributes_per_event,
+                                            options_.max_attributes_per_link);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (...)
+  {
+    return nullptr;
+  }
+#endif
 }
 
 sdk::common::ExportResult OtlpGrpcExporter::Export(
