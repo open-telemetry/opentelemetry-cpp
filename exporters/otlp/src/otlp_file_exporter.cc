@@ -50,7 +50,18 @@ OtlpFileExporter::OtlpFileExporter(const OtlpFileExporterOptions &options,
 
 std::unique_ptr<opentelemetry::sdk::trace::Recordable> OtlpFileExporter::MakeRecordable() noexcept
 {
-  return std::make_unique<exporter::otlp::OtlpRecordable>();
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    return std::make_unique<exporter::otlp::OtlpRecordable>();
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (...)
+  {
+    return nullptr;
+  }
+#endif
 }
 
 opentelemetry::sdk::common::ExportResult OtlpFileExporter::Export(

@@ -23,6 +23,10 @@ Increment the:
 * [SDK] Fix disabled Tracer StartSpan noop behavior
   [#4710](https://github.com/open-telemetry/opentelemetry-cpp/pull/4710)
 
+* [SDK] Return a null recordable when MakeRecordable() fails to allocate,
+  instead of terminating the process from a noexcept function.
+  [#4700](https://github.com/open-telemetry/opentelemetry-cpp/pull/4700)
+
 * [SDK] Preserve the default unlimited timeout when batch span and log record
   processors shut down their exporters.
   [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)

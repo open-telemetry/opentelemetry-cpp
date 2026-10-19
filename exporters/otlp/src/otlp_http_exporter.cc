@@ -301,9 +301,20 @@ OtlpHttpExporter::OtlpHttpExporter(std::unique_ptr<OtlpHttpClient> http_client)
 
 std::unique_ptr<opentelemetry::sdk::trace::Recordable> OtlpHttpExporter::MakeRecordable() noexcept
 {
-  return std::make_unique<exporter::otlp::OtlpRecordable>(
-      options_.max_attributes, options_.max_events, options_.max_links,
-      options_.max_attributes_per_event, options_.max_attributes_per_link);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  try
+  {
+#endif
+    return std::make_unique<exporter::otlp::OtlpRecordable>(
+        options_.max_attributes, options_.max_events, options_.max_links,
+        options_.max_attributes_per_event, options_.max_attributes_per_link);
+#if OPENTELEMETRY_HAVE_EXCEPTIONS
+  }
+  catch (...)
+  {
+    return nullptr;
+  }
+#endif
 }
 
 opentelemetry::sdk::common::ExportResult OtlpHttpExporter::Export(
