@@ -43,6 +43,7 @@
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
 #include "opentelemetry/trace/context.h"
+#include "opentelemetry/trace/default_span.h"
 #include "opentelemetry/trace/scope.h"
 #include "opentelemetry/trace/span.h"
 #include "opentelemetry/trace/span_context.h"
@@ -654,21 +655,180 @@ TEST(Tracer, SpanSetEvents)
   ASSERT_EQ(1, span_data_events[2].GetAttributes().size());
 }
 
+namespace
+{
+
+std::shared_ptr<opentelemetry::trace::Tracer> InitDisabledTracer(
+    InMemorySpanExporter *exporter = new InMemorySpanExporter())
+{
+  return initTracer(std::unique_ptr<SpanExporter>{exporter}, new AlwaysOnSampler(),
+                    new RandomIdGenerator(),
+                    ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Disabled()).Build());
+}
+
+trace_api::SpanContext MakeParentContext()
+{
+  RandomIdGenerator generator;
+  return trace_api::SpanContext{
+      generator.GenerateTraceId(), generator.GenerateSpanId(),
+      trace_api::TraceFlags{trace_api::TraceFlags::kIsSampled | trace_api::TraceFlags::kIsRandom},
+      true, trace_api::TraceState::GetDefault()->Set("vendor", "value")};
+}
+
+nostd::shared_ptr<trace_api::Span> MakeDefaultSpan(const trace_api::SpanContext &span_context)
+{
+  return nostd::shared_ptr<trace_api::Span>{std::make_shared<trace_api::DefaultSpan>(span_context)};
+}
+
+void ExpectNonRecordingWithContext(const nostd::shared_ptr<trace_api::Span> &span,
+                                   const trace_api::SpanContext &expected)
+{
+  EXPECT_FALSE(span->IsRecording());
+  const auto actual = span->GetContext();
+  EXPECT_EQ(actual.trace_id(), expected.trace_id());
+  EXPECT_EQ(actual.span_id(), expected.span_id());
+  EXPECT_EQ(actual.trace_flags().flags(), expected.trace_flags().flags());
+  EXPECT_EQ(actual.IsRemote(), expected.IsRemote());
+  EXPECT_EQ(actual.trace_state()->ToHeader(), expected.trace_state()->ToHeader());
+}
+
+}  // namespace
+
 TEST(Tracer, StartSpanWithDisabledConfig)
 {
-  InMemorySpanExporter *exporter              = new InMemorySpanExporter();
-  std::shared_ptr<InMemorySpanData> span_data = exporter->GetData();
-  ScopeConfigurator<TracerConfig> disable_tracer =
-      ScopeConfigurator<TracerConfig>::Builder(TracerConfig::Disabled()).Build();
-  auto tracer = initTracer(std::unique_ptr<SpanExporter>{exporter}, new AlwaysOnSampler(),
-                           new RandomIdGenerator(), disable_tracer);
-  auto span   = tracer->StartSpan("span 1");
+  InMemorySpanExporter *exporter = new InMemorySpanExporter();
+  auto span_data                 = exporter->GetData();
+  auto tracer                    = InitDisabledTracer(exporter);
 
+  auto span = tracer->StartSpan("span");
   EXPECT_FALSE(span->IsRecording());
+  EXPECT_FALSE(span->GetContext().IsValid());
+  span->End();
+  EXPECT_TRUE(span_data->GetSpans().empty());
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   EXPECT_FALSE(tracer->Enabled());
 #endif
+}
+
+TEST(Tracer, StartSpanWithDisabledConfigUsesExplicitSpanContextParent)
+{
+  auto tracer = InitDisabledTracer();
+  auto parent = MakeParentContext();
+  trace_api::StartSpanOptions options;
+  options.parent = parent;
+
+  ExpectNonRecordingWithContext(tracer->StartSpan("span", options), parent);
+}
+
+TEST(Tracer, StartSpanWithDisabledConfigUsesExplicitContextParent)
+{
+  auto tracer = InitDisabledTracer();
+  auto parent = MakeParentContext();
+  trace_api::StartSpanOptions options;
+  options.parent = opentelemetry::context::Context{trace_api::kSpanKey, MakeDefaultSpan(parent)};
+
+  ExpectNonRecordingWithContext(tracer->StartSpan("span", options), parent);
+}
+
+TEST(Tracer, StartSpanWithDisabledConfigUsesActiveSpanParent)
+{
+  auto tracer = InitDisabledTracer();
+  auto parent = MakeParentContext();
+  trace_api::Scope scope(MakeDefaultSpan(parent));
+
+  ExpectNonRecordingWithContext(tracer->StartSpan("span"), parent);
+}
+
+TEST(Tracer, StartSpanWithDisabledConfigUsesSpanContextStoredInContext)
+{
+  auto tracer = InitDisabledTracer();
+  auto parent = MakeParentContext();
+  trace_api::StartSpanOptions options;
+  options.parent = opentelemetry::context::Context{
+      trace_api::kSpanKey,
+      nostd::shared_ptr<trace_api::SpanContext>{std::make_shared<trace_api::SpanContext>(parent)}};
+
+  ExpectNonRecordingWithContext(tracer->StartSpan("span", options), parent);
+}
+
+TEST(Tracer, StartSpanWithDisabledConfigReturnsNonRecordingSpanForRecordingParent)
+{
+  auto tracer           = InitDisabledTracer();
+  auto enabled_tracer   = initTracer(std::unique_ptr<SpanExporter>{new InMemorySpanExporter()});
+  auto recording_parent = enabled_tracer->StartSpan("parent");
+  trace_api::StartSpanOptions options;
+  options.parent = opentelemetry::context::Context{trace_api::kSpanKey, recording_parent};
+
+  ExpectNonRecordingWithContext(tracer->StartSpan("span", options), recording_parent->GetContext());
+}
+
+TEST(Tracer, StartSpanWithDisabledConfigExplicitSpanContextOverridesActiveSpan)
+{
+  auto tracer = InitDisabledTracer();
+  trace_api::Scope scope(MakeDefaultSpan(MakeParentContext()));
+  auto parent = MakeParentContext();
+  trace_api::StartSpanOptions options;
+  options.parent = parent;
+
+  ExpectNonRecordingWithContext(tracer->StartSpan("span", options), parent);
+}
+
+TEST(Tracer, StartSpanWithDisabledConfigExplicitContextOverridesActiveSpan)
+{
+  auto tracer = InitDisabledTracer();
+  trace_api::Scope scope(MakeDefaultSpan(MakeParentContext()));
+  auto parent = MakeParentContext();
+  trace_api::StartSpanOptions options;
+  options.parent = opentelemetry::context::Context{trace_api::kSpanKey, MakeDefaultSpan(parent)};
+
+  ExpectNonRecordingWithContext(tracer->StartSpan("span", options), parent);
+}
+
+TEST(Tracer, StartSpanWithDisabledConfigInvalidSpanContextFallsBackToActiveSpan)
+{
+  auto tracer = InitDisabledTracer();
+  auto active = MakeParentContext();
+  trace_api::Scope scope(MakeDefaultSpan(active));
+  trace_api::StartSpanOptions options;
+  options.parent = trace_api::SpanContext::GetInvalid();
+
+  ExpectNonRecordingWithContext(tracer->StartSpan("span", options), active);
+}
+
+TEST(Tracer, StartSpanWithDisabledConfigContextWithoutSpanFallsBackToActiveSpan)
+{
+  auto tracer = InitDisabledTracer();
+  auto active = MakeParentContext();
+  trace_api::Scope scope(MakeDefaultSpan(active));
+  trace_api::StartSpanOptions options;
+  options.parent = opentelemetry::context::Context{};
+
+  ExpectNonRecordingWithContext(tracer->StartSpan("span", options), active);
+}
+
+TEST(Tracer, StartSpanWithDisabledConfigContextWithInvalidSpanFallsBackToActiveSpan)
+{
+  auto tracer = InitDisabledTracer();
+  auto active = MakeParentContext();
+  trace_api::Scope scope(MakeDefaultSpan(active));
+  trace_api::StartSpanOptions options;
+  options.parent = opentelemetry::context::Context{
+      trace_api::kSpanKey, MakeDefaultSpan(trace_api::SpanContext::GetInvalid())};
+
+  ExpectNonRecordingWithContext(tracer->StartSpan("span", options), active);
+}
+
+TEST(Tracer, StartSpanWithDisabledConfigRootContextIgnoresActiveSpan)
+{
+  auto tracer = InitDisabledTracer();
+  trace_api::Scope scope(MakeDefaultSpan(MakeParentContext()));
+  trace_api::StartSpanOptions options;
+  options.parent = opentelemetry::context::Context{trace_api::kIsRootSpanKey, true};
+
+  auto span = tracer->StartSpan("span", options);
+  EXPECT_FALSE(span->IsRecording());
+  EXPECT_FALSE(span->GetContext().IsValid());
 }
 
 TEST(Tracer, StartSpanWithEnabledConfig)
