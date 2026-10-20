@@ -8,6 +8,7 @@ apt-get update
 apt-get install --no-install-recommends --no-install-suggests -y \
                 ninja-build \
                 build-essential \
+                libc++-dev \
                 ca-certificates \
                 wget \
                 git \
