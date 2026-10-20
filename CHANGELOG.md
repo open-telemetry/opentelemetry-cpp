@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [API/SDK] Add ASCII helpers and remove regex from InstrumentMetaDataValidator
+  [#4715](https://github.com/open-telemetry/opentelemetry-cpp/pull/4715)
+
 * [SDK] Release provider mutexes before construction-failure diagnostics so
   custom log handlers can retrieve cached or noop tracers, loggers, and meters
   from the same provider without deadlocking.
@@ -22,6 +25,9 @@ Increment the:
 
 * [SDK] Fix disabled Tracer StartSpan noop behavior
   [#4710](https://github.com/open-telemetry/opentelemetry-cpp/pull/4710)
+
+* [API] Preserve a valid parent SpanContext in spans returned by the no-op tracer.
+  [#4711](https://github.com/open-telemetry/opentelemetry-cpp/issues/4711)
 
 * [SDK] Preserve the default unlimited timeout when batch span and log record
   processors shut down their exporters.

@@ -28,7 +28,7 @@
 #endif
 
 #ifdef OTEL_CURL_DEBUG
-#  include <cctype>
+#  include "opentelemetry/common/detail/ascii.h"
 #endif
 
 #include "opentelemetry/common/string_util.h"
@@ -843,7 +843,7 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
   {
     static const auto kHeaderSent = nostd::string_view("Send header => ");
 
-    while (!text_to_log.empty() && !std::iscntrl(text_to_log[0]))
+    while (!text_to_log.empty() && !opentelemetry::common::detail::IsAsciiControl(text_to_log[0]))
     {
       const auto pos = text_to_log.find('\n');
 

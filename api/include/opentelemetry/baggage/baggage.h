@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include <cctype>
-
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/common/macros.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -215,16 +214,11 @@ private:
   // Implementation inspired from : https://golang.org/src/net/url/url.go?s=7851:7884#L264
   static std::string UrlEncode(nostd::string_view str)
   {
-    auto to_hex = [](char c) -> char {
-      static const char *hex = "0123456789ABCDEF";
-      return hex[c & 15];
-    };
-
     std::string ret;
 
     for (auto c : str)
     {
-      if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
+      if (common::detail::IsAsciiAlnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
       {
         ret.push_back(c);
       }
@@ -235,8 +229,8 @@ private:
       else
       {
         ret.push_back('%');
-        ret.push_back(to_hex(static_cast<char>(c >> 4)));
-        ret.push_back(to_hex(static_cast<char>(c & 15)));
+        ret.push_back(common::detail::UpperHexDigit(static_cast<unsigned char>(c) >> 4));
+        ret.push_back(common::detail::UpperHexDigit(c));
       }
     }
 
@@ -246,16 +240,6 @@ private:
   // Uri decode key value pairs after extracting from header
   static std::string UrlDecode(nostd::string_view str, bool &err)
   {
-    auto IsHex = [](char c) {
-      return std::isdigit(c) || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
-    };
-
-    auto from_hex = [](char c) -> char {
-      // c - '0' produces integer type which could trigger error/warning when casting to char,
-      // but the cast is safe here.
-      return static_cast<char>(std::isdigit(c) ? c - '0' : std::toupper(c) - 'A' + 10);
-    };
-
     std::string ret;
     ret.reserve(str.size());
 
@@ -263,12 +247,14 @@ private:
     {
       if (str[i] == '%')
       {
-        if (i + 2 >= str.size() || !IsHex(str[i + 1]) || !IsHex(str[i + 2]))
+        if (i + 2 >= str.size() || !common::detail::IsAsciiHexDigit(str[i + 1]) ||
+            !common::detail::IsAsciiHexDigit(str[i + 2]))
         {
           err = true;
           return "";
         }
-        ret.push_back(static_cast<char>(from_hex(str[i + 1]) << 4 | from_hex(str[i + 2])));
+        ret.push_back(static_cast<char>(common::detail::HexDigitValue(str[i + 1]) << 4 |
+                                        common::detail::HexDigitValue(str[i + 2])));
         i += 2;
       }
       else if (str[i] == '+')
