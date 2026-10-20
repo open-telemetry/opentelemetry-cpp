@@ -20,6 +20,9 @@ Increment the:
   from the same provider without deadlocking.
   [#4693](https://github.com/open-telemetry/opentelemetry-cpp/issues/4693)
 
+* [SDK] Fix disabled Tracer StartSpan noop behavior
+  [#4710](https://github.com/open-telemetry/opentelemetry-cpp/pull/4710)
+
 * [SDK] Preserve the default unlimited timeout when batch span and log record
   processors shut down their exporters.
   [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)
@@ -31,6 +34,9 @@ Increment the:
   `Base2ExponentialHistogramAggregation`, so a recording that spans the full
   double range no longer downscales without end.
   [#4353](https://github.com/open-telemetry/opentelemetry-cpp/pull/4353)
+
+* [SDK] Remove TracerConfig copy from Tracer
+  [#4712](https://github.com/open-telemetry/opentelemetry-cpp/pull/4712)
 
 * [LOGS] Fix undefined behavior in `Logger::EmitLogRecord()` when a logger is
   enabled (e.g. via `LoggerProvider::UpdateLoggerConfigurator()`) after
