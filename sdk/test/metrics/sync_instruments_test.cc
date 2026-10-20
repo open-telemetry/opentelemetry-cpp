@@ -229,10 +229,11 @@ private:
 // Adds value through every Add overload.
 void AddWithAllOverloads(LongCounter &counter, uint64_t value)
 {
+  M attributes = {{"k", "v"}};
   counter.Add(value);
   counter.Add(value, opentelemetry::context::Context{});
-  counter.Add(value, opentelemetry::common::KeyValueIterableView<M>({{"k", "v"}}));
-  counter.Add(value, opentelemetry::common::KeyValueIterableView<M>({{"k", "v"}}),
+  counter.Add(value, opentelemetry::common::KeyValueIterableView<M>(attributes));
+  counter.Add(value, opentelemetry::common::KeyValueIterableView<M>(attributes),
               opentelemetry::context::Context{});
 }
 
