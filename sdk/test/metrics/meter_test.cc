@@ -404,10 +404,8 @@ TEST(MeterTest, AsyncCumulativeObservationsAreReaderScoped)
 {
   struct CallbackState
   {
-    bool report_get = true;
-    int64_t get     = 10;
-    bool report_put = true;
-    int64_t put     = 5;
+    bool report  = true;
+    size_t round = 0;
   } callback_state;
 
   auto provider = std::make_shared<MeterProvider>();
@@ -422,13 +420,18 @@ TEST(MeterTest, AsyncCumulativeObservationsAreReaderScoped)
     auto observer_long =
         nostd::get<nostd::shared_ptr<opentelemetry::metrics::ObserverResultT<int64_t>>>(observer);
     auto &measurements = *static_cast<CallbackState *>(state);
-    if (measurements.report_get)
+    ++measurements.round;
+    if (!measurements.report)
     {
-      observer_long->Observe(measurements.get, {{"RequestType", "GET"}});
+      return;
     }
-    if (measurements.report_put)
+    if (measurements.round % 2 == 1)
     {
-      observer_long->Observe(measurements.put, {{"RequestType", "PUT"}});
+      observer_long->Observe(10, {{"RequestType", "GET"}});
+    }
+    else
+    {
+      observer_long->Observe(5, {{"RequestType", "PUT"}});
     }
   };
   observable_counter->AddCallback(callback, &callback_state);
@@ -470,17 +473,16 @@ TEST(MeterTest, AsyncCumulativeObservationsAreReaderScoped)
     }
   };
 
-  // Each reader runs the callback independently and initially observes both attributes.
-  collect_and_check(reader1, 1, 10, 1);
-  collect_and_check(reader2, 1, 10, 1);
-
-  // GET is unchanged, so its callback produces a zero delta; PUT is absent from both rounds.
-  callback_state.report_put = false;
+  // Each reader runs the callback independently and observes only its own attribute set.
   collect_and_check(reader1, 1, 10, 0);
-  collect_and_check(reader2, 1, 10, 0);
+  collect_and_check(reader2, 0, 0, 1);
 
-  // An empty callback round emits no points, even though both attributes remain in history.
-  callback_state.report_get = false;
+  // Repeating each reader's observation keeps its cumulative value unchanged and scoped.
+  collect_and_check(reader1, 1, 10, 0);
+  collect_and_check(reader2, 0, 0, 1);
+
+  // An empty callback round emits no points, even though both readers have history.
+  callback_state.report = false;
   collect_and_check(reader1, 0, 0, 0);
   collect_and_check(reader2, 0, 0, 0);
 

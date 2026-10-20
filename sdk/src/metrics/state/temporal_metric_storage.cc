@@ -48,6 +48,8 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   std::lock_guard<std::mutex> guard(lock_);
   AggregationTemporality aggregation_temporarily =
       collector->GetAggregationTemporality(instrument_descriptor_.type_);
+  const bool is_async =
+      InstrumentDescriptorUtil::IsInstrumentTypeAsync(instrument_descriptor_.type_);
   // Per OTel spec (issue #4062): the start_ts for the first delta collection
   // interval must be the instrument creation time, not the MeterProvider
   // start time (which is what sdk_start_ts carries). For cumulative, sdk_start_ts
@@ -96,16 +98,22 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
   }
 
   const bool async_cumulative =
-      InstrumentDescriptorUtil::IsInstrumentTypeAsync(instrument_descriptor_.type_) &&
-      aggregation_temporarily == AggregationTemporality::kCumulative;
+      is_async && aggregation_temporarily == AggregationTemporality::kCumulative;
   bool async_cumulative_overflow_observed =
       async_cumulative && delta_metrics->Has(GetOverflowAttributes());
 
   if (delta_metrics->Size())
   {
-    for (auto &col : collectors)
+    if (is_async)
     {
-      unreported_metrics_[col.get()].push_back(delta_metrics);
+      unreported_metrics_[collector].push_back(delta_metrics);
+    }
+    else
+    {
+      for (auto &col : collectors)
+      {
+        unreported_metrics_[col.get()].push_back(delta_metrics);
+      }
     }
   }
 
@@ -143,6 +151,18 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
 
   auto reported = last_reported_metrics_.find(collector);
   std::unique_ptr<AttributesHashMap> last_aggr_hashmap;
+  if (async_cumulative)
+  {
+    // Reserve this reader's current callback attributes before carrying forward stale series.
+    delta_metrics->GetAllEntries(
+        [this, &merged_metrics](const MetricAttributes &attributes, Aggregation &) {
+          merged_metrics->GetOrSetDefault(attributes, [this]() {
+            return DefaultAggregation::CreateAggregation(aggregation_type_, instrument_descriptor_,
+                                                         aggregation_config_);
+          });
+          return true;
+        });
+  }
   if (reported != last_reported_metrics_.end())
   {
     last_aggr_hashmap = std::move(reported->second.attributes_map);
@@ -165,8 +185,8 @@ bool TemporalMetricStorage::buildMetrics(CollectorHandle *collector,
     });
   }
 
-  // Cumulative storage admits the previous state first to preserve its cardinality slots.
-  // Delta storage carries forward only the unreported metrics.
+  // Synchronous cumulative storage preserves prior series' cardinality slots. Async cumulative
+  // storage reserves the current callback's slots above before carrying forward prior state.
 
   if (reported != last_reported_metrics_.end())
   {
