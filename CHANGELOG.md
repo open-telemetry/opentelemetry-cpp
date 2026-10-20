@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS] Extend preview bound instruments to UpDownCounter and Gauge
+  [#4321](https://github.com/open-telemetry/opentelemetry-cpp/pull/4321)
 * [SDK] Release provider mutexes before construction-failure diagnostics so
   custom log handlers can retrieve cached or noop tracers, loggers, and meters
   from the same provider without deadlocking.

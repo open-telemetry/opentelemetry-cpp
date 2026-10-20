@@ -1,6 +1,26 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+// PR #4321 results, 2026-09-21, source b3e71a6b.
+// Apple M4 Pro (12 cores), macOS 26.6.2 arm64, Apple Clang 21.0.0.
+// Release (-O3 -DNDEBUG), C++17, Google Benchmark 1.9.5.
+// CMake: OTELCPP_WITH_ABI_VERSION_1=OFF, OTELCPP_WITH_ABI_VERSION_2=ON,
+// OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW=ON,
+// OTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW=OFF, OTELCPP_WITH_STL=OFF,
+// OTELCPP_BUILD_TESTING=ON, OTELCPP_WITH_BENCHMARK=ON.
+// Five repetitions, --benchmark_min_time=0.25s --benchmark_repetitions=5.
+// Machine-specific measurements. Threads were not pinned.
+// Run measurements_benchmark with:
+// --benchmark_filter='BM_(Unbound|Bound)FixedAttrs(UpDownCounter|Gauge)$'
+// Median time per recording, ns:
+// clang-format off
+// Benchmark                              Real time      CPU time
+// UnboundFixedAttrsUpDownCounter             279.1         278.4
+// BoundFixedAttrsUpDownCounter                13.1          13.1
+// UnboundFixedAttrsGauge                     285.6         285.2
+// BoundFixedAttrsGauge                        35.3          35.3
+// clang-format on
+
 #include <benchmark/benchmark.h>
 #include <atomic>
 #include <chrono>
@@ -274,6 +294,85 @@ void BM_BoundFixedAttrsCounter(benchmark::State &state)
   exporter->Collect([&](ResourceMetrics & /*rm*/) { return true; });
 }
 BENCHMARK(BM_BoundFixedAttrsCounter);
+
+void BM_UnboundFixedAttrsUpDownCounter(benchmark::State &state)
+{
+  MeterProvider mp;
+  std::shared_ptr<MetricReader> exporter(new MockMetricExporter());
+  mp.AddMetricReader(exporter);
+  auto m = mp.GetMeter("meter1", "version1", "schema1");
+  auto counter =
+      m->CreateDoubleUpDownCounter("updown_unbound_fixed", "fixed-attrs unbound", "unit");
+  auto attrs   = MakeFixedAttributes();
+  auto context = opentelemetry::context::Context{};
+  while (state.KeepRunning())
+  {
+    counter->Add(
+        -1.0,
+        opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        context);
+  }
+  exporter->Collect([&](ResourceMetrics & /*rm*/) { return true; });
+}
+BENCHMARK(BM_UnboundFixedAttrsUpDownCounter);
+
+void BM_BoundFixedAttrsUpDownCounter(benchmark::State &state)
+{
+  MeterProvider mp;
+  std::shared_ptr<MetricReader> exporter(new MockMetricExporter());
+  mp.AddMetricReader(exporter);
+  auto m       = mp.GetMeter("meter1", "version1", "schema1");
+  auto counter = m->CreateDoubleUpDownCounter("updown_bound_fixed", "fixed-attrs bound", "unit");
+  auto attrs   = MakeFixedAttributes();
+  auto bound   = counter->Bind(
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs));
+  benchmark::DoNotOptimize(bound.get());
+  while (state.KeepRunning())
+  {
+    bound->Add(-1.0);
+  }
+  exporter->Collect([&](ResourceMetrics & /*rm*/) { return true; });
+}
+BENCHMARK(BM_BoundFixedAttrsUpDownCounter);
+
+void BM_UnboundFixedAttrsGauge(benchmark::State &state)
+{
+  MeterProvider mp;
+  std::shared_ptr<MetricReader> exporter(new MockMetricExporter());
+  mp.AddMetricReader(exporter);
+  auto m       = mp.GetMeter("meter1", "version1", "schema1");
+  auto gauge   = m->CreateDoubleGauge("gauge_unbound_fixed", "fixed-attrs unbound", "unit");
+  auto attrs   = MakeFixedAttributes();
+  auto context = opentelemetry::context::Context{};
+  while (state.KeepRunning())
+  {
+    gauge->Record(
+        -1.0,
+        opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs),
+        context);
+  }
+  exporter->Collect([&](ResourceMetrics & /*rm*/) { return true; });
+}
+BENCHMARK(BM_UnboundFixedAttrsGauge);
+
+void BM_BoundFixedAttrsGauge(benchmark::State &state)
+{
+  MeterProvider mp;
+  std::shared_ptr<MetricReader> exporter(new MockMetricExporter());
+  mp.AddMetricReader(exporter);
+  auto m     = mp.GetMeter("meter1", "version1", "schema1");
+  auto gauge = m->CreateDoubleGauge("gauge_bound_fixed", "fixed-attrs bound", "unit");
+  auto attrs = MakeFixedAttributes();
+  auto bound = gauge->Bind(
+      opentelemetry::common::KeyValueIterableView<std::map<std::string, std::string>>(attrs));
+  benchmark::DoNotOptimize(bound.get());
+  while (state.KeepRunning())
+  {
+    bound->Record(-1.0);
+  }
+  exporter->Collect([&](ResourceMetrics & /*rm*/) { return true; });
+}
+BENCHMARK(BM_BoundFixedAttrsGauge);
 #endif  // OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
 
 }  // namespace
