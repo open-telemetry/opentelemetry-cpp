@@ -32,6 +32,16 @@ Increment the:
 * [METRICS SDK] Validate Base2 Exponential Histogram Aggregation config
   [#4253](https://github.com/open-telemetry/opentelemetry-cpp/pull/4253)
 
+* [SDK] `BatchLogRecordProcessor` now waits for a full batch
+  (`max_export_batch_size`) before exporting, instead of draining the buffer
+  whenever it is non-empty, matching `BatchSpanProcessor`
+  ([#4466](https://github.com/open-telemetry/opentelemetry-cpp/pull/4466)).
+  This reduces gRPC request count and CPU usage under steady load while
+  preserving `ForceFlush`/`Shutdown` drain semantics. Force-flush exports also
+  respect `max_export_batch_size`, splitting buffered log records into multiple
+  batches when needed.
+  [#4498](https://github.com/open-telemetry/opentelemetry-cpp/issues/4498)
+
 Breaking changes:
 
 * [METRICS SDK] Rename Base2 Exponential Histogram Aggregation config field
