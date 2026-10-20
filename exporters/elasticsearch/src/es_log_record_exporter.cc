@@ -494,10 +494,10 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   // non-positive response_timeout_ means no timeout, matching the curl client's own
   // CURLOPT_TIMEOUT_MS 0 semantics, so it gets the max time_point rather than one already in
   // the past; this backstop only bounds the wait when the caller actually asked for a bound.
-  auto deadline = options_.response_timeout_ > 0
-                      ? std::chrono::steady_clock::now() +
-                            std::chrono::seconds(options_.response_timeout_)
-                      : std::chrono::steady_clock::time_point::max();
+  auto deadline =
+      options_.response_timeout_ > 0
+          ? std::chrono::steady_clock::now() + std::chrono::seconds(options_.response_timeout_)
+          : std::chrono::steady_clock::time_point::max();
   session->SendRequest(handler);
 
   // Wait for the response to be received
