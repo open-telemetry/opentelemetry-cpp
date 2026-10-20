@@ -23,6 +23,9 @@ Increment the:
 * [SDK] Fix disabled Tracer StartSpan noop behavior
   [#4710](https://github.com/open-telemetry/opentelemetry-cpp/pull/4710)
 
+* [API] Preserve a valid parent SpanContext in spans returned by the no-op tracer.
+  [#4711](https://github.com/open-telemetry/opentelemetry-cpp/issues/4711)
+
 * [SDK] Preserve the default unlimited timeout when batch span and log record
   processors shut down their exporters.
   [#4686](https://github.com/open-telemetry/opentelemetry-cpp/pull/4686)
