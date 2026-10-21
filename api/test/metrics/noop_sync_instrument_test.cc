@@ -53,3 +53,18 @@ TEST(UpDownCountr, Record)
   counter->Add(10, {{"k1", "1"}, {"k2", 2}});
   counter->Add(10, {{"k1", "1"}, {"k2", 2}}, opentelemetry::context::Context{});
 }
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+TEST(SynchronousInstrument, NoopInstrumentsAreDisabled)
+{
+  opentelemetry::metrics::NoopCounter<uint64_t> counter("test", "none", "unitless");
+  opentelemetry::metrics::NoopHistogram<double> histogram("test", "none", "unitless");
+  opentelemetry::metrics::NoopUpDownCounter<int64_t> up_down_counter("test", "none", "unitless");
+  opentelemetry::metrics::NoopGauge<double> gauge("test", "none", "unitless");
+
+  EXPECT_FALSE(counter.Enabled());
+  EXPECT_FALSE(histogram.Enabled());
+  EXPECT_FALSE(up_down_counter.Enabled());
+  EXPECT_FALSE(gauge.Enabled());
+}
+#endif

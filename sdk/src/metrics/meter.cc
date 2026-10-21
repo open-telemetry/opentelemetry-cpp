@@ -155,6 +155,17 @@ void Meter::UpdateMeterConfig(MeterConfig config) noexcept
   meter_enabled_state_->SetEnabled(config.IsEnabled());
 }
 
+std::shared_ptr<MeterEnabledState> Meter::GetInstrumentEnabledState(
+    const SyncMultiMetricStorage *storage) const noexcept
+{
+  // Every matching view uses the Drop aggregation, so the instrument never records.
+  if (storage != nullptr && storage->Empty())
+  {
+    return always_disabled_state_;
+  }
+  return meter_enabled_state_;
+}
+
 opentelemetry::nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64Counter(
     opentelemetry::nostd::string_view name,
     opentelemetry::nostd::string_view description,
@@ -171,9 +182,10 @@ opentelemetry::nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kCounter, InstrumentValueType::kLong};
-  auto storage = RegisterSyncMetricStorage(instrument_descriptor);
+  auto storage       = RegisterSyncMetricStorage(instrument_descriptor);
+  auto enabled_state = GetInstrumentEnabledState(storage.get());
   return opentelemetry::nostd::unique_ptr<metrics::Counter<uint64_t>>(
-      new LongCounter(instrument_descriptor, std::move(storage), meter_enabled_state_));
+      new LongCounter(instrument_descriptor, std::move(storage), std::move(enabled_state)));
 }
 
 opentelemetry::nostd::unique_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
@@ -193,9 +205,10 @@ opentelemetry::nostd::unique_ptr<metrics::Counter<double>> Meter::CreateDoubleCo
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kCounter,
       InstrumentValueType::kDouble};
-  auto storage = RegisterSyncMetricStorage(instrument_descriptor);
+  auto storage       = RegisterSyncMetricStorage(instrument_descriptor);
+  auto enabled_state = GetInstrumentEnabledState(storage.get());
   return opentelemetry::nostd::unique_ptr<metrics::Counter<double>>{
-      new DoubleCounter(instrument_descriptor, std::move(storage), meter_enabled_state_)};
+      new DoubleCounter(instrument_descriptor, std::move(storage), std::move(enabled_state))};
 }
 
 opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -257,9 +270,10 @@ opentelemetry::nostd::unique_ptr<metrics::Histogram<uint64_t>> Meter::CreateUInt
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kHistogram,
       InstrumentValueType::kLong};
-  auto storage = RegisterSyncMetricStorage(instrument_descriptor);
+  auto storage       = RegisterSyncMetricStorage(instrument_descriptor);
+  auto enabled_state = GetInstrumentEnabledState(storage.get());
   return opentelemetry::nostd::unique_ptr<metrics::Histogram<uint64_t>>{
-      new LongHistogram(instrument_descriptor, std::move(storage), meter_enabled_state_)};
+      new LongHistogram(instrument_descriptor, std::move(storage), std::move(enabled_state))};
 }
 
 opentelemetry::nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
@@ -279,9 +293,10 @@ opentelemetry::nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDouble
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kHistogram,
       InstrumentValueType::kDouble};
-  auto storage = RegisterSyncMetricStorage(instrument_descriptor);
+  auto storage       = RegisterSyncMetricStorage(instrument_descriptor);
+  auto enabled_state = GetInstrumentEnabledState(storage.get());
   return opentelemetry::nostd::unique_ptr<metrics::Histogram<double>>{
-      new DoubleHistogram(instrument_descriptor, std::move(storage), meter_enabled_state_)};
+      new DoubleHistogram(instrument_descriptor, std::move(storage), std::move(enabled_state))};
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -301,9 +316,10 @@ opentelemetry::nostd::unique_ptr<metrics::Gauge<int64_t>> Meter::CreateInt64Gaug
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kGauge, InstrumentValueType::kLong};
-  auto storage = RegisterSyncMetricStorage(instrument_descriptor);
+  auto storage       = RegisterSyncMetricStorage(instrument_descriptor);
+  auto enabled_state = GetInstrumentEnabledState(storage.get());
   return opentelemetry::nostd::unique_ptr<metrics::Gauge<int64_t>>{
-      new LongGauge(instrument_descriptor, std::move(storage), meter_enabled_state_)};
+      new LongGauge(instrument_descriptor, std::move(storage), std::move(enabled_state))};
 }
 
 opentelemetry::nostd::unique_ptr<metrics::Gauge<double>> Meter::CreateDoubleGauge(
@@ -322,9 +338,10 @@ opentelemetry::nostd::unique_ptr<metrics::Gauge<double>> Meter::CreateDoubleGaug
   InstrumentDescriptor instrument_descriptor = {
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kGauge, InstrumentValueType::kDouble};
-  auto storage = RegisterSyncMetricStorage(instrument_descriptor);
+  auto storage       = RegisterSyncMetricStorage(instrument_descriptor);
+  auto enabled_state = GetInstrumentEnabledState(storage.get());
   return opentelemetry::nostd::unique_ptr<metrics::Gauge<double>>{
-      new DoubleGauge(instrument_descriptor, std::move(storage), meter_enabled_state_)};
+      new DoubleGauge(instrument_descriptor, std::move(storage), std::move(enabled_state))};
 }
 #endif
 
@@ -387,9 +404,10 @@ opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<int64_t>> Meter::CreateI
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kUpDownCounter,
       InstrumentValueType::kLong};
-  auto storage = RegisterSyncMetricStorage(instrument_descriptor);
+  auto storage       = RegisterSyncMetricStorage(instrument_descriptor);
+  auto enabled_state = GetInstrumentEnabledState(storage.get());
   return opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<int64_t>>{
-      new LongUpDownCounter(instrument_descriptor, std::move(storage), meter_enabled_state_)};
+      new LongUpDownCounter(instrument_descriptor, std::move(storage), std::move(enabled_state))};
 }
 
 opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCounter(
@@ -409,9 +427,10 @@ opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<double>> Meter::CreateDo
       std::string{name.data(), name.size()}, std::string{description.data(), description.size()},
       std::string{unit.data(), unit.size()}, InstrumentType::kUpDownCounter,
       InstrumentValueType::kDouble};
-  auto storage = RegisterSyncMetricStorage(instrument_descriptor);
+  auto storage       = RegisterSyncMetricStorage(instrument_descriptor);
+  auto enabled_state = GetInstrumentEnabledState(storage.get());
   return opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<double>>{
-      new DoubleUpDownCounter(instrument_descriptor, std::move(storage), meter_enabled_state_)};
+      new DoubleUpDownCounter(instrument_descriptor, std::move(storage), std::move(enabled_state))};
 }
 
 opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -462,7 +481,7 @@ const sdk::instrumentationscope::InstrumentationScope *Meter::GetInstrumentation
   return scope_.get();
 }
 
-std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
+std::unique_ptr<SyncMultiMetricStorage> Meter::RegisterSyncMetricStorage(
     InstrumentDescriptor &instrument_descriptor)
 {
   std::lock_guard<std::mutex> guard(storage_lock_);
@@ -476,7 +495,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
   }
 
   auto view_registry = ctx->GetViewRegistry();
-  std::unique_ptr<SyncWritableMetricStorage> storages(new SyncMultiMetricStorage());
+  std::unique_ptr<SyncMultiMetricStorage> storages(new SyncMultiMetricStorage());
 
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
   auto exemplar_filter_type = ctx->GetExemplarFilter();
@@ -533,8 +552,7 @@ std::unique_ptr<SyncWritableMetricStorage> Meter::RegisterSyncMetricStorage(
               view.GetAggregationConfig()));
           storage_registry_.insert({view_instr_desc, sync_storage});
         }
-        auto sync_multi_storage = static_cast<SyncMultiMetricStorage *>(storages.get());
-        if (!sync_multi_storage->AddStorage(sync_storage))
+        if (!storages->AddStorage(sync_storage))
         {
           WarnOnViewSemanticError(GetInstrumentationScope(), instrument_descriptor, view_instr_desc,
                                   view);
