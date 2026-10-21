@@ -183,6 +183,14 @@ Breaking changes:
     the exporter implementation needs to be adjusted,
     when using the NoopSpan.
 
+* [EXPORTER] Allocate the OTLP trace and log recordable messages on an Arena
+  owned by the recordable
+  [#4580](https://github.com/open-telemetry/opentelemetry-cpp/pull/4580)
+  * Recording a field is an Arena bump instead of a heap allocation.
+  * `OtlpRecordable` and `OtlpLogRecordable` are larger and no longer
+    copyable or movable. `span()`, `log_record()` and
+    `OtlpRecordableUtils::PopulateRequest` are unchanged.
+
 ## [1.29.0] 2026-09-13
 
 * [RELEASE] Bump main branch to 1.29.0-dev (#4259)
