@@ -218,7 +218,8 @@ Increment the:
 * [CODE HEALTH] Fix clang-tidy bugprone-exception-escape in lastvalue_aggregation.cc
   [#4564](https://github.com/open-telemetry/opentelemetry-cpp/pull/4564)
 
-* [EXPORTER ETW] Fix PropertyValue string conversions that doubled length and ignored string_view size
+* [EXPORTER ETW] Fix PropertyValue string conversions that
+  doubled length and ignored string_view size
   [#4656](https://github.com/open-telemetry/opentelemetry-cpp/pull/4656)
 
 * [SDK] Preserve unlimited batch processor shutdown timeout
