@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include <cctype>
 #include <cstddef>
 #include <string>
 #include <vector>
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/common/kv_properties.h"
 #include "opentelemetry/nostd/function_ref.h"
 #include "opentelemetry/nostd/shared_ptr.h"
@@ -104,9 +104,9 @@ public:
           {
             first = false;
           }
-          header_s.append(std::string(key.data(), key.size()));
+          header_s.append(key.data(), key.size());
           header_s.append(1, kKeyValueSeparator);
-          header_s.append(std::string(value.data(), value.size()));
+          header_s.append(value.data(), value.size());
           return true;
         });
     return header_s;
@@ -298,7 +298,7 @@ private:
 
   static bool IsLowerCaseAlphaOrDigit(char c) noexcept
   {
-    return std::isdigit(c) || std::islower(c);
+    return common::detail::IsAsciiDigit(c) || common::detail::IsAsciiLower(c);
   }
 
 private:

@@ -8,12 +8,7 @@
 #include <string>
 #include <vector>
 
-#if defined(HAVE_GSL)
-#  include <gsl/gsl>
-#else
-#  include <cassert>
-#endif
-
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/nostd/string_view.h"
 
 // clang-format off
@@ -39,23 +34,6 @@ namespace otlp
 namespace
 {
 
-inline char HexEncode(unsigned char byte)
-{
-#if defined(HAVE_GSL)
-  Expects(byte <= 16);
-#else
-  assert(byte <= 16);
-#endif
-  if (byte >= 10)
-  {
-    return static_cast<char>(byte - 10 + 'a');
-  }
-  else
-  {
-    return static_cast<char>(byte + '0');
-  }
-}
-
 std::string HexEncode(const std::string &bytes)
 {
   std::string ret;
@@ -63,8 +41,8 @@ std::string HexEncode(const std::string &bytes)
   for (std::string::size_type i = 0; i < bytes.size(); ++i)
   {
     unsigned char byte = static_cast<unsigned char>(bytes[i]);
-    ret.push_back(HexEncode(byte >> 4));
-    ret.push_back(HexEncode(byte & 0x0f));
+    ret.push_back(opentelemetry::common::detail::LowerHexDigit(byte >> 4));
+    ret.push_back(opentelemetry::common::detail::LowerHexDigit(byte));
   }
   return ret;
 }
@@ -83,8 +61,8 @@ void WriteHexString(JsonWriter &writer, const std::string &bytes)
   for (std::size_t i = 0; i < bytes.size(); ++i)
   {
     unsigned char byte = static_cast<unsigned char>(bytes[i]);
-    buffer[2 * i]      = HexEncode(static_cast<unsigned char>(byte >> 4));
-    buffer[2 * i + 1]  = HexEncode(static_cast<unsigned char>(byte & 0x0f));
+    buffer[2 * i]      = opentelemetry::common::detail::LowerHexDigit(byte >> 4);
+    buffer[2 * i + 1]  = opentelemetry::common::detail::LowerHexDigit(byte);
   }
   writer.WriteString(nostd::string_view(buffer, bytes.size() * 2));
 }
