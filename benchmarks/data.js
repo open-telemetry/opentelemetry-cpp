@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792539228971,
+  "lastUpdate": 1792550678373,
   "repoUrl": "https://github.com/open-telemetry/opentelemetry-cpp",
   "entries": {
     "OpenTelemetry-cpp api Benchmark": [
@@ -789226,6 +789226,132 @@ window.BENCHMARK_DATA = {
             "value": 108.23118069108277,
             "unit": "us/iter",
             "extra": "iterations: 1274\ncpu: 108.1602778649924 us\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "bvkraditya@gmail.com",
+            "name": "Aditya Bavadekar",
+            "username": "adityabavadekar"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d4b49e39a1f9bf8c6a2a9145b5286938f1e43d08",
+          "message": "[SDK] Support MeterConfigurator updates and example (#4313)",
+          "timestamp": "2026-10-21T04:19:52+02:00",
+          "tree_id": "099f6a8c6ede289a14d69c911797d9c2c9822871",
+          "url": "https://github.com/open-telemetry/opentelemetry-cpp/commit/d4b49e39a1f9bf8c6a2a9145b5286938f1e43d08"
+        },
+        "date": 1792550635406,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_OtlpExporterEmptySpans",
+            "value": 16.762309366549754,
+            "unit": "ns/iter",
+            "extra": "iterations: 8471000\ncpu: 16.759361232440092 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterSparseSpans",
+            "value": 75.33754991448444,
+            "unit": "ns/iter",
+            "extra": "iterations: 1840000\ncpu: 75.31414347826089 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpExporterDenseSpans",
+            "value": 545.4863889150351,
+            "unit": "ns/iter",
+            "extra": "iterations: 249000\ncpu: 545.4876867469882 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_otlp_grpc_with_collector",
+            "value": 2228844.749824458,
+            "unit": "ns/iter",
+            "extra": "iterations: 347\ncpu: 396752.0518731988 ns\nthreads: 1"
+          },
+          {
+            "name": "OtlpRecordableFixture/RecordMinimalSpan",
+            "value": 2242.5144549815204,
+            "unit": "ns/iter",
+            "extra": "iterations: 62412\ncpu: 2286.6550983786087 ns\nthreads: 1"
+          },
+          {
+            "name": "OtlpRecordableFixture/RecordNominalSpan",
+            "value": 3253.324233499476,
+            "unit": "ns/iter",
+            "extra": "iterations: 42962\ncpu: 3303.2043666495147 ns\nthreads: 1"
+          },
+          {
+            "name": "OtlpRecordableFixture/RecordSpanWithAttributes/attribute_count:1",
+            "value": 2426.476050966348,
+            "unit": "ns/iter",
+            "extra": "iterations: 57228\ncpu: 2478.0446634514265 ns\nthreads: 1"
+          },
+          {
+            "name": "OtlpRecordableFixture/RecordSpanWithAttributes/attribute_count:10",
+            "value": 3597.761359075105,
+            "unit": "ns/iter",
+            "extra": "iterations: 32329\ncpu: 3603.9771103344187 ns\nthreads: 1"
+          },
+          {
+            "name": "OtlpRecordableFixture/RecordSpanWithAttributes/attribute_count:128",
+            "value": 36551.8963540111,
+            "unit": "ns/iter",
+            "extra": "iterations: 4342\ncpu: 36466.458544452325 ns\nthreads: 1"
+          },
+          {
+            "name": "OtlpRecordableFixture/RecordSpanWithEvents/event_count:1",
+            "value": 2978.730405325457,
+            "unit": "ns/iter",
+            "extra": "iterations: 47308\ncpu: 2953.495920352119 ns\nthreads: 1"
+          },
+          {
+            "name": "OtlpRecordableFixture/RecordSpanWithEvents/event_count:10",
+            "value": 7269.296103493546,
+            "unit": "ns/iter",
+            "extra": "iterations: 18577\ncpu: 7299.13489799195 ns\nthreads: 1"
+          },
+          {
+            "name": "OtlpRecordableFixture/RecordSpanWithEvents/event_count:128",
+            "value": 67181.38461056435,
+            "unit": "ns/iter",
+            "extra": "iterations: 2024\ncpu: 66039.9491106677 ns\nthreads: 1"
+          },
+          {
+            "name": "OtlpRecordableFixture/RecordSpanWithLinks/link_count:1",
+            "value": 2732.2907591953176,
+            "unit": "ns/iter",
+            "extra": "iterations: 49259\ncpu: 2778.2340892019183 ns\nthreads: 1"
+          },
+          {
+            "name": "OtlpRecordableFixture/RecordSpanWithLinks/link_count:10",
+            "value": 7657.009911694866,
+            "unit": "ns/iter",
+            "extra": "iterations: 19201\ncpu: 7434.076870997049 ns\nthreads: 1"
+          },
+          {
+            "name": "OtlpRecordableFixture/RecordSpanWithLinks/link_count:128",
+            "value": 67516.63018346504,
+            "unit": "ns/iter",
+            "extra": "iterations: 2132\ncpu: 67352.2809568492 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpPopulateRequest/span_count:1",
+            "value": 1.667925513667475,
+            "unit": "us/iter",
+            "extra": "iterations: 82120\ncpu: 1.6502710301997083 us\nthreads: 1"
+          },
+          {
+            "name": "BM_OtlpPopulateRequest/span_count:512",
+            "value": 111.54355901766328,
+            "unit": "us/iter",
+            "extra": "iterations: 1227\ncpu: 111.31040994295012 us\nthreads: 1"
           }
         ]
       }
