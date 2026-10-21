@@ -18,7 +18,7 @@ Increment the:
 * [EXPORTER] Add a `JsonWriter` interface for OTLP/JSON serialization, so a
   consumer can supply their own JSON backend in place of the default
   nlohmann-json one.
-  [#2541](https://github.com/open-telemetry/opentelemetry-cpp/issues/2541)
+  [#4556](https://github.com/open-telemetry/opentelemetry-cpp/pull/4556)
 
 * [API/SDK] Add ASCII helpers and remove regex from InstrumentMetaDataValidator
   [#4715](https://github.com/open-telemetry/opentelemetry-cpp/pull/4715)
