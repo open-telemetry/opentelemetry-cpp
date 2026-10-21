@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+## [1.30.0] 2026-10-22
+
 * [API/SDK] Add ASCII helpers and remove regex from InstrumentMetaDataValidator
   [#4715](https://github.com/open-telemetry/opentelemetry-cpp/pull/4715)
 
