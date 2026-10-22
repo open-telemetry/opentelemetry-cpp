@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Clamp `BatchSpanProcessor` max_export_batch_size to max_queue_size,
+  so a larger value no longer stops spans from being exported until the
+  schedule delay expires.
+  [#XXXX](https://github.com/open-telemetry/opentelemetry-cpp/pull/XXXX)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
