@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [API/SDK] Add `Enabled()` to synchronous metric instruments (ABI v2). It
+  returns `false` when the Meter is disabled or every matching view uses the
+  Drop aggregation
+  [#4721](https://github.com/open-telemetry/opentelemetry-cpp/pull/4721)
+
 * [API/SDK] Add ASCII helpers and remove regex from InstrumentMetaDataValidator
   [#4715](https://github.com/open-telemetry/opentelemetry-cpp/pull/4715)
 

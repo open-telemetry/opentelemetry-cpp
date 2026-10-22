@@ -28,6 +28,46 @@ public:
   SynchronousInstrument &operator=(const SynchronousInstrument &)     = default;
   SynchronousInstrument &operator=(SynchronousInstrument &&) noexcept = default;
   virtual ~SynchronousInstrument()                                    = default;
+
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+  /**
+   * Reports if the instrument is enabled or not. A disabled instrument drops its measurements.
+   *
+   * The instrumentation authors should call this method each time before recording a
+   * measurement, to potentially avoid performing computationally expensive operations for
+   * disabled instruments. The returned value can change over time.
+   *
+   * @since ABI_VERSION 2
+   */
+  bool Enabled() const noexcept { return OPENTELEMETRY_ATOMIC_READ_RELAXED_8(enabled_) != 0; }
+
+protected:
+  /**
+   * Sets the flag read by Enabled(). SDKs point it at a flag they update; it must outlive this
+   * instrument.
+   *
+   * @since ABI_VERSION 2
+   */
+  void SetEnabledFlag(const bool *enabled) noexcept { enabled_ = enabled; }
+
+  /** A flag that is always false, for instruments that are never enabled. */
+  static const bool *DisabledFlag() noexcept
+  {
+    static const bool kDisabled = false;
+    return &kDisabled;
+  }
+
+private:
+  static const bool *EnabledFlag() noexcept
+  {
+    static const bool kEnabled = true;
+    return &kEnabled;
+  }
+
+  // Variable to support implementation of Enabled method introduced in ABI V2.
+  // A pointer, so an SDK can flip many instruments with a single write.
+  const bool *enabled_ = EnabledFlag();
+#endif
 };
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
