@@ -18,9 +18,14 @@ Increment the:
 ## [1.30.0] 2026-10-22
 
 This release contains:
+
 * Important changes
 * Breaking changes
 * Security fixes
+
+Please check the full release notes.
+
+Changes:
 
 * [RELEASE] Bump main branch to 1.30.0-dev
   [#4563](https://github.com/open-telemetry/opentelemetry-cpp/pull/4563)
@@ -390,7 +395,8 @@ Security fixes:
     containing raw control bytes other than permitted HTAB are dropped.
   * Members with empty metadata properties (`;;` or a trailing `;`), non-token
     property keys, or non-ASCII metadata are also dropped.
-  * `Baggage::Set()` rejects invalid metadata without replacing existing entries or adding new ones.
+  * `Baggage::Set()` rejects invalid metadata without replacing
+     existing entries or adding new ones.
   * The curl client now fails the whole request for non-token header names or
     header values containing control bytes other than HTAB, or DEL.
   * This includes configured exporter headers.
