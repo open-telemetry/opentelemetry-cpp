@@ -17,6 +17,11 @@ Increment the:
 
 ## [1.30.0] 2026-10-22
 
+This release contains:
+* Important changes
+* Breaking changes
+* Security fixes
+
 * [RELEASE] Bump main branch to 1.30.0-dev
   [#4563](https://github.com/open-telemetry/opentelemetry-cpp/pull/4563)
 
@@ -306,6 +311,10 @@ Increment the:
 * [CODE HEALTH] Fix misc-use-internal-linkage warning
   [#4724](https://github.com/open-telemetry/opentelemetry-cpp/pull/4724)
 
+* [SECURITY] HTTP request splitting and header injection
+  on outbound requests via unencoded baggage metadata (CRLF)
+  [GHSA-j5cq-83xw-rx48](https://github.com/open-telemetry/opentelemetry-cpp/security/advisories/GHSA-j5cq-83xw-rx48)
+
 * [RELEASE] Release opentelemetry-cpp 1.30.0
   [#4722](https://github.com/open-telemetry/opentelemetry-cpp/pull/4722)
 
@@ -373,7 +382,20 @@ Breaking changes:
 
 Security fixes:
 
-* TBD
+* [SECURITY] HTTP request splitting and header injection
+  on outbound requests via unencoded baggage metadata (CRLF)
+  [GHSA-j5cq-83xw-rx48](https://github.com/open-telemetry/opentelemetry-cpp/security/advisories/GHSA-j5cq-83xw-rx48)
+  * Reject invalid baggage metadata during extraction and injection.
+  * After the existing trimming of leading and trailing whitespace, members
+    containing raw control bytes other than permitted HTAB are dropped.
+  * Members with empty metadata properties (`;;` or a trailing `;`), non-token
+    property keys, or non-ASCII metadata are also dropped.
+  * `Baggage::Set()` rejects invalid metadata without replacing existing entries or adding new ones.
+  * The curl client now fails the whole request for non-token header names or
+    header values containing control bytes other than HTAB, or DEL.
+  * This includes configured exporter headers.
+  * Applications must recompile to receive the header-only baggage fix,
+    using API headers from opentelemetry-cpp 1.30.0 (or later)
 
 ## [1.29.0] 2026-09-13
 

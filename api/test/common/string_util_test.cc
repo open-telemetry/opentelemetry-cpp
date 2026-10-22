@@ -8,6 +8,7 @@
 
 #include <opentelemetry/common/macros.h>
 #include <opentelemetry/common/string_util.h>
+#include <opentelemetry/nostd/string_view.h>
 
 // ------------------------- StringUtil class tests ---------------------------------
 
@@ -15,6 +16,17 @@ using opentelemetry::common::StringUtil;
 
 namespace
 {
+
+TEST(StringUtilTest, TrimPreservesHighBytes)
+{
+  for (int byte = 0x80; byte <= 0xff; ++byte)
+  {
+    SCOPED_TRACE(byte);
+    const std::string value(1, static_cast<char>(byte));
+    const std::string padded = " \t\r\n" + value + "\v\f ";
+    EXPECT_EQ(std::string(StringUtil::Trim(padded)), value);
+  }
+}
 
 TEST(StringUtilTest, TrimStringWithIndex)
 {
