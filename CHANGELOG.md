@@ -300,6 +300,9 @@ Increment the:
 * Update step-security/harden-runner action to v2.22.2
   [#4720](https://github.com/open-telemetry/opentelemetry-cpp/pull/4720)
 
+* Update all [patches]
+  [#4723](https://github.com/open-telemetry/opentelemetry-cpp/pull/4723)
+
 * [RELEASE] Release opentelemetry-cpp 1.30.0
   [#4722](https://github.com/open-telemetry/opentelemetry-cpp/pull/4722)
 
