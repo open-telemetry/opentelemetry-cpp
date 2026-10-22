@@ -303,8 +303,28 @@ Increment the:
 * Update all [patches]
   [#4723](https://github.com/open-telemetry/opentelemetry-cpp/pull/4723)
 
+* [CODE HEALTH] Fix misc-use-internal-linkage warning
+  [#4724](https://github.com/open-telemetry/opentelemetry-cpp/pull/4724)
+
 * [RELEASE] Release opentelemetry-cpp 1.30.0
   [#4722](https://github.com/open-telemetry/opentelemetry-cpp/pull/4722)
+
+Important changes:
+
+* [API] Preserve parent SpanContext in NoopTracer spans
+  [#4717](https://github.com/open-telemetry/opentelemetry-cpp/pull/4717)
+  * When a valid parent span context is present, StartSpan() now
+    returns a non recording span referencing the parent,
+    instead of a NoopSpan as before.
+  * This is the behavior required by the specification,
+    to avoid breaking traces when code is instrumented but traces
+    are disabled.
+  * Because this fix is in the header only API,
+    instrumented code must be compiled again using API headers
+    from opentelemetry-cpp 1.30.0 (or later), so see the benefits of this fix.
+  * Instrumentation compiled with older API headers and linked with
+    the SDK from opentelemetry-cpp 1.30 (or later) will not see the fix,
+    causing traces to break.
 
 Breaking changes:
 
