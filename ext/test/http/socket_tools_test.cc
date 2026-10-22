@@ -2,9 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
+#include <stddef.h>
+#include <cstdint>
 #include <string>
 #ifndef _WIN32
-#  include <sys/socket.h>  // for sockaddr, AF_UNSPEC, AF_INET
+#  include <netinet/in.h>  // for sockaddr_in, IPPROTO_TCP
+#  include <sys/socket.h>  // for sockaddr, AF_UNSPEC, AF_INET, SOCK_STREAM
 #endif
 
 #include "opentelemetry/ext/http/server/socket_tools.h"
@@ -17,14 +20,75 @@ namespace
 // corrupted while port() happens to still return -1.
 void ExpectInvalid(const SocketTools::SocketAddr &addr)
 {
-  EXPECT_EQ(addr.m_data.sa_family, AF_UNSPEC);
+  EXPECT_EQ(addr.m_data.ss_family, AF_UNSPEC);
   EXPECT_EQ(addr.port(), -1);
+}
+
+TEST(SocketAddrTest, DefaultsToUnspecified)
+{
+  SocketTools::SocketAddr addr;
+  EXPECT_EQ(addr.m_data.ss_family, AF_UNSPEC);
+  EXPECT_EQ(addr.port(), -1);
+}
+
+// The storage must be aligned for every address type copied into it. Placing the address after a
+// single byte lets the compiler put it wherever its own alignment allows; with a sockaddr
+// (alignment 1 or 2) as the storage that was an address a sockaddr_in (alignment 4) cannot live
+// at, which UBSan's alignment check reported for this constructor.
+TEST(SocketAddrTest, ConstructsFromHostOrderAddressAndPort)
+{
+  struct Padded
+  {
+    char pad = 0;
+    SocketTools::SocketAddr addr{SocketTools::SocketAddr::Loopback, 8800};
+  } padded;
+  EXPECT_EQ(reinterpret_cast<std::uintptr_t>(&padded.addr.m_data) % alignof(sockaddr_in), 0u);
+  EXPECT_EQ(padded.addr.m_data.ss_family, AF_INET);
+  EXPECT_EQ(padded.addr.port(), 8800);
+  EXPECT_EQ(padded.addr.toString(), "127.0.0.1:8800");
+}
+
+// bind() and connect() take addr() and addr_len(). The storage is larger than an IPv4 address, and
+// passing its full size as the address length is rejected with EINVAL on some platforms.
+TEST(SocketAddrTest, ExposesAddressAndLengthForTheSocketApi)
+{
+  SocketTools::SocketAddr addr(SocketTools::SocketAddr::Loopback, 8800);
+  EXPECT_EQ(static_cast<const void *>(addr.addr()), static_cast<const void *>(&addr.m_data));
+  EXPECT_EQ(static_cast<size_t>(addr.addr_len()), sizeof(sockaddr_in));
+}
+
+TEST(SocketTest, BindsConnectsAndAcceptsOnLoopback)
+{
+  SocketTools::Socket listener(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  ASSERT_FALSE(listener.invalid());
+  ASSERT_TRUE(listener.bind(SocketTools::SocketAddr(SocketTools::SocketAddr::Loopback, 0)));
+  ASSERT_TRUE(listener.listen(1));
+
+  SocketTools::SocketAddr bound;
+  ASSERT_TRUE(listener.getsockname(bound));
+  EXPECT_EQ(bound.m_data.ss_family, AF_INET);
+  ASSERT_GT(bound.port(), 0);
+
+  SocketTools::Socket client(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+  ASSERT_FALSE(client.invalid());
+  ASSERT_TRUE(client.connect(SocketTools::SocketAddr(SocketTools::SocketAddr::Loopback,
+                                                     static_cast<uint16_t>(bound.port()))));
+
+  SocketTools::Socket accepted;
+  SocketTools::SocketAddr peer;
+  ASSERT_TRUE(listener.accept(accepted, peer));
+  EXPECT_EQ(peer.m_data.ss_family, AF_INET);
+  EXPECT_EQ(peer.toString().substr(0, 10), "127.0.0.1:");
+
+  accepted.close();
+  client.close();
+  listener.close();
 }
 
 TEST(SocketAddrTest, ParsesHostAndPort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:8800");
-  EXPECT_EQ(addr.m_data.sa_family, AF_INET);
+  EXPECT_EQ(addr.m_data.ss_family, AF_INET);
   EXPECT_EQ(addr.port(), 8800);
   EXPECT_EQ(addr.toString(), "127.0.0.1:8800");
 }
@@ -57,7 +121,7 @@ TEST(SocketAddrTest, ParsesHostWithoutPort)
 TEST(SocketAddrTest, ParsesLegitimateZeroPort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:0");
-  EXPECT_EQ(addr.m_data.sa_family, AF_INET);
+  EXPECT_EQ(addr.m_data.ss_family, AF_INET);
   EXPECT_EQ(addr.port(), 0);
   EXPECT_EQ(addr.toString(), "127.0.0.1:0");
 }
@@ -67,7 +131,7 @@ TEST(SocketAddrTest, ParsesLegitimateZeroPort)
 TEST(SocketAddrTest, AcceptsLeadingZeroPort)
 {
   SocketTools::SocketAddr addr("127.0.0.1:080");
-  EXPECT_EQ(addr.m_data.sa_family, AF_INET);
+  EXPECT_EQ(addr.m_data.ss_family, AF_INET);
   EXPECT_EQ(addr.port(), 80);
 }
 
