@@ -13,6 +13,9 @@
 
 using opentelemetry::common::StringUtil;
 
+namespace
+{
+
 TEST(StringUtilTest, TrimStringWithIndex)
 {
   struct
@@ -124,3 +127,5 @@ TEST_P(SubstrOutOfRangeTestFixture, HandlesPosPastTheEnd)
 INSTANTIATE_TEST_SUITE_P(SubstrOutOfRangeTestCases,
                          SubstrOutOfRangeTestFixture,
                          ::testing::ValuesIn(substr_out_of_range_test_cases));
+
+}  // namespace
