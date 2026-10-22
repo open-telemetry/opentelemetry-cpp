@@ -316,8 +316,7 @@ Changes:
 * [CODE HEALTH] Fix misc-use-internal-linkage warning
   [#4724](https://github.com/open-telemetry/opentelemetry-cpp/pull/4724)
 
-* [SECURITY] HTTP request splitting and header injection
-  on outbound requests via unencoded baggage metadata (CRLF)
+* [SECURITY] Fix baggage metadata injection and reject unsafe curl headers
   [GHSA-j5cq-83xw-rx48](https://github.com/open-telemetry/opentelemetry-cpp/security/advisories/GHSA-j5cq-83xw-rx48)
 
 * [RELEASE] Release opentelemetry-cpp 1.30.0
@@ -387,8 +386,7 @@ Breaking changes:
 
 Security fixes:
 
-* [SECURITY] HTTP request splitting and header injection
-  on outbound requests via unencoded baggage metadata (CRLF)
+* [SECURITY] Fix baggage metadata injection and reject unsafe curl headers
   [GHSA-j5cq-83xw-rx48](https://github.com/open-telemetry/opentelemetry-cpp/security/advisories/GHSA-j5cq-83xw-rx48)
   * Reject invalid baggage metadata during extraction and injection.
   * After the existing trimming of leading and trailing whitespace, members
