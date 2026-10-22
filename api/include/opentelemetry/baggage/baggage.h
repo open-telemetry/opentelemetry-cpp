@@ -55,7 +55,7 @@ public:
   {
 
     nostd::shared_ptr<Baggage> baggage(new Baggage(kv_properties_->Size() + 1));
-    const bool valid_kv = IsValidKey(key) && IsValidValue(value);
+    const bool valid_kv = IsValidKey(key) && IsValidValue(value) && IsValidValueMetadata(value);
 
     if (valid_kv)
     {
@@ -125,9 +125,14 @@ public:
 
     while (kv_str_tokenizer.next(kv_valid, key, value) && baggage->kv_properties_->Size() < cnt)
     {
-      if (!kv_valid || (key.size() + value.size() > kMaxKeyValueSize))
+      if (!kv_valid || key.size() + value.size() > kMaxKeyValueSize)
       {
-        // if kv pair is not valid, skip it
+        continue;
+      }
+      // Preserve the tokenizer's edge-whitespace normalization, but reject
+      // unsafe bytes before decoding or separating metadata from the value.
+      if (!IsValidWireString(key) || !IsValidWireString(value))
+      {
         continue;
       }
 
@@ -145,7 +150,8 @@ public:
       auto key_str   = UrlDecode(common::StringUtil::Trim(key), err);
       auto value_str = UrlDecode(common::StringUtil::Trim(value), err);
 
-      if (err == false && IsValidKey(key_str) && IsValidValue(value_str))
+      if (err == false && IsValidKey(key_str) && IsValidValue(value_str) &&
+          IsValidMetadata(metadata))
       {
         if (!metadata.empty())
         {
@@ -164,6 +170,12 @@ public:
     std::string header_s;
     bool first = true;
     kv_properties_->GetAllEntries([&](nostd::string_view key, nostd::string_view value) {
+      // Constructors can populate baggage without going through FromHeader or Set.
+      auto metadata_separator = value.find(kMetadataSeparator);
+      if (!IsValidValueMetadata(value))
+      {
+        return true;
+      }
       if (!first)
       {
         header_s.push_back(kMembersSeparator);
@@ -176,11 +188,10 @@ public:
       header_s.push_back(kKeyValueSeparator);
 
       // extracting metadata from value. We do not encode metadata
-      auto metadata_separator = value.find(kMetadataSeparator);
       if (metadata_separator != std::string::npos)
       {
-        header_s.append(UrlEncode(value.substr(0, metadata_separator)));
-        auto metadata = value.substr(metadata_separator);
+        header_s.append(UrlEncode(common::StringUtil::Substr(value, 0, metadata_separator)));
+        auto metadata = common::StringUtil::Substr(value, metadata_separator);
         header_s.append(std::string(metadata.data(), metadata.size()));
       }
       else
@@ -193,6 +204,93 @@ public:
   }
 
 private:
+  static bool IsValidValueMetadata(nostd::string_view value) noexcept
+  {
+    auto separator = value.find(kMetadataSeparator);
+    return separator == nostd::string_view::npos ||
+           IsValidMetadata(common::StringUtil::Substr(value, separator));
+  }
+
+  static nostd::string_view TrimOws(nostd::string_view value) noexcept
+  {
+    while (!value.empty() && (value[0] == ' ' || value[0] == '\t'))
+    {
+      value = common::StringUtil::Substr(value, 1);
+    }
+    while (!value.empty() && (value[value.size() - 1] == ' ' || value[value.size() - 1] == '\t'))
+    {
+      value = common::StringUtil::Substr(value, 0, value.size() - 1);
+    }
+    return value;
+  }
+
+  static bool IsValidWireString(nostd::string_view value) noexcept
+  {
+    for (unsigned char ch : value)
+    {
+      if ((ch < 0x20 && ch != '\t') || ch > 0x7e)
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  static bool IsToken(nostd::string_view value) noexcept
+  {
+    if (value.empty())
+    {
+      return false;
+    }
+    for (char ch : value)
+    {
+      if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') ||
+            nostd::string_view("!#$%&'*+-.^_`|~").find(ch) != nostd::string_view::npos))
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Metadata is stored in wire form. Validate properties without decoding or
+  // re-encoding them, so existing percent escapes retain their meaning.
+  static bool IsValidMetadata(nostd::string_view metadata) noexcept
+  {
+    while (!metadata.empty())
+    {
+      if (metadata[0] != kMetadataSeparator)
+      {
+        return false;
+      }
+      metadata      = common::StringUtil::Substr(metadata, 1);
+      auto end      = metadata.find(kMetadataSeparator);
+      auto property = TrimOws(common::StringUtil::Substr(metadata, 0, end));
+      auto equals   = property.find(kKeyValueSeparator);
+      if (!IsToken(TrimOws(common::StringUtil::Substr(property, 0, equals))))
+      {
+        return false;
+      }
+      if (equals != nostd::string_view::npos)
+      {
+        for (unsigned char ch : TrimOws(common::StringUtil::Substr(property, equals + 1)))
+        {
+          // W3C baggage-octet; SP and HTAB are only allowed around properties.
+          if (ch < 0x21 || ch > 0x7e || ch == '"' || ch == ',' || ch == '\\')
+          {
+            return false;
+          }
+        }
+      }
+      if (end == nostd::string_view::npos)
+      {
+        return true;
+      }
+      metadata = common::StringUtil::Substr(metadata, end);
+    }
+    return true;
+  }
+
   static bool IsPrintableString(nostd::string_view str)
   {
     for (const auto ch : str)
