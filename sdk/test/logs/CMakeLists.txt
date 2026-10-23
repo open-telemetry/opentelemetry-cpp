@@ -19,10 +19,8 @@ foreach(
     opentelemetry_logs opentelemetry_trace)
   if(testname STREQUAL "logger_provider_sdk_test")
     target_link_libraries(${testname} opentelemetry_test_common)
+    gtest_discover_tests(${testname} TEST_PREFIX logs. PROPERTIES TIMEOUT 10)
+  else()
+    gtest_discover_tests(${testname} TEST_PREFIX logs.)
   endif()
-  gtest_discover_tests(${testname} TEST_PREFIX logs.)
 endforeach()
-
-set_tests_properties(
-  logs.LoggerProviderSDK.ConstructionFailureDiagnosticsAllowProviderReentry
-  PROPERTIES TIMEOUT 10)

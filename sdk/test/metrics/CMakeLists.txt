@@ -46,12 +46,12 @@ foreach(
     opentelemetry_resources
     opentelemetry_test_common)
   target_compile_definitions(${testname} PRIVATE UNIT_TESTING)
-  gtest_discover_tests(${testname} TEST_PREFIX metrics.)
+  if(testname STREQUAL "meter_provider_sdk_test")
+    gtest_discover_tests(${testname} TEST_PREFIX metrics. PROPERTIES TIMEOUT 10)
+  else()
+    gtest_discover_tests(${testname} TEST_PREFIX metrics.)
+  endif()
 endforeach()
-
-set_tests_properties(
-  metrics.MeterProvider.ConstructionFailureDiagnosticsAllowProviderReentry
-  PROPERTIES TIMEOUT 10)
 
 if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
   add_executable(multi_observer_test multi_observer_test.cc)

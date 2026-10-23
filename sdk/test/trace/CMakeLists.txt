@@ -30,13 +30,11 @@ foreach(
     opentelemetry_exporter_in_memory)
   if(testname STREQUAL "tracer_provider_test")
     target_link_libraries(${testname} opentelemetry_test_common)
+    gtest_discover_tests(${testname} TEST_PREFIX trace. PROPERTIES TIMEOUT 10)
+  else()
+    gtest_discover_tests(${testname} TEST_PREFIX trace.)
   endif()
-  gtest_discover_tests(${testname} TEST_PREFIX trace.)
 endforeach()
-
-set_tests_properties(
-  trace.TracerProvider.ConstructionFailureDiagnosticsAllowProviderReentry
-  PROPERTIES TIMEOUT 10)
 
 if(OTELCPP_WITH_BENCHMARK)
   add_executable(sampler_benchmark sampler_benchmark.cc)
