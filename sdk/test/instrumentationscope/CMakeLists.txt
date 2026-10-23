@@ -8,8 +8,5 @@ foreach(testname instrumentationscope_test)
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_instrumentation_scope)
-  gtest_add_tests(
-    TARGET ${testname}
-    TEST_PREFIX instrumentationscope.
-    TEST_LIST ${testname})
+  gtest_discover_tests(${testname} TEST_PREFIX instrumentationscope.)
 endforeach()

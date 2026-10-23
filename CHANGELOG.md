@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [TEST] Replace `gtest_add_tests()` with `gtest_discover_tests()` to prevent
+  false-positive test passes for tests compiled out by preprocessor conditionals.
+  [#4341](https://github.com/open-telemetry/opentelemetry-cpp/issues/4341)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:

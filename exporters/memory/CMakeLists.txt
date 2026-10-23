@@ -86,20 +86,8 @@ if(OTELCPP_BUILD_TESTING)
     ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_in_memory_metric
     opentelemetry_resources)
 
-  gtest_add_tests(
-    TARGET in_memory_span_data_test
-    TEST_PREFIX exporter.
-    TEST_LIST in_memory_span_data_test)
-  gtest_add_tests(
-    TARGET in_memory_span_exporter_test
-    TEST_PREFIX exporter.
-    TEST_LIST in_memory_span_exporter_test)
-  gtest_add_tests(
-    TARGET in_memory_metric_data_test
-    TEST_PREFIX exporter.
-    TEST_LIST in_memory_metric_data_test)
-  gtest_add_tests(
-    TARGET in_memory_metric_exporter_test
-    TEST_PREFIX exporter.
-    TEST_LIST in_memory_metric_exporter_test)
+  gtest_discover_tests(in_memory_span_data_test TEST_PREFIX exporter.)
+  gtest_discover_tests(in_memory_span_exporter_test TEST_PREFIX exporter.)
+  gtest_discover_tests(in_memory_metric_data_test TEST_PREFIX exporter.)
+  gtest_discover_tests(in_memory_metric_exporter_test TEST_PREFIX exporter.)
 endif()

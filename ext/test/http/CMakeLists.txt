@@ -11,10 +11,7 @@ if(OTELCPP_WITH_HTTP_CLIENT_CURL)
   if(WIN32)
     target_link_libraries(${FILENAME} PRIVATE ws2_32)
   endif()
-  gtest_add_tests(
-    TARGET ${FILENAME}
-    TEST_PREFIX ext.http.curl.
-    TEST_LIST ${FILENAME})
+  gtest_discover_tests(${FILENAME} TEST_PREFIX ext.http.curl.)
 endif()
 
 set(SOCKET_TOOLS_FILENAME socket_tools_test)
@@ -26,16 +23,10 @@ target_link_libraries(${SOCKET_TOOLS_FILENAME} opentelemetry_ext ${GMOCK_LIB}
 if(WIN32)
   target_link_libraries(${SOCKET_TOOLS_FILENAME} ws2_32)
 endif()
-gtest_add_tests(
-  TARGET ${SOCKET_TOOLS_FILENAME}
-  TEST_PREFIX ext.http.sockettools.
-  TEST_LIST ${SOCKET_TOOLS_FILENAME})
+gtest_discover_tests(${SOCKET_TOOLS_FILENAME} TEST_PREFIX ext.http.sockettools.)
 
 set(URL_PARSER_FILENAME url_parser_test)
 add_executable(${URL_PARSER_FILENAME} ${URL_PARSER_FILENAME}.cc)
 target_link_libraries(${URL_PARSER_FILENAME} opentelemetry_ext ${GMOCK_LIB}
                       ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-gtest_add_tests(
-  TARGET ${URL_PARSER_FILENAME}
-  TEST_PREFIX ext.http.urlparser.
-  TEST_LIST ${URL_PARSER_FILENAME})
+gtest_discover_tests(${URL_PARSER_FILENAME} TEST_PREFIX ext.http.urlparser.)
