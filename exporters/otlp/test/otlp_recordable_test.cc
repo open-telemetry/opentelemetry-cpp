@@ -190,6 +190,18 @@ TEST(OtlpRecordable, SetStatus)
   EXPECT_EQ(rec2.span().status().message(), "");
 }
 
+TEST(OtlpRecordable, SetStatusClearsStaleMessage)
+{
+  OtlpRecordable rec;
+  rec.SetStatus(trace::StatusCode::kError, "boom");
+  EXPECT_EQ(rec.span().status().message(), "boom");
+
+  rec.SetStatus(trace::StatusCode::kOk, "");
+  EXPECT_EQ(rec.span().status().code(),
+            proto::trace::v1::Status_StatusCode(trace::StatusCode::kOk));
+  EXPECT_EQ(rec.span().status().message(), "");
+}
+
 TEST(OtlpRecordable, SetTraceFlags)
 {
   OtlpRecordable rec;

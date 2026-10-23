@@ -17,6 +17,7 @@ cc_test(
         "//exporters/memory:in_memory_span_exporter",
         "//sdk/src/resource",
         "//sdk/src/trace",
+        "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -53,6 +54,21 @@ cc_test(
 )
 
 cc_test(
+    name = "span_status_test",
+    srcs = [
+        "span_status_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "simple_processor_test",
     srcs = [
         "simple_processor_test.cc",
@@ -63,6 +79,21 @@ cc_test(
     ],
     deps = [
         "//exporters/memory:in_memory_span_exporter",
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "multi_span_processor_test",
+    srcs = [
+        "multi_span_processor_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
+    ],
+    deps = [
         "//sdk/src/trace",
         "@com_google_googletest//:gtest_main",
     ],

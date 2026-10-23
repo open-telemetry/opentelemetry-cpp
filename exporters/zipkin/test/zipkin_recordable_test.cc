@@ -156,6 +156,19 @@ TEST(ZipkinSpanRecordable, SetStatus)
   }
 }
 
+TEST(ZipkinSpanRecordable, SetStatusClearsStaleErrorTag)
+{
+  zipkin::Recordable rec;
+
+  rec.SetStatus(trace::StatusCode::kError, "boom");
+  EXPECT_EQ(rec.span()["tags"]["error"], "boom");
+
+  rec.SetStatus(trace::StatusCode::kOk, "");
+  const json j_span = {{"tags", {{"otel.status_code", trace::StatusCode::kOk}}}};
+  EXPECT_EQ(rec.span(), j_span);
+  EXPECT_FALSE(rec.span()["tags"].contains("error"));
+}
+
 TEST(ZipkinSpanRecordable, SetSpanKind)
 {
   json j_json_client = {{"kind", "CLIENT"}};

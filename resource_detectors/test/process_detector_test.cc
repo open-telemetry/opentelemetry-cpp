@@ -24,6 +24,9 @@
 #endif
 
 #include "opentelemetry/resource_detectors/detail/process_detector_utils.h"
+#include "opentelemetry/resource_detectors/process_detector.h"
+#include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/semconv/incubating/process_attributes.h"
 
 TEST(ProcessDetectorUtilsTest, FormFilePath)
 {
@@ -78,22 +81,28 @@ TEST(ProcessDetectorUtilsTest, GetExecutablePathTest)
   }
   else
   {
-
     WCHAR wbuffer[MAX_PATH];
-    DWORD len = GetProcessImageFileNameW(hProcess, wbuffer, MAX_PATH);
+    DWORD len    = MAX_PATH;
+    BOOL success = QueryFullProcessImageNameW(hProcess, 0, wbuffer, &len);
     CloseHandle(hProcess);
 
-    if (len == 0)
+    if (!success || len == 0)
     {
       path = std::string();
     }
     else
     {
       int size_needed = WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, NULL, 0, NULL, NULL);
-      std::string utf8_path(size_needed, 0);
-      WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL);
-
-      path = utf8_path;
+      if (size_needed > 0)
+      {
+        std::string utf8_path(size_needed, 0);
+        WideCharToMultiByte(CP_UTF8, 0, wbuffer, len, &utf8_path[0], size_needed, NULL, NULL);
+        path = utf8_path;
+      }
+      else
+      {
+        path = std::string();
+      }
     }
   }
 #elif defined(__APPLE__)
@@ -122,7 +131,7 @@ TEST(ProcessDetectorUtilsTest, GetExecutablePathTest)
     path = std::string();
   }
 #endif
-  std::string expected_path = opentelemetry::resource_detector::detail::GetExecutablePath(pid);
+  std::string expected_path = opentelemetry::resource_detector::detail::GetExecutableInfo(pid).path;
   EXPECT_EQ(path, expected_path);
 }
 
@@ -201,4 +210,100 @@ TEST(ProcessDetectorUtilsTest, GetCommandWithArgsTest)
   std::vector<std::string> expected_args =
       opentelemetry::resource_detector::detail::GetCommandWithArgs(pid);
   EXPECT_EQ(args, expected_args);
+}
+
+// ---------------------------------------------------------------------------
+// New utility tests
+// ---------------------------------------------------------------------------
+
+TEST(ProcessDetectorUtilsTest, GetExecutableNameTest)
+{
+  int32_t pid          = getpid();
+  auto exe_info        = opentelemetry::resource_detector::detail::GetExecutableInfo(pid);
+  std::string exe_path = exe_info.path;
+  std::string exe_name = exe_info.name;
+
+  if (exe_path.empty())
+  {
+    EXPECT_TRUE(exe_name.empty()) << "Name should be empty when path is empty";
+    return;
+  }
+
+  EXPECT_FALSE(exe_name.empty()) << "Executable name must not be empty when path is available";
+  // The name must be a suffix of the path.
+  EXPECT_NE(exe_path.find(exe_name), std::string::npos)
+      << "Executable name '" << exe_name << "' should be a substring of path '" << exe_path << "'";
+  // The name must not contain directory separators.
+  EXPECT_EQ(exe_name.find('/'), std::string::npos) << "Name should not contain '/'";
+  EXPECT_EQ(exe_name.find('\\'), std::string::npos) << "Name should not contain '\\'";
+}
+
+TEST(ProcessDetectorUtilsTest, GetProcessCreationTimeTest)
+{
+  int32_t pid          = getpid();
+  std::string iso_time = opentelemetry::resource_detector::detail::GetProcessCreationTime(pid);
+
+#if defined(_MSC_VER) || defined(__linux__) || defined(__APPLE__)
+  // On supported platforms we expect a non-empty ISO 8601 result.
+  EXPECT_FALSE(iso_time.empty()) << "Creation time should be non-empty on this platform";
+
+  if (!iso_time.empty())
+  {
+    // Very basic format check: "YYYY-MM-DDTHH:MM:SS.mmmZ" = 24 chars.
+    EXPECT_GE(iso_time.size(), 20u) << "ISO 8601 string too short: " << iso_time;
+    EXPECT_EQ(iso_time[4], '-') << "Expected '-' at index 4: " << iso_time;
+    EXPECT_EQ(iso_time[7], '-') << "Expected '-' at index 7: " << iso_time;
+    EXPECT_EQ(iso_time[10], 'T') << "Expected 'T' at index 10: " << iso_time;
+    EXPECT_EQ(iso_time.back(), 'Z') << "Expected 'Z' at end: " << iso_time;
+  }
+#else
+  // On unsupported platforms accept an empty string gracefully.
+  (void)iso_time;
+#endif
+}
+
+TEST(ProcessDetectorUtilsTest, GetProcessOwnerTest)
+{
+  std::string owner = opentelemetry::resource_detector::detail::GetProcessOwner();
+
+  // On all supported platforms the effective user name must be non-empty.
+  EXPECT_FALSE(owner.empty()) << "Process owner should be non-empty";
+  // Sanity: no newline characters in the username.
+  EXPECT_EQ(owner.find('\n'), std::string::npos) << "Owner should not contain newline";
+}
+
+// ---------------------------------------------------------------------------
+// Integration test — Detect() attribute presence
+// ---------------------------------------------------------------------------
+
+TEST(ProcessResourceDetectorTest, DetectPopulatesExpectedAttributes)
+{
+  opentelemetry::resource_detector::ProcessResourceDetector detector;
+  opentelemetry::sdk::resource::Resource resource = detector.Detect();
+  const auto &attrs                               = resource.GetAttributes();
+
+  // process.pid — always present.
+  EXPECT_NE(attrs.find(opentelemetry::semconv::process::kProcessPid), attrs.end())
+      << "process.pid must be present";
+
+#if defined(_MSC_VER) || defined(__linux__) || defined(__APPLE__)
+  // process.executable.path — present on Linux, macOS, and Windows.
+  EXPECT_NE(attrs.find(opentelemetry::semconv::process::kProcessExecutablePath), attrs.end())
+      << "process.executable.path must be present on this platform";
+
+  // process.executable.name — present whenever executable.path is.
+  EXPECT_NE(attrs.find(opentelemetry::semconv::process::kProcessExecutableName), attrs.end())
+      << "process.executable.name must be present on this platform";
+
+#endif
+
+#if defined(_MSC_VER) || defined(__linux__) || defined(__APPLE__)
+  // process.creation.time — present on Linux, macOS, and Windows.
+  EXPECT_NE(attrs.find(opentelemetry::semconv::process::kProcessCreationTime), attrs.end())
+      << "process.creation.time must be present on this platform";
+
+  // process.owner — present on Linux, macOS, and Windows.
+  EXPECT_NE(attrs.find(opentelemetry::semconv::process::kProcessOwner), attrs.end())
+      << "process.owner must be present on this platform";
+#endif
 }

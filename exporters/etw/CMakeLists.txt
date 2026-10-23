@@ -33,6 +33,7 @@ if(OTELCPP_BUILD_TESTING)
   add_executable(etw_provider_test test/etw_provider_test.cc)
   add_executable(etw_tracer_test test/etw_tracer_test.cc)
   add_executable(etw_logger_test test/etw_logger_test.cc)
+  add_executable(etw_properties_test test/etw_properties_test.cc)
   add_executable(etw_tracer_test_enable_env_properties test/etw_tracer_test.cc)
   add_executable(etw_logger_test_enable_env_properties test/etw_logger_test.cc)
 
@@ -43,6 +44,9 @@ if(OTELCPP_BUILD_TESTING)
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
 
   target_link_libraries(etw_logger_test ${GTEST_BOTH_LIBRARIES}
+                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+
+  target_link_libraries(etw_properties_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
 
   target_link_libraries(

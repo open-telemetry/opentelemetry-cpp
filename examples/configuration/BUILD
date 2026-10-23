@@ -44,11 +44,9 @@ cc_test(
         "//resource_detectors:resource_detectors_builders",
         "//sdk:headers",
         "//sdk/src/configuration",
-        "//sdk/src/configuration:configuration_registry_factory",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -75,11 +73,9 @@ cc_test(
         "//exporters/ostream:ostream_span_exporter_builder",
         "//sdk:headers",
         "//sdk/src/configuration",
-        "//sdk/src/configuration:configuration_registry_factory",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -106,10 +102,8 @@ cc_test(
         "//exporters/ostream:ostream_span_exporter_builder",
         "//sdk:headers",
         "//sdk/src/configuration",
-        "//sdk/src/configuration:configuration_registry_factory",
         "//sdk/src/logs",
         "//sdk/src/metrics",
         "//sdk/src/trace",
-        "@com_google_googletest//:gtest_main",
     ],
 )

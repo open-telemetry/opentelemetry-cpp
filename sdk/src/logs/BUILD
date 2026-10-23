@@ -14,6 +14,7 @@ cc_library(
         "//sdk:headers",
         "//sdk/src/common:disabled",
         "//sdk/src/common:global_log_handler",
+        "//sdk/src/instrumentationscope",
         "//sdk/src/resource",
     ],
 )

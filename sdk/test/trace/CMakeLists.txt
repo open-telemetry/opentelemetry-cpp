@@ -6,7 +6,9 @@ foreach(
   tracer_provider_set_test
   tracer_provider_test
   span_data_test
+  span_status_test
   simple_processor_test
+  multi_span_processor_test
   tracer_test
   always_off_sampler_test
   always_on_sampler_test
@@ -26,8 +28,15 @@ foreach(
     opentelemetry_trace
     opentelemetry_resources
     opentelemetry_exporter_in_memory)
+  if(testname STREQUAL "tracer_provider_test")
+    target_link_libraries(${testname} opentelemetry_test_common)
+  endif()
   gtest_discover_tests(${testname} TEST_PREFIX trace.)
 endforeach()
+
+set_tests_properties(
+  trace.TracerProvider.ConstructionFailureDiagnosticsAllowProviderReentry
+  PROPERTIES TIMEOUT 10)
 
 if(OTELCPP_WITH_BENCHMARK)
   add_executable(sampler_benchmark sampler_benchmark.cc)

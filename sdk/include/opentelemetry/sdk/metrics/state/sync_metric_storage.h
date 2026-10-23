@@ -11,7 +11,6 @@
 #include <unordered_map>
 
 #include "opentelemetry/common/key_value_iterable.h"
-#include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/nostd/function_ref.h"
@@ -122,7 +121,7 @@ public:
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
     // Resolve via the unified cardinality policy so unbound and bound paths
     // share one combined limit (see ResolveCardinality()).
-    MetricAttributes resolved = ResolveCardinality(std::move(attr));
+    MetricAttributes resolved = ResolveCardinality(attr);
     // cppcheck-suppress accessMoved
     attributes_hashmap_->GetOrSetDefault(std::move(resolved), create_default_aggregation_)
         ->Aggregate(value);
@@ -176,7 +175,7 @@ public:
     MetricAttributes attr{attributes, attributes_processor_.get()};
     std::lock_guard<std::mutex> guard(attribute_hashmap_lock_);
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
-    MetricAttributes resolved = ResolveCardinality(std::move(attr));
+    MetricAttributes resolved = ResolveCardinality(attr);
     // cppcheck-suppress accessMoved
     attributes_hashmap_->GetOrSetDefault(std::move(resolved), create_default_aggregation_)
         ->Aggregate(value);
@@ -197,7 +196,7 @@ public:
   std::shared_ptr<BoundSyncWritableMetricStorage> Bind(
       const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
 
-  // Internal: stable bound entry. Self-contained: owns its own spinlock and
+  // Internal: stable bound entry. Self-contained: owns its own mutex and
   // aggregation so the user-held handle stays safe to call even if the parent
   // SyncMetricStorage is destroyed first (writes simply have no observer).
   // Collect() rotates current_ when dirty so bound + unbound writes for the
@@ -226,7 +225,7 @@ public:
     InstrumentValueType value_type_;
     MetricAttributes attributes_;
     // Protected by lock_.
-    opentelemetry::common::SpinLockMutex lock_;
+    std::mutex lock_;
     std::unique_ptr<Aggregation> current_;
     bool dirty_ = false;
   };

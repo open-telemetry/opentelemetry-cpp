@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <memory>
+#include <string>
 #include <utility>
 
 #include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_file_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_push_metric_builder.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/registry.h"
@@ -29,9 +32,22 @@ void OtlpFilePushMetricBuilder::Register(opentelemetry::sdk::configuration::Regi
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpFilePushMetricBuilder::Build(
     const opentelemetry::sdk::configuration::OtlpFilePushMetricExporterConfiguration *model) const
 {
+  // FIXME-SDK: default_histogram_aggregation is parsed but not implemented by the SDK.
+  if (model->default_histogram_aggregation !=
+      opentelemetry::sdk::configuration::DefaultHistogramAggregation::explicit_bucket_histogram)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Otlp File Exporter] default_histogram_aggregation is not supported and will be "
+        "ignored");
+  }
+
   OtlpFileMetricExporterOptions options;
 
   // FIXME: unclear how to map model->output_stream to a OtlpFileClientBackendOptions
+  if (!model->output_stream.empty())
+  {
+    OTEL_INTERNAL_LOG_WARN("[Otlp File Exporter] output_stream is not yet supported, ignoring");
+  }
 
   options.aggregation_temporality =
       OtlpBuilderUtils::ConvertTemporalityPreference(model->temporality_preference);

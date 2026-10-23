@@ -149,8 +149,8 @@ private:
   friend class ReservoirCellTestPeer;
 };
 
-typedef std::shared_ptr<ExemplarData> (ReservoirCell::*MapAndResetCellType)(
-    const MetricAttributes &);
+using MapAndResetCellType =
+    std::shared_ptr<ExemplarData> (ReservoirCell::*)(const MetricAttributes &);
 
 }  // namespace metrics
 }  // namespace sdk

@@ -4,7 +4,7 @@
 #ifdef ENABLE_METRICS_EXEMPLAR_PREVIEW
 
 #  include <gtest/gtest.h>
-#  include <stdint.h>
+#  include <cstdint>
 #  include <string>
 
 #  include "opentelemetry/context/context.h"
