@@ -30,6 +30,7 @@
 #include "opentelemetry/sdk/metrics/meter.h"
 #include "opentelemetry/sdk/metrics/meter_config.h"
 #include "opentelemetry/sdk/metrics/meter_context.h"
+#include "opentelemetry/sdk/metrics/meter_enabled_state.h"
 #include "opentelemetry/sdk/metrics/state/async_metric_storage.h"
 #include "opentelemetry/sdk/metrics/state/attributes_hashmap.h"
 #include "opentelemetry/sdk/metrics/state/metric_collector.h"
@@ -158,24 +159,39 @@ namespace metrics
 
 namespace metrics = opentelemetry::metrics;
 
-metrics::NoopMeter Meter::kNoopMeter = metrics::NoopMeter();
+namespace
+{
+
+bool IsAsyncInstrument(InstrumentType type) noexcept
+{
+  return type == InstrumentType::kObservableCounter || type == InstrumentType::kObservableGauge ||
+         type == InstrumentType::kObservableUpDownCounter;
+}
+
+}  // namespace
 
 Meter::Meter(std::weak_ptr<MeterContext> meter_context,
              std::unique_ptr<sdk::instrumentationscope::InstrumentationScope> instrumentation_scope)
     : scope_{std::move(instrumentation_scope)},
       meter_context_{std::move(meter_context)},
-      observable_registry_(new ObservableRegistry()),
-      meter_config_(MeterConfig::Default())
+      observable_registry_(new ObservableRegistry())
 {
   if (auto meter_context_locked_ptr = meter_context_.lock())
   {
-    meter_config_ = meter_context_locked_ptr->GetMeterConfigurator().ComputeConfig(*scope_);
+    UpdateMeterConfig(meter_context_locked_ptr->GetMeterConfigurator().ComputeConfig(*scope_));
   }
   else
   {
+    // Without a context the meter can never be collected, so recording would be wasted work.
+    UpdateMeterConfig(MeterConfig::Disabled());
     OTEL_INTERNAL_LOG_ERROR("[Meter::Meter()] - Error during initialization."
                             << "The metric context is invalid")
   }
+}
+
+void Meter::UpdateMeterConfig(MeterConfig config) noexcept
+{
+  meter_enabled_state_->SetEnabled(config.IsEnabled());
 }
 
 opentelemetry::nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64Counter(
@@ -183,11 +199,6 @@ opentelemetry::nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateUInt64Counter(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateUInt64Counter - failed. Invalid parameters."
@@ -201,7 +212,7 @@ opentelemetry::nostd::unique_ptr<metrics::Counter<uint64_t>> Meter::CreateUInt64
       std::string{unit.data(), unit.size()}, InstrumentType::kCounter, InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return opentelemetry::nostd::unique_ptr<metrics::Counter<uint64_t>>(
-      new LongCounter(instrument_descriptor, std::move(storage)));
+      new LongCounter(instrument_descriptor, std::move(storage), meter_enabled_state_));
 }
 
 opentelemetry::nostd::unique_ptr<metrics::Counter<double>> Meter::CreateDoubleCounter(
@@ -209,11 +220,6 @@ opentelemetry::nostd::unique_ptr<metrics::Counter<double>> Meter::CreateDoubleCo
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateDoubleCounter(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleCounter - failed. Invalid parameters."
@@ -228,7 +234,7 @@ opentelemetry::nostd::unique_ptr<metrics::Counter<double>> Meter::CreateDoubleCo
       InstrumentValueType::kDouble};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return opentelemetry::nostd::unique_ptr<metrics::Counter<double>>{
-      new DoubleCounter(instrument_descriptor, std::move(storage))};
+      new DoubleCounter(instrument_descriptor, std::move(storage), meter_enabled_state_)};
 }
 
 opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -236,11 +242,6 @@ Meter::CreateInt64ObservableCounter(opentelemetry::nostd::string_view name,
                                     opentelemetry::nostd::string_view description,
                                     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateInt64ObservableCounter(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateInt64ObservableCounter - failed. Invalid parameters."
@@ -262,11 +263,6 @@ Meter::CreateDoubleObservableCounter(opentelemetry::nostd::string_view name,
                                      opentelemetry::nostd::string_view description,
                                      opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateDoubleObservableCounter(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleObservableCounter - failed. Invalid parameters."
@@ -288,11 +284,6 @@ opentelemetry::nostd::unique_ptr<metrics::Histogram<uint64_t>> Meter::CreateUInt
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateUInt64Histogram(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateUInt64Histogram - failed. Invalid parameters."
@@ -307,7 +298,7 @@ opentelemetry::nostd::unique_ptr<metrics::Histogram<uint64_t>> Meter::CreateUInt
       InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return opentelemetry::nostd::unique_ptr<metrics::Histogram<uint64_t>>{
-      new LongHistogram(instrument_descriptor, std::move(storage))};
+      new LongHistogram(instrument_descriptor, std::move(storage), meter_enabled_state_)};
 }
 
 opentelemetry::nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDoubleHistogram(
@@ -315,11 +306,6 @@ opentelemetry::nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDouble
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateDoubleHistogram(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleHistogram - failed. Invalid parameters."
@@ -334,7 +320,7 @@ opentelemetry::nostd::unique_ptr<metrics::Histogram<double>> Meter::CreateDouble
       InstrumentValueType::kDouble};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return opentelemetry::nostd::unique_ptr<metrics::Histogram<double>>{
-      new DoubleHistogram(instrument_descriptor, std::move(storage))};
+      new DoubleHistogram(instrument_descriptor, std::move(storage), meter_enabled_state_)};
 }
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
@@ -343,11 +329,6 @@ opentelemetry::nostd::unique_ptr<metrics::Gauge<int64_t>> Meter::CreateInt64Gaug
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateInt64Gauge(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateInt64Gauge - failed. Invalid parameters."
@@ -361,7 +342,7 @@ opentelemetry::nostd::unique_ptr<metrics::Gauge<int64_t>> Meter::CreateInt64Gaug
       std::string{unit.data(), unit.size()}, InstrumentType::kGauge, InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return opentelemetry::nostd::unique_ptr<metrics::Gauge<int64_t>>{
-      new LongGauge(instrument_descriptor, std::move(storage))};
+      new LongGauge(instrument_descriptor, std::move(storage), meter_enabled_state_)};
 }
 
 opentelemetry::nostd::unique_ptr<metrics::Gauge<double>> Meter::CreateDoubleGauge(
@@ -369,11 +350,6 @@ opentelemetry::nostd::unique_ptr<metrics::Gauge<double>> Meter::CreateDoubleGaug
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateDoubleGauge(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleGauge - failed. Invalid parameters."
@@ -387,7 +363,7 @@ opentelemetry::nostd::unique_ptr<metrics::Gauge<double>> Meter::CreateDoubleGaug
       std::string{unit.data(), unit.size()}, InstrumentType::kGauge, InstrumentValueType::kDouble};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return opentelemetry::nostd::unique_ptr<metrics::Gauge<double>>{
-      new DoubleGauge(instrument_descriptor, std::move(storage))};
+      new DoubleGauge(instrument_descriptor, std::move(storage), meter_enabled_state_)};
 }
 #endif
 
@@ -396,11 +372,6 @@ Meter::CreateInt64ObservableGauge(opentelemetry::nostd::string_view name,
                                   opentelemetry::nostd::string_view description,
                                   opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateInt64ObservableGauge(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateInt64ObservableGauge - failed. Invalid parameters."
@@ -422,11 +393,6 @@ Meter::CreateDoubleObservableGauge(opentelemetry::nostd::string_view name,
                                    opentelemetry::nostd::string_view description,
                                    opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateDoubleObservableGauge(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleObservableGauge - failed. Invalid parameters."
@@ -448,11 +414,6 @@ opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<int64_t>> Meter::CreateI
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateInt64UpDownCounter(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateInt64UpDownCounter - failed. Invalid parameters."
@@ -467,7 +428,7 @@ opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<int64_t>> Meter::CreateI
       InstrumentValueType::kLong};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<int64_t>>{
-      new LongUpDownCounter(instrument_descriptor, std::move(storage))};
+      new LongUpDownCounter(instrument_descriptor, std::move(storage), meter_enabled_state_)};
 }
 
 opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<double>> Meter::CreateDoubleUpDownCounter(
@@ -475,11 +436,6 @@ opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<double>> Meter::CreateDo
     opentelemetry::nostd::string_view description,
     opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateDoubleUpDownCounter(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR("Meter::CreateDoubleUpDownCounter - failed. Invalid parameters."
@@ -494,7 +450,7 @@ opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<double>> Meter::CreateDo
       InstrumentValueType::kDouble};
   auto storage = RegisterSyncMetricStorage(instrument_descriptor);
   return opentelemetry::nostd::unique_ptr<metrics::UpDownCounter<double>>{
-      new DoubleUpDownCounter(instrument_descriptor, std::move(storage))};
+      new DoubleUpDownCounter(instrument_descriptor, std::move(storage), meter_enabled_state_)};
 }
 
 opentelemetry::nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
@@ -502,11 +458,6 @@ Meter::CreateInt64ObservableUpDownCounter(opentelemetry::nostd::string_view name
                                           opentelemetry::nostd::string_view description,
                                           opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateInt64ObservableUpDownCounter(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR(
@@ -528,11 +479,6 @@ Meter::CreateDoubleObservableUpDownCounter(opentelemetry::nostd::string_view nam
                                            opentelemetry::nostd::string_view description,
                                            opentelemetry::nostd::string_view unit) noexcept
 {
-  if (!meter_config_.IsEnabled())
-  {
-    return kNoopMeter.CreateDoubleObservableUpDownCounter(name, description, unit);
-  }
-
   if (!ValidateInstrument(name, description, unit))
   {
     OTEL_INTERNAL_LOG_ERROR(
@@ -741,11 +687,14 @@ std::unique_ptr<AsyncWritableMetricStorage> Meter::RegisterAsyncMetricStorage(
 std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
                                        opentelemetry::common::SystemTimestamp collect_ts) noexcept
 {
-  if (!meter_config_.IsEnabled())
+  // A disabled meter still exports what its sync instruments recorded before it was disabled.
+  // Async callbacks are skipped, and so are async storages, which would otherwise re-export
+  // their last cumulative values.
+  const bool enabled = IsEnabled();
+  if (enabled)
   {
-    return std::vector<MetricData>();
+    observable_registry_->Observe(collect_ts);
   }
-  observable_registry_->Observe(collect_ts);
   std::vector<MetricData> metric_data_list;
   auto ctx = meter_context_.lock();
   if (!ctx)
@@ -757,6 +706,10 @@ std::vector<MetricData> Meter::Collect(CollectorHandle *collector,
   std::lock_guard<std::mutex> guard(storage_lock_);
   for (auto &metric_storage : storage_registry_)
   {
+    if (!enabled && IsAsyncInstrument(metric_storage.first.type_))
+    {
+      continue;
+    }
     metric_storage.second->Collect(collector, ctx->GetCollectors(), ctx->GetSDKStartTime(),
                                    collect_ts, [&metric_data_list](const MetricData &metric_data) {
                                      metric_data_list.push_back(metric_data);
