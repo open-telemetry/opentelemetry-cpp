@@ -32,7 +32,8 @@ namespace sampler_env
  * For traceidratio and parentbased_traceidratio, OTEL_TRACES_SAMPLER_ARG specifies the ratio
  * (0.0 to 1.0). If unset, defaults to 1.0.
  *
- * If an unknown sampler name or invalid ratio is provided, logs a warning and returns AlwaysOnSampler.
+ * If an unknown sampler name or invalid ratio is provided, logs a warning and returns
+ * AlwaysOnSampler.
  */
 OPENTELEMETRY_EXPORT std::unique_ptr<Sampler> GetSamplerFromEnv();
 
