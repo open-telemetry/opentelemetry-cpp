@@ -15,6 +15,7 @@
 #  include <unistd.h>
 #endif
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/resource_detectors/detail/process_detector_utils.h"
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/version.h"
@@ -31,7 +32,6 @@ namespace
 constexpr const char *kOtelServiceName      = "OTEL_SERVICE_NAME";
 constexpr const char *kUnknownService       = "unknown_service";
 constexpr const char *kUnknownServicePrefix = "unknown_service:";
-constexpr const char kUuidHexDigits[]       = "0123456789abcdef";
 
 std::string FormatUuidV4(const uint8_t bytes[16]) noexcept
 {
@@ -43,8 +43,8 @@ std::string FormatUuidV4(const uint8_t bytes[16]) noexcept
     {
       uuid.push_back('-');
     }
-    uuid.push_back(kUuidHexDigits[bytes[i] >> 4]);
-    uuid.push_back(kUuidHexDigits[bytes[i] & 0x0F]);
+    uuid.push_back(opentelemetry::common::detail::LowerHexDigit(bytes[i] >> 4));
+    uuid.push_back(opentelemetry::common::detail::LowerHexDigit(bytes[i]));
   }
   return uuid;
 }
