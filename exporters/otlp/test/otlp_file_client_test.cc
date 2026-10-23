@@ -39,6 +39,7 @@
 #include "opentelemetry/trace/trace_id.h"
 #include "opentelemetry/trace/trace_state.h"
 #include "opentelemetry/version.h"
+#include "otlp_stub_json_writer.h"
 
 // clang-format off
 #include "opentelemetry/exporters/otlp/protobuf_include_prefix.h" // IWYU pragma: keep
@@ -161,6 +162,90 @@ static std::unique_ptr<opentelemetry::sdk::trace::Recordable> MakeRecordable(
 
   // We should not depends NRVO of compilers, so do not return std::move(recordable) or recordable.
   return {std::move(recordable)};
+}
+
+TEST(OtlpFileClientTest, CustomJsonWriterFactoryIsUsed)
+{
+  auto resource              = MakeResource();
+  auto instrumentation_scope = MakeInstrumentationScope();
+
+  std::unique_ptr<opentelemetry::sdk::trace::Recordable> recordable[] = {
+      MakeRecordable(resource, *instrumentation_scope)};
+
+  opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request;
+  OtlpRecordableUtils::PopulateRequest(MakeSpan(recordable), &request);
+
+  std::stringstream output_stream;
+
+  opentelemetry::exporter::otlp::OtlpFileClientOptions opts;
+  opentelemetry::exporter::otlp::OtlpFileClientRuntimeOptions rt_opts;
+  opts.backend_options = std::ref(output_stream);
+
+  rt_opts.json_writer_factory = std::make_shared<test::StubJsonWriterFactory>([] {
+    auto writer          = std::make_unique<test::StubJsonWriter>();
+    writer->on_to_string = [] { return std::string("/*custom-writer*/"); };
+    return writer;
+  });
+
+  auto client = std::make_unique<opentelemetry::exporter::otlp::OtlpFileClient>(std::move(opts),
+                                                                                std::move(rt_opts));
+  client->Export(request, 1);
+
+  EXPECT_EQ(output_stream.str().rfind("/*custom-writer*/", 0), 0u)
+      << "output was not produced by the injected JsonWriter: " << output_stream.str();
+}
+
+TEST(OtlpFileClientTest, ExportFailsWhenTheWriterFailsInToString)
+{
+  auto resource              = MakeResource();
+  auto instrumentation_scope = MakeInstrumentationScope();
+
+  std::unique_ptr<opentelemetry::sdk::trace::Recordable> recordable[] = {
+      MakeRecordable(resource, *instrumentation_scope)};
+
+  opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request;
+  OtlpRecordableUtils::PopulateRequest(MakeSpan(recordable), &request);
+
+  std::stringstream output_stream;
+
+  opentelemetry::exporter::otlp::OtlpFileClientOptions opts;
+  opentelemetry::exporter::otlp::OtlpFileClientRuntimeOptions rt_opts;
+  opts.backend_options        = std::ref(output_stream);
+  rt_opts.json_writer_factory = std::make_shared<test::StubJsonWriterFactory>([] {
+    auto writer          = std::make_unique<test::StubJsonWriter>();
+    auto failed          = std::make_shared<bool>(false);
+    writer->on_ok        = [failed] { return !*failed; };
+    writer->on_to_string = [failed] {
+      *failed = true;
+      return std::string("/*failed-writer-output*/");
+    };
+    return writer;
+  });
+
+  auto client = std::make_unique<opentelemetry::exporter::otlp::OtlpFileClient>(std::move(opts),
+                                                                                std::move(rt_opts));
+
+  EXPECT_EQ(client->Export(request, 1), opentelemetry::sdk::common::ExportResult::kFailure);
+  EXPECT_EQ(output_stream.str(), "") << "the output of a failed writer was written";
+}
+
+TEST(OtlpFileClientTest, ExportFailsWhenTheFactoryReturnsNull)
+{
+  opentelemetry::proto::collector::trace::v1::ExportTraceServiceRequest request;
+
+  std::stringstream output_stream;
+
+  opentelemetry::exporter::otlp::OtlpFileClientOptions opts;
+  opentelemetry::exporter::otlp::OtlpFileClientRuntimeOptions rt_opts;
+  opts.backend_options = std::ref(output_stream);
+  rt_opts.json_writer_factory =
+      std::make_shared<test::StubJsonWriterFactory>([] { return nullptr; });
+
+  auto client = std::make_unique<opentelemetry::exporter::otlp::OtlpFileClient>(std::move(opts),
+                                                                                std::move(rt_opts));
+
+  EXPECT_EQ(client->Export(request, 1), opentelemetry::sdk::common::ExportResult::kFailure);
+  EXPECT_EQ(output_stream.str(), "");
 }
 
 TEST(OtlpFileClientTest, Shutdown)
