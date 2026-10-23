@@ -15,6 +15,16 @@ Increment the:
 
 ## [Unreleased]
 
+* [SDK] Support `OTEL_TRACES_SAMPLER` and `OTEL_TRACES_SAMPLER_ARG` environment variables
+  [#4709](https://github.com/open-telemetry/opentelemetry-cpp/issues/4709)
+  Users can now configure the sampler via environment variables, supporting:
+  - `always_on`, `always_off`, `traceidratio`, `parentbased_traceidratio`,
+    `parentbased_always_on`, `parentbased_always_off`
+  - For ratio-based samplers, `OTEL_TRACES_SAMPLER_ARG` specifies the ratio (default 1.0)
+  - Environment configuration applies to TracerProvider, TracerContext, and factory methods
+  - Explicitly supplied samplers always take precedence over environment variables
+  - Invalid sampler names or ratios fall back to the default AlwaysOnSampler with a warning
+
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply

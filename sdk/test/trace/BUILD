@@ -206,6 +206,21 @@ cc_test(
 )
 
 cc_test(
+    name = "sampler_env_test",
+    srcs = [
+        "sampler_env_test.cc",
+    ],
+    tags = [
+        "test",
+        "trace",
+    ],
+    deps = [
+        "//sdk/src/trace",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "tracer_config_test",
     srcs = [
         "tracer_config_test.cc",
