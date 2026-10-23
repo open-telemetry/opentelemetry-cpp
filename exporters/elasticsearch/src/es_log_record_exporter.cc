@@ -1,6 +1,7 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
+#include <algorithm>  // IWYU pragma: keep
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -441,8 +442,29 @@ sdk::common::ExportResult ElasticsearchLogRecordExporter::Export(
   request->SetBody(body_vec);
 
 #ifdef ENABLE_ASYNC_EXPORT
-  // Send the request
-  synchronization_data_->session_counter_.fetch_add(1, std::memory_order_release);
+  bool rejected = false;
+  // Send the request. Registration has to happen under the same lock Shutdown() takes to
+  // flip is_shutdown_ and snapshot session_counter_ (see ForceFlush()) - otherwise a session
+  // that passes the isShutdown() check above can still register after Shutdown() has already
+  // taken its snapshot, and ForceFlush() would return without ever having waited for it.
+  {
+    std::lock_guard<std::recursive_mutex> lock_guard{synchronization_data_->force_flush_m};
+    rejected = isShutdown();
+    if (!rejected)
+    {
+      synchronization_data_->session_counter_.fetch_add(1, std::memory_order_release);
+    }
+  }
+
+  // Outside the lock: the client owns the session until somebody hands it back, and this is the
+  // only path that can, since the handler that would do it later is never built.
+  if (rejected)
+  {
+    session->FinishSession();
+    OTEL_INTERNAL_LOG_ERROR("[ES Log Exporter] Exporting "
+                            << records.size() << " log(s) failed, exporter is shutdown");
+    return sdk::common::ExportResult::kFailure;
+  }
   std::size_t span_count    = records.size();
   auto synchronization_data = synchronization_data_;
   auto handler              = std::make_shared<AsyncResponseHandler>(
@@ -525,7 +547,10 @@ bool ElasticsearchLogRecordExporter::ForceFlush(std::chrono::microseconds timeou
   }
 
   std::unique_lock<std::mutex> lk_cv(synchronization_data_->force_flush_cv_m);
-  // Wait for all the sessions to finish
+  // Wait for all the sessions to finish. The condition variable's return value is not trusted
+  // on its own: the standard permits wait_for() to report cv_status::no_timeout on a spurious
+  // wakeup, indistinguishable from a real notification, so completion is always verified
+  // against finished_session_counter_ directly instead of inferred from the wait's return.
   while (timeout_steady > std::chrono::steady_clock::duration::zero())
   {
     if (synchronization_data_->finished_session_counter_.load(std::memory_order_acquire) >=
@@ -534,30 +559,50 @@ bool ElasticsearchLogRecordExporter::ForceFlush(std::chrono::microseconds timeou
       break;
     }
 
+    // Clamp the wait to whatever is left of the caller's deadline: waiting the full
+    // response_timeout_ regardless of timeout_steady would let Shutdown(timeout) block far
+    // longer than the timeout it was given whenever nothing ever notifies this condition
+    // variable (e.g. an export that never completes).
+    const std::chrono::steady_clock::duration wait_interval =
+        (std::min)(std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+                       std::chrono::seconds{options_.response_timeout_}),
+                   timeout_steady);
+
     std::chrono::steady_clock::time_point start_timepoint = std::chrono::steady_clock::now();
-    if (std::cv_status::no_timeout != synchronization_data_->force_flush_cv.wait_for(
-                                          lk_cv, std::chrono::seconds{options_.response_timeout_}))
-    {
-      break;
-    }
+    synchronization_data_->force_flush_cv.wait_for(lk_cv, wait_interval);
     timeout_steady -= std::chrono::steady_clock::now() - start_timepoint;
   }
 
-  return timeout_steady > std::chrono::steady_clock::duration::zero();
+  return synchronization_data_->finished_session_counter_.load(std::memory_order_acquire) >=
+         running_counter;
 #else
   return true;
 #endif
 }
 
-bool ElasticsearchLogRecordExporter::Shutdown(std::chrono::microseconds /* timeout */) noexcept
+bool ElasticsearchLogRecordExporter::Shutdown(std::chrono::microseconds timeout) noexcept
 {
+#ifdef ENABLE_ASYNC_EXPORT
+  {
+    // Same lock Export() takes around its isShutdown() check and registration, so that by the
+    // time ForceFlush() below takes its session_counter_ snapshot, every session that is
+    // going to register for this shutdown already has.
+    std::lock_guard<std::recursive_mutex> lock_guard{synchronization_data_->force_flush_m};
+    is_shutdown_ = true;
+  }
+#else
   is_shutdown_ = true;
+#endif
+
+  // Flush with the caller's deadline before cancelling anything, so the wait below has
+  // something to wait for. Cancelling first would leave nothing pending to flush.
+  const bool flushed = ForceFlush(timeout);
 
   // Shutdown the session manager
   http_client_->CancelAllSessions();
   http_client_->FinishAllSessions();
 
-  return true;
+  return flushed;
 }
 
 bool ElasticsearchLogRecordExporter::isShutdown() const noexcept
