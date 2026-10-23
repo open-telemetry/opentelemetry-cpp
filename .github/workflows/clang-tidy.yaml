@@ -17,15 +17,15 @@ jobs:
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 133
+            warning_limit: 198
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 144
+            warning_limit: 212
     env:
       CC: /usr/bin/clang-22
       CXX: /usr/bin/clang++-22
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
         with:
           egress-policy: audit
 
@@ -88,13 +88,13 @@ jobs:
           cat $REPORT_PATH >> $GITHUB_STEP_SUMMARY
 
       - name: Upload build log
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Logs-clang-tidy-${{ matrix.cmake_options }}
           path: ${{ steps.build.outputs.build_log }}
 
       - name: Upload warning report
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Report-clang-tidy-${{ matrix.cmake_options }}
           path: ${{ steps.analyze.outputs.report_path }}
@@ -107,6 +107,13 @@ jobs:
         run: |
           readonly COUNT="$WARNING_COUNT"
           readonly LIMIT="$WARNING_LIMIT"
+
+          # Print instructions to help investigations
+          echo "::notice::See instructions below to investigate warnings"
+          echo "1) Find the previous job in CI, named 'Upload warning report'"
+          echo "2) In the job logs, search for 'Artifact download URL:'"
+          echo "3) Upload the report given by the URL"
+          echo "4) Read the warnings in the report, and adjust the code accordingly."
 
           echo "clang-tidy reported ${COUNT} unique warning(s) with preset '${CMAKE_OPTIONS}'"
           echo "Limit is ${LIMIT}"

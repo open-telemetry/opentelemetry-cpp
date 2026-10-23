@@ -16,6 +16,10 @@
 #include <opentelemetry/exporters/otlp/otlp_file_push_metric_builder.h>
 #include <opentelemetry/exporters/otlp/otlp_file_span_builder.h>
 
+#include <opentelemetry/sdk/configuration/otlp_file_log_record_exporter_configuration.h>
+#include <opentelemetry/sdk/configuration/otlp_file_push_metric_exporter_configuration.h>
+#include <opentelemetry/sdk/configuration/otlp_file_span_exporter_configuration.h>
+
 TEST(ExportersOtlpFileInstall, OtlpFileExporter)
 {
   auto options  = opentelemetry::exporter::otlp::OtlpFileExporterOptions();
@@ -41,7 +45,9 @@ TEST(ExportersOtlpFileBuilderInstall, OtlpFileSpanBuilder)
 {
   auto builder = std::make_unique<opentelemetry::exporter::otlp::OtlpFileSpanBuilder>();
   ASSERT_TRUE(builder != nullptr);
-  auto exporter = builder->Build(nullptr);
+
+  opentelemetry::sdk::configuration::OtlpFileSpanExporterConfiguration model;
+  auto exporter = builder->Build(&model);
   ASSERT_TRUE(exporter != nullptr);
 }
 
@@ -62,6 +68,8 @@ TEST(ExportersOtlpFileBuilderInstall, OtlpFileLogRecordBuilder)
 {
   auto builder = std::make_unique<opentelemetry::exporter::otlp::OtlpFileLogRecordBuilder>();
   ASSERT_TRUE(builder != nullptr);
-  auto exporter = builder->Build(nullptr);
+
+  opentelemetry::sdk::configuration::OtlpFileLogRecordExporterConfiguration model;
+  auto exporter = builder->Build(&model);
   ASSERT_TRUE(exporter != nullptr);
 }

@@ -7,9 +7,12 @@
 #include <utility>
 
 #include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
+#include "opentelemetry/exporters/otlp/otlp_grpc_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_grpc_push_metric_builder.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/grpc_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_grpc_push_metric_exporter_configuration.h"
@@ -32,21 +35,28 @@ void OtlpGrpcPushMetricBuilder::Register(opentelemetry::sdk::configuration::Regi
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpGrpcPushMetricBuilder::Build(
     const opentelemetry::sdk::configuration::OtlpGrpcPushMetricExporterConfiguration *model) const
 {
+  // FIXME-SDK: default_histogram_aggregation is parsed but not implemented by the SDK.
+  if (model->default_histogram_aggregation !=
+      opentelemetry::sdk::configuration::DefaultHistogramAggregation::explicit_bucket_histogram)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Otlp Grpc Exporter] default_histogram_aggregation is not supported and will be "
+        "ignored");
+  }
+
   OtlpGrpcMetricExporterOptions options(nullptr);
 
   const auto *tls = model->tls.get();
 
   options.endpoint = model->endpoint;
 
-  options.use_ssl_credentials = OtlpBuilderUtils::GrpcUseSsl(options.endpoint, tls);
+  options.use_ssl_credentials = OtlpGrpcBuilderUtils::GrpcUseSsl(options.endpoint, tls);
 
   if (tls != nullptr)
   {
     options.ssl_credentials_cacert_path = tls->ca_file;
-#ifdef ENABLE_OTLP_GRPC_SSL_MTLS_PREVIEW
-    options.ssl_client_key_path  = tls->key_file;
-    options.ssl_client_cert_path = tls->cert_file;
-#endif
+    options.ssl_client_key_path         = tls->key_file;
+    options.ssl_client_cert_path        = tls->cert_file;
   }
 
   options.timeout = std::chrono::duration_cast<std::chrono::system_clock::duration>(

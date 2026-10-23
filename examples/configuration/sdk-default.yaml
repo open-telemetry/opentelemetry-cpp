@@ -13,6 +13,7 @@
 
 file_format: "1.1"
 disabled: false
+log_level: debug
 
 # --- Logs ---
 logger_provider:

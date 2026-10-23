@@ -1,16 +1,19 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef OPENTELEMETRY_STL_VERSION
+#include <gtest/gtest.h>
+#include <memory>
+#include <string>
+#include <utility>
 
-#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h"
-#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
-#  include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_runtime_options.h"
-#  include "opentelemetry/ext/http/client/http_client_factory.h"
-#  include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
-#  include "opentelemetry/test_common/ext/http/client/nosend/http_client_factory_nosend.h"
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_options.h"
+#include "opentelemetry/exporters/otlp/otlp_http_log_record_exporter_runtime_options.h"
+#include "opentelemetry/sdk/logs/exporter.h"
+#include "opentelemetry/version.h"
 
-#  include <gtest/gtest.h>
+#include "opentelemetry/test_common/ext/http/client/http_client_test_factory.h"
+#include "opentelemetry/test_common/ext/http/client/nosend/http_client_factory_nosend.h"
 
 namespace http_client = opentelemetry::ext::http::client;
 
@@ -60,5 +63,3 @@ TEST(OtlpHttpLogRecordExporterCustomClientTest, RuntimeOptionsWithHttpClientCrea
 }  // namespace otlp
 }  // namespace exporter
 OPENTELEMETRY_END_NAMESPACE
-
-#endif  // OPENTELEMETRY_STL_VERSION
