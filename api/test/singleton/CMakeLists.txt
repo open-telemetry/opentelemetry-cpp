@@ -17,6 +17,10 @@ add_library(component_d SHARED component_d.cc)
 set_target_properties(component_d PROPERTIES CXX_VISIBILITY_PRESET hidden)
 target_link_libraries(component_d opentelemetry_api)
 
+if(WIN32)
+  target_link_libraries(component_d opentelemetry_api_symbol_bridge)
+endif()
+
 add_library(component_e SHARED component_e.cc)
 set_target_properties(component_e PROPERTIES CXX_VISIBILITY_PRESET default)
 target_link_libraries(component_e opentelemetry_api)
