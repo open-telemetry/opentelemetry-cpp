@@ -64,25 +64,10 @@ if(OTELCPP_BUILD_TESTING)
       opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
   endif()
 
-  gtest_add_tests(
-    TARGET etw_provider_test
-    TEST_PREFIX exporter.
-    TEST_LIST etw_provider_test)
-  gtest_add_tests(
-    TARGET etw_tracer_test
-    TEST_PREFIX exporter.
-    TEST_LIST etw_tracer_test)
-  gtest_add_tests(
-    TARGET etw_logger_test
-    TEST_PREFIX exporter.
-    TEST_LIST etw_logger_test)
-  gtest_add_tests(
-    TARGET etw_tracer_test_enable_env_properties
-    TEST_PREFIX exporter.with_env_properties.
-    TEST_LIST etw_tracer_test_enable_env_properties)
-  gtest_add_tests(
-    TARGET etw_logger_test_enable_env_properties
-    TEST_PREFIX exporter.with_env_properties.
-    TEST_LIST etw_logger_test_enable_env_properties)
+  gtest_discover_tests(etw_provider_test TEST_PREFIX exporter.)
+  gtest_discover_tests(etw_tracer_test TEST_PREFIX exporter.)
+  gtest_discover_tests(etw_logger_test TEST_PREFIX exporter.)
+  gtest_discover_tests(etw_tracer_test_enable_env_properties TEST_PREFIX exporter.with_env_properties.)
+  gtest_discover_tests(etw_logger_test_enable_env_properties TEST_PREFIX exporter.with_env_properties.)
 
 endif() # OTELCPP_BUILD_TESTING

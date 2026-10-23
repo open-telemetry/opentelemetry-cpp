@@ -46,10 +46,7 @@ foreach(
     opentelemetry_resources
     opentelemetry_test_common)
   target_compile_definitions(${testname} PRIVATE UNIT_TESTING)
-  gtest_add_tests(
-    TARGET ${testname}
-    TEST_PREFIX metrics.
-    TEST_LIST ${testname})
+  gtest_discover_tests(${testname} TEST_PREFIX metrics.)
 endforeach()
 
 if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
@@ -58,10 +55,7 @@ if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
     multi_observer_test ${GTEST_BOTH_LIBRARIES} ${GMOCK_LIB}
     ${CMAKE_THREAD_LIBS_INIT} metrics_common_test_utils opentelemetry_resources)
   target_compile_definitions(multi_observer_test PRIVATE UNIT_TESTING)
-  gtest_add_tests(
-    TARGET multi_observer_test
-    TEST_PREFIX metrics.
-    TEST_LIST multi_observer_test)
+  gtest_discover_tests(multi_observer_test TEST_PREFIX metrics.)
 
   if(OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW)
     add_executable(bound_sync_instruments_test bound_sync_instruments_test.cc)
@@ -70,10 +64,7 @@ if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
       PRIVATE ${GTEST_BOTH_LIBRARIES} ${GMOCK_LIB} ${CMAKE_THREAD_LIBS_INIT}
               metrics_common_test_utils opentelemetry_resources)
     target_compile_definitions(bound_sync_instruments_test PRIVATE UNIT_TESTING)
-    gtest_add_tests(
-      TARGET bound_sync_instruments_test
-      TEST_PREFIX metrics.
-      TEST_LIST bound_sync_instruments_test)
+    gtest_discover_tests(bound_sync_instruments_test TEST_PREFIX metrics.)
   endif()
 endif()
 

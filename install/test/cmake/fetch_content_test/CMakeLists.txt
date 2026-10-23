@@ -154,7 +154,4 @@ target_link_libraries(
 include(CTest)
 include(GoogleTest)
 
-gtest_add_tests(
-  TARGET fetch_content_src_test
-  TEST_PREFIX fetch_content.
-  TEST_LIST fetch_content_src_test)
+gtest_discover_tests(fetch_content_src_test TEST_PREFIX fetch_content.)

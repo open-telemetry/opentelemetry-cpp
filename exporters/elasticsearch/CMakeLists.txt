@@ -51,8 +51,5 @@ if(OTELCPP_BUILD_TESTING)
     es_log_record_exporter_test ${GTEST_BOTH_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_elasticsearch_logs)
 
-  gtest_add_tests(
-    TARGET es_log_record_exporter_test
-    TEST_PREFIX exporter.
-    TEST_LIST es_log_record_exporter_test)
+  gtest_discover_tests(es_log_record_exporter_test TEST_PREFIX exporter.)
 endif() # OTELCPP_BUILD_TESTING

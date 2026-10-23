@@ -15,8 +15,5 @@ foreach(
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_logs opentelemetry_trace)
-  gtest_add_tests(
-    TARGET ${testname}
-    TEST_PREFIX logs.
-    TEST_LIST ${testname})
+  gtest_discover_tests(${testname} TEST_PREFIX logs.)
 endforeach()

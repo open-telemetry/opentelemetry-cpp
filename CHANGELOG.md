@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [TEST] Replace `gtest_add_tests()` with `gtest_discover_tests()` to prevent
+  false-positive test passes for tests compiled out by preprocessor conditionals.
+  [#4341](https://github.com/open-telemetry/opentelemetry-cpp/issues/4341)
 * [CONFIGURATION] Add a configuration builder for the host resource detector
   [#4451](https://github.com/open-telemetry/opentelemetry-cpp/issues/4451)
 * [CONFIGURATION] Build the configured resource detectors in SdkBuilder, apply

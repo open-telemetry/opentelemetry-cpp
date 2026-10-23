@@ -26,10 +26,7 @@ foreach(
     opentelemetry_trace
     opentelemetry_resources
     opentelemetry_exporter_in_memory)
-  gtest_add_tests(
-    TARGET ${testname}
-    TEST_PREFIX trace.
-    TEST_LIST ${testname})
+  gtest_discover_tests(${testname} TEST_PREFIX trace.)
 endforeach()
 
 if(OTELCPP_WITH_BENCHMARK)

@@ -830,10 +830,7 @@ if(OTELCPP_BUILD_TESTING)
   target_link_libraries(
     otlp_recordable_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_otlp_recordable protobuf::libprotobuf)
-  gtest_add_tests(
-    TARGET otlp_recordable_test
-    TEST_PREFIX exporter.otlp.
-    TEST_LIST otlp_recordable_test)
+  gtest_discover_tests(otlp_recordable_test TEST_PREFIX exporter.otlp.)
 
   add_executable(otlp_log_recordable_test test/otlp_log_recordable_test.cc)
   target_link_libraries(otlp_log_recordable_test ${GTEST_BOTH_LIBRARIES}
@@ -842,10 +839,7 @@ if(OTELCPP_BUILD_TESTING)
     target_compile_definitions(otlp_log_recordable_test
                                PRIVATE ENABLE_OTLP_UTF8_VALIDITY)
   endif()
-  gtest_add_tests(
-    TARGET otlp_log_recordable_test
-    TEST_PREFIX exporter.otlp.
-    TEST_LIST otlp_log_recordable_test)
+  gtest_discover_tests(otlp_log_recordable_test TEST_PREFIX exporter.otlp.)
 
   add_executable(otlp_populate_attribute_utils_test
                  test/otlp_populate_attribute_utils_test.cc)
@@ -856,10 +850,7 @@ if(OTELCPP_BUILD_TESTING)
     target_compile_definitions(otlp_populate_attribute_utils_test
                                PRIVATE ENABLE_OTLP_UTF8_VALIDITY)
   endif()
-  gtest_add_tests(
-    TARGET otlp_populate_attribute_utils_test
-    TEST_PREFIX exporter.otlp.
-    TEST_LIST otlp_populate_attribute_utils_test)
+  gtest_discover_tests(otlp_populate_attribute_utils_test TEST_PREFIX exporter.otlp.)
 
   add_executable(otlp_metrics_serialization_test
                  test/otlp_metrics_serialization_test.cc)
@@ -867,39 +858,27 @@ if(OTELCPP_BUILD_TESTING)
     otlp_metrics_serialization_test ${GTEST_BOTH_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT} opentelemetry_otlp_recordable
     protobuf::libprotobuf)
-  gtest_add_tests(
-    TARGET otlp_metrics_serialization_test
-    TEST_PREFIX exporter.otlp.
-    TEST_LIST otlp_metrics_serialization_test)
+  gtest_discover_tests(otlp_metrics_serialization_test TEST_PREFIX exporter.otlp.)
 
   if(OTELCPP_WITH_OTLP_GRPC)
     add_executable(otlp_grpc_exporter_test test/otlp_grpc_exporter_test.cc)
     target_link_libraries(
       otlp_grpc_exporter_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
       ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc opentelemetry_test_common)
-    gtest_add_tests(
-      TARGET otlp_grpc_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_grpc_exporter_test)
+    gtest_discover_tests(otlp_grpc_exporter_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_grpc_target_test test/otlp_grpc_target_test.cc)
     target_link_libraries(
       otlp_grpc_target_test ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
       ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc)
-    gtest_add_tests(
-      TARGET otlp_grpc_target_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_grpc_target_test)
+    gtest_discover_tests(otlp_grpc_target_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_grpc_exporter_factory_test
                    test/otlp_grpc_exporter_factory_test.cc)
     target_link_libraries(
       otlp_grpc_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_grpc)
-    gtest_add_tests(
-      TARGET otlp_grpc_exporter_factory_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_grpc_exporter_factory_test)
+    gtest_discover_tests(otlp_grpc_exporter_factory_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_grpc_log_record_exporter_test
                    test/otlp_grpc_log_record_exporter_test.cc)
@@ -913,10 +892,7 @@ if(OTELCPP_BUILD_TESTING)
       opentelemetry_trace
       opentelemetry_logs
       opentelemetry_test_common)
-    gtest_add_tests(
-      TARGET otlp_grpc_log_record_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_grpc_log_record_exporter_test)
+    gtest_discover_tests(otlp_grpc_log_record_exporter_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_grpc_log_record_exporter_factory_test
                    test/otlp_grpc_log_record_exporter_factory_test.cc)
@@ -924,10 +900,7 @@ if(OTELCPP_BUILD_TESTING)
       otlp_grpc_log_record_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
       opentelemetry_exporter_otlp_grpc_log opentelemetry_logs)
-    gtest_add_tests(
-      TARGET otlp_grpc_log_record_exporter_factory_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_grpc_log_record_exporter_factory_test)
+    gtest_discover_tests(otlp_grpc_log_record_exporter_factory_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_grpc_metric_exporter_test
                    test/otlp_grpc_metric_exporter_test.cc)
@@ -939,10 +912,7 @@ if(OTELCPP_BUILD_TESTING)
       opentelemetry_exporter_otlp_grpc
       opentelemetry_exporter_otlp_grpc_metrics
       opentelemetry_test_common)
-    gtest_add_tests(
-      TARGET otlp_grpc_metric_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_grpc_metric_exporter_test)
+    gtest_discover_tests(otlp_grpc_metric_exporter_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_grpc_metric_exporter_factory_test
                    test/otlp_grpc_metric_exporter_factory_test.cc)
@@ -950,10 +920,7 @@ if(OTELCPP_BUILD_TESTING)
       otlp_grpc_metric_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
       opentelemetry_exporter_otlp_grpc_metrics opentelemetry_metrics)
-    gtest_add_tests(
-      TARGET otlp_grpc_metric_exporter_factory_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_grpc_metric_exporter_factory_test)
+    gtest_discover_tests(otlp_grpc_metric_exporter_factory_test TEST_PREFIX exporter.otlp.)
   endif()
 
   if(OTELCPP_WITH_OTLP_HTTP)
@@ -971,20 +938,14 @@ if(OTELCPP_BUILD_TESTING)
     if(WIN32)
       target_link_libraries(otlp_http_exporter_test ws2_32)
     endif()
-    gtest_add_tests(
-      TARGET otlp_http_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_http_exporter_test)
+    gtest_discover_tests(otlp_http_exporter_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_http_exporter_factory_test
                    test/otlp_http_exporter_factory_test.cc)
     target_link_libraries(
       otlp_http_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_http)
-    gtest_add_tests(
-      TARGET otlp_http_exporter_factory_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_http_exporter_factory_test)
+    gtest_discover_tests(otlp_http_exporter_factory_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_http_log_record_exporter_test
                    test/otlp_http_log_record_exporter_test.cc)
@@ -1001,10 +962,7 @@ if(OTELCPP_BUILD_TESTING)
     if(WIN32)
       target_link_libraries(otlp_http_log_record_exporter_test ws2_32)
     endif()
-    gtest_add_tests(
-      TARGET otlp_http_log_record_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_http_log_record_exporter_test)
+    gtest_discover_tests(otlp_http_log_record_exporter_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_http_log_record_exporter_factory_test
                    test/otlp_http_log_record_exporter_factory_test.cc)
@@ -1012,10 +970,7 @@ if(OTELCPP_BUILD_TESTING)
       otlp_http_log_record_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
       opentelemetry_exporter_otlp_http_log opentelemetry_logs)
-    gtest_add_tests(
-      TARGET otlp_http_log_record_exporter_factory_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_http_log_record_exporter_factory_test)
+    gtest_discover_tests(otlp_http_log_record_exporter_factory_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_http_metric_exporter_test
                    test/otlp_http_metric_exporter_test.cc)
@@ -1030,10 +985,7 @@ if(OTELCPP_BUILD_TESTING)
       nlohmann_json::nlohmann_json
       protobuf::libprotobuf
       opentelemetry_test_common)
-    gtest_add_tests(
-      TARGET otlp_http_metric_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_http_metric_exporter_test)
+    gtest_discover_tests(otlp_http_metric_exporter_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_http_metric_exporter_factory_test
                    test/otlp_http_metric_exporter_factory_test.cc)
@@ -1041,10 +993,7 @@ if(OTELCPP_BUILD_TESTING)
       otlp_http_metric_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
       opentelemetry_exporter_otlp_http_metric opentelemetry_metrics)
-    gtest_add_tests(
-      TARGET otlp_http_metric_exporter_factory_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_http_metric_exporter_factory_test)
+    gtest_discover_tests(otlp_http_metric_exporter_factory_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_http_exporter_custom_client_test
                    test/otlp_http_exporter_custom_client_test.cc)
@@ -1052,10 +1001,7 @@ if(OTELCPP_BUILD_TESTING)
       otlp_http_exporter_custom_client_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_http
       opentelemetry_http_client_nosend)
-    gtest_add_tests(
-      TARGET otlp_http_exporter_custom_client_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_http_exporter_custom_client_test)
+    gtest_discover_tests(otlp_http_exporter_custom_client_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_http_metric_exporter_custom_client_test
                    test/otlp_http_metric_exporter_custom_client_test.cc)
@@ -1063,10 +1009,7 @@ if(OTELCPP_BUILD_TESTING)
       otlp_http_metric_exporter_custom_client_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_otlp_http_metric
       opentelemetry_metrics opentelemetry_http_client_nosend)
-    gtest_add_tests(
-      TARGET otlp_http_metric_exporter_custom_client_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_http_metric_exporter_custom_client_test)
+    gtest_discover_tests(otlp_http_metric_exporter_custom_client_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_http_log_record_exporter_custom_client_test
                    test/otlp_http_log_record_exporter_custom_client_test.cc)
@@ -1074,10 +1017,7 @@ if(OTELCPP_BUILD_TESTING)
       otlp_http_log_record_exporter_custom_client_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} opentelemetry_exporter_otlp_http_log
       opentelemetry_logs opentelemetry_http_client_nosend)
-    gtest_add_tests(
-      TARGET otlp_http_log_record_exporter_custom_client_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_http_log_record_exporter_custom_client_test)
+    gtest_discover_tests(otlp_http_log_record_exporter_custom_client_test TEST_PREFIX exporter.otlp.)
   endif()
 
   if(OTELCPP_WITH_OTLP_FILE)
@@ -1090,10 +1030,7 @@ if(OTELCPP_BUILD_TESTING)
       opentelemetry_exporter_otlp_file
       opentelemetry_otlp_recordable
       nlohmann_json::nlohmann_json)
-    gtest_add_tests(
-      TARGET otlp_file_client_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_file_client_test)
+    gtest_discover_tests(otlp_file_client_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_file_exporter_test test/otlp_file_exporter_test.cc)
     target_link_libraries(
@@ -1104,20 +1041,14 @@ if(OTELCPP_BUILD_TESTING)
       opentelemetry_exporter_otlp_file
       nlohmann_json::nlohmann_json
       protobuf::libprotobuf)
-    gtest_add_tests(
-      TARGET otlp_file_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_file_exporter_test)
+    gtest_discover_tests(otlp_file_exporter_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_file_exporter_factory_test
                    test/otlp_file_exporter_factory_test.cc)
     target_link_libraries(
       otlp_file_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB} opentelemetry_exporter_otlp_file)
-    gtest_add_tests(
-      TARGET otlp_file_exporter_factory_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_file_exporter_factory_test)
+    gtest_discover_tests(otlp_file_exporter_factory_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_file_log_record_exporter_test
                    test/otlp_file_log_record_exporter_test.cc)
@@ -1129,10 +1060,7 @@ if(OTELCPP_BUILD_TESTING)
       opentelemetry_exporter_otlp_file_log
       opentelemetry_logs
       nlohmann_json::nlohmann_json)
-    gtest_add_tests(
-      TARGET otlp_file_log_record_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_file_log_record_exporter_test)
+    gtest_discover_tests(otlp_file_log_record_exporter_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_file_log_record_exporter_factory_test
                    test/otlp_file_log_record_exporter_factory_test.cc)
@@ -1140,10 +1068,7 @@ if(OTELCPP_BUILD_TESTING)
       otlp_file_log_record_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
       opentelemetry_exporter_otlp_file_log opentelemetry_logs)
-    gtest_add_tests(
-      TARGET otlp_file_log_record_exporter_factory_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_file_log_record_exporter_factory_test)
+    gtest_discover_tests(otlp_file_log_record_exporter_factory_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_file_metric_exporter_test
                    test/otlp_file_metric_exporter_test.cc)
@@ -1156,10 +1081,7 @@ if(OTELCPP_BUILD_TESTING)
       opentelemetry_metrics
       nlohmann_json::nlohmann_json
       protobuf::libprotobuf)
-    gtest_add_tests(
-      TARGET otlp_file_metric_exporter_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_file_metric_exporter_test)
+    gtest_discover_tests(otlp_file_metric_exporter_test TEST_PREFIX exporter.otlp.)
 
     add_executable(otlp_file_metric_exporter_factory_test
                    test/otlp_file_metric_exporter_factory_test.cc)
@@ -1167,10 +1089,7 @@ if(OTELCPP_BUILD_TESTING)
       otlp_file_metric_exporter_factory_test ${GTEST_BOTH_LIBRARIES}
       ${CMAKE_THREAD_LIBS_INIT} ${GMOCK_LIB}
       opentelemetry_exporter_otlp_file_metric opentelemetry_metrics)
-    gtest_add_tests(
-      TARGET otlp_file_metric_exporter_factory_test
-      TEST_PREFIX exporter.otlp.
-      TEST_LIST otlp_file_metric_exporter_factory_test)
+    gtest_discover_tests(otlp_file_metric_exporter_factory_test TEST_PREFIX exporter.otlp.)
   endif()
 endif() # OTELCPP_BUILD_TESTING
 

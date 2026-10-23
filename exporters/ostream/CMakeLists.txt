@@ -27,10 +27,7 @@ if(OTELCPP_BUILD_TESTING)
   add_executable(ostream_span_test test/ostream_span_test.cc)
   target_link_libraries(ostream_span_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_ostream_span)
-  gtest_add_tests(
-    TARGET ostream_span_test
-    TEST_PREFIX exporter.
-    TEST_LIST ostream_span_test)
+  gtest_discover_tests(ostream_span_test TEST_PREFIX exporter.)
 endif() # OTELCPP_BUILD_TESTING
 
 #
@@ -81,10 +78,7 @@ if(OTELCPP_BUILD_TESTING)
   target_link_libraries(
     ostream_metric_test ${GTEST_BOTH_LIBRARIES}
     opentelemetry_exporter_ostream_metrics opentelemetry_resources)
-  gtest_add_tests(
-    TARGET ostream_metric_test
-    TEST_PREFIX exporter.
-    TEST_LIST ostream_metric_test)
+  gtest_discover_tests(ostream_metric_test TEST_PREFIX exporter.)
 endif()
 
 #
@@ -130,10 +124,7 @@ if(OTELCPP_BUILD_TESTING)
   add_executable(ostream_log_test test/ostream_log_test.cc)
   target_link_libraries(ostream_log_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_ostream_logs)
-  gtest_add_tests(
-    TARGET ostream_log_test
-    TEST_PREFIX exporter.
-    TEST_LIST ostream_log_test)
+  gtest_discover_tests(ostream_log_test TEST_PREFIX exporter.)
 endif()
 
 #

@@ -229,7 +229,7 @@ foreach(
   target_link_libraries(
     ${testname} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
     opentelemetry_common opentelemetry_trace)
-  gtest_add_tests(TARGET ${testname} TEST_PREFIX trace. TEST_LIST ${testname})
+  gtest_discover_tests(${testname} TEST_PREFIX trace.)
 endforeach()
 
 add_executable(sampler_benchmark sampler_benchmark.cc)
@@ -237,6 +237,8 @@ target_link_libraries(sampler_benchmark benchmark::benchmark
                       ${CMAKE_THREAD_LIBS_INIT} opentelemetry_trace)
 
 ```
+
+**Note:** The project uses `gtest_discover_tests()` instead of `gtest_add_tests()` to ensure that tests compiled out by preprocessor conditionals are not registered in CTest. This prevents false-positive test passes for tests that were never actually run.
 
 This is how a `CMakeLists.txt` file will be written with the purpose of unit
 testing. After writing a unit test, navigate to the `CMakeLists.txt` file for

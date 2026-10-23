@@ -46,9 +46,6 @@ if(OTELCPP_BUILD_TESTING)
     target_link_libraries(
       ${testname} PRIVATE ${GTEST_BOTH_LIBRARIES} Threads::Threads
                           opentelemetry_opentracing_shim)
-    gtest_add_tests(
-      TARGET ${testname}
-      TEST_PREFIX opentracing_shim.
-      TEST_LIST ${testname})
+    gtest_discover_tests(${testname} TEST_PREFIX opentracing_shim.)
   endforeach()
 endif() # OTELCPP_BUILD_TESTING
