@@ -107,6 +107,12 @@ public:
 
   static size_t ReadCursor(const HttpOperation &operation) { return operation.request_nwrite_; }
 
+  static bool HasCurlResources(const HttpOperation &operation)
+  {
+    return operation.curl_resource_.easy_handle != nullptr ||
+           operation.curl_resource_.headers_chunk != nullptr;
+  }
+
   static void SetReadCursor(HttpOperation &operation, size_t value)
   {
     operation.request_nwrite_ = value;
@@ -443,6 +449,114 @@ class DISABLED_BasicCurlHttpTests : public BasicCurlHttpTests
 {};
 
 TEST_F(BasicCurlHttpTests, DoNothing) {}
+
+TEST_F(BasicCurlHttpTests, CopiesHeadersDuringConstruction)
+{
+  const http_client::HttpSslOptions ssl_options;
+  const http_client::Body body;
+  const auto compression = http_client::Compression::kNone;
+  curl::HttpOperation operation(http_client::Method::Get, "http://127.0.0.1:19000/get/",
+                                ssl_options, nullptr, {{"X-Temporary", "value"}}, body,
+                                compression);
+  EXPECT_EQ(operation.Send(), CURLE_OK);
+  EXPECT_EQ(operation.GetSessionState(), http_client::SessionState::Response);
+}
+
+TEST_F(BasicCurlHttpTests, RejectedAsyncHeadersReleaseCurlResources)
+{
+  curl::HttpClient client;
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  auto handler = std::make_shared<CustomEventHandler>();
+  const http_client::HttpSslOptions ssl_options;
+  const http_client::Headers headers = {{"baggage", "k=v;a\r\nX-Injected: 1"}};
+  const http_client::Body body;
+  const auto compression = http_client::Compression::kNone;
+  curl::HttpOperation operation(http_client::Method::Get, "http://127.0.0.1:19000/get/",
+                                ssl_options, handler.get(), headers, body, compression);
+  EXPECT_EQ(operation.SendAsync(static_cast<curl::Session *>(session.get()),
+                                [](curl::HttpOperation &) {}),
+            CURLE_BAD_FUNCTION_ARGUMENT);
+  operation.Finish();
+  operation.Cleanup();
+  EXPECT_FALSE(curl::HttpOperationTestPeer::HasCurlResources(operation));
+}
+
+TEST_F(BasicCurlHttpTests, RejectUnsafeHeadersBeforeSyncOrAsyncTransfer)
+{
+  const std::vector<std::pair<std::string, std::string>> invalid = {
+      {"baggage", "k=v;a\r\nX-Injected: 1"},
+      {"baggage", "k=v;a\r\n\r\nGET /smuggled HTTP/1.1\r\nHost: localhost"},
+      {"name", "value\r"},
+      {"name", "value\n"},
+      {"name", std::string("a\0b", 3)},
+      {"name", "value\x7f"},
+      {"name", "value\x01"},
+      {"bad\r\nname", "value"},
+      {std::string("bad\0name", 8), "value"},
+      {"bad:name", "value"},
+      {"bad name", "value"},
+      {"", "value"}};
+  curl::HttpClientSync sync;
+  curl::HttpClient async;
+  for (const auto &header : invalid)
+  {
+    SCOPED_TRACE(header.first);
+    http_client::Headers headers = {{"valid", "value"}, header};
+    auto result                  = sync.GetNoSsl("http://127.0.0.1:19000/get/", headers);
+    EXPECT_FALSE(result);
+    EXPECT_EQ(result.GetSessionState(), http_client::SessionState::ConnectFailed);
+
+    auto session = async.CreateSession("http://127.0.0.1:19000");
+    auto request = session->CreateRequest();
+    request->SetUri("get/");
+    request->AddHeader(header.first, header.second);
+    auto handler = std::make_shared<CustomEventHandler>();
+    session->SendRequest(handler);
+    EXPECT_FALSE(session->IsSessionActive());
+    EXPECT_TRUE(handler->is_called_.load());
+    EXPECT_FALSE(handler->got_response_.load());
+    session->FinishSession();
+  }
+  async.FinishAllSessions();
+  {
+    std::lock_guard<std::mutex> lock(mtx_requests);
+    EXPECT_TRUE(received_requests_.empty());
+  }
+  // A rejected request must not poison subsequent requests on the client.
+  EXPECT_TRUE(sync.GetNoSsl("http://127.0.0.1:19000/get/",
+                            {{"X-Valid", "value\twith space"}, {"X-Empty", ""}}));
+}
+
+TEST_F(BasicCurlHttpTests, PreserveHighBytesInHeaderValues)
+{
+  std::string value = "prefix";
+  for (unsigned int byte = 0x80; byte <= 0xff; ++byte)
+  {
+    value.push_back(static_cast<char>(byte));
+  }
+  value += "suffix";
+  curl::HttpClientSync sync;
+  EXPECT_TRUE(sync.GetNoSsl("http://127.0.0.1:19000/get/", {{"x-high-bytes", value}}));
+
+  curl::HttpClient async;
+  auto session = async.CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  request->AddHeader("x-high-bytes", value);
+  auto handler = std::make_shared<CustomEventHandler>();
+  session->SendRequest(handler);
+  session->FinishSession();
+  EXPECT_TRUE(handler->got_response_.load());
+
+  std::lock_guard<std::mutex> lock(mtx_requests);
+  ASSERT_EQ(received_requests_.size(), 2);
+  for (const auto &received : received_requests_)
+  {
+    const auto header = received.headers.find("X-High-Bytes");
+    ASSERT_NE(header, received.headers.end());
+    EXPECT_EQ(header->second, value);
+  }
+}
 
 TEST_F(BasicCurlHttpTests, HttpRequest)
 {

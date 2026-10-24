@@ -13,6 +13,7 @@
 #include <list>
 #include <map>
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "socket_tools.h"
 
 #ifdef HAVE_HTTP_DEBUG
@@ -724,7 +725,7 @@ protected:
   static bool equalsLowercased(std::string const &str, char const *mask)
   {
     char const *ptr = str.c_str();
-    while (*ptr && *mask && ::tolower(*ptr) == *mask)
+    while (*ptr && *mask && opentelemetry::common::detail::ToAsciiLower(*ptr) == *mask)
     {
       ptr++;
       mask++;
@@ -740,7 +741,7 @@ protected:
     {
       if (first)
       {
-        ch    = static_cast<char>(::toupper(ch));
+        ch    = opentelemetry::common::detail::ToAsciiUpper(ch);
         first = false;
       }
       else if (ch == '-')
@@ -749,7 +750,7 @@ protected:
       }
       else
       {
-        ch = static_cast<char>(::tolower(ch));
+        ch = opentelemetry::common::detail::ToAsciiLower(ch);
       }
     }
     return result;

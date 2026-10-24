@@ -4,7 +4,7 @@
 // clang-format off
 
 // ~/build/api/test/trace/propagation/propagator_benchmark --benchmark_repetitions=5 --benchmark_display_aggregates_only=true
-// 2026-10-12T16:13:28+00:00
+// 2026-10-13T16:12:49+00:00
 // Running /home/devuser/build/api/test/trace/propagation/propagator_benchmark
 // Run on (32 X 5700 MHz CPU s)
 // CPU Caches:
@@ -12,67 +12,99 @@
 //   L1 Instruction 32 KiB (x16)
 //   L2 Unified 2048 KiB (x16)
 //   L3 Unified 36864 KiB (x1)
-// Load Average: 1.02, 0.76, 0.61
+// Load Average: 0.11, 1.06, 1.26
 // ***WARNING*** ASLR is enabled, the results may have unreproducible noise in them.
-// ------------------------------------------------------------------------------------------
-// Benchmark                                                Time             CPU   Iterations
-// ------------------------------------------------------------------------------------------
-// BM_HttpTraceContextInject_mean                        19.5 ns         19.5 ns            5
-// BM_HttpTraceContextInject_median                      19.4 ns         19.4 ns            5
-// BM_HttpTraceContextInject_stddev                     0.312 ns        0.312 ns            5
-// BM_HttpTraceContextInject_cv                          1.60 %          1.60 %             5
-// BM_HttpTraceContextInjectWithTraceState_mean          55.0 ns         54.9 ns            5
-// BM_HttpTraceContextInjectWithTraceState_median        54.8 ns         54.8 ns            5
-// BM_HttpTraceContextInjectWithTraceState_stddev       0.312 ns        0.312 ns            5
-// BM_HttpTraceContextInjectWithTraceState_cv            0.57 %          0.57 %             5
-// BM_HttpTraceContextExtract_mean                        158 ns          158 ns            5
-// BM_HttpTraceContextExtract_median                      157 ns          157 ns            5
-// BM_HttpTraceContextExtract_stddev                     1.83 ns         1.83 ns            5
-// BM_HttpTraceContextExtract_cv                         1.16 %          1.16 %             5
-// BM_HttpTraceContextExtractWithTraceState_mean          222 ns          222 ns            5
-// BM_HttpTraceContextExtractWithTraceState_median        222 ns          222 ns            5
-// BM_HttpTraceContextExtractWithTraceState_stddev       1.97 ns         1.95 ns            5
-// BM_HttpTraceContextExtractWithTraceState_cv           0.89 %          0.88 %             5
-// BM_B3PropagatorInject_mean                            18.6 ns         18.6 ns            5
-// BM_B3PropagatorInject_median                          18.6 ns         18.6 ns            5
-// BM_B3PropagatorInject_stddev                         0.083 ns        0.084 ns            5
-// BM_B3PropagatorInject_cv                              0.45 %          0.45 %             5
-// BM_B3PropagatorExtract_mean                            103 ns          103 ns            5
-// BM_B3PropagatorExtract_median                          103 ns          103 ns            5
-// BM_B3PropagatorExtract_stddev                        0.433 ns        0.439 ns            5
-// BM_B3PropagatorExtract_cv                             0.42 %          0.43 %             5
-// BM_B3PropagatorMultiHeaderInject_mean                 29.1 ns         29.1 ns            5
-// BM_B3PropagatorMultiHeaderInject_median               29.1 ns         29.1 ns            5
-// BM_B3PropagatorMultiHeaderInject_stddev              0.210 ns        0.211 ns            5
-// BM_B3PropagatorMultiHeaderInject_cv                   0.72 %          0.72 %             5
-// BM_B3PropagatorMultiHeaderExtract_mean                89.3 ns         89.2 ns            5
-// BM_B3PropagatorMultiHeaderExtract_median              89.1 ns         89.1 ns            5
-// BM_B3PropagatorMultiHeaderExtract_stddev             0.524 ns        0.527 ns            5
-// BM_B3PropagatorMultiHeaderExtract_cv                  0.59 %          0.59 %             5
-// BM_JaegerPropagatorInject_mean                        18.6 ns         18.6 ns            5
-// BM_JaegerPropagatorInject_median                      18.5 ns         18.5 ns            5
-// BM_JaegerPropagatorInject_stddev                     0.242 ns        0.242 ns            5
-// BM_JaegerPropagatorInject_cv                          1.30 %          1.30 %             5
-// BM_JaegerPropagatorExtract_mean                       98.2 ns         98.2 ns            5
-// BM_JaegerPropagatorExtract_median                     97.7 ns         97.7 ns            5
-// BM_JaegerPropagatorExtract_stddev                     2.16 ns         2.17 ns            5
-// BM_JaegerPropagatorExtract_cv                         2.20 %          2.21 %             5
-// BM_BaggagePropagatorInject_mean                        169 ns          169 ns            5
-// BM_BaggagePropagatorInject_median                      169 ns          169 ns            5
-// BM_BaggagePropagatorInject_stddev                    0.384 ns        0.396 ns            5
-// BM_BaggagePropagatorInject_cv                         0.23 %          0.24 %             5
-// BM_BaggagePropagatorExtract_mean                       425 ns          425 ns            5
-// BM_BaggagePropagatorExtract_median                     422 ns          422 ns            5
-// BM_BaggagePropagatorExtract_stddev                    7.84 ns         7.85 ns            5
-// BM_BaggagePropagatorExtract_cv                        1.85 %          1.85 %             5
-// BM_CompositeTraceContextBaggageInject_mean             189 ns          189 ns            5
-// BM_CompositeTraceContextBaggageInject_median           189 ns          189 ns            5
-// BM_CompositeTraceContextBaggageInject_stddev         0.830 ns        0.826 ns            5
-// BM_CompositeTraceContextBaggageInject_cv              0.44 %          0.44 %             5
-// BM_CompositeTraceContextBaggageExtract_mean            619 ns          619 ns            5
-// BM_CompositeTraceContextBaggageExtract_median          619 ns          619 ns            5
-// BM_CompositeTraceContextBaggageExtract_stddev         4.59 ns         4.62 ns            5
-// BM_CompositeTraceContextBaggageExtract_cv             0.74 %          0.75 %             5
+// -----------------------------------------------------------------------------------------------
+// Benchmark                                                     Time             CPU   Iterations
+// -----------------------------------------------------------------------------------------------
+// BM_HttpTraceContextInject_mean                             20.1 ns         20.1 ns            5
+// BM_HttpTraceContextInject_median                           20.1 ns         20.1 ns            5
+// BM_HttpTraceContextInject_stddev                          0.082 ns        0.083 ns            5
+// BM_HttpTraceContextInject_cv                               0.41 %          0.41 %             5
+// BM_HttpTraceContextInjectEmptyContext_mean                 3.61 ns         3.61 ns            5
+// BM_HttpTraceContextInjectEmptyContext_median               3.61 ns         3.61 ns            5
+// BM_HttpTraceContextInjectEmptyContext_stddev              0.014 ns        0.014 ns            5
+// BM_HttpTraceContextInjectEmptyContext_cv                   0.39 %          0.38 %             5
+// BM_HttpTraceContextInjectWithTraceState_mean               60.0 ns         60.0 ns            5
+// BM_HttpTraceContextInjectWithTraceState_median             60.0 ns         60.0 ns            5
+// BM_HttpTraceContextInjectWithTraceState_stddev            0.384 ns        0.383 ns            5
+// BM_HttpTraceContextInjectWithTraceState_cv                 0.64 %          0.64 %             5
+// BM_HttpTraceContextExtract_mean                             156 ns          156 ns            5
+// BM_HttpTraceContextExtract_median                           157 ns          157 ns            5
+// BM_HttpTraceContextExtract_stddev                          2.56 ns         2.56 ns            5
+// BM_HttpTraceContextExtract_cv                              1.64 %          1.64 %             5
+// BM_HttpTraceContextExtractEmptyContext_mean                21.1 ns         21.1 ns            5
+// BM_HttpTraceContextExtractEmptyContext_median              21.0 ns         21.0 ns            5
+// BM_HttpTraceContextExtractEmptyContext_stddev             0.277 ns        0.277 ns            5
+// BM_HttpTraceContextExtractEmptyContext_cv                  1.31 %          1.31 %             5
+// BM_HttpTraceContextExtractWithTraceState_mean               223 ns          223 ns            5
+// BM_HttpTraceContextExtractWithTraceState_median             224 ns          224 ns            5
+// BM_HttpTraceContextExtractWithTraceState_stddev            4.11 ns         4.10 ns            5
+// BM_HttpTraceContextExtractWithTraceState_cv                1.84 %          1.84 %             5
+// BM_B3PropagatorInject_mean                                 18.9 ns         18.9 ns            5
+// BM_B3PropagatorInject_median                               18.9 ns         18.9 ns            5
+// BM_B3PropagatorInject_stddev                              0.336 ns        0.337 ns            5
+// BM_B3PropagatorInject_cv                                   1.78 %          1.78 %             5
+// BM_B3PropagatorInjectEmptyContext_mean                     3.74 ns         3.74 ns            5
+// BM_B3PropagatorInjectEmptyContext_median                   3.72 ns         3.72 ns            5
+// BM_B3PropagatorInjectEmptyContext_stddev                  0.052 ns        0.052 ns            5
+// BM_B3PropagatorInjectEmptyContext_cv                       1.39 %          1.39 %             5
+// BM_B3PropagatorExtract_mean                                 100 ns          100 ns            5
+// BM_B3PropagatorExtract_median                             100.0 ns        100.0 ns            5
+// BM_B3PropagatorExtract_stddev                             0.583 ns        0.583 ns            5
+// BM_B3PropagatorExtract_cv                                  0.58 %          0.58 %             5
+// BM_B3PropagatorExtractEmptyContext_mean                    35.2 ns         35.2 ns            5
+// BM_B3PropagatorExtractEmptyContext_median                  35.2 ns         35.2 ns            5
+// BM_B3PropagatorExtractEmptyContext_stddev                 0.302 ns        0.302 ns            5
+// BM_B3PropagatorExtractEmptyContext_cv                      0.86 %          0.86 %             5
+// BM_B3PropagatorMultiHeaderInject_mean                      29.5 ns         29.5 ns            5
+// BM_B3PropagatorMultiHeaderInject_median                    29.4 ns         29.4 ns            5
+// BM_B3PropagatorMultiHeaderInject_stddev                   0.173 ns        0.173 ns            5
+// BM_B3PropagatorMultiHeaderInject_cv                        0.59 %          0.59 %             5
+// BM_B3PropagatorMultiHeaderInjectEmptyContext_mean          3.69 ns         3.69 ns            5
+// BM_B3PropagatorMultiHeaderInjectEmptyContext_median        3.70 ns         3.70 ns            5
+// BM_B3PropagatorMultiHeaderInjectEmptyContext_stddev       0.018 ns        0.018 ns            5
+// BM_B3PropagatorMultiHeaderInjectEmptyContext_cv            0.50 %          0.49 %             5
+// BM_B3PropagatorMultiHeaderExtract_mean                     97.4 ns         97.4 ns            5
+// BM_B3PropagatorMultiHeaderExtract_median                   97.1 ns         97.1 ns            5
+// BM_B3PropagatorMultiHeaderExtract_stddev                  0.575 ns        0.578 ns            5
+// BM_B3PropagatorMultiHeaderExtract_cv                       0.59 %          0.59 %             5
+// BM_B3PropagatorMultiHeaderExtractEmptyContext_mean         38.9 ns         38.9 ns            5
+// BM_B3PropagatorMultiHeaderExtractEmptyContext_median       38.9 ns         38.9 ns            5
+// BM_B3PropagatorMultiHeaderExtractEmptyContext_stddev      0.318 ns        0.318 ns            5
+// BM_B3PropagatorMultiHeaderExtractEmptyContext_cv           0.82 %          0.82 %             5
+// BM_JaegerPropagatorInject_mean                             19.1 ns         19.1 ns            5
+// BM_JaegerPropagatorInject_median                           19.2 ns         19.2 ns            5
+// BM_JaegerPropagatorInject_stddev                          0.251 ns        0.251 ns            5
+// BM_JaegerPropagatorInject_cv                               1.32 %          1.31 %             5
+// BM_JaegerPropagatorInjectEmptyContext_mean                 3.84 ns         3.84 ns            5
+// BM_JaegerPropagatorInjectEmptyContext_median               3.85 ns         3.85 ns            5
+// BM_JaegerPropagatorInjectEmptyContext_stddev              0.023 ns        0.023 ns            5
+// BM_JaegerPropagatorInjectEmptyContext_cv                   0.60 %          0.60 %             5
+// BM_JaegerPropagatorExtract_mean                             106 ns          106 ns            5
+// BM_JaegerPropagatorExtract_median                           107 ns          107 ns            5
+// BM_JaegerPropagatorExtract_stddev                          1.81 ns         1.81 ns            5
+// BM_JaegerPropagatorExtract_cv                              1.71 %          1.71 %             5
+// BM_JaegerPropagatorExtractEmptyContext_mean                23.0 ns         23.0 ns            5
+// BM_JaegerPropagatorExtractEmptyContext_median              22.8 ns         22.8 ns            5
+// BM_JaegerPropagatorExtractEmptyContext_stddev             0.474 ns        0.475 ns            5
+// BM_JaegerPropagatorExtractEmptyContext_cv                  2.06 %          2.06 %             5
+// BM_BaggagePropagatorInject_mean                             172 ns          172 ns            5
+// BM_BaggagePropagatorInject_median                           172 ns          172 ns            5
+// BM_BaggagePropagatorInject_stddev                          1.57 ns         1.58 ns            5
+// BM_BaggagePropagatorInject_cv                              0.91 %          0.92 %             5
+// BM_BaggagePropagatorExtract_mean                            488 ns          488 ns            5
+// BM_BaggagePropagatorExtract_median                          494 ns          494 ns            5
+// BM_BaggagePropagatorExtract_stddev                         8.24 ns         8.25 ns            5
+// BM_BaggagePropagatorExtract_cv                             1.69 %          1.69 %             5
+// BM_CompositeTraceContextBaggageInject_mean                  197 ns          197 ns            5
+// BM_CompositeTraceContextBaggageInject_median                198 ns          198 ns            5
+// BM_CompositeTraceContextBaggageInject_stddev               3.30 ns         3.31 ns            5
+// BM_CompositeTraceContextBaggageInject_cv                   1.67 %          1.68 %             5
+// BM_CompositeTraceContextBaggageExtract_mean                 718 ns          718 ns            5
+// BM_CompositeTraceContextBaggageExtract_median               718 ns          718 ns            5
+// BM_CompositeTraceContextBaggageExtract_stddev              1.58 ns         1.59 ns            5
+// BM_CompositeTraceContextBaggageExtract_cv                  0.22 %          0.22 %             5
 //
 // clang-format on
 
@@ -255,6 +287,21 @@ void BM_HttpTraceContextInject(benchmark::State &state)
 }
 BENCHMARK(BM_HttpTraceContextInject);
 
+void BM_HttpTraceContextInjectEmptyContext(benchmark::State &state)
+{
+  HttpTraceContext propagator;
+  TraceContextCarrier carrier;
+  context::Context input;
+  while (state.KeepRunning())
+  {
+    benchmark::DoNotOptimize(input);
+    benchmark::DoNotOptimize(carrier);
+    propagator.Inject(carrier, input);
+    benchmark::ClobberMemory();
+  }
+}
+BENCHMARK(BM_HttpTraceContextInjectEmptyContext);
+
 void BM_HttpTraceContextInjectWithTraceState(benchmark::State &state)
 {
   HttpTraceContext propagator;
@@ -286,6 +333,22 @@ void BM_HttpTraceContextExtract(benchmark::State &state)
   }
 }
 BENCHMARK(BM_HttpTraceContextExtract);
+
+void BM_HttpTraceContextExtractEmptyContext(benchmark::State &state)
+{
+  HttpTraceContext propagator;
+  TraceContextCarrier carrier;
+  context::Context base;
+  while (state.KeepRunning())
+  {
+    benchmark::DoNotOptimize(carrier);
+    benchmark::DoNotOptimize(base);
+    auto extracted = propagator.Extract(carrier, base);
+    benchmark::DoNotOptimize(extracted);
+    benchmark::ClobberMemory();
+  }
+}
+BENCHMARK(BM_HttpTraceContextExtractEmptyContext);
 
 void BM_HttpTraceContextExtractWithTraceState(benchmark::State &state)
 {
@@ -320,6 +383,21 @@ void BM_B3PropagatorInject(benchmark::State &state)
 }
 BENCHMARK(BM_B3PropagatorInject);
 
+void BM_B3PropagatorInjectEmptyContext(benchmark::State &state)
+{
+  B3Propagator propagator;
+  SingleHeaderCarrier carrier(kB3CombinedHeader);
+  context::Context input;
+  while (state.KeepRunning())
+  {
+    benchmark::DoNotOptimize(input);
+    benchmark::DoNotOptimize(carrier);
+    propagator.Inject(carrier, input);
+    benchmark::ClobberMemory();
+  }
+}
+BENCHMARK(BM_B3PropagatorInjectEmptyContext);
+
 void BM_B3PropagatorExtract(benchmark::State &state)
 {
   B3Propagator propagator;
@@ -337,6 +415,22 @@ void BM_B3PropagatorExtract(benchmark::State &state)
 }
 BENCHMARK(BM_B3PropagatorExtract);
 
+void BM_B3PropagatorExtractEmptyContext(benchmark::State &state)
+{
+  B3Propagator propagator;
+  SingleHeaderCarrier carrier(kB3CombinedHeader);
+  context::Context base;
+  while (state.KeepRunning())
+  {
+    benchmark::DoNotOptimize(carrier);
+    benchmark::DoNotOptimize(base);
+    auto extracted = propagator.Extract(carrier, base);
+    benchmark::DoNotOptimize(extracted);
+    benchmark::ClobberMemory();
+  }
+}
+BENCHMARK(BM_B3PropagatorExtractEmptyContext);
+
 void BM_B3PropagatorMultiHeaderInject(benchmark::State &state)
 {
   B3PropagatorMultiHeader propagator;
@@ -350,6 +444,21 @@ void BM_B3PropagatorMultiHeaderInject(benchmark::State &state)
   }
 }
 BENCHMARK(BM_B3PropagatorMultiHeaderInject);
+
+void BM_B3PropagatorMultiHeaderInjectEmptyContext(benchmark::State &state)
+{
+  B3PropagatorMultiHeader propagator;
+  B3MultiHeaderCarrier carrier;
+  context::Context input;
+  while (state.KeepRunning())
+  {
+    benchmark::DoNotOptimize(input);
+    benchmark::DoNotOptimize(carrier);
+    propagator.Inject(carrier, input);
+    benchmark::ClobberMemory();
+  }
+}
+BENCHMARK(BM_B3PropagatorMultiHeaderInjectEmptyContext);
 
 void BM_B3PropagatorMultiHeaderExtract(benchmark::State &state)
 {
@@ -370,6 +479,22 @@ void BM_B3PropagatorMultiHeaderExtract(benchmark::State &state)
 }
 BENCHMARK(BM_B3PropagatorMultiHeaderExtract);
 
+void BM_B3PropagatorMultiHeaderExtractEmptyContext(benchmark::State &state)
+{
+  B3PropagatorMultiHeader propagator;
+  B3MultiHeaderCarrier carrier;
+  context::Context base;
+  while (state.KeepRunning())
+  {
+    benchmark::DoNotOptimize(carrier);
+    benchmark::DoNotOptimize(base);
+    auto extracted = propagator.Extract(carrier, base);
+    benchmark::DoNotOptimize(extracted);
+    benchmark::ClobberMemory();
+  }
+}
+BENCHMARK(BM_B3PropagatorMultiHeaderExtractEmptyContext);
+
 void BM_JaegerPropagatorInject(benchmark::State &state)
 {
   JaegerPropagator propagator;
@@ -383,6 +508,21 @@ void BM_JaegerPropagatorInject(benchmark::State &state)
   }
 }
 BENCHMARK(BM_JaegerPropagatorInject);
+
+void BM_JaegerPropagatorInjectEmptyContext(benchmark::State &state)
+{
+  JaegerPropagator propagator;
+  SingleHeaderCarrier carrier(kJaegerTraceHeader);
+  context::Context input;
+  while (state.KeepRunning())
+  {
+    benchmark::DoNotOptimize(input);
+    benchmark::DoNotOptimize(carrier);
+    propagator.Inject(carrier, input);
+    benchmark::ClobberMemory();
+  }
+}
+BENCHMARK(BM_JaegerPropagatorInjectEmptyContext);
 
 void BM_JaegerPropagatorExtract(benchmark::State &state)
 {
@@ -400,6 +540,22 @@ void BM_JaegerPropagatorExtract(benchmark::State &state)
   }
 }
 BENCHMARK(BM_JaegerPropagatorExtract);
+
+void BM_JaegerPropagatorExtractEmptyContext(benchmark::State &state)
+{
+  JaegerPropagator propagator;
+  SingleHeaderCarrier carrier(kJaegerTraceHeader);
+  context::Context base;
+  while (state.KeepRunning())
+  {
+    benchmark::DoNotOptimize(carrier);
+    benchmark::DoNotOptimize(base);
+    auto extracted = propagator.Extract(carrier, base);
+    benchmark::DoNotOptimize(extracted);
+    benchmark::ClobberMemory();
+  }
+}
+BENCHMARK(BM_JaegerPropagatorExtractEmptyContext);
 
 void BM_BaggagePropagatorInject(benchmark::State &state)
 {

@@ -351,7 +351,8 @@ private:
 
   char curl_error_message_[CURL_ERROR_SIZE]{};
   HttpCurlEasyResource curl_resource_;
-  CURLcode last_curl_result_{CURLE_OK};  // Curl result OR HTTP status code if successful
+  CURLcode last_curl_result_{CURLE_OK};     // Curl result OR HTTP status code if successful
+  CURLcode header_setup_result_{CURLE_OK};  // Construction-time header validation/allocation result
 
   opentelemetry::ext::http::client::EventHandler *event_handle_{nullptr};
 
