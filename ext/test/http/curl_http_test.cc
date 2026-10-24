@@ -2561,6 +2561,41 @@ TEST_F(BasicCurlHttpTests, AFailedEasyHandleIsReportedOnce)
   client->FinishAllSessions();
 }
 
+// The count above is taken while the session is still alive, and the event this guards against
+// arrives later: Cleanup() runs from the operation's destructor and treats a state it reads as
+// still in flight by announcing a cancel. So the same scenario is counted again after everything
+// that could dispatch has been destroyed.
+TEST_F(BasicCurlHttpTests, AFailedEasyHandleDispatchesNothingFurtherOnTeardown)
+{
+  ASSERT_TRUE(g_curl_hooks_installed);
+  received_requests_.clear();
+
+  auto handler = std::make_shared<MultiHandleOutcomeHandler>();
+  {
+    auto client = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
+    ASSERT_TRUE(client != nullptr);
+    auto session = client->CreateSession("http://127.0.0.1:19000");
+    auto request = session->CreateRequest();
+    request->SetUri("get/");
+
+    {
+      FailCurlCallocEverywhere failing;
+      session->SendRequest(handler);
+    }
+
+    EXPECT_EQ(1, handler->terminal_.load(std::memory_order_acquire))
+        << "the refusal was not reported exactly once while the session was alive";
+
+    session->FinishSession();
+    client->FinishAllSessions();
+  }
+
+  EXPECT_EQ(1, handler->terminal_.load(std::memory_order_acquire))
+      << "tearing the session and client down dispatched a further terminal event";
+  EXPECT_EQ(0, handler->cancels_.load(std::memory_order_acquire))
+      << "an operation that never started was announced as cancelled";
+}
+
 TEST_F(BasicCurlHttpTests, APersistentMultiHandleFailureDoesNotSpin)
 {
   ASSERT_TRUE(g_curl_hooks_installed);

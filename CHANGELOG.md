@@ -15,8 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
-* [BUG] Check what curl_easy_init, curl_slist_append and curl_multi_init return
-  instead of treating a failed allocation as success
+* [BUG] Check what curl_multi_init returns instead of treating a failed
+  allocation as success, and report a curl operation that could not be
+  constructed once, with the reason, rather than from the constructor as well
   [#4404](https://github.com/open-telemetry/opentelemetry-cpp/issues/4404)
 
 * [BUG] Stop the curl IO thread spinning, flooding the log, and refusing to be
