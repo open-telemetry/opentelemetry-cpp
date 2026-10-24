@@ -15,6 +15,12 @@ Increment the:
 
 ## [Unreleased]
 
+Changes:
+
+* [METRICS SDK] Avoid materializing owned exemplar attributes before
+  fixed-size reservoir selection.
+  [#4475](https://github.com/open-telemetry/opentelemetry-cpp/pull/4475)
+
 Breaking Changes:
 
 * [METRICS SDK] Add non-owning `KeyValueIterable` overloads to the preview
@@ -330,10 +336,6 @@ Changes:
 
 * [RELEASE] Release opentelemetry-cpp 1.30.0
   [#4722](https://github.com/open-telemetry/opentelemetry-cpp/pull/4722)
-
-* [METRICS SDK] Avoid materializing owned exemplar attributes before
-  fixed-size reservoir selection.
-  [#4475](https://github.com/open-telemetry/opentelemetry-cpp/pull/4475)
 
 Important changes:
 
