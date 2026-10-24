@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <memory>
+#include <string>
 
 #include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
@@ -22,6 +23,34 @@ namespace trace
 
 namespace sampler_env
 {
+
+namespace
+{
+
+// Case-insensitive comparison of two ASCII strings
+static bool CaseInsensitiveAsciiEquals(const std::string &lhs, const std::string &rhs) noexcept
+{
+  if (lhs.size() != rhs.size())
+  {
+    return false;
+  }
+  for (size_t i = 0; i < lhs.size(); ++i)
+  {
+    char a = lhs[i];
+    char b = rhs[i];
+    if (a >= 'A' && a <= 'Z')
+      a += 32;
+    if (b >= 'A' && b <= 'Z')
+      b += 32;
+    if (a != b)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+}  // namespace
 
 static constexpr const char *kTracesSamplerEnv    = "OTEL_TRACES_SAMPLER";
 static constexpr const char *kTracesSamplerArgEnv = "OTEL_TRACES_SAMPLER_ARG";
@@ -50,15 +79,15 @@ std::unique_ptr<Sampler> GetSamplerFromEnv()
   }
 
   // Build sampler based on environment variable value
-  if (sampler_name == "always_on")
+  if (CaseInsensitiveAsciiEquals(sampler_name, "always_on"))
   {
     return AlwaysOnSamplerFactory::Create();
   }
-  else if (sampler_name == "always_off")
+  else if (CaseInsensitiveAsciiEquals(sampler_name, "always_off"))
   {
     return AlwaysOffSamplerFactory::Create();
   }
-  else if (sampler_name == "traceidratio")
+  else if (CaseInsensitiveAsciiEquals(sampler_name, "traceidratio"))
   {
     // Validate ratio
     if (std::isnan(ratio_arg) || std::isinf(ratio_arg) || ratio_arg < 0.0f || ratio_arg > 1.0f)
@@ -71,26 +100,26 @@ std::unique_ptr<Sampler> GetSamplerFromEnv()
     }
     return TraceIdRatioBasedSamplerFactory::Create(ratio_arg);
   }
-  else if (sampler_name == "parentbased_traceidratio")
+  else if (CaseInsensitiveAsciiEquals(sampler_name, "parentbased_traceidratio"))
   {
-    // Validate ratio
+    // Validate ratio - if invalid, use default ratio of 1.0
     if (std::isnan(ratio_arg) || std::isinf(ratio_arg) || ratio_arg < 0.0f || ratio_arg > 1.0f)
     {
       OTEL_INTERNAL_LOG_WARN("Environment variable <" << kTracesSamplerArgEnv
                                                       << "> has invalid value <" << ratio_arg
                                                       << "> for parentbased_traceidratio sampler, "
-                                                      << "falling back to AlwaysOnSampler");
-      return AlwaysOnSamplerFactory::Create();
+                                                      << "using default ratio of 1.0");
+      ratio_arg = static_cast<float>(kDefaultTraceIdRatio);
     }
     auto root_sampler = TraceIdRatioBasedSamplerFactory::Create(ratio_arg);
     return ParentBasedSamplerFactory::Create(std::shared_ptr<Sampler>(root_sampler.release()));
   }
-  else if (sampler_name == "parentbased_always_on")
+  else if (CaseInsensitiveAsciiEquals(sampler_name, "parentbased_always_on"))
   {
     auto root_sampler = AlwaysOnSamplerFactory::Create();
     return ParentBasedSamplerFactory::Create(std::shared_ptr<Sampler>(root_sampler.release()));
   }
-  else if (sampler_name == "parentbased_always_off")
+  else if (CaseInsensitiveAsciiEquals(sampler_name, "parentbased_always_off"))
   {
     auto root_sampler = AlwaysOffSamplerFactory::Create();
     return ParentBasedSamplerFactory::Create(std::shared_ptr<Sampler>(root_sampler.release()));

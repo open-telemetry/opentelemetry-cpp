@@ -42,3 +42,4 @@ OPENTELEMETRY_EXPORT std::unique_ptr<Sampler> GetSamplerFromEnv();
 }  // namespace trace
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE
+

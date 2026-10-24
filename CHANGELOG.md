@@ -918,7 +918,6 @@ Important changes:
 
 * [CONFIGURATION] Complete resource detection support in SdkBuilder (#4424)
   [#4424](https://github.com/open-telemetry/opentelemetry-cpp/pull/4424)
->>>>>>> upstream/main
   * Behavior change: `SetResource` no longer runs `OTELResourceDetector` and no
     longer injects a default `service.name`, since neither is part of the
     configuration model. Use the `service` detector or set the attributes in

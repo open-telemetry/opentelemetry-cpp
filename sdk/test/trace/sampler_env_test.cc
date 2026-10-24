@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 
+#include "opentelemetry/sdk/common/env_variables.h"
 #include "opentelemetry/sdk/trace/sampler.h"
 #include "opentelemetry/sdk/trace/sampler_env.h"
 #include "opentelemetry/sdk/trace/samplers/always_off_factory.h"
@@ -175,8 +176,11 @@ TEST_F(SamplerEnvTest, ParentBasedTraceIdRatioWithInvalidRatioReturnsAlwaysOnSam
   setenv("OTEL_TRACES_SAMPLER", "parentbased_traceidratio", 1);
   setenv("OTEL_TRACES_SAMPLER_ARG", "1.5", 1);
   auto sampler = GetSamplerFromEnv();
-  // Should fall back to AlwaysOnSampler for invalid ratio
-  EXPECT_EQ(sampler->GetDescription(), AlwaysOnSamplerFactory::Create()->GetDescription());
+  // Should use default ratio of 1.0 for invalid ratio, not fall back to AlwaysOnSampler
+  auto root_sampler     = TraceIdRatioBasedSamplerFactory::Create(1.0);
+  auto expected_sampler = ParentBasedSamplerFactory::Create(
+      std::shared_ptr<opentelemetry::sdk::trace::Sampler>(root_sampler.release()));
+  EXPECT_EQ(sampler->GetDescription(), expected_sampler->GetDescription());
 }
 
 TEST_F(SamplerEnvTest, ParentBasedTraceIdRatioWithNegativeRatioReturnsAlwaysOnSampler)
@@ -184,8 +188,11 @@ TEST_F(SamplerEnvTest, ParentBasedTraceIdRatioWithNegativeRatioReturnsAlwaysOnSa
   setenv("OTEL_TRACES_SAMPLER", "parentbased_traceidratio", 1);
   setenv("OTEL_TRACES_SAMPLER_ARG", "-0.5", 1);
   auto sampler = GetSamplerFromEnv();
-  // Should fall back to AlwaysOnSampler for invalid ratio
-  EXPECT_EQ(sampler->GetDescription(), AlwaysOnSamplerFactory::Create()->GetDescription());
+  // Should use default ratio of 1.0 for invalid ratio, not fall back to AlwaysOnSampler
+  auto root_sampler     = TraceIdRatioBasedSamplerFactory::Create(1.0);
+  auto expected_sampler = ParentBasedSamplerFactory::Create(
+      std::shared_ptr<opentelemetry::sdk::trace::Sampler>(root_sampler.release()));
+  EXPECT_EQ(sampler->GetDescription(), expected_sampler->GetDescription());
 }
 
 TEST_F(SamplerEnvTest, ParentBasedTraceIdRatioWithNaNReturnsAlwaysOnSampler)
@@ -193,8 +200,23 @@ TEST_F(SamplerEnvTest, ParentBasedTraceIdRatioWithNaNReturnsAlwaysOnSampler)
   setenv("OTEL_TRACES_SAMPLER", "parentbased_traceidratio", 1);
   setenv("OTEL_TRACES_SAMPLER_ARG", "nan", 1);
   auto sampler = GetSamplerFromEnv();
-  // Should fall back to AlwaysOnSampler for invalid ratio
-  EXPECT_EQ(sampler->GetDescription(), AlwaysOnSamplerFactory::Create()->GetDescription());
+  // Should use default ratio of 1.0 for invalid ratio, not fall back to AlwaysOnSampler
+  auto root_sampler     = TraceIdRatioBasedSamplerFactory::Create(1.0);
+  auto expected_sampler = ParentBasedSamplerFactory::Create(
+      std::shared_ptr<opentelemetry::sdk::trace::Sampler>(root_sampler.release()));
+  EXPECT_EQ(sampler->GetDescription(), expected_sampler->GetDescription());
+}
+
+TEST_F(SamplerEnvTest, ParentBasedTraceIdRatioWithMalformedRatio)
+{
+  setenv("OTEL_TRACES_SAMPLER", "parentbased_traceidratio", 1);
+  setenv("OTEL_TRACES_SAMPLER_ARG", "0.5abc", 1);
+  auto sampler = GetSamplerFromEnv();
+  // Malformed ratio should be treated as unset, use default ratio of 1.0
+  auto root_sampler     = TraceIdRatioBasedSamplerFactory::Create(1.0);
+  auto expected_sampler = ParentBasedSamplerFactory::Create(
+      std::shared_ptr<opentelemetry::sdk::trace::Sampler>(root_sampler.release()));
+  EXPECT_EQ(sampler->GetDescription(), expected_sampler->GetDescription());
 }
 
 TEST_F(SamplerEnvTest, EmptySamplerNameReturnsAlwaysOnSampler)
@@ -209,8 +231,37 @@ TEST_F(SamplerEnvTest, CaseInsensitiveSamplerNames)
 {
   setenv("OTEL_TRACES_SAMPLER", "ALWAYS_ON", 1);
   auto sampler = GetSamplerFromEnv();
-  // Should fall back to AlwaysOnSampler for case-sensitive mismatch
+  // Should match case-insensitively and return AlwaysOnSampler
   EXPECT_EQ(sampler->GetDescription(), AlwaysOnSamplerFactory::Create()->GetDescription());
+}
+
+TEST_F(SamplerEnvTest, CaseInsensitiveSamplerNamesAlwaysOff)
+{
+  setenv("OTEL_TRACES_SAMPLER", "ALWAYS_OFF", 1);
+  auto sampler = GetSamplerFromEnv();
+  // Should match case-insensitively and return AlwaysOffSampler
+  EXPECT_EQ(sampler->GetDescription(), AlwaysOffSamplerFactory::Create()->GetDescription());
+}
+
+TEST_F(SamplerEnvTest, CaseInsensitiveSamplerNamesTraceIdRatio)
+{
+  setenv("OTEL_TRACES_SAMPLER", "TRACEIDRATIO", 1);
+  setenv("OTEL_TRACES_SAMPLER_ARG", "0.5", 1);
+  auto sampler = GetSamplerFromEnv();
+  // Should match case-insensitively and return TraceIdRatioBasedSampler
+  EXPECT_EQ(sampler->GetDescription(),
+            TraceIdRatioBasedSamplerFactory::Create(0.5)->GetDescription());
+}
+
+TEST_F(SamplerEnvTest, CaseInsensitiveSamplerNamesParentBased)
+{
+  setenv("OTEL_TRACES_SAMPLER", "PARENTBASED_ALWAYS_ON", 1);
+  auto sampler          = GetSamplerFromEnv();
+  auto root_sampler     = AlwaysOnSamplerFactory::Create();
+  auto expected_sampler = ParentBasedSamplerFactory::Create(
+      std::shared_ptr<opentelemetry::sdk::trace::Sampler>(root_sampler.release()));
+  // Should match case-insensitively and return ParentBasedSampler
+  EXPECT_EQ(sampler->GetDescription(), expected_sampler->GetDescription());
 }
 
 TEST_F(SamplerEnvTest, ExplicitSamplerOverridesEnvironmentVariables)
