@@ -15,8 +15,6 @@ Increment the:
 
 ## [Unreleased]
 
-## [1.30.0] 2026-10-22
-
 Changes:
 
 * [METRICS SDK] Fix preview exemplar reservoirs to serialize concurrent
@@ -26,6 +24,7 @@ Changes:
   sampling bounds so the current measurement can be discarded.
   [#4429](https://github.com/open-telemetry/opentelemetry-cpp/pull/4429)
 
+## [1.30.0] 2026-10-22
 
 This release contains:
 
