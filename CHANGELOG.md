@@ -15,6 +15,8 @@ Increment the:
 
 ## [Unreleased]
 
+Breaking Changes:
+
 * [METRICS SDK] Add non-owning `KeyValueIterable` overloads to the preview
   `ExemplarReservoir` and `ReservoirCellSelector` interfaces. Custom reservoir
   implementations inherit compatibility adapters but must be rebuilt because
