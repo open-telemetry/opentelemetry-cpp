@@ -28,7 +28,7 @@
 #endif
 
 #ifdef OTEL_CURL_DEBUG
-#  include <cctype>
+#  include "opentelemetry/common/detail/ascii.h"
 #endif
 
 #include "opentelemetry/common/string_util.h"
@@ -47,6 +47,33 @@
 
 namespace
 {
+
+bool IsValidRequestHeader(const std::string &name, const std::string &value)
+{
+  if (name.empty())
+  {
+    return false;
+  }
+  for (char ch : name)
+  {
+    if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') ||
+          opentelemetry::nostd::string_view("!#$%&'*+-.^_`|~").find(ch) !=
+              opentelemetry::nostd::string_view::npos))
+    {
+      return false;
+    }
+  }
+  for (unsigned char ch : value)
+  {
+    // field-vchar / SP / HTAB / obs-text. In particular, never pass CR, LF
+    // or an embedded NUL to libcurl's verbatim, NUL-terminated header API.
+    if ((ch < 0x20 && ch != '\t') || ch == 0x7f)
+    {
+      return false;
+    }
+  }
+  return true;
+}
 
 bool FindRetryAfterValue(const std::vector<uint8_t> &raw_headers,
                          opentelemetry::nostd::string_view &value)
@@ -473,38 +500,37 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
   if (!curl_resource_.easy_handle)
   {
     last_curl_result_ = CURLE_FAILED_INIT;
-    // Refuses Send() and SendAsync(), which would otherwise drive a null handle into libcurl.
-    construction_result_ = CURLE_FAILED_INIT;
-    // Terminal already, and reported once by the caller that sees SendAsync refuse, the same
-    // way the header list failure below is. Nothing is dispatched from here.
-    session_state_ = opentelemetry::ext::http::client::SessionState::CreateFailed;
+    // Recorded, not dispatched. Send() and SendAsync() refuse on it at entry, before Setup()
+    // can call curl_easy_setopt on a handle that does not exist. Dispatching a terminal event
+    // from the constructor is the second one #4360 is about.
+    header_setup_result_ = CURLE_FAILED_INIT;
     return;
   }
 
-  // Specify our custom headers
-  if (!this->request_headers_.empty())
+  // Validate before libcurl copies these borrowed headers. Setup reports any
+  // failure before either the synchronous or asynchronous path can send.
+  for (const auto &kv : request_headers_)
   {
-    for (auto &kv : this->request_headers_)
+    if (!IsValidRequestHeader(kv.first, kv.second))
+    {
+      header_setup_result_ = CURLE_BAD_FUNCTION_ARGUMENT;
+      break;
+    }
+  }
+  if (header_setup_result_ == CURLE_OK)
+  {
+    for (const auto &kv : request_headers_)
     {
       const auto header = std::string(kv.first).append(": ").append(kv.second);
-
-      // Into a temporary first: curl_slist_append returns null without freeing the list it was
-      // given, so assigning straight back would lose everything appended so far, and Setup()
-      // would send the request with none of these headers rather than not send it.
-      curl_slist *appended = curl_slist_append(curl_resource_.headers_chunk, header.c_str());
-      if (nullptr == appended)
+      auto *headers     = curl_slist_append(curl_resource_.headers_chunk, header.c_str());
+      if (headers == nullptr)
       {
         curl_slist_free_all(curl_resource_.headers_chunk);
         curl_resource_.headers_chunk = nullptr;
-        last_curl_result_            = CURLE_OUT_OF_MEMORY;
-        construction_result_         = CURLE_OUT_OF_MEMORY;
-        // Terminal already, so Cleanup() does not later announce a cancel for an operation that
-        // never started, to a handler the caller may no longer be holding.
-        session_state_ = opentelemetry::ext::http::client::SessionState::CreateFailed;
-        return;
+        header_setup_result_         = CURLE_OUT_OF_MEMORY;
+        break;
       }
-
-      curl_resource_.headers_chunk = appended;
+      curl_resource_.headers_chunk = headers;
     }
   }
 
@@ -862,7 +888,7 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
   {
     static const auto kHeaderSent = nostd::string_view("Send header => ");
 
-    while (!text_to_log.empty() && !std::iscntrl(text_to_log[0]))
+    while (!text_to_log.empty() && !opentelemetry::common::detail::IsAsciiControl(text_to_log[0]))
     {
       const auto pos = text_to_log.find('\n');
 
@@ -898,6 +924,11 @@ CURLcode HttpOperation::Setup()
 
   curl_error_message_[0] = '\0';
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ERRORBUFFER, curl_error_message_);
+
+  if (header_setup_result_ != CURLE_OK)
+  {
+    return header_setup_result_;
+  }
 
 // Support for custom debug function callback was added in version 7.9.6 so we guard against
 // exposing the default CURL output by keeping verbosity always disabled in lower versions.
@@ -1447,10 +1478,12 @@ CURLcode HttpOperation::Setup()
 
 CURLcode HttpOperation::Send()
 {
-  if (construction_result_ != CURLE_OK)
+  // Only a handle that was never created. Everything else Setup() reports, which both
+  // callers consult, and which dispatches the terminal event the caller is waiting for.
+  if (nullptr == curl_resource_.easy_handle)
   {
-    last_curl_result_ = construction_result_;
-    return construction_result_;
+    last_curl_result_ = header_setup_result_;
+    return header_setup_result_;
   }
 
   // If it is async sending, just return error
@@ -1483,10 +1516,12 @@ CURLcode HttpOperation::Send()
 
 CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOperation &)> callback)
 {
-  if (construction_result_ != CURLE_OK)
+  // Only a handle that was never created. Everything else Setup() reports, which both
+  // callers consult, and which dispatches the terminal event the caller is waiting for.
+  if (nullptr == curl_resource_.easy_handle)
   {
-    last_curl_result_ = construction_result_;
-    return construction_result_;
+    last_curl_result_ = header_setup_result_;
+    return header_setup_result_;
   }
 
   if (nullptr == session)
@@ -1509,6 +1544,9 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   last_curl_result_ = code;
   if (code != CURLE_OK)
   {
+    // No session owns the curl resources yet. Leave cleanup on the synchronous
+    // path so a rejected request does not leak its easy handle or header list.
+    async_data_.reset();
     const char *message = GetCurlErrorMessage(code);
     DispatchEvent(opentelemetry::ext::http::client::SessionState::ConnectFailed, message);
     return code;

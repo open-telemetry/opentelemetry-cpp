@@ -25,6 +25,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <functional>
 #include <limits>
 #include <map>
 #include <mutex>
@@ -101,6 +102,12 @@ public:
   }
 
   static size_t ReadCursor(const HttpOperation &operation) { return operation.request_nwrite_; }
+
+  static bool HasCurlResources(const HttpOperation &operation)
+  {
+    return operation.curl_resource_.easy_handle != nullptr ||
+           operation.curl_resource_.headers_chunk != nullptr;
+  }
 
   static void SetReadCursor(HttpOperation &operation, size_t value)
   {
@@ -823,6 +830,114 @@ class DISABLED_BasicCurlHttpTests : public BasicCurlHttpTests
 {};
 
 TEST_F(BasicCurlHttpTests, DoNothing) {}
+
+TEST_F(BasicCurlHttpTests, CopiesHeadersDuringConstruction)
+{
+  const http_client::HttpSslOptions ssl_options;
+  const http_client::Body body;
+  const auto compression = http_client::Compression::kNone;
+  curl::HttpOperation operation(http_client::Method::Get, "http://127.0.0.1:19000/get/",
+                                ssl_options, nullptr, {{"X-Temporary", "value"}}, body,
+                                compression);
+  EXPECT_EQ(operation.Send(), CURLE_OK);
+  EXPECT_EQ(operation.GetSessionState(), http_client::SessionState::Response);
+}
+
+TEST_F(BasicCurlHttpTests, RejectedAsyncHeadersReleaseCurlResources)
+{
+  curl::HttpClient client;
+  auto session = client.CreateSession("http://127.0.0.1:19000");
+  auto handler = std::make_shared<CustomEventHandler>();
+  const http_client::HttpSslOptions ssl_options;
+  const http_client::Headers headers = {{"baggage", "k=v;a\r\nX-Injected: 1"}};
+  const http_client::Body body;
+  const auto compression = http_client::Compression::kNone;
+  curl::HttpOperation operation(http_client::Method::Get, "http://127.0.0.1:19000/get/",
+                                ssl_options, handler.get(), headers, body, compression);
+  EXPECT_EQ(operation.SendAsync(static_cast<curl::Session *>(session.get()),
+                                [](curl::HttpOperation &) {}),
+            CURLE_BAD_FUNCTION_ARGUMENT);
+  operation.Finish();
+  operation.Cleanup();
+  EXPECT_FALSE(curl::HttpOperationTestPeer::HasCurlResources(operation));
+}
+
+TEST_F(BasicCurlHttpTests, RejectUnsafeHeadersBeforeSyncOrAsyncTransfer)
+{
+  const std::vector<std::pair<std::string, std::string>> invalid = {
+      {"baggage", "k=v;a\r\nX-Injected: 1"},
+      {"baggage", "k=v;a\r\n\r\nGET /smuggled HTTP/1.1\r\nHost: localhost"},
+      {"name", "value\r"},
+      {"name", "value\n"},
+      {"name", std::string("a\0b", 3)},
+      {"name", "value\x7f"},
+      {"name", "value\x01"},
+      {"bad\r\nname", "value"},
+      {std::string("bad\0name", 8), "value"},
+      {"bad:name", "value"},
+      {"bad name", "value"},
+      {"", "value"}};
+  curl::HttpClientSync sync;
+  curl::HttpClient async;
+  for (const auto &header : invalid)
+  {
+    SCOPED_TRACE(header.first);
+    http_client::Headers headers = {{"valid", "value"}, header};
+    auto result                  = sync.GetNoSsl("http://127.0.0.1:19000/get/", headers);
+    EXPECT_FALSE(result);
+    EXPECT_EQ(result.GetSessionState(), http_client::SessionState::ConnectFailed);
+
+    auto session = async.CreateSession("http://127.0.0.1:19000");
+    auto request = session->CreateRequest();
+    request->SetUri("get/");
+    request->AddHeader(header.first, header.second);
+    auto handler = std::make_shared<CustomEventHandler>();
+    session->SendRequest(handler);
+    EXPECT_FALSE(session->IsSessionActive());
+    EXPECT_TRUE(handler->is_called_.load());
+    EXPECT_FALSE(handler->got_response_.load());
+    session->FinishSession();
+  }
+  async.FinishAllSessions();
+  {
+    std::lock_guard<std::mutex> lock(mtx_requests);
+    EXPECT_TRUE(received_requests_.empty());
+  }
+  // A rejected request must not poison subsequent requests on the client.
+  EXPECT_TRUE(sync.GetNoSsl("http://127.0.0.1:19000/get/",
+                            {{"X-Valid", "value\twith space"}, {"X-Empty", ""}}));
+}
+
+TEST_F(BasicCurlHttpTests, PreserveHighBytesInHeaderValues)
+{
+  std::string value = "prefix";
+  for (unsigned int byte = 0x80; byte <= 0xff; ++byte)
+  {
+    value.push_back(static_cast<char>(byte));
+  }
+  value += "suffix";
+  curl::HttpClientSync sync;
+  EXPECT_TRUE(sync.GetNoSsl("http://127.0.0.1:19000/get/", {{"x-high-bytes", value}}));
+
+  curl::HttpClient async;
+  auto session = async.CreateSession("http://127.0.0.1:19000");
+  auto request = session->CreateRequest();
+  request->SetUri("get/");
+  request->AddHeader("x-high-bytes", value);
+  auto handler = std::make_shared<CustomEventHandler>();
+  session->SendRequest(handler);
+  session->FinishSession();
+  EXPECT_TRUE(handler->got_response_.load());
+
+  std::lock_guard<std::mutex> lock(mtx_requests);
+  ASSERT_EQ(received_requests_.size(), 2);
+  for (const auto &received : received_requests_)
+  {
+    const auto header = received.headers.find("X-High-Bytes");
+    ASSERT_NE(header, received.headers.end());
+    EXPECT_EQ(header->second, value);
+  }
+}
 
 TEST_F(BasicCurlHttpTests, HttpRequest)
 {
@@ -1642,123 +1757,6 @@ TEST_F(BasicCurlHttpTests, CurlAllocationHooksAreInstalled)
       << "libcurl allocated without calling the hooks, so they were installed too late";
 }
 
-// A header list that cannot be built has to end the operation. Reporting it is what stops the
-// request going out with none of the caller's headers, which for an OTLP export means no
-// Content-Type and a receiver that rejects it.
-TEST_F(BasicCurlHttpTests, AFailedHeaderAllocationIsReported)
-{
-  ASSERT_TRUE(g_curl_hooks_installed);
-
-  received_requests_.clear();
-
-  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
-  auto session         = session_manager->CreateSession("http://127.0.0.1:19000");
-  auto request         = session->CreateRequest();
-  request->SetUri("get/");
-  request->AddHeader("X-Test", "1");
-
-  auto handler = std::make_shared<ReportedStateHandler>();
-  {
-    // The operation is constructed on this thread inside SendRequest, so the switch reaches
-    // only its allocations.
-    FailCurlMalloc fail;
-    session->SendRequest(handler);
-  }
-
-  session->FinishSession();
-  session_manager->FinishAllSessions();
-
-  size_t requests_seen = 0;
-  {
-    std::unique_lock<std::mutex> lock_requests(mtx_requests);
-    requests_seen = received_requests_.size();
-  }
-
-  EXPECT_TRUE(handler->create_failed_.load(std::memory_order_acquire))
-      << "a header list that could not be built was not reported";
-  // Reporting it is only half. The easy handle is still valid here and Setup() skips
-  // CURLOPT_HTTPHEADER when the list is null, so without a construction result the request goes
-  // out anyway, carrying none of the caller's headers.
-  EXPECT_EQ(static_cast<size_t>(0), requests_seen)
-      << "the request reached the server after the failure was reported";
-
-  // Everything past here is specific to the header list having been the allocation that failed.
-  // A libcurl that took the failure somewhere else reports its own message, and says so rather
-  // than asserting against a path it did not take.
-  const std::string reason = handler->Reason();
-  if (std::string::npos == reason.find("Out of memory"))
-  {
-    GTEST_SKIP() << "this libcurl consumed the failing allocation before the header list, "
-                 << "reported as: " << reason;
-  }
-
-  EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire))
-      << "expected exactly one terminal outcome";
-}
-
-// The first header goes on and the second does not. That is the case the temporary pointer is
-// there for: curl_slist_append returns null on failure and leaves the list it was given, so
-// assigning its result straight back over the member loses everything appended so far. With one
-// header there is nothing to lose, which is why the case above cannot tell the difference.
-TEST_F(BasicCurlHttpTests, AHeaderListThatFailsPartWayThroughIsNotLost)
-{
-  ASSERT_TRUE(g_curl_hooks_installed);
-  received_requests_.clear();
-
-  auto session_manager = std::make_shared<http_client::curl::HttpCurlClientFactory>()->Create();
-  auto session         = session_manager->CreateSession("http://127.0.0.1:19000");
-  auto request         = session->CreateRequest();
-  request->SetUri("get/");
-  request->AddHeader("X-First", "1");
-  request->AddHeader("X-Second", "2");
-
-  auto handler       = std::make_shared<ReportedStateHandler>();
-  int refusals       = 0;
-  int let_through_at = 0;
-  int refused_at     = 0;
-  {
-    // Named, not counted. Which append fails is then a property of this case rather than of how
-    // the libcurl in use sizes a node, or of what it happened to allocate before reaching the
-    // header list.
-    RefuseSlistAppendOf failing{"X-First: 1", "X-Second: 2"};
-    session->SendRequest(handler);
-    refusals       = g_strdup_refusals;
-    let_through_at = g_watched_at;
-    refused_at     = g_refused_at;
-  }
-
-  session->FinishSession();
-  session_manager->FinishAllSessions();
-
-  size_t requests_seen = 0;
-  {
-    std::unique_lock<std::mutex> lock_requests(mtx_requests);
-    requests_seen = received_requests_.size();
-  }
-
-  if (0 == refusals && 0 == let_through_at)
-  {
-    GTEST_SKIP() << "this libcurl does not copy appended header strings through the allocator "
-                 << "callbacks, so an append cannot be refused by name";
-  }
-  ASSERT_EQ(1, refusals) << "this libcurl reached the allocator callbacks with the first header "
-                         << "but never with the second, so nothing below is a statement about "
-                         << "what happens when an append fails";
-  ASSERT_GT(let_through_at, 0) << "the first header was never copied, so the refusal landed on "
-                               << "an empty list and this case is not the one it says it is";
-  ASSERT_LT(let_through_at, refused_at) << "the refusal came before the first header went on, so "
-                                        << "the list it landed on was still empty";
-
-  EXPECT_TRUE(handler->create_failed_.load(std::memory_order_acquire))
-      << "a header list that could not be finished was not reported";
-  EXPECT_EQ(static_cast<size_t>(0), requests_seen)
-      << "the request reached the server carrying a header list that was never finished";
-  EXPECT_EQ(1, handler->terminal_count_.load(std::memory_order_acquire))
-      << "expected exactly one terminal outcome";
-  // LeakSanitizer is what says the nodes that were appended before the failure were freed
-  // rather than dropped.
-}
-
 // A client whose multi handle is null accepts sessions, adds none of them, and completes none
 // of them, so the failure has to be visible somewhere.
 TEST_F(BasicCurlHttpTests, AFailedMultiHandleAllocationIsReported)
@@ -1788,47 +1786,6 @@ TEST_F(BasicCurlHttpTests, AFailedMultiHandleAllocationIsReported)
 
   EXPECT_NE(std::string::npos, text.find("curl_multi_init failed"))
       << "a multi handle that could not be created was not reported, captured: " << text;
-}
-
-// SendAsync refuses a request whose header list could not be built, and Send has to refuse it
-// the same way, or a synchronous caller puts one on the wire carrying none of its headers.
-TEST_F(BasicCurlHttpTests, ASynchronousSendRefusesAFailedHeaderAllocation)
-{
-  ASSERT_TRUE(g_curl_hooks_installed);
-  received_requests_.clear();
-
-  // The operation keeps references to these, so they outlive it.
-  const http_client::HttpSslOptions no_ssl;
-  const http_client::Body body;
-  const http_client::Headers headers         = {{"X-Test", "1"}};
-  const http_client::Compression compression = http_client::Compression::kNone;
-
-  std::unique_ptr<curl::HttpOperation> operation;
-  {
-    // Only the constructor allocates under the switch. Send needs its own allocations to work.
-    FailCurlMalloc fail;
-    operation.reset(new curl::HttpOperation(http_client::Method::Get, "http://127.0.0.1:19000/get/",
-                                            no_ssl, nullptr, headers, body, compression));
-  }
-
-  const CURLcode result = operation->Send();
-
-  size_t requests_seen = 0;
-  {
-    std::unique_lock<std::mutex> lock_requests(mtx_requests);
-    requests_seen = received_requests_.size();
-  }
-
-  EXPECT_EQ(static_cast<size_t>(0), requests_seen)
-      << "a synchronous request went out after its setup had failed";
-
-  if (CURLE_OUT_OF_MEMORY != result)
-  {
-    GTEST_SKIP() << "this libcurl consumed the failing allocation before the header list, "
-                 << "reported as: " << curl_easy_strerror(result);
-  }
-  EXPECT_EQ(CURLE_OUT_OF_MEMORY, operation->GetLastResultCode())
-      << "the refusal was not recorded as the last result";
 }
 
 // Both constructors reach the multi handle through the same helper, so the overload that takes
