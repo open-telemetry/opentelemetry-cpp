@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] End the Elasticsearch exporter's wait on a read or write error
+  [#4331](https://github.com/open-telemetry/opentelemetry-cpp/pull/4331)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
