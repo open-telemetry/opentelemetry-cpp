@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Remove a curl easy handle from the multi handle before freeing that
+  handle and the header list it points at, and keep both when libcurl will not
+  take the handle back
+  [#4391](https://github.com/open-telemetry/opentelemetry-cpp/issues/4391)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
@@ -164,18 +169,6 @@ Changes:
 
 * chore: fix duplicated and incorrect SpinLockMutex comments
   [#4641](https://github.com/open-telemetry/opentelemetry-cpp/pull/4641)
-* [SDK] Fix spatial re-aggregation for asynchronous instruments. A view which
-  drops attributes is now applied to asynchronous instruments as well, and the
-  observations which collapse onto the same attribute set are re-aggregated
-  (summed up for the additive instruments) instead of the last observation
-  overwriting the previous ones.
-  Note that `AsyncMetricStorage`'s constructor now takes the view's
-  `AttributesProcessor`, matching `SyncMetricStorage`.
-  [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
-* [BUG] Remove a curl easy handle from the multi handle before freeing that
-  handle and the header list it points at, and keep both when libcurl will not
-  take the handle back
-  [#4391](https://github.com/open-telemetry/opentelemetry-cpp/issues/4391)
 
 * Update dependency curl to v8.22.0
   [#4645](https://github.com/open-telemetry/opentelemetry-cpp/pull/4645)
