@@ -28,7 +28,7 @@
 #endif
 
 #ifdef OTEL_CURL_DEBUG
-#  include <cctype>
+#  include "opentelemetry/common/detail/ascii.h"
 #endif
 
 #include "opentelemetry/common/string_util.h"
@@ -47,6 +47,33 @@
 
 namespace
 {
+
+bool IsValidRequestHeader(const std::string &name, const std::string &value)
+{
+  if (name.empty())
+  {
+    return false;
+  }
+  for (char ch : name)
+  {
+    if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') ||
+          opentelemetry::nostd::string_view("!#$%&'*+-.^_`|~").find(ch) !=
+              opentelemetry::nostd::string_view::npos))
+    {
+      return false;
+    }
+  }
+  for (unsigned char ch : value)
+  {
+    // field-vchar / SP / HTAB / obs-text. In particular, never pass CR, LF
+    // or an embedded NUL to libcurl's verbatim, NUL-terminated header API.
+    if ((ch < 0x20 && ch != '\t') || ch == 0x7f)
+    {
+      return false;
+    }
+  }
+  return true;
+}
 
 bool FindRetryAfterValue(const std::vector<uint8_t> &raw_headers,
                          opentelemetry::nostd::string_view &value)
@@ -478,14 +505,30 @@ HttpOperation::HttpOperation(opentelemetry::ext::http::client::Method method,
     return;
   }
 
-  // Specify our custom headers
-  if (!this->request_headers_.empty())
+  // Validate before libcurl copies these borrowed headers. Setup reports any
+  // failure before either the synchronous or asynchronous path can send.
+  for (const auto &kv : request_headers_)
   {
-    for (auto &kv : this->request_headers_)
+    if (!IsValidRequestHeader(kv.first, kv.second))
+    {
+      header_setup_result_ = CURLE_BAD_FUNCTION_ARGUMENT;
+      break;
+    }
+  }
+  if (header_setup_result_ == CURLE_OK)
+  {
+    for (const auto &kv : request_headers_)
     {
       const auto header = std::string(kv.first).append(": ").append(kv.second);
-      curl_resource_.headers_chunk =
-          curl_slist_append(curl_resource_.headers_chunk, header.c_str());
+      auto *headers     = curl_slist_append(curl_resource_.headers_chunk, header.c_str());
+      if (headers == nullptr)
+      {
+        curl_slist_free_all(curl_resource_.headers_chunk);
+        curl_resource_.headers_chunk = nullptr;
+        header_setup_result_         = CURLE_OUT_OF_MEMORY;
+        break;
+      }
+      curl_resource_.headers_chunk = headers;
     }
   }
 
@@ -839,7 +882,7 @@ int HttpOperation::CurlLoggerCallback(const CURL * /* handle */,
   {
     static const auto kHeaderSent = nostd::string_view("Send header => ");
 
-    while (!text_to_log.empty() && !std::iscntrl(text_to_log[0]))
+    while (!text_to_log.empty() && !opentelemetry::common::detail::IsAsciiControl(text_to_log[0]))
     {
       const auto pos = text_to_log.find('\n');
 
@@ -875,6 +918,11 @@ CURLcode HttpOperation::Setup()
 
   curl_error_message_[0] = '\0';
   curl_easy_setopt(curl_resource_.easy_handle, CURLOPT_ERRORBUFFER, curl_error_message_);
+
+  if (header_setup_result_ != CURLE_OK)
+  {
+    return header_setup_result_;
+  }
 
 // Support for custom debug function callback was added in version 7.9.6 so we guard against
 // exposing the default CURL output by keeping verbosity always disabled in lower versions.
@@ -1474,6 +1522,9 @@ CURLcode HttpOperation::SendAsync(Session *session, std::function<void(HttpOpera
   last_curl_result_ = code;
   if (code != CURLE_OK)
   {
+    // No session owns the curl resources yet. Leave cleanup on the synchronous
+    // path so a rejected request does not leak its easy handle or header list.
+    async_data_.reset();
     const char *message = GetCurlErrorMessage(code);
     DispatchEvent(opentelemetry::ext::http::client::SessionState::ConnectFailed, message);
     return code;

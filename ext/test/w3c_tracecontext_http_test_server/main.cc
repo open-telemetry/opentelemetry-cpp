@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <atomic>
-#include <cctype>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
@@ -15,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
@@ -55,7 +55,8 @@ static bool equalsIgnoreCase(const std::string &str1, const std::string &str2)
   }
   for (size_t i = 0; i < str1.length(); i++)
   {
-    if (std::tolower(str1[i]) != std::tolower(str2[i]))
+    if (opentelemetry::common::detail::ToAsciiLower(str1[i]) !=
+        opentelemetry::common::detail::ToAsciiLower(str2[i]))
     {
       return false;
     }

@@ -16,6 +16,21 @@ otel_cc_benchmark(
 )
 
 cc_test(
+    name = "ascii_test",
+    srcs = [
+        "ascii_test.cc",
+    ],
+    tags = [
+        "api",
+        "test",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "kv_properties_test",
     srcs = [
         "kv_properties_test.cc",
