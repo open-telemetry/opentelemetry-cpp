@@ -88,17 +88,17 @@ TEST_P(CounterWritableMetricStorageTestFixture, LongCounterSumAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<LongSumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(data.value_, expected_total_get_requests);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(data.value_, expected_total_put_requests);
             count_attributes++;
           }
         }
@@ -123,18 +123,18 @@ TEST_P(CounterWritableMetricStorageTestFixture, LongCounterSumAggregation)
         }
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<LongSumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
             count_attributes++;
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(data.value_, expected_total_get_requests);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
             count_attributes++;
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(data.value_, expected_total_put_requests);
           }
         }
         return true;
@@ -157,17 +157,17 @@ TEST_P(CounterWritableMetricStorageTestFixture, LongCounterSumAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<LongSumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(data.value_, expected_total_get_requests);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<int64_t>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(data.value_, expected_total_put_requests);
             count_attributes++;
           }
         }
@@ -232,17 +232,17 @@ TEST_P(CounterWritableMetricStorageTestFixture, DoubleCounterSumAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<DoubleSumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(data.value_, expected_total_get_requests);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(data.value_, expected_total_put_requests);
             count_attributes++;
           }
         }
@@ -269,18 +269,18 @@ TEST_P(CounterWritableMetricStorageTestFixture, DoubleCounterSumAggregation)
         }
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<DoubleSumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
             count_attributes++;
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(data.value_, expected_total_get_requests);
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
             count_attributes++;
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(data.value_, expected_total_put_requests);
           }
         }
         return true;
@@ -305,17 +305,17 @@ TEST_P(CounterWritableMetricStorageTestFixture, DoubleCounterSumAggregation)
       collector.get(), collectors, sdk_start_ts, collection_ts, [&](const MetricData &metric_data) {
         for (const auto &data_attr : metric_data.point_data_attr_)
         {
-          const auto &data = opentelemetry::nostd::get<SumPointData>(data_attr.point_data);
+          const auto &data = opentelemetry::nostd::get<DoubleSumPointData>(data_attr.point_data);
           if (opentelemetry::nostd::get<std::string>(
                   data_attr.attributes.find("RequestType")->second) == "GET")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_get_requests);
+            EXPECT_EQ(data.value_, expected_total_get_requests);
             count_attributes++;
           }
           else if (opentelemetry::nostd::get<std::string>(
                        data_attr.attributes.find("RequestType")->second) == "PUT")
           {
-            EXPECT_EQ(opentelemetry::nostd::get<double>(data.value_), expected_total_put_requests);
+            EXPECT_EQ(data.value_, expected_total_put_requests);
             count_attributes++;
           }
         }

@@ -119,8 +119,8 @@ int64_t SumLongFor(SyncMetricStorage &storage,
                       }
                       if (match)
                       {
-                        const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                        total += opentelemetry::nostd::get<int64_t>(sp.value_);
+                        const auto &sp = opentelemetry::nostd::get<LongSumPointData>(p.point_data);
+                        total += sp.value_;
                       }
                     }
                     return true;
@@ -225,8 +225,8 @@ TEST(BoundSyncInstruments, BoundCounterBindEmptyAttributes)
                     for (const auto &p : md.point_data_attr_)
                     {
                       EXPECT_TRUE(p.attributes.empty());
-                      const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                      EXPECT_EQ(opentelemetry::nostd::get<int64_t>(sp.value_), 5);
+                      const auto &sp = opentelemetry::nostd::get<LongSumPointData>(p.point_data);
+                      EXPECT_EQ(sp.value_, 5);
                       seen = true;
                     }
                     return true;
@@ -586,8 +586,8 @@ TEST(BoundSyncInstruments, BoundSurvivesCumulativeCollect)
                     std::chrono::system_clock::now(), [&](const MetricData &md) {
                       for (const auto &p : md.point_data_attr_)
                       {
-                        const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                        total += opentelemetry::nostd::get<int64_t>(sp.value_);
+                        const auto &sp = opentelemetry::nostd::get<LongSumPointData>(p.point_data);
+                        total += sp.value_;
                       }
                       return true;
                     });
@@ -627,8 +627,8 @@ TEST(BoundSyncInstruments, BoundAndUnboundShareDatapoint)
                     count += md.point_data_attr_.size();
                     for (const auto &p : md.point_data_attr_)
                     {
-                      const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                      total += opentelemetry::nostd::get<int64_t>(sp.value_);
+                      const auto &sp = opentelemetry::nostd::get<LongSumPointData>(p.point_data);
+                      total += sp.value_;
                     }
                     return true;
                   });
@@ -672,8 +672,8 @@ TEST(BoundSyncInstruments, BindingAtOverflowGoesToOverflowBucket)
                       if (p.attributes.find(kAttributesLimitOverflowKey) != p.attributes.end())
                       {
                         seen           = true;
-                        const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                        ov_value += opentelemetry::nostd::get<int64_t>(sp.value_);
+                        const auto &sp = opentelemetry::nostd::get<LongSumPointData>(p.point_data);
+                        ov_value += sp.value_;
                       }
                     }
                     return true;
@@ -801,8 +801,8 @@ TEST(BoundSyncInstruments, BindOnExistingUnboundKeyDoesNotOverflow)
           auto it = p.attributes.find("k");
           if (it != p.attributes.end() && opentelemetry::nostd::get<std::string>(it->second) == "1")
           {
-            const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-            a1_sum += opentelemetry::nostd::get<int64_t>(sp.value_);
+            const auto &sp = opentelemetry::nostd::get<LongSumPointData>(p.point_data);
+            a1_sum += sp.value_;
           }
         }
         return true;
@@ -842,8 +842,8 @@ TEST(BoundSyncInstruments, UnboundOnExistingBoundKeyDoesNotOverflow)
                       auto it = p.attributes.find("k");
                       if (it == p.attributes.end())
                         continue;
-                      const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                      auto v         = opentelemetry::nostd::get<int64_t>(sp.value_);
+                      const auto &sp = opentelemetry::nostd::get<LongSumPointData>(p.point_data);
+                      auto v         = sp.value_;
                       auto s         = opentelemetry::nostd::get<std::string>(it->second);
                       if (s == "1")
                         a1_sum += v;
@@ -907,8 +907,8 @@ TEST(BoundSyncInstruments, RetainedBoundEntriesOverflowValue)
                     {
                       if (p.attributes.find(kAttributesLimitOverflowKey) == p.attributes.end())
                         continue;
-                      const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                      overflow_sum += opentelemetry::nostd::get<int64_t>(sp.value_);
+                      const auto &sp = opentelemetry::nostd::get<LongSumPointData>(p.point_data);
+                      overflow_sum += sp.value_;
                     }
                     return true;
                   });
@@ -941,8 +941,8 @@ TEST(BoundSyncInstruments, NoAttributeUnboundFollowsUnifiedPolicyLong)
                     {
                       if (p.attributes.find(kAttributesLimitOverflowKey) == p.attributes.end())
                         continue;
-                      const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                      overflow_sum += opentelemetry::nostd::get<int64_t>(sp.value_);
+                      const auto &sp = opentelemetry::nostd::get<LongSumPointData>(p.point_data);
+                      overflow_sum += sp.value_;
                     }
                     return true;
                   });
@@ -972,8 +972,8 @@ TEST(BoundSyncInstruments, NoAttributeUnboundFollowsUnifiedPolicyDouble)
                     {
                       if (p.attributes.find(kAttributesLimitOverflowKey) == p.attributes.end())
                         continue;
-                      const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                      overflow_sum += opentelemetry::nostd::get<double>(sp.value_);
+                      const auto &sp = opentelemetry::nostd::get<DoubleSumPointData>(p.point_data);
+                      overflow_sum += sp.value_;
                     }
                     return true;
                   });
@@ -1014,8 +1014,8 @@ TEST(BoundSyncInstruments, MixedBoundUnboundAcrossCumulativeCollections)
                     std::chrono::system_clock::now(), [&](const MetricData &md) {
                       for (const auto &p : md.point_data_attr_)
                       {
-                        const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                        total += opentelemetry::nostd::get<int64_t>(sp.value_);
+                        const auto &sp = opentelemetry::nostd::get<LongSumPointData>(p.point_data);
+                        total += sp.value_;
                       }
                       return true;
                     });
@@ -1117,8 +1117,8 @@ TEST(BoundSyncInstruments, OverflowParityAllowsFillingRemainingSlot)
                           opentelemetry::nostd::get<std::string>(it->second) == "key")
                       {
                         a5_seen        = true;
-                        const auto &sp = opentelemetry::nostd::get<SumPointData>(p.point_data);
-                        a5_value       = opentelemetry::nostd::get<int64_t>(sp.value_);
+                        const auto &sp = opentelemetry::nostd::get<LongSumPointData>(p.point_data);
+                        a5_value       = sp.value_;
                       }
                     }
                     return true;

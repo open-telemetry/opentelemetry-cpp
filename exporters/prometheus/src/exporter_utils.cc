@@ -149,7 +149,16 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
       bool is_monotonic  = true;
       if (kind == sdk::metrics::AggregationType::kSum)
       {
-        is_monotonic = nostd::get<sdk::metrics::SumPointData>(front.point_data).is_monotonic_;
+        if (auto *long_point_data =
+                nostd::get_if<sdk::metrics::LongSumPointData>(&front.point_data))
+        {
+          is_monotonic = long_point_data->is_monotonic_;
+        }
+        else if (auto *double_point_data =
+                     nostd::get_if<sdk::metrics::DoubleSumPointData>(&front.point_data))
+        {
+          is_monotonic = double_point_data->is_monotonic_;
+        }
       }
       const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
       metric_family.name = MapToPrometheusName(metric_data.instrument_descriptor.name_,
@@ -191,10 +200,20 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
             SetData(values, point_data_attr.attributes, scope, type, &metric_family,
                     data.resource_);
           }
-          else if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
+          else if (nostd::holds_alternative<sdk::metrics::LongSumPointData>(
+                       point_data_attr.point_data))
           {
             auto sum_point_data =
-                nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
+                nostd::get<sdk::metrics::LongSumPointData>(point_data_attr.point_data);
+            std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
+            SetData(values, point_data_attr.attributes, scope, type, &metric_family,
+                    data.resource_);
+          }
+          else if (nostd::holds_alternative<sdk::metrics::DoubleSumPointData>(
+                       point_data_attr.point_data))
+          {
+            auto sum_point_data =
+                nostd::get<sdk::metrics::DoubleSumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
             SetData(values, point_data_attr.attributes, scope, type, &metric_family,
                     data.resource_);
@@ -208,10 +227,19 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
         }
         else  // Counter, Untyped
         {
-          if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_data_attr.point_data))
+          if (nostd::holds_alternative<sdk::metrics::LongSumPointData>(point_data_attr.point_data))
           {
             auto sum_point_data =
-                nostd::get<sdk::metrics::SumPointData>(point_data_attr.point_data);
+                nostd::get<sdk::metrics::LongSumPointData>(point_data_attr.point_data);
+            std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
+            SetData(values, point_data_attr.attributes, scope, type, &metric_family,
+                    data.resource_);
+          }
+          else if (nostd::holds_alternative<sdk::metrics::DoubleSumPointData>(
+                       point_data_attr.point_data))
+          {
+            auto sum_point_data =
+                nostd::get<sdk::metrics::DoubleSumPointData>(point_data_attr.point_data);
             std::vector<metric_sdk::ValueType> values{sum_point_data.value_};
             SetData(values, point_data_attr.attributes, scope, type, &metric_family,
                     data.resource_);
@@ -539,7 +567,11 @@ metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
     const metric_sdk::PointType &point_type)
 {
 
-  if (nostd::holds_alternative<sdk::metrics::SumPointData>(point_type))
+  if (nostd::holds_alternative<sdk::metrics::LongSumPointData>(point_type))
+  {
+    return metric_sdk::AggregationType::kSum;
+  }
+  else if (nostd::holds_alternative<sdk::metrics::DoubleSumPointData>(point_type))
   {
     return metric_sdk::AggregationType::kSum;
   }

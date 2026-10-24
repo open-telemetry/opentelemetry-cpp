@@ -31,11 +31,11 @@ struct TestDataPoints
   /**
    * Helper function to create ResourceMetrics
    */
-  inline metric_sdk::ResourceMetrics CreateSumPointData()
+  inline metric_sdk::ResourceMetrics CreateDoubleSumPointData()
   {
-    metric_sdk::SumPointData sum_point_data{};
+    metric_sdk::DoubleSumPointData sum_point_data{};
     sum_point_data.value_ = 10.0;
-    metric_sdk::SumPointData sum_point_data2{};
+    metric_sdk::DoubleSumPointData sum_point_data2{};
     sum_point_data2.value_ = 20.0;
     metric_sdk::ResourceMetrics data;
     data.resource_ = &resource;
@@ -175,10 +175,18 @@ inline bool operator==(const metric_sdk::MetricData &lhs, const metric_sdk::Metr
     }
     auto &lhs_point_data = lhs.point_data_attr_.at(idx).point_data;
     auto &rhs_point_data = rhs.point_data_attr_.at(idx).point_data;
-    if (nostd::holds_alternative<metric_sdk::SumPointData>(lhs_point_data))
+    if (nostd::holds_alternative<metric_sdk::LongSumPointData>(lhs_point_data))
     {
-      if (nostd::get<metric_sdk::SumPointData>(lhs_point_data).value_ !=
-          nostd::get<metric_sdk::SumPointData>(rhs_point_data).value_)
+      if (nostd::get<metric_sdk::LongSumPointData>(lhs_point_data).value_ !=
+          nostd::get<metric_sdk::LongSumPointData>(rhs_point_data).value_)
+      {
+        return false;
+      }
+    }
+    else if (nostd::holds_alternative<metric_sdk::DoubleSumPointData>(lhs_point_data))
+    {
+      if (nostd::get<metric_sdk::DoubleSumPointData>(lhs_point_data).value_ !=
+          nostd::get<metric_sdk::DoubleSumPointData>(rhs_point_data).value_)
       {
         return false;
       }

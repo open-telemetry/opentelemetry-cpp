@@ -162,12 +162,12 @@ public:
         if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
         {
           return std::unique_ptr<Aggregation>(
-              new LongSumAggregation(nostd::get<SumPointData>(point_data)));
+              new LongSumAggregation(nostd::get<LongSumPointData>(point_data)));
         }
         else
         {
           return std::unique_ptr<Aggregation>(
-              new DoubleSumAggregation(nostd::get<SumPointData>(point_data)));
+              new DoubleSumAggregation(nostd::get<DoubleSumPointData>(point_data)));
         }
       default:
         return nullptr;  // won't reach here

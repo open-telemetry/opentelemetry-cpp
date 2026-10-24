@@ -35,7 +35,7 @@ public:
   {
     std::this_thread::sleep_for(sleep_ms_);
     data_sent_size_++;
-    ResourceMetrics data = test_data_points_.CreateSumPointData();
+    ResourceMetrics data = test_data_points_.CreateDoubleSumPointData();
     return {data, MetricProducer::Status::kSuccess};
   }
 

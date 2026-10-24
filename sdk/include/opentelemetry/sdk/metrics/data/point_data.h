@@ -21,6 +21,7 @@ using ValueType = nostd::variant<int64_t, double>;
 // TODO: remove ctors and initializers from below classes when GCC<5 stops
 // shipping on Ubuntu
 
+template <class T>
 class SumPointData
 {
 public:
@@ -32,9 +33,12 @@ public:
   SumPointData &operator=(const SumPointData &other) = default;
   ~SumPointData()                                    = default;
 
-  ValueType value_   = {};
+  T value_           = {};
   bool is_monotonic_ = true;
 };
+
+typedef SumPointData<int64_t> LongSumPointData;
+typedef SumPointData<double> DoubleSumPointData;
 
 class LastValuePointData
 {
