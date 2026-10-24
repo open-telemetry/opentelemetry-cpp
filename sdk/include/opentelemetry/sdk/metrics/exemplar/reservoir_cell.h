@@ -73,7 +73,7 @@ public:
 
     if (const int64_t *value = nostd::get_if<int64_t>(&value_))
     {
-      point_data_attributes.point_data = ExemplarData::CreateSumPointData(*value);
+      point_data_attributes.point_data = ExemplarData::CreateLongSumPointData(*value);
     }
     std::shared_ptr<ExemplarData> result{
         new ExemplarData{ExemplarData::Create(context_, record_time_, point_data_attributes)}};
@@ -97,7 +97,7 @@ public:
     point_data_attributes.attributes = filtered(attributes, point_attributes);
     if (const double *value = nostd::get_if<double>(&value_))
     {
-      point_data_attributes.point_data = ExemplarData::CreateSumPointData(*value);
+      point_data_attributes.point_data = ExemplarData::CreateDoubleSumPointData(*value);
     }
     std::shared_ptr<ExemplarData> result{
         new ExemplarData{ExemplarData::Create(context_, record_time_, point_data_attributes)}};

@@ -51,7 +51,7 @@ void BM_SumAggregation(benchmark::State &state)
   {
     measurements[i] = static_cast<double>(distribution(generator));
   }
-  std::vector<SumPointData> actuals;
+  std::vector<DoubleSumPointData> actuals;
   std::vector<std::thread> collectionThreads;
   std::function<void()> collectMetrics = [&reader, &actuals]() {
     reader->Collect([&](ResourceMetrics &rm) {
@@ -61,7 +61,7 @@ void BM_SumAggregation(benchmark::State &state)
         {
           for (const PointDataAttributes &dp : md.point_data_attr_)
           {
-            actuals.push_back(opentelemetry::nostd::get<SumPointData>(dp.point_data));
+            actuals.push_back(opentelemetry::nostd::get<DoubleSumPointData>(dp.point_data));
           }
         }
       }

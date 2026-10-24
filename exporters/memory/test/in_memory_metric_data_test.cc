@@ -18,11 +18,11 @@
 
 using opentelemetry::exporter::memory::CircularBufferInMemoryMetricData;
 using opentelemetry::exporter::memory::SimpleAggregateInMemoryMetricData;
+using opentelemetry::sdk::metrics::DoubleSumPointData;
 using opentelemetry::sdk::metrics::MetricData;
 using opentelemetry::sdk::metrics::PointDataAttributes;
 using opentelemetry::sdk::metrics::ResourceMetrics;
 using opentelemetry::sdk::metrics::ScopeMetrics;
-using opentelemetry::sdk::metrics::SumPointData;
 using opentelemetry::sdk::resource::Resource;
 
 TEST(InMemoryMetricDataTest, CircularBuffer)
@@ -43,7 +43,7 @@ TEST(InMemoryMetricDataTest, SimpleAggregate)
   auto scope = opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create(
       "my-scope", "1.0.0", "http://example.com");
 
-  SumPointData spd;
+  DoubleSumPointData spd;
   spd.value_ = 42.0;
   PointDataAttributes pda{{{"hello", "world"}}, spd};
 
@@ -55,7 +55,7 @@ TEST(InMemoryMetricDataTest, SimpleAggregate)
       &resource, std::vector<ScopeMetrics>{{scope.get(), std::vector<MetricData>{md}}}}));
   auto it = agg.Get("my-scope", "my-metric").begin();
 
-  auto saved_point = opentelemetry::nostd::get<SumPointData>(it->second);
+  auto saved_point = opentelemetry::nostd::get<DoubleSumPointData>(it->second);
 
-  EXPECT_EQ(opentelemetry::nostd::get<double>(saved_point.value_), 42.0);
+  EXPECT_EQ(saved_point.value_, 42.0);
 }

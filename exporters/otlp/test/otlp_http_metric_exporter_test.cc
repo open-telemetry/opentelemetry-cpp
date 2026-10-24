@@ -168,9 +168,9 @@ public:
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
-    opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+    opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data{};
     sum_point_data.value_ = 10.0;
-    opentelemetry::sdk::metrics::SumPointData sum_point_data2{};
+    opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data2{};
     sum_point_data2.value_ = 20.0;
     opentelemetry::sdk::metrics::ResourceMetrics data;
     auto resource = opentelemetry::sdk::resource::Resource::Create(
@@ -268,9 +268,9 @@ public:
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
-    opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+    opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data{};
     sum_point_data.value_ = 10.0;
-    opentelemetry::sdk::metrics::SumPointData sum_point_data2{};
+    opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data2{};
     sum_point_data2.value_ = 20.0;
     opentelemetry::sdk::metrics::ResourceMetrics data;
     auto resource = opentelemetry::sdk::resource::Resource::Create(
@@ -486,9 +486,9 @@ public:
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
-    opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+    opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data{};
     sum_point_data.value_ = 10.0;
-    opentelemetry::sdk::metrics::SumPointData sum_point_data2{};
+    opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data2{};
     sum_point_data2.value_ = 20.0;
     opentelemetry::sdk::metrics::ResourceMetrics data;
     auto resource = opentelemetry::sdk::resource::Resource::Create(
@@ -754,9 +754,9 @@ public:
     auto client                = mock_otlp_client.second;
     auto exporter = GetExporter(std::unique_ptr<OtlpHttpClient>{mock_otlp_http_client});
 
-    opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+    opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data{};
     sum_point_data.value_ = 10.0;
-    opentelemetry::sdk::metrics::SumPointData sum_point_data2{};
+    opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data2{};
     sum_point_data2.value_ = 20.0;
     opentelemetry::sdk::metrics::ResourceMetrics data;
     auto resource = opentelemetry::sdk::resource::Resource::Create(
@@ -1277,7 +1277,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportPartialSuccess)
   auto mock_session =
       std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
 
-  opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+  opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data{};
   sum_point_data.value_ = 10.0;
   opentelemetry::sdk::metrics::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
@@ -1336,7 +1336,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportPartialSuccessJson)
   auto mock_session =
       std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
 
-  opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+  opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data{};
   sum_point_data.value_ = 10.0;
   opentelemetry::sdk::metrics::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
@@ -1392,7 +1392,7 @@ TEST_F(OtlpHttpMetricExporterTestPeer, ExportParseFailureReturnsFailure)
   auto mock_session =
       std::static_pointer_cast<http_client::nosend::Session>(no_send_client->session_);
 
-  opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+  opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data{};
   sum_point_data.value_ = 10.0;
   opentelemetry::sdk::metrics::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(

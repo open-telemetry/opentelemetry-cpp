@@ -41,7 +41,7 @@ static metrics_sdk::MetricData CreateSumAggregationData()
   metrics_sdk::InstrumentDescriptor inst_desc = {"Counter", "desc", "unit",
                                                  metrics_sdk::InstrumentType::kCounter,
                                                  metrics_sdk::InstrumentValueType::kDouble};
-  metrics_sdk::SumPointData s_data_1, s_data_2;
+  metrics_sdk::DoubleSumPointData s_data_1, s_data_2;
   s_data_1.value_ = 10.2;
   s_data_2.value_ = 20.2;
 

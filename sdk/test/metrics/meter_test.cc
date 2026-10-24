@@ -265,9 +265,13 @@ protected:
     };
 
     auto get_point_data_sum = [&value_to_double](const PointType &point_data) -> PointDataSum {
-      if (auto *sum_point_data = nostd::get_if<sdk::metrics::SumPointData>(&point_data))
+      if (auto *sum_point_data = nostd::get_if<sdk::metrics::LongSumPointData>(&point_data))
       {
         return PointDataSum{AggregationType::kSum, value_to_double(sum_point_data->value_)};
+      }
+      if (auto *sum_point_data = nostd::get_if<sdk::metrics::DoubleSumPointData>(&point_data))
+      {
+        return PointDataSum{AggregationType::kSum, sum_point_data->value_};
       }
       else if (auto *histogram_point_data =
                    nostd::get_if<sdk::metrics::HistogramPointData>(&point_data))

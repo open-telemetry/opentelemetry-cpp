@@ -74,7 +74,7 @@ TEST(HistogramToSum, Double)
   h->Record(50, {});
   h->Record(1e6, {});
 
-  std::vector<SumPointData> actuals;
+  std::vector<DoubleSumPointData> actuals;
   reader->Collect([&](ResourceMetrics &rm) {
     for (const ScopeMetrics &smd : rm.scope_metric_data_)
     {
@@ -82,7 +82,7 @@ TEST(HistogramToSum, Double)
       {
         for (const PointDataAttributes &dp : md.point_data_attr_)
         {
-          actuals.push_back(opentelemetry::nostd::get<SumPointData>(dp.point_data));
+          actuals.push_back(opentelemetry::nostd::get<DoubleSumPointData>(dp.point_data));
         }
       }
     }
@@ -91,7 +91,7 @@ TEST(HistogramToSum, Double)
 
   ASSERT_EQ(1, actuals.size());
   const auto &actual = actuals.at(0);
-  ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.value_));
+  ASSERT_EQ(1000275.0, actual.value_);
 }
 
 TEST(HistogramToSumFilterAttributes, Double)
@@ -134,9 +134,9 @@ TEST(HistogramToSumFilterAttributes, Double)
         EXPECT_EQ(1, md.point_data_attr_.size());
         if (md.point_data_attr_.size() == 1)
         {
-          EXPECT_EQ(15.0, opentelemetry::nostd::get<double>(opentelemetry::nostd::get<SumPointData>(
-                                                                md.point_data_attr_[0].point_data)
-                                                                .value_));
+          EXPECT_EQ(15.0,
+                    opentelemetry::nostd::get<DoubleSumPointData>(md.point_data_attr_[0].point_data)
+                        .value_);
           EXPECT_EQ(1, md.point_data_attr_[0].attributes.size());
           EXPECT_NE(md.point_data_attr_[0].attributes.end(),
                     md.point_data_attr_[0].attributes.find("attr1"));
@@ -203,10 +203,10 @@ TEST(HistogramToSumFilterAttributesWithCardinalityLimit, Double)
             if (md.point_data_attr_[i].attributes.end() !=
                 md.point_data_attr_[i].attributes.find("attr1"))
             {
-              EXPECT_EQ(total_metrics_times * (repeat + 1),
-                        opentelemetry::nostd::get<double>(opentelemetry::nostd::get<SumPointData>(
-                                                              md.point_data_attr_[i].point_data)
-                                                              .value_));
+              EXPECT_EQ(
+                  total_metrics_times * (repeat + 1),
+                  opentelemetry::nostd::get<DoubleSumPointData>(md.point_data_attr_[i].point_data)
+                      .value_);
             }
             else
             {
@@ -257,7 +257,7 @@ TEST(CounterToSum, Double)
   h->Add(50, {});
   h->Add(1e6, {});
 
-  std::vector<SumPointData> actuals;
+  std::vector<DoubleSumPointData> actuals;
   reader->Collect([&](ResourceMetrics &rm) {
     for (const ScopeMetrics &smd : rm.scope_metric_data_)
     {
@@ -265,7 +265,7 @@ TEST(CounterToSum, Double)
       {
         for (const PointDataAttributes &dp : md.point_data_attr_)
         {
-          actuals.push_back(opentelemetry::nostd::get<SumPointData>(dp.point_data));
+          actuals.push_back(opentelemetry::nostd::get<DoubleSumPointData>(dp.point_data));
         }
       }
     }
@@ -274,7 +274,7 @@ TEST(CounterToSum, Double)
 
   ASSERT_EQ(1, actuals.size());
   const auto &actual = actuals.at(0);
-  ASSERT_EQ(1000275.0, opentelemetry::nostd::get<double>(actual.value_));
+  ASSERT_EQ(1000275.0, actual.value_);
 }
 
 TEST(CounterToSumFilterAttributes, Double)
@@ -317,9 +317,9 @@ TEST(CounterToSumFilterAttributes, Double)
         EXPECT_EQ(1, md.point_data_attr_.size());
         if (md.point_data_attr_.size() == 1)
         {
-          EXPECT_EQ(15.0, opentelemetry::nostd::get<double>(opentelemetry::nostd::get<SumPointData>(
-                                                                md.point_data_attr_[0].point_data)
-                                                                .value_));
+          EXPECT_EQ(15.0,
+                    opentelemetry::nostd::get<DoubleSumPointData>(md.point_data_attr_[0].point_data)
+                        .value_);
           EXPECT_EQ(1, md.point_data_attr_[0].attributes.size());
           EXPECT_NE(md.point_data_attr_[0].attributes.end(),
                     md.point_data_attr_[0].attributes.find("attr1"));
@@ -388,10 +388,10 @@ TEST(CounterToSumFilterAttributesWithCardinalityLimit, Double)
             if (md.point_data_attr_[i].attributes.find("attr1") !=
                 md.point_data_attr_[i].attributes.end())
             {
-              EXPECT_EQ(total_metrics_times * (repeat + 1),
-                        opentelemetry::nostd::get<double>(opentelemetry::nostd::get<SumPointData>(
-                                                              md.point_data_attr_[i].point_data)
-                                                              .value_));
+              EXPECT_EQ(
+                  total_metrics_times * (repeat + 1),
+                  opentelemetry::nostd::get<DoubleSumPointData>(md.point_data_attr_[i].point_data)
+                      .value_);
             }
             else
             {
@@ -468,8 +468,7 @@ TEST(AsyncCounterToSumFilterAttributes, Double)
         for (const PointDataAttributes &dp : md.point_data_attr_)
         {
           ++collected_points;
-          EXPECT_EQ(3.0, opentelemetry::nostd::get<double>(
-                             opentelemetry::nostd::get<SumPointData>(dp.point_data).value_));
+          EXPECT_EQ(3.0, opentelemetry::nostd::get<DoubleSumPointData>(dp.point_data).value_);
           EXPECT_EQ(1, dp.attributes.size());
           EXPECT_NE(dp.attributes.end(), dp.attributes.find("attr1"));
           EXPECT_EQ(dp.attributes.end(), dp.attributes.find("version"));
@@ -520,7 +519,7 @@ TEST_P(UpDownCounterToSumFixture, Double)
   h->Add(25, {});
   h->Add(-30, {});
 
-  std::vector<SumPointData> actuals;
+  std::vector<DoubleSumPointData> actuals;
   reader->Collect([&](ResourceMetrics &rm) {
     for (const ScopeMetrics &smd : rm.scope_metric_data_)
     {
@@ -528,7 +527,7 @@ TEST_P(UpDownCounterToSumFixture, Double)
       {
         for (const PointDataAttributes &dp : md.point_data_attr_)
         {
-          actuals.push_back(opentelemetry::nostd::get<SumPointData>(dp.point_data));
+          actuals.push_back(opentelemetry::nostd::get<DoubleSumPointData>(dp.point_data));
         }
       }
     }
@@ -537,7 +536,7 @@ TEST_P(UpDownCounterToSumFixture, Double)
 
   ASSERT_EQ(1, actuals.size());
   const auto &actual = actuals.at(0);
-  ASSERT_EQ(15.0, opentelemetry::nostd::get<double>(actual.value_));
+  ASSERT_EQ(15.0, actual.value_);
 }
 INSTANTIATE_TEST_SUITE_P(UpDownCounterToSum,
                          UpDownCounterToSumFixture,

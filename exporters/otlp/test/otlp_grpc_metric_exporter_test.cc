@@ -396,7 +396,7 @@ TEST_F(OtlpGrpcMetricExporterTestPeer, ExportPartialSuccess)
       mock_stub);
   auto exporter = GetExporter(std::move(stub_interface));
 
-  opentelemetry::sdk::metrics::SumPointData sum_point_data{};
+  opentelemetry::sdk::metrics::DoubleSumPointData sum_point_data{};
   sum_point_data.value_ = 10.0;
   opentelemetry::sdk::metrics::ResourceMetrics data;
   auto resource = opentelemetry::sdk::resource::Resource::Create(
