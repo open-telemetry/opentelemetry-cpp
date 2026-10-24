@@ -21,7 +21,7 @@ namespace sdk
  * with default attributes.
  */
 const opentelemetry::common::KeyValueIterableView<std::array<std::pair<std::string, int32_t>, 0>> &
-GetEmptyAttributes() noexcept;
+GetEmptyAttributes();
 
 }  // namespace sdk
 OPENTELEMETRY_END_NAMESPACE

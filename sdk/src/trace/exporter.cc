@@ -13,7 +13,7 @@ OPENTELEMETRY_EXPORT SpanExporter::SpanExporter() {}
 
 OPENTELEMETRY_EXPORT SpanExporter::~SpanExporter() {}
 
-OPENTELEMETRY_EXPORT bool SpanExporter::ForceFlush(std::chrono::microseconds /*timeout*/) noexcept
+OPENTELEMETRY_EXPORT bool SpanExporter::ForceFlush(std::chrono::microseconds /*timeout*/)
 {
   return true;
 }

@@ -71,17 +71,17 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
   worker_thread_ = std::thread(&BatchSpanProcessor::DoBackgroundWork, this);
 }
 
-std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable() noexcept
+std::unique_ptr<Recordable> BatchSpanProcessor::MakeRecordable()
 {
   return exporter_->MakeRecordable();
 }
 
-void BatchSpanProcessor::OnStart(Recordable &, const SpanContext &) noexcept
+void BatchSpanProcessor::OnStart(Recordable &, const SpanContext &)
 {
   // no-op
 }
 
-void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
+void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span)
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
@@ -105,7 +105,7 @@ void BatchSpanProcessor::OnEnd(std::unique_ptr<Recordable> &&span) noexcept
   }
 }
 
-bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool BatchSpanProcessor::ForceFlush(std::chrono::microseconds timeout)
 {
   if (synchronization_data_->is_shutdown.load() == true)
   {
@@ -366,7 +366,7 @@ void BatchSpanProcessor::GetWaitAdjustedTime(
   }
 }
 
-bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout) noexcept
+bool BatchSpanProcessor::Shutdown(std::chrono::microseconds timeout)
 {
   return InternalShutdown(timeout);
 }
@@ -379,7 +379,7 @@ BatchSpanProcessor::~BatchSpanProcessor()
   }
 }
 
-bool BatchSpanProcessor::InternalShutdown(std::chrono::microseconds timeout) noexcept
+bool BatchSpanProcessor::InternalShutdown(std::chrono::microseconds timeout)
 {
   auto start_time = std::chrono::system_clock::now();
   std::lock_guard<std::mutex> shutdown_guard{synchronization_data_->shutdown_m};

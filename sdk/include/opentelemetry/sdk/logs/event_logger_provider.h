@@ -24,7 +24,7 @@ class OPENTELEMETRY_EXPORT EventLoggerProvider final
     : public opentelemetry::logs::EventLoggerProvider
 {
 public:
-  EventLoggerProvider() noexcept;
+  EventLoggerProvider();
 
   EventLoggerProvider(const EventLoggerProvider &)            = delete;
   EventLoggerProvider(EventLoggerProvider &&)                 = delete;

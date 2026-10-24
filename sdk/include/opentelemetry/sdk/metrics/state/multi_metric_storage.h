@@ -40,7 +40,7 @@ public:
     return true;
   }
 
-  void RecordLong(int64_t value, const opentelemetry::context::Context &context) noexcept override
+  void RecordLong(int64_t value, const opentelemetry::context::Context &context) override
   {
     for (auto &s : storages_)
     {
@@ -50,7 +50,7 @@ public:
 
   void RecordLong(int64_t value,
                   const opentelemetry::common::KeyValueIterable &attributes,
-                  const opentelemetry::context::Context &context) noexcept override
+                  const opentelemetry::context::Context &context) override
   {
     for (auto &s : storages_)
     {
@@ -58,7 +58,7 @@ public:
     }
   }
 
-  void RecordDouble(double value, const opentelemetry::context::Context &context) noexcept override
+  void RecordDouble(double value, const opentelemetry::context::Context &context) override
   {
     for (auto &s : storages_)
     {
@@ -68,7 +68,7 @@ public:
 
   void RecordDouble(double value,
                     const opentelemetry::common::KeyValueIterable &attributes,
-                    const opentelemetry::context::Context &context) noexcept override
+                    const opentelemetry::context::Context &context) override
   {
     for (auto &s : storages_)
     {
@@ -78,7 +78,7 @@ public:
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
   std::shared_ptr<BoundSyncWritableMetricStorage> Bind(
-      const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
+      const opentelemetry::common::KeyValueIterable &attributes) override;
 #endif
 
 private:
@@ -105,7 +105,7 @@ public:
 
   void RecordLong(
       const std::unordered_map<MetricAttributes, int64_t, AttributeHashGenerator> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+      opentelemetry::common::SystemTimestamp observation_time) override
   {
     for (auto &s : storages_)
     {
@@ -115,7 +115,7 @@ public:
 
   void RecordDouble(
       const std::unordered_map<MetricAttributes, double, AttributeHashGenerator> &measurements,
-      opentelemetry::common::SystemTimestamp observation_time) noexcept override
+      opentelemetry::common::SystemTimestamp observation_time) override
   {
     for (auto &s : storages_)
     {
@@ -139,12 +139,11 @@ private:
 class MultiBoundEntry : public BoundSyncWritableMetricStorage
 {
 public:
-  explicit MultiBoundEntry(
-      std::vector<std::shared_ptr<BoundSyncWritableMetricStorage>> children) noexcept
+  explicit MultiBoundEntry(std::vector<std::shared_ptr<BoundSyncWritableMetricStorage>> children)
       : children_(std::move(children))
   {}
 
-  void RecordLong(int64_t value) noexcept override
+  void RecordLong(int64_t value) override
   {
     for (auto &c : children_)
     {
@@ -152,7 +151,7 @@ public:
     }
   }
 
-  void RecordDouble(double value) noexcept override
+  void RecordDouble(double value) override
   {
     for (auto &c : children_)
     {
@@ -165,7 +164,7 @@ private:
 };
 
 inline std::shared_ptr<BoundSyncWritableMetricStorage> SyncMultiMetricStorage::Bind(
-    const opentelemetry::common::KeyValueIterable &attributes) noexcept
+    const opentelemetry::common::KeyValueIterable &attributes)
 {
   std::vector<std::shared_ptr<BoundSyncWritableMetricStorage>> children;
   children.reserve(storages_.size());

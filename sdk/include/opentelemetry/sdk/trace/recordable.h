@@ -60,7 +60,7 @@ public:
    * @param parent_span_id the parent span id to set
    */
   virtual void SetIdentity(const opentelemetry::trace::SpanContext &span_context,
-                           opentelemetry::trace::SpanId parent_span_id) noexcept = 0;
+                           opentelemetry::trace::SpanId parent_span_id) = 0;
 
   /**
    * Set an attribute of a span.
@@ -68,7 +68,7 @@ public:
    * @param value the attribute value
    */
   virtual void SetAttribute(nostd::string_view key,
-                            const opentelemetry::common::AttributeValue &value) noexcept = 0;
+                            const opentelemetry::common::AttributeValue &value) = 0;
 
   /**
    * Add an event to a span.
@@ -78,7 +78,7 @@ public:
    */
   virtual void AddEvent(nostd::string_view name,
                         opentelemetry::common::SystemTimestamp timestamp,
-                        const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
+                        const opentelemetry::common::KeyValueIterable &attributes) = 0;
 
   /**
    * Add an event to a span with default timestamp and attributes.
@@ -105,8 +105,7 @@ public:
    * @param name the name of the event
    * @param attributes the attributes associated with the event
    */
-  void AddEvent(nostd::string_view name,
-                const opentelemetry::common::KeyValueIterable &attributes) noexcept
+  void AddEvent(nostd::string_view name, const opentelemetry::common::KeyValueIterable &attributes)
   {
     AddEvent(name, opentelemetry::common::SystemTimestamp(std::chrono::system_clock::now()),
              attributes);
@@ -118,7 +117,7 @@ public:
    * @param attributes the attributes associated with the link
    */
   virtual void AddLink(const opentelemetry::trace::SpanContext &span_context,
-                       const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
+                       const opentelemetry::common::KeyValueIterable &attributes) = 0;
 
   /**
    * Add a link to a span with default (empty) attributes.
@@ -134,49 +133,48 @@ public:
    * @param code the status code
    * @param description a description of the status
    */
-  virtual void SetStatus(opentelemetry::trace::StatusCode code,
-                         nostd::string_view description) noexcept = 0;
+  virtual void SetStatus(opentelemetry::trace::StatusCode code, nostd::string_view description) = 0;
 
   /**
    * Set the name of the span.
    * @param name the name to set
    */
-  virtual void SetName(nostd::string_view name) noexcept = 0;
+  virtual void SetName(nostd::string_view name) = 0;
 
   /**
    * Set the trace flags of the span.
    */
-  virtual void SetTraceFlags(opentelemetry::trace::TraceFlags /* flags */) noexcept {}
+  virtual void SetTraceFlags(opentelemetry::trace::TraceFlags /* flags */) {}
 
   /**
    * Set the spankind of the span.
    * @param span_kind the spankind to set
    */
-  virtual void SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept = 0;
+  virtual void SetSpanKind(opentelemetry::trace::SpanKind span_kind) = 0;
 
   /**
    * Set Resource of the span
    * @param resource the resource to set
    */
-  virtual void SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept = 0;
+  virtual void SetResource(const opentelemetry::sdk::resource::Resource &resource) = 0;
 
   /**
    * Set the start time of the span.
    * @param start_time the start time to set
    */
-  virtual void SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept = 0;
+  virtual void SetStartTime(opentelemetry::common::SystemTimestamp start_time) = 0;
 
   /**
    * Set the duration of the span.
    * @param duration the duration to set
    */
-  virtual void SetDuration(std::chrono::nanoseconds duration) noexcept = 0;
+  virtual void SetDuration(std::chrono::nanoseconds duration) = 0;
 
   /**
    * Set the span limits for the span.
    * This method must be called before any SetAttribute / AddEvent / AddLink call.
    */
-  virtual void SetSpanLimits(const SpanLimits & /* limits */) noexcept {}
+  virtual void SetSpanLimits(const SpanLimits & /* limits */) {}
 
   /**
    * Get the SpanData object for this Recordable.
@@ -190,11 +188,10 @@ public:
    * Set the instrumentation scope of the span.
    * @param instrumentation_scope the instrumentation scope to set
    */
-  virtual void SetInstrumentationScope(
-      const InstrumentationScope &instrumentation_scope) noexcept = 0;
+  virtual void SetInstrumentationScope(const InstrumentationScope &instrumentation_scope) = 0;
 
   OPENTELEMETRY_DEPRECATED_MESSAGE("Please use SetInstrumentationScope instead")
-  void SetInstrumentationLibrary(const InstrumentationScope &instrumentation_scope) noexcept
+  void SetInstrumentationLibrary(const InstrumentationScope &instrumentation_scope)
   {
     SetInstrumentationScope(instrumentation_scope);
   }

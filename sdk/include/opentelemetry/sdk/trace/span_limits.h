@@ -50,7 +50,7 @@ struct SpanLimits
   /**
    * Limit values that impose no cap on any field
    */
-  static constexpr SpanLimits NoLimits() noexcept
+  static constexpr SpanLimits NoLimits()
   {
     SpanLimits limits;
     limits.attribute_count_limit        = (std::numeric_limits<std::uint32_t>::max)();

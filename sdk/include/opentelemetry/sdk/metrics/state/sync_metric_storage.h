@@ -77,7 +77,7 @@ public:
 
   void RecordLong(int64_t value,
                   const opentelemetry::context::Context &context
-                  OPENTELEMETRY_MAYBE_UNUSED) noexcept override
+                  OPENTELEMETRY_MAYBE_UNUSED) override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
@@ -103,7 +103,7 @@ public:
   void RecordLong(int64_t value,
                   const opentelemetry::common::KeyValueIterable &attributes,
                   const opentelemetry::context::Context &context
-                  OPENTELEMETRY_MAYBE_UNUSED) noexcept override
+                  OPENTELEMETRY_MAYBE_UNUSED) override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
     {
@@ -134,7 +134,7 @@ public:
 
   void RecordDouble(double value,
                     const opentelemetry::context::Context &context
-                    OPENTELEMETRY_MAYBE_UNUSED) noexcept override
+                    OPENTELEMETRY_MAYBE_UNUSED) override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
@@ -160,7 +160,7 @@ public:
   void RecordDouble(double value,
                     const opentelemetry::common::KeyValueIterable &attributes,
                     const opentelemetry::context::Context &context
-                    OPENTELEMETRY_MAYBE_UNUSED) noexcept override
+                    OPENTELEMETRY_MAYBE_UNUSED) override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
@@ -190,11 +190,11 @@ public:
                nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                opentelemetry::common::SystemTimestamp sdk_start_ts,
                opentelemetry::common::SystemTimestamp collection_ts,
-               nostd::function_ref<bool(MetricData)> callback) noexcept override;
+               nostd::function_ref<bool(MetricData)> callback) override;
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
   std::shared_ptr<BoundSyncWritableMetricStorage> Bind(
-      const opentelemetry::common::KeyValueIterable &attributes) noexcept override;
+      const opentelemetry::common::KeyValueIterable &attributes) override;
 
   // Internal: stable bound entry. Self-contained: owns its own mutex and
   // aggregation so the user-held handle stays safe to call even if the parent
@@ -211,14 +211,14 @@ public:
   public:
     BoundEntry(InstrumentValueType value_type,
                MetricAttributes attributes,
-               std::unique_ptr<Aggregation> initial_aggregation) noexcept
+               std::unique_ptr<Aggregation> initial_aggregation)
         : value_type_(value_type),
           attributes_(std::move(attributes)),
           current_(std::move(initial_aggregation))
     {}
 
-    void RecordLong(int64_t value) noexcept override;
-    void RecordDouble(double value) noexcept override;
+    void RecordLong(int64_t value) override;
+    void RecordDouble(double value) override;
 
   private:
     friend class SyncMetricStorage;
@@ -247,7 +247,7 @@ private:
   // It is reset to bound entry keys at every Collect().
   //
   // Must be called with attribute_hashmap_lock_ held.
-  MetricAttributes ResolveCardinality(const MetricAttributes &filtered) noexcept
+  MetricAttributes ResolveCardinality(const MetricAttributes &filtered)
   {
     if (filtered == GetOverflowAttributes())
     {

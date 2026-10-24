@@ -132,7 +132,7 @@ bool MultiLogRecordProcessor::Shutdown(std::chrono::microseconds timeout) noexce
   return InternalShutdown(timeout);
 }
 
-bool MultiLogRecordProcessor::InternalForceFlush(std::chrono::microseconds timeout) noexcept
+bool MultiLogRecordProcessor::InternalForceFlush(std::chrono::microseconds timeout)
 {
   bool result           = true;
   auto start_time       = std::chrono::system_clock::now();
@@ -167,7 +167,7 @@ bool MultiLogRecordProcessor::InternalForceFlush(std::chrono::microseconds timeo
   return result;
 }
 
-bool MultiLogRecordProcessor::InternalShutdown(std::chrono::microseconds timeout) noexcept
+bool MultiLogRecordProcessor::InternalShutdown(std::chrono::microseconds timeout)
 {
   bool result                = true;
   bool has_unlimited_timeout = timeout == (std::chrono::microseconds::max)();

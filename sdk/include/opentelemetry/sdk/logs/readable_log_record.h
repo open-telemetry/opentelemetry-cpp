@@ -51,68 +51,68 @@ public:
    * Get the timestamp of this log.
    * @return the timestamp of this log
    */
-  virtual opentelemetry::common::SystemTimestamp GetTimestamp() const noexcept = 0;
+  virtual opentelemetry::common::SystemTimestamp GetTimestamp() const = 0;
 
   /**
    * Get the observed timestamp of this log.
    * @return the observed timestamp of this log
    */
-  virtual opentelemetry::common::SystemTimestamp GetObservedTimestamp() const noexcept = 0;
+  virtual opentelemetry::common::SystemTimestamp GetObservedTimestamp() const = 0;
 
   /**
    * Get the severity of this log.
    * @return the severity of this log
    */
-  virtual opentelemetry::logs::Severity GetSeverity() const noexcept = 0;
+  virtual opentelemetry::logs::Severity GetSeverity() const = 0;
 
   /**
    * Get the severity text of this log.
    * @return the severity text for this log
    */
-  virtual nostd::string_view GetSeverityText() const noexcept;
+  virtual nostd::string_view GetSeverityText() const;
 
   /**
    * Get body field of this log.
    * @return the body field for this log.
    */
-  virtual const opentelemetry::sdk::common::OwnedAttributeValue &GetBody() const noexcept = 0;
+  virtual const opentelemetry::sdk::common::OwnedAttributeValue &GetBody() const = 0;
 
   /**
    * Get the Event id.
    * @return the event id
    */
-  virtual int64_t GetEventId() const noexcept = 0;
+  virtual int64_t GetEventId() const = 0;
 
   /**
    * Get the Event Name.
    * @return the event name
    */
-  virtual nostd::string_view GetEventName() const noexcept = 0;
+  virtual nostd::string_view GetEventName() const = 0;
 
   /**
    * Get the trace id of this log.
    * @return the trace id of this log
    */
-  virtual const opentelemetry::trace::TraceId &GetTraceId() const noexcept = 0;
+  virtual const opentelemetry::trace::TraceId &GetTraceId() const = 0;
 
   /**
    * Get the span id of this log.
    * @return the span id of this log
    */
-  virtual const opentelemetry::trace::SpanId &GetSpanId() const noexcept = 0;
+  virtual const opentelemetry::trace::SpanId &GetSpanId() const = 0;
 
   /**
    * Inject trace_flags of this log.
    * @return trace_flags of this log
    */
-  virtual const opentelemetry::trace::TraceFlags &GetTraceFlags() const noexcept = 0;
+  virtual const opentelemetry::trace::TraceFlags &GetTraceFlags() const = 0;
 
   /**
    * Get attributes of this log.
    * @return the body field of this log
    */
   virtual const std::unordered_map<std::string, opentelemetry::sdk::common::OwnedAttributeValue> &
-  GetAttributes() const noexcept = 0;
+  GetAttributes() const = 0;
 
   /**
    * Get the number of attributes dropped because the attribute count limit
@@ -120,33 +120,33 @@ public:
    * recordables that do not enforce limits compile without changes.
    * @return the number of dropped attributes
    */
-  virtual uint32_t GetDroppedAttributesCount() const noexcept { return 0; }
+  virtual uint32_t GetDroppedAttributesCount() const { return 0; }
 
   /**
    * Get resource of this log
    * @return the resource of this log
    */
-  virtual const opentelemetry::sdk::resource::Resource &GetResource() const noexcept = 0;
+  virtual const opentelemetry::sdk::resource::Resource &GetResource() const = 0;
 
   /**
    * Get instrumentation scope of this log.
    * @return  the instrumentation scope of this log
    */
   virtual const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
-  GetInstrumentationScope() const noexcept = 0;
+  GetInstrumentationScope() const = 0;
 
   /**
    * Get default instrumentation scope of logs.
    * @return  the default instrumentation scope of logs
    */
   static const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
-  GetDefaultInstrumentationScope() noexcept;
+  GetDefaultInstrumentationScope();
 
   /**
    * Get default resource of logs.
    * @return  the default resource of logs
    */
-  static const opentelemetry::sdk::resource::Resource &GetDefaultResource() noexcept;
+  static const opentelemetry::sdk::resource::Resource &GetDefaultResource();
 };
 }  // namespace logs
 }  // namespace sdk

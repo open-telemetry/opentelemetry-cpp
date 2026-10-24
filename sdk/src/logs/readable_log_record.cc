@@ -19,7 +19,7 @@ namespace sdk
 namespace logs
 {
 
-nostd::string_view ReadableLogRecord::GetSeverityText() const noexcept
+nostd::string_view ReadableLogRecord::GetSeverityText() const
 {
   std::size_t severity_index = static_cast<std::size_t>(GetSeverity());
   if (severity_index >= std::extent<decltype(opentelemetry::logs::SeverityNumToText)>::value)
@@ -31,7 +31,7 @@ nostd::string_view ReadableLogRecord::GetSeverityText() const noexcept
 }
 
 const opentelemetry::sdk::instrumentationscope::InstrumentationScope &
-ReadableLogRecord::GetDefaultInstrumentationScope() noexcept
+ReadableLogRecord::GetDefaultInstrumentationScope()
 {
   // FIXME: Use shared default instrumentation scope?
   static std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope>
@@ -40,7 +40,7 @@ ReadableLogRecord::GetDefaultInstrumentationScope() noexcept
   return *default_scope;
 }
 
-const opentelemetry::sdk::resource::Resource &ReadableLogRecord::GetDefaultResource() noexcept
+const opentelemetry::sdk::resource::Resource &ReadableLogRecord::GetDefaultResource()
 {
   static opentelemetry::sdk::resource::Resource default_resource =
       opentelemetry::sdk::resource::Resource::Create(

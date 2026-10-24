@@ -36,42 +36,41 @@ LoggerContext::LoggerContext(
       recordable_enforces_limits_(processor_->RecordableEnforcesLogRecordLimits())
 {}
 
-void LoggerContext::AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept
+void LoggerContext::AddProcessor(std::unique_ptr<LogRecordProcessor> processor)
 {
   auto multi_processor = static_cast<MultiLogRecordProcessor *>(processor_.get());
   multi_processor->AddProcessor(std::move(processor));
   recordable_enforces_limits_ = processor_->RecordableEnforcesLogRecordLimits();
 }
 
-LogRecordProcessor &LoggerContext::GetProcessor() const noexcept
+LogRecordProcessor &LoggerContext::GetProcessor() const
 {
   return *processor_;
 }
 
-const opentelemetry::sdk::resource::Resource &LoggerContext::GetResource() const noexcept
+const opentelemetry::sdk::resource::Resource &LoggerContext::GetResource() const
 {
   return resource_;
 }
 
 const instrumentationscope::ScopeConfigurator<LoggerConfig> &LoggerContext::GetLoggerConfigurator()
-    const noexcept
+    const
 {
   return *logger_configurator_;
 }
 
-const LogRecordLimits &LoggerContext::GetLogRecordLimits() const noexcept
+const LogRecordLimits &LoggerContext::GetLogRecordLimits() const
 {
   return log_record_limits_;
 }
 
-bool LoggerContext::RecordableEnforcesLogRecordLimits() const noexcept
+bool LoggerContext::RecordableEnforcesLogRecordLimits() const
 {
   return recordable_enforces_limits_;
 }
 
 void LoggerContext::SetLoggerConfigurator(
-    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
-        logger_configurator) noexcept
+    std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator)
 {
   if (!logger_configurator)
   {
@@ -82,12 +81,12 @@ void LoggerContext::SetLoggerConfigurator(
   logger_configurator_ = std::move(logger_configurator);
 }
 
-bool LoggerContext::ForceFlush(std::chrono::microseconds timeout) noexcept
+bool LoggerContext::ForceFlush(std::chrono::microseconds timeout)
 {
   return processor_->ForceFlush(timeout);
 }
 
-bool LoggerContext::Shutdown(std::chrono::microseconds timeout) noexcept
+bool LoggerContext::Shutdown(std::chrono::microseconds timeout)
 {
   return processor_->Shutdown(timeout);
 }

@@ -42,7 +42,7 @@ public:
    *
    * Note: This method must be callable from multiple threads.
    */
-  virtual std::unique_ptr<Recordable> MakeRecordable() noexcept = 0;
+  virtual std::unique_ptr<Recordable> MakeRecordable() = 0;
 
   /**
    * Exports a batch of span recordables. This method must not be called
@@ -50,7 +50,7 @@ public:
    * @param spans a span of unique pointers to span recordables
    */
   virtual sdk::common::ExportResult Export(
-      const nostd::span<std::unique_ptr<Recordable>> &spans) noexcept = 0;
+      const nostd::span<std::unique_ptr<Recordable>> &spans) = 0;
 
   /**
    * Export all spans that have been exported.
@@ -59,15 +59,14 @@ public:
    * @return return true when all data are exported, and false when timeout
    */
   virtual bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) = 0;
 
   /**
    * Shut down the exporter.
    * @param timeout an optional timeout.
    * @return return the status of the operation.
    */
-  virtual bool Shutdown(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+  virtual bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) = 0;
 };
 }  // namespace trace
 }  // namespace sdk

@@ -56,7 +56,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
   {
 #endif
     // Resolve parent span context from options or fall back to the current runtime context.
-    const auto parent_context = [&options]() noexcept -> opentelemetry::trace::SpanContext {
+    const auto parent_context = [&options]() -> opentelemetry::trace::SpanContext {
       // 1. If the parent is a valid SpanContext, use it directly.
       // 2. If the parent is a Context with a span, extract the SpanContext.
       // 3. If the parent is a Context with the `is_root_span` flag set, return an invalid
@@ -104,8 +104,7 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
     const auto sampling_result = context_->GetSampler().ShouldSample(
         parent_context, trace_id, name, options.kind, attributes, links);
 
-    const opentelemetry::trace::TraceFlags trace_flags =
-        [&]() noexcept -> opentelemetry::trace::TraceFlags {
+    const opentelemetry::trace::TraceFlags trace_flags = [&]() -> opentelemetry::trace::TraceFlags {
       std::uint8_t flags = 0;
       if (parent_context.IsValid())
       {
@@ -172,7 +171,11 @@ nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
 #endif
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+void Tracer::ForceFlushWithMicroseconds(uint64_t timeout)
+#else
 void Tracer::ForceFlushWithMicroseconds(uint64_t timeout) noexcept
+#endif
 {
   if (context_)
   {
@@ -181,7 +184,11 @@ void Tracer::ForceFlushWithMicroseconds(uint64_t timeout) noexcept
   }
 }
 
+#if OPENTELEMETRY_ABI_VERSION_NO >= 2
+void Tracer::CloseWithMicroseconds(uint64_t timeout)
+#else
 void Tracer::CloseWithMicroseconds(uint64_t timeout) noexcept
+#endif
 {
   // Trace context is shared by many tracers.So we just call ForceFlush to flush all pending spans
   // and do not shutdown it.
@@ -192,7 +199,7 @@ void Tracer::CloseWithMicroseconds(uint64_t timeout) noexcept
   }
 }
 
-void Tracer::UpdateTracerConfig(TracerConfig config) noexcept
+void Tracer::UpdateTracerConfig(TracerConfig config)
 {
   UpdateEnabled(config.IsEnabled());
 }

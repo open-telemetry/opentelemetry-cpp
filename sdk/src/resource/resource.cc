@@ -20,17 +20,15 @@ namespace sdk
 namespace resource
 {
 
-Resource::Resource() noexcept : attributes_(), schema_url_() {}
+Resource::Resource() : attributes_(), schema_url_() {}
 
-Resource::Resource(const ResourceAttributes &attributes) noexcept
-    : attributes_(attributes), schema_url_()
-{}
+Resource::Resource(const ResourceAttributes &attributes) : attributes_(attributes), schema_url_() {}
 
-Resource::Resource(const ResourceAttributes &attributes, const std::string &schema_url) noexcept
+Resource::Resource(const ResourceAttributes &attributes, const std::string &schema_url)
     : attributes_(attributes), schema_url_(schema_url)
 {}
 
-Resource Resource::Merge(const Resource &other) const noexcept
+Resource Resource::Merge(const Resource &other) const
 {
   ResourceAttributes merged_resource_attributes(other.attributes_);
   merged_resource_attributes.insert(attributes_.begin(), attributes_.end());
@@ -74,12 +72,12 @@ Resource &Resource::GetDefault()
   return default_resource;
 }
 
-const ResourceAttributes &Resource::GetAttributes() const noexcept
+const ResourceAttributes &Resource::GetAttributes() const
 {
   return attributes_;
 }
 
-const std::string &Resource::GetSchemaURL() const noexcept
+const std::string &Resource::GetSchemaURL() const
 {
   return schema_url_;
 }

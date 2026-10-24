@@ -107,7 +107,7 @@ public:
    * @param processor The processor to be stored inside the logger provider.
    * This must not be a nullptr.
    */
-  void AddProcessor(std::unique_ptr<LogRecordProcessor> processor) noexcept;
+  void AddProcessor(std::unique_ptr<LogRecordProcessor> processor);
 
   /**
    * Update the LoggerConfigurator for this provider. Updates the LoggerConfig for all existing
@@ -120,24 +120,23 @@ public:
    * ScopeConfigurator<LoggerConfig>::AddCondition) is not supported and will result in a deadlock.
    */
   void UpdateLoggerConfigurator(
-      std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>>
-          logger_configurator) noexcept;
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<LoggerConfig>> logger_configurator);
 
   /**
    * Obtain the resource associated with this logger provider.
    * @return The resource for this logger provider.
    */
-  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
+  const opentelemetry::sdk::resource::Resource &GetResource() const;
 
   /**
    * Shutdown the log processor associated with this log provider.
    */
-  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
   /**
    * Force flush the log processor associated with this log provider.
    */
-  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
 private:
   // order of declaration is important here - loggers should destroy only after context.

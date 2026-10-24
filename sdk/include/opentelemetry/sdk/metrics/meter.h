@@ -121,17 +121,17 @@ public:
                                       nostd::string_view unit        = "") noexcept override;
 
   /** Returns the associated instrumentation scope */
-  const sdk::instrumentationscope::InstrumentationScope *GetInstrumentationScope() const noexcept;
+  const sdk::instrumentationscope::InstrumentationScope *GetInstrumentationScope() const;
 
   OPENTELEMETRY_DEPRECATED_MESSAGE("Please use GetInstrumentationScope instead")
-  const sdk::instrumentationscope::InstrumentationScope *GetInstrumentationLibrary() const noexcept
+  const sdk::instrumentationscope::InstrumentationScope *GetInstrumentationLibrary() const
   {
     return GetInstrumentationScope();
   }
 
   /** collect metrics across all the instruments configured for the meter **/
   std::vector<MetricData> Collect(CollectorHandle *collector,
-                                  opentelemetry::common::SystemTimestamp collect_ts) noexcept;
+                                  opentelemetry::common::SystemTimestamp collect_ts);
 
 #if OPENTELEMETRY_ABI_VERSION_NO >= 2
   uintptr_t RegisterCallback(

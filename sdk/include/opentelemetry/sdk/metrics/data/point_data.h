@@ -76,9 +76,8 @@ public:
 class Base2ExponentialHistogramPointData
 {
 public:
-  Base2ExponentialHistogramPointData(Base2ExponentialHistogramPointData &&) noexcept = default;
-  Base2ExponentialHistogramPointData &operator=(Base2ExponentialHistogramPointData &&) noexcept =
-      default;
+  Base2ExponentialHistogramPointData(Base2ExponentialHistogramPointData &&)            = default;
+  Base2ExponentialHistogramPointData &operator=(Base2ExponentialHistogramPointData &&) = default;
 
   Base2ExponentialHistogramPointData(const Base2ExponentialHistogramPointData &other)
       : sum_(other.sum_),

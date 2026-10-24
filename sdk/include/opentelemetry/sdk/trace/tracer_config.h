@@ -19,13 +19,13 @@ namespace trace
 class OPENTELEMETRY_EXPORT TracerConfig
 {
 public:
-  bool operator==(const TracerConfig &other) const noexcept;
+  bool operator==(const TracerConfig &other) const;
 
   /**
    * Returns if the Tracer is enabled or disabled. Tracers are enabled by default.
    * @return a boolean indicating if the Tracer is enabled. Defaults to true.
    */
-  bool IsEnabled() const noexcept;
+  bool IsEnabled() const;
 
   /**
    * Returns a TracerConfig that represents a disabled Tracer. A disabled tracer behaves like a

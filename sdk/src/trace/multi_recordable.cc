@@ -23,19 +23,19 @@ namespace sdk
 namespace trace
 {
 
-std::size_t MultiRecordable::MakeKey(const SpanProcessor &processor) noexcept
+std::size_t MultiRecordable::MakeKey(const SpanProcessor &processor)
 {
   return reinterpret_cast<std::size_t>(&processor);
 }
 
 void MultiRecordable::AddRecordable(const SpanProcessor &processor,
-                                    std::unique_ptr<Recordable> recordable) noexcept
+                                    std::unique_ptr<Recordable> recordable)
 {
   recordables_[MakeKey(processor)] = std::move(recordable);
 }
 
 const std::unique_ptr<Recordable> &MultiRecordable::GetRecordable(
-    const SpanProcessor &processor) const noexcept
+    const SpanProcessor &processor) const
 {
   // TODO - return nullptr ref on failed lookup?
   auto i = recordables_.find(MakeKey(processor));
@@ -47,8 +47,7 @@ const std::unique_ptr<Recordable> &MultiRecordable::GetRecordable(
   return empty;
 }
 
-std::unique_ptr<Recordable> MultiRecordable::ReleaseRecordable(
-    const SpanProcessor &processor) noexcept
+std::unique_ptr<Recordable> MultiRecordable::ReleaseRecordable(const SpanProcessor &processor)
 {
   auto i = recordables_.find(MakeKey(processor));
   if (i != recordables_.end())
@@ -61,7 +60,7 @@ std::unique_ptr<Recordable> MultiRecordable::ReleaseRecordable(
 }
 
 void MultiRecordable::SetIdentity(const opentelemetry::trace::SpanContext &span_context,
-                                  opentelemetry::trace::SpanId parent_span_id) noexcept
+                                  opentelemetry::trace::SpanId parent_span_id)
 {
   for (auto &recordable : recordables_)
   {
@@ -69,7 +68,7 @@ void MultiRecordable::SetIdentity(const opentelemetry::trace::SpanContext &span_
   }
 }
 
-void MultiRecordable::SetSpanLimits(const SpanLimits &limits) noexcept
+void MultiRecordable::SetSpanLimits(const SpanLimits &limits)
 {
   for (auto &recordable : recordables_)
   {
@@ -78,7 +77,7 @@ void MultiRecordable::SetSpanLimits(const SpanLimits &limits) noexcept
 }
 
 void MultiRecordable::SetAttribute(nostd::string_view key,
-                                   const opentelemetry::common::AttributeValue &value) noexcept
+                                   const opentelemetry::common::AttributeValue &value)
 {
   for (auto &recordable : recordables_)
   {
@@ -88,7 +87,7 @@ void MultiRecordable::SetAttribute(nostd::string_view key,
 
 void MultiRecordable::AddEvent(nostd::string_view name,
                                opentelemetry::common::SystemTimestamp timestamp,
-                               const opentelemetry::common::KeyValueIterable &attributes) noexcept
+                               const opentelemetry::common::KeyValueIterable &attributes)
 {
   for (auto &recordable : recordables_)
   {
@@ -97,7 +96,7 @@ void MultiRecordable::AddEvent(nostd::string_view name,
 }
 
 void MultiRecordable::AddLink(const opentelemetry::trace::SpanContext &span_context,
-                              const opentelemetry::common::KeyValueIterable &attributes) noexcept
+                              const opentelemetry::common::KeyValueIterable &attributes)
 {
   for (auto &recordable : recordables_)
   {
@@ -106,7 +105,7 @@ void MultiRecordable::AddLink(const opentelemetry::trace::SpanContext &span_cont
 }
 
 void MultiRecordable::SetStatus(opentelemetry::trace::StatusCode code,
-                                nostd::string_view description) noexcept
+                                nostd::string_view description)
 {
   for (auto &recordable : recordables_)
   {
@@ -114,7 +113,7 @@ void MultiRecordable::SetStatus(opentelemetry::trace::StatusCode code,
   }
 }
 
-void MultiRecordable::SetName(nostd::string_view name) noexcept
+void MultiRecordable::SetName(nostd::string_view name)
 {
   for (auto &recordable : recordables_)
   {
@@ -122,7 +121,7 @@ void MultiRecordable::SetName(nostd::string_view name) noexcept
   }
 }
 
-void MultiRecordable::SetTraceFlags(opentelemetry::trace::TraceFlags flags) noexcept
+void MultiRecordable::SetTraceFlags(opentelemetry::trace::TraceFlags flags)
 {
   for (auto &recordable : recordables_)
   {
@@ -130,7 +129,7 @@ void MultiRecordable::SetTraceFlags(opentelemetry::trace::TraceFlags flags) noex
   }
 }
 
-void MultiRecordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noexcept
+void MultiRecordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind)
 {
   for (auto &recordable : recordables_)
   {
@@ -138,7 +137,7 @@ void MultiRecordable::SetSpanKind(opentelemetry::trace::SpanKind span_kind) noex
   }
 }
 
-void MultiRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource) noexcept
+void MultiRecordable::SetResource(const opentelemetry::sdk::resource::Resource &resource)
 {
   for (auto &recordable : recordables_)
   {
@@ -146,7 +145,7 @@ void MultiRecordable::SetResource(const opentelemetry::sdk::resource::Resource &
   }
 }
 
-void MultiRecordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time) noexcept
+void MultiRecordable::SetStartTime(opentelemetry::common::SystemTimestamp start_time)
 {
   for (auto &recordable : recordables_)
   {
@@ -154,7 +153,7 @@ void MultiRecordable::SetStartTime(opentelemetry::common::SystemTimestamp start_
   }
 }
 
-void MultiRecordable::SetDuration(std::chrono::nanoseconds duration) noexcept
+void MultiRecordable::SetDuration(std::chrono::nanoseconds duration)
 {
   for (auto &recordable : recordables_)
   {
@@ -162,8 +161,7 @@ void MultiRecordable::SetDuration(std::chrono::nanoseconds duration) noexcept
   }
 }
 
-void MultiRecordable::SetInstrumentationScope(
-    const InstrumentationScope &instrumentation_scope) noexcept
+void MultiRecordable::SetInstrumentationScope(const InstrumentationScope &instrumentation_scope)
 {
   for (auto &recordable : recordables_)
   {

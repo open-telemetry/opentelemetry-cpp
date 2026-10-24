@@ -52,13 +52,13 @@ public:
    *
    * Note: This method must be callable from multiple threads.
    */
-  virtual std::unique_ptr<Recordable> MakeRecordable() noexcept = 0;
+  virtual std::unique_ptr<Recordable> MakeRecordable() = 0;
 
   /**
    * OnEmit is called by the SDK once a log record has been successfully created.
    * @param record the log recordable object
    */
-  virtual void OnEmit(std::unique_ptr<Recordable> &&record) noexcept = 0;
+  virtual void OnEmit(std::unique_ptr<Recordable> &&record) = 0;
 
   /**
    * Enabled returns whether this processor is interested in a log with the given inputs.
@@ -69,7 +69,7 @@ public:
                                           opentelemetry::context::Context> &context_or_span,
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope &instrumentation_scope,
       opentelemetry::logs::Severity severity,
-      opentelemetry::nostd::string_view event_name = {}) const noexcept
+      opentelemetry::nostd::string_view event_name = {}) const
   {
     return EnabledImplementation(context_or_span, instrumentation_scope, severity, event_name);
   }
@@ -80,7 +80,7 @@ public:
    * @return a result code indicating whether it succeeded, failed or timed out
    */
   virtual bool ForceFlush(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) = 0;
 
   /**
    * Shuts down the processor and does any cleanup required.
@@ -89,8 +89,7 @@ public:
    * shutdown before giving up and returning failure.
    * @return true if the shutdown succeeded, false otherwise
    */
-  virtual bool Shutdown(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept = 0;
+  virtual bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) = 0;
 
   /**
    * Returns true if this processor's EnabledImplementation does any custom
@@ -98,7 +97,7 @@ public:
    * might filter), so the SDK Logger consults the full Enabled chain by
    * default.
    */
-  virtual bool HasEnabledFilter() const noexcept { return true; }
+  virtual bool HasEnabledFilter() const { return true; }
 
 protected:
   virtual bool EnabledImplementation(
@@ -107,7 +106,7 @@ protected:
       const opentelemetry::sdk::instrumentationscope::InstrumentationScope
           & /*instrumentation_scope*/,
       opentelemetry::logs::Severity /*severity*/,
-      opentelemetry::nostd::string_view /*event_name*/) const noexcept
+      opentelemetry::nostd::string_view /*event_name*/) const
   {
     return true;
   }
@@ -120,7 +119,7 @@ public:
    * processors return true if any child does. The SDK Logger consults this once
    * per context to decide whether to push limits onto each recordable.
    */
-  virtual bool RecordableEnforcesLogRecordLimits() const noexcept { return false; }
+  virtual bool RecordableEnforcesLogRecordLimits() const { return false; }
 };
 }  // namespace logs
 }  // namespace sdk

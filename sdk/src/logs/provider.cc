@@ -15,8 +15,7 @@ namespace sdk
 namespace logs
 {
 
-void Provider::SetLoggerProvider(
-    const nostd::shared_ptr<opentelemetry::logs::LoggerProvider> &lp) noexcept
+void Provider::SetLoggerProvider(const nostd::shared_ptr<opentelemetry::logs::LoggerProvider> &lp)
 {
   bool disabled = opentelemetry::sdk::common::GetSdkDisabled();
 

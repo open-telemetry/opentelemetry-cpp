@@ -111,7 +111,7 @@ public:
    * Note: This process may not receive any in-flight spans, but will get newly created spans.
    * Note: This method is not thread safe, and should ideally be called from main thread.
    */
-  void AddProcessor(std::unique_ptr<SpanProcessor> processor) noexcept;
+  void AddProcessor(std::unique_ptr<SpanProcessor> processor);
 
   /**
    * Update the TracerConfigurator for this provider, recreate and propagate the resulting
@@ -125,30 +125,29 @@ public:
    * is not supported and will result in a deadlock.
    */
   void UpdateTracerConfigurator(
-      std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>>
-          tracer_configurator) noexcept;
+      std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator);
 
   /**
    * Obtain the resource associated with this tracer provider.
    * @return The resource for this tracer provider.
    */
-  const opentelemetry::sdk::resource::Resource &GetResource() const noexcept;
+  const opentelemetry::sdk::resource::Resource &GetResource() const;
 
   /**
    * Obtain the span limits configured for this tracer provider.
    * @return The SpanLimits for this tracer provider.
    */
-  const opentelemetry::sdk::trace::SpanLimits &GetSpanLimits() const noexcept;
+  const opentelemetry::sdk::trace::SpanLimits &GetSpanLimits() const;
 
   /**
    * Shutdown the span processor associated with this tracer provider.
    */
-  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool Shutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
   /**
    * Force flush the span processor associated with this tracer provider.
    */
-  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool ForceFlush(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
 private:
   // order of declaration is important here - tracers should destroy only after context.

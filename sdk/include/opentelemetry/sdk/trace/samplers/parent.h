@@ -48,7 +48,7 @@ public:
                               const std::shared_ptr<Sampler> &local_parent_sampled_sampler =
                                   std::make_shared<AlwaysOnSampler>(),
                               const std::shared_ptr<Sampler> &local_parent_nonsampled_sampler =
-                                  std::make_shared<AlwaysOffSampler>()) noexcept;
+                                  std::make_shared<AlwaysOffSampler>());
 
   /** Implements the decision logic by checking the parent context and delegating to the appropriate
    * configured sampler
@@ -60,12 +60,12 @@ public:
       nostd::string_view name,
       opentelemetry::trace::SpanKind span_kind,
       const opentelemetry::common::KeyValueIterable &attributes,
-      const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept override;
+      const opentelemetry::trace::SpanContextKeyValueIterable &links) override;
 
   /**
    * @return Description MUST be ParentBased{delegate_sampler_.getDescription()}
    */
-  nostd::string_view GetDescription() const noexcept override;
+  nostd::string_view GetDescription() const override;
 
 private:
   const std::shared_ptr<Sampler> root_sampler_;

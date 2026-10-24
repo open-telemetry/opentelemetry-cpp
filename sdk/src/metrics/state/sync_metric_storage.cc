@@ -38,7 +38,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
                                 nostd::span<std::shared_ptr<CollectorHandle>> collectors,
                                 opentelemetry::common::SystemTimestamp sdk_start_ts,
                                 opentelemetry::common::SystemTimestamp collection_ts,
-                                nostd::function_ref<bool(MetricData)> callback) noexcept
+                                nostd::function_ref<bool(MetricData)> callback)
 {
   // Add the current delta metrics to `unreported metrics stash` for all the collectors,
   // this will also empty the delta metrics hashmap, and make it available for
@@ -183,7 +183,7 @@ bool SyncMetricStorage::Collect(CollectorHandle *collector,
 
 #ifdef OPENTELEMETRY_HAVE_METRICS_BOUND_INSTRUMENTS_PREVIEW
 std::shared_ptr<BoundSyncWritableMetricStorage> SyncMetricStorage::Bind(
-    const opentelemetry::common::KeyValueIterable &attributes) noexcept
+    const opentelemetry::common::KeyValueIterable &attributes)
 {
   // Filter attributes once, at bind time.
   MetricAttributes filtered{attributes, attributes_processor_.get()};
@@ -218,7 +218,7 @@ std::shared_ptr<BoundSyncWritableMetricStorage> SyncMetricStorage::Bind(
   return entry;
 }
 
-void SyncMetricStorage::BoundEntry::RecordLong(int64_t value) noexcept
+void SyncMetricStorage::BoundEntry::RecordLong(int64_t value)
 {
   if (value_type_ != InstrumentValueType::kLong)
   {
@@ -232,7 +232,7 @@ void SyncMetricStorage::BoundEntry::RecordLong(int64_t value) noexcept
   dirty_ = true;
 }
 
-void SyncMetricStorage::BoundEntry::RecordDouble(double value) noexcept
+void SyncMetricStorage::BoundEntry::RecordDouble(double value)
 {
   if (value_type_ != InstrumentValueType::kDouble)
   {

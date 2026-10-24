@@ -124,8 +124,7 @@ protected:
    * Shuts down the processor and does any cleanup required. Completely drains the buffer/queue of
    * all its logs and passes them to the exporter.
    */
-  bool InternalShutdown(
-      std::chrono::microseconds timeout = (std::chrono::microseconds::max)()) noexcept;
+  bool InternalShutdown(std::chrono::microseconds timeout = (std::chrono::microseconds::max)());
 
   /**
    * The background routine performed by the worker thread.

@@ -93,9 +93,7 @@ enum OwnedAttributeType : std::uint8_t  // NOLINT(cppcoreguidelines-use-enum-cla
 //   0xE0-0xEF  1110xxxx  lead of a 3-byte sequence
 //   0xF0-0xF7  11110xxx  lead of a 4-byte sequence
 //   0xF8-0xFF            not a valid lead byte
-inline std::size_t Utf8SafePrefixLength(const char *data,
-                                        std::size_t size,
-                                        std::size_t max_bytes) noexcept
+inline std::size_t Utf8SafePrefixLength(const char *data, std::size_t size, std::size_t max_bytes)
 {
   // When the whole value fits within the budget (including the common
   // unbounded case where max_bytes is SIZE_MAX), no truncation is possible,
@@ -162,7 +160,7 @@ struct AttributeConverter
   /// Constructs a converter that truncates string and bytes alternatives to
   /// at most `max_length` bytes during conversion. Other alternatives are
   /// unaffected. Used by recordables enforcing attribute_value_length_limit.
-  explicit AttributeConverter(std::size_t max_length) noexcept : max_length_(max_length) {}
+  explicit AttributeConverter(std::size_t max_length) : max_length_(max_length) {}
 
   OwnedAttributeValue operator()(bool v) { return OwnedAttributeValue(v); }
   OwnedAttributeValue operator()(int32_t v) { return OwnedAttributeValue(v); }
@@ -236,33 +234,33 @@ struct AttributeEqualToVisitor
 {
   // Different types are not equal including containers of different element types
   template <typename T, typename U>
-  bool operator()(const T &, const U &) const noexcept
+  bool operator()(const T &, const U &) const
   {
     return false;
   }
 
   // Compare the same arithmetic types
   template <typename T>
-  bool operator()(const T &owned_value, const T &value) const noexcept
+  bool operator()(const T &owned_value, const T &value) const
   {
     return owned_value == value;
   }
 
   // Compare std::string and const char*
-  bool operator()(const std::string &owned_value, const char *value) const noexcept
+  bool operator()(const std::string &owned_value, const char *value) const
   {
     return owned_value == value;
   }
 
   // Compare std::string and nostd::string_view
-  bool operator()(const std::string &owned_value, nostd::string_view value) const noexcept
+  bool operator()(const std::string &owned_value, nostd::string_view value) const
   {
     return owned_value == value;
   }
 
   // Compare std::vector<std::string> and nostd::span<const nostd::string_view>
   bool operator()(const std::vector<std::string> &owned_value,
-                  const nostd::span<const nostd::string_view> &value) const noexcept
+                  const nostd::span<const nostd::string_view> &value) const
   {
     return owned_value.size() == value.size() &&
            std::equal(owned_value.begin(), owned_value.end(), value.begin(),
@@ -273,8 +271,7 @@ struct AttributeEqualToVisitor
 
   // Compare nostd::span<const T> and std::vector<T> for arithmetic types
   template <typename T>
-  bool operator()(const std::vector<T> &owned_value,
-                  const nostd::span<const T> &value) const noexcept
+  bool operator()(const std::vector<T> &owned_value, const nostd::span<const T> &value) const
   {
     return owned_value.size() == value.size() &&
            std::equal(owned_value.begin(), owned_value.end(), value.begin());
@@ -291,7 +288,7 @@ struct AttributeEqualToVisitor
  */
 template <typename Map, typename Value>
 inline std::pair<typename Map::iterator, bool>
-AttributeInsertOrAssign(Map &map, opentelemetry::nostd::string_view key, Value &&value) noexcept
+AttributeInsertOrAssign(Map &map, opentelemetry::nostd::string_view key, Value &&value)
 {
 #if __cplusplus >= 201703L
   // Use insert_or_assign if C++17 is available
@@ -352,7 +349,7 @@ inline std::pair<ValueType, bool> VisitVariantImpl(Visitor &&visitor,
  *
  */
 template <typename Visitor, typename Variant>
-inline auto VisitVariant(Visitor &&visitor, const Variant &value) noexcept
+inline auto VisitVariant(Visitor &&visitor, const Variant &value)
 {
   using VisitorReturnType =
       decltype(opentelemetry::nostd::visit(std::forward<Visitor>(visitor), value));
@@ -421,14 +418,14 @@ public:
   void ConstructFrom(const opentelemetry::common::KeyValueIterable &attributes)
   {
     attributes.ForEachKeyValue(
-        [&](nostd::string_view key, const opentelemetry::common::AttributeValue &value) noexcept {
+        [&](nostd::string_view key, const opentelemetry::common::AttributeValue &value) {
           SetAttribute(key, value);
           return true;
         });
   }
 
   // Returns a reference to this map
-  const std::unordered_map<std::string, OwnedAttributeValue> &GetAttributes() const noexcept
+  const std::unordered_map<std::string, OwnedAttributeValue> &GetAttributes() const
   {
     return (*this);
   }
@@ -436,7 +433,7 @@ public:
   // Convert non-owning key-value to owning std::string(key) and OwnedAttributeValue(value)
   bool SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value,
-                    std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept
+                    std::size_t max_length = (std::numeric_limits<std::size_t>::max)())
   {
     std::pair<OwnedAttributeValue, bool> result =
         VisitVariant(AttributeConverter(max_length), value);
@@ -449,7 +446,7 @@ public:
   }
 
   // Compare the attributes of this map with another KeyValueIterable
-  bool EqualTo(const opentelemetry::common::KeyValueIterable &attributes) const noexcept
+  bool EqualTo(const opentelemetry::common::KeyValueIterable &attributes) const
   {
     if (attributes.size() != this->size())
     {
@@ -457,8 +454,7 @@ public:
     }
 
     const bool is_equal = attributes.ForEachKeyValue(
-        [this](nostd::string_view key,
-               const opentelemetry::common::AttributeValue &value) noexcept {
+        [this](nostd::string_view key, const opentelemetry::common::AttributeValue &value) {
           // Perform a linear search to find the key assuming the map is small
           // This avoids temporary string creation from this->find(std::string(key))
           for (const auto &kv : *this)
@@ -491,7 +487,7 @@ public:
       : OrderedAttributeMap()
   {
     attributes.ForEachKeyValue(
-        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) noexcept {
+        [&](nostd::string_view key, opentelemetry::common::AttributeValue value) {
           SetAttribute(key, value);
           return true;
         });
@@ -510,15 +506,12 @@ public:
   }
 
   // Returns a reference to this map
-  const std::map<std::string, OwnedAttributeValue> &GetAttributes() const noexcept
-  {
-    return (*this);
-  }
+  const std::map<std::string, OwnedAttributeValue> &GetAttributes() const { return (*this); }
 
   // Convert non-owning key-value to owning std::string(key) and OwnedAttributeValue(value)
   void SetAttribute(nostd::string_view key,
                     const opentelemetry::common::AttributeValue &value,
-                    std::size_t max_length = (std::numeric_limits<std::size_t>::max)()) noexcept
+                    std::size_t max_length = (std::numeric_limits<std::size_t>::max)())
   {
     std::pair<OwnedAttributeValue, bool> result =
         VisitVariant(AttributeConverter(max_length), value);

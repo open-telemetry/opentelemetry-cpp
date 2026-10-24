@@ -58,11 +58,11 @@ struct SamplingResult
   //  The tracestate used by the span.
   nostd::shared_ptr<opentelemetry::trace::TraceState> trace_state;
 
-  inline bool IsRecording() const noexcept
+  inline bool IsRecording() const
   {
     return decision == Decision::RECORD_ONLY || decision == Decision::RECORD_AND_SAMPLE;
   }
-  inline bool IsSampled() const noexcept { return decision == Decision::RECORD_AND_SAMPLE; }
+  inline bool IsSampled() const { return decision == Decision::RECORD_AND_SAMPLE; }
 };
 
 /**
@@ -101,7 +101,7 @@ public:
       nostd::string_view name,
       opentelemetry::trace::SpanKind span_kind,
       const opentelemetry::common::KeyValueIterable &attributes,
-      const opentelemetry::trace::SpanContextKeyValueIterable &links) noexcept = 0;
+      const opentelemetry::trace::SpanContextKeyValueIterable &links) = 0;
 
   /**
    * Returns the sampler name or short description with the configuration.
@@ -109,7 +109,7 @@ public:
    *
    * @return the description of this Sampler.
    */
-  virtual nostd::string_view GetDescription() const noexcept = 0;
+  virtual nostd::string_view GetDescription() const = 0;
 };
 }  // namespace trace
 }  // namespace sdk

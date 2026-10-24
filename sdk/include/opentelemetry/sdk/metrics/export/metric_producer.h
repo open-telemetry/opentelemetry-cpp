@@ -113,7 +113,7 @@ public:
    * the MetricProducer. Implementations may return successfully collected points even if there is a
    * partial failure.
    */
-  virtual Result Produce() noexcept = 0;
+  virtual Result Produce() = 0;
 };
 
 }  // namespace metrics

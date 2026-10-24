@@ -9,31 +9,29 @@ namespace sdk
 namespace logs
 {
 
-OPENTELEMETRY_EXPORT bool LoggerConfig::operator==(const LoggerConfig &other) const noexcept
+OPENTELEMETRY_EXPORT bool LoggerConfig::operator==(const LoggerConfig &other) const
 {
   return enabled_ == other.enabled_ && minimum_severity_ == other.minimum_severity_ &&
          trace_based_ == other.trace_based_;
 }
 
-OPENTELEMETRY_EXPORT bool LoggerConfig::IsEnabled() const noexcept
+OPENTELEMETRY_EXPORT bool LoggerConfig::IsEnabled() const
 {
   return enabled_;
 }
 
-OPENTELEMETRY_EXPORT opentelemetry::logs::Severity LoggerConfig::GetMinimumSeverity() const noexcept
+OPENTELEMETRY_EXPORT opentelemetry::logs::Severity LoggerConfig::GetMinimumSeverity() const
 {
   return minimum_severity_;
 }
 
-OPENTELEMETRY_EXPORT bool LoggerConfig::IsTraceBased() const noexcept
+OPENTELEMETRY_EXPORT bool LoggerConfig::IsTraceBased() const
 {
   return trace_based_;
 }
 
 OPENTELEMETRY_EXPORT LoggerConfig
-LoggerConfig::Create(bool enabled,
-                     opentelemetry::logs::Severity minimum_severity,
-                     bool trace_based) noexcept
+LoggerConfig::Create(bool enabled, opentelemetry::logs::Severity minimum_severity, bool trace_based)
 {
   return LoggerConfig(enabled, minimum_severity, trace_based);
 }
