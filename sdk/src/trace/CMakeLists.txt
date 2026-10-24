@@ -17,6 +17,7 @@ add_library(
   simple_processor_factory.cc
   span_data.cc
   span_limits.cc
+  sampler_env.cc
   samplers/always_on_factory.cc
   samplers/always_off_factory.cc
   samplers/parent.cc

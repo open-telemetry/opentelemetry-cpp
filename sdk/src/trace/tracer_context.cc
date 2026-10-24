@@ -13,6 +13,7 @@
 #include "opentelemetry/sdk/trace/multi_span_processor.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/sampler_env.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
 #include "opentelemetry/sdk/trace/tracer_context.h"
@@ -38,7 +39,12 @@ TracerContext::TracerContext(
       processor_(std::unique_ptr<SpanProcessor>(new MultiSpanProcessor(std::move(processors)))),
       tracer_configurator_(std::move(tracer_configurator)),
       span_limits_(span_limits)
-{}
+{
+  if (!sampler_)
+  {
+    sampler_ = sampler_env::GetSamplerFromEnv();
+  }
+}
 
 Sampler &TracerContext::GetSampler() const noexcept
 {
