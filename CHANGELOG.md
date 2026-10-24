@@ -15,6 +15,13 @@ Increment the:
 
 ## [Unreleased]
 
+* [METRICS SDK] Add non-owning `KeyValueIterable` overloads to the preview
+  `ExemplarReservoir` and `ReservoirCellSelector` interfaces. Custom reservoir
+  implementations inherit compatibility adapters but must be rebuilt because
+  the SDK vtable changes. Custom selector implementations must additionally
+  implement the new `int64_t` and `double` overloads.
+  [#4475](https://github.com/open-telemetry/opentelemetry-cpp/pull/4475)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
@@ -388,14 +395,6 @@ Breaking changes:
     the exporter implementation needs to be adjusted,
     when using the NoopSpan.
 
-<<<<<<< HEAD
-* [METRICS SDK] Add non-owning `KeyValueIterable` overloads to the preview
-  `ExemplarReservoir` and `ReservoirCellSelector` interfaces. Custom reservoir
-  implementations inherit compatibility adapters but must be rebuilt because
-  the SDK vtable changes. Custom selector implementations must additionally
-  implement the new `int64_t` and `double` overloads.
-  [#4475](https://github.com/open-telemetry/opentelemetry-cpp/pull/4475)
-=======
 Security fixes:
 
 * [SECURITY] Fix baggage metadata injection and reject unsafe curl headers
@@ -412,7 +411,6 @@ Security fixes:
   * This includes configured exporter headers.
   * Applications must recompile to receive the header-only baggage fix,
     using API headers from opentelemetry-cpp 1.30.0 (or later)
->>>>>>> ac7b87a871b258c8afd2e5dd0bb167d187fa5696
 
 ## [1.29.0] 2026-09-13
 
