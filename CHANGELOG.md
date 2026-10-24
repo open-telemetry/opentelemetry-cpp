@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Decide Elasticsearch bulk export success from the HTTP status, the
+  errors flag, and one acknowledgement per record that names its target index
+  and says the operation applied
+  [#4297](https://github.com/open-telemetry/opentelemetry-cpp/pull/4297)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
