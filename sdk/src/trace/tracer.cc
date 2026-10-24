@@ -3,7 +3,6 @@
 
 #include <chrono>
 #include <cstdint>
-#include <mutex>
 #include <utility>
 
 #include "opentelemetry/context/context.h"
@@ -40,11 +39,10 @@ Tracer::Tracer(std::shared_ptr<TracerContext> context,
                std::unique_ptr<InstrumentationScope> instrumentation_scope)
     : instrumentation_scope_{std::move(instrumentation_scope)},
       context_{std::move(context)},
-      tracer_config_(context_->GetTracerConfigurator().ComputeConfig(*instrumentation_scope_)),
       noop_span_{std::make_shared<opentelemetry::trace::DefaultSpan>(
           opentelemetry::trace::SpanContext::GetInvalid())}
 {
-  UpdateEnabled(tracer_config_.IsEnabled());
+  UpdateTracerConfig(context_->GetTracerConfigurator().ComputeConfig(*instrumentation_scope_));
 }
 
 nostd::shared_ptr<opentelemetry::trace::Span> Tracer::StartSpan(
@@ -203,12 +201,7 @@ void Tracer::CloseWithMicroseconds(uint64_t timeout) noexcept
 
 void Tracer::UpdateTracerConfig(TracerConfig config)
 {
-  const bool enabled = config.IsEnabled();
-  {
-    std::lock_guard<std::mutex> lock(tracer_config_mutex_);
-    tracer_config_ = config;
-  }
-  UpdateEnabled(enabled);
+  UpdateEnabled(config.IsEnabled());
 }
 
 }  // namespace trace

@@ -65,3 +65,7 @@ Checks: >
   -modernize-make-unique,
   -modernize-make-shared,
 
+CheckOptions:
+    - key: bugprone-exception-escape.TreatFunctionsWithoutSpecificationAsThrowing
+      value: OnlyUndefined
+
