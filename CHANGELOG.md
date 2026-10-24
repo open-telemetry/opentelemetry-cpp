@@ -15,6 +15,28 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Finish a curl operation that never gets scheduled, instead of leaving
+  FinishSession blocked forever
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
+
+* [BUG] Report a curl request the multi handle refused as a failed create,
+  rather than as a cancel nobody asked for
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
+
+* [BUG] Store the curl session state before the event that reports it, so a
+  cancel dispatched by the IO thread is not overwritten or raced
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
+
+* [BUG] Let a handler finish the request it is being told about from any event,
+  including the ones the IO thread delivers, instead of waiting on a completion
+  only that thread goes on to publish
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
+
+* [BUG] Decide whether a curl thread is inside a callback without an
+  unsynchronized member, which was read and written from two threads behind a
+  sanitizer suppression
+  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
@@ -164,31 +186,6 @@ Changes:
 
 * chore: fix duplicated and incorrect SpinLockMutex comments
   [#4641](https://github.com/open-telemetry/opentelemetry-cpp/pull/4641)
-* [SDK] Fix spatial re-aggregation for asynchronous instruments. A view which
-  drops attributes is now applied to asynchronous instruments as well, and the
-  observations which collapse onto the same attribute set are re-aggregated
-  (summed up for the additive instruments) instead of the last observation
-  overwriting the previous ones.
-  Note that `AsyncMetricStorage`'s constructor now takes the view's
-  `AttributesProcessor`, matching `SyncMetricStorage`.
-  [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
-* [BUG] Finish a curl operation that never gets scheduled, instead of leaving
-  FinishSession blocked forever
-  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
-* [BUG] Report a curl request the multi handle refused as a failed create,
-  rather than as a cancel nobody asked for
-  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
-* [BUG] Store the curl session state before the event that reports it, so a
-  cancel dispatched by the IO thread is not overwritten or raced
-  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
-* [BUG] Let a handler finish the request it is being told about from any event,
-  including the ones the IO thread delivers, instead of waiting on a completion
-  only that thread goes on to publish
-  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
-* [BUG] Decide whether a curl thread is inside a callback without an
-  unsynchronized member, which was read and written from two threads behind a
-  sanitizer suppression
-  ([#4395](https://github.com/open-telemetry/opentelemetry-cpp/pull/4395))
 
 * Update dependency curl to v8.22.0
   [#4645](https://github.com/open-telemetry/opentelemetry-cpp/pull/4645)
