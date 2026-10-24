@@ -15,6 +15,11 @@ Increment the:
 
 ## [Unreleased]
 
+* [BUG] Decide Elasticsearch bulk export success from the HTTP status, the
+  errors flag, and one acknowledgement per record that names its target index
+  and says the operation applied
+  [#4297](https://github.com/open-telemetry/opentelemetry-cpp/pull/4297)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
@@ -400,18 +405,6 @@ Security fixes:
   * This includes configured exporter headers.
   * Applications must recompile to receive the header-only baggage fix,
     using API headers from opentelemetry-cpp 1.30.0 (or later)
-* [SDK] Fix spatial re-aggregation for asynchronous instruments. A view which
-  drops attributes is now applied to asynchronous instruments as well, and the
-  observations which collapse onto the same attribute set are re-aggregated
-  (summed up for the additive instruments) instead of the last observation
-  overwriting the previous ones.
-  Note that `AsyncMetricStorage`'s constructor now takes the view's
-  `AttributesProcessor`, matching `SyncMetricStorage`.
-  [#1724](https://github.com/open-telemetry/opentelemetry-cpp/issues/1724)
-* [BUG] Decide Elasticsearch bulk export success from the HTTP status, the
-  errors flag, and one acknowledgement per record that names its target index
-  and says the operation applied
-  [#4297](https://github.com/open-telemetry/opentelemetry-cpp/pull/4297)
 
 ## [1.29.0] 2026-09-13
 
