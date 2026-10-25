@@ -426,7 +426,19 @@ ConfigurationParser::ParseOtlpHttpLogRecordExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->max_request_size  = node->GetInteger("max_request_size", Config::kMaxRequestSize);
+    model->max_response_size = node->GetInteger("max_response_size", Config::kMaxResponseSize);
+  }
+  else
+  {
+    model->max_request_size  = 0;
+    model->max_response_size = Config::kMaxResponseSize;
+  }
+
+  model->timeout = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   const std::string encoding = node->GetString("encoding", "protobuf");
   model->encoding            = ParseOtlpHttpEncoding(node, encoding);
@@ -458,7 +470,19 @@ ConfigurationParser::ParseOtlpGrpcLogRecordExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->max_request_size  = node->GetInteger("max_request_size", Config::kMaxRequestSize);
+    model->max_response_size = node->GetInteger("max_response_size", Config::kMaxResponseSize);
+  }
+  else
+  {
+    model->max_request_size  = 0;
+    model->max_response_size = Config::kMaxResponseSize;
+  }
+
+  model->timeout = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   return model;
 }
@@ -810,7 +834,19 @@ ConfigurationParser::ParseOtlpHttpPushMetricExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->max_request_size  = node->GetInteger("max_request_size", Config::kMaxRequestSize);
+    model->max_response_size = node->GetInteger("max_response_size", Config::kMaxResponseSize);
+  }
+  else
+  {
+    model->max_request_size  = 0;
+    model->max_response_size = Config::kMaxResponseSize;
+  }
+
+  model->timeout = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   const std::string temporality_preference =
       node->GetString("temporality_preference", "cumulative");
@@ -851,7 +887,19 @@ ConfigurationParser::ParseOtlpGrpcPushMetricExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->max_request_size  = node->GetInteger("max_request_size", Config::kMaxRequestSize);
+    model->max_response_size = node->GetInteger("max_response_size", Config::kMaxResponseSize);
+  }
+  else
+  {
+    model->max_request_size  = 0;
+    model->max_response_size = Config::kMaxResponseSize;
+  }
+
+  model->timeout = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   const std::string temporality_preference =
       node->GetString("temporality_preference", "cumulative");
@@ -2234,7 +2282,19 @@ ConfigurationParser::ParseOtlpHttpSpanExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->max_request_size  = node->GetInteger("max_request_size", Config::kMaxRequestSize);
+    model->max_response_size = node->GetInteger("max_response_size", Config::kMaxResponseSize);
+  }
+  else
+  {
+    model->max_request_size  = 0;
+    model->max_response_size = Config::kMaxResponseSize;
+  }
+
+  model->timeout = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   const std::string encoding = node->GetString("encoding", "protobuf");
   model->encoding            = ParseOtlpHttpEncoding(node, encoding);
@@ -2266,7 +2326,19 @@ ConfigurationParser::ParseOtlpGrpcSpanExporterConfiguration(
 
   model->headers_list = node->GetString("headers_list", "");
   model->compression  = node->GetString("compression", "");
-  model->timeout      = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->max_request_size  = node->GetInteger("max_request_size", Config::kMaxRequestSize);
+    model->max_response_size = node->GetInteger("max_response_size", Config::kMaxResponseSize);
+  }
+  else
+  {
+    model->max_request_size  = 0;
+    model->max_response_size = Config::kMaxResponseSize;
+  }
+
+  model->timeout = node->GetInteger("timeout", Config::kDefaultTimeoutMs);
 
   return model;
 }
