@@ -8,6 +8,7 @@
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/always_record_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
@@ -313,6 +314,10 @@ public:
       size_t depth) const;
 
   std::unique_ptr<AlwaysOnSamplerConfiguration> ParseAlwaysOnSamplerConfiguration(
+      const std::unique_ptr<DocumentNode> &node,
+      size_t depth) const;
+
+  std::unique_ptr<AlwaysRecordSamplerConfiguration> ParseAlwaysRecordSamplerConfiguration(
       const std::unique_ptr<DocumentNode> &node,
       size_t depth) const;
 

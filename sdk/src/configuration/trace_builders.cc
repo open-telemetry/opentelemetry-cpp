@@ -16,6 +16,7 @@
 #include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_builder.h"
+#include "opentelemetry/sdk/configuration/always_record_sampler_builder.h"
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_builder.h"
 #include "opentelemetry/sdk/configuration/batch_span_processor_configuration.h"
@@ -107,6 +108,20 @@ public:
       const AlwaysOffSamplerConfiguration * /* model */) const override
   {
     return opentelemetry::sdk::trace::AlwaysOffSamplerFactory::Create();
+  }
+};
+
+class DefaultAlwaysRecordSamplerBuilder : public AlwaysRecordSamplerBuilder
+{
+public:
+  std::unique_ptr<opentelemetry::sdk::trace::Sampler> Build(
+      const AlwaysRecordSamplerConfiguration * /* model */) const override
+  {
+    static const std::string die("AlwaysRecordSampler not supported");
+    throw UnsupportedException(die);
+
+    // FIXME: Implement AlwaysRecordSampler in SDK
+    // return opentelemetry::sdk::trace::AlwaysRecordSamplerFactory::Create();
   }
 };
 
@@ -527,6 +542,7 @@ void RegisterDefaultTraceBuilders(Registry *registry)
 {
   registry->SetAlwaysOnSamplerBuilder(std::make_unique<DefaultAlwaysOnSamplerBuilder>());
   registry->SetAlwaysOffSamplerBuilder(std::make_unique<DefaultAlwaysOffSamplerBuilder>());
+  registry->SetAlwaysRecordSamplerBuilder(std::make_unique<DefaultAlwaysRecordSamplerBuilder>());
   registry->SetTraceIdRatioBasedSamplerBuilder(
       std::make_unique<DefaultTraceIdRatioBasedSamplerBuilder>());
   registry->SetProbabilitySamplerBuilder(std::make_unique<DefaultProbabilitySamplerBuilder>());

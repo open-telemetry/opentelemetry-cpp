@@ -16,6 +16,7 @@
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/always_record_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
@@ -1713,6 +1714,16 @@ ConfigurationParser::ParseAlwaysOnSamplerConfiguration(
   return model;
 }
 
+std::unique_ptr<AlwaysRecordSamplerConfiguration>
+ConfigurationParser::ParseAlwaysRecordSamplerConfiguration(
+    const std::unique_ptr<DocumentNode> & /* node */,
+    size_t /* depth */) const
+{
+  auto model = std::make_unique<AlwaysRecordSamplerConfiguration>();
+
+  return model;
+}
+
 // NOLINTBEGIN(misc-no-recursion)
 std::unique_ptr<JaegerRemoteSamplerConfiguration>
 ConfigurationParser::ParseJaegerRemoteSamplerConfiguration(
@@ -2108,6 +2119,11 @@ std::unique_ptr<SamplerConfiguration> ConfigurationParser::ParseSamplerConfigura
   else if (name == "always_on")
   {
     model = ParseAlwaysOnSamplerConfiguration(child, depth);
+  }
+  else if ((version_major_ == 1) && (version_minor_ >= 2) && (name == "always_record"))
+  {
+    // Added in version 1.2.0
+    model = ParseAlwaysRecordSamplerConfiguration(child, depth);
   }
   else if (name == "jaeger_remote")
   {
@@ -2892,7 +2908,7 @@ std::unique_ptr<Configuration> ConfigurationParser::Parse(std::unique_ptr<Docume
       throw InvalidSchemaException(node->Location(), message);
     }
 
-    if (minor > 1)
+    if (minor > 2)
     {
       std::string message("Unsupported file_format, major = ");
       message.append(std::to_string(major));
