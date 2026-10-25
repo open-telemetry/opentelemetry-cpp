@@ -567,11 +567,8 @@ metric_sdk::AggregationType PrometheusExporterUtils::getAggregationType(
     const metric_sdk::PointType &point_type)
 {
 
-  if (nostd::holds_alternative<sdk::metrics::LongSumPointData>(point_type))
-  {
-    return metric_sdk::AggregationType::kSum;
-  }
-  else if (nostd::holds_alternative<sdk::metrics::DoubleSumPointData>(point_type))
+  if (nostd::holds_alternative<sdk::metrics::LongSumPointData>(point_type) ||
+      nostd::holds_alternative<sdk::metrics::DoubleSumPointData>(point_type))
   {
     return metric_sdk::AggregationType::kSum;
   }

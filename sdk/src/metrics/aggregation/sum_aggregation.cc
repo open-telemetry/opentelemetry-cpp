@@ -7,7 +7,6 @@
 #include <ostream>
 
 #include "opentelemetry/common/spin_lock_mutex.h"
-#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"

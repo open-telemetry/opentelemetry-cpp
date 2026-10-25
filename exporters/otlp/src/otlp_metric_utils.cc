@@ -56,12 +56,9 @@ metric_sdk::AggregationType OtlpMetricUtils::GetAggregationType(
   }
   auto point_data_with_attributes = metric_data.point_data_attr_[0];
   if (nostd::holds_alternative<sdk::metrics::LongSumPointData>(
+          point_data_with_attributes.point_data) ||
+      nostd::holds_alternative<sdk::metrics::DoubleSumPointData>(
           point_data_with_attributes.point_data))
-  {
-    return metric_sdk::AggregationType::kSum;
-  }
-  else if (nostd::holds_alternative<sdk::metrics::DoubleSumPointData>(
-               point_data_with_attributes.point_data))
   {
     return metric_sdk::AggregationType::kSum;
   }

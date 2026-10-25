@@ -37,8 +37,8 @@ public:
   bool is_monotonic_ = true;
 };
 
-typedef SumPointData<int64_t> LongSumPointData;
-typedef SumPointData<double> DoubleSumPointData;
+using LongSumPointData   = SumPointData<int64_t>;
+using DoubleSumPointData = SumPointData<double>;
 
 class LastValuePointData
 {
