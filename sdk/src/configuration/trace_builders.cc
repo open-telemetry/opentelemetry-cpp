@@ -453,6 +453,7 @@ private:
 
     opentelemetry::sdk::trace::SpanLimits span_limits;
     OptionalValue<std::size_t> model_attribute_value_length_limit;
+    OptionalValue<std::size_t> model_attribute_value_depth_limit;
     OptionalValue<std::uint32_t> model_attribute_count_limit;
     OptionalValue<std::uint32_t> model_event_count_limit;
     OptionalValue<std::uint32_t> model_link_count_limit;
@@ -461,6 +462,7 @@ private:
     if (model->limits)
     {
       model_attribute_value_length_limit = model->limits->attribute_value_length_limit;
+      model_attribute_value_depth_limit  = model->limits->attribute_value_depth_limit;
       model_attribute_count_limit        = model->limits->attribute_count_limit;
       model_event_count_limit            = model->limits->event_count_limit;
       model_link_count_limit             = model->limits->link_count_limit;
@@ -469,16 +471,21 @@ private:
     }
 
     OptionalValue<std::size_t> general_attribute_value_length_limit;
+    OptionalValue<std::size_t> general_attribute_value_depth_limit;
     OptionalValue<std::size_t> general_attribute_count_limit;
     if (context.attribute_limits)
     {
       general_attribute_value_length_limit = context.attribute_limits->attribute_value_length_limit;
+      general_attribute_value_depth_limit  = context.attribute_limits->attribute_value_depth_limit;
       general_attribute_count_limit        = context.attribute_limits->attribute_count_limit;
     }
 
     using SpanLimitDefaults = SpanLimitsConfiguration;
     span_limits.attribute_value_length_limit =
         ResolveLimit(model_attribute_value_length_limit, general_attribute_value_length_limit,
+                     SpanLimitDefaults::kDefaultAttributeValueLengthLimit);
+    span_limits.attribute_value_depth_limit =
+        ResolveLimit(model_attribute_value_depth_limit, general_attribute_value_depth_limit,
                      SpanLimitDefaults::kDefaultAttributeValueLengthLimit);
     span_limits.attribute_count_limit =
         ResolveLimit(model_attribute_count_limit, ToOptionalUint32(general_attribute_count_limit),

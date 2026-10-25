@@ -365,7 +365,13 @@ ConfigurationParser::ParseAttributeLimitsConfiguration(
   auto model = std::make_unique<AttributeLimitsConfiguration>();
 
   model->attribute_value_length_limit = node->GetOptionalInteger("attribute_value_length_limit");
-  model->attribute_count_limit        = node->GetOptionalInteger("attribute_count_limit");
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->attribute_value_depth_limit = node->GetOptionalInteger("attribute_value_depth_limit");
+  }
+
+  model->attribute_count_limit = node->GetOptionalInteger("attribute_count_limit");
 
   return model;
 }
@@ -642,7 +648,13 @@ ConfigurationParser::ParseLogRecordLimitsConfiguration(
   auto model = std::make_unique<LogRecordLimitsConfiguration>();
 
   model->attribute_value_length_limit = node->GetOptionalInteger("attribute_value_length_limit");
-  model->attribute_count_limit        = node->GetOptionalInteger("attribute_count_limit");
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->attribute_value_depth_limit = node->GetOptionalInteger("attribute_value_depth_limit");
+  }
+
+  model->attribute_count_limit = node->GetOptionalInteger("attribute_count_limit");
 
   return model;
 }
@@ -1721,11 +1733,17 @@ std::unique_ptr<SpanLimitsConfiguration> ConfigurationParser::ParseSpanLimitsCon
   };
 
   model->attribute_value_length_limit = node->GetOptionalInteger("attribute_value_length_limit");
-  model->attribute_count_limit        = get_optional_uint32("attribute_count_limit");
-  model->event_count_limit            = get_optional_uint32("event_count_limit");
-  model->link_count_limit             = get_optional_uint32("link_count_limit");
-  model->event_attribute_count_limit  = get_optional_uint32("event_attribute_count_limit");
-  model->link_attribute_count_limit   = get_optional_uint32("link_attribute_count_limit");
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    model->attribute_value_depth_limit = node->GetOptionalInteger("attribute_value_depth_limit");
+  }
+
+  model->attribute_count_limit       = get_optional_uint32("attribute_count_limit");
+  model->event_count_limit           = get_optional_uint32("event_count_limit");
+  model->link_count_limit            = get_optional_uint32("link_count_limit");
+  model->event_attribute_count_limit = get_optional_uint32("event_attribute_count_limit");
+  model->link_attribute_count_limit  = get_optional_uint32("link_attribute_count_limit");
 
   return model;
 }
