@@ -638,4 +638,98 @@ TEST(PrometheusExporterUtils, CrossSourceScopeCollisionsAndArrayAttributes)
   }
 }
 
+TEST(PrometheusExporterUtils, InstrumentationScopeLabelsAndAttributes)
+{
+  auto scope = InstrumentationScope::Create("library_name", "1.2.0",
+                                            "https://opentelemetry.io/schemas/1.21.0",
+                                            {{"scope.attr1", "val1"}, {"scope.attr2", 42}});
+
+  metric_sdk::SumPointData sum_point_data{};
+  sum_point_data.value_ = 10.0;
+  metric_sdk::MetricData metric_data{
+      metric_sdk::InstrumentDescriptor{"requests", "description", "1",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{}, sum_point_data}}};
+
+  Resource resource = Resource::Create(ResourceAttributes{});
+  metric_sdk::ResourceMetrics data{
+      &resource, std::vector<metric_sdk::ScopeMetrics>{
+                     {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
+  ASSERT_EQ(translated.size(), 1U);
+  ASSERT_EQ(translated[0].metric.size(), 1U);
+
+  const auto &labels                                    = translated[0].metric[0].label;
+  std::vector<prometheus::ClientMetric::Label> expected = {
+      {"otel_scope_name", "library_name"},
+      {"otel_scope_version", "1.2.0"},
+      {"otel_scope_schema_url", "https://opentelemetry.io/schemas/1.21.0"},
+      {"otel_scope_scope_attr1", "val1"},
+      {"otel_scope_scope_attr2", "42"}};
+  ASSERT_EQ(labels.size(), expected.size());
+  for (std::size_t i = 0; i < expected.size(); ++i)
+  {
+    EXPECT_EQ(labels[i].name, expected[i].name);
+    EXPECT_EQ(labels[i].value, expected[i].value);
+  }
+
+  auto translated_without_scope = PrometheusExporterUtils::TranslateToPrometheus(data, false, true);
+  ASSERT_EQ(translated_without_scope.size(), 1U);
+  ASSERT_EQ(translated_without_scope[0].metric.size(), 1U);
+  EXPECT_TRUE(translated_without_scope[0].metric[0].label.empty());
+}
+
+TEST(PrometheusExporterUtils, InstrumentationScopeAttributeCollisionsAndReservedConflicts)
+{
+  auto scope = InstrumentationScope::Create("library_name", "1.2.0",
+                                            "https://opentelemetry.io/schemas/1.21.0",
+                                            {{"name", "ignored_name"},
+                                             {"_name", "ignored_leading_underscore_name"},
+                                             {"version", "ignored_version"},
+                                             {"schema_url", "ignored_schema_url"},
+                                             {"schema.url", "ignored_schema_dot_url"},
+                                             {"foo.a", "value1"},
+                                             {"foo_a", "value2"},
+                                             {"foo.b", "value3"},
+                                             {"foo__a", "value4"}});
+
+  metric_sdk::SumPointData sum_point_data{};
+  sum_point_data.value_ = 5.0;
+  metric_sdk::MetricData metric_data{
+      metric_sdk::InstrumentDescriptor{"requests", "description", "1",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{{"k", "v"}}, sum_point_data}}};
+
+  Resource resource = Resource::Create(ResourceAttributes{});
+  metric_sdk::ResourceMetrics data{
+      &resource, std::vector<metric_sdk::ScopeMetrics>{
+                     {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
+  ASSERT_EQ(translated.size(), 1U);
+  ASSERT_EQ(translated[0].metric.size(), 1U);
+
+  const auto &labels                                    = translated[0].metric[0].label;
+  std::vector<prometheus::ClientMetric::Label> expected = {
+      {"k", "v"},
+      {"otel_scope_name", "library_name"},
+      {"otel_scope_version", "1.2.0"},
+      {"otel_scope_schema_url", "https://opentelemetry.io/schemas/1.21.0"},
+      {"otel_scope_foo_a", "value1;value4;value2"},
+      {"otel_scope_foo_b", "value3"}};
+  ASSERT_EQ(labels.size(), expected.size());
+  for (std::size_t i = 0; i < expected.size(); ++i)
+  {
+    EXPECT_EQ(labels[i].name, expected[i].name);
+    EXPECT_EQ(labels[i].value, expected[i].value);
+  }
+}
+
 OPENTELEMETRY_END_NAMESPACE
