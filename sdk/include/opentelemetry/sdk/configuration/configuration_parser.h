@@ -108,6 +108,7 @@
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/translation_strategy.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
+#include "opentelemetry/sdk/configuration/view_matching_mode.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/version.h"
@@ -258,6 +259,9 @@ public:
 
   ExemplarFilter ParseExemplarFilter(const std::unique_ptr<DocumentNode> &node,
                                      const std::string &name) const;
+
+  ViewMatchingMode ParseViewMatchingMode(const std::unique_ptr<DocumentNode> &node,
+                                         const std::string &name) const;
 
   std::unique_ptr<ViewSelectorConfiguration> ParseViewSelectorConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;

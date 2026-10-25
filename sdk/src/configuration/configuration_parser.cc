@@ -131,6 +131,7 @@
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/translation_strategy.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
+#include "opentelemetry/sdk/configuration/view_matching_mode.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
@@ -1334,6 +1335,30 @@ ExemplarFilter ConfigurationParser::ParseExemplarFilter(const std::unique_ptr<Do
   throw InvalidSchemaException(node->Location(), message);
 }
 
+ViewMatchingMode ConfigurationParser::ParseViewMatchingMode(
+    const std::unique_ptr<DocumentNode> &node,
+    const std::string &name) const
+{
+  if (name == "")
+  {
+    return ViewMatchingMode::independent;
+  }
+
+  if (name == "independent")
+  {
+    return ViewMatchingMode::independent;
+  }
+
+  if (name == "composable")
+  {
+    return ViewMatchingMode::composable;
+  }
+
+  std::string message("Illegal view matching mode: ");
+  message.append(name);
+  throw InvalidSchemaException(node->Location(), message);
+}
+
 std::unique_ptr<ViewSelectorConfiguration> ConfigurationParser::ParseViewSelectorConfiguration(
     const std::unique_ptr<DocumentNode> &node) const
 {
@@ -1616,6 +1641,17 @@ std::unique_ptr<MeterProviderConfiguration> ConfigurationParser::ParseMeterProvi
   if (child)
   {
     model->meter_configurator = ParseMeterConfiguratorConfiguration(child);
+  }
+
+  if ((version_major_ == 1) && (version_minor_ >= 2))
+  {
+    std::string view_matching_mode =
+        node->GetString("view_matching_mode/development", "independent");
+    model->view_matching_mode = ParseViewMatchingMode(node, view_matching_mode);
+  }
+  else
+  {
+    model->view_matching_mode = ViewMatchingMode::independent;
   }
 
   return model;
