@@ -638,4 +638,73 @@ TEST(PrometheusExporterUtils, CrossSourceScopeCollisionsAndArrayAttributes)
   }
 }
 
+TEST(PrometheusExporterUtils, MultipleScopesMetricFamilyCollisions)
+{
+  Resource resource = Resource::Create(ResourceAttributes{});
+  auto scope1       = InstrumentationScope::Create("scope_1", "1.0.0");
+  auto scope2       = InstrumentationScope::Create("scope_2", "2.0.0");
+  auto scope3       = InstrumentationScope::Create("scope_3", "3.0.0");
+
+  metric_sdk::SumPointData counter_point_1{};
+  counter_point_1.value_        = 10.0;
+  counter_point_1.is_monotonic_ = true;
+
+  metric_sdk::SumPointData counter_point_2{};
+  counter_point_2.value_        = 20.0;
+  counter_point_2.is_monotonic_ = true;
+
+  metric_sdk::LastValuePointData gauge_point_3{};
+  gauge_point_3.value_              = 30.0;
+  gauge_point_3.is_lastvalue_valid_ = true;
+
+  // Scope 1 & Scope 2 emit the same metric name & type, but different descriptions.
+  metric_sdk::MetricData metric_scope_1{
+      metric_sdk::InstrumentDescriptor{"http.requests", "first description", "s",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{{"env", "prod"}}, counter_point_1}}};
+
+  metric_sdk::MetricData metric_scope_2{
+      metric_sdk::InstrumentDescriptor{"http.requests", "conflicting description", "ms",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{{"env", "dev"}}, counter_point_2}}};
+
+  // Scope 3 emits a conflicting type (Gauge) that maps to the same Prometheus name when
+  // without_units=true and without_type_suffix=true.
+  metric_sdk::MetricData metric_scope_3_conflict_type{
+      metric_sdk::InstrumentDescriptor{"http_requests", "gauge description", "1",
+                                       metric_sdk::InstrumentType::kObservableGauge,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{{"env", "stage"}}, gauge_point_3}}};
+
+  metric_sdk::ResourceMetrics data{
+      &resource,
+      std::vector<metric_sdk::ScopeMetrics>{
+          {scope1.get(), std::vector<metric_sdk::MetricData>{metric_scope_1}},
+          {scope2.get(), std::vector<metric_sdk::MetricData>{metric_scope_2}},
+          {scope3.get(), std::vector<metric_sdk::MetricData>{metric_scope_3_conflict_type}}}};
+
+  // With without_units=true and without_type_suffix=true, all three map to "http_requests".
+  // Scope 1 and Scope 2 (both Counter) should be merged into a single MetricFamily keeping
+  // "first description", while Scope 3 (Gauge) should be dropped due to type conflict.
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(
+      data, /*populate_target_info=*/false, /*without_otel_scope=*/false,
+      /*without_units=*/true, /*without_type_suffix=*/true);
+
+  ASSERT_EQ(translated.size(), 1U);
+  EXPECT_EQ(translated[0].name, "http_requests");
+  EXPECT_EQ(translated[0].help, "first description");
+  EXPECT_EQ(translated[0].type, prometheus_client::MetricType::Counter);
+  ASSERT_EQ(translated[0].metric.size(), 2U);
+  EXPECT_DOUBLE_EQ(translated[0].metric[0].counter.value, 10.0);
+  EXPECT_DOUBLE_EQ(translated[0].metric[1].counter.value, 20.0);
+}
+
 OPENTELEMETRY_END_NAMESPACE
