@@ -28,6 +28,10 @@ Increment the:
   and empty point guards
   [#4738](https://github.com/open-telemetry/opentelemetry-cpp/pull/4738)
 
+* [EXPORTER] Prometheus exporter: export instrumentation scope schema URL and
+  attributes as labels
+  [#4735](https://github.com/open-telemetry/opentelemetry-cpp/pull/4735)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
