@@ -15,8 +15,10 @@
 #include "opentelemetry/common/timestamp.h"
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/nostd/unique_ptr.h"
+#include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/instrumentationscope/instrumentation_scope.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
+#include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/export/metric_producer.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 #include "opentelemetry/sdk/resource/resource.h"
@@ -545,6 +547,93 @@ TEST_F(AttributeCollisionTest, DropsInvertedKeys)
                     {"foo_b", "value2"},
                     {"otel_scope_name", "library_name"},
                     {"otel_scope_version", "1.2.0"}});
+}
+
+TEST(PrometheusExporterUtils, EmptyPointDataAttributesAndNullResourceScopeLabels)
+{
+  auto scope = InstrumentationScope::Create("library_name", "1.2.0");
+
+  metric_sdk::MetricData empty_metric_data{
+      metric_sdk::InstrumentDescriptor{"empty_requests", "description", "1",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{}, std::vector<metric_sdk::PointDataAttributes>{}};
+
+  metric_sdk::SumPointData sum_point_data{};
+  sum_point_data.value_ = 10.0;
+  metric_sdk::MetricData metric_data{
+      metric_sdk::InstrumentDescriptor{"requests", "description", "1",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{{}, sum_point_data}}};
+
+  metric_sdk::ResourceMetrics data{
+      nullptr,
+      std::vector<metric_sdk::ScopeMetrics>{
+          {scope.get(), std::vector<metric_sdk::MetricData>{empty_metric_data, metric_data}}}};
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
+  ASSERT_EQ(translated.size(), 1U);
+  ASSERT_EQ(translated[0].metric.size(), 1U);
+
+  const auto &labels                                    = translated[0].metric[0].label;
+  std::vector<prometheus::ClientMetric::Label> expected = {{"otel_scope_name", "library_name"},
+                                                           {"otel_scope_version", "1.2.0"}};
+  ASSERT_EQ(labels.size(), expected.size());
+  for (std::size_t i = 0; i < expected.size(); ++i)
+  {
+    EXPECT_EQ(labels[i].name, expected[i].name);
+    EXPECT_EQ(labels[i].value, expected[i].value);
+  }
+}
+
+TEST(PrometheusExporterUtils, CrossSourceScopeCollisionsAndArrayAttributes)
+{
+  auto scope = InstrumentationScope::Create("library_name", "1.2.0");
+
+  metric_sdk::PointAttributes point_attrs;
+  point_attrs["otel_scope.name"]    = std::string("point_name");
+  point_attrs["otel_scope_version"] = std::string("0.9.0");
+  point_attrs["tags.a"]             = std::vector<std::string>{"a", "b\"c"};
+  point_attrs["tags_a"]             = std::vector<std::string>{"d"};
+  point_attrs["counts"]             = std::vector<int>{1, 2, 3};
+  point_attrs["flags"]              = std::vector<bool>{true, false};
+
+  metric_sdk::SumPointData sum_point_data{};
+  sum_point_data.value_ = 5.0;
+  metric_sdk::MetricData metric_data{
+      metric_sdk::InstrumentDescriptor{"requests", "description", "1",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{{std::move(point_attrs), sum_point_data}}};
+
+  Resource resource = Resource::Create(ResourceAttributes{});
+  metric_sdk::ResourceMetrics data{
+      &resource, std::vector<metric_sdk::ScopeMetrics>{
+                     {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
+  ASSERT_EQ(translated.size(), 1U);
+  ASSERT_EQ(translated[0].metric.size(), 1U);
+
+  const auto &labels                                    = translated[0].metric[0].label;
+  std::vector<prometheus::ClientMetric::Label> expected = {
+      {"counts", "[1,2,3]"},
+      {"flags", "[true,false]"},
+      {"otel_scope_name", "point_name;library_name"},
+      {"otel_scope_version", "0.9.0;1.2.0"},
+      {"tags_a", "[\"a\",\"b\\\"c\"];[\"d\"]"}};
+  ASSERT_EQ(labels.size(), expected.size());
+  for (std::size_t i = 0; i < expected.size(); ++i)
+  {
+    EXPECT_EQ(labels[i].name, expected[i].name);
+    EXPECT_EQ(labels[i].value, expected[i].value);
+  }
 }
 
 OPENTELEMETRY_END_NAMESPACE

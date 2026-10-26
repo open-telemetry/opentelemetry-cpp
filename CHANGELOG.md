@@ -15,6 +15,10 @@ Increment the:
 
 ## [Unreleased]
 
+* [EXPORTER] Prometheus exporter: fix attribute serialization, label collision,
+  and empty point guards
+  [#4738](https://github.com/open-telemetry/opentelemetry-cpp/pull/4738)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
