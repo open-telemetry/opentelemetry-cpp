@@ -9,7 +9,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <iomanip>
 #include <limits>
+#include <locale>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -166,6 +168,25 @@ std::string NumericVectorToJson(const std::vector<T> &vec)
   }
   result.push_back(']');
   return result;
+}
+
+std::string FormatDouble(double val)
+{
+  std::ostringstream ss;
+  ss.imbue(std::locale::classic());
+  ss << std::setprecision(std::numeric_limits<double>::digits10) << val;
+  std::string str = ss.str();
+  std::istringstream iss(str);
+  iss.imbue(std::locale::classic());
+  double roundtrip = 0.0;
+  if ((iss >> roundtrip) && roundtrip == val)
+  {
+    return str;
+  }
+  ss.str("");
+  ss.clear();
+  ss << std::setprecision(std::numeric_limits<double>::max_digits10) << val;
+  return ss.str();
 }
 
 }  // namespace
@@ -926,7 +947,7 @@ std::string PrometheusExporterUtils::AttributeValueToString(
       }
       else
       {
-        result.append(std::to_string(vec[i]));
+        result.append(FormatDouble(vec[i]));
       }
     }
     result.push_back(']');

@@ -600,6 +600,7 @@ TEST(PrometheusExporterUtils, CrossSourceScopeCollisionsAndArrayAttributes)
   point_attrs["tags.a"]             = std::vector<std::string>{"a", "b\"c"};
   point_attrs["tags_a"]             = std::vector<std::string>{"d"};
   point_attrs["counts"]             = std::vector<int>{1, 2, 3};
+  point_attrs["doubles"]            = std::vector<double>{1e-9, 2e-9, 1.5};
   point_attrs["flags"]              = std::vector<bool>{true, false};
 
   metric_sdk::SumPointData sum_point_data{};
@@ -624,6 +625,7 @@ TEST(PrometheusExporterUtils, CrossSourceScopeCollisionsAndArrayAttributes)
   const auto &labels                                    = translated[0].metric[0].label;
   std::vector<prometheus::ClientMetric::Label> expected = {
       {"counts", "[1,2,3]"},
+      {"doubles", "[1e-09,2e-09,1.5]"},
       {"flags", "[true,false]"},
       {"otel_scope_name", "point_name;library_name"},
       {"otel_scope_version", "0.9.0;1.2.0"},
