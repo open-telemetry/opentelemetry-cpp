@@ -18,6 +18,7 @@ namespace configuration
 // Forward declarations
 class AlwaysOffSamplerBuilder;
 class AlwaysOnSamplerBuilder;
+class AlwaysRecordSamplerBuilder;
 class BatchLogRecordProcessorBuilder;
 class BatchSpanProcessorBuilder;
 class ComposableAlwaysOffSamplerBuilder;
@@ -209,6 +210,13 @@ public:
   }
 
   void SetAlwaysOnSamplerBuilder(std::unique_ptr<AlwaysOnSamplerBuilder> &&builder);
+
+  const AlwaysRecordSamplerBuilder *GetAlwaysRecordSamplerBuilder() const
+  {
+    return always_record_sampler_builder_.get();
+  }
+
+  void SetAlwaysRecordSamplerBuilder(std::unique_ptr<AlwaysRecordSamplerBuilder> &&builder);
 
   const AlwaysOffSamplerBuilder *GetAlwaysOffSamplerBuilder() const
   {
@@ -495,6 +503,7 @@ private:
   std::unique_ptr<ConsoleLogRecordExporterBuilder> console_log_record_builder_;
 
   std::unique_ptr<AlwaysOnSamplerBuilder> always_on_sampler_builder_;
+  std::unique_ptr<AlwaysRecordSamplerBuilder> always_record_sampler_builder_;
   std::unique_ptr<AlwaysOffSamplerBuilder> always_off_sampler_builder_;
   std::unique_ptr<TraceIdRatioBasedSamplerBuilder> trace_id_ratio_based_sampler_builder_;
   std::unique_ptr<ProbabilitySamplerBuilder> probability_sampler_builder_;
