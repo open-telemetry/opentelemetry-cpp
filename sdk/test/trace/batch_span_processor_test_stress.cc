@@ -148,9 +148,9 @@ TEST(BatchSpanProcessorStress, ForceFlushRacesWorkerPark)
 // Catch a lost cv wakeup in OnEnd() from the span that fills the queue.
 TEST(BatchSpanProcessorStress, OnEndRacesWorkerPark)
 {
-  constexpr std::size_t kQueueSize = 2;
-  constexpr int kSweepPeriod       = 200;
-  constexpr int kSpinSweep         = 10;
+  static constexpr std::size_t kQueueSize = 2;
+  constexpr int kSweepPeriod              = 200;
+  constexpr int kSpinSweep                = 10;
 
   for (int round = 0; round < kRounds; ++round)
   {
