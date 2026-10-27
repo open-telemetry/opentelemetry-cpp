@@ -44,10 +44,11 @@ namespace metrics
 namespace
 {
 
-static constexpr const char *kScopeNameKey      = "otel_scope_name";
-static constexpr const char *kScopeVersionKey   = "otel_scope_version";
-static constexpr const char *kScopeSchemaUrlKey = "otel_scope_schema_url";
-static constexpr const char *kScopeLabelPrefix  = "otel_scope_";
+static constexpr const char *kScopeNameKey        = "otel_scope_name";
+static constexpr const char *kScopeVersionKey     = "otel_scope_version";
+static constexpr const char *kScopeSchemaUrlKey   = "otel_scope_schema_url";
+static constexpr const char *kScopeLabelPrefix    = "otel_scope_";
+static constexpr std::size_t kScopeLabelPrefixLen = sizeof("otel_scope_") - 1;
 
 /**
  * Sanitize the given metric name by replacing invalid characters with _,
@@ -798,7 +799,7 @@ void PrometheusExporterUtils::SetMetricBasic(
     {
       previous_key    = sanitized;
       std::string val = AttributeValueToString(label.second);
-      if (scope != nullptr && (sanitized == kScopeNameKey || sanitized == kScopeVersionKey))
+      if (scope != nullptr && sanitized.compare(0, kScopeLabelPrefixLen, kScopeLabelPrefix) == 0)
       {
         colliding_scope_entries.push_back({metric.label.size(), label.first, val});
       }
@@ -807,7 +808,7 @@ void PrometheusExporterUtils::SetMetricBasic(
     else if (comparison == 0)  // key collision after sanitation
     {
       std::string val = AttributeValueToString(label.second);
-      if (scope != nullptr && (sanitized == kScopeNameKey || sanitized == kScopeVersionKey))
+      if (scope != nullptr && sanitized.compare(0, kScopeLabelPrefixLen, kScopeLabelPrefix) == 0)
       {
         colliding_scope_entries.push_back({metric.label.size() - 1, label.first, val});
       }
@@ -826,7 +827,9 @@ void PrometheusExporterUtils::SetMetricBasic(
   {
     return;
   }
-  auto add_or_merge_scope_label = [&metric, &colliding_scope_entries](
+
+  const std::size_t point_label_count = metric.label.size();
+  auto add_or_merge_scope_label       = [&metric, &colliding_scope_entries, point_label_count](
                                       const std::string &sanitized_key,
                                       const std::string &original_key, const std::string &value) {
     for (const auto &entry : colliding_scope_entries)
@@ -860,7 +863,14 @@ void PrometheusExporterUtils::SetMetricBasic(
         return;
       }
     }
-    metric.label.push_back({sanitized_key, value});
+    if (metric.label.size() > point_label_count && metric.label.back().name == sanitized_key)
+    {
+      metric.label.back().value += ";" + value;
+    }
+    else
+    {
+      metric.label.push_back({sanitized_key, value});
+    }
   };
 
   const auto &scope_name = scope->GetName();
@@ -876,9 +886,7 @@ void PrometheusExporterUtils::SetMetricBasic(
   const auto &scope_schema_url = scope->GetSchemaURL();
   if (!scope_schema_url.empty())
   {
-    metric.label.emplace_back();
-    metric.label.back().name  = kScopeSchemaUrlKey;
-    metric.label.back().value = scope_schema_url;
+    add_or_merge_scope_label(kScopeSchemaUrlKey, kScopeSchemaUrlKey, scope_schema_url);
   }
   const auto &scope_attributes = scope->GetAttributes();
   if (!scope_attributes.empty())
@@ -909,17 +917,10 @@ void PrometheusExporterUtils::SetMetricBasic(
                 }
                 return *a.original_key < *b.original_key;
               });
-    for (std::size_t i = 0; i < sorted_scope_attrs.size(); ++i)
+    for (const auto &scope_attr : sorted_scope_attrs)
     {
-      if (i > 0 && sorted_scope_attrs[i].sanitized_key == metric.label.back().name)
-      {
-        metric.label.back().value += ";" + AttributeValueToString(*sorted_scope_attrs[i].value);
-      }
-      else
-      {
-        metric.label.push_back({std::move(sorted_scope_attrs[i].sanitized_key),
-                                AttributeValueToString(*sorted_scope_attrs[i].value)});
-      }
+      add_or_merge_scope_label(scope_attr.sanitized_key, *scope_attr.original_key,
+                               AttributeValueToString(*scope_attr.value));
     }
   }
 }

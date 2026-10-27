@@ -732,4 +732,49 @@ TEST(PrometheusExporterUtils, InstrumentationScopeAttributeCollisionsAndReserved
   }
 }
 
+TEST(PrometheusExporterUtils, InstrumentationScopePointAttributeCollisions)
+{
+  auto scope = InstrumentationScope::Create("library_name", "1.2.0",
+                                            "https://opentelemetry.io/schemas/1.21.0",
+                                            {{"foo", "scope_foo"}, {"z", "scope_z"}});
+
+  metric_sdk::SumPointData sum_point_data{};
+  sum_point_data.value_ = 5.0;
+  metric_sdk::MetricData metric_data{
+      metric_sdk::InstrumentDescriptor{"requests", "description", "1",
+                                       metric_sdk::InstrumentType::kCounter,
+                                       metric_sdk::InstrumentValueType::kDouble},
+      metric_sdk::AggregationTemporality::kCumulative, opentelemetry::common::SystemTimestamp{},
+      opentelemetry::common::SystemTimestamp{},
+      std::vector<metric_sdk::PointDataAttributes>{
+          {{{"otel_scope_foo", "point_foo"},
+            {"otel_scope_schema_url", "https://example.com/point_schema"},
+            {"otel_scope_z", "point_z"}},
+           sum_point_data}}};
+
+  Resource resource = Resource::Create(ResourceAttributes{});
+  metric_sdk::ResourceMetrics data{
+      &resource, std::vector<metric_sdk::ScopeMetrics>{
+                     {scope.get(), std::vector<metric_sdk::MetricData>{metric_data}}}};
+
+  auto translated = PrometheusExporterUtils::TranslateToPrometheus(data, false, false);
+  ASSERT_EQ(translated.size(), 1U);
+  ASSERT_EQ(translated[0].metric.size(), 1U);
+
+  const auto &labels                                    = translated[0].metric[0].label;
+  std::vector<prometheus::ClientMetric::Label> expected = {
+      {"otel_scope_foo", "scope_foo;point_foo"},
+      {"otel_scope_schema_url",
+       "https://example.com/point_schema;https://opentelemetry.io/schemas/1.21.0"},
+      {"otel_scope_z", "point_z;scope_z"},
+      {"otel_scope_name", "library_name"},
+      {"otel_scope_version", "1.2.0"}};
+  ASSERT_EQ(labels.size(), expected.size());
+  for (std::size_t i = 0; i < expected.size(); ++i)
+  {
+    EXPECT_EQ(labels[i].name, expected[i].name);
+    EXPECT_EQ(labels[i].value, expected[i].value);
+  }
+}
+
 OPENTELEMETRY_END_NAMESPACE
