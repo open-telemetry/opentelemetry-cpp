@@ -776,14 +776,11 @@ void PrometheusExporterUtils::SetMetricBasic(
 
   struct LabelCollisionEntry
   {
+    std::size_t label_index;
     std::string original_key;
     std::string value;
   };
-  std::vector<std::vector<LabelCollisionEntry>> label_entries;
-  if (scope != nullptr)
-  {
-    label_entries.reserve(labels.size() + 2);
-  }
+  std::vector<LabelCollisionEntry> colliding_scope_entries;
 
   std::string previous_key;
   for (auto const &label : labels)
@@ -794,18 +791,18 @@ void PrometheusExporterUtils::SetMetricBasic(
     {
       previous_key    = sanitized;
       std::string val = AttributeValueToString(label.second);
-      if (scope != nullptr)
+      if (scope != nullptr && (sanitized == kScopeNameKey || sanitized == kScopeVersionKey))
       {
-        label_entries.push_back({{label.first, val}});
+        colliding_scope_entries.push_back({metric.label.size(), label.first, val});
       }
       metric.label.push_back({sanitized, std::move(val)});
     }
     else if (comparison == 0)  // key collision after sanitation
     {
       std::string val = AttributeValueToString(label.second);
-      if (scope != nullptr)
+      if (scope != nullptr && (sanitized == kScopeNameKey || sanitized == kScopeVersionKey))
       {
-        label_entries.back().push_back({label.first, val});
+        colliding_scope_entries.push_back({metric.label.size() - 1, label.first, val});
       }
       metric.label.back().value += ";" + val;
     }
@@ -823,33 +820,40 @@ void PrometheusExporterUtils::SetMetricBasic(
     return;
   }
 
-  auto add_or_merge_scope_label = [&metric, &label_entries](const std::string &sanitized_key,
-                                                            const std::string &original_key,
-                                                            const std::string &value) {
-    for (std::size_t i = 0; i < metric.label.size(); ++i)
+  auto add_or_merge_scope_label = [&metric, &colliding_scope_entries](
+                                      const std::string &sanitized_key,
+                                      const std::string &original_key, const std::string &value) {
+    for (const auto &entry : colliding_scope_entries)
     {
-      if (metric.label[i].name == sanitized_key)
+      if (metric.label[entry.label_index].name == sanitized_key)
       {
-        auto &entries = label_entries[i];
-        entries.push_back({original_key, value});
-        std::stable_sort(entries.begin(), entries.end(),
-                         [](const LabelCollisionEntry &a, const LabelCollisionEntry &b) {
-                           return a.original_key < b.original_key;
+        const std::size_t target_index = entry.label_index;
+        colliding_scope_entries.push_back({target_index, original_key, value});
+        std::vector<const LabelCollisionEntry *> matched;
+        for (const auto &candidate : colliding_scope_entries)
+        {
+          if (candidate.label_index == target_index)
+          {
+            matched.push_back(&candidate);
+          }
+        }
+        std::stable_sort(matched.begin(), matched.end(),
+                         [](const LabelCollisionEntry *a, const LabelCollisionEntry *b) {
+                           return a->original_key < b->original_key;
                          });
         std::string merged;
-        for (std::size_t j = 0; j < entries.size(); ++j)
+        for (std::size_t j = 0; j < matched.size(); ++j)
         {
           if (j > 0)
           {
             merged.push_back(';');
           }
-          merged.append(entries[j].value);
+          merged.append(matched[j]->value);
         }
-        metric.label[i].value = std::move(merged);
+        metric.label[target_index].value = std::move(merged);
         return;
       }
     }
-    label_entries.push_back({{original_key, value}});
     metric.label.push_back({sanitized_key, value});
   };
 
