@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <thread>
 #include <utility>
 
 #include "opentelemetry/nostd/span.h"
@@ -57,10 +58,13 @@ private:
 // while being generous enough to avoid false positives on slow CI runners.
 constexpr std::chrono::minutes kParkScheduleDelay{10};
 constexpr std::chrono::minutes kWakeupWatchdog{1};
+constexpr int kRounds = 2000;
+constexpr const char *kShutdownStallHint =
+    "possible lost shutdown wakeup stall during worker join()";
 
 // Runs `operation` on another thread and aborts the binary if it does not return in time.
 template <typename Operation>
-bool CallWithWatchdog(const char *operation_name,
+auto CallWithWatchdog(const char *operation_name,
                       const char *stall_hint,
                       int round,
                       const Operation &operation)
@@ -75,10 +79,26 @@ bool CallWithWatchdog(const char *operation_name,
   return result.get();
 }
 
+// Busy-spins a scheduling-independent amount to offset the next call within a race window.
+void BusySpin(int iterations)
+{
+  volatile int spin_sink = 0;
+  for (int s = 0; s < iterations; ++s)
+  {
+    int next  = spin_sink;
+    spin_sink = next + 1;
+  }
+}
+
+void ShutdownWithWatchdog(sdk::trace::BatchSpanProcessor &processor, int round)
+{
+  EXPECT_TRUE(CallWithWatchdog("teardown Shutdown()", kShutdownStallHint, round,
+                               [&processor] { return processor.Shutdown(); }));
+}
+
 template <typename Operation>
 void RunWorkerParkRace(const char *operation_name, const char *stall_hint, Operation operation)
 {
-  constexpr int kRounds    = 2000;
   constexpr int kSpinSweep = 50;
 
   for (int round = 0; round < kRounds; ++round)
@@ -95,14 +115,7 @@ void RunWorkerParkRace(const char *operation_name, const char *stall_hint, Opera
 
     // Vary the offset across a sweep so that over the whole set we have a better chance of hitting
     // the race window.
-    int spin_iterations    = round * kSpinSweep;
-    volatile int spin_sink = 0;
-    for (int s = 0; s < spin_iterations; ++s)
-    {
-      // busy-spin a scheduling-independent increasing amount to sweep the race offset
-      int next  = spin_sink;
-      spin_sink = next + 1;
-    }
+    BusySpin(round * kSpinSweep);
     processor->OnEnd(processor->MakeRecordable());
 
     EXPECT_TRUE(CallWithWatchdog(operation_name, stall_hint, round,
@@ -111,9 +124,7 @@ void RunWorkerParkRace(const char *operation_name, const char *stall_hint, Opera
 
     // Shutdown() already joined the worker; ForceFlush() left it running. Join it either way
     // before the next round.
-    EXPECT_TRUE(CallWithWatchdog("teardown Shutdown()",
-                                 "possible lost shutdown wakeup stall during worker join()", round,
-                                 [processor] { return processor->Shutdown(); }));
+    ShutdownWithWatchdog(*processor, round);
   }
 }
 
@@ -121,8 +132,7 @@ void RunWorkerParkRace(const char *operation_name, const char *stall_hint, Opera
 // delay, so the untimed join() inside Shutdown() blocks for that long.
 TEST(BatchSpanProcessorStress, ShutdownRacesWorkerPark)
 {
-  RunWorkerParkRace("ShutdownRacesWorkerPark: Shutdown()",
-                    "possible lost shutdown wakeup stall during worker join()",
+  RunWorkerParkRace("ShutdownRacesWorkerPark: Shutdown()", kShutdownStallHint,
                     [](sdk::trace::BatchSpanProcessor &processor) { return processor.Shutdown(); });
 }
 
@@ -133,6 +143,44 @@ TEST(BatchSpanProcessorStress, ForceFlushRacesWorkerPark)
   RunWorkerParkRace(
       "ForceFlushRacesWorkerPark: ForceFlush()", "possible lost force-flush wakeup",
       [](sdk::trace::BatchSpanProcessor &processor) { return processor.ForceFlush(); });
+}
+
+// Catch a lost cv wakeup in OnEnd() from the span that fills the queue.
+TEST(BatchSpanProcessorStress, OnEndRacesWorkerPark)
+{
+  constexpr std::size_t kQueueSize = 2;
+  constexpr int kSweepPeriod       = 200;
+  constexpr int kSpinSweep         = 10;
+
+  for (int round = 0; round < kRounds; ++round)
+  {
+    auto exported_count = std::make_shared<std::atomic<std::size_t>>(0);
+
+    sdk::trace::BatchSpanProcessorOptions options;
+    options.schedule_delay_millis = kParkScheduleDelay;
+    options.max_queue_size        = kQueueSize;
+    options.max_export_batch_size = kQueueSize;
+
+    auto processor = std::make_shared<sdk::trace::BatchSpanProcessor>(
+        std::make_unique<CountingSpanExporter>(exported_count), options);
+
+    // The half-full notify wakes the worker, which parks again on the partial batch.
+    processor->OnEnd(processor->MakeRecordable());
+
+    // The race window sits shortly after that wakeup, so sweep short offsets repeatedly.
+    BusySpin((round % kSweepPeriod) * kSpinSweep);
+    processor->OnEnd(processor->MakeRecordable());
+
+    CallWithWatchdog("OnEndRacesWorkerPark: export", "possible lost OnEnd wakeup", round,
+                     [exported_count] {
+                       while (exported_count->load(std::memory_order_relaxed) < kQueueSize)
+                       {
+                         std::this_thread::yield();
+                       }
+                     });
+
+    ShutdownWithWatchdog(*processor, round);
+  }
 }
 
 }  // namespace
