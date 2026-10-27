@@ -310,6 +310,12 @@ OtlpGrpcClient::~OtlpGrpcClient()
 
 std::string OtlpGrpcClient::GetGrpcTarget(const std::string &endpoint)
 {
+  // A raw VSOCK target is already in the format expected by gRPC.
+  if (endpoint.rfind("vsock:", 0) == 0 && endpoint.rfind("vsock://", 0) != 0)
+  {
+    return endpoint;
+  }
+
   //
   // Scheme is allowed in OTLP endpoint definition, but is not allowed for creating gRPC
   // channel. Passing URI with scheme to grpc::CreateChannel could resolve the endpoint to some
@@ -326,6 +332,10 @@ std::string OtlpGrpcClient::GetGrpcTarget(const std::string &endpoint)
   if (url.scheme_ == "unix")
   {
     grpc_target = "unix:" + url.path_;
+  }
+  else if (url.scheme_ == "vsock")
+  {
+    grpc_target = "vsock:" + url.host_ + ":" + std::to_string(static_cast<int>(url.port_));
   }
   else
   {

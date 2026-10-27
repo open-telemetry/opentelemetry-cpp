@@ -15,6 +15,9 @@ Increment the:
 
 ## [Unreleased]
 
+* [OTLP/gRPC] Support VSOCK endpoints on Linux
+  [#4706](https://github.com/open-telemetry/opentelemetry-cpp/issues/4706)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
