@@ -11,6 +11,7 @@
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/random_id_generator_factory.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/sampler_env.h"
 #include "opentelemetry/sdk/trace/samplers/always_on_factory.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
@@ -36,7 +37,7 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> TracerProviderFactory
     std::unique_ptr<SpanProcessor> processor,
     const opentelemetry::sdk::resource::Resource &resource)
 {
-  auto sampler = AlwaysOnSamplerFactory::Create();
+  auto sampler = sampler_env::GetSamplerFromEnv();
   return Create(std::move(processor), resource, std::move(sampler));
 }
 
@@ -100,7 +101,7 @@ std::unique_ptr<opentelemetry::sdk::trace::TracerProvider> TracerProviderFactory
     std::vector<std::unique_ptr<SpanProcessor>> &&processors,
     const opentelemetry::sdk::resource::Resource &resource)
 {
-  auto sampler = AlwaysOnSamplerFactory::Create();
+  auto sampler = sampler_env::GetSamplerFromEnv();
   return Create(std::move(processors), resource, std::move(sampler));
 }
 

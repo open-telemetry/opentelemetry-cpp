@@ -16,6 +16,7 @@ foreach(
   probability_sampler_test
   trace_id_ratio_sampler_test
   composable_sampler_test
+  sampler_env_test
   batch_span_processor_test
   batch_span_processor_test_stress
   tracer_config_test)

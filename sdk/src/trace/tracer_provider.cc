@@ -18,6 +18,7 @@
 #include "opentelemetry/sdk/trace/id_generator.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/sampler.h"
+#include "opentelemetry/sdk/trace/sampler_env.h"
 #include "opentelemetry/sdk/trace/span_limits.h"
 #include "opentelemetry/sdk/trace/tracer.h"
 #include "opentelemetry/sdk/trace/tracer_config.h"
@@ -82,6 +83,10 @@ TracerProvider::TracerProvider(
     SpanLimits span_limits)
     : noop_tracer_(CreateNoopTracerFallback())
 {
+  if (!sampler)
+  {
+    sampler = sampler_env::GetSamplerFromEnv();
+  }
   std::vector<std::unique_ptr<SpanProcessor>> processors;
   processors.push_back(std::move(processor));
   context_ = std::make_shared<TracerContext>(std::move(processors), resource, std::move(sampler),
@@ -98,15 +103,20 @@ TracerProvider::TracerProvider(
     std::unique_ptr<IdGenerator> id_generator,
     std::unique_ptr<instrumentationscope::ScopeConfigurator<TracerConfig>> tracer_configurator,
     SpanLimits span_limits)
-    : context_(std::make_shared<TracerContext>(std::move(processors),
+    : noop_tracer_(CreateNoopTracerFallback())
+{
+  if (!sampler)
+  {
+    sampler = sampler_env::GetSamplerFromEnv();
+  }
+  context_ = std::make_shared<TracerContext>(std::move(processors),
                                                resource,
                                                std::move(sampler),
                                                std::move(id_generator),
                                                std::move(tracer_configurator),
-                                               span_limits)),
-      noop_tracer_(CreateNoopTracerFallback()),
-      initialized_(true)
-{}
+                                               span_limits);
+  initialized_ = true;
+}
 
 TracerProvider::~TracerProvider()
 {
