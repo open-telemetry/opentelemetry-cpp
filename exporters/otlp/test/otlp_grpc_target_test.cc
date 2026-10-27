@@ -68,6 +68,12 @@ TEST(OtlpGrpcClientEndpointTest, GrpcClientTest)
   EXPECT_EQ(target3, "localhost:4317");
 }
 
+TEST(OtlpGrpcClientEndpointTest, VsockEndpoints)
+{
+  EXPECT_EQ(OtlpGrpcClient::GetGrpcTarget("vsock:3:1234"), "vsock:3:1234");
+  EXPECT_EQ(OtlpGrpcClient::GetGrpcTarget("vsock://3:1234"), "vsock:3:1234");
+}
+
 TEST_F(OtlpGrpcClientTestPeer, ChannelArgumentsOptionTest)
 {
   OtlpGrpcClientOptions options;
