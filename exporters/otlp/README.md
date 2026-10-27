@@ -68,17 +68,17 @@ auto exporter = std::make_unique<otlp::OtlpFileExporter>(options);
 |                                  |`OTEL_EXPORTER_OTLP_TRACES_SSL_ENABLE`        |                       |                                      |
 |`ssl_credentials_cacert_path`     |`OTEL_EXPORTER_OTLP_CERTIFICATE`              | `""`                  | SSL Certificate file path            |
 |                                  |`OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE`       |                       |                                      |
-|`ssl_credentials_cacert_as_string`|`OTEL_EXPORTER_OTLP_CERTIFICATE_STRING`        | `""`                  | SSL Certifcate as in-memory string   |
+|`ssl_credentials_cacert_as_string`|`OTEL_EXPORTER_OTLP_CERTIFICATE_STRING`       | `""`                  | SSL Certifcate as in-memory string   |
 |                                  |`OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE_STRING`|                       |                                      |
 |`timeout`                         |`OTEL_EXPORTER_OTLP_TIMEOUT`                  | `10s`                 | GRPC deadline                        |
-|                                  |`OTEL_EXPORTER_OTLP_TRACES_TIMEOUT`          |                       |                                      |
+|                                  |`OTEL_EXPORTER_OTLP_TRACES_TIMEOUT`           |                       |                                      |
 |`metadata`                        |`OTEL_EXPORTER_OTLP_HEADERS`                  |                       | Custom metadata for GRPC             |
-|                                  |`OTEL_EXPORTER_OTLP_TRACES_HEADERS`          |                       |                                      |
+|                                  |`OTEL_EXPORTER_OTLP_TRACES_HEADERS`           |                       |                                      |
 
 On Linux, the OTLP gRPC exporter supports VSOCK endpoints with gRPC 1.57.0 or
-later. Set the endpoint to `vsock://<cid>:<port>`; the exporter converts it to
-`vsock:<cid>:<port>`, the target format expected by gRPC. You can also provide a raw
-`vsock:<cid>:<port>` target.
+later. Set `vsock://<cid>:<port>` as the endpoint; the exporter converts it
+to the `vsock:<cid>:<port>` target format expected by gRPC. A raw
+`vsock:<cid>:<port>` target is also accepted.
 
 ### Configuration options ( OTLP HTTP Exporter )
 
@@ -101,8 +101,7 @@ later. Set the endpoint to `vsock://<cid>:<port>`; the exporter converts it to
 |`backend_options`   | n/a                                |`OtlpFileClientFileSystemOptions`| The OTLP FILE backend                                             |
 
 The backend for OTLP File Exporter can be `OtlpFileClientFileSystemOptions` (which
-support basic log rotate and alias), and reference to `std::ostream` or custom
-`OtlpFileAppender`.
+support basic log rotate and alias), and reference to `std::ostream` or custom `OtlpFileAppender`.
 
 #### Configuration options ( File System Backend for OTLP File Exporter )
 
@@ -114,10 +113,10 @@ support basic log rotate and alias), and reference to `std::ostream` or custom
 |`alias_pattern`     | n/a                                | `trace-latest.jsonl`            | The file which always point to the latest file                    |
 |                    |                                    | `metrics-latest.jsonl`          |                                                                   |
 |                    |                                    | `logs-latest.jsonl`             |                                                                   |
-|`flush_interval`   | n/a                                | `30s`                           | Interval to force flush ostream                                   |
-|`flush_count`      | n/a                                | `256`                            | Force flush ostream every `flush_count` records                   |
-|`file_size`        | n/a                                | `20MB`                           | File size to rotate log files                                     |
-|`rotate_size`      | n/a                                |                                 | Rotate count                                                      |
+|`flush_interval`    | n/a                                | `30s`                           | Interval to force flush ostream                                   |
+|`flush_count`       | n/a                                | `256`                           | Force flush ostream every `flush_count` records                   |
+|`file_size`         | n/a                                | `20MB`                          | File size to rotate log files                                     |
+|`rotate_size`       | n/a                                |                                 | Rotate count                                                      |
 
 Some special placeholders are available for `file_pattern` and `alias_pattern`:
 
@@ -132,7 +131,7 @@ Some special placeholders are available for `file_pattern` and `alias_pattern`:
 + `%M`:  Writes minute as a decimal number (range [00,59])
 + `%S`:  Writes second as a decimal number (range [00,60])
 + `%F`:  Equivalent to "%Y-%m-%d" (the ISO 8601 date format)
-+ `%T`:  Equivalent to "%H:%M:%S"
++ `%T`:  Equivalent to "%H:%M:%S" (the ISO 8601 time format)
 + `%R`:  Equivalent to "%H:%M"
 + `%N`:  Rotate index, start from 0
 + `%n`:  Rotate index, start from 1
