@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <ostream>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -40,12 +41,31 @@ namespace sdk
 namespace trace
 {
 
+namespace
+{
+
+size_t ClampMaxExportBatchSize(const BatchSpanProcessorOptions &options)
+{
+  // Clamping to a queue of 0 would give a batch of 0, which makes the worker spin.
+  if (options.max_queue_size > 0 && options.max_export_batch_size > options.max_queue_size)
+  {
+    OTEL_INTERNAL_LOG_WARN("[BatchSpanProcessor] max_export_batch_size ("
+                           << options.max_export_batch_size << ") is larger than max_queue_size ("
+                           << options.max_queue_size << "), using " << options.max_queue_size
+                           << ".");
+    return options.max_queue_size;
+  }
+  return options.max_export_batch_size;
+}
+
+}  // namespace
+
 BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
                                        const BatchSpanProcessorOptions &options)
     : exporter_(std::move(exporter)),
       max_queue_size_(options.max_queue_size),
       schedule_delay_millis_(options.schedule_delay_millis),
-      max_export_batch_size_(options.max_export_batch_size),
+      max_export_batch_size_(ClampMaxExportBatchSize(options)),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_instrumentation_(nullptr),
@@ -61,7 +81,7 @@ BatchSpanProcessor::BatchSpanProcessor(std::unique_ptr<SpanExporter> &&exporter,
     : exporter_(std::move(exporter)),
       max_queue_size_(options.max_queue_size),
       schedule_delay_millis_(options.schedule_delay_millis),
-      max_export_batch_size_(options.max_export_batch_size),
+      max_export_batch_size_(ClampMaxExportBatchSize(options)),
       buffer_(max_queue_size_),
       synchronization_data_(std::make_shared<SynchronizationData>()),
       worker_thread_instrumentation_(runtime_options.thread_instrumentation),
