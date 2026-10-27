@@ -82,8 +82,8 @@ struct OPENTELEMETRY_EXPORT BatchSpanProcessorOptions
       batch_span_processor_options_env::GetExportTimeoutFromEnv();
 
   /**
-   * The maximum batch size of every export. It must be smaller or
-   * equal to max_queue_size.
+   * The maximum batch size of every export. Values larger than a non-zero
+   * max_queue_size are clamped to it, with a warning.
    */
   size_t max_export_batch_size = batch_span_processor_options_env::GetMaxExportBatchSizeFromEnv();
 };
