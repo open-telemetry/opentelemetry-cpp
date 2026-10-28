@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-FROM python:3.14.8@sha256:f765e0376b849594fa104d0656b107dba7583aeed992fe6e0700f302f887d77c
+FROM python:3.15.2@sha256:903cb0a6ea2fb0aff701912a249023565979932372cca63a50c53d649737a0ed
 
 RUN pip install aiohttp
 RUN git clone https://github.com/w3c/trace-context
