@@ -227,6 +227,10 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   }
 
   std::unordered_map<std::string, std::size_t> family_index_by_name;
+  for (std::size_t i = 0; i < output.size(); ++i)
+  {
+    family_index_by_name.emplace(output[i].name, i);
+  }
 
   for (const auto &instrumentation_info : data.scope_metric_data_)
   {
