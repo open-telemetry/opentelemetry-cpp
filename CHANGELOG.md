@@ -18,6 +18,15 @@ Increment the:
 * [OTLP/gRPC] Support VSOCK endpoints on Linux
   [#4706](https://github.com/open-telemetry/opentelemetry-cpp/issues/4706)
 
+* [SDK] Clamp `BatchSpanProcessor` max_export_batch_size to max_queue_size,
+  so a larger value no longer stops spans from being exported until the
+  schedule delay expires.
+  [#4727](https://github.com/open-telemetry/opentelemetry-cpp/pull/4727)
+
+* [BUG] Store `SocketAddr` in a `sockaddr_storage` and pass `addr()` and
+  `addr_len()` to the socket API, fixing a misaligned `sockaddr_in` access
+  [#4307](https://github.com/open-telemetry/opentelemetry-cpp/issues/4307)
+
 ## [1.30.0] 2026-10-22
 
 This release contains:
