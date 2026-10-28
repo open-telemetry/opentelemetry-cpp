@@ -20,11 +20,17 @@
 #include "opentelemetry/sdk/common/global_log_handler.h"
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 #include "opentelemetry/sdk/trace/batch_span_processor_options.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_runtime_options.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/processor.h"
 #include "opentelemetry/sdk/trace/recordable.h"
 #include "opentelemetry/sdk/trace/span_data.h"
+#include "opentelemetry/test_common/sdk/common/scoped_test_log_handler.h"
 #include "opentelemetry/version.h"
+
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+#  include "opentelemetry/sdk/common/thread_instrumentation.h"
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
 #if defined(_MSC_VER)
 #  include "opentelemetry/sdk/common/env_variables.h"
@@ -452,6 +458,113 @@ TEST_F(BatchSpanProcessorTestPeer, TestForceFlushExportsAllBufferedSpans)
     EXPECT_LE(size, options.max_export_batch_size);
   }
 }
+
+TEST_F(BatchSpanProcessorTestPeer, TestMaxExportBatchSizeClampedToMaxQueueSize)
+{
+  const auto batch_sizes          = std::make_shared<std::vector<std::size_t>>();
+  const auto spans_received_count = std::make_shared<std::atomic<std::size_t>>(0);
+  const auto is_shutdown          = std::make_shared<std::atomic<bool>>(false);
+
+  auto exporter =
+      std::make_unique<BlockingMockSpanExporter>(batch_sizes, spans_received_count, is_shutdown);
+
+  sdk::trace::BatchSpanProcessorOptions options{};
+  options.max_export_batch_size = 512;
+  options.schedule_delay_millis = std::chrono::milliseconds(10000);
+  options.max_queue_size        = 8;
+
+  const auto batch_processor =
+      std::make_shared<sdk::trace::BatchSpanProcessor>(std::move(exporter), options);
+
+  const int num_spans = 8;
+
+  const auto test_spans = GetTestSpans(batch_processor, num_spans);
+  for (int i = 0; i < num_spans - 1; ++i)
+  {
+    batch_processor->OnEnd(std::move(test_spans->at(i)));
+  }
+
+  // Let the worker re-wait first, so the notify from the batch-filling span is not lost.
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  batch_processor->OnEnd(std::move(test_spans->at(num_spans - 1)));
+
+  // Well before schedule_delay_millis, so only a full batch can trigger the export.
+  const auto wait_start = std::chrono::steady_clock::now();
+  while (spans_received_count->load() < static_cast<std::size_t>(num_spans) &&
+         std::chrono::steady_clock::now() - wait_start < std::chrono::seconds(2))
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+
+  EXPECT_EQ(std::vector<std::size_t>({options.max_queue_size}), *batch_sizes);
+}
+
+#ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
+// Counts the worker's export cycles.
+struct LoadCountingThreadInstrumentation final : public sdk::common::ThreadInstrumentation
+{
+  void BeforeLoad() override { ++load_count; }
+
+  std::atomic<std::size_t> load_count{0};
+};
+
+TEST_F(BatchSpanProcessorTestPeer, TestZeroMaxQueueSizeKeepsWorkerIdle)
+{
+  const auto batch_sizes          = std::make_shared<std::vector<std::size_t>>();
+  const auto spans_received_count = std::make_shared<std::atomic<std::size_t>>(0);
+  const auto is_shutdown          = std::make_shared<std::atomic<bool>>(false);
+
+  auto exporter =
+      std::make_unique<BlockingMockSpanExporter>(batch_sizes, spans_received_count, is_shutdown);
+
+  sdk::trace::BatchSpanProcessorOptions options{};
+  options.max_export_batch_size = 512;
+  options.schedule_delay_millis = std::chrono::milliseconds(10000);
+  options.max_queue_size        = 0;
+
+  const auto instrumentation = std::make_shared<LoadCountingThreadInstrumentation>();
+  const sdk::trace::BatchSpanProcessorRuntimeOptions runtime_options{instrumentation};
+
+  const sdk::trace::BatchSpanProcessor batch_processor(std::move(exporter), options,
+                                                       runtime_options);
+
+  // Well before schedule_delay_millis, so any export cycle comes from a spinning worker.
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  EXPECT_EQ(0u, instrumentation->load_count.load());
+}
+#endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
+#if OTEL_INTERNAL_LOG_LEVEL >= OTEL_INTERNAL_LOG_LEVEL_WARN
+TEST_F(BatchSpanProcessorTestPeer, TestMaxExportBatchSizeClampLogsWarningOnce)
+{
+  test_common::ScopedTestLogHandler log_handler(sdk::common::internal_log::LogLevel::Warning);
+
+  const auto batch_sizes          = std::make_shared<std::vector<std::size_t>>();
+  const auto spans_received_count = std::make_shared<std::atomic<std::size_t>>(0);
+  const auto is_shutdown          = std::make_shared<std::atomic<bool>>(false);
+
+  auto exporter =
+      std::make_unique<BlockingMockSpanExporter>(batch_sizes, spans_received_count, is_shutdown);
+
+  sdk::trace::BatchSpanProcessorOptions options{};
+  options.max_export_batch_size = 512;
+  options.max_queue_size        = 8;
+
+  // The runtime-options constructor, so that both constructors are tested with a clamp.
+  const sdk::trace::BatchSpanProcessor batch_processor(
+      std::move(exporter), options, sdk::trace::BatchSpanProcessorRuntimeOptions());
+
+  const auto entries = log_handler.Drain();
+  EXPECT_EQ(1, std::count_if(entries.begin(), entries.end(),
+                             [](const test_common::ScopedTestLogHandler::Entry &entry) {
+                               return entry.level == sdk::common::internal_log::LogLevel::Warning &&
+                                      entry.msg ==
+                                          "[BatchSpanProcessor] max_export_batch_size (512) is "
+                                          "larger than max_queue_size (8), using 8.";
+                             }));
+}
+#endif
 
 // A mock log handler to check whether log messages with a specific level were emitted.
 struct MockLogHandler : public sdk::common::internal_log::LogHandler
