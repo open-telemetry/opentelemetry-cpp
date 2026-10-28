@@ -248,6 +248,14 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
         is_monotonic = nostd::get<sdk::metrics::SumPointData>(front.point_data).is_monotonic_;
       }
       const prometheus_client::MetricType type = TranslateType(kind, is_monotonic);
+      if (type == prometheus_client::MetricType::Untyped)
+      {
+        OTEL_INTERNAL_LOG_WARN(
+            "[Prometheus Exporter] TranslateToPrometheus - "
+            "Unsupported aggregation type for metric '"
+            << metric_data.instrument_descriptor.name_ << "'. Dropping metric.");
+        continue;
+      }
       const std::string name = MapToPrometheusName(metric_data.instrument_descriptor.name_,
                                                    metric_data.instrument_descriptor.unit_, type,
                                                    without_units, without_type_suffix);
