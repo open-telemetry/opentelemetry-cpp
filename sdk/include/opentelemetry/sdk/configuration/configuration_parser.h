@@ -8,6 +8,7 @@
 #include "opentelemetry/sdk/configuration/aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/always_off_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/always_on_sampler_configuration.h"
+#include "opentelemetry/sdk/configuration/always_record_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_limits_configuration.h"
 #include "opentelemetry/sdk/configuration/attribute_value_configuration.h"
 #include "opentelemetry/sdk/configuration/attributes_configuration.h"
@@ -38,6 +39,7 @@
 #include "opentelemetry/sdk/configuration/drop_aggregation_configuration.h"
 #include "opentelemetry/sdk/configuration/exemplar_filter.h"
 #include "opentelemetry/sdk/configuration/explicit_bucket_histogram_aggregation_configuration.h"
+#include "opentelemetry/sdk/configuration/extension_composable_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_log_record_processor_configuration.h"
 #include "opentelemetry/sdk/configuration/extension_metric_producer_configuration.h"
@@ -78,6 +80,7 @@
 #include "opentelemetry/sdk/configuration/otlp_http_span_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/parent_based_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/periodic_metric_reader_configuration.h"
+#include "opentelemetry/sdk/configuration/probability_sampler_configuration.h"
 #include "opentelemetry/sdk/configuration/process_resource_detector_configuration.h"
 #include "opentelemetry/sdk/configuration/prometheus_pull_metric_exporter_configuration.h"
 #include "opentelemetry/sdk/configuration/propagator_configuration.h"
@@ -105,6 +108,7 @@
 #include "opentelemetry/sdk/configuration/tracer_provider_configuration.h"
 #include "opentelemetry/sdk/configuration/translation_strategy.h"
 #include "opentelemetry/sdk/configuration/view_configuration.h"
+#include "opentelemetry/sdk/configuration/view_matching_mode.h"
 #include "opentelemetry/sdk/configuration/view_selector_configuration.h"
 #include "opentelemetry/sdk/configuration/view_stream_configuration.h"
 #include "opentelemetry/version.h"
@@ -256,6 +260,9 @@ public:
   ExemplarFilter ParseExemplarFilter(const std::unique_ptr<DocumentNode> &node,
                                      const std::string &name) const;
 
+  ViewMatchingMode ParseViewMatchingMode(const std::unique_ptr<DocumentNode> &node,
+                                         const std::string &name) const;
+
   std::unique_ptr<ViewSelectorConfiguration> ParseViewSelectorConfiguration(
       const std::unique_ptr<DocumentNode> &node) const;
 
@@ -314,11 +321,19 @@ public:
       const std::unique_ptr<DocumentNode> &node,
       size_t depth) const;
 
+  std::unique_ptr<AlwaysRecordSamplerConfiguration> ParseAlwaysRecordSamplerConfiguration(
+      const std::unique_ptr<DocumentNode> &node,
+      size_t depth) const;
+
   std::unique_ptr<JaegerRemoteSamplerConfiguration> ParseJaegerRemoteSamplerConfiguration(
       const std::unique_ptr<DocumentNode> &node,
       size_t depth) const;
 
   std::unique_ptr<ParentBasedSamplerConfiguration> ParseParentBasedSamplerConfiguration(
+      const std::unique_ptr<DocumentNode> &node,
+      size_t depth) const;
+
+  std::unique_ptr<ProbabilitySamplerConfiguration> ParseProbabilitySamplerConfiguration(
       const std::unique_ptr<DocumentNode> &node,
       size_t depth) const;
 
@@ -361,6 +376,11 @@ public:
   std::unique_ptr<ComposableSamplerConfiguration> ParseComposableSamplerConfiguration(
       const std::unique_ptr<DocumentNode> &node,
       size_t depth) const;
+
+  std::unique_ptr<ExtensionComposableSamplerConfiguration>
+  ParseComposableSamplerExtensionConfiguration(const std::string &name,
+                                               std::unique_ptr<DocumentNode> node,
+                                               size_t depth) const;
 
   std::unique_ptr<ExtensionSamplerConfiguration> ParseSamplerExtensionConfiguration(
       const std::string &name,

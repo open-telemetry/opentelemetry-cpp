@@ -12,7 +12,7 @@ that a component compiled against one version of the C++ standard library can
 work with an application or library compiled against a different version of the
 C++ standard library, we limit a portion of the OpenTelemetry API to use ABI
 stable `nostd::` types by default. The `OPENTELEMETRY_STL_VERSION` preprocessor macro
-(defined by the CMake `WITH_STL` build option) can be set to replace
+(defined by the CMake `OTELCPP_WITH_STL` build option) can be set to replace
 these ABI stable types with their `std::` equivalents (see [building with the
 standard C++ library](./building-with-stdlib.md) for when this is appropriate).
 

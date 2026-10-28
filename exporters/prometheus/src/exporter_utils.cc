@@ -17,6 +17,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
@@ -95,10 +96,8 @@ inline std::string Sanitize(std::string name, const T &valid)
 std::string SanitizeLabel(std::string label_key)
 {
   return Sanitize(std::move(label_key), [](int i, char c) {
-    return (c >= 'a' && c <= 'z') ||  //
-           (c >= 'A' && c <= 'Z') ||  //
-           c == '_' ||                //
-           (c >= '0' && c <= '9' && i > 0);
+    return opentelemetry::common::detail::IsAsciiAlpha(c) || c == '_' ||
+           (opentelemetry::common::detail::IsAsciiDigit(c) && i > 0);
   });
 }
 
@@ -255,8 +254,8 @@ std::string PrometheusExporterUtils::SanitizeNames(std::string name)
   constexpr const auto replacement_dup = '=';
 
   auto valid = [](int i, char c) {
-    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ':' ||
-        (c >= '0' && c <= '9' && i > 0))
+    if (opentelemetry::common::detail::IsAsciiAlpha(c) || c == ':' ||
+        (opentelemetry::common::detail::IsAsciiDigit(c) && i > 0))
     {
       return true;
     }
@@ -435,7 +434,7 @@ std::string PrometheusExporterUtils::CleanUpString(const std::string &str)
   }
   std::transform(cleaned_string.begin(), cleaned_string.end(), cleaned_string.begin(),
                  [](const char c) {
-                   if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+                   if (opentelemetry::common::detail::IsAsciiAlnum(c))
                    {
                      return c;
                    }

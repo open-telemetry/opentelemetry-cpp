@@ -51,46 +51,20 @@ set(INSTALL_TEST_SRC_DIR "${CMAKE_SOURCE_DIR}/../src")
 enable_testing()
 
 # -----------------------------------------------------------
-# CMake Usage tests for find_package(opentelemetry-cpp ...)
-#
-# 1. Test find_package with no components specified
-# 2. Test find_package with components specified but not sorted in dependency
-#    order
-# 3. Test find_package with components specified but missing dependent components
-# 4. Test find_package with components specified but including
-#    unsupported/unknown components
+# Test find_package with components specified but including deprecated
+# components
 
-add_test(
-  NAME cmake-usage-no-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/no_components -B
-    build-cmake-usage-no-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
-
-add_test(
-  NAME cmake-usage-unsorted-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/unsorted_components -B
-    build-cmake-usage-unsorted-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
-
-add_test(
-  NAME cmake-usage-missing-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/missing_components -B
-    build-cmake-usage-missing-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
-
-add_test(
-  NAME cmake-usage-unsupported-components-test
-  COMMAND
-    ${CMAKE_COMMAND} --log-level=DEBUG -S
-    ${CMAKE_SOURCE_DIR}/usage_tests/unsupported_components -B
-    build-cmake-usage-unsupported-components-test
-    "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS})
+if(INSTALL_TEST_DEPRECATED_COMPONENTS)
+  add_test(
+    NAME cmake-deprecated-components-test
+    COMMAND
+      ${CMAKE_COMMAND} -Wdeprecated --log-level=DEBUG -S
+      ${CMAKE_SOURCE_DIR}/deprecated_components -B
+      build-cmake-usage-deprecated-components-test
+      "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}" ${INSTALL_TEST_CMAKE_OPTIONS}
+      "-DINSTALL_TEST_DEPRECATED_COMPONENTS=${INSTALL_TEST_DEPRECATED_COMPONENTS}"
+  )
+endif()
 
 # -----------------------------------------------------------
 # Test the full package install using legacy cmake build instructions
@@ -115,6 +89,34 @@ add_test(NAME full-package-build-test
 add_test(NAME full-package-run-test
          COMMAND ${CMAKE_BINARY_DIR}/build-full-package-test/full_test)
 # -----------------------------------------------------------
+
+# -----------------------------------------------------------
+# Pkg-config consumer test (compile/link/run against installed .pc files).
+# Enabled only for the Ubuntu 24.04 system-package install job.
+option(OTEL_ENABLE_PKGCONFIG_INSTALL_TEST
+       "Run pkg-config consumer tests against installed .pc files" OFF)
+if(OTEL_ENABLE_PKGCONFIG_INSTALL_TEST)
+  find_package(PkgConfig REQUIRED)
+  add_test(
+    NAME pkgconfig-test-config-test
+    COMMAND
+      ${CMAKE_COMMAND} --log-level=DEBUG -S ${CMAKE_SOURCE_DIR}/pkgconfig_test
+      -B build-pkgconfig-test "-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
+      ${INSTALL_TEST_CMAKE_OPTIONS}
+      "-DINSTALL_TEST_COMPONENTS=${INSTALL_TEST_COMPONENTS}"
+      "-DINSTALL_TEST_SRC_DIR=${INSTALL_TEST_SRC_DIR}")
+
+  set_tests_properties(
+    pkgconfig-test-config-test
+    PROPERTIES ENVIRONMENT "PKG_CONFIG_PATH=${CMAKE_PREFIX_PATH}/lib/pkgconfig")
+
+  add_test(NAME pkgconfig-test-build-test
+           COMMAND ${CMAKE_COMMAND} --build
+                   ${CMAKE_BINARY_DIR}/build-pkgconfig-test --parallel)
+
+  add_test(NAME pkgconfig-test-run-test
+           COMMAND ${CMAKE_BINARY_DIR}/build-pkgconfig-test/full_pkgconfig_test)
+endif()
 
 # -----------------------------------------------------------
 # Loop over all the components to test

@@ -12,7 +12,7 @@ Refer to install instructions [INSTALL.md](../../INSTALL.md#building-as-standalo
 Modify step 2 to create `cmake` build configuration for compiling Zipkin as below:
 
 ```console
-   $ cmake -DWITH_ZIPKIN=ON ..
+   $ cmake -DOTELCPP_WITH_ZIPKIN=ON ..
    -- The C compiler identification is GNU 9.3.0
    -- The CXX compiler identification is GNU 9.3.0
    ...

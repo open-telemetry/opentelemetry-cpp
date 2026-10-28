@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <string.h>
 #include <array>
+#include <cstring>
 #include <string>
 #include <utility>
 
@@ -21,7 +21,7 @@ TEST(EmptyAttributesTest, TestMemory)
 {
   auto attributes1 = opentelemetry::sdk::GetEmptyAttributes();
   auto attributes2 = opentelemetry::sdk::GetEmptyAttributes();
-  EXPECT_EQ(memcmp(static_cast<void *>(&attributes1), static_cast<void *>(&attributes2),
-                   sizeof(attributes1)),
+  EXPECT_EQ(std::memcmp(static_cast<void *>(&attributes1), static_cast<void *>(&attributes2),
+                        sizeof(attributes1)),
             0);  // NOLINT
 }

@@ -47,6 +47,7 @@ cc_test(
     ],
     deps = [
         "metrics_common_test_utils",
+        "//sdk/src/metrics",
         "//test_common:headers",
         "@com_google_googletest//:gtest_main",
     ],
@@ -115,6 +116,21 @@ otel_cc_benchmark(
 )
 
 otel_cc_benchmark(
+    name = "circular_buffer_counter_benchmark",
+    srcs = [
+        "circular_buffer_counter_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+    ],
+)
+
+otel_cc_benchmark(
     name = "histogram_aggregation_benchmark",
     srcs = [
         "histogram_aggregation_benchmark.cc",
@@ -152,6 +168,37 @@ otel_cc_benchmark(
     name = "measurements_benchmark",
     srcs = [
         "measurements_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+        "//sdk/src/resource",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "instrument_metadata_validator_benchmark",
+    srcs = [
+        "instrument_metadata_validator_benchmark.cc",
+    ],
+    tags = [
+        "benchmark",
+        "metrics",
+        "test",
+    ],
+    deps = [
+        "//sdk/src/metrics",
+    ],
+)
+
+otel_cc_benchmark(
+    name = "sync_instruments_benchmark",
+    srcs = [
+        "sync_instruments_benchmark.cc",
     ],
     tags = [
         "benchmark",

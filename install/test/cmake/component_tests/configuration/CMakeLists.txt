@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.16)
 project(opentelemetry-cpp-configuration-install-test LANGUAGES CXX)
 
 find_package(opentelemetry-cpp REQUIRED COMPONENTS configuration
-                                                   exporters_ostream_builder)
+                                                   exporters_ostream)
 
 if(NOT TARGET Threads::Threads)
   message(FATAL_ERROR "Threads::Threads target not found")

@@ -8,6 +8,7 @@
 #include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -22,6 +23,7 @@
 // #  include <windows.h>
 
 #  include <winsock2.h>
+#  include <ws2tcpip.h>  // inet_pton
 
 // TODO: consider NOMINMAX
 #  undef min
@@ -58,11 +60,11 @@
 // Log to console if there's no standard log facility defined
 #  include <cstdio>
 #  ifndef LOG_DEBUG
-#    define LOG_DEBUG(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_TRACE(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_INFO(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_WARN(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
-#    define LOG_ERROR(fmt_, ...) printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_DEBUG(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_TRACE(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_INFO(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_WARN(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
+#    define LOG_ERROR(fmt_, ...) std::printf(" " fmt_ "\n", ##__VA_ARGS__)
 #  endif
 #endif
 
@@ -165,74 +167,124 @@ struct SocketAddr
 {
   static u_long const Loopback = 0x7F000001;
 
-  sockaddr m_data;
+  // sockaddr_storage is the socket API's type for holding an address of any family: it is large
+  // enough and aligned strictly enough for a sockaddr_in, which a plain sockaddr is not on every
+  // ABI. See addr() and addr_len() for how it is passed to the socket API.
+  sockaddr_storage m_data{};
 
   /// <summary>
   /// SocketAddr constructor
   /// </summary>
   /// <returns>SocketAddr</returns>
-  SocketAddr() { memset(&m_data, 0, sizeof(m_data)); }
+  SocketAddr() { m_data.ss_family = AF_UNSPEC; }
 
-  SocketAddr(u_long addr, int port)
+  SocketAddr(u_long addr, uint16_t port)
   {
     sockaddr_in &inet4    = reinterpret_cast<sockaddr_in &>(m_data);
     inet4.sin_family      = AF_INET;
-    inet4.sin_port        = htons(static_cast<uint16_t>(port));
+    inet4.sin_port        = htons(port);
     inet4.sin_addr.s_addr = htonl(addr);
   }
 
+  /// Parses an IPv4 address in "host" or "host:port" form. Host parsing follows the platform's
+  /// inet_pton(AF_INET), which requires four decimal components; a port, when present, must be
+  /// decimal digits only in the range 0..65535, and an omitted port is represented as 0. Invalid
+  /// input leaves the address at AF_UNSPEC, for which port() returns -1.
   SocketAddr(char const *addr)
   {
-#ifdef _WIN32
-    INT addrlen = sizeof(m_data);
-    WCHAR buf[200];
-    for (int i = 0; i < sizeof(buf) && addr[i]; i++)
+    // One parser for every platform: inet_pton (Winsock provides it since Vista) plus a strict
+    // decimal port. This avoids WSAStringToAddress, whose grammar and default-component filling
+    // differ from the POSIX path. Parse into a local sockaddr_in and commit with memcpy only on
+    // success, which keeps m_data at AF_UNSPEC on failure and avoids accessing the sockaddr
+    // storage through a sockaddr_in glvalue (an alignment/type-access issue tracked in #4307).
+    if (addr == nullptr)
     {
-      buf[i] = addr[i];
+      LOG_WARN("SocketAddr: cannot parse a null address");
+      return;  // m_data is already AF_UNSPEC, so port() reports -1.
     }
-    buf[199] = L'\0';
-    ::WSAStringToAddressW(buf, AF_INET, nullptr, &m_data, &addrlen);
-#else
-    sockaddr_in &inet4 = reinterpret_cast<sockaddr_in &>(m_data);
-    inet4.sin_family   = AF_INET;
-    char const *colon  = strchr(addr, ':');
-    if (colon)
+
+    sockaddr_in parsed{};
+    parsed.sin_family = AF_INET;
+
+    char const *colon          = std::strchr(addr, ':');
+    char const *hostEnd        = colon ? colon : addr + std::strlen(addr);
+    ptrdiff_t const hostLength = hostEnd - addr;
+
+    // Reject a host that would not fit rather than truncating it into a different valid address
+    // (for example "255.255.255.2559" would otherwise become "255.255.255.255"). No dotted-quad
+    // exceeds 15 characters.
+    bool ok = (hostLength >= 1 && hostLength <= 15);
+    if (ok)
     {
-      char *portEnd     = nullptr;
-      errno             = 0;
-      auto const parsed = std::strtol(colon + 1, &portEnd, 10);
-      // Accept only a converted, in-range port value; fall back to 0 otherwise.
-      if (errno == 0 && portEnd != colon + 1 && parsed >= 0 && parsed <= 65535)
+      char host[16];
+      std::memcpy(host, addr, static_cast<size_t>(hostLength));
+      host[hostLength] = '\0';
+      ok               = (::inet_pton(AF_INET, host, &parsed.sin_addr) == 1);
+    }
+
+    // Port: decimal digits only, with overflow checked before it can wrap. strtol would also
+    // accept a leading sign or whitespace and depend on the locale.
+    if (ok && colon)
+    {
+      char const *p = colon + 1;
+      uint16_t port = 0;
+      if (*p == '\0')
       {
-        inet4.sin_port = htons(static_cast<uint16_t>(parsed));
+        ok = false;  // empty port, e.g. "127.0.0.1:"
       }
-      else
+      while (ok && *p != '\0')
       {
-        inet4.sin_port = 0;
+        if (*p < '0' || *p > '9')
+        {
+          ok = false;
+          break;
+        }
+        const uint16_t digit = static_cast<uint16_t>(*p - '0');
+        if (port > (65535u - digit) / 10u)
+        {
+          ok = false;  // would exceed 65535
+          break;
+        }
+        port = port * 10u + digit;
+        ++p;
       }
-      char buf[16];
-      memcpy(buf, addr, (std::min<ptrdiff_t>)(15, colon - addr));
-      buf[15] = '\0';
-      ::inet_pton(AF_INET, buf, &inet4.sin_addr);
+      if (ok)
+      {
+        parsed.sin_port = htons(port);
+      }
+    }
+
+    if (ok)
+    {
+      std::memcpy(&m_data, &parsed, sizeof(parsed));
     }
     else
     {
-      inet4.sin_port = 0;
-      ::inet_pton(AF_INET, addr, &inet4.sin_addr);
+      // Leave m_data at AF_UNSPEC; port() returns -1 so callers can tell a parse failure from a
+      // real endpoint, including the legitimate ":0". Do not echo the raw input, which may be
+      // arbitrarily long.
+      LOG_WARN("SocketAddr: cannot parse address");
     }
-#endif
   }
 
-  operator sockaddr *() { return &m_data; }
+  /// The stored address as the socket API takes it. Only AF_INET addresses are stored, so
+  /// addr_len() is the length of a sockaddr_in rather than of the whole storage: bind() and
+  /// connect() reject a length that is too large for the address family on some platforms.
+  sockaddr *addr() { return reinterpret_cast<sockaddr *>(&m_data); }
 
-  operator const sockaddr *() const { return &m_data; }
+  const sockaddr *addr() const { return reinterpret_cast<const sockaddr *>(&m_data); }
+
+  socklen_t addr_len() const { return static_cast<socklen_t>(sizeof(sockaddr_in)); }
 
   int port() const
   {
-    switch (m_data.sa_family)
+    switch (m_data.ss_family)
     {
       case AF_INET: {
-        sockaddr_in const &inet4 = reinterpret_cast<sockaddr_in const &>(m_data);
+        // Copy out rather than binding a sockaddr_in glvalue to sockaddr storage, which is an
+        // alignment/type-access issue (see the constructor and #4307).
+        sockaddr_in inet4{};
+        std::memcpy(&inet4, &m_data, sizeof(inet4));
         return ntohs(inet4.sin_port);
       }
 
@@ -245,11 +297,12 @@ struct SocketAddr
   {
     std::ostringstream os;
 
-    switch (m_data.sa_family)
+    switch (m_data.ss_family)
     {
       case AF_INET: {
-        sockaddr_in const &inet4 = reinterpret_cast<sockaddr_in const &>(m_data);
-        u_long addr              = ntohl(inet4.sin_addr.s_addr);
+        sockaddr_in inet4{};
+        std::memcpy(&inet4, &m_data, sizeof(inet4));
+        u_long addr = ntohl(inet4.sin_addr.s_addr);
         os << (addr >> 24) << '.' << ((addr >> 16) & 255) << '.' << ((addr >> 8) & 255) << '.'
            << (addr & 255);
         os << ':' << ntohs(inet4.sin_port);
@@ -257,11 +310,22 @@ struct SocketAddr
       }
 
       default:
-        os << "[?AF?" << m_data.sa_family << ']';
+        os << "[?AF?" << m_data.ss_family << ']';
     }
     return os.str();
   }
 };
+
+// The constructors stores a sockaddr_in into m_data, port() and toString() reads it back out, and
+// the address family is read through ss_family. Those are only well defined if the storage is
+// large enough and aligned strictly enough for a sockaddr_in and places the address family where
+// a sockaddr_in does.
+static_assert(sizeof(sockaddr_storage) >= sizeof(sockaddr_in),
+              "sockaddr_storage must be large enough to hold a sockaddr_in");
+static_assert(alignof(sockaddr_storage) >= alignof(sockaddr_in),
+              "sockaddr_storage must be aligned strictly enough for a sockaddr_in");
+static_assert(offsetof(sockaddr_storage, ss_family) == offsetof(sockaddr_in, sin_family),
+              "sockaddr_storage and sockaddr_in must place the address family at the same offset");
 
 /// <summary>
 /// Encapsulation of a socket (non-exclusive ownership)
@@ -269,10 +333,10 @@ struct SocketAddr
 struct Socket
 {
 #ifdef _WIN32
-  typedef SOCKET Type;
+  using Type                = SOCKET;
   static Type const Invalid = INVALID_SOCKET;
 #else
-  typedef int Type;
+  using Type                = int;
   static Type const Invalid = -1;
 #endif
 
@@ -331,7 +395,7 @@ struct Socket
   bool connect(SocketAddr const &addr)
   {
     assert(m_sock != Invalid);
-    return (::connect(m_sock, addr, sizeof(addr)) == 0);
+    return (::connect(m_sock, addr.addr(), addr.addr_len()) == 0);
   }
 
   void close()
@@ -361,18 +425,18 @@ struct Socket
   bool bind(SocketAddr const &addr)
   {
     assert(m_sock != Invalid);
-    return (::bind(m_sock, addr, sizeof(addr)) == 0);
+    return (::bind(m_sock, addr.addr(), addr.addr_len()) == 0);
   }
 
   bool getsockname(SocketAddr &addr) const
   {
     assert(m_sock != Invalid);
 #ifdef _WIN32
-    int addrlen = sizeof(addr);
+    int addrlen = sizeof(addr.m_data);
 #else
-    socklen_t addrlen = sizeof(addr);
+    socklen_t addrlen = sizeof(addr.m_data);
 #endif
-    return (::getsockname(m_sock, addr, &addrlen) == 0);
+    return (::getsockname(m_sock, addr.addr(), &addrlen) == 0);
   }
 
   bool listen(int backlog)
@@ -385,11 +449,11 @@ struct Socket
   {
     assert(m_sock != Invalid);
 #ifdef _WIN32
-    int addrlen = sizeof(caddr);
+    int addrlen = sizeof(caddr.m_data);
 #else
-    socklen_t addrlen = sizeof(caddr);
+    socklen_t addrlen = sizeof(caddr.m_data);
 #endif
-    csock = ::accept(m_sock, caddr, &addrlen);
+    csock = ::accept(m_sock, caddr.addr(), &addrlen);
     return !csock.invalid();
   }
 
@@ -408,7 +472,7 @@ struct Socket
 #endif
   }
 
-  enum  // NOLINT(performance-enum-size)
+  enum  // NOLINT(performance-enum-size,cppcoreguidelines-use-enum-class)
   {
 #ifdef _WIN32
     ErrorWouldBlock = WSAEWOULDBLOCK
@@ -417,7 +481,7 @@ struct Socket
 #endif
   };
 
-  enum  // NOLINT(performance-enum-size)
+  enum  // NOLINT(performance-enum-size,cppcoreguidelines-use-enum-class)
   {
 #ifdef _WIN32
     ShutdownReceive = SD_RECEIVE,
@@ -470,7 +534,7 @@ struct Reactor : protected common::Thread
   /// <summary>
   /// Socket State
   /// </summary>
-  enum State : std::uint8_t
+  enum State : std::uint8_t  // NOLINT(cppcoreguidelines-use-enum-class)
   {
     Readable   = 1,
     Writable   = 2,
@@ -569,7 +633,7 @@ public:
         EV_SET(&event, event.ident, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
         kevent(kq, &event, 1, NULL, 0, NULL);
 #endif
-        m_sockets.push_back(SocketData());
+        m_sockets.emplace_back();
         m_sockets.back().socket = socket;
         m_sockets.back().flags  = 0;
         it                      = m_sockets.end() - 1;
@@ -717,6 +781,7 @@ public:
     m_sockets.clear();
   }
 
+protected:
   /// <summary>
   /// Thread Loop for async events processing
   /// </summary>
@@ -775,7 +840,13 @@ public:
       for (int i = 0; i < result; i++)
       {
         auto it = std::find(m_sockets.begin(), m_sockets.end(), events[i].data.fd);
-        assert(it != m_sockets.end());
+        if (it == m_sockets.end())
+        {
+          // epoll_wait() fills a batch, and handling one event can remove a socket that a later
+          // entry in the same batch still names. Such an entry is stale, and reading it->socket
+          // would dereference end().
+          continue;
+        }
         Socket socket = it->socket;
         int flags     = it->flags;
 
@@ -813,7 +884,13 @@ public:
         struct kevent &event = m_events[i];
         int fd               = (int)event.ident;
         auto it              = std::find(m_sockets.begin(), m_sockets.end(), fd);
-        assert(it != m_sockets.end());
+        if (it == m_sockets.end())
+        {
+          // kevent() reports a batch, and handling one event can remove a socket that a later
+          // entry in the same batch still names. Such an entry is stale, and reading it->socket
+          // would dereference end().
+          continue;
+        }
         Socket socket = it->socket;
         int flags     = it->flags;
 

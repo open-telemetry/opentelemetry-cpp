@@ -58,8 +58,8 @@ RUN mkdir -p ${OTEL_BUILD_DIR} \
         "-DCMAKE_CXX_STANDARD_REQUIRED=ON" \
         "-DCMAKE_CXX_EXTENSIONS=OFF" \
         "-DCMAKE_POSITION_INDEPENDENT_CODE=TRUE" \
-        "-DBUILD_TESTING=OFF" \
-        "-DBUILD_EXAMPLES=OFF" \
+        "-DOTELCPP_BUILD_TESTING=OFF" \
+        "-DOTELCPP_WITH_EXAMPLES=OFF" \
         "-DBUILD_SHARED_LIBS=${OTEL_BUILD_SHARED_LIBS}" \
     && cmake --build "${OTEL_BUILD_DIR}" -j ${CORES} --target install
 

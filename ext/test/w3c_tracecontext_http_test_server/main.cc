@@ -1,10 +1,9 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-#include <ctype.h>
-#include <stdint.h>
 #include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -15,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/context/runtime_context.h"
@@ -55,7 +55,8 @@ static bool equalsIgnoreCase(const std::string &str1, const std::string &str2)
   }
   for (size_t i = 0; i < str1.length(); i++)
   {
-    if (tolower(str1[i]) != tolower(str2[i]))
+    if (opentelemetry::common::detail::ToAsciiLower(str1[i]) !=
+        opentelemetry::common::detail::ToAsciiLower(str2[i]))
     {
       return false;
     }
@@ -203,7 +204,7 @@ int main(int argc, char *argv[])
 
         for (auto &part : body)
         {
-          auto headers_2 = const_cast<std::map<std::string, std::string> &>(req.headers);
+          auto headers_2 = req.headers;
 
           const TextMapCarrierTest carrier(headers_2);
           auto current_ctx = context::RuntimeContext::GetCurrent();

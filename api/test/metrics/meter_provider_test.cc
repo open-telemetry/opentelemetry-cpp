@@ -35,3 +35,20 @@ TEST(Provider, MultipleMeterProviders)
 
   ASSERT_NE(Provider::GetMeterProvider(), tf);
 }
+
+TEST(Provider, SetNullMeterProvider)
+{
+  auto tf = opentelemetry::nostd::shared_ptr<MeterProvider>(new NoopMeterProvider());
+  Provider::SetMeterProvider(tf);
+  ASSERT_EQ(tf, Provider::GetMeterProvider());
+
+  // Setting a null MeterProvider installs a no-op MeterProvider.
+  Provider::SetMeterProvider(opentelemetry::nostd::shared_ptr<MeterProvider>());
+
+  auto noop = Provider::GetMeterProvider();
+  ASSERT_NE(nullptr, noop);
+  ASSERT_NE(tf, noop);
+
+  // The no-op MeterProvider is usable, it does not crash on use.
+  EXPECT_NE(nullptr, noop->GetMeter("test"));
+}

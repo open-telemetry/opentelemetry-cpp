@@ -92,7 +92,7 @@ REM - stl              - build with Standard Template Library
 REM ##########################################################################################
 REM Build with nostd implementation.
 REM ##########################################################################################
-set CONFIG=-DWITH_STL:BOOL=OFF %*
+set CONFIG=-DOTELCPP_WITH_STL=OFF %*
 set "OUTDIR=%ROOT%\out\%BUILDTOOLS_VERSION%\nostd"
 call :build_config
 
@@ -100,7 +100,7 @@ REM ############################################################################
 REM Build with STL implementation. This option does not yield benefits for vs2015 build.
 REM ##########################################################################################
 if "%BUILDTOOLS_VERSION%" neq "vs2015" (
-  set CONFIG=-DWITH_STL:BOOL=ON %*
+  set CONFIG=-DOTELCPP_WITH_STL=ON %*
   set "OUTDIR=%ROOT%\out\%BUILDTOOLS_VERSION%\stl"
   call :build_config
 )

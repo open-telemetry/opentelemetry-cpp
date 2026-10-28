@@ -8,9 +8,12 @@
 
 #include "opentelemetry/exporters/otlp/otlp_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_http.h"
+#include "opentelemetry/exporters/otlp/otlp_http_builder_utils.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_factory.h"
 #include "opentelemetry/exporters/otlp/otlp_http_metric_exporter_options.h"
 #include "opentelemetry/exporters/otlp/otlp_http_push_metric_builder.h"
+#include "opentelemetry/sdk/common/global_log_handler.h"
+#include "opentelemetry/sdk/configuration/default_histogram_aggregation.h"
 #include "opentelemetry/sdk/configuration/http_tls_configuration.h"
 #include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_builder.h"
 #include "opentelemetry/sdk/configuration/otlp_http_push_metric_exporter_configuration.h"
@@ -33,12 +36,21 @@ void OtlpHttpPushMetricBuilder::Register(opentelemetry::sdk::configuration::Regi
 std::unique_ptr<opentelemetry::sdk::metrics::PushMetricExporter> OtlpHttpPushMetricBuilder::Build(
     const opentelemetry::sdk::configuration::OtlpHttpPushMetricExporterConfiguration *model) const
 {
+  // FIXME-SDK: default_histogram_aggregation is parsed but not implemented by the SDK.
+  if (model->default_histogram_aggregation !=
+      opentelemetry::sdk::configuration::DefaultHistogramAggregation::explicit_bucket_histogram)
+  {
+    OTEL_INTERNAL_LOG_WARN(
+        "[Otlp Http Exporter] default_histogram_aggregation is not supported and will be "
+        "ignored");
+  }
+
   OtlpHttpMetricExporterOptions options(nullptr);
 
   const auto *tls = model->tls.get();
 
   options.url                = model->endpoint;
-  options.content_type       = OtlpBuilderUtils::ConvertOtlpHttpEncoding(model->encoding);
+  options.content_type       = OtlpHttpBuilderUtils::ConvertOtlpHttpEncoding(model->encoding);
   options.json_bytes_mapping = JsonBytesMappingKind::kHexId;
   options.use_json_name      = false;
   options.console_debug      = false;

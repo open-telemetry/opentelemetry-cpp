@@ -52,6 +52,10 @@ foreach(
     TEST_LIST ${testname})
 endforeach()
 
+set_tests_properties(
+  metrics.MeterProvider.ConstructionFailureDiagnosticsAllowProviderReentry
+  PROPERTIES TIMEOUT 10)
+
 if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
   add_executable(multi_observer_test multi_observer_test.cc)
   target_link_libraries(
@@ -63,7 +67,7 @@ if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
     TEST_PREFIX metrics.
     TEST_LIST multi_observer_test)
 
-  if(WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW)
+  if(OTELCPP_WITH_METRICS_BOUND_INSTRUMENTS_PREVIEW)
     add_executable(bound_sync_instruments_test bound_sync_instruments_test.cc)
     target_link_libraries(
       bound_sync_instruments_test
@@ -77,7 +81,7 @@ if(OPENTELEMETRY_ABI_VERSION_NO GREATER_EQUAL 2)
   endif()
 endif()
 
-if(WITH_BENCHMARK)
+if(OTELCPP_WITH_BENCHMARK)
   add_executable(attributes_processor_benchmark
                  attributes_processor_benchmark.cc)
   target_link_libraries(attributes_processor_benchmark benchmark::benchmark
@@ -94,6 +98,12 @@ if(WITH_BENCHMARK)
     base2_exponential_histogram_indexer_benchmark benchmark::benchmark
     opentelemetry_metrics ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
 
+  add_executable(circular_buffer_counter_benchmark
+                 circular_buffer_counter_benchmark.cc)
+  target_link_libraries(
+    circular_buffer_counter_benchmark benchmark::benchmark
+    opentelemetry_metrics ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+
   add_executable(histogram_aggregation_benchmark
                  histogram_aggregation_benchmark.cc)
   target_link_libraries(
@@ -105,12 +115,21 @@ if(WITH_BENCHMARK)
   target_link_libraries(
     measurements_benchmark benchmark::benchmark opentelemetry_metrics
     opentelemetry_resources ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+  add_executable(sync_instruments_benchmark sync_instruments_benchmark.cc)
+  target_link_libraries(
+    sync_instruments_benchmark benchmark::benchmark opentelemetry_metrics
+    opentelemetry_resources ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
+  add_executable(instrument_metadata_validator_benchmark
+                 instrument_metadata_validator_benchmark.cc)
+  target_link_libraries(
+    instrument_metadata_validator_benchmark benchmark::benchmark
+    opentelemetry_metrics ${CMAKE_THREAD_LIBS_INIT} opentelemetry_common)
   add_executable(sum_aggregation_benchmark sum_aggregation_benchmark.cc)
   target_link_libraries(
     sum_aggregation_benchmark benchmark::benchmark ${CMAKE_THREAD_LIBS_INIT}
     metrics_common_test_utils opentelemetry_common opentelemetry_resources)
 endif()
 
-if(WITH_METRICS_EXEMPLAR_PREVIEW)
+if(OTELCPP_WITH_METRICS_EXEMPLAR_PREVIEW)
   add_subdirectory(exemplar)
 endif()

@@ -53,6 +53,6 @@ TEST(TraceIdTest, CopyBytesTo)
   TraceId id(src);
   uint8_t buf[TraceId::kSize];
   id.CopyBytesTo(buf);
-  EXPECT_TRUE(memcmp(src, buf, sizeof(buf)) == 0);
+  EXPECT_TRUE(std::memcmp(src, buf, sizeof(buf)) == 0);
 }
 }  // namespace

@@ -4,6 +4,7 @@
 #ifdef _WIN32
 
 #  include <gtest/gtest.h>
+#  include <cstdint>
 #  include <map>
 #  include <string>
 #  include "opentelemetry//sdk/trace/sampler.h"
@@ -578,6 +579,86 @@ TEST(ETWTracer, EndWithCustomTime)
   auto end_time = static_cast<opentelemetry::exporter::etw::Span *>(s1.get())->GetEndTime();
   EXPECT_EQ(end.end_steady_time.time_since_epoch(), end_time.time_since_epoch());
 
+}
+
+/**
+ * Reads back the status fields the ETW exporter puts on the "Span" event at End.
+ */
+static void GetEmittedStatus(opentelemetry::trace::Span &span, uint32_t &code, std::string &message)
+{
+  exporter::etw::Properties evt;
+  static_cast<exporter::etw::Span &>(span).UpdateStatus(evt);
+  const exporter::etw::PropertyVariant &code_value = evt[ETW_FIELD_STATUSCODE];
+  const exporter::etw::PropertyVariant &message_value = evt[ETW_FIELD_STATUSMESSAGE];
+  code = nostd::get<uint32_t>(code_value);
+  message = nostd::get<std::string>(message_value);
+}
+
+TEST(ETWTracer, SpanSetStatusOkIsFinal)
+{
+  exporter::etw::TracerProvider tp;
+  auto tracer = tp.GetTracer("SpanSetStatus");
+  auto span = tracer->StartSpan("span 1");
+  span->SetStatus(opentelemetry::trace::StatusCode::kOk, "");
+  span->SetStatus(opentelemetry::trace::StatusCode::kError, "later error");
+  span->SetStatus(opentelemetry::trace::StatusCode::kUnset, "");
+
+  uint32_t code = 0;
+  std::string message;
+  GetEmittedStatus(*span, code, message);
+  EXPECT_EQ(code, static_cast<uint32_t>(opentelemetry::trace::StatusCode::kOk));
+  EXPECT_EQ(message, "");
+  span->End();
+}
+
+TEST(ETWTracer, SpanSetStatusUnsetIsIgnored)
+{
+  exporter::etw::TracerProvider tp;
+  auto tracer = tp.GetTracer("SpanSetStatus");
+  auto span = tracer->StartSpan("span 1");
+  span->SetStatus(opentelemetry::trace::StatusCode::kError, "the real failure");
+  span->SetStatus(opentelemetry::trace::StatusCode::kUnset, "");
+
+  uint32_t code = 0;
+  std::string message;
+  GetEmittedStatus(*span, code, message);
+  EXPECT_EQ(code, static_cast<uint32_t>(opentelemetry::trace::StatusCode::kError));
+  EXPECT_EQ(message, "the real failure");
+  span->End();
+}
+
+TEST(ETWTracer, SpanSetStatusDescriptionIgnoredForOk)
+{
+  exporter::etw::TracerProvider tp;
+  auto tracer = tp.GetTracer("SpanSetStatus");
+  auto span = tracer->StartSpan("span 1");
+  span->SetStatus(opentelemetry::trace::StatusCode::kError, "transient");
+  span->SetStatus(opentelemetry::trace::StatusCode::kOk, "ignored description");
+
+  uint32_t code = 0;
+  std::string message;
+  GetEmittedStatus(*span, code, message);
+  EXPECT_EQ(code, static_cast<uint32_t>(opentelemetry::trace::StatusCode::kOk));
+  EXPECT_EQ(message, "");
+  span->End();
+}
+
+TEST(ETWTracer, SpanSetStatusErrorKeepsDescription)
+{
+  exporter::etw::TracerProvider tp;
+  auto tracer = tp.GetTracer("SpanSetStatus");
+  auto span = tracer->StartSpan("span 1");
+  // The description is not null terminated at its end, so a copy through data() alone overruns it.
+  std::string description = "boomX";
+  span->SetStatus(opentelemetry::trace::StatusCode::kError,
+                  nostd::string_view(description.data(), 4));
+
+  uint32_t code = 0;
+  std::string message;
+  GetEmittedStatus(*span, code, message);
+  EXPECT_EQ(code, static_cast<uint32_t>(opentelemetry::trace::StatusCode::kError));
+  EXPECT_EQ(message, "boom");
+  span->End();
 }
 
 TEST(ETWTracer, ConstructorInitializesToOpenState)

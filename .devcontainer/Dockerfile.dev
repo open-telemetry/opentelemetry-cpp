@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-FROM otel/cpp_format_tools
+FROM ubuntu:24.04@sha256:24737cef17f4e22b1977df7d9a05e77c4e28b7da5b8911f8d8ccda136bf3573c
 
 ARG USER_UID=1000
 ARG USER_GID=1000
@@ -37,6 +37,8 @@ RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-22 200 && 
     update-alternatives --config llvm-config
 
 RUN cd /opt/ci && bash setup_ci_environment.sh
+RUN cd /opt/ci && bash install_format_tools.sh
+RUN cd /opt/ci && bash setup_cmake.sh
 RUN cd /opt/ci && bash install_iwyu.sh
 RUN cd /opt/ci && bash install_bazelisk.sh
 RUN git config --global core.autocrlf input

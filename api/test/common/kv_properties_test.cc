@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>
+#include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>
@@ -72,6 +72,23 @@ TEST(EntryTest, SetValue)
 
 using opentelemetry::common::KeyValueStringTokenizer;
 using opentelemetry::common::KeyValueStringTokenizerOptions;
+
+TEST(KVStringTokenizer, PreserveExistingWhitespaceNormalization)
+{
+  // OTLP headers and resource attributes also rely on member-edge trimming.
+  KeyValueStringTokenizer tk(" \t\r\n\v\fAuthorization=token\r\n,resource=value\v\f");
+  bool valid = false;
+  nostd::string_view key, value;
+  ASSERT_TRUE(tk.next(valid, key, value));
+  EXPECT_TRUE(valid);
+  EXPECT_EQ(key, "Authorization");
+  EXPECT_EQ(value, "token");
+  ASSERT_TRUE(tk.next(valid, key, value));
+  EXPECT_TRUE(valid);
+  EXPECT_EQ(key, "resource");
+  EXPECT_EQ(value, "value");
+  EXPECT_FALSE(tk.next(valid, key, value));
+}
 
 TEST(KVStringTokenizer, SinglePair)
 {
@@ -223,6 +240,15 @@ TEST(KeyValueProperties, GetValue)
 
   present = kv_properties.GetValue("k3", value);
   EXPECT_FALSE(present);
+}
+
+TEST(KeyValueProperties, HasKey)
+{
+  auto kv_properties = KeyValueProperties(1);
+  kv_properties.AddEntry("k1", "v1");
+
+  EXPECT_TRUE(kv_properties.HasKey("k1"));
+  EXPECT_FALSE(kv_properties.HasKey("k3"));
 }
 
 TEST(KeyValueProperties, GetAllEntries)

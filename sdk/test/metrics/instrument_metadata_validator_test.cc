@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>
+#include <cstddef>
 #include <string>
 #include <vector>
 
+#include "opentelemetry/nostd/string_view.h"
 #include "opentelemetry/sdk/metrics/instrument_metadata_validator.h"
 
 static std::string CreateVeryLargeString(size_t multiple)
@@ -31,6 +32,10 @@ TEST(InstrumentMetadataValidator, TestName)
       "a\\broken\\path",                // contains backward slash
       CreateVeryLargeString(25) + "X",  // total 256 characters
       CreateVeryLargeString(26),        // string much bigger than 255 character
+      std::string("abc\0def", 7),       // contains embedded NUL
+      "ab\xc3\xa9",                     // non-ASCII letter
+      "\xc3\xa9t",                      // starting with non-ASCII letter
+      "a b",                            // contains space
   };
   for (auto const &str : invalid_names)
   {
@@ -61,6 +66,7 @@ TEST(InstrumentMetadataValidator, TestUnit)
       CreateVeryLargeString(5) + "ABCERTYGJ",  // total 64 charactes
       CreateVeryLargeString(7),                // string bigger than 63 chars
       "\x31\x32\x33\xe2\x82\xac\x41\x41\x41\xe2\x82\xac\x42\x42\x42",  // unicode string
+      std::string("m\0s", 3),                                          // contains embedded NUL
   };
   for (auto const &str : invalid_units)
   {
@@ -74,9 +80,50 @@ TEST(InstrumentMetadataValidator, TestUnit)
       "d1234_-sdsds.sdsd344",                 // combination of all valid characters
       CreateVeryLargeString(5) + "ABCERTYG",  // total 63 charactes
       "ASDDSDF",                              // uppercase
+      "",                                     // empty
+      "{request}/s",                          // annotation and slash
+      "\x01\x7F",                             // lowest and highest ASCII characters
   };
   for (auto const &str : valid_units)
   {
-    EXPECT_TRUE(validator.ValidateName(str));
+    EXPECT_TRUE(validator.ValidateUnit(str));
   }
+}
+
+// The views below are not NUL-terminated, so the characters after their end
+// must not change the result.
+
+TEST(InstrumentMetadataValidator, NameViewEndsBeforeInvalidCharacter)
+{
+  opentelemetry::sdk::metrics::InstrumentMetaDataValidator validator;
+  const std::string buffer = "abc def";
+  EXPECT_TRUE(validator.ValidateName(opentelemetry::nostd::string_view(buffer.data(), 3)));
+}
+
+TEST(InstrumentMetadataValidator, EmptyNameViewOverValidName)
+{
+  opentelemetry::sdk::metrics::InstrumentMetaDataValidator validator;
+  const std::string buffer = "abcdef";
+  EXPECT_FALSE(validator.ValidateName(opentelemetry::nostd::string_view(buffer.data(), 0)));
+}
+
+TEST(InstrumentMetadataValidator, MaxLengthNameViewOverLongerName)
+{
+  opentelemetry::sdk::metrics::InstrumentMetaDataValidator validator;
+  const std::string buffer = CreateVeryLargeString(26);  // 265 characters
+  EXPECT_TRUE(validator.ValidateName(opentelemetry::nostd::string_view(buffer.data(), 255)));
+}
+
+TEST(InstrumentMetadataValidator, UnitViewEndsBeforeNonAsciiCharacter)
+{
+  opentelemetry::sdk::metrics::InstrumentMetaDataValidator validator;
+  const std::string buffer = "ms\xe2\x82\xac";
+  EXPECT_TRUE(validator.ValidateUnit(opentelemetry::nostd::string_view(buffer.data(), 2)));
+}
+
+TEST(InstrumentMetadataValidator, MaxLengthUnitViewOverLongerUnit)
+{
+  opentelemetry::sdk::metrics::InstrumentMetaDataValidator validator;
+  const std::string buffer = CreateVeryLargeString(7);  // 75 characters
+  EXPECT_TRUE(validator.ValidateUnit(opentelemetry::nostd::string_view(buffer.data(), 63)));
 }

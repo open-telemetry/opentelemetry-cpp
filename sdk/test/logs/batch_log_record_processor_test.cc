@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -144,11 +144,14 @@ public:
   }
 
   // toggles the boolean flag marking this exporter as shut down
-  bool Shutdown(std::chrono::microseconds /* timeout */) noexcept override
+  bool Shutdown(std::chrono::microseconds timeout) noexcept override
   {
-    *is_shutdown_ = true;
+    shutdown_timeout_ = timeout;
+    *is_shutdown_     = true;
     return true;
   }
+
+  std::chrono::microseconds GetShutdownTimeout() const noexcept { return shutdown_timeout_; }
 
 private:
   std::shared_ptr<std::vector<std::unique_ptr<MockLogRecordable>>> logs_received_;
@@ -156,6 +159,7 @@ private:
   std::shared_ptr<std::atomic<bool>> is_shutdown_;
   std::shared_ptr<std::atomic<bool>> is_export_completed_;
   std::chrono::milliseconds export_delay_;
+  std::chrono::microseconds shutdown_timeout_{std::chrono::microseconds::zero()};
 };
 
 class BlockingMockLogExporter final : public LogRecordExporter
@@ -318,8 +322,12 @@ TEST_F(BatchLogRecordProcessorTest, TestShutdown)
       new std::vector<std::unique_ptr<MockLogRecordable>>);
   std::shared_ptr<std::atomic<std::size_t>> force_flush_counter(new std::atomic<std::size_t>(0));
   std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
+  std::shared_ptr<std::atomic<bool>> is_export_completed(new std::atomic<bool>(false));
 
-  auto batch_processor = GetMockProcessor(logs_received, force_flush_counter, is_shutdown);
+  auto exporter =
+      new MockLogExporter(logs_received, force_flush_counter, is_shutdown, is_export_completed);
+  auto batch_processor = std::shared_ptr<LogRecordProcessor>(
+      new BatchLogRecordProcessor(std::unique_ptr<LogRecordExporter>(exporter)));
 
   // Create a few test log records and send them to the processor
   const int num_logs = 3;
@@ -348,6 +356,7 @@ TEST_F(BatchLogRecordProcessorTest, TestShutdown)
 
   // Also check that the processor is shut down at the end
   EXPECT_TRUE(is_shutdown->load());
+  EXPECT_EQ((std::chrono::microseconds::max)(), exporter->GetShutdownTimeout());
 }
 
 TEST_F(BatchLogRecordProcessorTest, TestForceFlush)
@@ -395,7 +404,7 @@ TEST_F(BatchLogRecordProcessorTest, TestForceFlush)
   }
 }
 
-TEST_F(BatchLogRecordProcessorTest, TestWaitsForFullBatch)
+TEST_F(BatchLogRecordProcessorTest, TestHalfFullWakeupDoesNotDrainPartialBatch)
 {
   std::shared_ptr<std::vector<std::size_t>> batch_sizes(new std::vector<std::size_t>());
   std::shared_ptr<std::atomic<std::size_t>> logs_received_count(new std::atomic<std::size_t>(0));
@@ -430,6 +439,45 @@ TEST_F(BatchLogRecordProcessorTest, TestWaitsForFullBatch)
   ASSERT_EQ(2u, sizes.size());
   EXPECT_EQ(50u, sizes[0]);
   EXPECT_EQ(10u, sizes[1]);
+
+  EXPECT_TRUE(batch_processor->Shutdown());
+}
+
+TEST_F(BatchLogRecordProcessorTest, TestWaitsForFullBatch)
+{
+  std::shared_ptr<std::vector<std::size_t>> batch_sizes(new std::vector<std::size_t>());
+  std::shared_ptr<std::atomic<std::size_t>> logs_received_count(new std::atomic<std::size_t>(0));
+  std::shared_ptr<std::atomic<bool>> is_shutdown(new std::atomic<bool>(false));
+  std::shared_ptr<std::atomic<std::size_t>> export_call_count(new std::atomic<std::size_t>(0));
+
+  auto *exporter_raw = new BlockingMockLogExporter(batch_sizes, logs_received_count, is_shutdown,
+                                                   std::chrono::milliseconds(0), export_call_count);
+
+  BatchLogRecordProcessorOptions options;
+  options.max_queue_size        = 1000;
+  options.schedule_delay_millis = std::chrono::milliseconds(5000);
+  options.max_export_batch_size = 100;
+  auto batch_processor = GetProcessor(std::unique_ptr<LogRecordExporter>(exporter_raw), options);
+
+  exporter_raw->SetBlock(true);
+  EmitLogs(batch_processor, 100);
+  EXPECT_TRUE(WaitForExportCalls(export_call_count, 1));
+
+  EmitLogs(batch_processor, 99);
+  exporter_raw->SetBlock(false);
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+  EXPECT_EQ(1u, export_call_count->load());
+  EXPECT_EQ(100u, logs_received_count->load());
+
+  EmitLogs(batch_processor, 1);
+  EXPECT_TRUE(WaitForExportCalls(export_call_count, 2, std::chrono::milliseconds(2000)));
+  EXPECT_EQ(200u, logs_received_count->load());
+
+  auto sizes = exporter_raw->GetBatchSizes();
+  ASSERT_EQ(2u, sizes.size());
+  EXPECT_EQ(100u, sizes[0]);
+  EXPECT_EQ(100u, sizes[1]);
 
   EXPECT_TRUE(batch_processor->Shutdown());
 }

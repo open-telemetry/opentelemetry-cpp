@@ -16,10 +16,13 @@ add_library(
   batch_span_processor_options.cc
   simple_processor_factory.cc
   span_data.cc
+  span_limits.cc
   samplers/always_on_factory.cc
   samplers/always_off_factory.cc
   samplers/parent.cc
   samplers/parent_factory.cc
+  samplers/probability.cc
+  samplers/probability_factory.cc
   samplers/trace_id_ratio.cc
   samplers/trace_id_ratio_factory.cc
   samplers/ot_trace_state.cc
@@ -28,6 +31,7 @@ add_library(
   samplers/composable_probability.cc
   samplers/composable_parent_threshold.cc
   samplers/composable_rule_based.cc
+  samplers/rule_based_predicate.cc
   multi_recordable.cc
   random_id_generator.cc
   random_id_generator_factory.cc
@@ -36,16 +40,17 @@ add_library(
 set_target_properties(opentelemetry_trace PROPERTIES EXPORT_NAME trace)
 set_target_version(opentelemetry_trace)
 
-target_link_libraries(opentelemetry_trace PUBLIC opentelemetry_common
-                                                 opentelemetry_resources)
+target_link_libraries(
+  opentelemetry_trace PUBLIC opentelemetry_common opentelemetry_resources
+                             opentelemetry_instrumentation_scope)
 
 target_include_directories(
   opentelemetry_trace
   PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sdk/include>")
 
-if(OPENTELEMETRY_INSTALL)
+if(OTELCPP_INSTALL)
   opentelemetry_add_pkgconfig(
     trace "OpenTelemetry SDK - Trace"
     "Components for exporting traces in the OpenTelemetry SDK."
-    "opentelemetry_resources")
+    "opentelemetry_resources" "opentelemetry_instrumentation_scope")
 endif()

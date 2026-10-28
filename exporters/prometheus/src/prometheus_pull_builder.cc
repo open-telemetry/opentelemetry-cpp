@@ -38,8 +38,8 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> PrometheusPullBuilder
   url.append(std::to_string(model->port));
 
   options.url                  = url;
-  options.populate_target_info = !model->without_target_info;
-  options.without_otel_scope   = model->without_scope_info;
+  options.populate_target_info = model->target_info_enabled;
+  options.without_otel_scope   = !model->scope_info_enabled;
 
   switch (model->translation_strategy)
   {
@@ -53,22 +53,23 @@ std::unique_ptr<opentelemetry::sdk::metrics::MetricReader> PrometheusPullBuilder
       break;
     case sdk::configuration::TranslationStrategy::NoUTF8EscapingWithSuffixes:
       // FIXME: no flag to disable UnderscoreEscaping
-      OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] NoUTF8EscapingWithSuffixes not supported");
+      OTEL_INTERNAL_LOG_WARN(
+          "[Prometheus Exporter] no_utf8_escaping_with_suffixes/development not supported");
       options.without_units       = false;
       options.without_type_suffix = false;
       break;
     case sdk::configuration::TranslationStrategy::NoTranslation:
       // FIXME: no flag to disable UnderscoreEscaping
-      OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] NoTranslation not supported");
+      OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] no_translation/development not supported");
       options.without_units       = true;
       options.without_type_suffix = true;
       break;
   }
 
-  if (model->with_resource_constant_labels != nullptr)
+  if (model->resource_constant_labels != nullptr)
   {
-    // FIXME: with_resource_constant_labels
-    OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] with_resource_constant_labels not supported");
+    // FIXME: resource_constant_labels
+    OTEL_INTERNAL_LOG_WARN("[Prometheus Exporter] resource_constant_labels not supported");
   }
 
   return PrometheusExporterFactory::Create(options);

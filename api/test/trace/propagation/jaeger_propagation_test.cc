@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stdint.h>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <utility>
@@ -191,11 +191,28 @@ TEST(JaegerPropagatorTest, InjectsContext)
 
   std::vector<std::string> fields;
   format.Fields([&fields](nostd::string_view field) {
-    fields.push_back(field.data());
+    fields.emplace_back(field.data());
     return true;
   });
   EXPECT_EQ(fields.size(), 1);
   EXPECT_EQ(fields[0], opentelemetry::trace::propagation::kJaegerTraceHeader);
+}
+
+TEST(JaegerPropagatorTest, DoNotInjectEmptyContext)
+{
+  TextMapCarrierTest carrier;
+  context::Context ctx;
+  format.Inject(carrier, ctx);
+  EXPECT_TRUE(carrier.headers_.empty());
+}
+
+TEST(JaegerPropagatorTest, ExtractMissingHeaders)
+{
+  TextMapCarrierTest carrier;
+  context::Context ctx;
+  auto extracted = format.Extract(carrier, ctx);
+  EXPECT_FALSE(nostd::holds_alternative<nostd::shared_ptr<trace::Span>>(
+      extracted.GetValue(trace::kSpanKey)));
 }
 
 TEST(JaegerPropagatorTest, DoNotInjectInvalidContext)

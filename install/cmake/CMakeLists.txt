@@ -23,7 +23,7 @@
 # Defaults to 14 if not set.
 
 cmake_minimum_required(VERSION 3.16)
-project(opentelemetry-cpp-thirdparty-install LANGUAGES CXX)
+project(opentelemetry-thirdparty-install LANGUAGES CXX)
 
 # Added in CMake 3.16. ExternalProject_Add() with GIT_SUBMODULES "" initializes
 # no submodules.
@@ -488,5 +488,7 @@ if(ryml IN_LIST _THIRDPARTY_PACKAGE_LIST)
     GIT_SHALLOW ON
     PREFIX ${CMAKE_BINARY_DIR}/external/ryml
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
-    CMAKE_ARGS "${CMAKE_OPTIONS}")
+    CMAKE_ARGS "${CMAKE_OPTIONS}" "-DRYML_BUILD_TOOLS=OFF"
+               "-DRYML_BUILD_API=OFF" "-DRYML_DBG=OFF"
+               "-DRYML_DEFAULT_CALLBACK_USES_EXCEPTIONS=ON" "-DRYML_INSTALL=ON")
 endif()

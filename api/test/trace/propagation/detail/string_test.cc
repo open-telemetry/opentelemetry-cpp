@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <stddef.h>
+#include <cstddef>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -43,7 +43,6 @@ const SplitStringTestData split_string_test_cases[] = {
     {"foo ,bar, baz ", ',', 4, 3},
     {"00-0af7651916cd43dd8448eb211c80319c-00f067aa0ba902b7-01", '-', 4, 4},
 };
-}  // namespace
 
 // Test fixture
 class SplitStringTestFixture : public ::testing::TestWithParam<SplitStringTestData>
@@ -63,3 +62,5 @@ TEST_P(SplitStringTestFixture, SplitsAsExpected)
 INSTANTIATE_TEST_SUITE_P(SplitStringTestCases,
                          SplitStringTestFixture,
                          ::testing::ValuesIn(split_string_test_cases));
+
+}  // namespace

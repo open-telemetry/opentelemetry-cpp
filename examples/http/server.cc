@@ -51,9 +51,7 @@ public:
     std::string span_name = request.uri;
 
     // extract context from http header
-    std::map<std::string, std::string> &request_headers =
-        const_cast<std::map<std::string, std::string> &>(request.headers);
-    const HttpTextMapCarrier<std::map<std::string, std::string>> carrier(request_headers);
+    const HttpTextMapCarrier<std::map<std::string, std::string>> carrier(request.headers);
     auto prop        = context::propagation::GlobalTextMapPropagator::GetGlobalPropagator();
     auto current_ctx = context::RuntimeContext::GetCurrent();
     auto new_context = prop->Extract(carrier, current_ctx);
@@ -107,7 +105,7 @@ int main(int argc, char *argv[])
   Scope scope(root_span);
   http_server.Start();
   std::cout << "Server is running..Press ctrl-c to exit...\n";
-  while (1)
+  while (true)
   {
     std::this_thread::sleep_for(std::chrono::seconds(100));
   }

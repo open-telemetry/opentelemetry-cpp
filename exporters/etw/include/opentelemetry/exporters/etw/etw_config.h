@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#include <cstring>
 #include <map>
 
 #if defined(OPENTELEMETRY_ATTRIBUTE_TIMESTAMP_PREVIEW)
@@ -225,7 +226,7 @@ static inline std::string ToLowerBase16(const T &id)
 static inline bool CopySpanIdToActivityId(const opentelemetry::trace::SpanId &span_id,
                                           GUID &outGuid)
 {
-  memset(&outGuid, 0, sizeof(outGuid));
+  std::memset(&outGuid, 0, sizeof(outGuid));
   if (!span_id.IsValid())
   {
     return false;

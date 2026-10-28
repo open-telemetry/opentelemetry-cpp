@@ -1,9 +1,12 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
+include(${PROJECT_SOURCE_DIR}/cmake/pkgconfig.cmake)
+
 add_library(
-  opentelemetry_http_client_curl http_client_factory_curl.cc
-                                 http_client_curl.cc http_operation_curl.cc)
+  opentelemetry_http_client_curl
+  http_client_factory_curl.cc http_client_curl.cc http_operation_curl.cc
+  http_time_util.cc)
 
 set_target_properties(opentelemetry_http_client_curl
                       PROPERTIES EXPORT_NAME http_client_curl)
@@ -16,7 +19,7 @@ target_link_libraries(
   PUBLIC opentelemetry_ext
   PRIVATE CURL::libcurl)
 
-if(WITH_CURL_LOGGING)
+if(OTELCPP_WITH_CURL_LOGGING)
   target_compile_definitions(opentelemetry_http_client_curl
                              PRIVATE ENABLE_CURL_LOGGING)
 endif()
@@ -24,7 +27,7 @@ endif()
 target_compile_definitions(opentelemetry_http_client_curl
                            PUBLIC ENABLE_HTTP_CLIENT_CURL)
 
-if(WITH_OTLP_HTTP_COMPRESSION)
+if(OTELCPP_WITH_OTLP_HTTP_COMPRESSION)
   target_link_libraries(
     opentelemetry_http_client_curl
     PUBLIC opentelemetry_ext
@@ -33,3 +36,14 @@ endif()
 
 otel_add_component(COMPONENT ext_http_curl TARGETS
                    opentelemetry_http_client_curl)
+
+if(OTELCPP_INSTALL)
+  set(_http_client_curl_pc_requires "opentelemetry_common libcurl")
+  if(OTELCPP_WITH_OTLP_HTTP_COMPRESSION)
+    string(APPEND _http_client_curl_pc_requires " zlib")
+  endif()
+  opentelemetry_add_pkgconfig(
+    http_client_curl "OpenTelemetry Extension - HTTP Client CURL"
+    "CURL-based HTTP client used by OTLP HTTP, Zipkin, and Elasticsearch."
+    "${_http_client_curl_pc_requires}")
+endif()

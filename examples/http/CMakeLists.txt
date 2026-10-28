@@ -1,7 +1,7 @@
 # Copyright The OpenTelemetry Authors
 # SPDX-License-Identifier: Apache-2.0
 
-if(WITH_HTTP_CLIENT_CURL)
+if(OTELCPP_WITH_HTTP_CLIENT_CURL)
   add_executable(http_client client.cc)
   add_executable(http_server server.cc)
 
@@ -14,4 +14,7 @@ if(WITH_HTTP_CLIENT_CURL)
     http_server
     PRIVATE opentelemetry-cpp::trace opentelemetry-cpp::http_client_curl
             opentelemetry-cpp::ostream_span_exporter)
+  if(WIN32)
+    target_link_libraries(http_server PRIVATE ws2_32)
+  endif()
 endif()

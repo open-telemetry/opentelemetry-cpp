@@ -3,7 +3,6 @@
 
 add_subdirectory(core)
 add_subdirectory(context)
-# deprecated: add_subdirectory(plugin)
 add_subdirectory(nostd)
 add_subdirectory(trace)
 add_subdirectory(metrics)
@@ -11,6 +10,6 @@ add_subdirectory(logs)
 add_subdirectory(common)
 add_subdirectory(baggage)
 
-if(NOT OPENTELEMETRY_SKIP_DYNAMIC_LOADING_TESTS)
+if(NOT OTELCPP_SKIP_DYNAMIC_LOADING_TESTS)
   add_subdirectory(singleton)
 endif()

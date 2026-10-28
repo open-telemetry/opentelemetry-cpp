@@ -17,3 +17,18 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "global_propagator_test",
+    srcs = [
+        "global_propagator_test.cc",
+    ],
+    tags = [
+        "api",
+        "test",
+    ],
+    deps = [
+        "//api",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

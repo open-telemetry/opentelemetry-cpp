@@ -29,10 +29,11 @@ otel_add_component(
   PATTERN
   "*.h")
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_executable(etw_provider_test test/etw_provider_test.cc)
   add_executable(etw_tracer_test test/etw_tracer_test.cc)
   add_executable(etw_logger_test test/etw_logger_test.cc)
+  add_executable(etw_properties_test test/etw_properties_test.cc)
   add_executable(etw_tracer_test_enable_env_properties test/etw_tracer_test.cc)
   add_executable(etw_logger_test_enable_env_properties test/etw_logger_test.cc)
 
@@ -43,6 +44,9 @@ if(BUILD_TESTING)
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
 
   target_link_libraries(etw_logger_test ${GTEST_BOTH_LIBRARIES}
+                        opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
+
+  target_link_libraries(etw_properties_test ${GTEST_BOTH_LIBRARIES}
                         opentelemetry_exporter_etw ${CMAKE_THREAD_LIBS_INIT})
 
   target_link_libraries(
@@ -57,7 +61,7 @@ if(BUILD_TESTING)
   target_compile_definitions(etw_logger_test_enable_env_properties
                              PRIVATE ENABLE_ENV_PROPERTIES)
 
-  if(WITH_BENCHMARK)
+  if(OTELCPP_WITH_BENCHMARK)
     add_executable(etw_perf_test test/etw_perf_test.cc)
     target_link_libraries(
       etw_perf_test benchmark::benchmark ${GTEST_BOTH_LIBRARIES}
@@ -77,6 +81,10 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.
     TEST_LIST etw_logger_test)
   gtest_add_tests(
+    TARGET etw_properties_test
+    TEST_PREFIX exporter.
+    TEST_LIST etw_properties_test)
+  gtest_add_tests(
     TARGET etw_tracer_test_enable_env_properties
     TEST_PREFIX exporter.with_env_properties.
     TEST_LIST etw_tracer_test_enable_env_properties)
@@ -85,4 +93,4 @@ if(BUILD_TESTING)
     TEST_PREFIX exporter.with_env_properties.
     TEST_LIST etw_logger_test_enable_env_properties)
 
-endif() # BUILD_TESTING
+endif() # OTELCPP_BUILD_TESTING

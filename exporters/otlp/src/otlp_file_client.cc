@@ -3,9 +3,9 @@
 
 #include <nlohmann/json.hpp>
 
-#include <limits.h>
 #include <atomic>
 #include <chrono>
+#include <climits>
 #include <condition_variable>
 #include <cstdint>
 #include <cstdio>
@@ -21,14 +21,7 @@
 
 // IWYU pragma: no_include <features.h>
 
-#if defined(HAVE_GSL)
-#  include <gsl/gsl>
-#else
-#  include <assert.h>
-#endif
-
 #ifdef _MSC_VER
-#  include <string.h>
 #  define strcasecmp _stricmp
 #else
 #  include <strings.h>
@@ -93,17 +86,18 @@
 #  endif
 #else
 #  define OTLP_FILE_SNPRINTF(buffer, bufsz, fmt, args...) \
-    snprintf(buffer, static_cast<size_t>(bufsz), fmt, ##args)
+    std::snprintf(buffer, static_cast<size_t>(bufsz), fmt, ##args)
 #endif
 
 #if (defined(_MSC_VER) && _MSC_VER >= 1600) || \
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L)
 #  define OTLP_FILE_OPEN(f, path, mode) fopen_s(&f, path, mode)
 #else
-#  include <errno.h>
-#  define OTLP_FILE_OPEN(f, path, mode) f = fopen(path, mode)
+#  include <cerrno>
+#  define OTLP_FILE_OPEN(f, path, mode) f = std::fopen(path, mode)
 #endif
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_options.h"
 #include "opentelemetry/exporters/otlp/otlp_file_client_runtime_options.h"
@@ -417,7 +411,8 @@ static std::size_t FormatPath(char *buff,
             snprintf_s(&buff[ret], bufz - ret, "%llu", static_cast<unsigned long long>(value));
 #  endif
 #else
-        auto res = snprintf(&buff[ret], bufz - ret, "%llu", static_cast<unsigned long long>(value));
+        auto res =
+            std::snprintf(&buff[ret], bufz - ret, "%llu", static_cast<unsigned long long>(value));
 #endif
         if (res < 0)
         {
@@ -552,12 +547,12 @@ public:
     char *token   = SAFE_STRTOK_S(&path_buffer[0], "\\/", &saveptr);
     while (nullptr != token)
     {
-      if (0 != strlen(token))
+      if (0 != std::strlen(token))
       {
         if (normalize)
         {
           // Normalize path
-          if (0 == strcmp("..", token))
+          if (0 == std::strcmp("..", token))
           {
             if (!out.empty() && out.back() != "..")
             {
@@ -565,17 +560,17 @@ public:
             }
             else
             {
-              out.push_back(token);
+              out.emplace_back(token);
             }
           }
-          else if (0 != strcmp(".", token))
+          else if (0 != std::strcmp(".", token))
           {
-            out.push_back(token);
+            out.emplace_back(token);
           }
         }
         else
         {
-          out.push_back(token);
+          out.emplace_back(token);
         }
       }
       token = SAFE_STRTOK_S(nullptr, "\\/", &saveptr);
@@ -607,7 +602,7 @@ public:
     std::string current_path;
     if (nullptr != dir_path && ('/' == *dir_path || '\\' == *dir_path))
     {
-      current_path.reserve(strlen(dir_path) + 4);
+      current_path.reserve(std::strlen(dir_path) + 4);
       current_path = *dir_path;
 
       // NFS Supporting
@@ -714,23 +709,6 @@ public:
 #endif
 };
 
-static inline char HexEncode(unsigned char byte)
-{
-#if defined(HAVE_GSL)
-  Expects(byte <= 16);
-#else
-  assert(byte <= 16);
-#endif
-  if (byte >= 10)
-  {
-    return static_cast<char>(byte - 10 + 'a');
-  }
-  else
-  {
-    return static_cast<char>(byte + '0');
-  }
-}
-
 static std::string HexEncode(const std::string &bytes)
 {
   std::string ret;
@@ -738,8 +716,8 @@ static std::string HexEncode(const std::string &bytes)
   for (std::string::size_type i = 0; i < bytes.size(); ++i)
   {
     unsigned char byte = static_cast<unsigned char>(bytes[i]);
-    ret.push_back(HexEncode(byte >> 4));
-    ret.push_back(HexEncode(byte & 0x0f));
+    ret.push_back(opentelemetry::common::detail::LowerHexDigit(byte >> 4));
+    ret.push_back(opentelemetry::common::detail::LowerHexDigit(byte));
   }
   return ret;
 }
@@ -973,7 +951,6 @@ void ConvertListFieldToJson(nlohmann::json &value,
 
 // NOLINTEND(misc-no-recursion) suppressing for performance as if implemented with stack needs
 // Dynamic memory allocation
-}  // namespace
 
 class OPENTELEMETRY_LOCAL_SYMBOL OtlpFileSystemBackend : public OtlpFileAppender
 {
@@ -995,6 +972,10 @@ public:
   {
     if (file_)
     {
+      {
+        std::lock_guard<std::mutex> waker_guard{file_->background_thread_waker_lock};
+        file_->is_shutdown.store(true, std::memory_order_release);
+      }
       file_->background_thread_waker_cv.notify_all();
       std::unique_ptr<std::thread> background_flush_thread;
       {
@@ -1134,7 +1115,10 @@ public:
 
   bool Shutdown(std::chrono::microseconds timeout) noexcept override
   {
-    file_->is_shutdown.store(true, std::memory_order_release);
+    {
+      std::lock_guard<std::mutex> waker_guard{file_->background_thread_waker_lock};
+      file_->is_shutdown.store(true, std::memory_order_release);
+    }
 
     bool result = ForceFlush(timeout);
     return result;
@@ -1270,7 +1254,7 @@ private:
 
     if (destroy_content && FileSystemUtil::IsExist(file_path))
     {
-      FILE *trunc_file = nullptr;
+      std::FILE *trunc_file = nullptr;
       OTLP_FILE_OPEN(trunc_file, file_path, "wb");
       if (nullptr == trunc_file)
       {
@@ -1279,7 +1263,7 @@ private:
                                 << " failed with pattern: " << options_.file_pattern);
         return nullptr;
       }
-      fclose(trunc_file);
+      std::fclose(trunc_file);
     }
 
     std::FILE *new_file = nullptr;
@@ -1344,9 +1328,10 @@ private:
                                                            << alias_file_path
                                                            << " failed, errno: " << res);
 #  else
-        OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Link "
-                                << file_->file_path << " to " << alias_file_path
-                                << " failed, errno: " << res << ", message: " << strerror(res));
+        OTEL_INTERNAL_LOG_ERROR("[OTLP FILE Client] Link " << file_->file_path << " to "
+                                                           << alias_file_path
+                                                           << " failed, errno: " << res
+                                                           << ", message: " << std::strerror(res));
 #  endif
         return file_->current_file;
       }
@@ -1482,11 +1467,6 @@ private:
             break;
           }
 
-          if (concurrency_file->is_shutdown.load(std::memory_order_acquire))
-          {
-            break;
-          }
-
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
           if (thread_instrumentation != nullptr)
           {
@@ -1494,9 +1474,19 @@ private:
           }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
 
+          bool is_shutdown = false;
           {
             std::unique_lock<std::mutex> lk(concurrency_file->background_thread_waker_lock);
-            concurrency_file->background_thread_waker_cv.wait_for(lk, flush_interval);
+            // Even though is_shutdown is atomic, the lock guarantees that either a change to
+            // is_shutdown will be observed, or background_thread_waker_cv will see the notification
+            // at shutdown. It is important to set is_shutdown prior to `wait_for` rather than
+            // as part of a condition in `wait_for` so that a shutdown while the thread is in
+            // `wait_for` will still call `std::fflush` below.
+            is_shutdown = concurrency_file->is_shutdown.load(std::memory_order_acquire);
+            if (!is_shutdown)
+            {
+              concurrency_file->background_thread_waker_cv.wait_for(lk, flush_interval);
+            }
           }
 
 #ifdef ENABLE_THREAD_INSTRUMENTATION_PREVIEW
@@ -1505,6 +1495,11 @@ private:
             thread_instrumentation->AfterWait();
           }
 #endif /* ENABLE_THREAD_INSTRUMENTATION_PREVIEW */
+
+          if (is_shutdown)
+          {
+            break;
+          }
 
           {
             std::size_t current_record_count =
@@ -1569,16 +1564,16 @@ private:
 
   struct FileStats
   {
-    std::atomic<bool> is_shutdown;
-    std::size_t rotate_index;
-    std::size_t written_size;
-    std::size_t left_flush_record_count;
+    std::atomic<bool> is_shutdown{false};
+    std::size_t rotate_index{0};
+    std::size_t written_size{0};
+    std::size_t left_flush_record_count{0};
     std::shared_ptr<std::FILE> current_file;
     std::mutex file_lock;
-    std::time_t last_checkpoint;
+    std::time_t last_checkpoint{0};
     std::string file_path;
-    std::atomic<std::size_t> record_count;
-    std::atomic<std::size_t> flushed_record_count;
+    std::atomic<std::size_t> record_count{0};
+    std::atomic<std::size_t> flushed_record_count{0};
 
     std::unique_ptr<std::thread> background_flush_thread;
     std::mutex background_thread_lock;
@@ -1615,6 +1610,7 @@ public:
 private:
   std::reference_wrapper<std::ostream> os_;
 };
+}  // namespace
 
 OtlpFileClient::OtlpFileClient(OtlpFileClientOptions &&options,
                                OtlpFileClientRuntimeOptions &&runtime_options)

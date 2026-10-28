@@ -16,6 +16,9 @@ target_link_libraries(
   PRIVATE opentelemetry-cpp::ostream_log_record_exporter
           opentelemetry-cpp::ostream_metrics_exporter
           opentelemetry-cpp::ostream_span_exporter
+          opentelemetry-cpp::ostream_log_record_exporter_builder
+          opentelemetry-cpp::ostream_metrics_exporter_builder
+          opentelemetry-cpp::ostream_span_exporter_builder
           GTest::gtest
           GTest::gtest_main)
 

@@ -13,7 +13,7 @@ foreach(testname baggage_test)
     TEST_LIST ${testname})
 endforeach()
 
-if(WITH_BENCHMARK)
+if(OTELCPP_WITH_BENCHMARK)
   add_executable(baggage_benchmark baggage_benchmark.cc)
   target_link_libraries(baggage_benchmark benchmark::benchmark
                         ${CMAKE_THREAD_LIBS_INIT} opentelemetry_api)

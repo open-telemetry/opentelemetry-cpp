@@ -7,6 +7,38 @@ include("${PROJECT_SOURCE_DIR}/cmake/thirdparty-dependency-config.cmake")
 ########################################################################
 
 #-----------------------------------------------------------------------
+# _otel_check_component_name:
+#   1. Checks if the component name is valid and not already registered or deprecated.
+#   2. Checks if any of the deprecated names conflict with existing components or deprecated names.
+#
+#-----------------------------------------------------------------------
+function(_otel_check_component_name _COMPONENT_NAME _DEPRECATED_NAMES)
+  get_property(_COMPONENTS DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENTS_LIST)
+  get_property(_DEPRECATED_COMPONENTS DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST)
+
+  # Check if the component name is already registered or deprecated
+  if(_COMPONENT_NAME IN_LIST _COMPONENTS)
+    message(FATAL_ERROR
+      "_otel_check_component_name: COMPONENT ${_COMPONENT_NAME} has already been created")
+  elseif(_COMPONENT_NAME IN_LIST _DEPRECATED_COMPONENTS)
+    message(FATAL_ERROR
+      "_otel_check_component_name: COMPONENT ${_COMPONENT_NAME} is already registered as a deprecated name")
+  endif()
+
+  # Check if any of the deprecated names conflict with existing components or deprecated names
+  foreach(_DEPRECATED_NAME IN LISTS _DEPRECATED_NAMES)
+    if(_DEPRECATED_NAME STREQUAL _COMPONENT_NAME OR _DEPRECATED_NAME IN_LIST _COMPONENTS)
+      message(FATAL_ERROR
+        "_otel_check_component_name: DEPRECATED_NAME ${_DEPRECATED_NAME} conflicts with a component name")
+    endif()
+    if(_DEPRECATED_NAME IN_LIST _DEPRECATED_COMPONENTS)
+      message(FATAL_ERROR
+        "_otel_check_component_name: DEPRECATED_NAME ${_DEPRECATED_NAME} is already registered")
+    endif()
+  endforeach()
+endfunction()
+
+#-----------------------------------------------------------------------
 # _otel_set_component_properties:
 #   Sets the component properties used for install.
 #   Properties set on PROJECT_SOURCE_DIR directory include:
@@ -27,9 +59,6 @@ function(_otel_set_component_properties)
 
     # Add the component to the current components list
     get_property(existing_components DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENTS_LIST)
-    if(_PROPERTIES_COMPONENT IN_LIST existing_components)
-      message(FATAL_ERROR "  component ${_PROPERTIES_COMPONENT} has already been created.")
-    endif()
     list(APPEND existing_components "${_PROPERTIES_COMPONENT}")
     set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_COMPONENTS_LIST "${existing_components}")
 
@@ -80,7 +109,7 @@ function(_otel_set_target_component_property _TARGET _COMPONENT)
   if(_TARGET_COMPONENT)
     message(FATAL_ERROR "  Target ${_TARGET} is already assigned to an opentelemetry-cpp COMPONENT ${_TARGET_COMPONENT}.")
   endif()
-  set_target_properties(${_TARGET} PROPERTIES INTERFACE_OTEL_COMPONENT_NAME ${_OTEL_ADD_COMP_COMPONENT})
+  set_target_properties(${_TARGET} PROPERTIES INTERFACE_OTEL_COMPONENT_NAME ${_COMPONENT})
 endfunction()
 
 #-----------------------------------------------------------------------
@@ -181,14 +210,14 @@ function(_otel_collect_component_dependencies _TARGET _COMPONENT OUT_COMPONENT_D
     endif()
 
     # Skip BUILD_INTERFACE targets
-    string(FIND "${_linked_target}" "$<BUILD_INTERFACE:" _is_build_interface)
+    string(FIND "${_linked_target}" "\$<BUILD_INTERFACE:" _is_build_interface)
     if(_is_build_interface GREATER -1)
       message(DEBUG "  - skipping BUILD_INTERFACE target: ${_linked_target}")
       continue()
     endif()
 
     # Handle targets in generator expressions
-    string(FIND "${_linked_target}" "$<" _is_generator_expression)
+    string(FIND "${_linked_target}" "\$<" _is_generator_expression)
     if(_is_generator_expression GREATER -1)
       # Find targets in generator expressions (there can be more than one per expression)
       string(REGEX MATCHALL "[A-Za-z0-9_\\-\\.]+(::[A-Za-z0-9_\\-\\.]+)*" _parsed_targets "${_linked_target}")
@@ -317,22 +346,27 @@ endfunction()
 
 #-----------------------------------------------------------------------
 # otel_add_component:
-#   Adds a component to the list of components to be installed. A component name and list of targest are required.
+#   Adds a component to the list of components to be installed. A component name and list of targets are required.
 #   Optional files can be added to the component by specifying a directory, destination and matching pattern.
 #   Each target is assigned to the component and its dependencies are identified based on the LINK_LIBRARIES property.
 #   An alias target is also created for each target in the form of PROJECT_NAME::TARGET_EXPORT_NAME.
+#   DEPRECATED_NAMES lists old component names that are redirected to this component with a deprecation warning.
+#
+#   TODO: add a DEPRECATED tag to support deprecated components that are still installed but will be removed in the future.
+#
 # Usage:
 #    otel_add_component(
 #      COMPONENT <component_name>
+#      [DEPRECATED_NAMES <old_name1> <old_name2> ...]
 #      TARGETS <target1> <target2> ...
-#      FILES_DIRECTORY <directory>
-#      FILES_DESTINATION <destination>
-#      FILES_MATCHING <matching>)
+#      [FILES_DIRECTORY <directory>
+#       FILES_DESTINATION <destination>
+#       FILES_MATCHING <matching>])
 #-----------------------------------------------------------------------
 function(otel_add_component)
-  set(optionArgs )
+  set(optionArgs DEPRECATED)
   set(oneValueArgs COMPONENT FILES_DIRECTORY FILES_DESTINATION)
-  set(multiValueArgs TARGETS FILES_MATCHING)
+  set(multiValueArgs TARGETS FILES_MATCHING DEPRECATED_NAMES)
   cmake_parse_arguments(_OTEL_ADD_COMP "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" "${ARGN}")
 
   if(NOT _OTEL_ADD_COMP_COMPONENT)
@@ -342,6 +376,8 @@ function(otel_add_component)
   if(NOT _OTEL_ADD_COMP_TARGETS)
     message(FATAL_ERROR "otel_add_component: TARGETS is required")
   endif()
+
+  _otel_check_component_name(${_OTEL_ADD_COMP_COMPONENT} "${_OTEL_ADD_COMP_DEPRECATED_NAMES}")
 
   message(DEBUG "Add COMPONENT: ${_OTEL_ADD_COMP_COMPONENT}")
   set(_COMPONENT_DEPENDS "")
@@ -378,6 +414,16 @@ function(otel_add_component)
     FILES_MATCHING ${_OTEL_ADD_COMP_FILES_MATCHING}
     COMPONENT_DEPENDS ${_COMPONENT_DEPENDS}
     THIRDPARTY_DEPENDS ${_THIRDPARTY_DEPENDS})
+
+  foreach(_DEP_NAME IN LISTS _OTEL_ADD_COMP_DEPRECATED_NAMES)
+    get_property(_deprecated_components DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST)
+    list(APPEND _deprecated_components "${_DEP_NAME}")
+    set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST "${_deprecated_components}")
+    set_property(DIRECTORY ${PROJECT_SOURCE_DIR}
+      PROPERTY OTEL_COMPONENT_REPLACEMENT_${_DEP_NAME}
+      "${_OTEL_ADD_COMP_COMPONENT}")
+    message(DEBUG "  DEPRECATED_NAME: ${_DEP_NAME} -> ${_OTEL_ADD_COMP_COMPONENT}")
+  endforeach()
 endfunction()
 
 #-----------------------------------------------------------------------
@@ -418,6 +464,26 @@ function(otel_install_components)
     _otel_populate_component_targets_block(${_COMPONENT} OTEL_COMPONENTS_TARGETS_BLOCK)
     _otel_populate_component_internal_depends_block(${_COMPONENT} OTEL_COMPONENTS_INTERNAL_DEPENDENCIES_BLOCK)
     _otel_populate_component_thirdparty_depends_block(${_COMPONENT} OTEL_COMPONENTS_THIRDPARTY_DEPENDENCIES_BLOCK)
+  endforeach()
+
+  get_property(OTEL_DEPRECATED_COMPONENTS_LIST DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY OTEL_DEPRECATED_COMPONENTS_LIST)
+
+  if(OTEL_DEPRECATED_COMPONENTS_LIST)
+     message(STATUS "Install DEPRECATED COMPONENT definitions:")
+  endif()
+
+  set(OTEL_COMPONENTS_REPLACEMENTS_BLOCK "")
+  foreach(_DEPRECATED_COMPONENT IN LISTS OTEL_DEPRECATED_COMPONENTS_LIST)
+    get_property(_REPLACEMENT_COMPONENT DIRECTORY ${PROJECT_SOURCE_DIR}
+      PROPERTY OTEL_COMPONENT_REPLACEMENT_${_DEPRECATED_COMPONENT})
+    message(STATUS "  Deprecated COMPONENT ${_DEPRECATED_COMPONENT}")
+    if(_REPLACEMENT_COMPONENT)
+      message(STATUS "    Replacement: ${_REPLACEMENT_COMPONENT}")
+      string(APPEND OTEL_COMPONENTS_REPLACEMENTS_BLOCK
+        "set(COMPONENT_${_DEPRECATED_COMPONENT}_REPLACEMENT ${_REPLACEMENT_COMPONENT})\n")
+    else()
+      message(FATAL_ERROR " no DEPRECATED_NAME on an installed component was found for ${_DEPRECATED_COMPONENT} -- deprecating components with no replacement is not currently supported.")
+    endif()
   endforeach()
 
   configure_file(

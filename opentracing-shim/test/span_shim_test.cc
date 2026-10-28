@@ -4,8 +4,8 @@
  */
 
 #include <gtest/gtest.h>
-#include <stdint.h>
 #include <chrono>
+#include <cstdint>
 #include <functional>
 #include <initializer_list>
 #include <string>

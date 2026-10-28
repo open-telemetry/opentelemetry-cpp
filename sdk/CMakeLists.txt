@@ -22,9 +22,15 @@ otel_add_component(
   opentelemetry_common
   opentelemetry_resources
   opentelemetry_version
+  opentelemetry_instrumentation_scope
   opentelemetry_logs
   opentelemetry_trace
   opentelemetry_metrics
+  opentelemetry_configuration_core
+  opentelemetry_configuration_trace_builders
+  opentelemetry_configuration_metrics_builders
+  opentelemetry_configuration_logs_builders
+  opentelemetry_configuration_registry_factory
   FILES_DIRECTORY
   "include/opentelemetry/"
   FILES_DESTINATION
@@ -33,14 +39,24 @@ otel_add_component(
   PATTERN
   "*.h"
   PATTERN
-  "sdk/configuration/*.h"
+  "sdk/configuration/configuration_parser.h"
+  EXCLUDE
+  PATTERN
+  "sdk/configuration/yaml_configuration_parser.h"
+  EXCLUDE
+  PATTERN
+  "sdk/configuration/ryml_document.h"
+  EXCLUDE
+  PATTERN
+  "sdk/configuration/ryml_document_node.h"
   EXCLUDE)
 
-if(WITH_CONFIGURATION)
+if(OTELCPP_WITH_CONFIGURATION)
   otel_add_component(
     COMPONENT
     configuration
     TARGETS
+    opentelemetry_configuration_yaml
     opentelemetry_configuration
     FILES_DIRECTORY
     "include/opentelemetry/"
@@ -48,9 +64,15 @@ if(WITH_CONFIGURATION)
     "include/opentelemetry"
     FILES_MATCHING
     PATTERN
-    "sdk/configuration/*.h")
+    "sdk/configuration/configuration_parser.h"
+    PATTERN
+    "sdk/configuration/yaml_configuration_parser.h"
+    PATTERN
+    "sdk/configuration/ryml_document.h"
+    PATTERN
+    "sdk/configuration/ryml_document_node.h")
 endif()
 
-if(BUILD_TESTING)
+if(OTELCPP_BUILD_TESTING)
   add_subdirectory(test)
 endif()

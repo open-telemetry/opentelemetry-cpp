@@ -15,6 +15,7 @@
 #include "opentelemetry/context/context.h"
 #include "opentelemetry/context/propagation/text_map_propagator.h"
 #include "opentelemetry/nostd/function_ref.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/nostd/string_view.h"
 
 using namespace opentelemetry;
@@ -46,6 +47,21 @@ public:
 
 static BaggagePropagator format;
 
+TEST(BaggagePropagatorTest, DoesNotPropagateHeaderInjection)
+{
+  for (const auto *payload : {"bad=value;a\r\nX-Injected: 1",
+                              "bad=value;a\r\n\r\nGET /smuggled HTTP/1.1\r\nHost: localhost"})
+  {
+    BaggageCarrierTest inbound;
+    inbound.Set("baggage", std::string(payload) + ",good=ok;flag");
+    context::Context base;
+    auto extracted = format.Extract(inbound, base);
+    BaggageCarrierTest outbound;
+    format.Inject(outbound, extracted);
+    EXPECT_EQ(outbound.Get("baggage"), "good=ok;flag");
+  }
+}
+
 TEST(BaggagePropagatorTest, ExtractNoBaggageHeader)
 {
   BaggageCarrierTest carrier;
@@ -54,6 +70,33 @@ TEST(BaggagePropagatorTest, ExtractNoBaggageHeader)
   context::Context ctx2 = format.Extract(carrier, ctx1);
   auto ctx2_baggage     = baggage::GetBaggage(ctx2);
   EXPECT_EQ(ctx2_baggage->ToHeader(), "");
+}
+
+TEST(BaggagePropagatorTest, ExtractEmptyOrInvalidHeaderPreservesBaggage)
+{
+  auto original_baggage = baggage::Baggage::FromHeader("key=value");
+  context::Context base;
+  auto ctx = baggage::SetBaggage(base, original_baggage);
+
+  for (const auto *header : {"", "invalid_header"})
+  {
+    BaggageCarrierTest carrier;
+    carrier.Set(baggage::kBaggageHeader, header);
+    auto extracted = format.Extract(carrier, ctx);
+    EXPECT_EQ(baggage::GetBaggage(extracted), original_baggage);
+    EXPECT_EQ(baggage::GetBaggage(ctx), original_baggage);
+  }
+}
+
+TEST(BaggagePropagatorTest, InjectNullBaggage)
+{
+  BaggageCarrierTest carrier;
+  context::Context base;
+  auto ctx = baggage::SetBaggage(base, nostd::shared_ptr<baggage::Baggage>{});
+
+  format.Inject(carrier, ctx);
+
+  EXPECT_TRUE(carrier.headers_.empty());
 }
 
 TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
@@ -87,7 +130,7 @@ TEST(BaggagePropagatorTest, ExtractAndInjectBaggage)
 
     std::vector<std::string> fields;
     format.Fields([&fields](nostd::string_view field) {
-      fields.push_back(field.data());
+      fields.emplace_back(field.data());
       return true;
     });
     EXPECT_EQ(fields.size(), 1);

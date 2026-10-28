@@ -17,20 +17,21 @@ jobs:
       matrix:
         include:
           - cmake_options: all-options-abiv1-preview
-            warning_limit: 216
+            warning_limit: 198
           - cmake_options: all-options-abiv2-preview
-            warning_limit: 226
+            warning_limit: 212
     env:
       CC: /usr/bin/clang-22
       CXX: /usr/bin/clang++-22
     steps:
       - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           submodules: recursive
 
       - name: Setup Environment
@@ -72,10 +73,13 @@ jobs:
 
       - name: Analyze clang-tidy output
         id: analyze
+        env:
+          BUILD_LOG: ${{ steps.build.outputs.build_log }}
+          CMAKE_OPTIONS: ${{ matrix.cmake_options }}
         run: |
           SCRIPT_OUTPUT=$(python3 ./ci/create_clang_tidy_report.py \
-            --build_log ${{ steps.build.outputs.build_log }} \
-            --output ./clang_tidy_report-${{ matrix.cmake_options }}.md)
+            --build_log "$BUILD_LOG" \
+            --output "./clang_tidy_report-${CMAKE_OPTIONS}.md")
           export $SCRIPT_OUTPUT
           echo "Found $TOTAL_WARNINGS unique warnings"
           echo "clang-tidy report generated at $REPORT_PATH"
@@ -84,23 +88,34 @@ jobs:
           cat $REPORT_PATH >> $GITHUB_STEP_SUMMARY
 
       - name: Upload build log
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Logs-clang-tidy-${{ matrix.cmake_options }}
           path: ${{ steps.build.outputs.build_log }}
 
       - name: Upload warning report
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: Report-clang-tidy-${{ matrix.cmake_options }}
           path: ${{ steps.analyze.outputs.report_path }}
 
       - name: Check Warning Limits
+        env:
+          WARNING_COUNT: ${{ steps.analyze.outputs.warning_count }}
+          WARNING_LIMIT: ${{ matrix.warning_limit }}
+          CMAKE_OPTIONS: ${{ matrix.cmake_options }}
         run: |
-          readonly COUNT="${{ steps.analyze.outputs.warning_count }}"
-          readonly LIMIT="${{ matrix.warning_limit }}"
+          readonly COUNT="$WARNING_COUNT"
+          readonly LIMIT="$WARNING_LIMIT"
 
-          echo "clang-tidy reported ${COUNT} unique warning(s) with preset '${{ matrix.cmake_options }}'"
+          # Print instructions to help investigations
+          echo "::notice::See instructions below to investigate warnings"
+          echo "1) Find the previous job in CI, named 'Upload warning report'"
+          echo "2) In the job logs, search for 'Artifact download URL:'"
+          echo "3) Upload the report given by the URL"
+          echo "4) Read the warnings in the report, and adjust the code accordingly."
+
+          echo "clang-tidy reported ${COUNT} unique warning(s) with preset '${CMAKE_OPTIONS}'"
           echo "Limit is ${LIMIT}"
 
           if [ "$COUNT" -gt "$LIMIT" ]; then
