@@ -198,6 +198,10 @@ Changes:
 
 * [BUG] Keep the curl retry deadline stable within an attempt
   [#4452](https://github.com/open-telemetry/opentelemetry-cpp/pull/4452)
+* [TEST] Compile each header the ext_common component installs in its own
+  translation unit, so one that stops compiling on its own fails the install
+  test
+  [#4310](https://github.com/open-telemetry/opentelemetry-cpp/issues/4310)
 
 * [SDK] Handle instrumentation object construction failures safely
   [#4469](https://github.com/open-telemetry/opentelemetry-cpp/pull/4469)
