@@ -5,10 +5,13 @@
 #include <prometheus/metric_family.h>
 #include <prometheus/metric_type.h>
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <iomanip>
 #include <limits>
+#include <locale>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -17,6 +20,7 @@
 #include <utility>
 #include <vector>
 
+#include "opentelemetry/common/detail/ascii.h"
 #include "opentelemetry/exporters/prometheus/exporter_utils.h"
 #include "opentelemetry/nostd/variant.h"
 #include "opentelemetry/sdk/common/attribute_utils.h"
@@ -95,11 +99,94 @@ inline std::string Sanitize(std::string name, const T &valid)
 std::string SanitizeLabel(std::string label_key)
 {
   return Sanitize(std::move(label_key), [](int i, char c) {
-    return (c >= 'a' && c <= 'z') ||  //
-           (c >= 'A' && c <= 'Z') ||  //
-           c == '_' ||                //
-           (c >= '0' && c <= '9' && i > 0);
+    return opentelemetry::common::detail::IsAsciiAlpha(c) || c == '_' ||
+           (opentelemetry::common::detail::IsAsciiDigit(c) && i > 0);
   });
+}
+
+std::string EscapeJsonString(const std::string &str)
+{
+  std::string out;
+  out.reserve(str.size() + 2);
+  out.push_back('"');
+  for (unsigned char c : str)
+  {
+    switch (c)
+    {
+      case '"':
+        out.append("\\\"");
+        break;
+      case '\\':
+        out.append("\\\\");
+        break;
+      case '\b':
+        out.append("\\b");
+        break;
+      case '\f':
+        out.append("\\f");
+        break;
+      case '\n':
+        out.append("\\n");
+        break;
+      case '\r':
+        out.append("\\r");
+        break;
+      case '\t':
+        out.append("\\t");
+        break;
+      default:
+        if (c <= 0x1F)
+        {
+          constexpr char kHex[] = "0123456789abcdef";
+          unsigned int uc       = static_cast<unsigned int>(c);
+          char buf[6]           = {'\\', 'u', '0', '0', kHex[(uc >> 4U) & 0x0FU], kHex[uc & 0x0FU]};
+          out.append(buf, 6);
+        }
+        else
+        {
+          out.push_back(static_cast<char>(c));
+        }
+        break;
+    }
+  }
+  out.push_back('"');
+  return out;
+}
+
+template <typename T>
+std::string NumericVectorToJson(const std::vector<T> &vec)
+{
+  std::string result;
+  result.push_back('[');
+  for (std::size_t i = 0; i < vec.size(); ++i)
+  {
+    if (i > 0)
+    {
+      result.push_back(',');
+    }
+    result.append(std::to_string(vec[i]));
+  }
+  result.push_back(']');
+  return result;
+}
+
+std::string FormatDouble(double val)
+{
+  std::ostringstream ss;
+  ss.imbue(std::locale::classic());
+  ss << std::setprecision(std::numeric_limits<double>::digits10) << val;
+  std::string str = ss.str();
+  std::istringstream iss(str);
+  iss.imbue(std::locale::classic());
+  double roundtrip = 0.0;
+  if ((iss >> roundtrip) && roundtrip == val)
+  {
+    return str;
+  }
+  ss.str("");
+  ss.clear();
+  ss << std::setprecision(std::numeric_limits<double>::max_digits10) << val;
+  return ss.str();
 }
 
 }  // namespace
@@ -143,6 +230,10 @@ std::vector<prometheus_client::MetricFamily> PrometheusExporterUtils::TranslateT
   {
     for (const auto &metric_data : instrumentation_info.metric_data_)
     {
+      if (metric_data.point_data_attr_.empty())
+      {
+        continue;
+      }
       prometheus_client::MetricFamily metric_family;
       metric_family.help = metric_data.instrument_descriptor.description_;
       auto front         = metric_data.point_data_attr_.front();
@@ -255,8 +346,8 @@ std::string PrometheusExporterUtils::SanitizeNames(std::string name)
   constexpr const auto replacement_dup = '=';
 
   auto valid = [](int i, char c) {
-    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == ':' ||
-        (c >= '0' && c <= '9' && i > 0))
+    if (opentelemetry::common::detail::IsAsciiAlpha(c) || c == ':' ||
+        (opentelemetry::common::detail::IsAsciiDigit(c) && i > 0))
     {
       return true;
     }
@@ -435,7 +526,7 @@ std::string PrometheusExporterUtils::CleanUpString(const std::string &str)
   }
   std::transform(cleaned_string.begin(), cleaned_string.end(), cleaned_string.begin(),
                  [](const char c) {
-                   if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+                   if (opentelemetry::common::detail::IsAsciiAlnum(c))
                    {
                      return c;
                    }
@@ -672,7 +763,7 @@ void PrometheusExporterUtils::SetMetricBasic(
     const opentelemetry::sdk::instrumentationscope::InstrumentationScope *scope,
     const opentelemetry::sdk::resource::Resource *resource)
 {
-  if (labels.empty() && nullptr == resource)
+  if (labels.empty() && nullptr == scope && nullptr == resource)
   {
     return;
   }
@@ -682,6 +773,15 @@ void PrometheusExporterUtils::SetMetricBasic(
   // We could sort the sanitized keys again, but this seems too expensive to do
   // in this hot code path. Instead, we ignore out-of-order keys and emit a warning.
   metric.label.reserve(labels.size() + 2);
+
+  struct LabelCollisionEntry
+  {
+    std::size_t label_index;
+    std::string original_key;
+    std::string value;
+  };
+  std::vector<LabelCollisionEntry> colliding_scope_entries;
+
   std::string previous_key;
   for (auto const &label : labels)
   {
@@ -689,12 +789,22 @@ void PrometheusExporterUtils::SetMetricBasic(
     int comparison = previous_key.compare(sanitized);
     if (metric.label.empty() || comparison < 0)  // new key
     {
-      previous_key = sanitized;
-      metric.label.push_back({sanitized, AttributeValueToString(label.second)});
+      previous_key    = sanitized;
+      std::string val = AttributeValueToString(label.second);
+      if (scope != nullptr && (sanitized == kScopeNameKey || sanitized == kScopeVersionKey))
+      {
+        colliding_scope_entries.push_back({metric.label.size(), label.first, val});
+      }
+      metric.label.push_back({sanitized, std::move(val)});
     }
     else if (comparison == 0)  // key collision after sanitation
     {
-      metric.label.back().value += ";" + AttributeValueToString(label.second);
+      std::string val = AttributeValueToString(label.second);
+      if (scope != nullptr && (sanitized == kScopeNameKey || sanitized == kScopeVersionKey))
+      {
+        colliding_scope_entries.push_back({metric.label.size() - 1, label.first, val});
+      }
+      metric.label.back().value += ";" + val;
     }
     else  // order inversion introduced by sanitation
     {
@@ -709,19 +819,53 @@ void PrometheusExporterUtils::SetMetricBasic(
   {
     return;
   }
-  auto scope_name = scope->GetName();
+
+  auto add_or_merge_scope_label = [&metric, &colliding_scope_entries](
+                                      const std::string &sanitized_key,
+                                      const std::string &original_key, const std::string &value) {
+    for (const auto &entry : colliding_scope_entries)
+    {
+      if (metric.label[entry.label_index].name == sanitized_key)
+      {
+        const std::size_t target_index = entry.label_index;
+        colliding_scope_entries.push_back({target_index, original_key, value});
+        std::vector<const LabelCollisionEntry *> matched;
+        for (const auto &candidate : colliding_scope_entries)
+        {
+          if (candidate.label_index == target_index)
+          {
+            matched.push_back(&candidate);
+          }
+        }
+        std::stable_sort(matched.begin(), matched.end(),
+                         [](const LabelCollisionEntry *a, const LabelCollisionEntry *b) {
+                           return a->original_key < b->original_key;
+                         });
+        std::string merged;
+        for (std::size_t j = 0; j < matched.size(); ++j)
+        {
+          if (j > 0)
+          {
+            merged.push_back(';');
+          }
+          merged.append(matched[j]->value);
+        }
+        metric.label[target_index].value = std::move(merged);
+        return;
+      }
+    }
+    metric.label.push_back({sanitized_key, value});
+  };
+
+  const auto &scope_name = scope->GetName();
   if (!scope_name.empty())
   {
-    metric.label.emplace_back();
-    metric.label.back().name  = kScopeNameKey;
-    metric.label.back().value = std::move(scope_name);
+    add_or_merge_scope_label(kScopeNameKey, kScopeNameKey, scope_name);
   }
-  auto scope_version = scope->GetVersion();
+  const auto &scope_version = scope->GetVersion();
   if (!scope_version.empty())
   {
-    metric.label.emplace_back();
-    metric.label.back().name  = kScopeVersionKey;
-    metric.label.back().value = std::move(scope_version);
+    add_or_merge_scope_label(kScopeVersionKey, kScopeVersionKey, scope_version);
   }
 }
 
@@ -756,6 +900,75 @@ std::string PrometheusExporterUtils::AttributeValueToString(
   else if (nostd::holds_alternative<std::string>(value))
   {
     result = nostd::get<std::string>(value);
+  }
+  else if (nostd::holds_alternative<std::vector<bool>>(value))
+  {
+    const auto &vec = nostd::get<std::vector<bool>>(value);
+    result.push_back('[');
+    for (std::size_t i = 0; i < vec.size(); ++i)
+    {
+      if (i > 0)
+      {
+        result.push_back(',');
+      }
+      result.append(vec[i] ? "true" : "false");
+    }
+    result.push_back(']');
+  }
+  else if (nostd::holds_alternative<std::vector<int>>(value))
+  {
+    result = NumericVectorToJson(nostd::get<std::vector<int>>(value));
+  }
+  else if (nostd::holds_alternative<std::vector<int64_t>>(value))
+  {
+    result = NumericVectorToJson(nostd::get<std::vector<int64_t>>(value));
+  }
+  else if (nostd::holds_alternative<std::vector<unsigned int>>(value))
+  {
+    result = NumericVectorToJson(nostd::get<std::vector<unsigned int>>(value));
+  }
+  else if (nostd::holds_alternative<std::vector<uint64_t>>(value))
+  {
+    result = NumericVectorToJson(nostd::get<std::vector<uint64_t>>(value));
+  }
+  else if (nostd::holds_alternative<std::vector<double>>(value))
+  {
+    const auto &vec = nostd::get<std::vector<double>>(value);
+    result.push_back('[');
+    for (std::size_t i = 0; i < vec.size(); ++i)
+    {
+      if (i > 0)
+      {
+        result.push_back(',');
+      }
+      if (std::isnan(vec[i]))
+      {
+        result.append("\"NaN\"");
+      }
+      else if (std::isinf(vec[i]))
+      {
+        result.append(vec[i] < 0 ? "\"-Infinity\"" : "\"Infinity\"");
+      }
+      else
+      {
+        result.append(FormatDouble(vec[i]));
+      }
+    }
+    result.push_back(']');
+  }
+  else if (nostd::holds_alternative<std::vector<std::string>>(value))
+  {
+    const auto &vec = nostd::get<std::vector<std::string>>(value);
+    result.push_back('[');
+    for (std::size_t i = 0; i < vec.size(); ++i)
+    {
+      if (i > 0)
+      {
+        result.push_back(',');
+      }
+      result.append(EscapeJsonString(vec[i]));
+    }
+    result.push_back(']');
   }
   else
   {
